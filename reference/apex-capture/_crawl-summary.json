@@ -1,0 +1,80 @@
+[
+  {
+    "slug": "dashboard",
+    "status": 200,
+    "url": "https://apexbeat.ai/dashboard",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "realtime-mcqs",
+    "status": 200,
+    "url": "https://apexbeat.ai/realtime-mcqs",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "study",
+    "status": 200,
+    "url": "https://apexbeat.ai/study",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "audios",
+    "status": 200,
+    "url": "https://apexbeat.ai/audios",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "practice",
+    "status": 200,
+    "url": "https://apexbeat.ai/practice",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "exam-papers",
+    "status": 200,
+    "url": "https://apexbeat.ai/exam-papers",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "take-exam",
+    "status": 200,
+    "url": "https://apexbeat.ai/take-exam",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "plab",
+    "status": 200,
+    "url": "https://apexbeat.ai/plab",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "community",
+    "status": 200,
+    "url": "https://apexbeat.ai/community",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "soft-skills",
+    "status": 200,
+    "url": "https://apexbeat.ai/soft-skills",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "reference-books",
+    "status": 200,
+    "url": "https://apexbeat.ai/resources/reference-books",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "subscription",
+    "status": 200,
+    "url": "https://apexbeat.ai/subscription",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  },
+  {
+    "slug": "settings",
+    "status": 200,
+    "url": "https://apexbeat.ai/settings",
+    "title": "ApexBeat - AI-Powered MBBS Mastery"
+  }
+]

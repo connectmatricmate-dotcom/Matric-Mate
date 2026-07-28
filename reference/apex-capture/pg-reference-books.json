@@ -1,0 +1,61 @@
+{
+  "url": "https://apexbeat.ai/resources/reference-books",
+  "title": "ApexBeat - AI-Powered MBBS Mastery",
+  "h1": [
+    "Reference Books: MBBS Curriculum"
+  ],
+  "h2": [
+    "Anatomy",
+    "Physiology",
+    "Biochemistry",
+    "Pathology",
+    "Pharmacology",
+    "Forensic Medicine",
+    "Community Medicine",
+    "Family Medicine",
+    "Behavioral Sciences",
+    "Ophthalmology",
+    "ENT",
+    "Medicine",
+    "Histology",
+    "Surgery",
+    "Obstetrics and Gynecology",
+    "Pediatrics"
+  ],
+  "h3": [],
+  "h4": [],
+  "buttons": [
+    "↩Logout",
+    "I",
+    "Chat with AI",
+    "Logout",
+    "Anatomy",
+    "Physiology",
+    "Biochemistry",
+    "Pathology",
+    "Pharmacology",
+    "Forensic Medicine",
+    "Community Medicine",
+    "Family Medicine",
+    "Behavioral Sciences",
+    "Ophthalmology",
+    "ENT",
+    "Medicine",
+    "Histology",
+    "Surgery",
+    "Obstetrics and Gynecology",
+    "Pediatrics"
+  ],
+  "tabs": [],
+  "tables": 0,
+  "cards": 0,
+  "listItems": 0,
+  "images": 33,
+  "audio": 0,
+  "video": 0,
+  "iframes": [
+    "https://js.stripe.com/v3/controller-with-preconnect-37b44ff6afdb1d935b5c2bcce962d8e4.html#__shared_params__[version]=v3&__shared_params__[light_experiment_assignments]=%7B%22token%22%3A%22e66618f4-af8d-488a-aa56-390684adbeb4%22%2C%22assignments%22%3A%7B%7D%7D&apiKey=pk_live_51SyD5mFWJAG4bHrYPgD4MVNj1pXTyFdrEMI5gJ3shHbwYtTKIobCH0UF4cmT5ltP99CtnPyEtqK4cxN2hObK6ToA00VZwp3fFU&stripeJsId=e66618f4-af8d-488a-aa56-390684adbeb4&stripeObjId=sobj-26169fb0-71b6-4598-8767-9a04376ec9dc&firstStripeInstanceCreatedLatency=10&controllerCount=1&isCheckout=false&stripeJsLoadTime=1781004811434&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=297b2118-b83d-4f3f-8d8c-dfc4cdd78e881c865e&mids[sid]=c6beb745-e290-4be8-8eeb-3a93151b4e8fccb965&referrer=https%3A%2F%2Fapexbeat.ai%2Fresources%2Freference-books&controllerId=__privateStripeController2431",
+    "https://js.stripe.com/v3/m-outer-3437aaddcdf6922d623e172c2d6f9278.html#url=https%3A%2F%2Fapexbeat.ai%2Fresources%2Freference-books&title=ApexBeat%20-%20AI-Powered%20MBBS%20Mastery&referrer=&muid=297b2118-b83d-4f3f-8d8c-dfc4cdd78e881c865e&sid=c6beb745-e290-4be8-8eeb-3a93151b4e8fccb965&version=6&preview=false&__shared_params__[version]=v3"
+  ],
+  "bodyText": "Anatomy Clinical Anatomy by Regions Snell R.S. · 7th ed · Lippincott Williams & Wilkins (Wolters Kluwer) · 2019 Langman's Medical Embryology Sadler T.W. · 12th ed · Lippincott Williams & Wilkins (Wolters Kluwer) · 2012 Physiology Guyton and Hall Textbook of Medical Physiology John E. Hall & Michael E. Hall · 14th ed · Elsevier · 2021 Biochemistry Lippincott Illustrated Reviews: Biochemistry 8th ed · Wolters Kluwer Pathology Robbins & Cotran Pathologic Basis of Disease Kumar V., Abbas A.K., Aster J.C. · 11th ed · Elsevier · 2025 Review of Medical Microbiology and Immunology Warren Levinson · 13th ed · Lange Pharmacology Katzung's Basic & Clinical Pharmacology Katzung B.G., Vanderah T.W. · 12th ed · McGraw-Hill Forensic Medicine Principles of Forensic Medicine and Toxicology Rajesh Bardley · Jaypee Principles & Practice of Forensic Medicine Nasib R. Awan · 2nd ed · Zubair Books (Lahore) · 2018 Community Medicine Park's Textbook of Preventive and Social Medicine K. Park · 27th ed · Banarsidas Bhanot Publishers Family Medicine Oxford Handbook of General Practice Chantal Simon & Hazel Everitt · 5th ed · Oxford University Press · 2020 Behavioral Sciences Handbook of Behavioral Sciences Mowadat H. Rana · 3rd ed · 2016 Ophthalmology Basic Ophthalmology Renu Jogi · 4th ed · Jaypee Oxford American Handbook of Ophthalmology James C. Tsai, Philip I. Murray, John J. Huang · Oxford University Press ENT Diseases of Ear, Nose & Throat P.L. Dhingra · 4th ed Logan Turner's Diseases of Nose, Throat and Ear 11th ed Medicine Davidson's Principles and Practice of Medicine 24th ed · Elsevier · 2022 ABC of Dermatology 7th ed · Wiley-Blackwell · 2021 Histology Junqueira's Basic Histology Anthony L. Mesher · 15th ed Surgery Bailey & Love's Short Practice of Surgery 25th ed Obstetrics and Gynecology Gynecology by Ten Teachers Helen Bickerstaff, Louise C Kenny (Editors) · 20th ed · CRC Press Obstetrics by Ten Teachers Louise C. Kenny & Fergus McCarthy (Editors) · 20th ed · CRC Press Pediatrics Nelson Textbook of Pediatrics Robert M. Kliegman & Joseph W. St. Geme III · 22nd ed · Elsevier Basis of Pediatrics Pervez Akbar Khan · 11th ed"
+}

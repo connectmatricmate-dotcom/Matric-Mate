@@ -1,0 +1,39 @@
+{
+  "url": "https://apexbeat.ai/settings",
+  "title": "ApexBeat - AI-Powered MBBS Mastery",
+  "h1": [
+    "What's up, Doc?"
+  ],
+  "h2": [
+    "About you",
+    "Security"
+  ],
+  "h3": [
+    "Your profile"
+  ],
+  "h4": [],
+  "buttons": [
+    "Feedback",
+    "↩Logout",
+    "Chat with AI",
+    "I",
+    "Chat with AI",
+    "Logout",
+    "My notes",
+    "Save profile",
+    "Set new password",
+    "Log out"
+  ],
+  "tabs": [],
+  "tables": 0,
+  "cards": 0,
+  "listItems": 0,
+  "images": 39,
+  "audio": 0,
+  "video": 0,
+  "iframes": [
+    "https://js.stripe.com/v3/controller-with-preconnect-37b44ff6afdb1d935b5c2bcce962d8e4.html#__shared_params__[version]=v3&__shared_params__[light_experiment_assignments]=%7B%22token%22%3A%22fd938299-e274-400d-9abd-41faafbec93b%22%2C%22assignments%22%3A%7B%7D%7D&apiKey=pk_live_51SyD5mFWJAG4bHrYPgD4MVNj1pXTyFdrEMI5gJ3shHbwYtTKIobCH0UF4cmT5ltP99CtnPyEtqK4cxN2hObK6ToA00VZwp3fFU&stripeJsId=fd938299-e274-400d-9abd-41faafbec93b&stripeObjId=sobj-918560ed-6c20-48eb-ab40-e0b9dc0ca82e&firstStripeInstanceCreatedLatency=10&controllerCount=1&isCheckout=false&stripeJsLoadTime=1781004823876&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=297b2118-b83d-4f3f-8d8c-dfc4cdd78e881c865e&mids[sid]=c6beb745-e290-4be8-8eeb-3a93151b4e8fccb965&referrer=https%3A%2F%2Fapexbeat.ai%2Fsettings&controllerId=__privateStripeController0221",
+    "https://js.stripe.com/v3/m-outer-3437aaddcdf6922d623e172c2d6f9278.html#url=https%3A%2F%2Fapexbeat.ai%2Fsettings&title=ApexBeat%20-%20AI-Powered%20MBBS%20Mastery&referrer=&muid=297b2118-b83d-4f3f-8d8c-dfc4cdd78e881c865e&sid=c6beb745-e290-4be8-8eeb-3a93151b4e8fccb965&version=6&preview=false&__shared_params__[version]=v3"
+  ],
+  "bodyText": "My notes About you First name Last name Email Phone +92 Username City Medical college Study year Select year Year 1 Year 2 Year 3 Year 4 Year 5 Study mode Select mode Year-wise Modular Save profile Security Password Set new password Your profile Imran Rasheed dino14986@gmail.com Log out"
+}

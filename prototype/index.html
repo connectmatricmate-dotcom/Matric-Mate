@@ -1,0 +1,1029 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MatricMate — Clickable Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#096A8B; --teal-d:#0F5064; --teal-t:#E9F2F5; --teal-t2:#D5E7ED;
+  --ink:#0F3D4C; --ink2:#517682; --ink3:#8AA4AD;
+  --paper:#FAFBF7; --card:#FFFFFF; --line:#E4EAE6;
+  --orange:#F29329; --orange-d:#D97B10; --orange-t:#FDF1E1;
+  --green:#2E9E5B; --green-t:#E7F5EC; --red:#D9534F; --red-t:#FBECEB;
+  --disp:'Baloo 2',ui-rounded,'Segoe UI',system-ui,sans-serif;
+  --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --ur:'Noto Nastaliq Urdu','Jameel Noori Nastaleeq',serif;
+  --sh:0 6px 20px rgba(15,80,100,.07);
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+svg:not([width]){width:20px;height:20px;flex:none}
+html,body{height:100%}
+body{font-family:var(--body);color:var(--ink);background:#EDF1EE;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#C9D6D2;border-radius:8px}
+
+/* ---------- viewer chrome ---------- */
+#viewer{display:grid;grid-template-columns:284px 1fr 316px;height:100vh}
+#nav{background:var(--card);border-right:1px solid var(--line);overflow-y:auto;padding:14px 12px 40px}
+#nav .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 14px}
+#nav .brand img{height:30px}
+#nav .brand small{display:block;color:var(--ink2);font-size:11px;font-weight:600}
+#nav .grp{margin-top:14px}
+#nav .grp>h4{font-family:var(--disp);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);padding:0 8px 6px;display:flex;justify-content:space-between;align-items:center}
+#nav .grp>h4 .m{font-size:10px;background:var(--teal-t);color:var(--teal);border-radius:99px;padding:2px 8px;letter-spacing:0}
+#nav a{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:10px;color:var(--ink);text-decoration:none;font-size:13.5px;font-weight:600}
+#nav a:hover{background:var(--paper)}
+#nav a.on{background:var(--teal);color:#fff}
+#nav a .n{color:var(--ink3);font-size:11px;font-weight:700;width:18px;flex:none}
+#nav a.on .n{color:rgba(255,255,255,.7)}
+#stage{display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+#notes{background:var(--card);border-left:1px solid var(--line);overflow-y:auto;padding:18px 18px 40px}
+#notes h3{font-family:var(--disp);font-size:17px;margin-bottom:2px}
+#notes .m{display:inline-block;font-size:11px;font-weight:800;background:var(--orange-t);color:var(--orange-d);border-radius:99px;padding:2px 9px;margin:4px 0 10px}
+#notes ul{list-style:none;display:grid;gap:8px;margin-top:8px}
+#notes li{font-size:13px;line-height:1.5;color:var(--ink);padding-left:14px;position:relative}
+#notes li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:99px;background:var(--teal)}
+#notes .hint{margin-top:16px;padding:10px 12px;background:var(--paper);border:1px solid var(--line);border-radius:12px;font-size:12px;color:var(--ink2);line-height:1.5}
+
+/* ---------- phone frame ---------- */
+#phonewrap{transform-origin:center center}
+.phone{width:390px;height:844px;background:#0B2E3A;border-radius:52px;padding:10px;box-shadow:0 30px 80px rgba(15,80,100,.35)}
+.phone-in{position:relative;width:100%;height:100%;background:var(--paper);border-radius:42px;overflow:hidden}
+.sbar{position:absolute;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:13px;font-weight:800;z-index:40;pointer-events:none}
+.sbar .pill-notch{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:110px;height:26px;background:#0B2E3A;border-radius:99px}
+.sbar svg{width:17px;height:17px}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:44px}
+.scr.dark{background:var(--teal-d)}
+.body{flex:1;overflow-y:auto;padding:8px 18px 24px;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.body.pad0{padding:0}
+.gesture{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:120px;height:4px;border-radius:99px;background:rgba(15,80,100,.25);z-index:40;pointer-events:none}
+
+/* ---------- desktop frame ---------- */
+#deskwrap{display:none;transform-origin:center center}
+.deskframe{width:1240px;background:#0B2E3A;border-radius:18px;padding:8px;box-shadow:0 30px 80px rgba(15,80,100,.3)}
+.desk-chrome{display:flex;align-items:center;gap:8px;padding:6px 10px 10px}
+.desk-chrome i{width:11px;height:11px;border-radius:99px;background:#3F6675;display:inline-block}
+.desk-chrome .url{flex:1;background:#123C4A;color:#9FC0CB;border-radius:8px;font-size:12px;padding:5px 12px;font-weight:600}
+.desk-in{position:relative;height:780px;background:var(--paper);border-radius:10px;overflow:hidden}
+.desk-body{position:absolute;inset:0;overflow-y:auto}
+
+/* ---------- shared app components ---------- */
+.hdr{display:flex;align-items:center;gap:10px;padding:10px 18px 6px;min-height:52px}
+.hdr .tt{font-family:var(--disp);font-size:20px;font-weight:700;flex:1;line-height:1.2}
+.hdr .sub{font-size:12px;color:var(--ink2);font-weight:700}
+.icb{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--line);flex:none;position:relative}
+.icb svg{width:20px;height:20px}
+.icb.plain{background:none;border:0}
+.icb .dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:99px;background:var(--orange);border:2px solid var(--paper)}
+.ava{width:40px;height:40px;border-radius:14px;background:var(--orange-t);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none;border:1px solid var(--line)}
+.tabbar{display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(10px + 8px)}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:800;color:var(--ink3);padding:5px 0;border-radius:12px}
+.tabbar button svg{width:22px;height:22px}
+.tabbar button.on{color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:14px}
+.card.flat{box-shadow:none}
+.stit{font-family:var(--disp);font-size:15px;font-weight:700;margin:16px 2px 8px;display:flex;justify-content:space-between;align-items:baseline}
+.stit a{font-size:12px;color:var(--teal);text-decoration:none;font-weight:800}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:16px;font-family:var(--disp);font-size:16px;font-weight:700;background:var(--teal);color:#fff}
+.btn svg{width:18px;height:18px}
+.btn.orange{background:var(--orange);color:#fff}
+.btn.ghost{background:none;color:var(--teal)}
+.btn.line{background:var(--card);border:1.5px solid var(--teal-t2);color:var(--teal)}
+.btn.sm{padding:9px 14px;font-size:14px;border-radius:12px;width:auto}
+.btn:disabled{opacity:.4}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;border-radius:99px;padding:4px 10px;background:var(--teal-t);color:var(--teal)}
+.pill.or{background:var(--orange-t);color:var(--orange-d)}
+.pill.gr{background:var(--green-t);color:var(--green)}
+.pill.rd{background:var(--red-t);color:var(--red)}
+.pill.gy{background:#EFF3F0;color:var(--ink2)}
+.pill svg{width:12px;height:12px}
+.seg{display:flex;background:#EFF3F0;border-radius:13px;padding:3px;gap:3px}
+.seg button{flex:1;padding:8px 6px;border-radius:10px;font-size:13px;font-weight:800;color:var(--ink2)}
+.seg button.on{background:var(--card);color:var(--teal);box-shadow:0 1px 4px rgba(15,80,100,.12)}
+.inp{margin-bottom:12px}
+.inp label{display:block;font-size:12.5px;font-weight:800;color:var(--ink2);margin-bottom:6px}
+.inp .f{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-size:15px;font-weight:600;color:var(--ink)}
+.inp .f svg{width:18px;height:18px;color:var(--ink3);flex:none}
+.inp .f i{font-style:normal;color:var(--ink3);margin-left:auto}
+.inp .f.focus{border-color:var(--teal)}
+.item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .ic{width:42px;height:42px;border-radius:13px;background:var(--teal-t);display:flex;align-items:center;justify-content:center;flex:none;font-size:20px}
+.item .ic svg{width:20px;height:20px;color:var(--teal)}
+.item .ic.or{background:var(--orange-t)} .item .ic.or svg{color:var(--orange-d)}
+.item b{display:block;font-size:14.5px;font-weight:800}
+.item small{display:block;font-size:12px;color:var(--ink2);font-weight:600;margin-top:1px}
+.item .mid{flex:1;min-width:0}
+.item .chev{color:var(--ink3)}.item .chev svg{width:18px;height:18px}
+.bar{height:7px;background:#EAF0EC;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--orange)}
+.bar.tl i{background:var(--teal)}
+.opt{display:flex;align-items:center;gap:11px;background:var(--card);border:1.5px solid var(--line);border-radius:15px;padding:13px 14px;margin-bottom:10px;font-size:14.5px;font-weight:700;text-align:left;width:100%}
+.opt .k{width:26px;height:26px;border-radius:9px;background:#EFF3F0;color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;flex:none}
+.opt.sel{border-color:var(--teal);background:var(--teal-t)}
+.opt.sel .k{background:var(--teal);color:#fff}
+.opt.ok{border-color:var(--green);background:var(--green-t)} .opt.ok .k{background:var(--green);color:#fff}
+.opt.bad{border-color:var(--red);background:var(--red-t)} .opt.bad .k{background:var(--red);color:#fff}
+.footcta{padding:10px 18px 14px;background:linear-gradient(transparent,var(--paper) 40%)}
+.ur{font-family:var(--ur);direction:rtl;line-height:2.1}
+.tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.center{text-align:center}
+.toast{position:absolute;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;font-weight:700;padding:10px 16px;border-radius:99px;opacity:0;transition:opacity .2s;z-index:60;white-space:nowrap}
+.toast.show{opacity:1}
+.lockrow{filter:grayscale(.2);opacity:.62}
+.sheetback{position:absolute;inset:0;background:rgba(11,46,58,.45);z-index:50;display:flex;align-items:flex-end;border-radius:42px}
+.sheet{background:var(--paper);width:100%;border-radius:26px 26px 0 0;padding:10px 18px 26px;max-height:78%;overflow-y:auto}
+.sheet .grab{width:44px;height:5px;border-radius:99px;background:#C9D6D2;margin:4px auto 12px}
+.skel{background:linear-gradient(90deg,#EAF0EC 25%,#F4F8F5 50%,#EAF0EC 75%);background-size:200% 100%;animation:sk 1.2s infinite linear;border-radius:12px}
+@keyframes sk{to{background-position:-200% 0}}
+.flame{display:inline-flex;animation:fl 1.6s ease-in-out 2}
+@keyframes fl{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.pkm{display:flex;gap:8px;margin:6px 0 12px}
+.pkm button{flex:1;padding:10px 6px;border-radius:13px;border:1.5px solid var(--line);background:var(--card);font-size:12.5px;font-weight:800;color:var(--ink2)}
+.pkm button.on{border-color:var(--orange);background:var(--orange-t);color:var(--orange-d)}
+.fcard{perspective:1200px;height:340px}
+.fcard .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s}
+.fcard.flip .in{transform:rotateY(180deg)}
+.fcard .face{position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;border-radius:22px}
+.fcard .front{background:var(--card);border:1.5px solid var(--line);box-shadow:var(--sh)}
+.fcard .back{background:var(--teal);color:#fff;transform:rotateY(180deg)}
+.chat{display:grid;gap:12px}
+.msg{max-width:82%;padding:11px 14px;border-radius:18px;font-size:14px;line-height:1.55;font-weight:600}
+.msg.me{background:var(--teal);color:#fff;justify-self:end;border-bottom-right-radius:6px}
+.msg.ai{background:var(--card);border:1px solid var(--line);justify-self:start;border-bottom-left-radius:6px}
+.msg .step{display:flex;gap:8px;margin-top:8px;font-size:13.5px}
+.msg .step b{flex:none;width:20px;height:20px;border-radius:99px;background:var(--teal-t);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px}
+.typing i{display:inline-block;width:6px;height:6px;border-radius:99px;background:var(--ink3);margin-right:3px;animation:ty 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes ty{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.kpi b{font-family:var(--disp);font-size:22px;display:block}
+.kpi small{font-size:11.5px;color:var(--ink2);font-weight:700}
+.dial{position:relative;width:150px;height:150px;margin:0 auto}
+.dial svg{transform:rotate(-90deg)}
+.dial .v{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp)}
+.dial .v b{font-size:30px}
+.dial .v small{font-size:12px;color:var(--ink2);font-weight:700}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:45}
+.confetti i{position:absolute;top:-12px;width:8px;height:12px;border-radius:2px;animation:cf 1.6s ease-in forwards}
+@keyframes cf{to{transform:translateY(880px) rotate(540deg);opacity:.1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- web/admin inner layouts ---------- */
+.wshell{display:grid;grid-template-columns:224px 1fr;min-height:780px}
+.wside{background:var(--card);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.wside img{height:26px;align-self:flex-start;margin:0 8px 14px}
+.wside a{display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:11px;font-size:13.5px;font-weight:800;color:var(--ink2);text-decoration:none}
+.wside a svg{width:18px;height:18px}
+.wside a.on{background:var(--teal-t);color:var(--teal)}
+.wside .sp{flex:1}
+.wmain{padding:22px 26px;max-width:1040px}
+.wtop{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.wtop .srch{flex:1;max-width:380px;display:flex;gap:8px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:9px 13px;font-size:13px;color:var(--ink3);font-weight:600}
+.wtop .srch svg{width:16px;height:16px}
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13px}
+.tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);text-align:left;padding:10px 12px;background:var(--paper);border-bottom:1px solid var(--line)}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--line);font-weight:600}
+.tbl tr:last-child td{border-bottom:0}
+
+/* ---------- mobile viewing ---------- */
+#fabs{display:none}
+@media (max-width:920px){
+  #viewer{grid-template-columns:1fr}
+  #nav,#notes{display:none}
+  #stage{height:100vh;height:100dvh}
+  .phone{width:100vw;height:100vh;height:100dvh;border-radius:0;padding:0;box-shadow:none}
+  .phone-in{border-radius:0}
+  .sbar .pill-notch{display:none}
+  #fabs{display:flex;position:fixed;right:14px;bottom:90px;flex-direction:column;gap:10px;z-index:90}
+  #fabs button{width:46px;height:46px;border-radius:99px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(15,80,100,.35)}
+  #fabs button svg{width:20px;height:20px}
+  #msheet{position:fixed;inset:0;background:rgba(11,46,58,.5);z-index:100;display:none;align-items:flex-end}
+  #msheet.show{display:flex}
+  #msheet>div{background:var(--paper);width:100%;max-height:76vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:16px}
+  .deskframe{width:1240px}
+}
+</style>
+</head>
+<body>
+<div id="viewer">
+  <aside id="nav">
+    <div class="brand"><img id="brandimg" alt="MatricMate"><div><small>Clickable prototype · v1</small><small id="cnt"></small></div></div>
+    <div id="navlist"></div>
+  </aside>
+  <main id="stage">
+    <div id="phonewrap">
+      <div class="phone"><div class="phone-in" id="phone-in">
+        <div class="sbar"><span>9:41</span><span class="pill-notch"></span><span style="display:flex;gap:5px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="18" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><rect x="4" y="9" width="12" height="6" rx="1"/><path d="M22 10v4"/></svg></span></div>
+        <div id="scrhost"></div>
+        <div class="gesture"></div>
+        <div class="toast" id="toast"></div>
+      </div></div>
+    </div>
+    <div id="deskwrap">
+      <div class="deskframe">
+        <div class="desk-chrome"><i></i><i></i><i></i><div class="url" id="deskurl">matricmate.pk</div></div>
+        <div class="desk-in"><div class="desk-body" id="deskhost"></div></div>
+      </div>
+    </div>
+  </main>
+  <aside id="notes"><div id="notebody"></div></aside>
+</div>
+<div id="fabs">
+  <button id="fab-list" aria-label="All screens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <button id="fab-note" aria-label="Screen notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
+</div>
+<div id="msheet"><div id="msheet-in"></div></div>
+<script>
+/* ============ assets ============ */
+const IMG={mono:"data:image/png;base64,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",word:"data:image/png;base64,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",lockup:"data:image/png;base64,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"};
+
+/* ============ icons ============ */
+const P={
+home:'M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5M9 21v-6h6v6',
+book:'M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19a2 2 0 0 1 2-2h13M8 7h7',
+target:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM12 13a1 1 0 1 0 0-2',
+spark:'M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4L12 3ZM19 15l.9 2.6L22.5 18l-2.6.9L19 21.5l-.9-2.6L15.5 18l2.6-.9L19 15Z',
+chart:'M4 20V10M10 20V4M16 20v-7M21 20H3',
+user:'M12 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM5 20a7 7 0 0 1 14 0',
+bell:'M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6ZM10 19a2 2 0 0 0 4 0',
+flame:'M12 3s5 4.5 5 9a5 5 0 0 1-10 0c0-1.5.5-2.8 1.2-4C9 9.5 10 10 10.5 9c.6-1.2.3-3.4 1.5-6Z',
+back:'M15 5l-7 7 7 7', chevr:'M9 5l7 7-7 7', close:'M6 6l12 12M18 6 6 18',
+play:'M8 5.5v13l11-6.5-11-6.5Z', pause:'M8 5h3v14H8zM13 5h3v14h-3z',
+dl:'M12 3v11m0 0 4-4m-4 4-4-4M4 20h16',
+check:'M4.5 12.5 10 18 19.5 7', lock:'M6 11V8a6 6 0 1 1 12 0v3M5 11h14v10H5zM12 15v3',
+search:'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM20 20l-4.5-4.5',
+cam:'M4 8h3l2-2.5h6L17 8h3v11H4zM12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+mic:'M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm6-3a6 6 0 0 1-12 0M12 17v4',
+send:'M4 12 20 4l-4 8 4 8-16-8ZM20 4 10 12',
+doc:'M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5',
+clock:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5l3.5 2',
+gear:'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7.5-3a7.5 7.5 0 0 0-.2-1.6l2.1-1.6-2-3.4-2.5 1a7.6 7.6 0 0 0-2.7-1.6L13.7 2h-3.4l-.5 2.8a7.6 7.6 0 0 0-2.7 1.6l-2.5-1-2 3.4L4.7 10a7.5 7.5 0 0 0 0 3.2l-2.1 1.6 2 3.4 2.5-1a7.6 7.6 0 0 0 2.7 1.6l.5 2.8h3.4l.5-2.8a7.6 7.6 0 0 0 2.7-1.6l2.5 1 2-3.4-2.1-1.6c.13-.5.2-1.05.2-1.6Z',
+card:'M3 6h18v12H3zM3 10h18M7 15h4',
+share:'M18 8a2.5 2.5 0 1 0-2.4-3.2L8.9 8.2a2.5 2.5 0 1 0 0 7.6l6.7 3.4A2.5 2.5 0 1 0 18 16l-7-3.5v-1L18 8Z',
+trash:'M5 7h14M9 7V4h6v3M8 7l1 13h6l1-13M10 11v5M14 11v5',
+plus:'M12 5v14M5 12h14', dots:'M6 12h.01M12 12h.01M18 12h.01',
+eye:'M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+wifioff:'M2 3l19 19M8.5 16.5a5 5 0 0 1 5.4-1.1M5 12.5a10 10 0 0 1 4-2.4m6.8 1a10 10 0 0 1 3.2 1.9M2 8.8A15 15 0 0 1 7 6m8.6-.6A15 15 0 0 1 22 8.8M12 20h.01',
+refresh:'M20 12a8 8 0 1 1-2.3-5.6M20 3v4h-4',
+edit:'M14 5.5 18.5 10 8 20.5H3.5V16L14 5.5ZM12 8l4 4',
+out:'M14 8V5H4v14h10v-3M9 12h11m0 0-3-3m3 3-3 3',
+help:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM9.5 9.2A2.6 2.6 0 0 1 14.6 10c0 1.8-2.6 2-2.6 3.6M12 17h.01',
+head:'M4 14a8 8 0 1 1 16 0M4 14v3a2 2 0 0 0 2 2h1v-6H6a2 2 0 0 0-2 1Zm16 0v3a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 1Z',
+cards:'M4 7l9-4 7 3.5-9 4L4 7Zm0 0v10l9 4m0-14v14m7-10.5v10L13 21',
+quill:'M20 4c-6 0-11 3-13.5 8.5C5 16 4 20 4 20s4-1 7.5-2.5C17 15 20 10 20 4ZM4 20 14 10',
+flask:'M9 3h6M10 3v5.5L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 8.5V3M7 15h10',
+calc:'M5 3h14v18H5zM8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01',
+leaf:'M5 20C5 10 11 4 20 4c0 9-6 15-15 16Zm0 0c2-6 6-10 11-12',
+globe:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-9-9h18M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18Z',
+moon:'M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z',
+bolt:'M13 2 4 14h6l-1 8 9-12h-6l1-8Z',
+filter:'M4 5h16l-6 7v6l-4 2v-8L4 5Z',
+star:'M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.4 6.8 19.2l1-5.9L3.5 9.2l5.9-.8L12 3Z',
+wa:'M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3Zm4.2 12.3c-.7.5-2.4.3-4.6-1s-3.5-3-3.8-4.3c-.2-1 .4-1.7.8-2 .3-.2.7-.1.9.2l.9 1.5c.2.3.1.6-.1.9l-.4.5c.3.8 1 1.6 1.7 2.2.6.5 1.3.9 1.9 1l.5-.5c.2-.3.6-.3.9-.2l1.5.8c.3.2.4.7.1 1Z'};
+function ic(n,s){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"'+(s?' style="'+s+'"':'')+'><path d="'+P[n]+'"/></svg>'}
+
+/* ============ sample data (FBISE Class 9) ============ */
+const SUBJ=[
+ {id:'phy',n:'Physics',ic:'bolt',ch:9,p:62,cont:'Ch 3 · Dynamics'},
+ {id:'chem',n:'Chemistry',ic:'flask',ch:8,p:41,cont:'Ch 2 · Structure of Atoms'},
+ {id:'bio',n:'Biology',ic:'leaf',ch:9,p:28,cont:'Ch 4 · Cells and Tissues'},
+ {id:'math',n:'Mathematics',ic:'calc',ch:17,p:55,cont:'Ch 5 · Factorization'},
+ {id:'eng',n:'English',ic:'book',ch:12,p:70,cont:'Unit 6 · Fitness First'},
+ {id:'urd',n:'Urdu',ur:'اردو',ic:'quill',ch:13,p:33,cont:'سبق ۴ · نصوح اور سلیم'},
+ {id:'isl',n:'Islamiyat',ur:'اسلامیات',ic:'star',ch:7,p:48,cont:'باب ۲'},
+];
+const PHY_CH=[
+ {n:1,t:'Physical Quantities & Measurement',p:100,mc:38},
+ {n:2,t:'Kinematics',p:100,mc:42},
+ {n:3,t:'Dynamics',p:64,mc:40,cur:1},
+ {n:4,t:'Turning Effect of Forces',p:20,mc:36},
+ {n:5,t:'Gravitation',p:0,mc:30},
+ {n:6,t:'Work and Energy',p:0,mc:34},
+ {n:7,t:'Properties of Matter',p:0,mc:32,lock:1},
+ {n:8,t:'Thermal Properties of Matter',p:0,mc:35,lock:1},
+ {n:9,t:'Transfer of Heat',p:0,mc:28,lock:1},
+];
+
+/* ============ registry / router ============ */
+const REG=[]; const BYID={};
+function scr(id,group,title,kind,m,note,fn){const s={id,group,title,kind,m,note,fn};REG.push(s);BYID[id]=s}
+let CUR=null, HIST=[];
+function go(id,push=true){const s=BYID[id];if(!s)return;if(push&&CUR)HIST.push(CUR.id);CUR=s;
+ const ph=document.getElementById('phonewrap'),dw=document.getElementById('deskwrap');
+ if(s.kind==='desk'){ph.style.display='none';dw.style.display='block';document.getElementById('deskhost').innerHTML=s.fn();document.getElementById('deskurl').textContent=s.url||'matricmate.pk';}
+ else{ph.style.display='block';dw.style.display='none';document.getElementById('scrhost').innerHTML='<div class="scr'+(s.darkbar?' dark':'')+'">'+s.fn()+'</div>';}
+ history.replaceState(null,'','#'+id);
+ document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.id===id));
+ const on=document.querySelector('#nav a.on');if(on)on.scrollIntoView({block:'nearest'});
+ renderNote(s); fit(); if(s.after)s.after();
+}
+function back(){const p=HIST.pop();if(p)go(p,false)}
+function renderNote(s){document.getElementById('notebody').innerHTML=
+ '<h3>'+s.title+'</h3><span class="m">Ships in '+s.m+'</span><ul>'+s.note.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
+ '<div class="hint">Prototype only — data is sample FBISE Class 9 content. Tap anything highlighted; every screen is reachable from the index. Spec: docs/DESIGN-SPEC.md.</div>'}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1600)}
+
+/* ============ shared partials ============ */
+function hdr(t,o={}){return '<div class="hdr">'+
+ (o.back?'<button class="icb plain" data-back>'+ic('back')+'</button>':'')+
+ '<div style="flex:1;min-width:0"><div class="tt">'+t+'</div>'+(o.sub?'<div class="sub">'+o.sub+'</div>':'')+'</div>'+
+ (o.right||'')+'</div>'}
+const TABS=[['dash','home','Home'],['subjects','book','Study'],['practice','target','Practice'],['ai-home','spark','AI Tutor'],['prog','chart','Progress']];
+function tabs(on){return '<div class="tabbar">'+TABS.map(t=>'<button class="'+(t[0]===on?'on':'')+'" data-go="'+t[0]+'">'+ic(t[1])+t[2]+'</button>').join('')+'</div>'}
+function item(o){return '<div class="item'+(o.lock?' lockrow':'')+'" '+(o.go?'data-go="'+o.go+'"':'')+' style="cursor:pointer">'+
+ (o.emoji?'<div class="ic'+(o.or?' or':'')+'">'+o.emoji+'</div>':o.icn?'<div class="ic'+(o.or?' or':'')+'">'+ic(o.icn)+'</div>':'')+
+ '<div class="mid"><b>'+o.t+'</b>'+(o.s?'<small>'+o.s+'</small>':'')+(o.bar!=null?'<div class="bar tl" style="margin-top:7px"><i style="width:'+o.bar+'%"></i></div>':'')+'</div>'+
+ (o.r||(o.lock?'<span class="pill gy">'+ic('lock')+'Premium</span>':'<span class="chev">'+ic('chevr')+'</span>'))+'</div>'}
+function ring(p,size=54,col='var(--teal)'){const r=(size-8)/2,c=2*Math.PI*r;return '<svg width="'+size+'" height="'+size+'" style="transform:rotate(-90deg)"><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="#EAF0EC" stroke-width="7"/><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+c*(1-p/100)+'"/></svg>'}
+function obdots(n){let h='<div style="display:flex;gap:6px;justify-content:center;margin:2px 0 14px">';for(let i=1;i<=4;i++)h+='<span style="width:'+(i===n?22:8)+'px;height:8px;border-radius:99px;background:'+(i<=n?'var(--teal)':'#DDE6E1')+'"></span>';return h+'</div>'}
+function pkmeter(){return '<div class="tag" style="margin:4px 2px 6px">How sure are you?</div><div class="pkm" id="pkm">'+
+ '<button data-pk="0">Tukka 🎲</button><button data-pk="1">Thora sure</button><button data-pk="2">Pakka ✓</button></div>'}
+/* ============ ONBOARDING ============ */
+scr('splash','Onboarding','Splash','phone','M1',
+ ['Auto-advances after ~1.2 s: logged-in → Dashboard, else → Welcome. (Prototype: tap anywhere.)','No spinner unless startup exceeds 1 s.','Brand monogram + wordmark on paper background.'],
+ ()=>'<div class="body center" data-go="welcome" style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;cursor:pointer">'+
+ '<img src="'+IMG.mono+'" style="width:190px"><img src="'+IMG.word+'" style="width:210px">'+
+ '<div class="tag" style="margin-top:10px">Your 9th &amp; 10th study mate</div></div>');
+
+const WSLIDES=[
+ {e:'📚',h:'Poori tayyari, one app',s:'Chapter-wise notes, audio lessons and examples for FBISE Class 9 — English aur Urdu medium.'},
+ {e:'🎯',h:'Practice till it sticks',s:'MCQs, flashcards, fill-in-the-blanks, past papers and timed exams — with instant explanations.'},
+ {e:'✨',h:'Your 24/7 AI tutor',s:'Stuck on a question at 1 AM? Ask a doubt and get step-by-step help, in English or Urdu.'}];
+let wIdx=0;
+scr('welcome','Onboarding','Welcome carousel','phone','M1',
+ ['3 slides, swipeable; dots indicate position.','"Get started" → Choose class. "Log in" for returning users.','Skip is implicit — CTA is always visible.'],
+ ()=>'<div class="body" style="display:flex;flex-direction:column">'+
+ '<img src="'+IMG.word+'" style="width:150px;margin:12px auto 0">'+
+ '<div class="center" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:0 10px">'+
+ '<div style="font-size:84px">'+WSLIDES[wIdx].e+'</div>'+
+ '<div style="font-family:var(--disp);font-size:25px;font-weight:800;line-height:1.15">'+WSLIDES[wIdx].h+'</div>'+
+ '<p style="color:var(--ink2);font-size:14.5px;font-weight:600;line-height:1.6">'+WSLIDES[wIdx].s+'</p>'+
+ '<div style="display:flex;gap:6px;justify-content:center;margin-top:6px">'+WSLIDES.map((_,i)=>'<button data-slide="'+i+'" style="width:'+(i===wIdx?22:8)+'px;height:8px;border-radius:99px;background:'+(i===wIdx?'var(--orange)':'#DDE6E1')+'"></button>').join('')+'</div></div>'+
+ '<div style="display:grid;gap:8px;padding-bottom:8px">'+
+ (wIdx<2?'<button class="btn" data-slide="'+(wIdx+1)+'">Next</button>':'<button class="btn orange" data-go="ob-class">Get started</button>')+
+ '<button class="btn ghost" data-go="login">I already have an account</button></div></div>');
+
+function obChoice(step,title,sub,cards,next){return '<div class="body">'+hdr(title,{back:1,sub})+obdots(step)+
+ '<div style="display:grid;gap:12px;padding:0 2px">'+cards+'</div></div>'+
+ '<div class="footcta"><button class="btn" data-go="'+next+'">Continue</button></div>'}
+function bigcard(t,s,sel,dis,extra){return '<button class="card" style="text-align:left;display:flex;align-items:center;gap:14px;'+(sel?'border-color:var(--teal);background:var(--teal-t);':'')+(dis?'opacity:.55;':'')+'" '+(dis?'data-toast="Coming soon — FBISE Class 9 launches first"':'')+'>'+
+ '<div style="flex:1"><div style="font-family:var(--disp);font-size:18px;font-weight:800">'+t+'</div><small style="color:var(--ink2);font-weight:700">'+s+'</small></div>'+
+ (dis?'<span class="pill gy">Coming soon</span>':sel?'<span class="pill gr">'+ic('check')+'</span>':'')+(extra||'')+'</button>'}
+
+scr('ob-class','Onboarding','Choose class','phone','M1',
+ ['Step 1 of 4. Class 9 selectable; Class 10 shown but disabled ("Coming soon") — sets expectation honestly.','Selection persists to profile; changeable later in Settings (resets study plan with warning).'],
+ ()=>obChoice(1,'Which class are you in?','We’ll load your exact syllabus',
+ bigcard('Class 9','Matric part one — start strong',1)+bigcard('Class 10','Matric part two',0,1),'ob-board'));
+scr('ob-board','Onboarding','Choose board','phone','M1',
+ ['Step 2 of 4. FBISE active; Punjab Board disabled ("Coming soon") per launch scope.','Board drives chapter lists, past papers and paper pattern.'],
+ ()=>obChoice(2,'Your board?','Syllabus and past papers follow your board',
+ bigcard('FBISE','Federal Board — Islamabad',1)+bigcard('Punjab Board','BISE Lahore, Rawalpindi & more',0,1),'ob-medium'));
+scr('ob-medium','Onboarding','Choose medium','phone','M1',
+ ['Step 3 of 4. Sets default content language; UI stays English.','Urdu option rendered in Nastaliq — the first bilingual moment.','Changeable per subject later from the chapter screen toggle.'],
+ ()=>obChoice(3,'English ya Urdu medium?','Notes and audio in your medium',
+ bigcard('English medium','Notes, MCQs and audio in English',1)+
+ bigcard('<span class="ur" style="font-size:20px">اردو میڈیم</span>','<span class="ur">نوٹس، سوالات اور آڈیو اردو میں</span>',0),'ob-subjects'));
+
+scr('ob-subjects','Onboarding','Group & subjects','phone','M1',
+ ['Step 4 of 4. Science/Arts toggle filters electives; compulsory subjects locked-checked.','CTA shows live count ("Continue with 8 subjects"). Minimum 6.','D2: exact FBISE-9 compulsory list to confirm with client content.'],
+ ()=>{const comp=['English','Urdu','Islamiyat','Mathematics'];const sci=['Physics','Chemistry','Biology','Computer Science'];
+ return '<div class="body">'+hdr('Pick your subjects',{back:1,sub:'Compulsory ones are already in'})+obdots(4)+
+ '<div class="seg" style="margin-bottom:14px"><button class="on">Science</button><button data-toast="Arts group — elective list swaps">Arts</button></div>'+
+ '<div class="card flat" style="padding:6px 14px">'+comp.map(s=>'<div class="item"><div class="mid"><b>'+s+'</b><small>Compulsory</small></div><span class="pill gy">'+ic('lock')+'</span></div>').join('')+'</div>'+
+ '<div class="stit">Electives — pick at least 2</div>'+
+ '<div class="card flat" style="padding:6px 14px">'+sci.map((s,i)=>'<div class="item" data-toast="'+(i<3?'Removed from selection':'Added to selection')+'"><div class="mid"><b>'+s+'</b></div>'+(i<3?'<span class="pill gr">'+ic('check')+'</span>':'<span class="pill gy">+</span>')+'</div>').join('')+'</div></div>'+
+ '<div class="footcta"><button class="btn" data-go="signup">Continue with 7 subjects</button></div>'});
+
+function field(l,ph,icn,right){return '<div class="inp"><label>'+l+'</label><div class="f">'+(icn?ic(icn):'')+'<span style="color:'+(ph.startsWith('•')||ph.includes('@')||/\d/.test(ph[0]||'')?'var(--ink)':'var(--ink3)')+'">'+ph+'</span>'+(right||'')+'</div></div>'}
+scr('signup','Onboarding','Create account','phone','M1',
+ ['Email OR phone accepted in one field (detected by format). Password with show/hide.','Inline validation on blur; duplicate-account error shows a banner with "Log in instead".','D3: phone-OTP deferred — schema stores phone now, OTP added when SMS provider is chosen.'],
+ ()=>'<div class="body">'+hdr('Create your account',{back:1,sub:'2 minutes — then straight to your plan'})+
+ field('Full name','Ahmed Raza','user')+
+ field('Email or phone','ahmed.raza@gmail.com','send')+
+ field('Password','••••••••','lock','<i>'+ic('eye')+'</i>')+
+ '<p style="font-size:12px;color:var(--ink2);font-weight:600;margin:2px 2px 14px">By continuing you agree to the Terms &amp; Privacy Policy.</p>'+
+ '<button class="btn" data-go="paywall">Create account</button>'+
+ '<button class="btn ghost" data-go="login">I already have an account</button></div>');
+scr('login','Onboarding','Log in','phone','M1',
+ ['Email/phone + password. Error state: "Wrong email or password." above the form.','Forgot password → reset flow.','Session persists; splash skips straight to Dashboard next time.'],
+ ()=>'<div class="body">'+hdr('Welcome back',{back:1,sub:'Chalo, continue karte hain'})+
+ '<img src="'+IMG.mono+'" style="width:120px;margin:6px auto 16px;display:block">'+
+ field('Email or phone','ahmed.raza@gmail.com','send')+
+ field('Password','••••••••','lock','<i>'+ic('eye')+'</i>')+
+ '<button class="btn" data-go="dash" style="margin-top:4px">Log in</button>'+
+ '<button class="btn ghost" data-go="forgot">Forgot password?</button></div>');
+scr('forgot','Onboarding','Reset password','phone','M1',
+ ['Enter email/phone → success state replaces form: "Reset link sent — check your inbox."','Rate-limited server-side; generic success message (no account enumeration).'],
+ ()=>'<div class="body">'+hdr('Reset password',{back:1,sub:'We’ll send you a reset link'})+
+ field('Email or phone','ahmed.raza@gmail.com','send')+
+ '<button class="btn" data-toast="Reset link sent — check your inbox">Send reset link</button></div>');
+
+scr('paywall','Onboarding','Premium plan','phone','M4',
+ ['Value list first, price after. Rs 1,000/month; D4: 3-day trial shown pending client confirmation.','"Not now" → free mode (D5: browse + 1 open chapter/subject + 5 MCQs + 5 AI msgs daily). Never a dead end.','Locked content across the app reopens this as a bottom sheet.'],
+ ()=>'<div class="body">'+hdr('Go Premium',{back:1,sub:'Everything unlocked, one price'})+
+ '<div class="card" style="display:grid;gap:11px">'+[['book','Every chapter, note & audio lesson'],['target','Unlimited MCQs, exams & past papers'],['spark','AI tutor — step-by-step help 24/7'],['chart','Weak topics & monthly report card'],['dl','Offline downloads'],['bell','Study reminders that actually help']].map(x=>'<div style="display:flex;gap:10px;align-items:center;font-weight:700;font-size:14px"><span style="color:var(--teal)">'+ic(x[0])+'</span>'+x[1]+'</div>').join('')+'</div>'+
+ '<div class="card" style="margin-top:12px;border-color:var(--orange);border-width:1.5px">'+
+ '<span class="pill or">First 3 days free</span>'+
+ '<div style="display:flex;align-items:baseline;gap:6px;margin-top:8px"><span style="font-family:var(--disp);font-size:32px;font-weight:800">Rs 1,000</span><span style="color:var(--ink2);font-weight:700">/month</span></div>'+
+ '<small style="color:var(--ink2);font-weight:600">Cancel anytime. Cards, JazzCash &amp; EasyPaisa.</small></div></div>'+
+ '<div class="footcta"><button class="btn orange" data-go="pay-method">Start Premium</button><button class="btn ghost" data-go="dash">Not now — use free mode</button></div>');
+scr('pay-method','Onboarding','Pay with Safepay','phone','M4',
+ ['Safepay checkout: Card / JazzCash / EasyPaisa segmented. Wallets: phone number + "approve in your app" instruction, then poll for confirmation.','Failure: red banner + retry, method preserved.','Manual monthly renewal (no auto-recurring) — renewal reminder push 2 days before expiry.'],
+ ()=>'<div class="body">'+hdr('Payment',{back:1,sub:'Secured by Safepay'})+
+ '<div class="seg" style="margin-bottom:14px"><button class="on">Card</button><button data-toast="JazzCash: phone number + approve in app">JazzCash</button><button data-toast="EasyPaisa: phone number + approve in app">EasyPaisa</button></div>'+
+ field('Card number','4242 4242 4242 4242','card')+
+ '<div class="grid2">'+field('Expiry','12 / 27','clock')+field('CVC','•••','lock')+'</div>'+
+ '<div class="card flat" style="display:flex;justify-content:space-between;font-weight:800;margin:6px 0 14px"><span>MatricMate Premium · 1 month</span><span>Rs 1,000</span></div>'+
+ '<button class="btn" data-go="pay-done">Pay Rs 1,000</button></div>');
+scr('pay-done','Onboarding','Payment success','phone','M4',
+ ['Success check + plan validity date. Single CTA into the app.','Receipt lands in Payment history + push confirmation.','Failure path returns to method screen with the error banner.'],
+ ()=>'<div class="body center" style="display:flex;flex-direction:column;justify-content:center;gap:14px">'+
+ '<div style="width:92px;height:92px;border-radius:99px;background:var(--green-t);display:flex;align-items:center;justify-content:center;margin:0 auto"><span style="color:var(--green)">'+ic('check','width:44px;height:44px')+'</span></div>'+
+ '<div style="font-family:var(--disp);font-size:24px;font-weight:800">Shabash! You’re Premium 🎉</div>'+
+ '<p style="color:var(--ink2);font-weight:700">Active till 19 Aug 2026<br>Receipt saved in Payment history.</p>'+
+ '<button class="btn orange" data-go="dash">Let’s start</button></div>');
+
+/* ============ HOME ============ */
+scr('dash','Home','Dashboard','phone','M1 shell · M4 live',
+ ['Header: avatar → Profile, streak flame → Progress, bell → Notifications (dot = unread).','Today’s Plan: AI-generated daily tasks (static till M9); checkable rows; count updates.','Continue learning resumes exact scroll position.','Free tier: slim upgrade banner above the tab bar.','Offline: banner slides under header; cached content stays tappable.'],
+ ()=>'<div class="hdr"><button class="ava" data-go="profile">🧑🏽‍🎓</button>'+
+ '<div style="flex:1"><div class="tag">Saturday, 19 Jul</div><div class="tt">Salam, Ahmed 👋</div></div>'+
+ '<button class="pill or flame" data-go="prog" style="font-size:13px">🔥 6</button>'+
+ '<button class="icb" data-go="notifs">'+ic('bell')+'<span class="dot"></span></button></div>'+
+ '<div class="body">'+
+ '<div class="card" style="background:linear-gradient(135deg,var(--teal) 0%,var(--teal-d) 100%);color:#fff;border:0">'+
+ '<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--disp);font-size:16px">Aaj ka plan</b><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">3/8 done</span></div>'+
+ '<div class="bar" style="background:rgba(255,255,255,.25);margin:10px 0 12px"><i style="width:37%;background:var(--orange)"></i></div>'+
+ [['Physics · Ch 3','Revise Newton’s laws — 15 min',1],['Physics · Ch 3','20 MCQs on Dynamics',0],['Urdu · سبق ۴','Flashcards — 10 cards',0]].map(t=>'<div style="display:flex;gap:10px;align-items:center;padding:7px 0;border-top:1px solid rgba(255,255,255,.14)"><span style="width:22px;height:22px;border-radius:8px;border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;flex:none">'+(t[2]?ic('check','width:13px;height:13px'):'')+'</span><div style="flex:1"><b style="font-size:13.5px">'+t[1]+'</b><small style="display:block;font-size:11px;opacity:.75;font-weight:700">'+t[0]+'</small></div></div>').join('')+
+ '<button style="color:#fff;font-weight:800;font-size:12.5px;margin-top:8px;opacity:.9" data-toast="Full plan — ships with AI planner (M9)">See full plan →</button></div>'+
+ '<div class="stit">Continue learning</div>'+
+ '<div class="card" data-go="chapter" style="cursor:pointer"><div style="display:flex;gap:12px;align-items:center"><div class="ic" style="width:46px;height:46px;border-radius:14px;background:var(--teal-t);display:flex;align-items:center;justify-content:center;color:var(--teal)">'+ic('bolt')+'</div>'+
+ '<div style="flex:1"><b style="font-size:14.5px">Ch 3 · Dynamics</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">Physics · Section 2 of 6</small><div class="bar" style="margin-top:8px"><i style="width:64%"></i></div></div><span class="chev">'+ic('chevr')+'</span></div></div>'+
+ '<div class="stit">Quick actions</div>'+
+ '<div class="grid2">'+[['target','20 MCQs','p-setup'],['cards','Flashcards','flash'],['spark','Ask AI','ai-home'],['doc','Past papers','papers']].map(q=>'<button class="card" data-go="'+q[2]+'" style="display:flex;gap:10px;align-items:center;font-weight:800;font-size:14px;text-align:left"><span style="color:var(--teal)">'+ic(q[0])+'</span>'+q[1]+'</button>').join('')+'</div>'+
+ '<div class="stit">This week</div>'+
+ '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'+[['76%','accuracy'],['214','questions'],['3h 40m','study time']].map(k=>'<div class="kpi"><b>'+k[0]+'</b><small>'+k[1]+'</small></div>').join('')+'</div>'+
+ '<div style="height:8px"></div></div>'+tabs('dash'));
+
+scr('notifs','Home','Notifications','phone','M4',
+ ['Grouped Today / Earlier. Types: reminder, streak, report, payment.','Tap deep-links to the relevant screen.','Empty state: "No notifications yet — we’ll nudge you when it matters."'],
+ ()=>'<div class="body">'+hdr('Notifications',{back:1})+
+ '<div class="stit">Today</div><div class="card flat" style="padding:4px 14px">'+
+ item({emoji:'🔥',or:1,t:'6-day streak — shabash!',s:'Keep it alive: one lesson today counts.',go:'prog'})+
+ item({emoji:'⏰',t:'Study reminder',s:'20 MCQs on Dynamics are waiting.',go:'p-setup'})+'</div>'+
+ '<div class="stit">Earlier</div><div class="card flat" style="padding:4px 14px">'+
+ item({emoji:'📊',t:'June report card is ready',s:'Overall A− · tap to view & share.',go:'report'})+
+ item({emoji:'🧾',t:'Payment received',s:'Rs 1,000 · Premium till 19 Aug.',go:'payments'})+'</div></div>');
+/* ============ STUDY ============ */
+scr('subjects','Study','Subjects','phone','M1',
+ ['Search filters list live. Cards: progress ring, chapter count, "Continue" subtitle.','Urdu subject titles render in Nastaliq beside English label.','Free tier: subjects beyond the open set show the lock pattern → paywall sheet.'],
+ ()=>'<div class="hdr"><div style="flex:1"><div class="tt">Study</div><div class="sub">Class 9 · FBISE · English medium</div></div><button class="ava" data-go="profile">🧑🏽‍🎓</button></div>'+
+ '<div class="body">'+
+ '<div class="inp"><div class="f">'+ic('search')+'<span style="color:var(--ink3)">Search subject or chapter</span></div></div>'+
+ SUBJ.map(s=>'<div class="card" data-go="'+(s.id==='phy'?'chapters':'chapters')+'" style="cursor:pointer;margin-bottom:10px;display:flex;gap:12px;align-items:center">'+
+ '<div style="position:relative;flex:none">'+ring(s.p)+'<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--teal)">'+ic(s.ic,'width:18px;height:18px')+'</span></div>'+
+ '<div style="flex:1;min-width:0"><b style="font-size:15px">'+s.n+(s.ur?' <span class="ur" style="font-size:14px;color:var(--ink2)">'+s.ur+'</span>':'')+'</b>'+
+ '<small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">'+s.ch+' chapters · '+s.p+'%</small>'+
+ '<small style="display:block;color:var(--teal);font-weight:800;font-size:12px;margin-top:2px">Continue: '+s.cont+'</small></div><span class="chev">'+ic('chevr')+'</span></div>').join('')+
+ '<div style="height:8px"></div></div>'+tabs('subjects'));
+
+scr('chapters','Study','Chapters — Physics','phone','M1',
+ ['Subject header: overall ring + medium toggle (EN/اردو) for dual-medium content.','Rows: number badge, meta (MCQs · audio · notes), progress bar; done = green check; premium-locked rows open paywall sheet.','FAB "Chapter test" starts a chapter-scoped exam.'],
+ ()=>'<div class="body">'+hdr('Physics',{back:1,sub:'9 chapters · 62% complete',right:'<div class="seg" style="width:118px"><button class="on" style="padding:6px">EN</button><button style="padding:6px" data-toast="Urdu medium content — dual-medium (D2)"><span class="ur" style="font-size:12px">اردو</span></button></div>'})+
+ PHY_CH.map(c=>'<div class="card'+(c.cur?'':' flat')+'" data-go="'+(c.lock?'':'chapter')+'" '+(c.lock?'data-toast="Premium chapter — opens paywall sheet"':'')+' style="cursor:pointer;margin-bottom:9px;'+(c.cur?'border-color:var(--teal);':'')+(c.lock?'opacity:.6;':'')+'">'+
+ '<div style="display:flex;gap:12px;align-items:center">'+
+ '<div style="width:38px;height:38px;border-radius:12px;background:'+(c.p===100?'var(--green-t)':'var(--teal-t)')+';display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;color:'+(c.p===100?'var(--green)':'var(--teal)')+';flex:none">'+(c.p===100?ic('check','width:18px;height:18px'):c.n)+'</div>'+
+ '<div style="flex:1;min-width:0"><b style="font-size:14px">'+c.t+'</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:11.5px">'+c.mc+' MCQs · Audio · Notes · Flashcards</small>'+
+ (c.p>0&&c.p<100?'<div class="bar" style="margin-top:7px"><i style="width:'+c.p+'%"></i></div>':'')+'</div>'+
+ (c.lock?'<span class="pill gy">'+ic('lock')+'</span>':c.cur?'<span class="pill or">Continue</span>':'<span class="chev">'+ic('chevr')+'</span>')+'</div></div>').join('')+
+ '<div style="height:70px"></div></div>'+
+ '<div style="position:absolute;right:16px;bottom:88px"><button class="btn orange sm" data-go="exam-intro" style="box-shadow:0 10px 26px rgba(242,147,41,.45)">'+ic('clock')+'Chapter test</button></div>'+tabs('subjects'));
+
+scr('chapter','Study','Chapter home — Dynamics','phone','M2',
+ ['Hero: number, title, progress, XP earned in this chapter.','Section list = the Apex per-chapter pattern: Notes → Audio → Flashcards → MCQs → Past-paper questions.','Download toggle (top-right) caches the whole chapter (~2 MB) for offline.','"Continue" resumes the furthest incomplete section.'],
+ ()=>'<div class="body">'+hdr('Chapter 3',{back:1,sub:'Physics · FBISE Class 9',right:'<button class="icb" data-toast="Chapter downloaded for offline ✓">'+ic('dl')+'</button>'})+
+ '<div class="card" style="background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;border:0">'+
+ '<div style="font-family:var(--disp);font-size:22px;font-weight:800">Dynamics</div>'+
+ '<small style="opacity:.85;font-weight:700">Force, inertia, Newton’s laws, friction</small>'+
+ '<div style="display:flex;gap:14px;margin-top:12px;align-items:center"><div class="bar" style="flex:1;background:rgba(255,255,255,.25)"><i style="width:64%"></i></div><b style="font-family:var(--disp)">64%</b><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">+120 XP</span></div></div>'+
+ '<div class="stit">Sections</div><div class="card flat" style="padding:4px 14px">'+
+ item({icn:'book',t:'Notes & examples',s:'6 sections · 2 left',bar:66,go:'reader'})+
+ item({icn:'head',t:'Audio lesson',s:'18 min · Urdu & English',go:'audio'})+
+ item({icn:'cards',t:'Flashcards',s:'24 cards · 8 due for review',go:'flash'})+
+ item({icn:'target',t:'Practice MCQs',s:'40 questions · best 16/20',go:'p-setup'})+
+ item({icn:'doc',t:'Past-paper questions',s:'12 from FBISE 2019–2025',go:'papers'})+'</div>'+
+ '<div style="height:10px"></div><button class="btn" data-go="reader">Continue — Notes, section 3</button><div style="height:8px"></div></div>'+tabs('subjects'));
+
+scr('reader','Study','Notes reader','phone','M2',
+ ['Sticky mini-header: chapter + thin progress bar; scroll position saved for resume.','Blocks: headings, paragraphs, definition callout, formula block, figure with caption.','Medium toggle flips content EN ↔ اردو (RTL Nastaliq).','Floating "Ask AI" opens bottom sheet with lesson context + suggestion chips; full conversation → AI chat.','Footer: prev · section 3/6 · next. Font-size stepper in overflow.'],
+ ()=>'<div class="hdr" style="border-bottom:1px solid var(--line)"><button class="icb plain" data-back>'+ic('back')+'</button>'+
+ '<div style="flex:1"><b style="font-size:13.5px">Ch 3 · Dynamics — Newton’s Second Law</b><div class="bar tl" style="margin-top:6px;height:4px"><i style="width:46%"></i></div></div>'+
+ '<button class="icb plain" data-toast="Aa · font size / medium toggle">'+ic('dots')+'</button></div>'+
+ '<div class="body" style="padding-top:14px">'+
+ '<span class="tag">Section 3 of 6</span>'+
+ '<h2 style="font-family:var(--disp);font-size:21px;margin:6px 0 10px">Newton’s Second Law of Motion</h2>'+
+ '<p style="font-size:15px;line-height:1.75;font-weight:600;color:var(--ink)">When a net force acts on a body, it produces acceleration in the direction of the force. The acceleration is directly proportional to the force and inversely proportional to the mass of the body.</p>'+
+ '<div class="card" style="border-left:4px solid var(--teal);margin:14px 0;background:var(--teal-t)"><span class="tag" style="color:var(--teal)">Definition</span><p style="font-weight:700;font-size:14px;margin-top:4px;line-height:1.6">Newton (N): the force that produces an acceleration of 1 m/s² in a body of mass 1 kg.</p></div>'+
+ '<div class="card center" style="margin:14px 0"><span style="font-family:var(--disp);font-size:24px;letter-spacing:.06em">F = ma</span><small style="display:block;color:var(--ink2);font-weight:700;margin-top:4px">force = mass × acceleration</small></div>'+
+ '<p class="ur" style="font-size:16px;color:var(--ink2)">جب کسی جسم پر قوت عمل کرتی ہے تو وہ قوت کی سمت میں اسراع پیدا کرتی ہے۔</p>'+
+ '<p style="font-size:15px;line-height:1.75;font-weight:600;margin-top:10px">Example: a 1,200 kg car accelerating at 2 m/s² needs a net force of 2,400 N. Double the mass and the same force gives half the acceleration.</p>'+
+ '<div style="height:90px"></div></div>'+
+ '<div style="position:absolute;right:16px;bottom:96px"><button class="btn sm" data-go="ai-chat" style="border-radius:99px;box-shadow:0 10px 26px rgba(9,106,139,.4)">'+ic('spark')+'Ask AI</button></div>'+
+ '<div style="display:flex;align-items:center;gap:10px;padding:10px 18px 14px;border-top:1px solid var(--line);background:var(--card)">'+
+ '<button class="icb" data-toast="Previous section">'+ic('back')+'</button><div style="flex:1;text-align:center;font-weight:800;font-size:13px;color:var(--ink2)">Section 3 / 6</div><button class="icb" data-toast="Next section — progress saved">'+ic('chevr')+'</button></div>');
+
+scr('audio','Study','Audio lesson','phone','M2',
+ ['Podcast-style player: −15s / play / +15s, scrubber, speed chip (1.0→1.25→1.5×).','Background play; mini-player persists over tab roots while playing.','Download for offline; downloaded state shown.','Audio is client-provided or pre-generated TTS (ur-PK / en) — never runtime TTS.'],
+ ()=>'<div class="body center" style="display:flex;flex-direction:column">'+hdr('Audio lesson',{back:1,right:'<button class="icb" data-toast="Saved for offline ✓">'+ic('dl')+'</button>'})+
+ '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px">'+
+ '<div class="card" style="width:210px;height:210px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--teal),var(--teal-d));border:0"><img src="'+IMG.mono+'" style="width:130px"></div>'+
+ '<div style="font-family:var(--disp);font-size:19px;font-weight:800;margin-top:10px">Dynamics — full chapter</div>'+
+ '<small style="color:var(--ink2);font-weight:700">Physics · Urdu narration · 18 min</small>'+
+ '<div style="padding:0 14px;margin-top:14px"><div class="bar tl"><i style="width:35%"></i></div>'+
+ '<div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:800;color:var(--ink2);margin-top:5px"><span>6:18</span><span>18:02</span></div></div>'+
+ '<div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-top:8px">'+
+ '<button class="icb" data-toast="−15 s" style="width:52px;height:52px;border-radius:99px">−15</button>'+
+ '<button id="playbtn" data-toast="Playing… mini-player stays across tabs" style="width:74px;height:74px;border-radius:99px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(9,106,139,.4)">'+ic('play','width:30px;height:30px')+'</button>'+
+ '<button class="icb" data-toast="+15 s" style="width:52px;height:52px;border-radius:99px">+15</button></div>'+
+ '<button class="pill" data-toast="Speed: 1.25×" style="margin:10px auto 0;border:0">1.0× speed</button></div>'+
+ '<div class="stit" style="text-align:left">Up next</div>'+
+ '<div class="card flat" style="padding:2px 14px;text-align:left">'+item({icn:'head',t:'Turning Effect of Forces',s:'Ch 4 · 15 min',go:'audio'})+'</div><div style="height:8px"></div></div>');
+
+scr('downloads','Study','Downloads & offline','phone','M2',
+ ['Storage summary; per-subject groups; swipe row to delete (prototype: bin icon).','Chapter pack = notes + audio + MCQs + flashcards (~2 MB each).','Attempts made offline queue and sync when back online (last-write wins).','Empty state invites downloading the current chapter.'],
+ ()=>'<div class="body">'+hdr('Downloads',{back:1,sub:'Available without internet'})+
+ '<div class="card" style="display:flex;align-items:center;gap:12px"><span style="color:var(--teal)">'+ic('dl')+'</span><div style="flex:1"><b style="font-size:14px">142 MB used</b><div class="bar tl" style="margin-top:7px"><i style="width:28%"></i></div></div><small style="color:var(--ink2);font-weight:700">of 512 MB cap</small></div>'+
+ '<div class="stit">Physics</div><div class="card flat" style="padding:4px 14px">'+
+ [['Ch 2 · Kinematics','38 MB · notes, audio, MCQs'],['Ch 3 · Dynamics','41 MB · notes, audio, MCQs']].map(d=>'<div class="item"><div class="ic">'+ic('check')+'</div><div class="mid"><b>'+d[0]+'</b><small>'+d[1]+'</small></div><button class="icb plain" data-toast="Removed from downloads" style="color:var(--red)">'+ic('trash')+'</button></div>').join('')+'</div>'+
+ '<div class="stit">Urdu</div><div class="card flat" style="padding:4px 14px">'+
+ '<div class="item"><div class="ic">'+ic('check')+'</div><div class="mid"><b class="ur" style="font-size:15px">سبق ۴ · نصوح اور سلیم</b><small>22 MB · notes, audio</small></div><button class="icb plain" data-toast="Removed from downloads" style="color:var(--red)">'+ic('trash')+'</button></div></div>'+
+ '<div style="height:12px"></div><button class="btn line" data-toast="Chapter pack queued — downloads on Wi-Fi">'+ic('dl')+'Download current chapter (Ch 3)</button></div>');
+/* ============ PRACTICE ============ */
+scr('practice','Practice','Practice home','phone','M3',
+ ['Mode cards with live counts; Timed exam gets the orange accent; AI test ships M9.','Recent sessions resume or review.','Fill-blanks / short questions / past papers ship M8 (cards present, marked).'],
+ ()=>'<div class="hdr"><div style="flex:1"><div class="tt">Practice</div><div class="sub">Har question type, ek jagah</div></div><button class="ava" data-go="profile">🧑🏽‍🎓</button></div>'+
+ '<div class="body"><div class="grid2">'+
+ [['target','MCQs','2,400 questions','p-setup',''],['cards','Flashcards','380 cards','flash',''],['edit','Fill in the blanks','620 items','blanks',''],['quill','Short questions','410 with answers','shortq',''],['doc','Past papers','2019–2025','papers',''],['clock','Timed exam','XP ×2','exam-intro','orange']]
+ .map(m=>'<button class="card" data-go="'+m[3]+'" style="text-align:left;display:grid;gap:6px;'+(m[4]?'border-color:var(--orange);':'')+'"><span style="color:'+(m[4]?'var(--orange-d)':'var(--teal)')+'">'+ic(m[0])+'</span><b style="font-size:14.5px">'+m[1]+'</b><small style="color:var(--ink2);font-weight:700;font-size:11.5px">'+m[2]+'</small></button>').join('')+'</div>'+
+ '<button class="card" data-go="ai-test" style="width:100%;margin-top:10px;text-align:left;display:flex;gap:12px;align-items:center;border-style:dashed;border-color:var(--teal-t2)"><span style="color:var(--orange-d)">'+ic('spark')+'</span><div style="flex:1"><b style="font-size:14.5px">AI test — from my weak topics</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">Personalised paper in seconds</small></div><span class="pill or">M9</span></button>'+
+ '<div class="stit">Recent sessions</div><div class="card flat" style="padding:4px 14px">'+
+ item({icn:'target',t:'Dynamics · 20 MCQs',s:'Today · 16/20 · +84 XP',go:'result'})+
+ item({icn:'clock',t:'Kinematics · timed exam',s:'Thu · 80% · reviewed',go:'review'})+'</div><div style="height:8px"></div></div>'+tabs('practice'));
+
+scr('p-setup','Practice','Session setup','phone','M3',
+ ['Subject chips → chapter multi-select (or "Mixed — all studied chapters").','Count segmented 10/20/50; exams add duration 15/30/60 min.','CTA repeats the config ("Start — 20 questions"). Last config remembered.'],
+ ()=>'<div class="body">'+hdr('New MCQ session',{back:1})+
+ '<div class="stit" style="margin-top:4px">Subject</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+ SUBJ.slice(0,5).map((s,i)=>'<button class="pill'+(i===0?'':' gy')+'" style="font-size:13px;padding:8px 14px">'+s.n+'</button>').join('')+'</div>'+
+ '<div class="stit">Chapters</div><div class="card flat" style="padding:4px 14px">'+
+ [['Ch 2 · Kinematics',1],['Ch 3 · Dynamics',1],['Mixed — all studied chapters',0]].map(c=>'<div class="item" data-toast="Selection toggled"><div class="mid"><b>'+c[0]+'</b></div>'+(c[1]?'<span class="pill gr">'+ic('check')+'</span>':'<span class="pill gy">+</span>')+'</div>').join('')+'</div>'+
+ '<div class="stit">How many?</div><div class="seg"><button>10</button><button class="on">20</button><button>50</button></div>'+
+ '<div style="height:18px"></div><button class="btn" data-go="mcq">Start — 20 questions</button></div>');
+
+scr('mcq','Practice','MCQ + Pakka-meter','phone','M3',
+ ['THE signature flow: pick an answer → the Pakka-meter appears (Tukka 🎲 / Thora sure / Pakka ✓) → Check answer enables.','Confidence is stored per attempt and powers the confidence-vs-accuracy analytics (contract requirement).','No timer in practice mode. Overflow: bookmark, report question.','Formula/figure support in the question body.'],
+ ()=>'<div class="hdr"><button class="icb plain" data-go="practice">'+ic('close')+'</button>'+
+ '<div style="flex:1"><div class="bar tl" style="height:6px"><i style="width:35%"></i></div><small style="font-weight:800;color:var(--ink2);font-size:11px">Question 7 of 20</small></div>'+
+ '<span class="pill">Physics</span></div>'+
+ '<div class="body"><p style="font-family:var(--disp);font-size:18px;font-weight:700;line-height:1.45;margin:8px 0 16px">A body has constant speed but its velocity keeps changing. The body is moving…</p>'+
+ ['in a straight line','in a circle','with zero acceleration','under no force'].map((o,i)=>'<button class="opt" data-opt="'+i+'"><span class="k">'+String.fromCharCode(65+i)+'</span>'+o+'</button>').join('')+
+ '<div id="pkwrap" style="display:none">'+pkmeter()+'</div></div>'+
+ '<div class="footcta"><button class="btn" id="checkbtn" disabled data-go="mcq-fb">Check answer</button></div>');
+
+scr('mcq-fb','Practice','MCQ feedback','phone','M3',
+ ['Options recolor: green = correct, red = your wrong pick. Verdict row with XP (+10, Pakka bonus +2 / Tukka +5 — honesty incentive).','Explanation card links the concept back to the reader.','Confident-wrong gets the coaching line: "You said Pakka — is concept ko dobara dekh lo."','CTAs: Next question · Ask AI about this.'],
+ ()=>'<div class="hdr"><button class="icb plain" data-go="practice">'+ic('close')+'</button>'+
+ '<div style="flex:1"><div class="bar tl" style="height:6px"><i style="width:35%"></i></div><small style="font-weight:800;color:var(--ink2);font-size:11px">Question 7 of 20</small></div><span class="pill">Physics</span></div>'+
+ '<div class="body"><p style="font-family:var(--disp);font-size:18px;font-weight:700;line-height:1.45;margin:8px 0 16px">A body has constant speed but its velocity keeps changing. The body is moving…</p>'+
+ '<button class="opt"><span class="k">A</span>in a straight line</button>'+
+ '<button class="opt ok"><span class="k">B</span>in a circle &nbsp;·&nbsp; correct</button>'+
+ '<button class="opt bad"><span class="k">C</span>with zero acceleration &nbsp;·&nbsp; your pick</button>'+
+ '<button class="opt"><span class="k">D</span>under no force</button>'+
+ '<div class="card" style="border-color:var(--orange);background:var(--orange-t);margin-top:6px"><b style="font-size:13.5px;color:var(--orange-d)">You said Pakka ✓ — is concept ko dobara dekh lo 👀</b></div>'+
+ '<div class="card" style="margin-top:10px"><span class="tag" style="color:var(--teal)">Why</span><p style="font-size:14px;font-weight:600;line-height:1.6;margin-top:4px">In circular motion the <b>direction</b> of velocity changes at every point even when speed is constant — so velocity changes and there is acceleration (centripetal).</p>'+
+ '<button style="color:var(--teal);font-weight:800;font-size:12.5px;margin-top:8px" data-go="reader">Read: Ch 3 · circular motion →</button></div></div>'+
+ '<div class="footcta" style="display:flex;gap:10px"><button class="btn line sm" data-go="ai-chat" style="flex:1">'+ic('spark')+'Ask AI</button><button class="btn sm" data-go="mcq" style="flex:1">Next question</button></div>');
+
+scr('flash','Practice','Flashcards','phone','M3',
+ ['Tap flips the card (3D, 240 ms; fade if reduced-motion).','Swipe right "Yaad hai ✓" / left "Repeat 🔁" (prototype: buttons).','Repeats resurface first next session (simple spaced repetition, SM-lite).','End state: recap counts + "Review repeats".'],
+ ()=>'<div class="body" style="display:flex;flex-direction:column">'+hdr('Flashcards',{back:1,sub:'Dynamics · card 12 of 24'})+
+ '<div class="bar tl" style="margin:0 2px 16px"><i style="width:50%"></i></div>'+
+ '<div class="fcard" id="fcard" style="flex:none"><div class="in">'+
+ '<div class="face front"><span class="tag">Term</span><b style="font-family:var(--disp);font-size:23px">Inertia</b><small style="color:var(--ink2);font-weight:700">Tap to flip</small></div>'+
+ '<div class="face back"><span class="tag" style="color:rgba(255,255,255,.7)">Definition</span><p style="font-size:16px;font-weight:700;line-height:1.6">The property of a body to resist any change in its state of rest or of uniform motion.</p><small style="opacity:.8" class="ur">جسم کی وہ خاصیت جو حالت میں تبدیلی کی مزاحمت کرے</small></div></div></div>'+
+ '<div style="display:flex;gap:10px;margin-top:auto;padding-bottom:8px">'+
+ '<button class="btn line" data-toast="Repeat 🔁 — resurfaces first next time" style="flex:1;color:var(--red);border-color:#F3D7D6">Repeat 🔁</button>'+
+ '<button class="btn" data-toast="Yaad hai ✓ +2 XP" style="flex:1;background:var(--green)">Yaad hai ✓</button></div></div>');
+
+scr('blanks','Practice','Fill in the blanks','phone','M8',
+ ['Sentence with a blank chip; answer from a 4-word bank (tap to fill, tap again to undo).','Check → inline correct/wrong; same footer pattern as MCQs.','Feeds the same attempts/weak-topic pipeline.'],
+ ()=>'<div class="hdr"><button class="icb plain" data-go="practice">'+ic('close')+'</button><div style="flex:1"><div class="bar tl" style="height:6px"><i style="width:20%"></i></div><small style="font-weight:800;color:var(--ink2);font-size:11px">Item 2 of 10</small></div><span class="pill">Chemistry</span></div>'+
+ '<div class="body"><p style="font-family:var(--disp);font-size:18px;font-weight:700;line-height:1.8;margin:10px 0 18px">The horizontal rows of the periodic table are called <span style="display:inline-block;min-width:96px;border-bottom:2.5px dashed var(--teal);color:var(--teal);text-align:center;font-weight:800">periods</span>.</p>'+
+ '<div style="display:flex;gap:8px;flex-wrap:wrap">'+['groups','periods','shells','orbits'].map((w,i)=>'<button class="pill'+(i===1?'':' gy')+'" style="font-size:14px;padding:9px 16px" data-toast="'+(i===1?'Placed in blank':'Swapped into blank')+'">'+w+'</button>').join('')+'</div></div>'+
+ '<div class="footcta"><button class="btn" data-toast="Sahi jawab! +8 XP">Check</button></div>');
+
+scr('shortq','Practice','Short questions','phone','M8',
+ ['"Think, then reveal" → model answer (client-provided) + marking points.','Self-mark: Got it / Partially / Missed — feeds weak topics honestly.','Optional typed answer kept for later AI feedback phase.'],
+ ()=>'<div class="body">'+hdr('Short questions',{back:1,sub:'Dynamics · 3 of 8'})+
+ '<div class="card"><span class="tag" style="color:var(--teal)">Q3 · 2 marks</span><p style="font-family:var(--disp);font-size:17px;font-weight:700;line-height:1.5;margin-top:6px">Why does a passenger fall forward when a moving bus stops suddenly?</p></div>'+
+ '<div class="card" style="margin-top:12px;border-color:var(--green);background:var(--green-t)"><span class="tag" style="color:var(--green)">Model answer</span>'+
+ '<p style="font-size:14px;font-weight:600;line-height:1.65;margin-top:4px">The lower body stops with the bus, but due to <b>inertia</b> the upper body keeps moving forward — so the passenger falls forward.</p>'+
+ '<ul style="margin:8px 0 0 16px;font-size:12.5px;font-weight:700;color:var(--ink2)"><li>names inertia (1 mark)</li><li>explains upper vs lower body (1 mark)</li></ul></div>'+
+ '<div class="stit">How did you do?</div>'+
+ '<div class="seg"><button class="on" data-toast="+6 XP">Got it</button><button data-toast="Half marks — topic flagged lightly">Partially</button><button data-toast="Marked for revision — added to weak topics">Missed</button></div>'+
+ '<div style="height:16px"></div><button class="btn" data-toast="Next question">Next</button></div>');
+
+scr('papers','Practice','Past papers','phone','M8',
+ ['Filters: year, session (Annual/Supply).','Card actions: Practice as exam (timed, real marks) · View paper.','Downloaded badge for offline papers.'],
+ ()=>'<div class="body">'+hdr('Past papers',{back:1,sub:'FBISE · Physics · Class 9'})+
+ '<div style="display:flex;gap:8px;margin-bottom:12px">'+['All years','2025','2024','Annual'].map((f,i)=>'<button class="pill'+(i===0?'':' gy')+'" style="font-size:12.5px">'+f+'</button>').join('')+'</div>'+
+ [['FBISE 2025 · Annual','65 marks · 2h 30m',1],['FBISE 2024 · Annual','65 marks · 2h 30m',1],['FBISE 2024 · Supplementary','65 marks · 2h 30m',0],['FBISE 2023 · Annual','65 marks · 2h 30m',0]].map(p=>'<div class="card" style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px"><div class="ic" style="width:40px;height:40px;border-radius:12px;background:var(--teal-t);color:var(--teal);display:flex;align-items:center;justify-content:center">'+ic('doc')+'</div><div style="flex:1"><b style="font-size:14px">'+p[0]+'</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">'+p[1]+'</small></div>'+(p[2]?'<span class="pill gr">'+ic('dl')+'</span>':'')+'</div>'+
+ '<div style="display:flex;gap:8px;margin-top:11px"><button class="btn sm line" data-go="paper-view" style="flex:1">View paper</button><button class="btn sm" data-go="exam-intro" style="flex:1">Practice as exam</button></div></div>').join('')+'</div>');
+
+scr('paper-view','Practice','Paper viewer','phone','M8',
+ ['Sectioned paper view (Section A objective, B short, C long); pinch to zoom.','"Practice this paper" converts it into a timed session with real marks distribution.'],
+ ()=>'<div class="body">'+hdr('FBISE 2025 · Annual',{back:1,sub:'Physics · Class 9 · 65 marks'})+
+ '<div class="card" style="font-size:13px;line-height:1.7;font-weight:600">'+
+ '<div class="center" style="font-family:var(--disp);font-weight:800;font-size:15px">FEDERAL BOARD — SSC-I PHYSICS</div>'+
+ '<div class="center tag" style="margin:2px 0 10px">Time: 2h 30m · Marks: 65</div><hr style="border:0;border-top:1px solid var(--line);margin:8px 0">'+
+ '<b>SECTION — A (12 marks)</b><p>Q1. Circle the correct option.</p><p style="color:var(--ink2)">i. The SI unit of force is… &nbsp; ii. Rate of change of momentum equals…</p>'+
+ '<b>SECTION — B (33 marks)</b><p style="color:var(--ink2)">Q2. Attempt any eleven parts. i. Define inertia with an example…</p>'+
+ '<b>SECTION — C (20 marks)</b><p style="color:var(--ink2)">Q3. State and explain Newton’s second law…</p></div>'+
+ '<div style="height:12px"></div><button class="btn" data-go="exam-intro">Practice this paper</button></div>');
+
+scr('exam-intro','Practice','Timed exam — rules','phone','M3',
+ ['Rules card: count, duration, no pause, XP ×2; shows past best.','D6: leaving the app pauses the timer once (soft anti-cheat).','Start is deliberate — no accidental entry.'],
+ ()=>'<div class="body" style="display:flex;flex-direction:column">'+hdr('Timed exam',{back:1,sub:'Dynamics · Physics'})+
+ '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">'+
+ '<div class="card center" style="border-color:var(--orange)"><span style="color:var(--orange-d)">'+ic('clock','width:34px;height:34px')+'</span>'+
+ '<div style="font-family:var(--disp);font-size:21px;font-weight:800;margin-top:6px">20 questions · 30 minutes</div>'+
+ '<small style="color:var(--ink2);font-weight:700">No answers shown till the end · XP ×2</small>'+
+ '<div style="display:flex;gap:8px;justify-content:center;margin-top:12px"><span class="pill">Best: 80%</span><span class="pill or">Leaving pauses once</span></div></div>'+
+ '<p class="center" style="font-size:12.5px;color:var(--ink2);font-weight:700">Phone silent kar lo — 30 minute focus. 💪</p></div>'+
+ '<button class="btn orange" data-go="exam">Start exam</button><div style="height:8px"></div></div>');
+
+scr('exam','Practice','Timed exam session','phone','M3',
+ ['Timer pill top-center: orange under 2 min, pulses under 30 s.','Same question UI as practice but no Pakka-meter and no instant feedback.','Bottom: question palette dots (answered / flagged / current); flag toggle.','Submit sheet warns about unanswered count.'],
+ ()=>'<div class="hdr"><button class="icb plain" data-toast="Exit? Progress is submitted as-is">'+ic('close')+'</button>'+
+ '<div style="flex:1;display:flex;justify-content:center"><span class="pill or" style="font-size:14px;padding:7px 16px">'+ic('clock')+'18:42</span></div>'+
+ '<button class="icb plain" data-toast="Flagged for review 🚩">'+ic('star')+'</button></div>'+
+ '<div class="body"><small style="font-weight:800;color:var(--ink2)">Question 9 of 20</small>'+
+ '<p style="font-family:var(--disp);font-size:18px;font-weight:700;line-height:1.45;margin:8px 0 16px">The turning effect of a force about a pivot is called…</p>'+
+ ['momentum','torque','impulse','equilibrium'].map((o,i)=>'<button class="opt'+(i===1?' sel':'')+'"><span class="k">'+String.fromCharCode(65+i)+'</span>'+o+'</button>').join('')+
+ '<div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:16px">'+Array.from({length:20},(_,i)=>{const st=i<8?'background:var(--teal);color:#fff':i===8?'background:var(--orange);color:#fff':i===12?'background:var(--orange-t);color:var(--orange-d)':'background:#EFF3F0;color:var(--ink2)';return '<span style="width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;'+st+'">'+(i+1)+'</span>'}).join('')+'</div></div>'+
+ '<div class="footcta" style="display:flex;gap:10px"><button class="btn line sm" data-toast="2 unanswered — submit anyway?" style="flex:1">Submit</button><button class="btn sm" data-go="result" style="flex:1">Next</button></div>');
+
+scr('result','Practice','Result','phone','M3',
+ ['Score dial counts up; grade chip; XP with exam ×2.','Weakest-topic callout links straight to study ("Turning Effect — 2/5 → Study now").','Confetti burst once (skipped under reduced-motion).','CTAs: Review answers · Done.'],
+ ()=>'<div class="body center" style="display:flex;flex-direction:column;justify-content:center;gap:14px">'+
+ '<div class="confetti" id="cfx"></div>'+
+ '<div class="dial">'+ring(80,150,'var(--orange)')+'<div class="v"><b>80%</b><small>16 / 20</small></div></div>'+
+ '<div style="font-family:var(--disp);font-size:22px;font-weight:800">Shabash, Ahmed! 🔥</div>'+
+ '<div style="display:flex;gap:8px;justify-content:center"><span class="pill gr">Grade A</span><span class="pill or">+168 XP (×2)</span><span class="pill">+6% vs your avg</span></div>'+
+ '<div class="card" style="text-align:left;border-color:var(--red);background:var(--red-t)"><b style="font-size:13.5px;color:var(--red)">Weak spot: Turning Effect of Forces — 2/5</b>'+
+ '<button class="btn sm" data-go="chapter" style="margin-top:10px;background:var(--red)">Study now</button></div>'+
+ '<div style="display:flex;gap:10px"><button class="btn line" data-go="review" style="flex:1">Review answers</button><button class="btn" data-go="practice" style="flex:1">Done</button></div></div>',
+ );
+BYID['result'].after=()=>{const c=document.getElementById('cfx');if(!c||matchMedia('(prefers-reduced-motion: reduce)').matches)return;const cols=['#F29329','#096A8B','#2E9E5B','#F2C029'];c.innerHTML=Array.from({length:26},(_,i)=>'<i style="left:'+(Math.random()*100)+'%;background:'+cols[i%4]+';animation-delay:'+(Math.random()*.5)+'s"></i>').join('')};
+
+scr('review','Practice','Review answers','phone','M3',
+ ['Wrong answers first (red border), then correct; filter chips All / Wrong / Flagged.','Rows expand to mini feedback (your answer, correct, explanation, Ask AI).','Every wrong answer feeds weak-topic scoring.'],
+ ()=>'<div class="body">'+hdr('Review',{back:1,sub:'Dynamics exam · 16/20'})+
+ '<div style="display:flex;gap:8px;margin-bottom:12px"><button class="pill">All</button><button class="pill rd">Wrong · 4</button><button class="pill gy">Flagged · 1</button></div>'+
+ '<div class="card" style="border-left:4px solid var(--red);margin-bottom:10px"><b style="font-size:13.5px">Q7 · Constant speed, changing velocity…</b>'+
+ '<div style="display:flex;gap:8px;margin-top:8px"><span class="pill rd">You: C</span><span class="pill gr">Correct: B</span></div>'+
+ '<p style="font-size:13px;font-weight:600;color:var(--ink2);line-height:1.6;margin-top:8px">Direction changes in circular motion, so velocity changes even at constant speed.</p>'+
+ '<button style="color:var(--teal);font-weight:800;font-size:12.5px;margin-top:6px" data-go="ai-chat">Ask AI about this →</button></div>'+
+ '<div class="card" style="border-left:4px solid var(--red);margin-bottom:10px"><b style="font-size:13.5px">Q13 · SI unit of momentum…</b><div style="display:flex;gap:8px;margin-top:8px"><span class="pill rd">You: N</span><span class="pill gr">Correct: kg·m/s</span></div></div>'+
+ '<div class="card flat" style="margin-bottom:10px;opacity:.75"><b style="font-size:13.5px">Q1 · SI unit of force… ✓</b></div>'+
+ '<div class="card flat" style="opacity:.75"><b style="font-size:13.5px">Q2 · Inertia depends on… ✓</b></div></div>');
+/* ============ AI TUTOR ============ */
+scr('ai-home','AI Tutor','AI Tutor home','phone','M3',
+ ['Daily quota ring in header (D7: 20 premium / 5 free) — cost control made visible; teal → orange as it depletes.','Four entries: Ask a doubt (text+camera), Explain a topic, Solve a question (camera-first), Concept clarification.','Recent chats resume with context. Footer: "AI can make mistakes — verify with your book."','Server-side Claude via Edge Function; per-user quota enforced server-side.'],
+ ()=>'<div class="hdr"><div style="flex:1"><div class="tt">AI Tutor</div><div class="sub">24/7 — English ya Urdu mein poochho</div></div>'+
+ '<div style="position:relative">'+ring(70,46,'var(--teal)')+'<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800">14/20</span></div></div>'+
+ '<div class="body"><div class="grid2">'+
+ [['spark','Ask a doubt','Type or snap a photo','ai-chat'],['book','Explain a topic','From your chapters','ai-chat'],['cam','Solve a question','Camera-first','ai-chat'],['help','Concept clarification','Simple words + example','ai-chat']]
+ .map(a=>'<button class="card" data-go="'+a[3]+'" style="text-align:left;display:grid;gap:6px"><span style="color:var(--teal)">'+ic(a[0])+'</span><b style="font-size:14px">'+a[1]+'</b><small style="color:var(--ink2);font-weight:700;font-size:11.5px">'+a[2]+'</small></button>').join('')+'</div>'+
+ '<div class="stit">Recent chats</div><div class="card flat" style="padding:4px 14px">'+
+ item({icn:'bolt',t:'Why is velocity a vector?',s:'Physics · today',go:'ai-chat'})+
+ item({icn:'flask',t:'Ionic vs covalent bond',s:'Chemistry · yesterday',go:'ai-chat'})+
+ item({icn:'calc',t:'Factorise x² − 9x + 20',s:'Math · Tue',go:'ai-chat'})+'</div>'+
+ '<p class="center" style="font-size:11.5px;color:var(--ink3);font-weight:700;margin-top:14px">AI can make mistakes — verify with your book.</p><div style="height:8px"></div></div>'+tabs('ai-home'));
+
+scr('ai-chat','AI Tutor','AI chat','phone','M3',
+ ['Streaming reply with typing indicator; step-by-step blocks for working.','Context chip when opened from a lesson ("Ch 3 · Dynamics").','Message actions: 👍👎 (Was this helpful?), copy, "اردو میں" re-explain.','Composer: text + camera; mic disabled (D8, later phase).','Quota exhausted: banner "Daily limit reached — resets 12 AM" + upgrade CTA on free tier.'],
+ ()=>'<div class="hdr" style="border-bottom:1px solid var(--line)"><button class="icb plain" data-back>'+ic('back')+'</button>'+
+ '<div style="flex:1"><b style="font-size:15px">AI Tutor</b><div class="sub">Context: Ch 3 · Dynamics</div></div><span class="pill">14 left today</span></div>'+
+ '<div class="body"><div class="chat">'+
+ '<div class="msg me">Why is velocity a vector but speed is not? 🤔</div>'+
+ '<div class="msg ai"><b style="font-size:13.5px">Great question! Two-line answer, phir steps:</b>'+
+ '<div class="step"><b>1</b><span><b>Speed</b> = only <i>how fast</i> (magnitude). 60 km/h — bas.</span></div>'+
+ '<div class="step"><b>2</b><span><b>Velocity</b> = how fast <i>plus direction</i>. 60 km/h towards north.</span></div>'+
+ '<div class="step"><b>3</b><span>Direction badle to velocity badal jati hai — even at constant speed. That’s why circular motion has acceleration!</span></div>'+
+ '<div style="display:flex;gap:10px;margin-top:10px"><button class="pill gy" data-toast="Thanks for the feedback!">👍</button><button class="pill gy" data-toast="Noted — we’ll improve">👎</button><button class="pill" data-toast="Re-explaining in Urdu…"><span class="ur">اردو میں</span></button></div></div>'+
+ '<div class="msg ai typing" id="typing"><i></i><i></i><i></i></div></div><div style="height:8px"></div></div>'+
+ '<div style="display:flex;gap:8px;align-items:center;padding:10px 14px 14px;border-top:1px solid var(--line);background:var(--card)">'+
+ '<button class="icb plain" data-toast="Snap a question — OCR + solve">'+ic('cam')+'</button>'+
+ '<div class="f" style="flex:1;display:flex;align-items:center;background:var(--paper);border:1.5px solid var(--line);border-radius:99px;padding:10px 16px;font-size:14px;color:var(--ink3);font-weight:600">Ask anything…</div>'+
+ '<button class="icb plain" style="opacity:.35" data-toast="Voice input — later phase (D8)">'+ic('mic')+'</button>'+
+ '<button data-toast="Sent" style="width:42px;height:42px;border-radius:99px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center">'+ic('send','width:18px;height:18px')+'</button></div>');
+
+scr('ai-test','AI Tutor','AI test generator','phone','M9',
+ ['Weak topics pre-checked from analytics, each with current accuracy.','Count + difficulty segmented; generation ~5 s with skeleton state.','Output = timed exam labeled "AI test — focus: your weak topics."'],
+ ()=>'<div class="body">'+hdr('AI test',{back:1,sub:'Built from your weak topics'})+
+ '<div class="stit" style="margin-top:2px">Focus on</div><div class="card flat" style="padding:4px 14px">'+
+ [['Turning Effect of Forces','40% accuracy',1],['Circular motion','52% accuracy',1],['Ionic bonding','58% accuracy',0]].map(w=>'<div class="item" data-toast="Selection toggled"><div class="mid"><b>'+w[0]+'</b><small>'+w[1]+'</small></div>'+(w[2]?'<span class="pill gr">'+ic('check')+'</span>':'<span class="pill gy">+</span>')+'</div>').join('')+'</div>'+
+ '<div class="stit">Questions</div><div class="seg"><button>10</button><button class="on">15</button><button>20</button></div>'+
+ '<div class="stit">Difficulty</div><div class="seg"><button>Easy start</button><button class="on">Board level</button><button>Challenge</button></div>'+
+ '<div style="height:18px"></div><button class="btn orange" data-go="exam-intro">'+ic('spark')+'Generate my test</button></div>');
+
+/* ============ PROGRESS ============ */
+scr('prog','Progress','Progress overview','phone','M4',
+ ['Overall ring + 14-day streak strip (flame = active day).','Stats row: questions, accuracy, minutes, tests.','Per-subject bars tap → Performance filtered; weak-topic preview → Weak topics; report teaser → Report card.'],
+ ()=>'<div class="hdr"><div style="flex:1"><div class="tt">Progress</div><div class="sub">Dekho kitna aa gaya 📈</div></div><button class="ava" data-go="profile">🧑🏽‍🎓</button></div>'+
+ '<div class="body"><div class="card" style="display:flex;gap:16px;align-items:center">'+
+ '<div style="position:relative">'+ring(68,84)+'<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:18px">68%</span></div>'+
+ '<div style="flex:1"><b style="font-size:15px">Overall syllabus</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px;margin-top:2px">On track for December mocks</small>'+
+ '<div style="display:flex;gap:4px;margin-top:10px">'+Array.from({length:14},(_,i)=>'<span style="width:14px;height:20px;border-radius:5px;display:flex;align-items:flex-end;justify-content:center;font-size:8px;background:'+([2,5,6,8,9,11,12,13].includes(i)?'var(--orange-t)':'#EFF3F0')+'">'+([2,5,6,8,9,11,12,13].includes(i)?'🔥':'')+'</span>').join('')+'</div></div></div>'+
+ '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px">'+[['1,204','questions'],['76%','accuracy'],['21h','study time'],['9','tests']].map(k=>'<div class="kpi" style="padding:10px"><b style="font-size:17px">'+k[0]+'</b><small style="font-size:10.5px">'+k[1]+'</small></div>').join('')+'</div>'+
+ '<div class="stit">By subject <a data-go="perf">Details</a></div><div class="card flat" style="padding:10px 14px;display:grid;gap:12px">'+
+ SUBJ.slice(0,5).map(s=>'<div data-go="perf" style="cursor:pointer"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800"><span>'+s.n+'</span><span style="color:var(--ink2)">'+s.p+'%</span></div><div class="bar tl" style="margin-top:5px"><i style="width:'+s.p+'%"></i></div></div>').join('')+'</div>'+
+ '<div class="stit">Weak topics <a data-go="weak">All</a></div><div class="card flat" style="padding:4px 14px">'+
+ item({emoji:'⚠️',or:1,t:'Turning Effect of Forces',s:'Physics · 40% accuracy',go:'weak'})+
+ item({emoji:'⚠️',or:1,t:'Ionic bonding',s:'Chemistry · 58% accuracy',go:'weak'})+'</div>'+
+ '<div class="card" data-go="report" style="margin-top:12px;cursor:pointer;display:flex;align-items:center;gap:12px;border-color:var(--orange)"><span style="font-size:26px">🎓</span><div style="flex:1"><b style="font-size:14px">June report card</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">Overall A− · share with Abbu/Ammi</small></div><span class="chev">'+ic('chevr')+'</span></div>'+
+ '<div style="height:8px"></div></div>'+tabs('prog'));
+
+scr('perf','Progress','Performance analytics','phone','M4',
+ ['Range segmented: Week / Month / All.','Accuracy line + questions/day bars (SVG).','Confidence vs accuracy — the Pakka-meter payoff: per confidence level, how often you were right, with a coaching insight line.','Tests table with review links.'],
+ ()=>'<div class="body">'+hdr('Performance',{back:1,sub:'Physics · last 30 days'})+
+ '<div class="seg" style="margin-bottom:14px"><button>Week</button><button class="on">Month</button><button>All time</button></div>'+
+ '<div class="card"><span class="tag">Accuracy trend</span>'+
+ '<svg viewBox="0 0 300 90" style="width:100%;margin-top:8px"><polyline points="0,64 40,58 80,62 120,48 160,44 200,50 240,32 280,26 300,28" fill="none" stroke="#096A8B" stroke-width="3" stroke-linecap="round"/><circle cx="280" cy="26" r="4.5" fill="#F29329"/><text x="266" y="14" font-size="11" font-weight="800" fill="#0F3D4C">82%</text></svg>'+
+ '<div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:var(--ink3)"><span>Jun 19</span><span>Jul 19</span></div></div>'+
+ '<div class="card" style="margin-top:12px"><span class="tag">Questions per day</span>'+
+ '<svg viewBox="0 0 300 70" style="width:100%;margin-top:8px">'+Array.from({length:14},(_,i)=>{const h=[18,30,8,42,36,12,48,26,40,20,52,34,44,50][i];return '<rect x="'+(i*21+4)+'" y="'+(64-h)+'" width="13" height="'+h+'" rx="4" fill="'+(i>=12?'#F29329':'#B9D2DB')+'"/>'}).join('')+'</svg></div>'+
+ '<div class="card" style="margin-top:12px;border-color:var(--orange)"><span class="tag" style="color:var(--orange-d)">Confidence vs accuracy · Pakka-meter</span>'+
+ [['Pakka ✓','said 96 times','91%','var(--green)'],['Thora sure','said 74 times','68%','var(--orange)'],['Tukka 🎲','said 41 times','39%','var(--red)']].map(r=>'<div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span style="width:88px;font-size:12.5px;font-weight:800">'+r[0]+'</span><div class="bar" style="flex:1"><i style="width:'+r[2]+';background:'+r[3]+'"></i></div><span style="font-size:12px;font-weight:800;width:36px;text-align:right">'+r[2]+'</span></div>').join('')+
+ '<p style="font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:10px">Jab tum Pakka kehte ho, 91% sahi hota hai — trust yourself! Tukka pe kaam karna hai. 😉</p></div>'+
+ '<div class="stit">Tests</div><div class="card flat" style="padding:4px 14px">'+
+ item({icn:'clock',t:'Dynamics exam · 80%',s:'Today · +168 XP',go:'review'})+
+ item({icn:'clock',t:'Kinematics exam · 75%',s:'Jul 14',go:'review'})+'</div></div>');
+
+scr('weak','Progress','Weak topics','phone','M4',
+ ['Per-subject accordion; rows: topic, accuracy % (red <50, orange <70), question count.','Actions: Study (→ chapter) / Practice 10 (→ MCQs pre-filtered to the topic).','New-user empty state: "Practice a bit first — we’ll find your weak spots."'],
+ ()=>'<div class="body">'+hdr('Weak topics',{back:1,sub:'AI-spotted from your attempts'})+
+ '<div class="stit" style="margin-top:0">Physics</div>'+
+ [['Turning Effect of Forces','40%','18 questions','var(--red)'],['Circular motion','52%','24 questions','var(--orange-d)']].map(w=>'<div class="card" style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px"><b style="flex:1;font-size:14px">'+w[0]+'</b><span style="font-family:var(--disp);font-weight:800;color:'+w[3]+'">'+w[1]+'</span></div><small style="color:var(--ink2);font-weight:700;font-size:12px">'+w[2]+' attempted</small>'+
+ '<div style="display:flex;gap:8px;margin-top:11px"><button class="btn sm line" data-go="chapter" style="flex:1">Study</button><button class="btn sm" data-go="mcq" style="flex:1">Practice 10</button></div></div>').join('')+
+ '<div class="stit">Chemistry</div>'+
+ '<div class="card"><div style="display:flex;align-items:center;gap:10px"><b style="flex:1;font-size:14px">Ionic bonding</b><span style="font-family:var(--disp);font-weight:800;color:var(--orange-d)">58%</span></div><small style="color:var(--ink2);font-weight:700;font-size:12px">12 questions attempted</small>'+
+ '<div style="display:flex;gap:8px;margin-top:11px"><button class="btn sm line" data-go="chapter" style="flex:1">Study</button><button class="btn sm" data-go="mcq" style="flex:1">Practice 10</button></div></div></div>');
+
+scr('report','Progress','Report card','phone','M9',
+ ['Styled like a school report: month, overall grade, per-subject grades with trend arrows, activity stats, MatricMate stamp.','Share as image (WhatsApp-first) — D9: parents view without login. PDF download secondary.','Month switcher for history.'],
+ ()=>'<div class="body">'+hdr('Report card',{back:1,right:'<div class="seg" style="width:130px"><button style="padding:6px">May</button><button class="on" style="padding:6px">June</button></div>'})+
+ '<div class="card" style="border:2px solid var(--teal);position:relative;overflow:hidden">'+
+ '<div style="position:absolute;right:-14px;top:-14px;width:90px;height:90px;border-radius:99px;background:var(--orange-t);display:flex;align-items:center;justify-content:center;transform:rotate(12deg)"><b style="font-family:var(--disp);color:var(--orange-d);font-size:26px;margin-top:14px;margin-right:10px">A−</b></div>'+
+ '<img src="'+IMG.word+'" style="width:120px"><div class="tag" style="margin-top:4px">Monthly report · June 2026</div>'+
+ '<b style="display:block;margin-top:8px;font-size:15px">Ahmed Raza · Class 9 · FBISE</b>'+
+ '<table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:13px">'+
+ [['Physics','A','↑'],['Chemistry','B+','↑'],['Biology','B','→'],['Mathematics','A−','↑'],['English','A','→'],['Urdu','B+','↓']].map(r=>'<tr><td style="padding:7px 0;border-bottom:1px solid var(--line);font-weight:700">'+r[0]+'</td><td style="text-align:right;font-family:var(--disp);font-weight:800">'+r[1]+'</td><td style="width:30px;text-align:right;color:'+(r[2]==='↑'?'var(--green)':r[2]==='↓'?'var(--red)':'var(--ink3)')+';font-weight:800">'+r[2]+'</td></tr>').join('')+'</table>'+
+ '<div style="display:flex;gap:8px;margin-top:12px"><span class="pill">22 active days</span><span class="pill">1,204 questions</span><span class="pill or">9 tests</span></div></div>'+
+ '<div style="display:flex;gap:10px;margin-top:14px"><button class="btn" data-toast="Opening WhatsApp share…" style="flex:1;background:#25D366">'+ic('wa')+'Share</button><button class="btn line" data-toast="PDF saved" style="flex:1">'+ic('dl')+'PDF</button></div></div>');
+
+/* ============ PROFILE ============ */
+scr('profile','Profile','Profile','phone','M1 shell · M4 live',
+ ['Identity card: avatar, name, class/board/medium; edit → Edit profile.','Premium status card → Manage subscription; XP + level row.','Menu: Payment history, Downloads, Notifications, Settings, Help, Log out (confirm dialog).'],
+ ()=>'<div class="body">'+hdr('Profile',{back:1})+
+ '<div class="card" style="display:flex;gap:14px;align-items:center"><span class="ava" style="width:56px;height:56px;font-size:28px">🧑🏽‍🎓</span>'+
+ '<div style="flex:1"><b style="font-size:16px">Ahmed Raza</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">Class 9 · FBISE · English medium</small></div>'+
+ '<button class="icb" data-go="edit-profile">'+ic('edit')+'</button></div>'+
+ '<div class="card" data-go="subscription" style="margin-top:10px;cursor:pointer;display:flex;align-items:center;gap:12px;border-color:var(--orange);background:var(--orange-t)"><span style="font-size:22px">👑</span><div style="flex:1"><b style="font-size:14px">Premium active</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">Till 19 Aug · renews manually</small></div><span class="chev">'+ic('chevr')+'</span></div>'+
+ '<div class="card" style="margin-top:10px;display:flex;align-items:center;gap:12px"><span style="font-size:22px">⚡</span><div style="flex:1"><b style="font-size:14px">2,840 XP · Level 6</b><div class="bar" style="margin-top:7px"><i style="width:68%"></i></div></div><small style="color:var(--ink2);font-weight:800;font-size:11px">160 to L7</small></div>'+
+ '<div class="stit">Account</div><div class="card flat" style="padding:4px 14px">'+
+ item({icn:'card',t:'Payment history',go:'payments'})+item({icn:'dl',t:'Downloads',go:'downloads'})+item({icn:'bell',t:'Notifications',go:'notifs'})+item({icn:'gear',t:'Settings',go:'settings'})+item({icn:'help',t:'Help & support',go:'help'})+
+ '<div class="item" data-toast="Log out? — confirm dialog" style="cursor:pointer"><div class="ic" style="background:var(--red-t)"><span style="color:var(--red)">'+ic('out')+'</span></div><div class="mid"><b style="color:var(--red)">Log out</b></div></div></div><div style="height:8px"></div></div>');
+
+scr('edit-profile','Profile','Edit profile','phone','M4',
+ ['Preset cartoon avatars (no photo upload at MVP).','Changing class/board/medium warns: study plan resets.','Subjects re-pick re-enters the onboarding subject screen.'],
+ ()=>'<div class="body">'+hdr('Edit profile',{back:1})+
+ '<div style="display:flex;gap:10px;justify-content:center;margin:6px 0 16px">'+['🧑🏽‍🎓','👩🏽‍🎓','🧕🏽','👨🏽‍💻','🦸🏽'].map((a,i)=>'<button class="ava" style="width:52px;height:52px;font-size:26px;'+(i===0?'border:2px solid var(--teal)':'')+'" data-toast="Avatar selected">'+a+'</button>').join('')+'</div>'+
+ field('Full name','Ahmed Raza','user')+
+ field('Class & board','Class 9 · FBISE','book','<i>'+ic('chevr')+'</i>')+
+ field('Medium','English','globe','<i>'+ic('chevr')+'</i>')+
+ '<button class="btn line" data-go="ob-subjects" style="margin-bottom:10px">Change my subjects</button>'+
+ '<button class="btn" data-toast="Saved ✓">Save changes</button></div>');
+
+scr('subscription','Profile','Manage subscription','phone','M4',
+ ['Current plan, renewal date, payment method.','Manual monthly renewal: "Renew now" → Safepay; reminder push 2 days before expiry.','Cancel flow: confirm + reason chips. Free-tier variant shows upgrade instead.'],
+ ()=>'<div class="body">'+hdr('Subscription',{back:1})+
+ '<div class="card" style="border-color:var(--orange)"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">👑</span><div style="flex:1"><b style="font-size:15px">Premium · Rs 1,000/month</b><small style="display:block;color:var(--ink2);font-weight:700;font-size:12px">Active till 19 Aug 2026</small></div><span class="pill gr">Active</span></div>'+
+ '<div class="item" style="border:0;padding-bottom:0;margin-top:6px"><div class="ic">'+ic('card')+'</div><div class="mid"><b>JazzCash · 0300 •••1234</b><small>Last used 19 Jul</small></div></div></div>'+
+ '<div style="height:12px"></div><button class="btn orange" data-go="pay-method">Renew now — Rs 1,000</button>'+
+ '<button class="btn ghost" data-toast="Cancel flow: confirm + reason chips" style="color:var(--red)">Cancel subscription</button>'+
+ '<p class="center" style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:6px">No auto-charge — hum reminder bhejte hain, tum renew karte ho.</p></div>');
+
+scr('payments','Profile','Payment history','phone','M4',
+ ['Receipt rows: date, amount, method icon, status chip.','Tap → receipt sheet with reference number for support.','Empty state for new accounts.'],
+ ()=>'<div class="body">'+hdr('Payment history',{back:1})+
+ '<div class="card flat" style="padding:4px 14px">'+
+ [['19 Jul 2026','JazzCash','Paid'],['19 Jun 2026','EasyPaisa','Paid'],['19 May 2026','Card ••4242','Paid']].map(p=>'<div class="item" data-toast="Receipt · ref SP-88'+p[0].slice(0,2)+'41"><div class="ic">'+ic('card')+'</div><div class="mid"><b>Rs 1,000 — Premium</b><small>'+p[0]+' · '+p[1]+'</small></div><span class="pill gr">'+p[2]+'</span></div>').join('')+'</div></div>');
+
+scr('settings','Profile','Settings','phone','M2',
+ ['Groups: Appearance (dark mode), Content (medium, font size), Notifications (reminders + time), Storage, About.','UI language stays English at launch (D10); content medium is per-subject.','Dark mode ships with M5 polish; toggle present from M2.'],
+ ()=>{const tg=(on)=>'<span style="width:44px;height:26px;border-radius:99px;background:'+(on?'var(--teal)':'#D7E0DB')+';position:relative;display:inline-block;flex:none"><i style="position:absolute;top:3px;'+(on?'right:3px':'left:3px')+';width:20px;height:20px;border-radius:99px;background:#fff"></i></span>';
+ return '<div class="body">'+hdr('Settings',{back:1})+
+ '<div class="stit" style="margin-top:0">Appearance</div><div class="card flat" style="padding:4px 14px">'+
+ '<div class="item" data-toast="Dark mode — ships with M5 polish"><div class="ic">'+ic('moon')+'</div><div class="mid"><b>Dark mode</b></div>'+tg(0)+'</div></div>'+
+ '<div class="stit">Content</div><div class="card flat" style="padding:4px 14px">'+
+ '<div class="item"><div class="ic">'+ic('globe')+'</div><div class="mid"><b>Content medium</b><small>English (per subject on chapter screen)</small></div><span class="chev">'+ic('chevr')+'</span></div>'+
+ '<div class="item"><div class="ic">'+ic('book')+'</div><div class="mid"><b>Reading font size</b><small>Medium</small></div><span class="chev">'+ic('chevr')+'</span></div></div>'+
+ '<div class="stit">Notifications</div><div class="card flat" style="padding:4px 14px">'+
+ '<div class="item"><div class="ic">'+ic('bell')+'</div><div class="mid"><b>Study reminder</b><small>Daily · 7:00 PM</small></div>'+tg(1)+'</div>'+
+ '<div class="item"><div class="ic">'+ic('flame')+'</div><div class="mid"><b>Streak alerts</b></div>'+tg(1)+'</div></div>'+
+ '<div class="stit">Storage</div><div class="card flat" style="padding:4px 14px">'+
+ item({icn:'dl',t:'Manage downloads',s:'142 MB',go:'downloads'})+
+ '<div class="item" data-toast="Cache cleared — 18 MB freed"><div class="ic">'+ic('trash')+'</div><div class="mid"><b>Clear cache</b><small>18 MB</small></div></div></div>'+
+ '<div class="stit">About</div><div class="card flat" style="padding:4px 14px">'+
+ '<div class="item"><div class="mid"><b>Version</b><small>1.0.0 (M1 prototype)</small></div></div>'+
+ '<div class="item"><div class="mid"><b>Terms & privacy</b></div><span class="chev">'+ic('chevr')+'</span></div></div><div style="height:8px"></div></div>'});
+
+scr('help','Profile','Help & support','phone','M5',
+ ['FAQ accordions: subscription, offline, AI limits.','WhatsApp contact CTA (deep link) with support hours.','Report-a-problem form: category + text.'],
+ ()=>'<div class="body">'+hdr('Help & support',{back:1})+
+ '<button class="btn" data-toast="Opening WhatsApp…" style="background:#25D366;margin-bottom:14px">'+ic('wa')+'Chat on WhatsApp · 10am–10pm</button>'+
+ '<div class="stit" style="margin-top:0">Common questions</div>'+
+ [['How do I renew Premium?','Profile → Subscription → Renew now. JazzCash, EasyPaisa ya card.'],['Does it work offline?','Downloaded chapters, audio and MCQs — yes. AI tutor and exams need internet.'],['Why is my AI limited daily?','Quotas keep MatricMate affordable for everyone. Premium gets 20 messages/day.']].map(f=>'<div class="card flat" style="margin-bottom:8px"><b style="font-size:13.5px">'+f[0]+'</b><p style="font-size:13px;color:var(--ink2);font-weight:600;line-height:1.6;margin-top:5px">'+f[1]+'</p></div>').join('')+
+ '<div class="stit">Still stuck?</div><button class="btn line" data-toast="Problem report form">Report a problem</button></div>');
+
+/* ============ SYSTEM STATES ============ */
+scr('states','System','UI states gallery','phone','M1',
+ ['The reference for every screen’s edge states — never a blank screen.','Skeleton pattern for loading lists; empty states invite an action; errors say what happened + Retry.','Offline banner slides under the header; premium lock opens the paywall sheet; toasts confirm quiet actions.'],
+ ()=>'<div class="body">'+hdr('UI states',{back:1,sub:'Loading · empty · error · offline'})+
+ '<div class="stit" style="margin-top:0">Loading (skeleton)</div><div class="card flat" style="display:grid;gap:10px">'+
+ '<div style="display:flex;gap:10px"><span class="skel" style="width:42px;height:42px"></span><div style="flex:1;display:grid;gap:7px"><span class="skel" style="height:13px;width:70%"></span><span class="skel" style="height:10px;width:45%"></span></div></div>'+
+ '<div style="display:flex;gap:10px"><span class="skel" style="width:42px;height:42px"></span><div style="flex:1;display:grid;gap:7px"><span class="skel" style="height:13px;width:60%"></span><span class="skel" style="height:10px;width:35%"></span></div></div></div>'+
+ '<div class="stit">Offline banner</div><div class="card flat" style="display:flex;gap:10px;align-items:center;background:var(--orange-t);border-color:var(--orange)"><span style="color:var(--orange-d)">'+ic('wifioff')+'</span><b style="font-size:13px;flex:1">You’re offline — downloaded content still works.</b></div>'+
+ '<div class="stit">Empty state</div><div class="card flat center" style="padding:22px"><div style="font-size:34px">📭</div><b style="font-size:14px;display:block;margin-top:6px">No downloads yet</b><small style="color:var(--ink2);font-weight:700">Save a chapter and study without internet.</small><div style="height:10px"></div><button class="btn sm line" data-go="downloads" style="margin:0 auto">Download Ch 3</button></div>'+
+ '<div class="stit">Error + retry</div><div class="card flat center" style="padding:22px;border-color:var(--red)"><b style="font-size:14px;color:var(--red)">Couldn’t load chapters</b><small style="display:block;color:var(--ink2);font-weight:700;margin-top:3px">Check your connection and try again.</small><div style="height:10px"></div><button class="btn sm" data-toast="Retrying…" style="margin:0 auto">'+ic('refresh')+'Retry</button></div>'+
+ '<div class="stit">Premium lock (sheet)</div><div class="card flat" style="display:flex;gap:10px;align-items:center"><span style="color:var(--ink3)">'+ic('lock')+'</span><b style="font-size:13px;flex:1">Chapter 7 is Premium</b><button class="btn sm orange" data-go="paywall">Unlock</button></div><div style="height:8px"></div></div>');
+/* ============ STUDENT WEB (M6) ============ */
+function wside(on){return '<div class="wside"><img src="'+IMG.word+'">'+
+ [['home','Home','web-dash'],['book','Study','web-reader'],['target','Practice','web-dash'],['spark','AI Tutor','web-dash'],['chart','Progress','web-dash']].map(x=>'<a data-go="'+x[2]+'" class="'+(x[1]===on?'on':'')+'">'+ic(x[0])+x[1]+'</a>').join('')+
+ '<div class="sp"></div><a>'+ic('user')+'Ahmed · Class 9</a></div>'}
+scr('web-dash','Student web','Web — dashboard','desk','M6',
+ ['Same components as mobile, web shell: left sidebar replaces tab bar; content grid max-width 1040.','This is the payoff of the universal app — one codebase, two layouts.','Top bar: search + streak + quota; everything else identical to the phone dashboard.'],
+ ()=>'<div class="wshell">'+wside('Home')+'<div class="wmain">'+
+ '<div class="wtop"><div class="srch">'+ic('search')+'Search chapters, questions…</div><span style="flex:1"></span><span class="pill or">🔥 6-day streak</span><span class="pill">AI: 14/20</span></div>'+
+ '<h2 style="font-family:var(--disp);font-size:24px;margin-bottom:14px">Salam, Ahmed 👋</h2>'+
+ '<div style="display:grid;grid-template-columns:1.2fr .8fr;gap:14px">'+
+ '<div class="card" style="background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;border:0"><b style="font-family:var(--disp);font-size:16px">Aaj ka plan · 3/8 done</b><div class="bar" style="background:rgba(255,255,255,.25);margin:10px 0"><i style="width:37%"></i></div><small style="font-weight:700;opacity:.85">Next: 20 MCQs on Dynamics · 15 min</small></div>'+
+ '<div class="card"><b style="font-size:14px">Continue learning</b><div style="display:flex;gap:10px;align-items:center;margin-top:10px"><span style="color:var(--teal)">'+ic('bolt')+'</span><div style="flex:1"><b style="font-size:13.5px">Ch 3 · Dynamics</b><div class="bar" style="margin-top:6px"><i style="width:64%"></i></div></div></div></div></div>'+
+ '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px">'+[['76%','accuracy this week'],['214','questions'],['3h 40m','study time'],['2,840','XP · Level 6']].map(k=>'<div class="kpi"><b>'+k[0]+'</b><small>'+k[1]+'</small></div>').join('')+'</div>'+
+ '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">'+
+ '<div class="card"><b style="font-size:14px">Subjects</b>'+SUBJ.slice(0,4).map(s=>'<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-top:10px"><span>'+s.n+'</span><span style="color:var(--ink2)">'+s.p+'%</span></div><div class="bar tl" style="margin-top:4px"><i style="width:'+s.p+'%"></i></div>').join('')+'</div>'+
+ '<div class="card"><b style="font-size:14px">Weak topics</b>'+[['Turning Effect of Forces','40%'],['Circular motion','52%'],['Ionic bonding','58%']].map(w=>'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px;font-weight:700"><span>⚠️ '+w[0]+'</span><span class="pill rd">'+w[1]+'</span></div>').join('')+'</div></div></div></div>');
+BYID['web-dash'].url='app.matricmate.pk/home';
+
+scr('web-reader','Student web','Web — reader + Ask AI','desk','M6',
+ ['Reader on web: sticky chapter outline left, 680px content column, Ask-AI panel docked right (replaces the mobile bottom sheet).','Same content blocks as mobile reader — one component, two layouts.'],
+ ()=>'<div class="wshell">'+wside('Study')+'<div style="display:grid;grid-template-columns:200px 1fr 300px;gap:0">'+
+ '<div style="border-right:1px solid var(--line);padding:20px 14px"><b style="font-size:12px;color:var(--ink2)">CH 3 · DYNAMICS</b>'+['Force & inertia','Newton’s 1st law','Newton’s 2nd law','Newton’s 3rd law','Friction','Circular motion'].map((s,i)=>'<div style="padding:8px 10px;border-radius:9px;font-size:13px;font-weight:700;margin-top:4px;'+(i===2?'background:var(--teal-t);color:var(--teal)':'color:var(--ink2)')+'">'+(i===2?'▸ ':'')+s+'</div>').join('')+'</div>'+
+ '<div style="padding:26px 34px;max-width:680px"><span class="tag">Section 3 of 6</span><h2 style="font-family:var(--disp);font-size:24px;margin:8px 0 12px">Newton’s Second Law of Motion</h2>'+
+ '<p style="font-size:15px;line-height:1.8;font-weight:600">When a net force acts on a body, it produces acceleration in the direction of the force, directly proportional to the force and inversely proportional to the mass.</p>'+
+ '<div class="card center" style="margin:16px 0"><span style="font-family:var(--disp);font-size:26px;letter-spacing:.06em">F = ma</span></div>'+
+ '<p class="ur" style="font-size:16px;color:var(--ink2)">جب کسی جسم پر قوت عمل کرتی ہے تو وہ قوت کی سمت میں اسراع پیدا کرتی ہے۔</p></div>'+
+ '<div style="border-left:1px solid var(--line);padding:20px 16px;background:var(--card)"><b style="font-size:13px;display:flex;gap:8px;align-items:center"><span style="color:var(--teal)">'+ic('spark')+'</span>Ask AI · this section</b>'+
+ '<div class="msg ai" style="margin-top:12px;font-size:13px">Confused about F = ma? Poochh lo — main hoon na.</div>'+
+ '<div style="display:grid;gap:6px;margin-top:10px">'+['Explain simply','Give an example','اردو میں سمجھائیں'].map(c=>'<button class="pill gy" style="justify-content:flex-start" data-toast="Opens AI chat with context">'+(c==='اردو میں سمجھائیں'?'<span class="ur">'+c+'</span>':c)+'</button>').join('')+'</div></div></div></div>');
+BYID['web-reader'].url='app.matricmate.pk/study/physics/ch-3';
+
+/* ============ LANDING (M6) ============ */
+scr('landing','Landing & marketing','Landing page','desk','M6',
+ ['Single page, anchor navigation. Hero: wordmark + bilingual headline + phone mockup + store CTAs.','Sections: social proof strip, features 3-up, how-it-works, pricing card (Rs 1,000 + trial), FAQ, footer.','SEO/meta + WhatsApp share cards; page weight < 200 KB.'],
+ ()=>'<div style="background:var(--paper)">'+
+ '<div style="display:flex;align-items:center;gap:14px;padding:16px 40px;border-bottom:1px solid var(--line);background:var(--card)"><img src="'+IMG.word+'" style="height:26px"><span style="flex:1"></span>'+
+ ['Features','Pricing','FAQ'].map(l=>'<a style="font-size:13.5px;font-weight:800;color:var(--ink2);text-decoration:none">'+l+'</a>').join('')+
+ '<button class="btn sm" data-go="web-dash">Use on web</button></div>'+
+ '<div style="display:grid;grid-template-columns:1.1fr .9fr;gap:30px;padding:54px 60px;align-items:center">'+
+ '<div><span class="pill or">FBISE Class 9 · Class 10 coming</span>'+
+ '<h1 style="font-family:var(--disp);font-size:44px;line-height:1.08;margin:14px 0 6px">Board exams,<br><span style="color:var(--teal)">sorted.</span></h1>'+
+ '<p style="margin:8px 0 14px"><span class="ur" style="font-size:19px;color:var(--ink2)">پوری تیاری، ایک ایپ میں</span></p>'+
+ '<p style="font-size:15.5px;font-weight:600;color:var(--ink2);line-height:1.7;max-width:440px">Chapter-wise notes, audio lessons, flashcards, past papers, timed exams and a 24/7 AI tutor — sab kuch, one app.</p>'+
+ '<div style="display:flex;gap:10px;margin-top:20px"><button class="btn sm orange" style="padding:12px 20px" data-toast="Play Store listing">'+ic('play')+'Get it on Google Play</button><button class="btn sm line" style="padding:12px 20px" data-go="web-dash">Use on web →</button></div>'+
+ '<div style="display:flex;gap:18px;margin-top:22px;font-size:12.5px;font-weight:800;color:var(--ink2)"><span>⭐ 4.8 early rating</span><span>👨‍🎓 2,000+ students</span><span>🇵🇰 Made for Pakistan</span></div></div>'+
+ '<div style="display:flex;justify-content:center"><div class="phone" style="width:250px;height:520px;border-radius:34px;padding:7px;box-shadow:0 24px 60px rgba(15,80,100,.25)"><div class="phone-in" style="border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="'+IMG.mono+'" style="width:120px"><b style="font-family:var(--disp)">Aaj ka plan · 3/8</b><div class="bar" style="width:60%"><i style="width:37%"></i></div><span class="pill or">🔥 6-day streak</span></div></div></div></div>'+
+ '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:10px 60px 40px">'+
+ [['book','Study','Notes, examples & audio for every chapter — English aur Urdu medium.'],['target','Practice','MCQs with explanations, flashcards, past papers, timed exams.'],['spark','AI Tutor','Step-by-step help 24/7. Photo bhejo, hal samjho.']].map(f=>'<div class="card" style="display:grid;gap:8px"><span style="color:var(--teal)">'+ic(f[0])+'</span><b style="font-family:var(--disp);font-size:16px">'+f[1]+'</b><small style="color:var(--ink2);font-weight:600;font-size:13px;line-height:1.6">'+f[2]+'</small></div>').join('')+'</div>'+
+ '<div style="display:flex;justify-content:center;padding:0 60px 50px"><div class="card center" style="max-width:360px;border-color:var(--orange);border-width:2px"><span class="pill or">First 3 days free</span><div style="font-family:var(--disp);font-size:34px;font-weight:800;margin-top:8px">Rs 1,000<span style="font-size:15px;color:var(--ink2)">/month</span></div><small style="color:var(--ink2);font-weight:700">Everything unlocked · cards, JazzCash & EasyPaisa · cancel anytime</small><div style="height:12px"></div><button class="btn orange" data-go="paywall">Start free trial</button></div></div>'+
+ '<div style="padding:18px 60px;border-top:1px solid var(--line);display:flex;gap:20px;font-size:12px;font-weight:700;color:var(--ink2)"><img src="'+IMG.word+'" style="height:18px"><span style="flex:1"></span><span>Terms</span><span>Privacy</span><span>WhatsApp support</span></div></div>');
+BYID['landing'].url='matricmate.pk';
+
+/* ============ ADMIN (M7) ============ */
+function aside(on){return '<div class="wside" style="background:var(--teal-d)"><img src="'+IMG.word+'" style="filter:brightness(0) invert(1);opacity:.9">'+
+ [['chart','Overview','adm-dash'],['book','Curriculum','adm-curriculum'],['edit','Content editor','adm-editor'],['target','MCQ bank','adm-mcq'],['user','Students','adm-students']].map(x=>'<a data-go="'+x[2]+'" style="color:'+(x[1]===on?'#fff':'#9FC0CB')+';'+(x[1]===on?'background:rgba(255,255,255,.12)':'')+'">'+ic(x[0])+x[1]+'</a>').join('')+
+ '<div class="sp"></div><a style="color:#9FC0CB">'+ic('out')+'Log out</a></div>'}
+scr('adm-login','Admin CMS','Admin — login','desk','M7',
+ ['Email + password only; admin role enforced by RLS.','No public signup — admins are created manually.'],
+ ()=>'<div style="min-height:780px;background:var(--teal-d);display:flex;align-items:center;justify-content:center">'+
+ '<div class="card" style="width:360px;padding:26px"><img src="'+IMG.word+'" style="height:26px"><div class="tag" style="margin:6px 0 16px">Admin console</div>'+
+ field('Email','admin@matricmate.pk','send')+field('Password','••••••••','lock')+
+ '<button class="btn" data-go="adm-dash">Log in</button>'+
+ '<p style="font-size:11.5px;color:var(--ink2);font-weight:700;margin-top:10px">Admin access only. Students use the app.</p></div></div>');
+BYID['adm-login'].url='admin.matricmate.pk';
+
+scr('adm-dash','Admin CMS','Admin — overview','desk','M7',
+ ['KPIs: students, active today, premium count, MRR estimate.','Signups chart; content pipeline widget (draft / in review / published).','AI-generated MCQs awaiting review surface here — the review-before-publish loop starts on the dashboard.'],
+ ()=>'<div class="wshell">'+aside('Overview')+'<div class="wmain">'+
+ '<h2 style="font-family:var(--disp);font-size:22px;margin-bottom:16px">Overview</h2>'+
+ '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">'+[['2,412','students'],['861','active today'],['514','premium'],['Rs 514k','MRR est.']].map(k=>'<div class="kpi"><b>'+k[0]+'</b><small>'+k[1]+'</small></div>').join('')+'</div>'+
+ '<div style="display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px">'+
+ '<div class="card"><b style="font-size:14px">Signups · last 30 days</b><svg viewBox="0 0 300 80" style="width:100%;margin-top:10px"><polyline points="0,66 30,60 60,62 90,50 120,52 150,40 180,42 210,30 240,26 270,18 300,14" fill="none" stroke="#096A8B" stroke-width="3" stroke-linecap="round"/></svg></div>'+
+ '<div class="card"><b style="font-size:14px">Content pipeline</b>'+[['Draft','34','gy'],['In review','12','or'],['Published','188','gr']].map(p=>'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px;font-weight:700"><span>'+p[0]+'</span><span class="pill '+p[2]+'">'+p[1]+'</span></div>').join('')+'</div></div>'+
+ '<div class="card" style="margin-top:14px;display:flex;align-items:center;gap:12px;border-color:var(--orange)"><span style="color:var(--orange-d)">'+ic('spark')+'</span><b style="flex:1;font-size:14px">23 AI-generated MCQs waiting for review</b><button class="btn sm" data-go="adm-mcq">Review queue</button></div></div></div>');
+BYID['adm-dash'].url='admin.matricmate.pk/overview';
+
+scr('adm-curriculum','Admin CMS','Admin — curriculum','desk','M7',
+ ['Tree: Board → Medium → Class → Subject → Chapter; drag to reorder chapters.','Right panel: chapter status (draft/review/published), content counts, audio presence.','"Add chapter" modal; publishing requires review approval.'],
+ ()=>'<div class="wshell">'+aside('Curriculum')+'<div style="display:grid;grid-template-columns:270px 1fr;gap:0">'+
+ '<div style="border-right:1px solid var(--line);padding:18px 12px;background:var(--card)">'+
+ '<div style="font-size:12px;font-weight:800;color:var(--ink2)">FBISE · ENGLISH · CLASS 9</div>'+
+ SUBJ.slice(0,5).map((s,i)=>'<div style="padding:8px 10px;border-radius:9px;font-size:13.5px;font-weight:800;margin-top:4px;'+(i===0?'background:var(--teal-t);color:var(--teal)':'color:var(--ink2)')+'">'+s.n+' <span style="opacity:.6;font-weight:700">· '+s.ch+'</span></div>').join('')+'</div>'+
+ '<div class="wmain"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><h2 style="font-family:var(--disp);font-size:20px;flex:1">Physics — chapters</h2><button class="btn sm" data-toast="Add chapter modal">'+ic('plus')+'Add chapter</button></div>'+
+ '<table class="tbl"><tr><th style="width:40px">#</th><th>Chapter</th><th>Content</th><th>Audio</th><th>Status</th><th></th></tr>'+
+ PHY_CH.slice(0,6).map(c=>'<tr><td>⠿ '+c.n+'</td><td><b>'+c.t+'</b></td><td>'+c.mc+' MCQs · notes · cards</td><td>'+(c.n<4?'EN + UR':'—')+'</td><td><span class="pill '+(c.n<4?'gr':c.n<6?'or':'gy')+'">'+(c.n<4?'Published':c.n<6?'In review':'Draft')+'</span></td><td><button class="pill gy" data-go="adm-editor">Edit</button></td></tr>').join('')+'</table></div></div></div>');
+BYID['adm-curriculum'].url='admin.matricmate.pk/curriculum';
+
+scr('adm-editor','Admin CMS','Admin — content editor','desk','M7',
+ ['Sections list left; editor center (toolbar: heading, bold, formula, image, callout).','Right meta: EN/UR medium tabs (dual-medium authoring side by side), audio upload with duration, review status.','Publish disabled until review status = Approved — the review-before-publish rule enforced in UI and API.'],
+ ()=>'<div class="wshell">'+aside('Content editor')+'<div style="display:grid;grid-template-columns:210px 1fr 250px">'+
+ '<div style="border-right:1px solid var(--line);padding:16px 12px;background:var(--card)"><b style="font-size:12px;color:var(--ink2)">CH 3 · SECTIONS</b>'+['Force & inertia','Newton’s 1st law','Newton’s 2nd law ▸','Newton’s 3rd law','Friction','Circular motion'].map((s,i)=>'<div style="padding:7px 9px;border-radius:8px;font-size:12.5px;font-weight:700;margin-top:4px;'+(i===2?'background:var(--teal-t);color:var(--teal)':'color:var(--ink2)')+'">'+s+'</div>').join('')+'<button class="pill gy" style="margin-top:10px" data-toast="Section added">+ Add section</button></div>'+
+ '<div style="padding:18px 22px"><div style="display:flex;gap:6px;margin-bottom:10px">'+['H2','B','ƒx','🖼','❝'].map(b=>'<button class="icb" style="width:34px;height:34px;font-weight:800;font-size:13px" data-toast="Formatting: '+b+'">'+b+'</button>').join('')+'</div>'+
+ '<div class="card" style="min-height:420px;font-size:14px;line-height:1.8;font-weight:600"><h3 style="font-family:var(--disp)">Newton’s Second Law of Motion</h3><p>When a net force acts on a body, it produces acceleration in the direction of the force…</p><p style="background:var(--teal-t);border-left:3px solid var(--teal);padding:8px 12px;border-radius:8px">Definition — Newton (N): force producing 1 m/s² in 1 kg.</p><p style="text-align:center;font-family:var(--disp);font-size:20px">F = ma</p><p style="color:var(--ink3)">| — cursor</p></div></div>'+
+ '<div style="border-left:1px solid var(--line);padding:16px;background:var(--card)"><div class="seg" style="margin-bottom:12px"><button class="on">English</button><button data-toast="Urdu authoring panel — dual medium"><span class="ur" style="font-size:12px">اردو</span></button></div>'+
+ '<b style="font-size:12px;color:var(--ink2)">AUDIO</b><div class="card flat" style="margin:6px 0 14px;display:flex;gap:8px;align-items:center;font-size:12.5px;font-weight:700">'+ic('head')+'dynamics_en.mp3 · 18:02<button class="pill gy" style="margin-left:auto" data-toast="Replace audio">↺</button></div>'+
+ '<b style="font-size:12px;color:var(--ink2)">REVIEW STATUS</b><div class="card flat" style="margin:6px 0 14px;font-weight:800;font-size:13px;color:var(--orange-d)">In review ▾</div>'+
+ '<button class="btn sm" style="width:100%" data-toast="Draft saved">Save draft</button><div style="height:8px"></div><button class="btn sm orange" style="width:100%;opacity:.5" data-toast="Publish needs review approval first">Publish</button></div></div></div>');
+BYID['adm-editor'].url='admin.matricmate.pk/content/phy/ch-3';
+
+scr('adm-mcq','Admin CMS','Admin — MCQ bank & AI queue','desk','M7',
+ ['Table: question, chapter, difficulty, source (Human/AI), status; filters + bulk approve.','AI review queue tab: Approve / Fix / Reject with reasons — nothing AI-made reaches students unreviewed.','Row click opens editor drawer (question, options, correct, explanation).'],
+ ()=>'<div class="wshell">'+aside('MCQ bank')+'<div class="wmain">'+
+ '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><h2 style="font-family:var(--disp);font-size:20px;flex:1">MCQ bank</h2><span class="pill or">AI queue · 23</span><button class="btn sm" data-toast="Bulk approve selected">'+ic('check')+'Approve selected</button></div>'+
+ '<div style="display:flex;gap:8px;margin-bottom:12px">'+['All','Physics','Ch 3','AI-generated','Needs review'].map((f,i)=>'<button class="pill'+(i===3||i===4?' or':' gy')+'">'+f+'</button>').join('')+'</div>'+
+ '<table class="tbl"><tr><th></th><th>Question</th><th>Chapter</th><th>Diff.</th><th>Source</th><th>Status</th><th></th></tr>'+
+ [['A body with constant speed but changing velocity…','Ch 3','Med','AI','review'],['The SI unit of force is…','Ch 3','Easy','Human','pub'],['Rate of change of momentum equals…','Ch 3','Med','AI','review'],['Friction always acts…','Ch 3','Easy','AI','rej']].map(r=>'<tr><td><input type="checkbox" '+(r[4]==='review'?'checked':'')+'></td><td style="max-width:280px"><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td><span class="pill '+(r[3]==='AI'?'or':'gy')+'">'+r[3]+'</span></td><td><span class="pill '+(r[4]==='pub'?'gr':r[4]==='review'?'or':'rd')+'">'+(r[4]==='pub'?'Published':r[4]==='review'?'In review':'Rejected')+'</span></td>'+
+ '<td style="white-space:nowrap"><button class="pill gr" data-toast="Approved ✓">✓</button> <button class="pill gy" data-toast="Opens editor drawer">Fix</button> <button class="pill rd" data-toast="Rejected — reason: too easy">✕</button></td></tr>').join('')+'</table></div></div>');
+BYID['adm-mcq'].url='admin.matricmate.pk/mcqs?filter=review';
+
+scr('adm-students','Admin CMS','Admin — students','desk','M7',
+ ['Table: name, class/medium, joined, last active, plan status; search + CSV export.','Manual subscription activation (bank-transfer fallback) and extension — the Safepay-outage safety valve.','Row actions: activate / extend / view activity.'],
+ ()=>'<div class="wshell">'+aside('Students')+'<div class="wmain">'+
+ '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><h2 style="font-family:var(--disp);font-size:20px;flex:1">Students</h2><div class="srch" style="max-width:240px;display:flex;gap:8px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font-size:12.5px;color:var(--ink3);font-weight:600">'+ic('search')+'Search name / phone</div><button class="btn sm line" data-toast="CSV exported">'+ic('dl')+'Export</button></div>'+
+ '<table class="tbl"><tr><th>Student</th><th>Class</th><th>Joined</th><th>Last active</th><th>Plan</th><th></th></tr>'+
+ [['Ahmed Raza','9 · EN','19 May','today','prem'],['Fatima Noor','9 · UR','2 Jun','today','prem'],['Bilal Khan','9 · EN','11 Jul','3d ago','free'],['Ayesha Tariq','9 · EN','18 Jul','yesterday','pend']].map(s=>'<tr><td><b>'+s[0]+'</b></td><td>'+s[1]+'</td><td>'+s[2]+'</td><td>'+s[3]+'</td><td><span class="pill '+(s[4]==='prem'?'gr':s[4]==='pend'?'or':'gy')+'">'+(s[4]==='prem'?'Premium':s[4]==='pend'?'Pending pay':'Free')+'</span></td>'+
+ '<td style="white-space:nowrap"><button class="pill gy" data-toast="Manual activation — bank transfer fallback">Activate</button> <button class="pill gy" data-toast="+1 month added">Extend</button></td></tr>').join('')+'</table>'+
+ '<p style="font-size:12px;font-weight:700;color:var(--ink2);margin-top:10px">Manual activation exists as the Safepay fallback — every action is audit-logged.</p></div></div>');
+BYID['adm-students'].url='admin.matricmate.pk/students';
+
+/* ============ boot ============ */
+function buildNav(){const groups=[];REG.forEach(s=>{let g=groups.find(x=>x.n===s.group);if(!g){g={n:s.group,items:[]};groups.push(g)}g.items.push(s)});
+ document.getElementById('navlist').innerHTML=groups.map(g=>'<div class="grp"><h4>'+g.n+'<span class="m">'+g.items.length+'</span></h4>'+
+ g.items.map((s,i)=>'<a href="#'+s.id+'" data-id="'+s.id+'"><span class="n">'+(i+1)+'</span>'+s.title+'</a>').join('')+'</div>').join('');
+ document.getElementById('cnt').textContent=REG.length+' screens · tap to explore';
+ document.getElementById('brandimg').src=IMG.word;}
+function fit(){const st=document.getElementById('stage'),ph=document.getElementById('phonewrap'),dw=document.getElementById('deskwrap');
+ const w=st.clientWidth-40,h=st.clientHeight-40;
+ if(matchMedia('(max-width:920px)').matches){ph.style.transform='none';dw.style.transform='scale('+Math.min(1,(innerWidth-16)/1240)+')';return}
+ ph.style.transform='scale('+Math.min(1,h/864,w/410)+')';
+ dw.style.transform='scale('+Math.min(1,w/1260,h/840)+')';}
+addEventListener('resize',fit);
+document.addEventListener('click',e=>{
+ const g=e.target.closest('[data-go]');if(g){e.preventDefault();go(g.dataset.go);return}
+ if(e.target.closest('[data-back]')){back();return}
+ const t=e.target.closest('[data-toast]');if(t){toast(t.dataset.toast);return}
+ const sl=e.target.closest('[data-slide]');if(sl){wIdx=+sl.dataset.slide;go('welcome',false);return}
+ const na=e.target.closest('#nav a');if(na){e.preventDefault();HIST=[];go(na.dataset.id);return}
+ const op=e.target.closest('[data-opt]');if(op){document.querySelectorAll('[data-opt]').forEach(o=>o.classList.remove('sel'));op.classList.add('sel');const pw=document.getElementById('pkwrap');if(pw)pw.style.display='block';return}
+ const pk=e.target.closest('[data-pk]');if(pk){document.querySelectorAll('[data-pk]').forEach(o=>o.classList.remove('on'));pk.classList.add('on');const cb=document.getElementById('checkbtn');if(cb)cb.disabled=false;return}
+ if(e.target.closest('#fcard')){document.getElementById('fcard').classList.toggle('flip');return}
+ if(e.target.closest('#fab-list')){const ms=document.getElementById('msheet');document.getElementById('msheet-in').innerHTML=document.getElementById('navlist').innerHTML;ms.classList.add('show');return}
+ if(e.target.closest('#fab-note')){const ms=document.getElementById('msheet');document.getElementById('msheet-in').innerHTML=document.getElementById('notebody').innerHTML;ms.classList.add('show');return}
+ if(e.target.id==='msheet'){e.target.classList.remove('show');return}
+ const ma=e.target.closest('#msheet a');if(ma){e.preventDefault();document.getElementById('msheet').classList.remove('show');HIST=[];go(ma.dataset.id);return}
+});
+buildNav();
+go((location.hash||'#splash').slice(1)||'splash',false);
+
+</script>
+</body>
+</html>

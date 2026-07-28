@@ -1,0 +1,31 @@
+{
+  "url": "https://apexbeat.ai/plab",
+  "title": "ApexBeat - AI-Powered MBBS Mastery",
+  "h1": [
+    "What's up, Doc?",
+    "PLAB MCQs"
+  ],
+  "h2": [],
+  "h3": [],
+  "h4": [],
+  "buttons": [
+    "Feedback",
+    "↩Logout",
+    "Chat with AI",
+    "I",
+    "Chat with AI",
+    "Logout"
+  ],
+  "tabs": [],
+  "tables": 0,
+  "cards": 0,
+  "listItems": 0,
+  "images": 35,
+  "audio": 0,
+  "video": 0,
+  "iframes": [
+    "https://js.stripe.com/v3/controller-with-preconnect-37b44ff6afdb1d935b5c2bcce962d8e4.html#__shared_params__[version]=v3&__shared_params__[light_experiment_assignments]=%7B%22token%22%3A%22756300da-e3b4-4b0e-a1eb-5b7bffbe2a51%22%2C%22assignments%22%3A%7B%22api_fastpath_habanero_v1%22%3A%22treatment%22%7D%7D&apiKey=pk_live_51SyD5mFWJAG4bHrYPgD4MVNj1pXTyFdrEMI5gJ3shHbwYtTKIobCH0UF4cmT5ltP99CtnPyEtqK4cxN2hObK6ToA00VZwp3fFU&stripeJsId=756300da-e3b4-4b0e-a1eb-5b7bffbe2a51&stripeObjId=sobj-43dbbf5d-7aee-4813-b395-59981890a16e&firstStripeInstanceCreatedLatency=12&controllerCount=1&isCheckout=false&stripeJsLoadTime=1781004793613&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=297b2118-b83d-4f3f-8d8c-dfc4cdd78e881c865e&mids[sid]=c6beb745-e290-4be8-8eeb-3a93151b4e8fccb965&referrer=https%3A%2F%2Fapexbeat.ai%2Fplab&controllerId=__privateStripeController3241",
+    "https://js.stripe.com/v3/m-outer-3437aaddcdf6922d623e172c2d6f9278.html#url=https%3A%2F%2Fapexbeat.ai%2Fplab&title=ApexBeat%20-%20AI-Powered%20MBBS%20Mastery&referrer=&muid=297b2118-b83d-4f3f-8d8c-dfc4cdd78e881c865e&sid=c6beb745-e290-4be8-8eeb-3a93151b4e8fccb965&version=6&preview=false&__shared_params__[version]=v3"
+  ],
+  "bodyText": "PLAB MCQs Select a module to practice PLAB-style MCQs Select Module Select a module Cardiovascular System Respiratory System Ear, Nose and Throat Rheumatology Anatomy Nephrology Obs_n_Gynae Oncology Opthalmology Orthopeadic Pediatrics Psychiatry Surgery"
+}

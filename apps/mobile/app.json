@@ -1,0 +1,69 @@
+{
+  "expo": {
+    "name": "MatricMate",
+    "slug": "matricmate",
+    "version": "0.1.0",
+    "scheme": "matricmate",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FAFBF7"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "pk.matricmate.app"
+    },
+    "android": {
+      "package": "pk.matricmate.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FAFBF7",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
+      "name": "MatricMate",
+      "shortName": "MatricMate",
+      "themeColor": "#096A8B",
+      "backgroundColor": "#FAFBF7",
+      "description": "Board exams, sorted. FBISE Class 9 study, practice and AI tutor."
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#FAFBF7"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "df2c0bb2-55a1-4525-9874-b63fa6d0c876"
+      }
+    },
+    "owner": "matricmate",
+    "updates": {
+      "url": "https://u.expo.dev/df2c0bb2-55a1-4525-9874-b63fa6d0c876"
+    }
+  }
+}

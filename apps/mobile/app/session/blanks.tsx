@@ -1,0 +1,137 @@
+import { useState } from 'react';
+import { Text, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Icon } from '../../src/components/Icon';
+import { Bar, Btn, Card, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import { api } from '../../src/core/api';
+import { useAsync } from '../../src/core/useAsync';
+import { useApp } from '../../src/store/app';
+import { C, F, S } from '../../src/theme';
+
+export default function Blanks() {
+  const { chapter } = useLocalSearchParams<{ chapter?: string }>();
+  const chapterId = chapter ?? 'phy-3';
+  const { actions } = useApp();
+  const { data: content, loading } = useAsync(() => api.getChapterContent(chapterId), [chapterId]);
+
+  const [i, setI] = useState(0);
+  const [pick, setPick] = useState<string | null>(null);
+  const [checked, setChecked] = useState(false);
+  const [right, setRight] = useState(0);
+
+  const items = content?.blanks ?? [];
+  const item = items[i];
+  const done = !!content && i >= items.length;
+  const correct = checked && pick === item?.answer;
+
+  function check() {
+    if (!item || !pick) return;
+    const ok = pick === item.answer;
+    setChecked(true);
+    if (ok) setRight((r) => r + 1);
+    actions.recordAttempt({
+      mcqId: item.id,
+      chapterId,
+      subjectId: chapterId.split('-')[0],
+      topic: 'Fill in the blanks',
+      correct: ok,
+      confidence: null,
+      mode: 'blanks',
+    });
+  }
+
+  if (loading) {
+    return (
+      <Screen>
+        <Header title="Fill in the blanks" back />
+        <Skeleton h={120} />
+      </Screen>
+    );
+  }
+
+  if (done) {
+    return (
+      <Screen>
+        <Header title="Fill in the blanks" sub="Complete" back />
+        <Card style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
+          <Text style={{ fontSize: 38 }}>{right === items.length ? '🎉' : '👍'}</Text>
+          <Text style={{ fontFamily: F.display, fontSize: 21, color: C.ink }}>
+            {right} / {items.length} correct
+          </Text>
+          <Small>Recall practice counts towards your chapter progress.</Small>
+        </Card>
+        <Spacer h={S.lg} />
+        <Btn title="Back to chapter" onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen
+      footer={
+        checked ? (
+          <Btn
+            title={i + 1 >= items.length ? 'See summary' : 'Next'}
+            onPress={() => {
+              setI(i + 1);
+              setPick(null);
+              setChecked(false);
+            }}
+          />
+        ) : (
+          <Btn title="Check" onPress={check} disabled={!pick} />
+        )
+      }
+    >
+      <Header title="Fill in the blanks" sub={`Item ${i + 1} of ${items.length}`} back />
+      <Bar pct={(i / Math.max(1, items.length)) * 100} tone="teal" />
+      <Spacer h={S.lg} />
+
+      <Card>
+        <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 34, color: C.ink }}>
+          {item?.sentence[0]}
+          <Text
+            style={{
+              fontFamily: F.bodyBold,
+              color: checked ? (correct ? C.green : C.red) : pick ? C.teal : C.ink3,
+              textDecorationLine: 'underline',
+            }}
+          >
+            {pick ?? '_______'}
+          </Text>
+          {item?.sentence[1]}
+        </Text>
+      </Card>
+
+      <Spacer h={S.md} />
+      <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+        {item?.options.map((o) => {
+          const selected = pick === o;
+          const isAnswer = o === item.answer;
+          const tone = checked ? (isAnswer ? 'green' : selected ? 'red' : 'grey') : selected ? 'teal' : 'grey';
+          return (
+            <Pill
+              key={o}
+              tone={tone}
+              onPress={checked ? undefined : () => setPick(o)}
+              style={{ paddingVertical: 10, paddingHorizontal: 16 }}
+            >
+              {o}
+            </Pill>
+          );
+        })}
+      </Row>
+
+      {checked ? (
+        <Card flat tint={correct ? C.greenTint : C.redTint} border={correct ? C.green : C.red} style={{ marginTop: S.md }}>
+          <Row gap={S.sm}>
+            <Icon name={correct ? 'check' : 'close'} size={18} color={correct ? C.green : C.red} strokeWidth={2.6} />
+            <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 13.5, color: correct ? C.green : C.red }}>
+              {correct ? 'Sahi! +8 XP' : `Correct answer: ${item?.answer}`}
+            </Text>
+          </Row>
+        </Card>
+      ) : null}
+    </Screen>
+  );
+}

@@ -1,0 +1,729 @@
+/**
+ * MatricMate shared UI kit. Every screen composes these — no screen styles colours directly.
+ * Works identically on Android and web (React Native Web).
+ */
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Animated,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle } from 'react-native-svg';
+import { router } from 'expo-router';
+import { C, F, R, S, T, WEB_MAX, isWeb, shadow, urdu } from '../theme';
+import { Icon, IconName } from './Icon';
+
+/* ------------------------------------------------------------------ text */
+
+export const H1 = (p: TextProps) => <Txt {...p} style={[T.h1, p.style]} />;
+export const H2 = (p: TextProps) => <Txt {...p} style={[T.h2, p.style]} />;
+export const H3 = (p: TextProps) => <Txt {...p} style={[T.h3, p.style]} />;
+export const Body = (p: TextProps) => <Txt {...p} style={[T.body, p.style]} />;
+export const Small = (p: TextProps) => <Txt {...p} style={[T.small, p.style]} />;
+export const Tiny = (p: TextProps) => <Txt {...p} style={[T.tiny, p.style]} />;
+export const Label = (p: TextProps) => <Txt {...p} style={[T.label, p.style]} />;
+
+type TextProps = { children?: React.ReactNode; style?: StyleProp<TextStyle>; numberOfLines?: number };
+function Txt({ children, style, numberOfLines }: TextProps) {
+  return (
+    <Text style={style} numberOfLines={numberOfLines}>
+      {children}
+    </Text>
+  );
+}
+
+/** Urdu text — Nastaliq, RTL, generous line-height. */
+export function Ur({ children, size = 16, style }: { children: React.ReactNode; size?: number; style?: StyleProp<TextStyle> }) {
+  return <Text style={[urdu(size), style]}>{children}</Text>;
+}
+
+/* ---------------------------------------------------------------- layout */
+
+/** Page wrapper: safe area + paper background + (on web) centred column. */
+export function Screen({
+  children,
+  scroll = true,
+  footer,
+  padded = true,
+}: {
+  children: React.ReactNode;
+  scroll?: boolean;
+  footer?: React.ReactNode;
+  padded?: boolean;
+}) {
+  const insets = useSafeAreaInsets();
+  const inner = (
+    <View style={[{ flex: 1, width: '100%' }, isWeb && { maxWidth: WEB_MAX, alignSelf: 'center' }]}>
+      {children}
+    </View>
+  );
+  return (
+    <View style={{ flex: 1, backgroundColor: C.paper, paddingTop: insets.top }}>
+      {scroll ? (
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={[
+            { paddingHorizontal: padded ? S.lg : 0, paddingBottom: S.xl },
+            isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
+      ) : (
+        inner
+      )}
+      {footer ? (
+        <View
+          style={[
+            { paddingHorizontal: S.lg, paddingTop: S.sm, paddingBottom: Math.max(insets.bottom, S.md) },
+            isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
+          ]}
+        >
+          {footer}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+export function Header({
+  title,
+  sub,
+  back,
+  right,
+  onBack,
+}: {
+  title?: string;
+  sub?: string;
+  back?: boolean;
+  right?: React.ReactNode;
+  onBack?: () => void;
+}) {
+  return (
+    <View style={st.header}>
+      {back ? (
+        <Tap onPress={onBack ?? (() => router.back())} hit style={{ marginLeft: -6 }}>
+          <Icon name="back" color={C.ink} />
+        </Tap>
+      ) : null}
+      <View style={{ flex: 1, minWidth: 0 }}>
+        {title ? <H2>{title}</H2> : null}
+        {sub ? <Small style={{ fontFamily: F.bodyBold }}>{sub}</Small> : null}
+      </View>
+      {right}
+    </View>
+  );
+}
+
+export function Row({ children, gap = S.sm, style }: { children: React.ReactNode; gap?: number; style?: ViewStyle }) {
+  return <View style={[{ flexDirection: 'row', alignItems: 'center', gap }, style]}>{children}</View>;
+}
+export function Col({ children, gap = S.sm, style }: { children: React.ReactNode; gap?: number; style?: ViewStyle }) {
+  return <View style={[{ gap }, style]}>{children}</View>;
+}
+export const Spacer = ({ h = S.md }: { h?: number }) => <View style={{ height: h }} />;
+
+export function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <View style={st.sectionTitle}>
+      <H3>{children}</H3>
+      {action}
+    </View>
+  );
+}
+
+/* --------------------------------------------------------------- surfaces */
+
+export function Card({
+  children,
+  style,
+  onPress,
+  flat,
+  tint,
+  border,
+}: {
+  children: React.ReactNode;
+  style?: ViewStyle;
+  onPress?: () => void;
+  flat?: boolean;
+  tint?: string;
+  border?: string;
+}) {
+  const body = (
+    <View
+      style={[
+        st.card,
+        !flat && shadow,
+        tint ? { backgroundColor: tint } : null,
+        border ? { borderColor: border, borderWidth: 1.5 } : null,
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
+  return onPress ? <Tap onPress={onPress}>{body}</Tap> : body;
+}
+
+/** Pressable with sane feedback on both platforms. */
+export function Tap({
+  children,
+  onPress,
+  style,
+  disabled,
+  hit,
+}: {
+  children: React.ReactNode;
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
+  hit?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled || !onPress}
+      hitSlop={hit ? 12 : undefined}
+      style={({ pressed }) => [
+        style,
+        pressed ? { opacity: 0.72 } : null,
+        isWeb ? ({ cursor: onPress && !disabled ? 'pointer' : 'default' } as ViewStyle) : null,
+      ]}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
+/* ---------------------------------------------------------------- controls */
+
+type BtnVariant = 'primary' | 'orange' | 'ghost' | 'line' | 'green' | 'danger' | 'whatsapp';
+export function Btn({
+  title,
+  onPress,
+  variant = 'primary',
+  icon,
+  sm,
+  disabled,
+  loading,
+  style,
+}: {
+  title: string;
+  onPress?: () => void;
+  variant?: BtnVariant;
+  icon?: IconName;
+  sm?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+  style?: ViewStyle;
+}) {
+  const bg: Record<BtnVariant, string> = {
+    primary: C.teal,
+    orange: C.orange,
+    green: C.green,
+    danger: C.red,
+    whatsapp: C.whatsapp,
+    ghost: 'transparent',
+    line: C.card,
+  };
+  const fg =
+    variant === 'ghost' ? C.teal : variant === 'line' ? C.teal : '#fff';
+  return (
+    <Tap onPress={onPress} disabled={disabled || loading} style={[{ opacity: disabled ? 0.45 : 1 }, style]}>
+      <View
+        style={[
+          st.btn,
+          { backgroundColor: bg[variant] },
+          sm && { paddingVertical: 10, paddingHorizontal: 16, borderRadius: R.md },
+          variant === 'line' && { borderWidth: 1.5, borderColor: C.tealTint2 },
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator color={fg} size="small" />
+        ) : (
+          <>
+            {icon ? <Icon name={icon} size={sm ? 16 : 18} color={fg} /> : null}
+            <Text style={{ fontFamily: F.display, fontSize: sm ? 14 : 16, color: fg }}>{title}</Text>
+          </>
+        )}
+      </View>
+    </Tap>
+  );
+}
+
+type Tone = 'teal' | 'orange' | 'green' | 'red' | 'grey';
+export function Pill({
+  children,
+  tone = 'teal',
+  icon,
+  onPress,
+  style,
+}: {
+  children?: React.ReactNode;
+  tone?: Tone;
+  icon?: IconName;
+  onPress?: () => void;
+  style?: ViewStyle;
+}) {
+  const map: Record<Tone, [string, string]> = {
+    teal: [C.tealTint, C.teal],
+    orange: [C.orangeTint, C.orangeDark],
+    green: [C.greenTint, C.green],
+    red: [C.redTint, C.red],
+    grey: [C.grey, C.ink2],
+  };
+  const [bg, fg] = map[tone];
+  // Anything that isn't already an element (string, number, or an interpolated
+  // array of them) must be wrapped in <Text> — a bare text node inside a View
+  // is invalid in React Native.
+  const body = (
+    <View style={[st.pill, { backgroundColor: bg }, style]}>
+      {icon ? <Icon name={icon} size={12} color={fg} strokeWidth={2.4} /> : null}
+      {children == null || React.isValidElement(children) ? (
+        children
+      ) : (
+        <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: fg }}>{children}</Text>
+      )}
+    </View>
+  );
+  return onPress ? <Tap onPress={onPress}>{body}</Tap> : body;
+}
+
+export function Seg<Tv extends string>({
+  options,
+  value,
+  onChange,
+  style,
+}: {
+  options: { value: Tv; label: string; urdu?: boolean }[];
+  value: Tv;
+  onChange: (v: Tv) => void;
+  style?: ViewStyle;
+}) {
+  return (
+    <View style={[st.seg, style]}>
+      {options.map((o) => {
+        const on = o.value === value;
+        return (
+          <Tap key={o.value} onPress={() => onChange(o.value)} style={[st.segBtn, on && st.segBtnOn]}>
+            {o.urdu ? (
+              <Ur size={13} style={{ color: on ? C.teal : C.ink2, textAlign: 'center' }}>
+                {o.label}
+              </Ur>
+            ) : (
+              <Text
+                style={{
+                  fontFamily: F.bodyBold,
+                  fontSize: 13,
+                  color: on ? C.teal : C.ink2,
+                  textAlign: 'center',
+                }}
+              >
+                {o.label}
+              </Text>
+            )}
+          </Tap>
+        );
+      })}
+    </View>
+  );
+}
+
+export function Field({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  icon,
+  secure,
+  keyboardType,
+  error,
+  autoCapitalize = 'none',
+}: {
+  label: string;
+  value: string;
+  onChangeText: (v: string) => void;
+  placeholder?: string;
+  icon?: IconName;
+  secure?: boolean;
+  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  error?: string;
+  autoCapitalize?: 'none' | 'words';
+}) {
+  const [hide, setHide] = useState(!!secure);
+  const [focus, setFocus] = useState(false);
+  return (
+    <View style={{ marginBottom: S.md }}>
+      <Text style={[T.tiny, { marginBottom: 6, color: C.ink2 }]}>{label}</Text>
+      <View style={[st.field, focus && { borderColor: C.teal }, !!error && { borderColor: C.red }]}>
+        {icon ? <Icon name={icon} size={18} color={C.ink3} /> : null}
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={C.ink3}
+          secureTextEntry={hide}
+          keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
+          onFocus={() => setFocus(true)}
+          onBlur={() => setFocus(false)}
+          style={[
+            { flex: 1, fontFamily: F.body, fontSize: 15, color: C.ink, paddingVertical: 0 },
+            isWeb && ({ outlineStyle: 'none' } as object),
+          ]}
+        />
+        {secure ? (
+          <Tap onPress={() => setHide((h) => !h)} hit>
+            <Icon name={hide ? 'eye' : 'eyeOff'} size={18} color={C.ink3} />
+          </Tap>
+        ) : null}
+      </View>
+      {error ? <Text style={[T.tiny, { color: C.red, marginTop: 4 }]}>{error}</Text> : null}
+    </View>
+  );
+}
+
+export function Toggle({ on, onPress }: { on: boolean; onPress?: () => void }) {
+  return (
+    <Tap onPress={onPress}>
+      <View style={[st.toggle, { backgroundColor: on ? C.teal : '#D7E0DB' }]}>
+        <View style={[st.knob, on ? { right: 3 } : { left: 3 }]} />
+      </View>
+    </Tap>
+  );
+}
+
+/* ------------------------------------------------------------ indicators */
+
+export function Bar({ pct, tone = 'orange', h = 7 }: { pct: number; tone?: 'orange' | 'teal' | 'green' | 'red'; h?: number }) {
+  const col = { orange: C.orange, teal: C.teal, green: C.green, red: C.red }[tone];
+  return (
+    <View style={{ height: h, backgroundColor: '#EAF0EC', borderRadius: R.pill, overflow: 'hidden' }}>
+      <View style={{ width: `${Math.max(0, Math.min(100, pct))}%`, height: '100%', backgroundColor: col, borderRadius: R.pill }} />
+    </View>
+  );
+}
+
+export function Ring({
+  pct,
+  size = 54,
+  stroke = 7,
+  color = C.teal,
+  children,
+}: {
+  pct: number;
+  size?: number;
+  stroke?: number;
+  color?: string;
+  children?: React.ReactNode;
+}) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}>
+        <Svg width={size} height={size}>
+          <Circle cx={size / 2} cy={size / 2} r={r} stroke="#EAF0EC" strokeWidth={stroke} fill="none" />
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            stroke={color}
+            strokeWidth={stroke}
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={circ}
+            strokeDashoffset={circ * (1 - Math.max(0, Math.min(100, pct)) / 100)}
+          />
+        </Svg>
+      </View>
+      {children}
+    </View>
+  );
+}
+
+export function Kpi({ value, label, small }: { value: string; label: string; small?: boolean }) {
+  return (
+    <View style={[st.kpi, small && { paddingVertical: 10, paddingHorizontal: 10 }]}>
+      <Text style={{ fontFamily: F.display, fontSize: small ? 17 : 22, color: C.ink }}>{value}</Text>
+      <Text style={{ fontFamily: F.bodyBold, fontSize: small ? 10.5 : 11.5, color: C.ink2 }}>{label}</Text>
+    </View>
+  );
+}
+
+/** List row used across study, practice, settings. */
+export function Item({
+  title,
+  sub,
+  icon,
+  emoji,
+  tone = 'teal',
+  right,
+  onPress,
+  pct,
+  urduTitle,
+  last,
+  dim,
+}: {
+  title: string;
+  sub?: string;
+  icon?: IconName;
+  emoji?: string;
+  tone?: 'teal' | 'orange' | 'green' | 'red' | 'grey';
+  right?: React.ReactNode;
+  onPress?: () => void;
+  pct?: number;
+  urduTitle?: boolean;
+  last?: boolean;
+  dim?: boolean;
+}) {
+  const bgMap = { teal: C.tealTint, orange: C.orangeTint, green: C.greenTint, red: C.redTint, grey: C.grey };
+  const fgMap = { teal: C.teal, orange: C.orangeDark, green: C.green, red: C.red, grey: C.ink2 };
+  return (
+    <Tap onPress={onPress} style={[st.item, last && { borderBottomWidth: 0 }, dim && { opacity: 0.6 }]}>
+      {emoji || icon ? (
+        <View style={[st.itemIcon, { backgroundColor: bgMap[tone] }]}>
+          {emoji ? <Text style={{ fontSize: 19 }}>{emoji}</Text> : <Icon name={icon!} size={20} color={fgMap[tone]} />}
+        </View>
+      ) : null}
+      <View style={{ flex: 1, minWidth: 0 }}>
+        {urduTitle ? (
+          <Ur size={15}>{title}</Ur>
+        ) : (
+          <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{title}</Text>
+        )}
+        {sub ? <Small style={{ marginTop: 1 }}>{sub}</Small> : null}
+        {pct != null ? (
+          <View style={{ marginTop: 7 }}>
+            <Bar pct={pct} tone="teal" />
+          </View>
+        ) : null}
+      </View>
+      {right ?? (onPress ? <Icon name="chevron" size={18} color={C.ink3} /> : null)}
+    </Tap>
+  );
+}
+
+/* ------------------------------------------------------------ feedback */
+
+export function Skeleton({ w = '100%', h = 14, style }: { w?: number | `${number}%`; h?: number; style?: ViewStyle }) {
+  const a = useRef(new Animated.Value(0.5)).current;
+  React.useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(a, { toValue: 1, duration: 620, useNativeDriver: !isWeb }),
+        Animated.timing(a, { toValue: 0.5, duration: 620, useNativeDriver: !isWeb }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [a]);
+  return <Animated.View style={[{ width: w, height: h, borderRadius: R.md, backgroundColor: '#EAF0EC', opacity: a }, style]} />;
+}
+
+export function Empty({
+  emoji = '📭',
+  title,
+  sub,
+  cta,
+}: {
+  emoji?: string;
+  title: string;
+  sub?: string;
+  cta?: React.ReactNode;
+}) {
+  return (
+    <Card flat style={{ alignItems: 'center', paddingVertical: 26 }}>
+      <Text style={{ fontSize: 34 }}>{emoji}</Text>
+      <H3 style={{ marginTop: 6, textAlign: 'center' }}>{title}</H3>
+      {sub ? <Small style={{ textAlign: 'center', marginTop: 3 }}>{sub}</Small> : null}
+      {cta ? <View style={{ marginTop: S.md }}>{cta}</View> : null}
+    </Card>
+  );
+}
+
+export function OfflineBanner() {
+  return (
+    <Card flat tint={C.orangeTint} border={C.orange} style={{ flexDirection: 'row', alignItems: 'center', gap: S.sm, marginBottom: S.md }}>
+      <Icon name="wifiOff" size={18} color={C.orangeDark} />
+      <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink, flex: 1 }}>
+        You’re offline — downloaded content still works.
+      </Text>
+    </Card>
+  );
+}
+
+/* --------------------------------------------------------------- toast */
+
+const ToastCtx = createContext<(msg: string) => void>(() => {});
+export const useToast = () => useContext(ToastCtx);
+
+export function ToastHost({ children }: { children: React.ReactNode }) {
+  const [msg, setMsg] = useState<string | null>(null);
+  const op = useRef(new Animated.Value(0)).current;
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const show = useCallback(
+    (m: string) => {
+      setMsg(m);
+      Animated.timing(op, { toValue: 1, duration: 160, useNativeDriver: !isWeb }).start();
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => {
+        Animated.timing(op, { toValue: 0, duration: 200, useNativeDriver: !isWeb }).start(() => setMsg(null));
+      }, 2000);
+    },
+    [op]
+  );
+
+  const value = useMemo(() => show, [show]);
+  return (
+    <ToastCtx.Provider value={value}>
+      {children}
+      {msg ? (
+        <Animated.View pointerEvents="none" style={[st.toast, { opacity: op }]}>
+          <Text style={{ color: '#fff', fontFamily: F.bodyBold, fontSize: 13, textAlign: 'center' }}>{msg}</Text>
+        </Animated.View>
+      ) : null}
+    </ToastCtx.Provider>
+  );
+}
+
+/** Bottom sheet used for paywall, confirmations, Ask AI. */
+export function Sheet({
+  visible,
+  onClose,
+  children,
+  title,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  title?: string;
+}) {
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable style={st.sheetBack} onPress={onClose}>
+        <Pressable style={st.sheet} onPress={() => {}}>
+          <View style={st.grab} />
+          {title ? <H2 style={{ marginBottom: S.sm }}>{title}</H2> : null}
+          {children}
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+/* --------------------------------------------------------------- styles */
+
+const st = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: S.sm,
+    paddingTop: S.sm,
+    paddingBottom: S.sm,
+    minHeight: 52,
+  },
+  sectionTitle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginTop: S.lg,
+    marginBottom: S.sm,
+  },
+  card: {
+    backgroundColor: C.card,
+    borderWidth: 1,
+    borderColor: C.line,
+    borderRadius: R.lg,
+    padding: S.lg - 2,
+  },
+  btn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: S.sm,
+    paddingVertical: 14,
+    paddingHorizontal: S.lg,
+    borderRadius: R.lg,
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: R.pill,
+    alignSelf: 'flex-start',
+  },
+  seg: { flexDirection: 'row', backgroundColor: C.grey, borderRadius: 13, padding: 3, gap: 3 },
+  segBtn: { flex: 1, paddingVertical: 9, borderRadius: R.sm, alignItems: 'center' },
+  segBtnOn: { backgroundColor: C.card, ...(shadow as object) },
+  field: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: S.sm,
+    backgroundColor: C.card,
+    borderWidth: 1.5,
+    borderColor: C.line,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: Platform.OS === 'ios' ? 14 : 12,
+  },
+  toggle: { width: 44, height: 26, borderRadius: R.pill, justifyContent: 'center' },
+  knob: { position: 'absolute', width: 20, height: 20, borderRadius: R.pill, backgroundColor: '#fff' },
+  kpi: {
+    flex: 1,
+    backgroundColor: C.card,
+    borderWidth: 1,
+    borderColor: C.line,
+    borderRadius: R.lg,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: S.md,
+    paddingVertical: 13,
+    borderBottomWidth: 1,
+    borderBottomColor: C.line,
+  },
+  itemIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  toast: {
+    position: 'absolute',
+    bottom: 100,
+    alignSelf: 'center',
+    maxWidth: 320,
+    backgroundColor: C.ink,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: R.pill,
+  },
+  sheetBack: { flex: 1, backgroundColor: 'rgba(11,46,58,0.45)', justifyContent: 'flex-end' },
+  sheet: {
+    backgroundColor: C.paper,
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    padding: S.lg,
+    paddingBottom: S.xxl,
+    maxHeight: '82%',
+    width: '100%',
+    ...(isWeb ? { maxWidth: 520, alignSelf: 'center' } : null),
+  },
+  grab: { width: 44, height: 5, borderRadius: R.pill, backgroundColor: '#C9D6D2', alignSelf: 'center', marginBottom: S.md },
+});
+
+export { st as uiStyles };

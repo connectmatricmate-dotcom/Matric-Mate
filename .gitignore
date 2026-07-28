@@ -1,0 +1,30 @@
+# dependencies & build output
+node_modules/
+apps/mobile/dist/
+apps/mobile/.expo/
+apps/mobile/android/
+apps/mobile/ios/
+*.log
+
+# secrets — never commit
+contract/credentials.md
+.env
+.env.*
+*.keystore
+*.jks
+google-services.json
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# scratch
+tmp/
+
+# agent/assistant config — local only, never committed
+CLAUDE.md
+AGENTS.md
+.claude/
+**/.claude/

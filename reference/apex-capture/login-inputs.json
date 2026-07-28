@@ -1,0 +1,146 @@
+[
+  {
+    "tag": "BUTTON",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "BUTTON",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "BUTTON",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "BUTTON",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "A",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": "Learn more"
+  },
+  {
+    "tag": "BUTTON",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "BUTTON",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "BUTTON",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "A",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": "Register"
+  },
+  {
+    "tag": "INPUT",
+    "type": "text",
+    "name": "email",
+    "id": "email",
+    "ph": "Enter Email or Username",
+    "txt": ""
+  },
+  {
+    "tag": "INPUT",
+    "type": "password",
+    "name": "password",
+    "id": "password",
+    "ph": "Enter Password",
+    "txt": ""
+  },
+  {
+    "tag": "BUTTON",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "BUTTON",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": ""
+  },
+  {
+    "tag": "A",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": "Apexbeat User Agreement"
+  },
+  {
+    "tag": "A",
+    "type": "",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": "Data Privacy Terms"
+  },
+  {
+    "tag": "BUTTON",
+    "type": "submit",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": "Login"
+  },
+  {
+    "tag": "BUTTON",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "ph": "",
+    "txt": "Forgot your password?"
+  },
+  {
+    "tag": "TEXTAREA",
+    "type": "",
+    "name": "g-recaptcha-response",
+    "id": "g-recaptcha-response-100000",
+    "ph": "",
+    "txt": ""
+  }
+]
