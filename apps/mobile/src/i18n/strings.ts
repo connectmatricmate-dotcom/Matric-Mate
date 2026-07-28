@@ -258,6 +258,9 @@ export const en = {
     narrationUr: 'Urdu narration',
     sampleNote:
       'This chapter has a real sample recording in both mediums — switch Study medium in Settings to hear the other one. Remaining chapters use the client’s own recordings.',
+    noTrackNote: 'No recording for this chapter yet — the client’s audio loads here.',
+    needsNewBuild:
+      'This copy of the app was built before audio support was added, so the transport below is a preview. Install the latest build to hear the recording.',
     demoNote: 'Demo build: playback is simulated. Real audio ships with the client’s recordings.',
     upNext: 'Up next',
     nextChapter: 'Next chapter audio',
@@ -878,6 +881,9 @@ export const ur: typeof en = {
     narrationUr: 'Urdu narration',
     sampleNote:
       'Is chapter ki asli sample recording dono mediums mein maujood hai — Settings se Study medium badal kar doosri sunein. Baqi chapters client ki apni recordings se aayein ge.',
+    noTrackNote: 'Is chapter ki recording abhi nahi — client ki audio yahan aaye gi.',
+    needsNewBuild:
+      'Yeh app audio support se pehle bani thi, is liye neeche sirf preview chal raha hai. Asli recording sunne ke liye nayi build install karein.',
     demoNote: 'Demo build: playback abhi simulate ho raha hai. Asli audio client ki recordings ke saath aaye gi.',
     upNext: 'Agla',
     nextChapter: 'Agle chapter ka audio',

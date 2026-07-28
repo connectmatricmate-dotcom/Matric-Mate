@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
+import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
 import { api } from '../../../src/core/api';
@@ -12,46 +13,39 @@ import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
 
 const SPEEDS = [1, 1.25, 1.5] as const;
+const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-export default function AudioLesson() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { state, actions } = useApp();
+/** Everything visual. Both the real player and the fallback render through this. */
+function PlayerChrome({
+  title,
+  subtitle,
+  position,
+  duration,
+  playing,
+  speed,
+  onPlay,
+  onSeek,
+  onSpeed,
+  disabled,
+  note,
+  downloaded,
+  onToggleDownload,
+}: {
+  title: string;
+  subtitle: string;
+  position: number;
+  duration: number;
+  playing: boolean;
+  speed: number;
+  onPlay: () => void;
+  onSeek: (delta: number) => void;
+  onSpeed: () => void;
+  disabled?: boolean;
+  note: string;
+  downloaded: boolean;
+  onToggleDownload: () => void;
+}) {
   const t = useT();
-  const toast = useToast();
-  const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
-  const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
-
-  const medium = state.settings.contentMedium;
-  const track = AUDIO_TRACKS[id]?.[medium] ?? AUDIO_TRACKS[id]?.en;
-  const player = useAudioPlayer(track ?? null);
-  const status = useAudioPlayerStatus(player);
-  const [speed, setSpeed] = useState(0);
-  const downloaded = state.downloads.includes(id);
-
-  // Keep playing when the screen locks or the app goes to the background.
-  useEffect(() => {
-    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(() => {});
-  }, []);
-
-  // Switching medium swaps the recording, so start the new one from the top.
-  useEffect(() => {
-    if (track) player.replace(track);
-  }, [track]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const duration = status.duration || (chapter?.audioMinutes ?? 14) * 60;
-  const position = status.currentTime || 0;
-  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-
-  function seek(delta: number) {
-    player.seekTo(Math.max(0, Math.min(duration, position + delta)));
-  }
-
-  function cycleSpeed() {
-    const next = (speed + 1) % SPEEDS.length;
-    setSpeed(next);
-    player.setPlaybackRate(SPEEDS[next]);
-  }
-
   return (
     <Screen>
       <Header
@@ -61,10 +55,7 @@ export default function AudioLesson() {
           <IconButton
             icon={downloaded ? 'check' : 'download'}
             tone={downloaded ? 'active' : 'card'}
-            onPress={() => {
-              actions.toggleDownload(id);
-              toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
-            }}
+            onPress={onToggleDownload}
           />
         }
       />
@@ -73,10 +64,8 @@ export default function AudioLesson() {
         <View style={{ width: 210, height: 210, borderRadius: 24, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
           <Image source={require('../../../assets/monogram.png')} style={{ width: 130, height: 100 }} resizeMode="contain" />
         </View>
-        <H2 style={{ marginTop: S.md, textAlign: 'center' }}>{content?.audioTitle ?? ''}</H2>
-        <Small style={{ textAlign: 'center' }}>
-          {medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
-        </Small>
+        <H2 style={{ marginTop: S.md, textAlign: 'center' }}>{title}</H2>
+        <Small style={{ textAlign: 'center' }}>{subtitle}</Small>
       </View>
 
       <Spacer h={S.lg} />
@@ -87,51 +76,164 @@ export default function AudioLesson() {
       </Row>
 
       <Row style={{ justifyContent: 'center', marginTop: S.lg }} gap={S.xl}>
-        <Tap onPress={() => seek(-15)}>
-          <View style={ctl}>
+        <Tap onPress={() => onSeek(-15)} disabled={disabled}>
+          <View style={[ctl, disabled && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>−15</Text>
           </View>
         </Tap>
-        <Tap
-          onPress={() => {
-            if (!track) return;
-            if (status.playing) player.pause();
-            else {
-              if (status.didJustFinish) player.seekTo(0);
-              player.play();
-            }
-          }}
-        >
+        <Tap onPress={onPlay} disabled={disabled}>
           <View
             testID="audio-play"
             accessibilityRole="button"
-            accessibilityLabel={status.playing ? 'Pause' : 'Play'}
-            style={{ width: 76, height: 76, borderRadius: 99, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}
+            accessibilityLabel={playing ? 'Pause' : 'Play'}
+            style={{
+              width: 76,
+              height: 76,
+              borderRadius: 99,
+              backgroundColor: disabled ? C.ink3 : C.teal,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <Icon name={status.playing ? 'pause' : 'play'} size={30} color="#fff" strokeWidth={2.2} />
+            <Icon name={playing ? 'pause' : 'play'} size={30} color="#fff" strokeWidth={2.2} />
           </View>
         </Tap>
-        <Tap onPress={() => seek(15)}>
-          <View style={ctl}>
+        <Tap onPress={() => onSeek(15)} disabled={disabled}>
+          <View style={[ctl, disabled && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>+15</Text>
           </View>
         </Tap>
       </Row>
 
       <Row style={{ justifyContent: 'center', marginTop: S.md }} gap={S.sm}>
-        <Pill tone="grey" onPress={cycleSpeed}>
+        <Pill tone="grey" onPress={disabled ? undefined : onSpeed}>
           {t('audio.speed', { n: SPEEDS[speed] })}
         </Pill>
         <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
           {downloaded ? t('audio.offline') : t('audio.stream')}
         </Pill>
-        {!status.isLoaded ? <Pill tone="grey">{t('common.loading')}</Pill> : null}
       </Row>
 
-      <Card flat tint={C.tealTint} style={{ marginTop: S.lg }}>
-        <Small>{t('audio.sampleNote')}</Small>
+      <Card flat tint={disabled ? C.orangeTint : C.tealTint} style={{ marginTop: S.lg }}>
+        <Small>{note}</Small>
       </Card>
     </Screen>
+  );
+}
+
+/** Real playback. Throws on a build that predates expo-audio — see the boundary below. */
+function RealPlayer({ id }: { id: string }) {
+  const { state, actions } = useApp();
+  const t = useT();
+  const toast = useToast();
+  const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
+  const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
+
+  const medium = state.settings.contentMedium;
+  const track = AUDIO_TRACKS[id]?.[medium] ?? AUDIO_TRACKS[id]?.en ?? null;
+  const player = useAudioPlayer(track);
+  const status = useAudioPlayerStatus(player);
+  const [speed, setSpeed] = useState(0);
+  const downloaded = state.downloads.includes(id);
+
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (track) player.replace(track);
+  }, [track]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const duration = status.duration || (chapter?.audioMinutes ?? 14) * 60;
+  const position = status.currentTime || 0;
+
+  return (
+    <PlayerChrome
+      title={content?.audioTitle ?? ''}
+      subtitle={medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
+      position={position}
+      duration={duration}
+      playing={status.playing}
+      speed={speed}
+      disabled={!track}
+      onPlay={() => {
+        if (!track) return;
+        if (status.playing) player.pause();
+        else {
+          if (status.didJustFinish) player.seekTo(0);
+          player.play();
+        }
+      }}
+      onSeek={(d) => player.seekTo(Math.max(0, Math.min(duration, position + d)))}
+      onSpeed={() => {
+        const next = (speed + 1) % SPEEDS.length;
+        setSpeed(next);
+        player.setPlaybackRate(SPEEDS[next]);
+      }}
+      note={track ? t('audio.sampleNote') : t('audio.noTrackNote')}
+      downloaded={downloaded}
+      onToggleDownload={() => {
+        actions.toggleDownload(id);
+        toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
+      }}
+    />
+  );
+}
+
+/**
+ * Shown when the installed binary has no audio support yet. The screen still
+ * works — the transport just runs on a timer — so a dev build from before the
+ * module was added keeps every other screen usable.
+ */
+function PreviewPlayer({ id }: { id: string }) {
+  const { state, actions } = useApp();
+  const t = useT();
+  const toast = useToast();
+  const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
+  const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
+
+  const duration = (chapter?.audioMinutes ?? 14) * 60;
+  const [position, setPosition] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(0);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const downloaded = state.downloads.includes(id);
+
+  useEffect(() => {
+    if (playing) timer.current = setInterval(() => setPosition((p) => Math.min(duration, p + SPEEDS[speed])), 1000);
+    else if (timer.current) clearInterval(timer.current);
+    return () => {
+      if (timer.current) clearInterval(timer.current);
+    };
+  }, [playing, speed, duration]);
+
+  return (
+    <PlayerChrome
+      title={content?.audioTitle ?? ''}
+      subtitle={state.settings.contentMedium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
+      position={position}
+      duration={duration}
+      playing={playing}
+      speed={speed}
+      onPlay={() => setPlaying((p) => !p)}
+      onSeek={(d) => setPosition((p) => Math.max(0, Math.min(duration, p + d)))}
+      onSpeed={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
+      note={t('audio.needsNewBuild')}
+      downloaded={downloaded}
+      onToggleDownload={() => {
+        actions.toggleDownload(id);
+        toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
+      }}
+    />
+  );
+}
+
+export default function AudioLesson() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return (
+    <ErrorBoundary fallback={<PreviewPlayer id={id} />}>
+      <RealPlayer id={id} />
+    </ErrorBoundary>
   );
 }
 
