@@ -63,16 +63,18 @@ server‑side.
 `docs/DESIGN-SPEC.md` (screen inventory, states, open decisions D1–D10) and the click‑through
 prototype at `prototype/index.html`. Brand tokens and assets: `docs/assets/brand/`.
 
-## Getting an APK to the client
+## See it on your phone, build it, ship it
 
-Local Android builds need the Android SDK + JDK (not installed here), so use Expo's cloud builder:
+See **[RELEASE.md](./RELEASE.md)** for the full playbook. Short version:
 
 ```bash
-npx expo login          # needs the Expo account
-eas build -p android --profile preview   # produces an installable .apk link
+npm start                                                   # Expo Go on your phone, live reload
+EAS_NO_VCS=1 npx eas-cli update --branch preview -m "..."   # push JS changes to installed apps (no rebuild)
+EAS_NO_VCS=1 npx eas-cli build -p android --profile preview # new installable APK
 ```
 
-Until then the client can use the web build, which is the same app.
+Expo project: `@matricmate/matricmate`. The `preview` APK listens on the `preview` update channel,
+so content and UI changes reach the client without reinstalling.
 
 ## Known gaps in this build
 
