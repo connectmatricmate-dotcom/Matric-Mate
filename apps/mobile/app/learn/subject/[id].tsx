@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../../src/components/Icon';
-import { Bar, Btn, Card, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
+import { Bar, Btn, Card, Header, Pill, Row, Screen, Sheet, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
+import { LockedNotice } from '../../../src/components/LockedNotice';
 import { api } from '../../../src/core/api';
 import { chapterPct, subjectPct } from '../../../src/core/domain';
 import { useAsync } from '../../../src/core/useAsync';
@@ -15,6 +17,7 @@ export default function Chapters() {
   const t = useT();
   const { data: subject } = useAsync(() => api.getSubject(id), [id]);
   const { data: chapters, loading } = useAsync(() => api.getChapters(id), [id]);
+  const [showLocked, setShowLocked] = useState(false);
 
   const pct = subjectPct(id, state.readSections, state.attempts);
 
@@ -66,7 +69,7 @@ export default function Chapters() {
                 flat={!current}
                 border={current ? C.teal : undefined}
                 style={{ opacity: locked ? 0.62 : 1 }}
-                onPress={() => (locked ? router.push('/paywall') : router.push(`/learn/chapter/${c.id}`))}
+                onPress={() => (locked ? setShowLocked(true) : router.push(`/learn/chapter/${c.id}`))}
               >
                 <Row gap={S.md}>
                   <View
@@ -114,6 +117,12 @@ export default function Chapters() {
       )}
       <Spacer h={S.md} />
       <Small>{t('study.premiumNote')}</Small>
+
+      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={t('billing.premium')}>
+        <LockedNotice variant="locked" />
+        <Spacer h={S.md} />
+        <Btn title={t('common.close')} variant="line" onPress={() => setShowLocked(false)} />
+      </Sheet>
     </Screen>
   );
 }

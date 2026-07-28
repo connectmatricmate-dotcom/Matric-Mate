@@ -44,7 +44,6 @@ export default function RootLayout() {
           >
             <Stack.Screen name="index" options={{ animation: 'none' }} />
             <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
-            <Stack.Screen name="paywall" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
           </Stack>
         </ToastHost>
       </AppProvider>

@@ -325,7 +325,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               id: `pay-${Date.now()}`,
               kind: 'payment',
               title: 'Payment received',
-              body: 'Rs 1,000 — Premium is active for one month.',
+              body: 'Premium is active for one month.',
               at: Date.now(),
               href: '/account/payments',
               read: false,

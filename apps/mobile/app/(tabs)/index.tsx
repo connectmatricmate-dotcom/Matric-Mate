@@ -18,6 +18,7 @@ import {
   Tap,
   Tiny,
 } from '../../src/components/ui';
+import { LockedNotice } from '../../src/components/LockedNotice';
 import { chapterById, subjectById } from '../../src/core/content';
 import { accuracy, chapterPct } from '../../src/core/domain';
 import { useT } from '../../src/i18n';
@@ -216,17 +217,7 @@ export default function Dashboard() {
       {!state.premium.active ? (
         <>
           <Spacer h={S.lg} />
-          <Card tint={C.orangeTint} border={C.orange}>
-            <Row gap={S.md}>
-              <Text style={{ fontSize: 22 }}>👑</Text>
-              <View style={{ flex: 1 }}>
-                <H3>{t('paywall.freeMode')}</H3>
-                <Small>{t('paywall.freeModeSub')}</Small>
-              </View>
-            </Row>
-            <Spacer h={S.md} />
-            <Btn title={t('paywall.seePremium')} variant="orange" sm onPress={() => router.push('/paywall')} />
-          </Card>
+          <LockedNotice variant="free" />
         </>
       ) : null}
 

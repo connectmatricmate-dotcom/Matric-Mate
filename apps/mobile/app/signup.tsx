@@ -22,7 +22,7 @@ export default function SignUp() {
     try {
       const user = await api.signUp({ name, contact, password });
       actions.signIn(user);
-      router.replace('/paywall');
+      router.replace('/(tabs)');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create your account.');
     } finally {
