@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { PayMark } from '@/components/commerce/PayMark';
 import { PlanPicker } from '@/components/commerce/PlanPicker';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
 import { FREE_INCLUDED, PAYMENT_METHODS } from '@/lib/plans';
@@ -123,7 +124,7 @@ export default function PricingPage() {
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {PAYMENT_METHODS.map((m) => (
               <Card key={m.id} flat className="flex items-center gap-3">
-                <span className="text-[22px]">{m.emoji}</span>
+                <PayMark logo={m.logo} label={m.label} size={30} />
                 <span>
                   <span className="block text-[14px] font-extrabold text-ink">{m.label}</span>
                   <span className="block text-[12.5px] text-ink2">{m.hint}</span>

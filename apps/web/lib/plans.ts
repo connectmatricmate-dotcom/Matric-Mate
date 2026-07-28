@@ -56,10 +56,21 @@ export const planById = (id: string): Plan => PLANS.find((p) => p.id === id) ?? 
 
 export const rupees = (n: number) => `Rs ${n.toLocaleString('en-PK')}`;
 
+/**
+ * How people pay. The two wallet marks are the official symbols, used unaltered
+ * beside our own text label rather than pressed into a horizontal lockup the
+ * brands do not publish. Card has no third-party mark: we would need Visa and
+ * Mastercard's own assets, and their guidelines are stricter than this prototype
+ * needs. Confirm all three against the current merchant brand kits before launch.
+ *
+ * These live on the web only. The Android build must never show a payment brand:
+ * to Google Play that reads as steering a user to an alternative payment method.
+ * See packages/core/src/billing.ts.
+ */
 export const PAYMENT_METHODS = [
-  { id: 'jazzcash' as const, label: 'JazzCash', hint: 'Mobile account', emoji: '📱' },
-  { id: 'easypaisa' as const, label: 'EasyPaisa', hint: 'Mobile account', emoji: '💚' },
-  { id: 'card' as const, label: 'Debit or credit card', hint: 'Visa, Mastercard', emoji: '💳' },
+  { id: 'jazzcash' as const, label: 'JazzCash', hint: 'Mobile account', logo: '/brand/pay/jazzcash.png' },
+  { id: 'easypaisa' as const, label: 'EasyPaisa', hint: 'Mobile account', logo: '/brand/pay/easypaisa.png' },
+  { id: 'card' as const, label: 'Debit or credit card', hint: 'Visa, Mastercard', logo: null },
 ];
 
 export const INCLUDED = [

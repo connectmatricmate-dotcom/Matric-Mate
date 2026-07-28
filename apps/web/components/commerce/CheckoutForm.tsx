@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from '@matricmate/core';
+import { PayMark } from '@/components/commerce/PayMark';
 import { Btn, ErrorBanner, Field } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
@@ -179,7 +180,7 @@ export function CheckoutForm({ plan }: { plan: Plan }) {
                     on ? 'border-teal bg-tealtint' : 'border-line bg-card hover:border-tealtint2'
                   }`}
                 >
-                  <span className="text-[20px]">{m.emoji}</span>
+                  <PayMark logo={m.logo} label={m.label} size={26} />
                   <span className="min-w-0 flex-1">
                     <span className="block text-[14.5px] font-extrabold text-ink">{m.label}</span>
                     <span className="block text-[12.5px] text-ink2">{m.hint}</span>

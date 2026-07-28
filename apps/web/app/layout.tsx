@@ -27,7 +27,6 @@ export const metadata: Metadata = {
     locale: 'en_PK',
     type: 'website',
   },
-  icons: { icon: '/brand/favicon-192.png', apple: '/brand/icon-1024.png' },
 };
 
 export const viewport: Viewport = {

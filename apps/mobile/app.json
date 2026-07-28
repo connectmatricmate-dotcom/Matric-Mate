@@ -20,7 +20,7 @@
     "android": {
       "package": "pk.matricmate.app",
       "adaptiveIcon": {
-        "backgroundColor": "#FAFBF7",
+        "backgroundColor": "#096A8B",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
