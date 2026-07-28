@@ -3,54 +3,68 @@
 Expo project: `@matricmate/matricmate` (owner account `matricmate`, project id in `app.json` →
 `extra.eas.projectId`). Android package: `pk.matricmate.app`.
 
-Three ways to see the app, in increasing permanence:
+## Two apps, two audiences
 
-| Need | Use | Rebuild needed? |
+Both install side by side on the same phone — different package names, so they never clash.
+
+| | **MatricMate Dev** (us) | **MatricMate** (client) |
 | :---- | :---- | :---- |
-| I'm editing code and want it live on my phone right now | **Expo Go + dev server** | no |
-| Client should get the latest JS without reinstalling | **EAS Update (OTA)** | no |
-| Native change, new dependency, or Play Store release | **EAS Build** | yes |
+| Build profile | `development` | `preview` |
+| Package | `pk.matricmate.app.dev` | `pk.matricmate.app` |
+| Purpose | live reload while coding | a stable app to review |
+| Gets changes | instantly from the dev server | when we publish an OTA update |
+| Rebuild needed | only for native changes | only for native changes |
+
+Why not Expo Go: the Play Store's Expo Go is still on SDK 54 while this project is on SDK 57 (Expo
+was awaiting store approval at the SDK 57 release), so Expo Go refuses to open the project. The
+development build is our own client, matched to our SDK — immune to that permanently.
 
 ---
 
-## 1. Live on your phone while developing (no APK)
+## 1. Live coding on your phone (development build)
 
-Phone and computer must be on the same Wi-Fi.
-
-```bash
-cd apps/mobile
-npm start                 # or: npx expo start --lan
-```
-
-On the phone: install **Expo Go** from the Play Store, open it, and either scan the QR shown in the
-terminal or tap *Enter URL manually* and type the `exp://<your-ip>:8081` address the terminal prints.
-Save the file, the phone reloads. Shake the phone for the dev menu.
-
-If the phone can't reach the computer (guest Wi-Fi, AP isolation), use a tunnel instead:
-
-```bash
-npx expo start --tunnel   # routes via ngrok; works across networks
-```
-
-Expo Go is enough for this project because we use no custom native modules. If that changes, build a
-**development build** once (`eas build -p android --profile development`) and use it in place of
-Expo Go — same live-reload workflow.
-
-## 2. Push changes to the client's installed app (OTA)
-
-The APK from the `preview` profile listens on the **preview** channel. Any JavaScript, style,
-content or asset change can be delivered without a new APK:
+Install **MatricMate Dev** once from the `development` build link. After that:
 
 ```bash
 cd apps/mobile
-EAS_NO_VCS=1 npx eas-cli update --branch preview --message "Fix chapter list spacing"
+npx expo start --dev-client        # phone and computer on the same Wi-Fi
 ```
 
-The client's app picks it up on next launch (Expo checks for updates on startup). Verify what's live:
+Open MatricMate Dev, tap the dev-server entry (or scan the QR). Save a file → the phone reloads in
+about a second. Shake the phone for the dev menu (reload, element inspector, performance monitor).
+
+If the phone can't reach the computer (guest Wi-Fi, AP isolation):
 
 ```bash
-npx eas-cli update:list --branch preview
+npx expo start --dev-client --tunnel
 ```
+
+Rebuild MatricMate Dev only when native config changes — a new native dependency, icon, splash,
+permission or app.json native field. Pure JS/TS, styling and content changes never need a rebuild.
+
+## 2. Ship a batch of changes to the client (OTA)
+
+The client's APK (`preview` profile) listens on the **preview** channel. Work accumulates locally;
+when a chunk is worth showing, publish it in one go — the client reopens the app and it's there.
+
+```bash
+cd apps/mobile
+EAS_NO_VCS=1 npx eas-cli update --branch preview \
+  --message "Study module: chapter reader, audio player, offline downloads"
+```
+
+Then message the client what's new. Their app fetches the update on next launch (Expo checks on
+startup; if the download isn't finished in time it applies on the launch after).
+
+Check what's live, and to whom:
+
+```bash
+npx eas-cli update:list --branch preview     # published updates
+npx eas-cli channel:view preview             # which branch the channel points at
+```
+
+Good practice: publish one update per milestone or per demo, with a message that reads like a
+changelog entry — those messages are the only record the client sees.
 
 **What OTA cannot do:** add or upgrade native dependencies, change app icon/splash/permissions, or
 change `app.json` native config. Those need a new build. Updates only reach builds whose
