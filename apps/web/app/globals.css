@@ -1,0 +1,75 @@
+@import 'tailwindcss';
+
+/**
+ * Brand tokens. The same values the Android app styles from — see
+ * packages/core/src/tokens.ts. The two surfaces are meant to be
+ * indistinguishable, so these stay in step with that file.
+ */
+@theme {
+  --color-teal: #096a8b;
+  --color-tealdark: #0f5064;
+  --color-tealtint: #e9f2f5;
+  --color-tealtint2: #d5e7ed;
+  --color-ink: #0f3d4c;
+  --color-ink2: #517682;
+  --color-ink3: #8aa4ad;
+  --color-paper: #fafbf7;
+  --color-card: #ffffff;
+  --color-line: #e4eae6;
+  --color-orange: #f29329;
+  --color-orangedark: #d97b10;
+  --color-orangetint: #fdf1e1;
+  --color-green: #2e9e5b;
+  --color-greentint: #e7f5ec;
+  --color-red: #d9534f;
+  --color-redtint: #fbeceb;
+  --color-grey: #eff3f0;
+  --color-whatsapp: #25d366;
+
+  --font-display: var(--font-baloo), ui-rounded, system-ui, sans-serif;
+  --font-body: var(--font-nunito), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-urdu: var(--font-nastaliq), serif;
+
+  --radius-card: 16px;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Urdu needs far more leading than Latin at the same size, and runs RTL. */
+.urdu {
+  font-family: var(--font-urdu);
+  direction: rtl;
+  text-align: right;
+  line-height: 2.1;
+}
+
+/* Keyboard focus stays visible — for some users it's the only affordance. */
+:focus-visible {
+  outline: 2.5px solid var(--color-teal);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -10,5 +10,6 @@ export * from './content';
 export * from './domain';
 export * from './billing';
 export * from './tokens';
+export * from './icons';
 export { api } from './api';
 export * from './i18n';
