@@ -1,5 +1,5 @@
 /**
- * MatricMate shared UI kit. Every screen composes these — no screen styles colours directly.
+ * MatricMate shared UI kit. Every screen composes these, no screen styles colours directly.
  * Works identically on Android and web (React Native Web).
  */
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
@@ -44,7 +44,7 @@ function Txt({ children, style, numberOfLines }: TextProps) {
   );
 }
 
-/** Urdu text — Nastaliq, RTL, generous line-height. */
+/** Urdu text. Nastaliq, RTL, generous line-height. */
 export function Ur({ children, size = 16, style }: { children: React.ReactNode; size?: number; style?: StyleProp<TextStyle> }) {
   return <Text style={[urdu(size), style]}>{children}</Text>;
 }
@@ -56,7 +56,7 @@ export function Ur({ children, size = 16, style }: { children: React.ReactNode; 
  * the status-bar inset at the top, the gesture-bar inset at the bottom, and
  * (on web) a centred column instead of full-bleed text.
  *
- * `tabbed` — set on the five tab roots, where the tab bar already occupies the
+ * `tabbed`, set on the five tab roots, where the tab bar already occupies the
  * bottom inset and adding it again would leave a dead gap.
  */
 export function Screen({
@@ -243,7 +243,7 @@ export function Tap({
 
 /**
  * Square checkbox for multi-select, round for single-select.
- * Selected state fills the box — an outline that turns into a floating tick
+ * Selected state fills the box, an outline that turns into a floating tick
  * reads as two different controls, which is the bug this replaces.
  */
 export function Check({
@@ -282,7 +282,7 @@ export function Check({
   );
 }
 
-/** Circular icon button used in headers — 44dp target, per platform guidance. */
+/** Circular icon button used in headers, 44dp target, per platform guidance. */
 export function IconButton({
   icon,
   onPress,
@@ -413,7 +413,7 @@ export function Pill({
   };
   const [bg, fg] = map[tone];
   // Anything that isn't already an element (string, number, or an interpolated
-  // array of them) must be wrapped in <Text> — a bare text node inside a View
+  // array of them) must be wrapped in <Text>, a bare text node inside a View
   // is invalid in React Native.
   const body = (
     <View style={[st.pill, { backgroundColor: bg }, style]}>
@@ -686,7 +686,7 @@ export function OfflineBanner() {
     <Card flat tint={C.orangeTint} border={C.orange} style={{ flexDirection: 'row', alignItems: 'center', gap: S.sm, marginBottom: S.md }}>
       <Icon name="wifiOff" size={18} color={C.orangeDark} />
       <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink, flex: 1 }}>
-        You’re offline — downloaded content still works.
+        You’re offline, downloaded content still works.
       </Text>
     </Card>
   );

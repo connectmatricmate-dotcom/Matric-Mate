@@ -1,5 +1,5 @@
 /**
- * App state — session, onboarding choices, progress, attempts, AI usage, settings.
+ * App state, session, onboarding choices, progress, attempts, AI usage, settings.
  *
  * Persisted to AsyncStorage (localStorage on web) so the demo survives reloads and
  * app restarts. When Supabase lands this becomes a thin cache over server state;
@@ -115,7 +115,7 @@ function seed(): Partial<State> {
   const attempts: Attempt[] = [];
   let i = 0;
   // Confidence pattern per topic. Correctness runs k < right, so Pakka answers
-  // land mostly right and Tukka mostly wrong — but not perfectly, which is what
+  // land mostly right and Tukka mostly wrong, but not perfectly, which is what
   // makes the confidence-vs-accuracy chart believable.
   const CONF: Confidence[] = [2, 1, 2, 0, 1, 2];
   topics.forEach(([topic, subjectId, chapterId, right]) => {
@@ -142,7 +142,7 @@ function seed(): Partial<State> {
       id: 'seed-r1',
       subjectId: 'phy',
       chapterId: 'phy-2',
-      label: 'Kinematics — timed exam',
+      label: 'Kinematics, timed exam',
       score: 15,
       total: 20,
       xp: 150,
@@ -154,7 +154,7 @@ function seed(): Partial<State> {
       id: 'seed-r2',
       subjectId: 'phy',
       chapterId: 'phy-3',
-      label: 'Dynamics — practice',
+      label: 'Dynamics, practice',
       score: 16,
       total: 20,
       xp: 168,
@@ -166,7 +166,7 @@ function seed(): Partial<State> {
       id: 'seed-r3',
       subjectId: 'chem',
       chapterId: 'chem-2',
-      label: 'Structure of Atoms — practice',
+      label: 'Structure of Atoms, practice',
       score: 12,
       total: 15,
       xp: 120,
@@ -184,10 +184,10 @@ function seed(): Partial<State> {
     {
       id: 'n1',
       kind: 'streak',
-      title: 'Streak alive — shabash!',
+      title: 'Streak alive, shabash!',
       body: 'Keep it going: one lesson today counts.',
       at: Date.now() - 2 * 36e5,
-      href: '/(tabs)/progress',
+      target: 'progress',
       read: false,
     },
     {
@@ -196,7 +196,7 @@ function seed(): Partial<State> {
       title: 'Study reminder',
       body: '10 MCQs on Dynamics are waiting.',
       at: Date.now() - 5 * 36e5,
-      href: '/session/setup',
+      target: 'session-setup',
       read: false,
     },
     {
@@ -205,7 +205,7 @@ function seed(): Partial<State> {
       title: 'Your report card is ready',
       body: 'Tap to view and share with your parents.',
       at: daysAgo(3),
-      href: '/insights/report',
+      target: 'report',
       read: true,
     },
   ];
@@ -275,7 +275,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setState({ ...EMPTY, ...parsed, settings: { ...DEFAULT_SETTINGS, ...parsed.settings } });
         }
       } catch {
-        // corrupt cache — start clean rather than crash
+        // corrupt cache, start clean rather than crash
       } finally {
         setHydrated(true);
       }
@@ -327,7 +327,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               title: 'Payment received',
               body: 'Premium is active for one month.',
               at: Date.now(),
-              href: '/account/payments',
+              target: 'payments',
               read: false,
             },
             ...s.notifications,

@@ -39,7 +39,7 @@ export const fonts = {
   urduBold: 'NotoNastaliqUrdu_600SemiBold',
 } as const;
 
-/** Web equivalents — CSS font stacks for the same faces. */
+/** Web equivalents. CSS font stacks for the same faces. */
 export const webFontStacks = {
   display: '"Baloo 2", ui-rounded, system-ui, sans-serif',
   body: 'Nunito, system-ui, -apple-system, "Segoe UI", sans-serif',

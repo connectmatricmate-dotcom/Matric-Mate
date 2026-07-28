@@ -1,5 +1,5 @@
 /**
- * Domain logic — XP, streaks, progress, weak topics, quotas.
+ * Domain logic. XP, streaks, progress, weak topics, quotas.
  * Pure functions so the same rules run on device, on web and (later) on the server.
  */
 import { Attempt, Confidence, PlanTask, TestResult } from './types';
@@ -11,7 +11,7 @@ export const XP = {
     if (!correct) return 0;
     if (confidence === 2) return 12; // Pakka
     if (confidence === 1) return 10; // Thora sure
-    if (confidence === 0) return 5; // Tukka — right, but own it
+    if (confidence === 0) return 5; // Tukka: right, but own it
     return 10;
   },
   card: 2,
@@ -38,7 +38,7 @@ export function streakFrom(activeDays: string[]): number {
       streak += 1;
       d.setDate(d.getDate() - 1);
     } else if (streak === 0 && key === dayKey(Date.now())) {
-      // today not active yet — a streak can still be alive from yesterday
+      // today not active yet, a streak can still be alive from yesterday
       d.setDate(d.getDate() - 1);
     } else break;
   }
@@ -58,7 +58,7 @@ export function last14(activeDays: string[]): boolean[] {
 export const accuracy = (attempts: Attempt[]) =>
   attempts.length ? Math.round((attempts.filter((a) => a.correct).length / attempts.length) * 100) : 0;
 
-/** Accuracy per confidence level — the Pakka-meter payoff shown in analytics. */
+/** Accuracy per confidence level, the Pakka-meter payoff shown in analytics. */
 export function confidenceBreakdown(attempts: Attempt[]) {
   return ([2, 1, 0] as Confidence[]).map((c) => {
     const set = attempts.filter((a) => a.confidence === c);
@@ -71,18 +71,18 @@ export function confidenceBreakdown(attempts: Attempt[]) {
   });
 }
 
-/** Coaching line derived from the breakdown — plain, specific, never preachy. */
+/** Coaching line derived from the breakdown, plain, specific, never preachy. */
 export function confidenceInsight(rows: ReturnType<typeof confidenceBreakdown>): string | null {
   const pakka = rows.find((r) => r.confidence === 2);
   const tukka = rows.find((r) => r.confidence === 0);
   if (!pakka?.said && !tukka?.said) return null;
   if (pakka && pakka.said >= 5 && pakka.accuracy >= 85)
-    return `Jab tum Pakka kehte ho, ${pakka.accuracy}% sahi hota hai — trust yourself.`;
+    return `Jab tum Pakka kehte ho, ${pakka.accuracy}% sahi hota hai, trust yourself.`;
   if (pakka && pakka.said >= 5 && pakka.accuracy < 65)
-    return `Pakka wale jawab sirf ${pakka.accuracy}% sahi hain — un topics ko dobara dekho, confidence dhoka de raha hai.`;
+    return `Pakka wale jawab sirf ${pakka.accuracy}% sahi hain. Un topics ko dobara dekho, confidence dhoka de raha hai.`;
   if (tukka && tukka.said > 0 && pakka)
-    return `Tukka answers ${tukka.accuracy}% sahi hain vs Pakka ${pakka.accuracy}% — guessing kam karne ke liye practice barhao.`;
-  return 'Thora aur practice karo — phir confidence ka pattern saaf nazar aayega.';
+    return `Tukka answers ${tukka.accuracy}% sahi hain vs Pakka ${pakka.accuracy}%. Guessing kam karne ke liye practice barhao.`;
+  return 'Thora aur practice karo, phir confidence ka pattern saaf nazar aayega.';
 }
 
 /** Topics ranked worst-first, from at least 3 attempts each. */
@@ -127,7 +127,7 @@ export function overallPct(subjectIds: string[], readSections: string[], attempt
 }
 
 /**
- * "Today's plan" — three tasks: finish the chapter you're on, practise it,
+ * "Today's plan", three tasks: finish the chapter you're on, practise it,
  * and revise your weakest topic. Deterministic per day so it doesn't reshuffle.
  * M9 replaces this with the AI planner; the shape stays identical.
  */
@@ -158,7 +158,7 @@ export function buildPlan(opts: {
   return tasks.map((task) => ({ ...task, done: opts.doneIds.includes(task.id) }));
 }
 
-/** Daily AI message quota (D7 — confirm with client). */
+/** Daily AI message quota (D7, confirm with client). */
 export const AI_QUOTA = { premium: 20, free: 5 };
 
 export const grade = (pct: number) =>

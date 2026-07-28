@@ -2,7 +2,7 @@
  * Class recipes shared by the server-rendered and client-rendered variants of a
  * control, so a link-button and a button-button can never drift apart.
  *
- * No 'use client' here on purpose — this file must stay importable from Server
+ * No 'use client' here on purpose, this file must stay importable from Server
  * Components.
  */
 
@@ -33,7 +33,7 @@ export function buttonClasses({
   className?: string;
 } = {}) {
   return [
-    // 44px minimum touch target, press cue, ~200ms ease-out — see the motion rule
+    // 44px minimum touch target, press cue, ~200ms ease-out, see the motion rule
     'inline-flex min-h-11 items-center justify-center gap-2 rounded-[16px] font-display',
     'transition-[background-color,border-color,transform] duration-200 ease-out active:scale-[0.98]',
     sm ? 'px-4 py-2.5 text-[14px]' : lg ? 'px-7 py-4 text-[17px]' : 'px-5 py-3.5 text-[16px]',

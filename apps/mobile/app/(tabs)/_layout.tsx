@@ -16,7 +16,7 @@ const TABS: { name: string; label: StringKey; icon: IconName }[] = [
 
 /**
  * Five tabs; Profile lives in each screen's header avatar (DESIGN-SPEC D1).
- * The bar itself is ours — see components/TabBar.
+ * The bar itself is ours, see components/TabBar.
  */
 export default function TabLayout() {
   const { state, hydrated } = useApp();

@@ -18,7 +18,7 @@ const PERKS: [IconName, StringKey][] = [
 
 /**
  * Read-only. The app may show what a student's plan includes, but never sell,
- * price, or link to a purchase — see core/billing.ts.
+ * price, or link to a purchase, see core/billing.ts.
  */
 export default function Subscription() {
   const { state } = useApp();

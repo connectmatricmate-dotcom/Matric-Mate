@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /**
- * Brand tokens. The same values the Android app styles from — see
+ * Brand tokens. The same values the Android app styles from, see
  * packages/core/src/tokens.ts. The two surfaces are meant to be
  * indistinguishable, so these stay in step with that file.
  */
@@ -48,7 +48,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Urdu needs far more leading than Latin at the same size, and runs RTL. */
+/**
+ * Urdu, two ways.
+ *
+ * Nastaliq is a steeply sloped script: its glyphs need roughly twice the leading
+ * of Latin, and its ink sits low in the line box. That is right for a paragraph
+ * and wrong for a word sitting beside English, "English & اردو medium" ends up
+ * with the Urdu dropped half a line below its neighbours.
+ *
+ * `.urdu` is for prose. `.urdu-inline` is for a word or two inside a Latin line:
+ * normal leading, and the box is nudged up so the two scripts share an optical
+ * baseline instead of a typographic one.
+ */
 .urdu {
   font-family: var(--font-urdu);
   direction: rtl;
@@ -56,11 +67,37 @@ body {
   line-height: 2.1;
 }
 
-/* Keyboard focus stays visible — for some users it's the only affordance. */
+.urdu-inline {
+  font-family: var(--font-urdu);
+  direction: rtl;
+  display: inline-block;
+  /* Nastaliq reads small next to Latin at the same px, and its ink hangs low in
+     the em box. Scale it up relative to whatever it sits beside, then drop the
+     box so the two scripts share an optical baseline. */
+  font-size: 1.22em;
+  line-height: 1;
+  vertical-align: -0.1em;
+}
+
+/* Keyboard focus stays visible, for some users it's the only affordance. */
 :focus-visible {
   outline: 2.5px solid var(--color-teal);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/**
+ * Text inputs are the exception. They sit inside a bordered shell that already
+ * carries the focus state, so an outline on the input itself draws a second
+ * ring inside the first. The shell owns the ring; the input stays bare.
+ */
+.field-shell :where(input, textarea, select):focus-visible {
+  outline: none;
+}
+
+.field-shell:focus-within {
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 3px rgb(9 106 139 / 0.13);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -76,7 +113,7 @@ body {
 
 /**
  * Tailwind v4 dropped the default `cursor: pointer` on buttons. Every clickable
- * must feel clickable — this restores it app-wide so no component has to
+ * must feel clickable, this restores it app-wide so no component has to
  * remember. Disabled controls say so with the cursor too.
  */
 button:not(:disabled),

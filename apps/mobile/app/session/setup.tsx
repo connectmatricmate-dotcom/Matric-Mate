@@ -47,7 +47,7 @@ export default function SessionSetup() {
       label:
         chapterIds.length === 1
           ? `${chapterById(chapterIds[0])?.title}`
-          : `${subjectById(subjectId)?.name} — ${t('session.mixed')}`,
+          : `${subjectById(subjectId)?.name} · ${t('session.mixed')}`,
       subjectId,
       chapterId: chapterIds.length === 1 ? chapterIds[0] : null,
       mcqs,

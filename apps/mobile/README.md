@@ -1,4 +1,4 @@
-# MatricMate — app (Android + web)
+# MatricMate, app (Android + web)
 
 One Expo/React Native codebase that ships as the **native Android app** and the **responsive web
 app**. This is the milestone‑1 build: every screen is real, navigable and interactive, running on a
@@ -20,7 +20,7 @@ To view the production web build locally: `cd dist && python3 -m http.server 809
 
 | Real | Mocked (M2+) |
 | :---- | :---- |
-| Every screen, navigation, layouts (phone + web sidebar) | No server — data comes from `src/core/content.ts` |
+| Every screen, navigation, layouts (phone + web sidebar) | No server, data comes from `src/core/content.ts` |
 | Onboarding, sign‑up/sign‑in validation, session persistence | Auth is local (any email + 6‑char password) |
 | MCQ engine, Pakka‑meter confidence, XP, streaks | AI tutor returns canned step‑by‑step answers |
 | Progress, weak topics, confidence‑vs‑accuracy analytics | Safepay payment is simulated (no charge) |
@@ -44,11 +44,11 @@ app/                      Expo Router routes (file = screen)
   insights/               performance, weak, report
   account/                profile, edit, subscription, payments, settings, help
 src/
-  theme.ts                design tokens (from the client's logo — see docs/assets/brand/BRAND.md)
+  theme.ts                design tokens (from the client's logo, see docs/assets/brand/BRAND.md)
   components/ui.tsx       shared UI kit; every screen composes these
   components/Icon.tsx     icon set (react-native-svg)
   core/content.ts         MOCK FBISE Class 9 content
-  core/api.ts             MOCK API — the single seam to replace with Supabase
+  core/api.ts             MOCK API, the single seam to replace with Supabase
   core/domain.ts          XP, streaks, progress, weak topics, quotas (pure functions)
   store/app.tsx           app state + persistence
   store/session.ts        the active practice/exam session

@@ -73,7 +73,7 @@ export default function Report() {
             >
               <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, color: C.ink }}>{subjectById(r.sid)?.name}</Text>
               <Text style={{ fontFamily: F.display, fontSize: 15, color: C.ink, width: 44, textAlign: 'right' }}>
-                {r.attempted ? grade(r.acc) : '—'}
+                {r.attempted ? grade(r.acc) : 'n/a'}
               </Text>
               <Text
                 style={{

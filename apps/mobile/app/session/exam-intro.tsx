@@ -50,7 +50,7 @@ export default function ExamIntro() {
     setBusy(false);
     session.start({
       mode: 'exam',
-      label: `${label} — ${t('session.examTitle')}`,
+      label: `${label} · ${t('session.examTitle')}`,
       subjectId,
       chapterId: chapter ?? null,
       mcqs,

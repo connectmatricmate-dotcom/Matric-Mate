@@ -1,5 +1,5 @@
 /**
- * MOCK API — the single seam between the UI and the backend.
+ * MOCK API, the single seam between the UI and the backend.
  *
  * Every function here is async with a little latency so real loading states are
  * exercised. When Supabase arrives (M2) only this file changes: each function
@@ -18,7 +18,7 @@ import {
 import { Chapter, ChapterContent, Flashcard, Mcq, PastPaper, Subject } from './types';
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-/** Simulated network latency — keep small so the demo feels quick but honest. */
+/** Simulated network latency, keep small so the demo feels quick but honest. */
 const LATENCY = 180;
 
 export const api = {
@@ -130,9 +130,9 @@ export const api = {
       return {
         text: 'Great question! Short answer first, phir steps:',
         steps: [
-          'Speed = only how fast (magnitude). 60 km/h — bas.',
+          'Speed = only how fast (magnitude). 60 km/h, bas.',
           'Velocity = how fast plus direction. 60 km/h towards north.',
-          'Direction badle to velocity badal jati hai — even at constant speed. That’s why circular motion has acceleration!',
+          'Direction badle to velocity badal jati hai, even at constant speed. That’s why circular motion has acceleration!',
         ],
       };
     if (q.includes('newton') || q.includes('f = ma') || q.includes('force'))
@@ -146,17 +146,17 @@ export const api = {
       };
     if (q.includes('inertia'))
       return {
-        text: 'Inertia — asaan alfaaz mein:',
+        text: 'Inertia, asaan alfaaz mein:',
         steps: [
           'Every body resists a change in its state of rest or motion.',
           'That resistance is called inertia, and mass is its measure.',
-          'Bus achanak ruke to aap aage gir jate hain — upper body inertia ki wajah se chalta rehta hai.',
+          'Bus achanak ruke to aap aage gir jate hain, kyunke upper body inertia ki wajah se chalta rehta hai.',
         ],
       };
     return {
       text: `Let’s work through “${question.trim() || 'your question'}”${context ? ` (${context})` : ''}:`,
       steps: [
-        'Pehle yeh dekho ke question kis concept ka hai — usko naam do.',
+        'Pehle yeh dekho ke question kis concept ka hai, phir usko naam do.',
         'Us concept ki definition aur formula likho, phir given values daalo.',
         'Answer ko unit ke saath likho aur ek line mein reason batao.',
         'Note: this demo returns a sample answer. The live tutor (M3) runs on Claude with a daily quota per student.',

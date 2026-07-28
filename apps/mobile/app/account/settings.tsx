@@ -18,7 +18,7 @@ export default function Settings() {
     <Screen>
       <Header title={t('account.settingsTitle')} back />
 
-      {/* App language — the interface, not the syllabus */}
+      {/* App language, the interface, not the syllabus */}
       <SectionTitle>{t('lang.label')}</SectionTitle>
       <Card flat style={{ alignItems: 'center', gap: S.sm }}>
         <LanguageToggle />
@@ -46,7 +46,7 @@ export default function Settings() {
         />
       </Card>
 
-      {/* Medium — which version of the syllabus, separate from app language */}
+      {/* Medium, which version of the syllabus, separate from app language */}
       <SectionTitle>{t('account.content')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>
         <Item

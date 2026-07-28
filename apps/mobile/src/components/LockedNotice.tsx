@@ -6,8 +6,8 @@ import { Card, Row, Small } from './ui';
 import { Icon } from './Icon';
 
 /**
- * The only thing the app may say about paying: what's locked, and — as plain,
- * non-tappable text — where subscriptions are managed. No price, no button, no
+ * The only thing the app may say about paying: what's locked, and, as plain,
+ * non-tappable text, where subscriptions are managed. No price, no button, no
  * link. See core/billing.ts.
  */
 export function LockedNotice({ variant = 'locked' }: { variant?: 'locked' | 'expired' | 'free' }) {
@@ -21,7 +21,7 @@ export function LockedNotice({ variant = 'locked' }: { variant?: 'locked' | 'exp
         <Icon name="lock" size={18} color={C.teal} />
         <View style={{ flex: 1 }}>
           <Small style={{ color: C.ink }}>{body}</Small>
-          {/* Plain text on purpose — must never be tappable. */}
+          {/* Plain text on purpose, must never be tappable. */}
           <Small style={{ marginTop: 4 }}>{t('billing.manageNote', { site: BILLING_SITE })}</Small>
         </View>
       </Row>

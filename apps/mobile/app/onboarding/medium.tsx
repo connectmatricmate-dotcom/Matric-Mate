@@ -6,7 +6,7 @@ import { Medium } from '@matricmate/core';
 import { useApp } from '../../src/store/app';
 
 /**
- * Medium is which version of the FBISE syllabus the student studies — it changes
+ * Medium is which version of the FBISE syllabus the student studies, it changes
  * the content, not the interface. The app's own language is set separately.
  */
 export default function ChooseMedium() {

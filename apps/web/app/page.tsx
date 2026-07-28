@@ -4,6 +4,7 @@ import { PAPER_CONTENT, contentFor } from '@matricmate/core';
 import { AudioSample } from '@/components/landing/AudioSample';
 import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 import { Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
 import type { IconName } from '@matricmate/core';
 
@@ -31,17 +32,17 @@ const PAINS = [
 ];
 
 const STEPS = [
-  { n: 1, title: 'Pick your subjects', body: 'Class 9, FBISE, English or Urdu medium. Your syllabus loads — nothing else.' },
+  { n: 1, title: 'Pick your subjects', body: 'Class 9, FBISE, English or Urdu medium. Your syllabus loads, nothing else.' },
   { n: 2, title: 'Study the chapter', body: 'Notes, worked examples and an audio lesson you can play while travelling.' },
-  { n: 3, title: 'Practise honestly', body: 'MCQs, flashcards, blanks and past papers — each answer records how sure you were.' },
+  { n: 3, title: 'Practise honestly', body: 'MCQs, flashcards, blanks and past papers. Each answer records how sure you were.' },
   { n: 4, title: 'Fix what’s weak', body: 'The app names the topics costing you marks and builds a test out of exactly those.' },
 ];
 
 const INSIDE: { icon: IconName; title: string; body: string }[] = [
-  { icon: 'book', title: 'Chapter-wise notes', body: 'Every chapter split into short sections with definitions, formulas and worked examples — in your medium.' },
+  { icon: 'book', title: 'Chapter-wise notes', body: 'Every chapter split into short sections with definitions, formulas and worked examples, in your medium.' },
   { icon: 'headphones', title: 'Audio lessons', body: 'Listen to the whole chapter in English or Urdu. Works offline, so it costs no data on the second listen.' },
   { icon: 'cards', title: 'Flashcards', body: 'Active recall for the definitions that show up in Section A. Cards you miss come back first.' },
-  { icon: 'target', title: 'MCQs with explanations', body: 'Every question tells you why the right answer is right — that’s the part that actually teaches.' },
+  { icon: 'target', title: 'MCQs with explanations', body: 'Every question tells you why the right answer is right, which is the part that actually teaches.' },
   { icon: 'edit', title: 'Blanks and short questions', body: 'Model answers with the marking points, so you know what earns each mark.' },
   { icon: 'clock', title: 'Timed tests', body: 'Full paper conditions with a question palette and flagging, so exam day isn’t the first time.' },
 ];
@@ -57,7 +58,7 @@ const FAQ = [
   },
   {
     q: 'My child studies in Urdu medium. Is the content really in Urdu?',
-    a: 'Yes — notes, questions and the audio lesson come in the medium you choose. The app’s own buttons can be set to English or Roman Urdu separately.',
+    a: 'Yes. Notes, questions and the audio lesson come in the medium you choose. The app’s own buttons can be set to English or Roman Urdu separately.',
   },
   {
     q: 'How do I pay from Pakistan?',
@@ -69,7 +70,7 @@ const FAQ = [
   },
   {
     q: 'What if it doesn’t suit us?',
-    a: 'The first three days are free, and there’s no lock-in — you pay month to month and can stop whenever you like.',
+    a: 'The first three days are free, and there’s no lock-in. You pay month to month and can stop whenever you like.',
   },
 ];
 
@@ -93,13 +94,11 @@ export default function LandingPage() {
 
               <p className="mt-3 max-w-[520px] text-[16.5px] leading-[1.65] text-ink2">
                 Chapter notes, audio lessons, past papers and a tutor that answers at midnight. Every question you
-                practise also records how sure you were — so MatricMate can show you the topics you only{' '}
+                practise also records how sure you were, so MatricMate can show you the topics you only{' '}
                 <em>think</em> you know.
               </p>
 
-              <p className="mt-3">
-                <Ur className="text-[17px] text-ink2">پوری تیاری، ایک ہی جگہ</Ur>
-              </p>
+              <p className="mt-3 text-[15px] font-extrabold text-ink2">Poori tayyari, aik hi jagah.</p>
 
               <div className="mt-7 flex flex-wrap gap-3">
                 <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
@@ -111,10 +110,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-3">
-              <p className="self-start text-[12px] font-extrabold uppercase tracking-[0.08em] text-ink3 md:self-center">
-                Try a real question ↓
-              </p>
+            <div className="flex flex-col items-center">
               <HeroDemo mcq={heroMcq} />
             </div>
           </div>
@@ -122,12 +118,17 @@ export default function LandingPage() {
 
         {/* --------------------------------------------------- trust strip */}
         <section className="border-y border-line bg-card">
-          <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-center gap-x-10 gap-y-3 px-5 py-4 text-[13px] font-extrabold text-ink2">
+          <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-center gap-x-14 gap-y-3 px-5 py-5 text-[13px] font-extrabold text-ink2">
             <span className="flex items-center gap-2">
               <Icon name="book2" size={16} className="text-teal" /> FBISE syllabus, chapter by chapter
             </span>
             <span className="flex items-center gap-2">
-              <Icon name="globe" size={16} className="text-teal" /> English &amp; <Ur className="text-[13px]">اردو</Ur> medium
+              <Icon name="globe" size={16} className="shrink-0 text-teal" />
+              {/* One inline run, so vertical-align lines the two scripts up.
+                  Split across flex items they would each centre on their own box. */}
+              <span>
+                English &amp; <Ur>اردو</Ur> medium
+              </span>
             </span>
             <span className="flex items-center gap-2">
               <Icon name="download" size={16} className="text-teal" /> Works offline
@@ -207,10 +208,9 @@ export default function LandingPage() {
                   <span className="font-display text-[22px] tracking-wide text-ink">F = m a</span>
                   <p className="text-[12px] text-ink2">force = mass × acceleration</p>
                 </div>
-                <p className="mt-3">
-                  <Ur className="text-[15px] text-ink2">
-                    جب کسی جسم پر خالص قوت عمل کرتی ہے تو وہ قوت کی سمت میں اسراع پیدا کرتی ہے۔
-                  </Ur>
+                {/* Roman Urdu, the way students actually write it in their notes. */}
+                <p className="mt-3 text-[14px] leading-[1.7] text-ink2">
+                  Jab kisi jism par net force lagti hai to us force ki simt mein acceleration paida hoti hai.
                 </p>
               </Card>
             </div>
@@ -228,7 +228,7 @@ export default function LandingPage() {
               <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
                 Every answer carries a confidence tag. Over a few hundred questions that turns into something a score
                 can’t tell you: the difference between a topic you’ve genuinely learned, one you’re guessing well at,
-                and one you’re confidently wrong about — which is the kind that ruins a paper.
+                and one you’re confidently wrong about, which is the kind that ruins a paper.
               </p>
               <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
                 Confidently wrong answers get flagged first, because they’re the ones you’d never revise on your own.
@@ -259,7 +259,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="mt-4 text-[13px] leading-[1.6] text-ink2">
-                “When you say you’re certain, you’re right 91% of the time — trust that. The guessing is where the
+                “When you say you’re certain, you’re right 91% of the time, so trust that. The guessing is where the
                 marks are leaking.”
               </p>
             </Card>
@@ -274,7 +274,7 @@ export default function LandingPage() {
                 Real board papers, in the board’s own shape.
               </h2>
               <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
-                Section A objective, Section B short answers, Section C detailed — with the marks distribution the
+                Section A objective, Section B short answers, Section C detailed, with the marks distribution the
                 examiner actually uses. Read a paper, or sit it under a timer with a question palette and flagging.
               </p>
               <ul className="mt-5 flex flex-col gap-2.5">
@@ -290,7 +290,7 @@ export default function LandingPage() {
             {/* a genuine excerpt, typeset the way the board prints it */}
             <Card>
               <p className="text-center font-display text-[15px] text-ink">FEDERAL BOARD SSC-I EXAMINATION</p>
-              <p className="text-center text-[13px] font-extrabold text-ink">PHYSICS — 2025</p>
+              <p className="text-center text-[13px] font-extrabold text-ink">PHYSICS · 2025</p>
               <p className="mt-1 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">
                 65 marks · 2h 30m
               </p>
@@ -319,13 +319,14 @@ export default function LandingPage() {
         <section id="parents" className="scroll-mt-20 border-y border-line bg-tealtint">
           <div className="mx-auto grid max-w-[1100px] items-center gap-10 px-5 py-16 md:grid-cols-[1fr_360px]">
             <div>
-              <Pill tone="teal">For parents</Pill>
-              <h2 className="mt-3 font-display text-[30px] leading-[1.15] text-ink md:text-[36px]">
+              {/* A label, not a badge, a pill's padding would indent it off the heading's edge. */}
+              <p className="text-[11.5px] font-extrabold uppercase tracking-[0.09em] text-teal">For parents</p>
+              <h2 className="mt-2 font-display text-[30px] leading-[1.15] text-ink md:text-[36px]">
                 You’ll actually know whether it’s working.
               </h2>
               <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
                 At the end of every month your child can share a report card: a grade per subject, how it moved,
-                how many days they actually studied, and which topics still need work. No login needed to view it —
+                how many days they actually studied, and which topics still need work. No login needed to view it:
                 it arrives on WhatsApp like any other message.
               </p>
               <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
@@ -352,10 +353,15 @@ export default function LandingPage() {
                   ['Biology', 'B', '→'],
                   ['Mathematics', 'A−', '↑'],
                 ].map(([subject, grade, trend]) => (
-                  <div key={subject} className="flex items-center justify-between border-b border-line py-2 last:border-0">
+                  // Fixed tracks, so grades sit in a column instead of drifting
+                  // with the length of the subject name.
+                  <div
+                    key={subject}
+                    className="grid grid-cols-[1fr_40px_20px] items-center border-b border-line py-2 last:border-0"
+                  >
                     <span className="text-[13.5px] text-ink">{subject}</span>
-                    <span className="font-display text-[15px] text-ink">{grade}</span>
-                    <span className={`w-6 text-right text-[14px] font-extrabold ${trend === '↑' ? 'text-green' : 'text-ink3'}`}>
+                    <span className="text-right font-display text-[15px] text-ink tabular">{grade}</span>
+                    <span className={`text-right text-[14px] font-extrabold ${trend === '↑' ? 'text-green' : 'text-ink3'}`}>
                       {trend}
                     </span>
                   </div>
@@ -408,7 +414,7 @@ export default function LandingPage() {
                 {[
                   'Every chapter, note and audio lesson',
                   'Unlimited MCQs, tests and past papers',
-                  'AI tutor — 20 questions a day',
+                  'AI tutor: 20 questions a day',
                   'Weak topics and monthly report card',
                   'Offline downloads',
                   'Android app and website, one account',
@@ -419,8 +425,11 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <LinkBtn title="Start 3 days free" href="/signup" variant="orange" className="mt-5 w-full" />
+              <LinkBtn title="Start 3 days free" href="/checkout?plan=quarter" variant="orange" className="mt-5 w-full" />
               <p className="mt-3 text-center text-[12px] text-ink3">JazzCash · EasyPaisa · Debit or credit card</p>
+              <Link href="/pricing" className="mt-2 text-center text-[12.5px] font-extrabold text-teal hover:underline">
+                Compare plan lengths
+              </Link>
             </Card>
           </div>
         </section>
@@ -465,39 +474,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-line bg-card">
-        <div className="mx-auto flex max-w-[1100px] flex-col gap-6 px-5 py-10 md:flex-row md:items-start md:justify-between">
-          <div className="max-w-[300px]">
-            <Image src="/brand/wordmark.png" alt="MatricMate" width={140} height={28} />
-            <p className="mt-3 text-[13px] leading-[1.6] text-ink2">
-              Exam preparation for FBISE Class 9, in English and Urdu medium. Built in Pakistan.
-            </p>
-          </div>
-          <div className="flex gap-12">
-            <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink3">Product</p>
-              <ul className="mt-2.5 flex flex-col gap-2 text-[13.5px] text-ink2">
-                <li><a className="hover:text-teal" href="#inside">What’s inside</a></li>
-                <li><a className="hover:text-teal" href="#papers">Past papers</a></li>
-                <li><a className="hover:text-teal" href="#pricing">Pricing</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink3">Support</p>
-              <ul className="mt-2.5 flex flex-col gap-2 text-[13.5px] text-ink2">
-                <li><a className="hover:text-teal" href="#faq">FAQ</a></li>
-                <li><span>WhatsApp · 10am–10pm</span></li>
-                <li><span>help@matricmate.pk</span></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-line">
-          <p className="mx-auto max-w-[1100px] px-5 py-4 text-[12px] text-ink3">
-            © {new Date().getFullYear()} MatricMate · Prototype build with sample content
-          </p>
-        </div>
-      </footer>
+      <SiteFooter home />
     </>
   );
 }

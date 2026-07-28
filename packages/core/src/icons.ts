@@ -44,7 +44,7 @@ export const ICON_PATHS = {
   help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM9.5 9.2A2.6 2.6 0 0 1 14.6 10c0 1.8-2.6 2-2.6 3.6M12 17h.01',
   headphones:
     'M4 14a8 8 0 1 1 16 0M4 14v3a2 2 0 0 0 2 2h1v-6H6a2 2 0 0 0-2 1Zm16 0v3a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 1Z',
-  /** two stacked cards — reads as flashcards, unlike a 3D box */
+  /** two stacked cards, reads as flashcards, unlike a 3D box */
   cards: 'M7.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 6 17V8a1.5 1.5 0 0 1 1.5-1.5ZM4 16V6a2 2 0 0 1 2-2h10',
   mail: 'M4 5.5h16v13H4zM4 6.5l8 6 8-6',
   phone: 'M8.5 3.5h7a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19V5a1.5 1.5 0 0 1 1.5-1.5ZM11 17.5h2',

@@ -78,7 +78,7 @@ export type PastPaper = {
   downloaded: boolean;
 };
 
-/** One answered question — the row that powers every analytic in the app. */
+/** One answered question, the row that powers every analytic in the app. */
 export type Attempt = {
   id: string;
   mcqId: string;
@@ -119,18 +119,23 @@ export type ChatMessage = { id: string; role: 'user' | 'ai'; text: string; steps
 export type ChatThread = { id: string; title: string; subjectId?: string; contextLabel?: string; messages: ChatMessage[]; at: number };
 
 /**
- * Where a notification can send you. A closed union rather than a free string,
- * so renaming a route breaks the build instead of shipping a dead link.
+ * Where a notification sends you, named by destination rather than by URL.
+ *
+ * The two apps spell the same screen differently: Expo Router wants
+ * `/(tabs)/progress`, Next wants `/progress`. A shared notification cannot hold
+ * either without being wrong in the other app, so it holds the destination and
+ * each app maps it to its own route. A closed union, so adding a destination
+ * without teaching both apps about it is a build error.
  */
-export type NotificationHref =
-  | '/(tabs)'
-  | '/(tabs)/study'
-  | '/(tabs)/practice'
-  | '/(tabs)/progress'
-  | '/session/setup'
-  | '/insights/report'
-  | '/account/payments'
-  | '/account/subscription';
+export type NotificationTarget =
+  | 'home'
+  | 'study'
+  | 'practice'
+  | 'progress'
+  | 'session-setup'
+  | 'report'
+  | 'payments'
+  | 'subscription';
 
 export type Notification = {
   id: string;
@@ -138,6 +143,6 @@ export type Notification = {
   title: string;
   body: string;
   at: number;
-  href?: NotificationHref;
+  target?: NotificationTarget;
   read: boolean;
 };

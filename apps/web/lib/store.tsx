@@ -4,7 +4,7 @@
  * React binding for the persisted store. The store itself lives outside React
  * (see ./persisted-store) so hydration doesn't need a setState effect.
  *
- * The public shape — `{ state, hydrated, actions, derived }` — matches the
+ * The public shape, `{ state, hydrated, actions, derived }`, matches the
  * Android app's `useApp()` exactly, so screens port between the two apps
  * without rewiring.
  */
@@ -99,7 +99,7 @@ const actions: Actions = {
           title: 'Payment received',
           body: 'Premium is active for one month.',
           at: Date.now(),
-          href: '/account/payments',
+          target: 'payments',
           read: false,
         },
         ...s.notifications,

@@ -36,7 +36,7 @@ export default function PaperViewer() {
           FEDERAL BOARD SSC-I EXAMINATION
         </Text>
         <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink, textAlign: 'center', marginTop: 2 }}>
-          {subjectById(paper?.subjectId ?? 'phy')?.name?.toUpperCase()} — {paper?.year}
+          {subjectById(paper?.subjectId ?? 'phy')?.name?.toUpperCase()}, {paper?.year}
         </Text>
         <Label style={{ textAlign: 'center', marginTop: 4 }}>
           {t('session.paperMeta', {

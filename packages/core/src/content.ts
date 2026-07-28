@@ -1,5 +1,5 @@
 /**
- * MOCK CONTENT — FBISE Class 9.
+ * MOCK CONTENT. FBISE Class 9.
  *
  * Chapter names follow the real FBISE SSC-I scheme so the app looks true to life.
  * Authored study material exists for the demo path (Physics 1–4, Chemistry 2, Biology 4);
@@ -48,7 +48,7 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Fundamentals of Chemistry', 'Branches of chemistry, atom and molecule, mole concept, Avogadro’s number.'],
     ['Structure of Atoms', 'Rutherford and Bohr models, isotopes, electronic configuration.'],
     ['Periodic Table & Periodicity', 'Mendeleev to modern table, periods and groups, periodic trends.'],
-    ['Structure of Molecules', 'Chemical bonds — ionic, covalent, coordinate, metallic; intermolecular forces.'],
+    ['Structure of Molecules', 'Chemical bonds: ionic, covalent, coordinate, metallic; intermolecular forces.'],
     ['Physical States of Matter', 'Gas laws, evaporation, vapour pressure, boiling and melting points.'],
     ['Solutions', 'Solute and solvent, concentration units, colloids and suspensions.'],
     ['Electrochemistry', 'Oxidation and reduction, electrolytic and galvanic cells, corrosion.'],
@@ -82,24 +82,24 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Patriotism', 'Comprehension, parts of speech, paragraph writing.'],
     ['Media and Its Impact', 'Comprehension, active and passive voice.'],
     ['Hazrat Asma (RA)', 'Comprehension, tenses revision, letter writing.'],
-    ['Daffodils', 'Poem — theme, figures of speech, appreciation.'],
+    ['Daffodils', 'Poem: theme, figures of speech, appreciation.'],
     ['Fitness First', 'Comprehension, punctuation, dialogue writing.'],
     ['Sultan Ahmad Masjid', 'Comprehension, prepositions, translation.'],
     ['Grammar & Composition', 'Sentence structure, essays, précis and idioms.'],
   ],
   urd: [
-    ['نعت', 'نعت کی تشریح، مشکل الفاظ اور معنی', 'Naat — explanation and vocabulary.'],
+    ['نعت', 'نعت کی تشریح، مشکل الفاظ اور معنی', 'Naat: explanation and vocabulary.'],
     ['ہجرتِ نبوی', 'سبق کا خلاصہ اور سوالات', 'Prose lesson with summary.'],
-    ['مرزا غالب', 'شخصیت، غزل کی تشریح', 'Ghalib — life and ghazal.'],
+    ['مرزا غالب', 'شخصیت، غزل کی تشریح', 'Ghalib: life and ghazal.'],
     ['نصوح اور سلیم', 'کردار نگاری، سبق کا خلاصہ', 'Character sketch and summary.'],
-    ['قومی ترانہ', 'مطالعہ اور تشریح', 'National anthem — study.'],
-    ['گرامر', 'اسم، فعل، حروف، محاورات', 'Grammar — parts of speech and idioms.'],
+    ['قومی ترانہ', 'مطالعہ اور تشریح', 'National anthem: study and explanation.'],
+    ['گرامر', 'اسم، فعل، حروف، محاورات', 'Grammar: parts of speech and idioms.'],
     ['خط نویسی', 'درخواست اور خط کے نمونے', 'Letter and application writing.'],
     ['مضمون نویسی', 'مضامین کے خاکے اور نمونے', 'Essay writing.'],
   ],
   isl: [
     ['قرآن مجید', 'منتخب آیات، ترجمہ اور تشریح', 'Selected verses with translation.'],
-    ['حدیثِ نبوی', 'احادیث کا مفہوم اور اطلاق', 'Ahadith — meaning and application.'],
+    ['حدیثِ نبوی', 'احادیث کا مفہوم اور اطلاق', 'Ahadith: meaning and application.'],
     ['توحید و رسالت', 'بنیادی عقائد', 'Core beliefs.'],
     ['عبادات', 'نماز، روزہ، زکوٰۃ، حج', 'Acts of worship.'],
     ['سیرتِ طیبہ', 'مکی و مدنی دور', 'Life of the Prophet ﷺ.'],
@@ -150,7 +150,7 @@ export const subjectById = (id: string) => SUBJECTS.find((s) => s.id === id);
 /**
  * Which chapters have a real recording, and under what name.
  *
- * Only the identifier lives here — each app resolves it to an actual file,
+ * Only the identifier lives here, each app resolves it to an actual file,
  * because the platforms load media differently (Metro `require` on Android, a
  * public URL on the web). One chapter is recorded in both mediums so the client
  * can hear how an audio lesson behaves; the rest wait on their own recordings.
@@ -169,7 +169,7 @@ const dynamicsSections: Section[] = [
       { kind: 'h', text: 'What is a force?' },
       {
         kind: 'p',
-        text: 'A force is an agent that moves or tends to move a body, stops or tends to stop a moving body, and can change the direction or shape of a body. Force is a vector quantity — it has both magnitude and direction, and its SI unit is the newton (N).',
+        text: 'A force is an agent that moves or tends to move a body, stops or tends to stop a moving body, and can change the direction or shape of a body. Force is a vector quantity: it has both magnitude and direction, and its SI unit is the newton (N).',
       },
       { kind: 'def', term: 'Inertia', text: 'The property of a body that resists any change in its state of rest or of uniform motion. The greater the mass, the greater the inertia.' },
       { kind: 'ur', text: 'جسم کی وہ خاصیت جو اپنی حالتِ سکون یا یکساں حرکت میں تبدیلی کی مزاحمت کرتی ہے، اسے جڑت (inertia) کہتے ہیں۔' },
@@ -243,12 +243,12 @@ const dynamicsMcqs: Omit<Mcq, 'chapterId'>[] = [
   { id: 'phy3-m2', topic: 'Force', q: 'The SI unit of force is the…', options: ['joule', 'newton', 'pascal', 'watt'], answer: 1, explanation: 'One newton is the force that gives a 1 kg mass an acceleration of 1 m/s².', difficulty: 'easy' },
   { id: 'phy3-m3', topic: 'Momentum', q: 'The rate of change of momentum of a body is equal to the…', options: ['work done on it', 'net force acting on it', 'power delivered to it', 'its kinetic energy'], answer: 1, explanation: 'This is the momentum form of Newton’s second law: F = Δp / Δt.', difficulty: 'medium' },
   { id: 'phy3-m4', topic: 'Momentum', q: 'The SI unit of momentum is…', options: ['N', 'kg·m/s', 'J·s', 'm/s²'], answer: 1, explanation: 'Momentum p = mv, so its unit is kilogram-metre per second (equivalently N·s).', difficulty: 'easy' },
-  { id: 'phy3-m5', topic: 'Newton’s laws', q: 'Newton’s first law of motion is also known as the law of…', options: ['momentum', 'inertia', 'gravitation', 'action and reaction'], answer: 1, explanation: 'It describes how bodies resist changes in their state of motion — the property called inertia.', difficulty: 'easy' },
-  { id: 'phy3-m6', topic: 'Inertia', q: 'Inertia of a body depends on its…', options: ['speed', 'mass', 'volume', 'shape'], answer: 1, explanation: 'Mass is the measure of inertia — heavier bodies resist changes in motion more.', difficulty: 'easy' },
+  { id: 'phy3-m5', topic: 'Newton’s laws', q: 'Newton’s first law of motion is also known as the law of…', options: ['momentum', 'inertia', 'gravitation', 'action and reaction'], answer: 1, explanation: 'It describes how bodies resist changes in their state of motion, a property called inertia.', difficulty: 'easy' },
+  { id: 'phy3-m6', topic: 'Inertia', q: 'Inertia of a body depends on its…', options: ['speed', 'mass', 'volume', 'shape'], answer: 1, explanation: 'Mass is the measure of inertia, so heavier bodies resist changes in motion more.', difficulty: 'easy' },
   { id: 'phy3-m7', topic: 'Newton’s laws', q: 'A 5 kg block is pushed with a net force of 20 N. Its acceleration is…', options: ['0.25 m/s²', '4 m/s²', '25 m/s²', '100 m/s²'], answer: 1, explanation: 'a = F/m = 20/5 = 4 m/s².', difficulty: 'medium' },
   { id: 'phy3-m8', topic: 'Friction', q: 'Force of friction between two surfaces does NOT depend on…', options: ['nature of the surfaces', 'normal reaction', 'area of contact', 'whether motion is sliding or rolling'], answer: 2, explanation: 'For solid surfaces friction is independent of the apparent area of contact; it depends on surface nature and normal reaction.', difficulty: 'hard' },
   { id: 'phy3-m9', topic: 'Newton’s laws', q: 'Action and reaction forces…', options: ['act on the same body', 'act on two different bodies', 'always cancel out', 'are unequal in magnitude'], answer: 1, explanation: 'They act on different bodies, which is exactly why they do not cancel each other.', difficulty: 'medium' },
-  { id: 'phy3-m10', topic: 'Circular motion', q: 'The centripetal force on a body moving in a circle is directed…', options: ['along the tangent', 'towards the centre', 'away from the centre', 'opposite to motion'], answer: 1, explanation: 'Centripetal means “centre-seeking” — the force always points to the centre of the circular path.', difficulty: 'easy' },
+  { id: 'phy3-m10', topic: 'Circular motion', q: 'The centripetal force on a body moving in a circle is directed…', options: ['along the tangent', 'towards the centre', 'away from the centre', 'opposite to motion'], answer: 1, explanation: 'Centripetal means “centre-seeking”, and the force always points to the centre of the circular path.', difficulty: 'easy' },
   { id: 'phy3-m11', topic: 'Friction', q: 'Rolling friction is generally…', options: ['greater than sliding friction', 'less than sliding friction', 'equal to sliding friction', 'zero'], answer: 1, explanation: 'That is why wheels and ball bearings are used to reduce resistance.', difficulty: 'easy' },
   { id: 'phy3-m12', topic: 'Force', q: 'Which of these is a vector quantity?', options: ['mass', 'time', 'force', 'temperature'], answer: 2, explanation: 'Force has both magnitude and direction, so it is a vector.', difficulty: 'easy' },
 ];
@@ -327,21 +327,21 @@ const dynamicsSectionsUr: Section[] = [
 
 const AUTHORED: Record<string, ChapterContent> = {
   'phy-3': {
-    audioTitle: 'Dynamics — full chapter',
+    audioTitle: 'Dynamics, full chapter',
     sections: dynamicsSections,
     sectionsUr: dynamicsSectionsUr,
     mcqs: dynamicsMcqs.map((m) => ({ ...m, chapterId: 'phy-3' })),
     flashcards: [
       { id: 'phy3-f1', chapterId: 'phy-3', front: 'Inertia', back: 'The property of a body to resist any change in its state of rest or of uniform motion.', urduBack: 'جسم کی وہ خاصیت جو حالت میں تبدیلی کی مزاحمت کرے' },
       { id: 'phy3-f2', chapterId: 'phy-3', front: 'Newton’s second law', back: 'Net force equals mass times acceleration: F = ma. Acceleration is along the direction of the net force.' },
-      { id: 'phy3-f3', chapterId: 'phy-3', front: 'Momentum', back: 'p = mv — the quantity of motion of a body. Unit: kg·m/s.' },
+      { id: 'phy3-f3', chapterId: 'phy-3', front: 'Momentum', back: 'p = mv, the quantity of motion of a body. Unit: kg·m/s.' },
       { id: 'phy3-f4', chapterId: 'phy-3', front: '1 newton', back: 'The force that produces an acceleration of 1 m/s² in a mass of 1 kg.' },
       { id: 'phy3-f5', chapterId: 'phy-3', front: 'Centripetal force', back: 'F = mv²/r, always directed towards the centre of the circular path.' },
       { id: 'phy3-f6', chapterId: 'phy-3', front: 'Friction', back: 'The force opposing relative motion of two contacting surfaces. Depends on surface nature and normal reaction.' },
       { id: 'phy3-f7', chapterId: 'phy-3', front: 'Newton’s third law', back: 'To every action there is an equal but opposite reaction, acting on a different body.' },
     ],
     shortQs: [
-      { id: 'phy3-q1', chapterId: 'phy-3', marks: 2, q: 'Why does a passenger fall forward when a moving bus stops suddenly?', answer: 'The lower body stops with the bus, but due to inertia the upper body keeps moving forward — so the passenger falls forward.', points: ['names inertia (1 mark)', 'explains upper vs lower body (1 mark)'] },
+      { id: 'phy3-q1', chapterId: 'phy-3', marks: 2, q: 'Why does a passenger fall forward when a moving bus stops suddenly?', answer: 'The lower body stops with the bus, but due to inertia the upper body keeps moving forward, so the passenger falls forward.', points: ['names inertia (1 mark)', 'explains upper vs lower body (1 mark)'] },
       { id: 'phy3-q2', chapterId: 'phy-3', marks: 2, q: 'Define momentum and give its SI unit.', answer: 'Momentum is the quantity of motion of a body, equal to the product of mass and velocity (p = mv). Its SI unit is kg·m/s.', points: ['correct definition or formula (1 mark)', 'correct unit kg·m/s (1 mark)'] },
       { id: 'phy3-q3', chapterId: 'phy-3', marks: 3, q: 'Why do action and reaction not cancel each other?', answer: 'Action and reaction are equal and opposite but act on two different bodies. Forces cancel only when they act on the same body, so these do not cancel.', points: ['equal and opposite (1)', 'act on different bodies (1)', 'cancellation needs same body (1)'] },
       { id: 'phy3-q4', chapterId: 'phy-3', marks: 2, q: 'How is circular motion possible at constant speed?', answer: 'Speed is a scalar and stays constant, but the direction of velocity changes continuously, so the velocity changes and a centripetal force acts towards the centre.', points: ['direction of velocity changes (1)', 'centripetal force towards centre (1)'] },
@@ -354,14 +354,14 @@ const AUTHORED: Record<string, ChapterContent> = {
     ],
   },
   'chem-2': {
-    audioTitle: 'Structure of Atoms — full chapter',
+    audioTitle: 'Structure of Atoms, full chapter',
     sections: [
       {
         id: 'chem-2-s1',
         title: 'Rutherford’s atomic model',
         blocks: [
           { kind: 'h', text: 'The gold-foil experiment' },
-          { kind: 'p', text: 'Rutherford bombarded a thin gold foil with alpha particles. Most passed straight through, a few deflected, and about one in 20,000 bounced back — showing the atom is mostly empty space with a tiny, dense, positively charged nucleus.' },
+          { kind: 'p', text: 'Rutherford bombarded a thin gold foil with alpha particles. Most passed straight through, a few deflected, and about one in 20,000 bounced back, showing the atom is mostly empty space with a tiny, dense, positively charged nucleus.' },
           { kind: 'def', term: 'Nucleus', text: 'The small, dense, positively charged centre of an atom containing protons and neutrons.' },
           { kind: 'list', items: ['Atom is mostly empty space.', 'All positive charge and nearly all mass sit in the nucleus.', 'Electrons revolve around the nucleus.'] },
         ],
@@ -372,14 +372,14 @@ const AUTHORED: Record<string, ChapterContent> = {
         blocks: [
           { kind: 'p', text: 'Bohr proposed that electrons revolve in fixed circular orbits (shells) of definite energy, and that energy is absorbed or emitted only when an electron jumps between shells.' },
           { kind: 'formula', text: '2n²', caption: 'maximum electrons in the nth shell' },
-          { kind: 'example', text: 'Sodium (Z = 11) has the configuration K=2, L=8, M=1 — one valence electron, which is why it loses an electron easily.' },
+          { kind: 'example', text: 'Sodium (Z = 11) has the configuration K=2, L=8, M=1, so one valence electron, which is why it loses an electron easily.' },
         ],
       },
       {
         id: 'chem-2-s3',
         title: 'Isotopes',
         blocks: [
-          { kind: 'def', term: 'Isotopes', text: 'Atoms of the same element with the same atomic number but different mass numbers — same protons, different neutrons.' },
+          { kind: 'def', term: 'Isotopes', text: 'Atoms of the same element with the same atomic number but different mass numbers: same protons, different neutrons.' },
           { kind: 'p', text: 'Hydrogen has three isotopes: protium, deuterium and tritium. Isotopes have identical chemical properties but differ in physical properties such as density.' },
         ],
       },
@@ -394,7 +394,7 @@ const AUTHORED: Record<string, ChapterContent> = {
     flashcards: [
       { id: 'chem2-f1', chapterId: 'chem-2', front: 'Isotopes', back: 'Atoms of the same element with the same atomic number but different mass numbers.' },
       { id: 'chem2-f2', chapterId: 'chem-2', front: 'Max electrons in a shell', back: '2n², where n is the shell number: K=2, L=8, M=18, N=32.' },
-      { id: 'chem2-f3', chapterId: 'chem-2', front: 'Atomic number (Z)', back: 'The number of protons in the nucleus — it identifies the element.' },
+      { id: 'chem2-f3', chapterId: 'chem-2', front: 'Atomic number (Z)', back: 'The number of protons in the nucleus, which identifies the element.' },
       { id: 'chem2-f4', chapterId: 'chem-2', front: 'Mass number (A)', back: 'Total number of protons and neutrons in the nucleus.' },
     ],
     shortQs: [
@@ -407,7 +407,7 @@ const AUTHORED: Record<string, ChapterContent> = {
     ],
   },
   'bio-4': {
-    audioTitle: 'Cells and Tissues — full chapter',
+    audioTitle: 'Cells and Tissues, full chapter',
     sections: [
       {
         id: 'bio-4-s1',
@@ -415,14 +415,14 @@ const AUTHORED: Record<string, ChapterContent> = {
         blocks: [
           { kind: 'h', text: 'Discovery of the cell' },
           { kind: 'p', text: 'Robert Hooke observed cork under a microscope in 1665 and named the compartments “cells”. The cell theory states that all organisms are made of cells, the cell is the basic unit of structure and function, and all cells come from pre-existing cells.' },
-          { kind: 'def', term: 'Resolution', text: 'The smallest distance between two points at which they can still be seen as separate — light microscopes resolve about 0.2 µm.' },
+          { kind: 'def', term: 'Resolution', text: 'The smallest distance between two points at which they can still be seen as separate. Light microscopes resolve about 0.2 µm.' },
         ],
       },
       {
         id: 'bio-4-s2',
         title: 'Cell organelles',
         blocks: [
-          { kind: 'list', items: ['Nucleus — contains DNA and controls cell activities.', 'Mitochondria — site of aerobic respiration, the “power house”.', 'Chloroplast — photosynthesis in plant cells.', 'Ribosomes — protein synthesis.', 'Vacuole — storage; large and central in plant cells.'] },
+          { kind: 'list', items: ['Nucleus: contains DNA and controls cell activities.', 'Mitochondria: site of aerobic respiration, the “power house”.', 'Chloroplast: photosynthesis in plant cells.', 'Ribosomes: protein synthesis.', 'Vacuole: storage, large and central in plant cells.'] },
           { kind: 'p', text: 'Plant cells have a cellulose cell wall, chloroplasts and a large central vacuole; animal cells have centrioles and lack a cell wall.' },
         ],
       },
@@ -445,7 +445,7 @@ const AUTHORED: Record<string, ChapterContent> = {
     ],
     flashcards: [
       { id: 'bio4-f1', chapterId: 'bio-4', front: 'Osmosis', back: 'Diffusion of water through a selectively permeable membrane from dilute to concentrated solution.' },
-      { id: 'bio4-f2', chapterId: 'bio-4', front: 'Mitochondrion', back: 'Site of aerobic respiration — produces ATP. Has its own DNA and a folded inner membrane (cristae).' },
+      { id: 'bio4-f2', chapterId: 'bio-4', front: 'Mitochondrion', back: 'Site of aerobic respiration, produces ATP. Has its own DNA and a folded inner membrane (cristae).' },
       { id: 'bio4-f3', chapterId: 'bio-4', front: 'Cell theory', back: 'All organisms are made of cells; the cell is the basic unit of structure and function; all cells arise from pre-existing cells.' },
       { id: 'bio4-f4', chapterId: 'bio-4', front: 'Plant vs animal cell', back: 'Plant: cell wall, chloroplasts, large central vacuole. Animal: centrioles, no cell wall, small vacuoles.' },
     ],
@@ -472,7 +472,7 @@ const termsOf = (ch: Chapter) =>
     .map((t) => t.trim().replace(/^[a-z]/, (m) => m))
     .filter((t) => t.length > 3);
 
-/** Terms from other chapters of the same subject — used as plausible distractors. */
+/** Terms from other chapters of the same subject, used as plausible distractors. */
 function otherTerms(ch: Chapter, n: number): string[] {
   const pool = (CHAPTERS[ch.subjectId] ?? [])
     .filter((c) => c.id !== ch.id)
@@ -497,9 +497,9 @@ function generate(ch: Chapter): ChapterContent {
   const terms = termsOf(ch);
   const sections: Section[] = Array.from({ length: Math.min(4, ch.sectionCount) }, (_, i) => ({
     id: `${ch.id}-gs${i + 1}`,
-    title: i === 0 ? `What this chapter covers` : terms[i - 1] ? `${terms[i - 1]}` : `${topic} — part ${i}`,
+    title: i === 0 ? `What this chapter covers` : terms[i - 1] ? `${terms[i - 1]}` : `${topic}, part ${i}`,
     blocks: [
-      { kind: 'h', text: i === 0 ? `${topic} at a glance` : terms[i - 1] ?? `${topic} — part ${i}` },
+      { kind: 'h', text: i === 0 ? `${topic} at a glance` : terms[i - 1] ?? `${topic}, part ${i}` },
       { kind: 'p', text: ch.blurb },
       ...(i === 0 && terms.length
         ? ([{ kind: 'list', items: terms }] as Block[])
@@ -537,7 +537,7 @@ function generate(ch: Chapter): ChapterContent {
       q: `“${term}” belongs to which chapter?`,
       options: [chapterOptions[0] ?? 'Another chapter', topic, chapterOptions[1] ?? 'Another chapter', chapterOptions[2] ?? 'Another chapter'],
       answer: 1,
-      explanation: `${term} is covered in Chapter ${ch.number} — ${topic}.`,
+      explanation: `${term} is covered in Chapter ${ch.number}, ${topic}.`,
       difficulty: 'easy',
     };
     return [q1, q2];
@@ -547,7 +547,7 @@ function generate(ch: Chapter): ChapterContent {
     id: `${ch.id}-gf${i + 1}`,
     chapterId: ch.id,
     front: term,
-    back: `Studied in Chapter ${ch.number} — ${topic}. The full definition comes with the client’s notes.`,
+    back: `Studied in Chapter ${ch.number}, ${topic}. The full definition comes with the client’s notes.`,
   }));
 
   const shortQs: ShortQ[] = terms.slice(0, 3).map((term, i) => ({
@@ -567,7 +567,7 @@ function generate(ch: Chapter): ChapterContent {
     options: [term, ...otherTerms(ch, 3)],
   }));
 
-  return { sections, mcqs, flashcards, shortQs, blanks, audioTitle: `${topic} — full chapter` };
+  return { sections, mcqs, flashcards, shortQs, blanks, audioTitle: `${topic}, full chapter` };
 }
 
 export function contentFor(chapterId: string): ChapterContent {
@@ -589,14 +589,14 @@ export const PAST_PAPERS: PastPaper[] = [
 ];
 
 /**
- * Two papers written out in full — one English-medium Physics paper and one Urdu
- * paper — so the client can see a complete paper in the viewer. The rest are
+ * Two papers written out in full, one English-medium Physics paper and one Urdu
+ * paper, so the client can see a complete paper in the viewer. The rest are
  * listed but carry the shared sample body until the real papers arrive.
  */
 export const PAPER_CONTENT: Record<string, PaperSection[]> = {
   pp1: [
     {
-      heading: 'SECTION A — Objective',
+      heading: 'SECTION A · Objective',
       marks: '12 marks · 20 minutes',
       lines: [
         'Q1. Circle the correct option. Each part carries one mark.',
@@ -609,7 +609,7 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
       ],
     },
     {
-      heading: 'SECTION B — Short answer questions',
+      heading: 'SECTION B · Short answer questions',
       marks: '33 marks',
       lines: [
         'Q2. Attempt any ELEVEN parts. Each part carries three marks.',
@@ -629,7 +629,7 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
       ],
     },
     {
-      heading: 'SECTION C — Detailed answer questions',
+      heading: 'SECTION C · Detailed answer questions',
       marks: '20 marks',
       lines: [
         'Note: Attempt ALL questions. Each question carries ten marks.',
@@ -642,7 +642,7 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
   ],
   'pp-urd': [
     {
-      heading: 'حصہ اول — معروضی',
+      heading: 'حصہ اول · معروضی',
       marks: '15 نمبر · 20 منٹ',
       urdu: true,
       lines: [
@@ -655,7 +655,7 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
       ],
     },
     {
-      heading: 'حصہ دوم — مختصر سوالات',
+      heading: 'حصہ دوم · مختصر سوالات',
       marks: '36 نمبر',
       urdu: true,
       lines: [
@@ -671,7 +671,7 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
       ],
     },
     {
-      heading: 'حصہ سوم — تفصیلی سوالات',
+      heading: 'حصہ سوم · تفصیلی سوالات',
       marks: '24 نمبر',
       urdu: true,
       lines: [
@@ -687,17 +687,17 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
 /** Fallback body for papers the client hasn't supplied yet. */
 export const PAPER_BODY: PaperSection[] = [
   {
-    heading: 'SECTION A — Objective',
+    heading: 'SECTION A · Objective',
     marks: '12 marks',
     lines: ['Q1. Circle the correct option.', 'The full paper for this year loads here once the client supplies it.'],
   },
   {
-    heading: 'SECTION B — Short answer questions',
+    heading: 'SECTION B · Short answer questions',
     marks: '33 marks',
     lines: ['Q2. Attempt any eleven parts.'],
   },
   {
-    heading: 'SECTION C — Detailed answer questions',
+    heading: 'SECTION C · Detailed answer questions',
     marks: '20 marks',
     lines: ['Q3. Attempt all questions.'],
   },

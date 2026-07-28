@@ -18,7 +18,7 @@ export class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch() {
-    // Nothing to report — the fallback explains the situation to the user.
+    // Nothing to report, the fallback explains the situation to the user.
   }
 
   render() {

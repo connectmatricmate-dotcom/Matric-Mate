@@ -5,7 +5,7 @@ import { Tap } from './ui';
 import { C, F, R, isWeb } from '../theme';
 
 /**
- * Only the parts of the navigator's tabBar props we actually use — typed here so
+ * Only the parts of the navigator's tabBar props we actually use, typed here so
  * the component doesn't need a direct dependency on @react-navigation internals.
  */
 type TabBarProps = {
@@ -19,7 +19,7 @@ type TabBarProps = {
 
 /**
  * Custom tab bar. Written by hand because the default one sizes itself
- * differently across platforms — here the height, the gesture-bar inset and the
+ * differently across platforms, here the height, the gesture-bar inset and the
  * label metrics are explicit, so a label can never end up under the system bar.
  * Wide web viewports get the same items as a left sidebar.
  */

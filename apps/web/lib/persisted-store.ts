@@ -3,12 +3,12 @@
  *
  * Why not `useState` + a hydrate effect: reading localStorage on the server is
  * impossible, so the naive version renders empty, then calls setState in an
- * effect — a cascading render, and exactly what `react-hooks/set-state-in-effect`
+ * effect, a cascading render, and exactly what `react-hooks/set-state-in-effect`
  * warns about. An external store with `useSyncExternalStore` is the supported
  * shape for this: the server snapshot is empty, the client snapshot is whatever
  * was saved, and React reconciles without a second render pass.
  *
- * The state shape matches the Android app's store deliberately — see
+ * The state shape matches the Android app's store deliberately, see
  * apps/mobile/src/store/app.tsx.
  */
 import { AI_QUOTA, Attempt, ChatThread, Language, Medium, Group, Notification, TestResult, XP, todayKey } from '@matricmate/core';
@@ -25,6 +25,7 @@ export type Onboarding = {
 
 export type Settings = {
   language: Language;
+  dark: boolean;
   reminders: boolean;
   reminderTime: string;
   streakAlerts: boolean;
@@ -56,6 +57,7 @@ export type State = {
 
 export const DEFAULT_SETTINGS: Settings = {
   language: 'en',
+  dark: false,
   reminders: true,
   reminderTime: '7:00 PM',
   streakAlerts: true,
@@ -63,7 +65,7 @@ export const DEFAULT_SETTINGS: Settings = {
   fontScale: 1,
 };
 
-/** Stable reference — `useSyncExternalStore` requires the server snapshot not to change identity. */
+/** Stable reference, `useSyncExternalStore` requires the server snapshot not to change identity. */
 export const EMPTY: State = {
   user: null,
   onboarding: null,
@@ -102,7 +104,7 @@ function persist() {
     try {
       window.localStorage.setItem(KEY, JSON.stringify(state));
     } catch {
-      // storage blocked or full — the session still works in memory
+      // storage blocked or full, the session still works in memory
     }
   }, 250);
 }
@@ -129,7 +131,7 @@ export function hydrate() {
       };
     }
   } catch {
-    // corrupt snapshot — start clean rather than crash
+    // corrupt snapshot, start clean rather than crash
   }
   state = restored;
   listeners.forEach((l) => l());

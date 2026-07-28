@@ -121,7 +121,7 @@ function PlayerChrome({
   );
 }
 
-/** Real playback. Throws on a build that predates expo-audio — see the boundary below. */
+/** Real playback. Throws on a build that predates expo-audio, see the boundary below. */
 function RealPlayer({ id }: { id: string }) {
   const { state, actions } = useApp();
   const t = useT();
@@ -182,7 +182,7 @@ function RealPlayer({ id }: { id: string }) {
 
 /**
  * Shown when the installed binary has no audio support yet. The screen still
- * works — the transport just runs on a timer — so a dev build from before the
+ * works, the transport just runs on a timer, so a dev build from before the
  * module was added keeps every other screen usable.
  */
 function PreviewPlayer({ id }: { id: string }) {

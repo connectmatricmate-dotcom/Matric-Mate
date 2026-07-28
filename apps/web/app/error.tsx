@@ -21,7 +21,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         </span>
         <h1 className="mt-3 font-display text-[22px] text-ink">Something went wrong</h1>
         <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2">
-          The page couldn’t load. Try again — if it keeps happening, let us know on WhatsApp.
+          The page couldn’t load. Try again. If it keeps happening, let us know on WhatsApp.
         </p>
         <div className="mt-5 flex justify-center gap-2">
           <Btn title="Try again" onClick={reset} />

@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * Interactive primitives — the only part of the UI kit that needs to run in the
+ * Interactive primitives, the only part of the UI kit that needs to run in the
  * browser. Kept in its own file so importing a Card doesn't ship a form control.
  */
 import React, { useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { IconName } from '@matricmate/core';
-import { Icon, ItemBody } from './primitives';
+import { Icon, ItemBody, Ur } from './primitives';
 import { BtnVariant, Tone, buttonClasses, itemClasses, pillClasses } from './styles';
 
 export function Btn({
@@ -78,6 +78,39 @@ export function SubmitButton({
   );
 }
 
+/** Square icon-only control. `label` is required, an icon alone says nothing to a screen reader. */
+export function IconButton({
+  icon,
+  label,
+  onClick,
+  tone = 'card',
+  size = 44,
+}: {
+  icon: IconName;
+  label: string;
+  onClick: () => void;
+  tone?: 'card' | 'active' | 'plain';
+  size?: number;
+}) {
+  const tones = {
+    card: 'border border-line bg-card text-ink hover:bg-paper',
+    active: 'border border-teal bg-teal text-white hover:bg-tealdark',
+    plain: 'text-ink2 hover:bg-paper',
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      style={{ width: size, height: size }}
+      className={`flex shrink-0 items-center justify-center rounded-[14px] transition-colors duration-200 ${tones[tone]}`}
+    >
+      <Icon name={icon} size={20} />
+    </button>
+  );
+}
+
 export function PillButton({
   children,
   tone = 'teal',
@@ -143,8 +176,9 @@ export function Field({
         {label}
         {required ? <span className="ml-0.5 text-red">*</span> : null}
       </label>
+      {/* .field-shell owns the focus ring, see globals.css */}
       <div
-        className={`flex items-center gap-2 rounded-[14px] border-[1.5px] bg-card px-3.5 py-3 transition-colors duration-200 focus-within:border-teal ${
+        className={`field-shell flex items-center gap-2 rounded-[14px] border-[1.5px] bg-card px-3.5 py-3 transition-[border-color,box-shadow] duration-200 ${
           error ? 'border-red' : 'border-line'
         }`}
       >
@@ -207,12 +241,11 @@ export function Seg<T extends string>({
             aria-selected={on}
             onClick={() => onChange(o.value)}
             className={[
-              'min-h-9 flex-1 cursor-pointer rounded-[10px] px-4 text-[13px] font-extrabold transition-colors duration-200',
+              'min-h-9 flex-1 cursor-pointer whitespace-nowrap rounded-[10px] px-4 text-[13px] font-extrabold transition-colors duration-200',
               on ? 'bg-card text-teal shadow-sm' : 'text-ink2 hover:text-ink',
-              o.urdu ? 'font-urdu leading-[2]' : '',
             ].join(' ')}
           >
-            {o.label}
+            {o.urdu ? <Ur>{o.label}</Ur> : o.label}
           </button>
         );
       })}
@@ -237,7 +270,7 @@ export function Toggle({ on, onClick, label }: { on: boolean; onClick: () => voi
   );
 }
 
-/** Transient error banner — announced to screen readers, gone after ~7s. */
+/** Transient error banner, announced to screen readers, gone after ~7s. */
 export function ErrorBanner({ message, onDismiss }: { message: string; onDismiss?: () => void }) {
   useEffect(() => {
     if (!onDismiss) return;

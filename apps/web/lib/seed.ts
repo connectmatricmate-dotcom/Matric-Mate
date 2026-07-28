@@ -24,7 +24,7 @@ export function seed(): Partial<State> {
   ];
 
   // Confidence pattern per topic: correctness runs k < right, so confident
-  // answers land mostly right and guesses mostly wrong — but not perfectly,
+  // answers land mostly right and guesses mostly wrong, but not perfectly,
   // which is what makes the confidence chart believable.
   const CONF: Confidence[] = [2, 1, 2, 0, 1, 2];
   const attempts: Attempt[] = [];
@@ -47,15 +47,15 @@ export function seed(): Partial<State> {
   });
 
   const results: TestResult[] = [
-    { id: 'seed-r1', subjectId: 'phy', chapterId: 'phy-2', label: 'Kinematics — timed test', score: 15, total: 20, xp: 150, mode: 'exam', at: daysAgo(5), attemptIds: [] },
-    { id: 'seed-r2', subjectId: 'phy', chapterId: 'phy-3', label: 'Dynamics — practice', score: 16, total: 20, xp: 168, mode: 'practice', at: daysAgo(2), attemptIds: [] },
-    { id: 'seed-r3', subjectId: 'chem', chapterId: 'chem-2', label: 'Structure of Atoms — practice', score: 12, total: 15, xp: 120, mode: 'practice', at: daysAgo(1), attemptIds: [] },
+    { id: 'seed-r1', subjectId: 'phy', chapterId: 'phy-2', label: 'Kinematics, timed test', score: 15, total: 20, xp: 150, mode: 'exam', at: daysAgo(5), attemptIds: [] },
+    { id: 'seed-r2', subjectId: 'phy', chapterId: 'phy-3', label: 'Dynamics, practice', score: 16, total: 20, xp: 168, mode: 'practice', at: daysAgo(2), attemptIds: [] },
+    { id: 'seed-r3', subjectId: 'chem', chapterId: 'chem-2', label: 'Structure of Atoms, practice', score: 12, total: 15, xp: 120, mode: 'practice', at: daysAgo(1), attemptIds: [] },
   ];
 
   const notifications: Notification[] = [
-    { id: 'n1', kind: 'streak', title: 'Streak alive — shabash!', body: 'Keep it going: one lesson today counts.', at: Date.now() - 2 * 36e5, href: '/(tabs)/progress', read: false },
-    { id: 'n2', kind: 'reminder', title: 'Study reminder', body: '10 MCQs on Dynamics are waiting.', at: Date.now() - 5 * 36e5, href: '/session/setup', read: false },
-    { id: 'n3', kind: 'report', title: 'Your report card is ready', body: 'View it and share with your parents.', at: daysAgo(3), href: '/insights/report', read: true },
+    { id: 'n1', kind: 'streak', title: 'Streak alive, shabash!', body: 'Keep it going: one lesson today counts.', at: Date.now() - 2 * 36e5, target: 'progress', read: false },
+    { id: 'n2', kind: 'reminder', title: 'Study reminder', body: '10 MCQs on Dynamics are waiting.', at: Date.now() - 5 * 36e5, target: 'session-setup', read: false },
+    { id: 'n3', kind: 'report', title: 'Your report card is ready', body: 'View it and share with your parents.', at: daysAgo(3), target: 'report', read: true },
   ];
 
   return {

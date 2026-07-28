@@ -1,5 +1,5 @@
 /**
- * Server-safe primitives — no hooks, no event handlers, no 'use client'.
+ * Server-safe primitives, no hooks, no event handlers, no 'use client'.
  *
  * Anything a page can render without interactivity lives here, so a page that
  * imports Card or Icon does not drag the whole UI kit into the client bundle.
@@ -41,9 +41,23 @@ export function Icon({
 
 /* ------------------------------------------------------------------ text */
 
-export function Ur({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+/**
+ * Urdu text. Inline by default, most Urdu in this app is a subject name or a
+ * chapter title sitting next to English, and that needs Latin leading and an
+ * optical baseline nudge. Pass `block` for actual Urdu prose, which wants the
+ * generous Nastaliq leading and right alignment. See globals.css.
+ */
+export function Ur({
+  children,
+  className = '',
+  block,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  block?: boolean;
+}) {
   return (
-    <span lang="ur" dir="rtl" className={`urdu ${className}`}>
+    <span lang="ur" dir="rtl" className={`${block ? 'urdu' : 'urdu-inline'} ${className}`}>
       {children}
     </span>
   );

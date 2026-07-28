@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Icon, LinkBtn } from '@/components/ui';
 
+// Three, not five. "For parents" and the FAQ are places you arrive at by
+// scrolling, not destinations you go looking for, they stay in the footer.
+// Absolute hrefs, so the same bar works on /pricing and /terms where an
+// in-page anchor would go nowhere.
 const LINKS = [
-  { href: '#inside', label: 'What’s inside' },
-  { href: '#papers', label: 'Past papers' },
-  { href: '#parents', label: 'For parents' },
-  { href: '#pricing', label: 'Pricing' },
-  { href: '#faq', label: 'FAQ' },
+  { href: '/#inside', label: 'What’s inside' },
+  { href: '/#papers', label: 'Past papers' },
+  { href: '/pricing', label: 'Pricing' },
 ];
 
 export function Nav() {
@@ -18,22 +20,24 @@ export function Nav() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur">
-      <nav className="mx-auto flex max-w-[1100px] items-center gap-6 px-5 py-3.5">
-        <Link href="/" className="shrink-0" aria-label="MatricMate home">
+      {/* Three tracks, so the links are centred on the page rather than pushed
+          along by whatever the logo and the buttons happen to measure. */}
+      <nav className="mx-auto flex max-w-[1100px] items-center justify-between gap-6 px-5 py-3.5 md:grid md:grid-cols-[1fr_auto_1fr]">
+        <Link href="/" className="shrink-0 justify-self-start" aria-label="MatricMate home">
           <Image src="/brand/wordmark.png" alt="MatricMate" width={148} height={29} priority />
         </Link>
 
-        <ul className="ml-2 hidden flex-1 items-center gap-6 md:flex">
+        <ul className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
-              <a href={l.href} className="text-[13.5px] font-extrabold text-ink2 transition-colors hover:text-teal">
+              <Link href={l.href} className="text-[13.5px] font-extrabold text-ink2 transition-colors hover:text-teal">
                 {l.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
 
-        <div className="ml-auto hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 justify-self-end md:flex">
           <Link href="/login" className="text-[13.5px] font-extrabold text-ink2 hover:text-teal">
             Log in
           </Link>
@@ -42,7 +46,7 @@ export function Nav() {
 
         <button
           type="button"
-          className="ml-auto md:hidden"
+          className="md:hidden"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-label="Menu"
@@ -56,13 +60,9 @@ export function Nav() {
           <ul className="flex flex-col gap-3">
             {LINKS.map((l) => (
               <li key={l.href}>
-                <a
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="text-[15px] font-extrabold text-ink"
-                >
+                <Link href={l.href} onClick={() => setOpen(false)} className="text-[15px] font-extrabold text-ink">
                   {l.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

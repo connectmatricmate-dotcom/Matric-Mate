@@ -12,7 +12,7 @@ export const DICTS = { en, ur } as const;
 type Dict = typeof en;
 type Section = keyof Dict;
 
-/** "section.key" — checked at compile time, so a typo is a build error. */
+/** "section.key", checked at compile time, so a typo is a build error. */
 export type StringKey = {
   [S in Section]: `${S}.${Extract<keyof Dict[S], string>}`;
 }[Section];

@@ -1,5 +1,5 @@
 /**
- * @matricmate/core — everything both apps must agree on.
+ * @matricmate/core, everything both apps must agree on.
  *
  * Content, domain rules, copy and design tokens live here so the Android app and
  * the web app cannot drift apart. Anything platform-specific (components,

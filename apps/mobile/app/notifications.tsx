@@ -1,9 +1,21 @@
 import { useEffect, useMemo } from 'react';
 import { router } from 'expo-router';
 import { Card, Empty, Header, Item, Screen, SectionTitle } from '../src/components/ui';
-import { Notification } from '@matricmate/core';
+import { Notification, NotificationTarget } from '@matricmate/core';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
+
+/** Shared destinations, in this app's route names. See NotificationTarget. */
+const ROUTE: Record<NotificationTarget, string> = {
+  home: '/(tabs)',
+  study: '/(tabs)/study',
+  practice: '/(tabs)/practice',
+  progress: '/(tabs)/progress',
+  'session-setup': '/session/setup',
+  report: '/insights/report',
+  payments: '/account/payments',
+  subscription: '/account/subscription',
+};
 
 const ICON: Record<Notification['kind'], { emoji: string; tone: 'orange' | 'teal' | 'green' | 'grey' }> = {
   streak: { emoji: '🔥', tone: 'orange' },
@@ -39,7 +51,7 @@ export default function Notifications() {
         emoji={meta.emoji}
         tone={meta.tone}
         last={last}
-        onPress={n.href ? () => router.push(n.href as never) : undefined}
+        onPress={n.target ? () => router.push(ROUTE[n.target!] as never) : undefined}
       />
     );
   };

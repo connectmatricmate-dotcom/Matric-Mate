@@ -273,7 +273,7 @@ export default function Reader() {
         </Row>
         <View style={{ gap: S.sm }}>
           {SUGGESTIONS.map((key) => (
-            <Tap key={key} onPress={() => ask(`${t(key)} — ${section?.title ?? ''}`)}>
+            <Tap key={key} onPress={() => ask(`${t(key)}: ${section?.title ?? ''}`)}>
               <Card flat style={{ paddingVertical: 14 }}>
                 <Body>{t(key)}</Body>
               </Card>

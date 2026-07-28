@@ -5,7 +5,7 @@
  * is cheap; letting someone hear one costs nothing and settles it.
  */
 import { useEffect, useRef, useState } from 'react';
-import { Icon, PillButton } from '@/components/ui';
+import { Icon, PillButton, Ur } from '@/components/ui';
 
 const TRACKS = {
   en: { src: '/audio/dynamics-en.mp3', label: 'English narration' },
@@ -48,14 +48,14 @@ export function AudioSample() {
         </button>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[14.5px] font-extrabold text-ink">Chapter 3 — Dynamics</p>
+          <p className="text-[14.5px] font-extrabold text-ink">Chapter 3 · Dynamics</p>
           <p className="text-[12.5px] text-ink2">{TRACKS[lang].label} · full chapter</p>
           <div className="mt-2 h-[6px] overflow-hidden rounded-full bg-[#EAF0EC]">
             <div className="h-full rounded-full bg-orange" style={{ width: `${progress}%` }} />
           </div>
           <div className="mt-1 flex justify-between text-[11px] font-extrabold text-ink3">
             <span>{fmt((progress / 100) * duration)}</span>
-            <span>{duration ? fmt(duration) : '—'}</span>
+            <span>{duration ? fmt(duration) : "0:00"}</span>
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@ export function AudioSample() {
           English
         </PillButton>
         <PillButton tone={lang === 'ur' ? 'teal' : 'grey'} onClick={() => setLang('ur')}>
-          <span className="font-urdu leading-[2]">اردو</span>
+          <Ur>اردو</Ur>
         </PillButton>
         <span className="ml-auto text-[11.5px] text-ink3">Sample lesson</span>
       </div>

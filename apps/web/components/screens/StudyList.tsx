@@ -1,0 +1,138 @@
+'use client';
+
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
+import { CHAPTERS, SUBJECT_ICON, type Subject, subjectPct } from '@matricmate/core';
+import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
+import { CoverageRail, UpgradeRail, WeakRail } from '@/components/app/rails';
+import { Bar, Card, Empty, Icon, Skeleton, Ur } from '@/components/ui/primitives';
+import { useApp, useT } from '@/lib/store';
+
+export function StudyListSkeleton() {
+  return (
+    <Page>
+      <div className="mb-5">
+        <Skeleton className="mb-2 h-3 w-40" />
+        <Skeleton className="h-8 w-32" />
+      </div>
+      <Split>
+        <Work>
+          <Skeleton className="mb-4 h-[50px] w-full rounded-[14px]" />
+          <div className="grid gap-3 md:grid-cols-2">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Card key={i} flat className="flex items-center gap-3">
+                <Skeleton className="h-[52px] w-[52px] rounded-[16px]" />
+                <div className="flex-1">
+                  <Skeleton className="mb-2 h-3.5 w-3/5" />
+                  <Skeleton className="h-2.5 w-2/5" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Work>
+        <Rail>
+          <Skeleton className="h-[104px] w-full rounded-[16px]" />
+          <Skeleton className="h-[150px] w-full rounded-[16px]" />
+        </Rail>
+      </Split>
+    </Page>
+  );
+}
+
+export function StudyList({ subjects }: { subjects: Subject[] }) {
+  const { state, derived } = useApp();
+  const t = useT();
+  const [q, setQ] = useState('');
+
+  const setup = state.onboarding;
+  const eyebrow = setup
+    ? t('study.setupLine', {
+        class: setup.classLevel,
+        board: setup.board === 'fbise' ? 'FBISE' : 'Punjab Board',
+        medium: setup.medium === 'en' ? 'English' : 'Urdu',
+      })
+    : undefined;
+
+  const rows = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return subjects
+      .filter((s) => derived.subjects.includes(s.id))
+      .map((s) => {
+        const chapters = CHAPTERS[s.id] ?? [];
+        return {
+          s,
+          chapters,
+          pct: subjectPct(s.id, state.readSections, state.attempts),
+          next: chapters.find((c) => c.id === state.lastChapterId) ?? chapters[0],
+        };
+      })
+      .filter(({ s, chapters }) =>
+        !needle ? true : s.name.toLowerCase().includes(needle) || chapters.some((c) => c.title.toLowerCase().includes(needle))
+      );
+  }, [subjects, q, derived.subjects, state.readSections, state.attempts, state.lastChapterId]);
+
+  return (
+    <Page>
+      <PageHead eyebrow={eyebrow} title={t('study.title')} sub={`${rows.length} subjects on your list`} />
+
+      <Split>
+        <Work>
+          <div className="field-shell mb-4 flex max-w-[460px] items-center gap-2 rounded-[14px] border-[1.5px] border-line bg-card px-3.5 py-2.5 transition-[border-color,box-shadow] duration-200">
+            <Icon name="search" size={18} className="shrink-0 text-ink3" />
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t('study.searchPlaceholder')}
+              aria-label={t('study.searchPlaceholder')}
+              className="w-full bg-transparent text-[14.5px] text-ink placeholder:text-ink3"
+            />
+          </div>
+
+          {rows.length === 0 ? (
+            <Empty emoji="🔍" title={t('study.noMatchTitle')} sub={t('study.noMatchBody', { q })} />
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              {rows.map(({ s, pct, next, chapters }) => (
+                <Link key={s.id} href={`/learn/subject/${s.id}`} className="min-w-0">
+                  <Card className="flex h-full flex-col gap-3 transition-colors duration-200 hover:border-teal">
+                    <span className="flex items-center gap-3">
+                      <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[14px] bg-tealtint text-teal">
+                        <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={22} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-baseline gap-x-2">
+                          <span className="text-[15.5px] font-extrabold text-ink">{s.name}</span>
+                          {s.urduName ? <Ur className="text-ink2">{s.urduName}</Ur> : null}
+                        </span>
+                        <span className="block text-[12.5px] text-ink2">
+                          {t('study.chapterCount', { n: chapters.length })} · {t('study.percentComplete', { n: pct })}
+                        </span>
+                      </span>
+                      <span className="shrink-0 font-display text-[17px] text-teal tabular">{pct}%</span>
+                    </span>
+
+                    <Bar pct={pct} tone="teal" h={6} />
+
+                    {next ? (
+                      <span className="flex items-center gap-1.5 text-[12.5px] font-extrabold text-teal">
+                        <Icon name="arrowRight" size={14} strokeWidth={2.4} className="shrink-0" />
+                        <span className="min-w-0 truncate">{t('study.continueChapter', { chapter: next.title })}</span>
+                      </span>
+                    ) : null}
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+        </Work>
+
+        <Rail>
+          <CoverageRail />
+          <WeakRail />
+          <UpgradeRail />
+        </Rail>
+      </Split>
+    </Page>
+  );
+}
