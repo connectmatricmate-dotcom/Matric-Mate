@@ -64,6 +64,9 @@
     "owner": "matricmate",
     "updates": {
       "url": "https://u.expo.dev/df2c0bb2-55a1-4525-9874-b63fa6d0c876"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }
