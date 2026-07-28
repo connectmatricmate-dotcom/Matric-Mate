@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Bar, Btn, Card, Empty, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { chapterById, subjectById } from '../../src/core/content';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
 
@@ -11,6 +12,7 @@ const CAP_MB = 512;
 
 export default function Downloads() {
   const { state, actions } = useApp();
+  const t = useT();
   const toast = useToast();
   const chapters = state.downloads.map(chapterById).filter(Boolean);
   const used = chapters.length * MB_PER_CHAPTER;
@@ -23,18 +25,18 @@ export default function Downloads() {
 
   return (
     <Screen>
-      <Header title="Downloads" sub="Available without internet" back />
+      <Header title={t('downloads.title')} sub={t('downloads.sub')} back />
 
       <Card>
         <Row gap={S.md}>
           <Icon name="download" color={C.teal} />
           <View style={{ flex: 1 }}>
-            <Small style={{ color: C.ink }}>{used} MB used</Small>
-            <View style={{ marginTop: 7 }}>
+            <Small style={{ color: C.ink }}>{t('downloads.used', { n: used })}</Small>
+            <View style={{ marginTop: 8 }}>
               <Bar pct={(used / CAP_MB) * 100} tone="teal" />
             </View>
           </View>
-          <Small>of {CAP_MB} MB</Small>
+          <Small>{t('downloads.cap', { n: CAP_MB })}</Small>
         </Row>
       </Card>
 
@@ -43,21 +45,21 @@ export default function Downloads() {
           <Spacer h={S.lg} />
           <Empty
             emoji="📭"
-            title="No downloads yet"
-            sub="Save a chapter and study without internet — useful when data runs out."
-            cta={<Btn title="Browse subjects" sm variant="line" onPress={() => router.push('/(tabs)/study')} />}
+            title={t('downloads.emptyTitle')}
+            sub={t('downloads.emptyBody')}
+            cta={<Btn title={t('downloads.browse')} sm variant="line" onPress={() => router.push('/(tabs)/study')} />}
           />
         </>
       ) : (
         Object.entries(bySubject).map(([subjectId, list]) => (
           <View key={subjectId}>
             <SectionTitle>{subjectById(subjectId)?.name}</SectionTitle>
-            <Card flat style={{ paddingVertical: 2 }}>
+            <Card flat style={{ paddingVertical: 0 }}>
               {list.map((c, i) => (
                 <Item
                   key={c!.id}
-                  title={`Ch ${c!.number} · ${c!.title}`}
-                  sub={`${MB_PER_CHAPTER} MB · notes, audio, MCQs`}
+                  title={c!.title}
+                  sub={t('downloads.perChapter', { n: MB_PER_CHAPTER })}
                   icon="check"
                   tone="green"
                   last={i === list.length - 1}
@@ -66,11 +68,11 @@ export default function Downloads() {
                     <Tap
                       onPress={() => {
                         actions.toggleDownload(c!.id);
-                        toast('Removed from downloads');
+                        toast(t('study.removedOffline'));
                       }}
                       hit
                     >
-                      <Icon name="trash" size={18} color={C.red} />
+                      <Icon name="trash" size={19} color={C.red} />
                     </Tap>
                   }
                 />
@@ -81,7 +83,7 @@ export default function Downloads() {
       )}
 
       <Spacer h={S.lg} />
-      <Small>Downloads happen on Wi-Fi by default. Attempts made offline sync when you reconnect.</Small>
+      <Small>{t('downloads.footnote')}</Small>
     </Screen>
   );
 }

@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Body, Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, Tap } from '../../src/components/ui';
+import { Body, Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer } from '../../src/components/ui';
+import { useT } from '../../src/i18n';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
 
 type Filter = 'all' | 'wrong' | 'flagged';
 
 export default function Review() {
+  const t = useT();
   const s = session.current;
   const [filter, setFilter] = useState<Filter>('wrong');
   const [open, setOpen] = useState<string | null>(null);
@@ -26,10 +28,10 @@ export default function Review() {
   if (!s) {
     return (
       <Screen>
-        <Header title="Review" back />
+        <Header title={t('session.reviewTitle')} back />
         <Card flat style={{ alignItems: 'center', gap: S.md }}>
-          <Small>This session has ended. Start a new one to review answers.</Small>
-          <Btn title="Practice now" sm onPress={() => router.replace('/session/setup')} />
+          <Small>{t('session.noSessionBody')}</Small>
+          <Btn title={t('session.setUpSession')} sm onPress={() => router.replace('/session/setup')} />
         </Card>
       </Screen>
     );
@@ -37,17 +39,17 @@ export default function Review() {
 
   return (
     <Screen>
-      <Header title="Review" sub={s.label} back onBack={() => router.replace('/(tabs)/practice')} />
+      <Header title={t('session.reviewTitle')} sub={s.label} back onBack={() => router.replace('/(tabs)/practice')} />
 
-      <Row gap={S.sm}>
+      <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
         <Pill tone={filter === 'all' ? 'teal' : 'grey'} onPress={() => setFilter('all')}>
-          All · {s.mcqs.length}
+          {`${t('session.all')} · ${s.mcqs.length}`}
         </Pill>
         <Pill tone={filter === 'wrong' ? 'red' : 'grey'} onPress={() => setFilter('wrong')}>
-          Wrong · {wrongCount}
+          {`${t('session.wrongOnly')} · ${wrongCount}`}
         </Pill>
         <Pill tone={filter === 'flagged' ? 'orange' : 'grey'} onPress={() => setFilter('flagged')}>
-          Flagged · {flagCount}
+          {`${t('session.flaggedOnly')} · ${flagCount}`}
         </Pill>
       </Row>
 
@@ -56,7 +58,7 @@ export default function Review() {
         <Card flat style={{ alignItems: 'center', paddingVertical: 24 }}>
           <Text style={{ fontSize: 30 }}>🎉</Text>
           <Body style={{ marginTop: 6, textAlign: 'center' }}>
-            {filter === 'wrong' ? 'Koi ghalti nahi — sab sahi!' : 'Nothing flagged in this session.'}
+            {filter === 'wrong' ? t('session.allCorrect') : t('session.nothingFlagged')}
           </Body>
         </Card>
       ) : (
@@ -68,34 +70,46 @@ export default function Review() {
               <Card
                 key={mcq.id}
                 flat
-                style={{ borderLeftWidth: 4, borderLeftColor: wrong ? C.red : C.green, opacity: wrong ? 1 : 0.8 }}
+                style={{ borderLeftWidth: 4, borderLeftColor: wrong ? C.red : C.green, opacity: wrong ? 1 : 0.85 }}
                 onPress={() => setOpen(isOpen ? null : mcq.id)}
               >
-                <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.ink }}>{mcq.q}</Text>
+                <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, lineHeight: 20, color: C.ink }}>{mcq.q}</Text>
                 <Row gap={S.sm} style={{ marginTop: S.sm, flexWrap: 'wrap' }}>
                   {a?.chosen != null ? (
-                    <Pill tone={wrong ? 'red' : 'green'}>You: {String.fromCharCode(65 + a.chosen)}</Pill>
+                    <Pill tone={wrong ? 'red' : 'green'}>{t('session.yourAnswer', { a: String.fromCharCode(65 + a.chosen) })}</Pill>
                   ) : (
-                    <Pill tone="grey">Not answered</Pill>
+                    <Pill tone="grey">{t('session.notAnswered')}</Pill>
                   )}
-                  <Pill tone="green">Correct: {String.fromCharCode(65 + mcq.answer)}</Pill>
+                  <Pill tone="green">{t('session.correctAnswer', { a: String.fromCharCode(65 + mcq.answer) })}</Pill>
                   {a?.confidence != null ? (
-                    <Pill tone="orange">{['Tukka 🎲', 'Thora sure', 'Pakka ✓'][a.confidence]}</Pill>
+                    <Pill tone="orange">
+                      {[t('session.conf0'), t('session.conf1'), t('session.conf2')][a.confidence]}
+                    </Pill>
                   ) : null}
                 </Row>
                 {isOpen ? (
                   <>
                     <Spacer h={S.sm} />
-                    <Label style={{ color: C.teal }}>Why</Label>
+                    <Label style={{ color: C.teal }}>{t('session.why')}</Label>
                     <Body style={{ fontSize: 13.5, marginTop: 2 }}>{mcq.explanation}</Body>
                     <Spacer h={S.sm} />
                     <Row gap={S.sm}>
-                      <Btn title="Ask AI" variant="line" sm onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`)} />
-                      <Btn title="Read chapter" variant="ghost" sm onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)} />
+                      <Btn
+                        title={t('session.askAi')}
+                        variant="line"
+                        sm
+                        onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`)}
+                      />
+                      <Btn
+                        title={t('session.readInChapter')}
+                        variant="ghost"
+                        sm
+                        onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)}
+                      />
                     </Row>
                   </>
                 ) : (
-                  <Small style={{ marginTop: 6 }}>Tap to see the explanation</Small>
+                  <Small style={{ marginTop: 6 }}>{t('session.tapForWhy')}</Small>
                 )}
               </Card>
             );
@@ -104,7 +118,7 @@ export default function Review() {
       )}
       <Spacer h={S.lg} />
       <Btn
-        title="Done"
+        title={t('common.done')}
         onPress={() => {
           session.clear();
           router.replace('/(tabs)/practice');

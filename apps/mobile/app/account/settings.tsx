@@ -1,43 +1,65 @@
+import { View } from 'react-native';
 import { router } from 'expo-router';
+import { LanguageToggle } from '../../src/components/LanguageToggle';
 import { Card, Header, Item, Screen, SectionTitle, Seg, Small, Spacer, Toggle, useToast } from '../../src/components/ui';
 import { Medium } from '../../src/core/types';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { S } from '../../src/theme';
-import { View } from 'react-native';
 
 export default function Settings() {
   const { state, actions } = useApp();
+  const t = useT();
   const toast = useToast();
   const s = state.settings;
+  const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
 
   return (
     <Screen>
-      <Header title="Settings" back />
+      <Header title={t('account.settingsTitle')} back />
 
-      <SectionTitle>Appearance</SectionTitle>
-      <Card flat style={{ paddingVertical: 2 }}>
+      {/* App language — the interface, not the syllabus */}
+      <SectionTitle>{t('lang.label')}</SectionTitle>
+      <Card flat style={{ alignItems: 'center', gap: S.sm }}>
+        <LanguageToggle />
+        <Small style={{ textAlign: 'center' }}>
+          {s.language === 'en' ? t('lang.englishHint') : t('lang.urduHint')}
+        </Small>
+      </Card>
+
+      <SectionTitle>{t('account.appearance')}</SectionTitle>
+      <Card flat style={{ paddingVertical: 0 }}>
         <Item
-          title="Dark mode"
-          sub="Ships with the polish milestone"
+          title={t('account.darkMode')}
+          sub={t('account.darkModeSub')}
           icon="moon"
           last
-          right={<Toggle on={s.dark} onPress={() => { actions.setSettings({ dark: !s.dark }); toast('Dark mode lands in M5 polish'); }} />}
+          right={
+            <Toggle
+              on={s.dark}
+              onPress={() => {
+                actions.setSettings({ dark: !s.dark });
+                toast(t('account.darkToast'));
+              }}
+            />
+          }
         />
       </Card>
 
-      <SectionTitle>Content</SectionTitle>
-      <Card flat style={{ paddingVertical: 2 }}>
+      {/* Medium — which version of the syllabus, separate from app language */}
+      <SectionTitle>{t('account.content')}</SectionTitle>
+      <Card flat style={{ paddingVertical: 0 }}>
         <Item
-          title="Content medium"
-          sub={s.contentMedium === 'ur' ? 'Urdu' : 'English'}
-          icon="globe"
+          title={t('account.contentMedium')}
+          sub={t('account.contentMediumSub')}
+          icon="book2"
           right={
-            <View style={{ width: 112 }}>
+            <View style={{ width: 118 }}>
               <Seg<Medium>
                 value={s.contentMedium}
                 onChange={(m) => actions.setSettings({ contentMedium: m })}
                 options={[
-                  { value: 'en', label: 'EN' },
+                  { value: 'en', label: 'English' },
                   { value: 'ur', label: 'اردو', urdu: true },
                 ]}
               />
@@ -45,25 +67,25 @@ export default function Settings() {
           }
         />
         <Item
-          title="Reading text size"
-          sub={['Small', 'Medium', 'Large'][s.fontScale]}
+          title={t('account.readingSize')}
+          sub={sizeLabel}
           icon="book"
           last
           onPress={() => actions.setSettings({ fontScale: ((s.fontScale + 1) % 3) as 0 | 1 | 2 })}
         />
       </Card>
 
-      <SectionTitle>Notifications</SectionTitle>
-      <Card flat style={{ paddingVertical: 2 }}>
+      <SectionTitle>{t('account.notificationsSection')}</SectionTitle>
+      <Card flat style={{ paddingVertical: 0 }}>
         <Item
-          title="Study reminder"
-          sub={`Daily · ${s.reminderTime}`}
+          title={t('account.studyReminder')}
+          sub={t('account.studyReminderSub', { time: s.reminderTime })}
           icon="bell"
           right={<Toggle on={s.reminders} onPress={() => actions.setSettings({ reminders: !s.reminders })} />}
         />
         <Item
-          title="Streak alerts"
-          sub="Nudge me before I break a streak"
+          title={t('account.streakAlerts')}
+          sub={t('account.streakAlertsSub')}
           icon="flame"
           tone="orange"
           last
@@ -71,30 +93,33 @@ export default function Settings() {
         />
       </Card>
 
-      <SectionTitle>Storage</SectionTitle>
-      <Card flat style={{ paddingVertical: 2 }}>
-        <Item title="Manage downloads" sub={`${state.downloads.length} chapters`} icon="download" onPress={() => router.push('/learn/downloads')} />
+      <SectionTitle>{t('account.storage')}</SectionTitle>
+      <Card flat style={{ paddingVertical: 0 }}>
         <Item
-          title="Reset demo data"
-          sub="Clears progress, attempts and receipts"
+          title={t('account.manageDownloads')}
+          sub={t('account.chaptersCount', { n: state.downloads.length })}
+          icon="download"
+          onPress={() => router.push('/learn/downloads')}
+        />
+        <Item
+          title={t('account.resetDemo')}
+          sub={t('account.resetDemoSub')}
           icon="trash"
           tone="red"
           last
           onPress={() => {
             actions.resetDemo();
-            toast('Demo data cleared');
+            toast(t('account.resetDone'));
           }}
         />
       </Card>
 
-      <SectionTitle>About</SectionTitle>
-      <Card flat style={{ paddingVertical: 2 }}>
-        <Item title="Version" sub="0.1.0 · milestone 1 demo" icon="help" />
-        <Item title="Terms & privacy" icon="doc" last onPress={() => toast('Legal pages ship with the landing page')} />
+      <SectionTitle>{t('account.about')}</SectionTitle>
+      <Card flat style={{ paddingVertical: 0 }}>
+        <Item title={t('account.version', { v: '0.1.0' })} icon="help" />
+        <Item title={t('account.terms')} icon="doc" last onPress={() => toast(t('account.termsToast'))} />
       </Card>
-
-      <Spacer h={S.lg} />
-      <Small>App language stays English at launch; Urdu UI is a later phase.</Small>
+      <Spacer h={S.md} />
     </Screen>
   );
 }

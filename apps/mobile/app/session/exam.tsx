@@ -2,13 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Btn, Card, H3, Pill, Row, Screen, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { Btn, Card, H3, IconButton, Pill, Row, Screen, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
 
 export default function Exam() {
   const { actions } = useApp();
+  const t = useT();
   const toast = useToast();
   const s = session.current;
   const [i, setI] = useState(0);
@@ -18,8 +20,8 @@ export default function Exam() {
   const [confirm, setConfirm] = useState(false);
 
   useEffect(() => {
-    const t = setInterval(() => setLeft((l) => Math.max(0, l - 1)), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setLeft((l) => Math.max(0, l - 1)), 1000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -55,8 +57,8 @@ export default function Exam() {
     return (
       <Screen>
         <Card flat style={{ marginTop: S.xl, alignItems: 'center', gap: S.md }}>
-          <H3>No exam in progress</H3>
-          <Btn title="Set up an exam" sm onPress={() => router.replace('/session/exam-intro')} />
+          <H3>{t('session.noSession')}</H3>
+          <Btn title={t('session.setUpSession')} sm onPress={() => router.replace('/session/exam-intro')} />
         </Card>
       </Screen>
     );
@@ -73,11 +75,11 @@ export default function Exam() {
         footer={
           <Row gap={S.sm}>
             <View style={{ flex: 1 }}>
-              <Btn title="Submit" variant="line" onPress={() => setConfirm(true)} />
+              <Btn title={t('session.submit')} variant="line" onPress={() => setConfirm(true)} />
             </View>
             <View style={{ flex: 1 }}>
               <Btn
-                title={i + 1 >= s.mcqs.length ? 'Last question' : 'Next'}
+                title={i + 1 >= s.mcqs.length ? t('session.lastQuestion') : t('common.next')}
                 onPress={() => setI(Math.min(s.mcqs.length - 1, i + 1))}
                 disabled={i + 1 >= s.mcqs.length}
               />
@@ -85,31 +87,30 @@ export default function Exam() {
           </Row>
         }
       >
-        <Row style={{ paddingTop: S.sm }} gap={S.sm}>
-          <Tap onPress={() => setConfirm(true)} hit>
-            <Icon name="close" color={C.ink} />
-          </Tap>
+        <Row style={{ paddingTop: S.xs }} gap={S.sm}>
+          <View style={{ marginLeft: -10 }}>
+            <IconButton icon="close" onPress={() => setConfirm(true)} />
+          </View>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <Pill tone={urgent ? 'red' : 'orange'} icon="clock" style={{ paddingVertical: 7, paddingHorizontal: 16 }}>
+            <Pill tone={urgent ? 'red' : 'orange'} icon="clock" style={{ paddingVertical: 8, paddingHorizontal: 16 }}>
               {`${mm}:${ss}`}
             </Pill>
           </View>
           <Tap
             onPress={() => {
               setFlags((f) => (flagged ? f.filter((x) => x !== mcq.id) : [...f, mcq.id]));
-              toast(flagged ? 'Flag removed' : 'Flagged for review 🚩');
+              toast(flagged ? t('session.flagRemoved') : t('session.flagged'));
             }}
-            hit
           >
-            <Icon name="star" color={flagged ? C.orange : C.ink3} />
+            <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="star" color={flagged ? C.orange : C.ink3} />
+            </View>
           </Tap>
         </Row>
 
         <Spacer h={S.sm} />
-        <Small style={{ fontFamily: F.bodyBold }}>
-          Question {i + 1} of {s.mcqs.length}
-        </Small>
-        <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 26, color: C.ink, marginVertical: S.md }}>{mcq.q}</Text>
+        <Small style={{ fontFamily: F.bodyBold }}>{t('session.questionOf', { a: i + 1, b: s.mcqs.length })}</Small>
+        <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 27, color: C.ink, marginVertical: S.md }}>{mcq.q}</Text>
 
         {mcq.options.map((opt, n) => {
           const sel = answers[mcq.id] === n;
@@ -124,15 +125,16 @@ export default function Exam() {
                   borderWidth: 1.5,
                   borderColor: sel ? C.teal : C.line,
                   borderRadius: 15,
-                  paddingVertical: 13,
+                  paddingVertical: 14,
                   paddingHorizontal: 14,
                   marginBottom: S.sm,
+                  minHeight: 56,
                 }}
               >
                 <View
                   style={{
-                    width: 26,
-                    height: 26,
+                    width: 27,
+                    height: 27,
                     borderRadius: 9,
                     backgroundColor: sel ? C.teal : C.grey,
                     alignItems: 'center',
@@ -143,15 +145,14 @@ export default function Exam() {
                     {String.fromCharCode(65 + n)}
                   </Text>
                 </View>
-                <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14.5, color: C.ink }}>{opt}</Text>
+                <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14.5, lineHeight: 21, color: C.ink }}>{opt}</Text>
               </View>
             </Tap>
           );
         })}
 
-        {/* question palette */}
         <Spacer h={S.md} />
-        <Row gap={5} style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
+        <Row gap={6} style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
           {s.mcqs.map((m, n) => {
             const answered = answers[m.id] != null;
             const isFlagged = flags.includes(m.id);
@@ -160,26 +161,25 @@ export default function Exam() {
             const fg = current || answered ? '#fff' : isFlagged ? C.orangeDark : C.ink2;
             return (
               <Tap key={m.id} onPress={() => setI(n)}>
-                <View style={{ width: 30, height: 30, borderRadius: 9, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: fg }}>{n + 1}</Text>
+                <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontFamily: F.bodyBold, fontSize: 12, color: fg }}>{n + 1}</Text>
                 </View>
               </Tap>
             );
           })}
         </Row>
         <Spacer h={S.sm} />
-        <Small style={{ textAlign: 'center' }}>Tap a number to jump · ⭐ flags a question</Small>
+        <Small style={{ textAlign: 'center' }}>{t('session.jumpHint')}</Small>
       </Screen>
 
-      <Sheet visible={confirm} onClose={() => setConfirm(false)} title="Submit your exam?">
+      <Sheet visible={confirm} onClose={() => setConfirm(false)} title={t('session.submitTitle')}>
         <Small>
-          {unanswered ? `${unanswered} question${unanswered > 1 ? 's' : ''} still unanswered.` : 'All questions answered.'}
-          {' '}You can’t change answers after submitting.
+          {unanswered ? t('session.unanswered', { n: unanswered }) : t('session.allAnswered')} {t('session.noChangeAfter')}
         </Small>
         <Spacer h={S.lg} />
-        <Btn title="Submit now" variant="orange" onPress={submit} />
+        <Btn title={t('session.submitNow')} variant="orange" onPress={submit} />
         <Spacer h={S.sm} />
-        <Btn title="Keep working" variant="ghost" onPress={() => setConfirm(false)} />
+        <Btn title={t('session.keepWorking')} variant="ghost" onPress={() => setConfirm(false)} />
       </Sheet>
     </>
   );

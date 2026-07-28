@@ -1,30 +1,19 @@
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Icon } from '../../../src/components/Icon';
-import {
-  Btn,
-  Card,
-  H2,
-  Header,
-  Item,
-  Pill,
-  Row,
-  Screen,
-  Small,
-  Spacer,
-  Tap,
-  useToast,
-} from '../../../src/components/ui';
+import { Btn, Card, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
 import { api } from '../../../src/core/api';
 import { chapterPct } from '../../../src/core/domain';
 import { useAsync } from '../../../src/core/useAsync';
 import { subjectById } from '../../../src/core/content';
+import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
+import { View } from 'react-native';
 
 export default function ChapterHub() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, actions } = useApp();
+  const t = useT();
   const toast = useToast();
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
@@ -32,50 +21,37 @@ export default function ChapterHub() {
   const pct = chapterPct(id, state.readSections, state.attempts);
   const downloaded = state.downloads.includes(id);
   const readCount = content ? content.sections.filter((s) => state.readSections.includes(s.id)).length : 0;
-  const bestResult = state.results.filter((r) => r.chapterId === id).sort((a, b) => b.score / b.total - a.score / a.total)[0];
+  const best = state.results.filter((r) => r.chapterId === id).sort((a, b) => b.score / b.total - a.score / a.total)[0];
   const knownCards = content ? content.flashcards.filter((f) => state.cardsKnown.includes(f.id)).length : 0;
 
   return (
     <Screen
       footer={
         <Btn
-          title={readCount ? 'Continue reading' : 'Start reading'}
+          title={readCount ? t('study.continueReading') : t('study.startReading')}
           onPress={() => router.push(`/learn/reader/${id}`)}
         />
       }
     >
       <Header
-        title={chapter ? `Chapter ${chapter.number}` : 'Chapter'}
-        sub={chapter ? `${subjectById(chapter.subjectId)?.name} · Class 9 FBISE` : ' '}
+        title={`Chapter ${chapter?.number ?? ''}`}
+        sub={chapter ? subjectById(chapter.subjectId)?.name : ' '}
         back
         right={
-          <Tap
+          <IconButton
+            icon={downloaded ? 'check' : 'download'}
+            tone={downloaded ? 'active' : 'card'}
             onPress={() => {
               actions.toggleDownload(id);
-              toast(downloaded ? 'Removed from downloads' : 'Saved for offline ✓');
+              toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
             }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 14,
-                backgroundColor: downloaded ? C.greenTint : C.card,
-                borderWidth: 1,
-                borderColor: downloaded ? C.green : C.line,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon name={downloaded ? 'check' : 'download'} size={20} color={downloaded ? C.green : C.ink} />
-            </View>
-          </Tap>
+          />
         }
       />
 
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         <H2 style={{ color: '#fff' }}>{chapter?.title ?? ''}</H2>
-        <Text style={{ fontFamily: F.body, fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 2 }}>
+        <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
           {chapter?.blurb}
         </Text>
         <Row gap={S.md} style={{ marginTop: S.md }}>
@@ -87,53 +63,60 @@ export default function ChapterHub() {
       </Card>
 
       <Spacer h={S.lg} />
-      <Card flat style={{ paddingVertical: 2 }}>
+      <Small style={{ fontFamily: F.bodyBold, marginBottom: S.sm }}>{t('study.sections')}</Small>
+      <Card flat style={{ paddingVertical: 0 }}>
         <Item
-          title="Notes & examples"
-          sub={content ? `${content.sections.length} sections · ${readCount} read` : 'Loading…'}
+          title={t('study.notes')}
+          sub={content ? t('study.notesSub', { n: content.sections.length, read: readCount }) : t('common.loading')}
           icon="book"
           pct={content?.sections.length ? (readCount / content.sections.length) * 100 : 0}
           onPress={() => router.push(`/learn/reader/${id}`)}
         />
         <Item
-          title="Audio lesson"
-          sub={chapter ? `${chapter.audioMinutes} min · Urdu & English` : ''}
+          title={t('study.audio')}
+          sub={chapter ? t('study.audioSub', { n: chapter.audioMinutes }) : ''}
           icon="headphones"
           onPress={() => router.push(`/learn/audio/${id}`)}
         />
         <Item
-          title="Flashcards"
-          sub={content ? `${content.flashcards.length} cards · ${knownCards} known` : ''}
+          title={t('study.flashcards')}
+          sub={content ? t('study.flashcardsSub', { n: content.flashcards.length, known: knownCards }) : ''}
           icon="cards"
           onPress={() => router.push(`/session/flashcards?chapter=${id}`)}
         />
         <Item
-          title="Practice MCQs"
-          sub={content ? `${content.mcqs.length} questions${bestResult ? ` · best ${bestResult.score}/${bestResult.total}` : ''}` : ''}
+          title={t('study.mcqs')}
+          sub={
+            content
+              ? best
+                ? t('study.mcqsBest', { n: content.mcqs.length, score: `${best.score}/${best.total}` })
+                : t('study.mcqsSub', { n: content.mcqs.length })
+              : ''
+          }
           icon="target"
           onPress={() => router.push(`/session/setup?chapter=${id}`)}
         />
         <Item
-          title="Short questions"
-          sub={content ? `${content.shortQs.length} with model answers` : ''}
+          title={t('study.shortQ')}
+          sub={content ? t('study.shortQSub', { n: content.shortQs.length }) : ''}
           icon="quill"
           onPress={() => router.push(`/session/shortq?chapter=${id}`)}
         />
         <Item
-          title="Fill in the blanks"
-          sub={content ? `${content.blanks.length} items` : ''}
+          title={t('study.blanks')}
+          sub={content ? t('study.blanksSub', { n: content.blanks.length }) : ''}
           icon="edit"
-          onPress={() => router.push(`/session/blanks?chapter=${id}`)}
           last
+          onPress={() => router.push(`/session/blanks?chapter=${id}`)}
         />
       </Card>
 
       <Spacer h={S.lg} />
       <Row gap={S.sm}>
         <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
-          {downloaded ? 'Available offline' : 'Not downloaded'}
+          {downloaded ? t('study.savedOffline') : t('study.notDownloaded')}
         </Pill>
-        <Pill tone="orange">≈ 2 MB</Pill>
+        <Pill tone="grey">≈ 2 MB</Pill>
       </Row>
     </Screen>
   );

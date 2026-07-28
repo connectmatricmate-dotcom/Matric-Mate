@@ -1,29 +1,31 @@
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName } from '../../src/components/Icon';
-import { Card, Empty, Item, Pill, Ring, Row, Screen, SectionTitle, Small, Spacer, Tiny } from '../../src/components/ui';
+import { Card, Empty, Item, Ring, Row, Screen, SectionTitle, Small, Spacer, Tiny } from '../../src/components/ui';
+import { useT } from '../../src/i18n';
+import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
-const ENTRIES: { label: string; sub: string; icon: IconName; prompt: string }[] = [
-  { label: 'Ask a doubt', sub: 'Type your question', icon: 'spark', prompt: '' },
-  { label: 'Explain a topic', sub: 'From your chapters', icon: 'book', prompt: 'Explain Newton’s second law simply' },
-  { label: 'Solve a question', sub: 'Step by step', icon: 'calc', prompt: 'Solve: a 5 kg body is pushed with 20 N. Find acceleration.' },
-  { label: 'Concept clarity', sub: 'Simple words + example', icon: 'help', prompt: 'What is inertia? Give an example.' },
+const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: string }[] = [
+  { label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark', prompt: '' },
+  { label: 'tutor.explainTopic', sub: 'tutor.explainTopicSub', icon: 'book', prompt: 'Explain Newton’s second law simply' },
+  { label: 'tutor.solveQuestion', sub: 'tutor.solveQuestionSub', icon: 'calc', prompt: 'A 5 kg body is pushed with 20 N. Find its acceleration.' },
+  { label: 'tutor.conceptClarity', sub: 'tutor.conceptClaritySub', icon: 'help', prompt: 'What is inertia? Give an example.' },
 ];
 
 export default function Tutor() {
   const { state, derived } = useApp();
+  const t = useT();
   const usedPct = ((derived.aiLimit - derived.aiLeft) / derived.aiLimit) * 100;
   const low = derived.aiLeft <= Math.max(1, Math.floor(derived.aiLimit * 0.2));
 
   return (
-    <Screen>
-      <Row style={{ paddingTop: S.sm, paddingBottom: S.sm }} gap={S.sm}>
+    <Screen tabbed>
+      <Row style={{ paddingTop: S.sm, paddingBottom: S.md }} gap={S.sm}>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontFamily: F.display, fontSize: 21, color: C.ink }}>AI Tutor</Text>
-          <Small style={{ fontFamily: F.bodyBold }}>24/7 — English ya Urdu mein poochho</Small>
+          <Text style={{ fontFamily: F.display, fontSize: 21, color: C.ink }}>{t('tutor.title')}</Text>
+          <Small style={{ fontFamily: F.bodyBold }}>{t('tutor.sub')}</Small>
         </View>
         <Ring pct={usedPct} size={46} stroke={6} color={low ? C.orange : C.teal}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: C.ink }}>
@@ -40,8 +42,8 @@ export default function Tutor() {
             style={{ flexGrow: 1, flexBasis: '46%', gap: 6 }}
           >
             <Icon name={e.icon} color={C.teal} />
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{e.label}</Text>
-            <Small style={{ fontSize: 11.5 }}>{e.sub}</Small>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(e.label)}</Text>
+            <Small style={{ fontSize: 11.5 }}>{t(e.sub)}</Small>
           </Card>
         ))}
       </View>
@@ -54,8 +56,8 @@ export default function Tutor() {
       >
         <Icon name="spark" color={C.orangeDark} />
         <View style={{ flex: 1 }}>
-          <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>Make me a test</Text>
-          <Small>AI picks questions from your weak topics</Small>
+          <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('tutor.makeTest')}</Text>
+          <Small>{t('tutor.makeTestSub')}</Small>
         </View>
         <Icon name="chevron" size={18} color={C.ink3} />
       </Card>
@@ -64,35 +66,35 @@ export default function Tutor() {
         <>
           <Spacer h={S.md} />
           <Card flat tint={C.redTint} border={C.red}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.red }}>Daily limit reached</Text>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.red }}>{t('tutor.limitTitle')}</Text>
             <Small style={{ marginTop: 2 }}>
-              Your {derived.aiLimit} questions reset at 12 AM.
-              {state.premium.active ? '' : ' Premium gets 20 a day.'}
+              {t('tutor.limitBody', { n: derived.aiLimit })}
+              {state.premium.active ? '' : ` ${t('tutor.limitPremium')}`}
             </Small>
           </Card>
         </>
       ) : null}
 
-      <SectionTitle>Recent chats</SectionTitle>
+      <SectionTitle>{t('tutor.recentChats')}</SectionTitle>
       {state.threads.length === 0 ? (
-        <Empty emoji="💬" title="No questions yet" sub="Ask your first doubt — it’s the fastest way to unstick yourself." />
+        <Empty emoji="💬" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />
       ) : (
-        <Card flat style={{ paddingVertical: 2 }}>
-          {state.threads.slice(0, 6).map((t, i) => (
+        <Card flat style={{ paddingVertical: 0 }}>
+          {state.threads.slice(0, 6).map((thread, i) => (
             <Item
-              key={t.id}
-              title={t.title}
-              sub={`${t.contextLabel ?? 'General'} · ${new Date(t.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`}
+              key={thread.id}
+              title={thread.title}
+              sub={`${thread.contextLabel ?? ''} ${new Date(thread.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`.trim()}
               icon="spark"
               last={i === Math.min(5, state.threads.length - 1)}
-              onPress={() => router.push(`/tutor/chat?thread=${t.id}`)}
+              onPress={() => router.push(`/tutor/chat?thread=${thread.id}`)}
             />
           ))}
         </Card>
       )}
 
       <Spacer h={S.lg} />
-      <Tiny style={{ textAlign: 'center' }}>AI can make mistakes — verify with your book.</Tiny>
+      <Tiny style={{ textAlign: 'center' }}>{t('tutor.disclaimer')}</Tiny>
     </Screen>
   );
 }

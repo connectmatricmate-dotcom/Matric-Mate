@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, Field, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
 
@@ -9,6 +10,7 @@ const AVATARS = ['🧑🏽‍🎓', '👩🏽‍🎓', '🧕🏽', '👨🏽‍�
 
 export default function EditProfile() {
   const { state, actions } = useApp();
+  const t = useT();
   const toast = useToast();
   const [name, setName] = useState(state.user?.name ?? '');
   const [avatar, setAvatar] = useState(0);
@@ -16,27 +18,28 @@ export default function EditProfile() {
 
   return (
     <Screen
+      avoidKeyboard
       footer={
         <Btn
-          title="Save changes"
+          title={t('common.save')}
           onPress={() => {
             if (state.user) actions.signIn({ ...state.user, name: name.trim() || state.user.name });
-            toast('Profile saved ✓');
+            toast(t('account.profileSaved'));
             router.back();
           }}
         />
       }
     >
-      <Header title="Edit profile" back />
+      <Header title={t('account.editTitle')} back />
 
       <Row gap={S.sm} style={{ justifyContent: 'center', marginVertical: S.md }}>
         {AVATARS.map((a, i) => (
           <Tap key={a} onPress={() => setAvatar(i)}>
             <View
               style={{
-                width: 52,
-                height: 52,
-                borderRadius: 16,
+                width: 54,
+                height: 54,
+                borderRadius: 17,
                 backgroundColor: C.orangeTint,
                 borderWidth: i === avatar ? 2 : 1,
                 borderColor: i === avatar ? C.teal : C.line,
@@ -50,32 +53,32 @@ export default function EditProfile() {
         ))}
       </Row>
 
-      <Field label="Full name" value={name} onChangeText={setName} placeholder="Your name" icon="user" autoCapitalize="words" />
+      <Field label={t('auth.fullName')} value={name} onChangeText={setName} icon="user" autoCapitalize="words" />
 
-      <SectionTitle>Study setup</SectionTitle>
-      <Card flat style={{ paddingVertical: 2 }}>
+      <SectionTitle>{t('account.studySetup')}</SectionTitle>
+      <Card flat style={{ paddingVertical: 0 }}>
         <Item
-          title="Class & board"
+          title={t('account.classAndBoard')}
           sub={`Class ${setup?.classLevel ?? 9} · ${setup?.board === 'punjab' ? 'Punjab Board' : 'FBISE'}`}
           icon="book"
           onPress={() => router.push('/onboarding/class')}
         />
         <Item
-          title="Medium"
-          sub={setup?.medium === 'ur' ? 'Urdu' : 'English'}
-          icon="globe"
+          title={t('account.medium')}
+          sub={setup?.medium === 'ur' ? t('onboarding.mediumUr') : t('onboarding.mediumEn')}
+          icon="book2"
           onPress={() => router.push('/onboarding/medium')}
         />
         <Item
-          title="My subjects"
-          sub={`${setup?.subjects.length ?? 0} selected`}
+          title={t('account.mySubjects')}
+          sub={t('account.subjectsCount', { n: setup?.subjects.length ?? 0 })}
           icon="cards"
           last
           onPress={() => router.push('/onboarding/subjects')}
         />
       </Card>
       <Spacer h={S.md} />
-      <Small>Changing class or board reloads your syllabus — your progress for the old one is kept.</Small>
+      <Small>{t('account.editFootnote')}</Small>
     </Screen>
   );
 }

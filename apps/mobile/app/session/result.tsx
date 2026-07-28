@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, H2, Pill, Ring, Row, Screen, Small, Spacer } from '../../src/components/ui';
-import { XP, accuracy, grade, weakTopics } from '../../src/core/domain';
+import { XP, accuracy, grade } from '../../src/core/domain';
 import { chapterById } from '../../src/core/content';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
 
 export default function Result() {
   const { state, actions } = useApp();
+  const t = useT();
   const s = session.current;
   const saved = useRef(false);
   const [shown, setShown] = useState(0);
@@ -24,7 +26,6 @@ export default function Result() {
     return s?.mode === 'exam' ? base * XP.examMultiplier : base;
   }, [answers, s?.mode]);
 
-  // Save the result once, then animate the dial up to the score.
   useEffect(() => {
     if (!s || saved.current) return;
     saved.current = true;
@@ -42,25 +43,25 @@ export default function Result() {
 
   useEffect(() => {
     let n = 0;
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       n += Math.max(1, Math.round(pct / 18));
       if (n >= pct) {
         n = pct;
-        clearInterval(t);
+        clearInterval(timer);
       }
       setShown(n);
     }, 24);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, [pct]);
 
   const myAverage = accuracy(state.attempts);
   const weakest = useMemo(() => {
-    const rows = answers
+    const topics = answers
       .filter((a) => !a.correct)
       .map((a) => s?.mcqs.find((m) => m.id === a.mcqId)?.topic)
       .filter(Boolean) as string[];
     const counts = new Map<string, number>();
-    rows.forEach((t) => counts.set(t, (counts.get(t) ?? 0) + 1));
+    topics.forEach((topic) => counts.set(topic, (counts.get(topic) ?? 0) + 1));
     return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
   }, [answers, s]);
 
@@ -68,15 +69,16 @@ export default function Result() {
     return (
       <Screen>
         <Card flat style={{ marginTop: S.xl, alignItems: 'center', gap: S.md }}>
-          <H2>Nothing to show yet</H2>
-          <Small>Finish a session to see your result.</Small>
-          <Btn title="Practice now" sm onPress={() => router.replace('/session/setup')} />
+          <H2>{t('session.noSession')}</H2>
+          <Small>{t('session.noSessionBody')}</Small>
+          <Btn title={t('session.setUpSession')} sm onPress={() => router.replace('/session/setup')} />
         </Card>
       </Screen>
     );
   }
 
   const good = pct >= 70;
+  const diff = pct - myAverage;
 
   return (
     <Screen>
@@ -89,32 +91,33 @@ export default function Result() {
           </Small>
         </Ring>
         <H2 style={{ marginTop: S.md, textAlign: 'center' }}>
-          {good ? `Shabash, ${(state.user?.name ?? 'Student').split(' ')[0]}! 🔥` : 'Thori aur practice chahiye 💪'}
+          {good
+            ? t('session.resultGood', { name: (state.user?.name ?? 'Student').split(' ')[0] })
+            : t('session.resultTry')}
         </H2>
         <Small style={{ textAlign: 'center' }}>{s.label}</Small>
       </View>
 
       <Spacer h={S.md} />
       <Row gap={S.sm} style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Pill tone={good ? 'green' : 'red'}>Grade {grade(pct)}</Pill>
+        <Pill tone={good ? 'green' : 'red'}>{t('session.grade', { g: grade(pct) })}</Pill>
         <Pill tone="orange">
-          +{xp} XP{s.mode === 'exam' ? ' (×2)' : ''}
+          {s.mode === 'exam' ? t('session.xpDoubled', { n: xp }) : t('session.xpEarned', { n: xp })}
         </Pill>
-        <Pill tone="grey">
-          {pct >= myAverage ? '+' : ''}
-          {pct - myAverage}% vs your average
-        </Pill>
+        <Pill tone="grey">{t('session.vsAverage', { n: `${diff >= 0 ? '+' : ''}${diff}` })}</Pill>
       </Row>
 
       {weakest ? (
         <>
           <Spacer h={S.lg} />
           <Card flat tint={C.redTint} border={C.red}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.red }}>Weak spot: {weakest}</Text>
-            <Small style={{ marginTop: 2 }}>Most of your wrong answers came from this topic.</Small>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.red }}>
+              {t('session.weakSpot', { topic: weakest })}
+            </Text>
+            <Small style={{ marginTop: 2 }}>{t('session.weakSpotSub')}</Small>
             <Spacer h={S.md} />
             <Btn
-              title="Study it now"
+              title={t('session.studyNow')}
               variant="danger"
               sm
               onPress={() => router.replace(`/learn/chapter/${s.chapterId ?? chapterById(s.mcqs[0].chapterId)?.id}`)}
@@ -126,11 +129,11 @@ export default function Result() {
       <Spacer h={S.lg} />
       <Row gap={S.sm}>
         <View style={{ flex: 1 }}>
-          <Btn title="Review answers" variant="line" onPress={() => router.replace('/session/review')} />
+          <Btn title={t('session.reviewAnswers')} variant="line" onPress={() => router.replace('/session/review')} />
         </View>
         <View style={{ flex: 1 }}>
           <Btn
-            title="Done"
+            title={t('common.done')}
             onPress={() => {
               session.clear();
               router.replace('/(tabs)/practice');
@@ -139,9 +142,7 @@ export default function Result() {
         </View>
       </Row>
       <Spacer h={S.md} />
-      <Small style={{ textAlign: 'center' }}>
-        Every answer with its confidence is saved — see the pattern in Progress → Performance.
-      </Small>
+      <Small style={{ textAlign: 'center' }}>{t('session.resultFootnote')}</Small>
     </Screen>
   );
 }

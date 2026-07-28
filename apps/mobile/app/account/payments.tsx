@@ -1,14 +1,15 @@
 import { useMemo } from 'react';
 import { router } from 'expo-router';
 import { Btn, Card, Empty, Header, Item, Pill, Screen, Small, Spacer, useToast } from '../../src/components/ui';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { S } from '../../src/theme';
 
 export default function Payments() {
   const { state } = useApp();
+  const t = useT();
   const toast = useToast();
 
-  /** Receipts are derived from the payment notifications this demo records. */
   const receipts = useMemo(
     () =>
       state.notifications
@@ -19,31 +20,31 @@ export default function Payments() {
 
   return (
     <Screen>
-      <Header title="Payment history" back />
+      <Header title={t('account.paymentsTitle')} back />
       {receipts.length === 0 ? (
         <Empty
           emoji="🧾"
-          title="No payments yet"
-          sub="Receipts appear here after your first Premium payment."
-          cta={<Btn title="See Premium" sm onPress={() => router.push('/paywall')} />}
+          title={t('account.noPaymentsTitle')}
+          sub={t('account.noPaymentsBody')}
+          cta={<Btn title={t('paywall.title')} sm onPress={() => router.push('/paywall')} />}
         />
       ) : (
-        <Card flat style={{ paddingVertical: 2 }}>
+        <Card flat style={{ paddingVertical: 0 }}>
           {receipts.map((r, i) => (
             <Item
               key={r.id}
-              title={`Rs ${r.amount.toLocaleString()} — Premium`}
+              title={t('account.receiptLine', { amount: r.amount.toLocaleString() })}
               sub={`${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · ${r.method}`}
               icon="card"
               last={i === receipts.length - 1}
-              onPress={() => toast(`Receipt ${state.premium.ref ?? 'SP-000000'} — tap to share in the live app`)}
-              right={<Pill tone="green">Paid</Pill>}
+              onPress={() => toast(t('pay.receipt', { ref: state.premium.ref ?? 'SP-000000' }))}
+              right={<Pill tone="green">{t('account.paidLabel')}</Pill>}
             />
           ))}
         </Card>
       )}
       <Spacer h={S.md} />
-      <Small>Every receipt carries a Safepay reference you can quote to support.</Small>
+      <Small>{t('account.paymentsFootnote')}</Small>
     </Screen>
   );
 }

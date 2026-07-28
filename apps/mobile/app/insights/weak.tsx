@@ -4,11 +4,13 @@ import { router } from 'expo-router';
 import { Btn, Card, Empty, Header, Row, Screen, SectionTitle, Small, Spacer } from '../../src/components/ui';
 import { subjectById } from '../../src/core/content';
 import { weakTopics } from '../../src/core/domain';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function Weak() {
   const { state } = useApp();
+  const t = useT();
   const rows = useMemo(() => weakTopics(state.attempts), [state.attempts]);
 
   const bySubject = rows.reduce<Record<string, typeof rows>>((acc, r) => {
@@ -18,14 +20,14 @@ export default function Weak() {
 
   return (
     <Screen>
-      <Header title="Weak topics" sub="Spotted from your own answers" back />
+      <Header title={t('progress.weakTitle')} sub={t('progress.weakSub')} back />
 
       {rows.length === 0 ? (
         <Empty
           emoji="🔍"
-          title="Nothing flagged yet"
-          sub="Practice a bit first — we look for topics where you drop below 75%."
-          cta={<Btn title="Practice 10 MCQs" sm onPress={() => router.push('/session/setup')} />}
+          title={t('progress.weakNoneTitle')}
+          sub={t('progress.weakNoneBody')}
+          cta={<Btn title={t('tutor.practiceTen')} sm onPress={() => router.push('/session/setup')} />}
         />
       ) : (
         Object.entries(bySubject).map(([sid, list]) => (
@@ -36,25 +38,17 @@ export default function Weak() {
                 <Card key={w.topic} flat>
                   <Row>
                     <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{w.topic}</Text>
-                    <Text
-                      style={{
-                        fontFamily: F.display,
-                        fontSize: 16,
-                        color: w.accuracy < 50 ? C.red : C.orangeDark,
-                      }}
-                    >
+                    <Text style={{ fontFamily: F.display, fontSize: 17, color: w.accuracy < 50 ? C.red : C.orangeDark }}>
                       {w.accuracy}%
                     </Text>
                   </Row>
-                  <Small>
-                    {w.right} right out of {w.total} attempted
-                  </Small>
+                  <Small>{t('progress.rightOutOf', { right: w.right, total: w.total })}</Small>
                   <Row gap={S.sm} style={{ marginTop: S.md }}>
                     <View style={{ flex: 1 }}>
-                      <Btn title="Study" variant="line" sm onPress={() => router.push(`/learn/chapter/${w.chapterId}`)} />
+                      <Btn title={t('progress.studyBtn')} variant="line" sm onPress={() => router.push(`/learn/chapter/${w.chapterId}`)} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Btn title="Practise 10" sm onPress={() => router.push(`/session/setup?chapter=${w.chapterId}`)} />
+                      <Btn title={t('progress.practiceTen')} sm onPress={() => router.push(`/session/setup?chapter=${w.chapterId}`)} />
                     </View>
                   </Row>
                 </Card>
@@ -64,7 +58,7 @@ export default function Weak() {
         ))
       )}
       <Spacer h={S.lg} />
-      <Small>A topic appears here after at least 3 attempts below 75% accuracy.</Small>
+      <Small>{t('progress.weakFootnote')}</Small>
     </Screen>
   );
 }

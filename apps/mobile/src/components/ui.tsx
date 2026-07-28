@@ -6,6 +6,7 @@ import React, { createContext, useCallback, useContext, useMemo, useRef, useStat
 import {
   ActivityIndicator,
   Animated,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -50,44 +51,62 @@ export function Ur({ children, size = 16, style }: { children: React.ReactNode; 
 
 /* ---------------------------------------------------------------- layout */
 
-/** Page wrapper: safe area + paper background + (on web) centred column. */
+/**
+ * Page wrapper. Handles the three things every screen needs:
+ * the status-bar inset at the top, the gesture-bar inset at the bottom, and
+ * (on web) a centred column instead of full-bleed text.
+ *
+ * `tabbed` — set on the five tab roots, where the tab bar already occupies the
+ * bottom inset and adding it again would leave a dead gap.
+ */
 export function Screen({
   children,
   scroll = true,
   footer,
   padded = true,
+  tabbed = false,
+  avoidKeyboard = false,
 }: {
   children: React.ReactNode;
   scroll?: boolean;
   footer?: React.ReactNode;
   padded?: boolean;
+  tabbed?: boolean;
+  avoidKeyboard?: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  const inner = (
+  const bottomGap = tabbed || footer ? S.lg : Math.max(insets.bottom, S.md) + S.sm;
+
+  const body = scroll ? (
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={[
+        { paddingHorizontal: padded ? S.lg : 0, paddingBottom: bottomGap },
+        isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
+      ]}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+    >
+      {children}
+    </ScrollView>
+  ) : (
     <View style={[{ flex: 1, width: '100%' }, isWeb && { maxWidth: WEB_MAX, alignSelf: 'center' }]}>
       {children}
     </View>
   );
-  return (
+
+  const content = (
     <View style={{ flex: 1, backgroundColor: C.paper, paddingTop: insets.top }}>
-      {scroll ? (
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={[
-            { paddingHorizontal: padded ? S.lg : 0, paddingBottom: S.xl },
-            isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          {children}
-        </ScrollView>
-      ) : (
-        inner
-      )}
+      {body}
       {footer ? (
         <View
           style={[
-            { paddingHorizontal: S.lg, paddingTop: S.sm, paddingBottom: Math.max(insets.bottom, S.md) },
+            {
+              paddingHorizontal: S.lg,
+              paddingTop: S.sm,
+              paddingBottom: tabbed ? S.md : Math.max(insets.bottom, S.md),
+            },
             isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
           ]}
         >
@@ -95,6 +114,19 @@ export function Screen({
         </View>
       ) : null}
     </View>
+  );
+
+  // Forms need the keyboard pushed out of the way rather than covering the CTA.
+  return avoidKeyboard ? (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={0}
+    >
+      {content}
+    </KeyboardAvoidingView>
+  ) : (
+    content
   );
 }
 
@@ -114,9 +146,9 @@ export function Header({
   return (
     <View style={st.header}>
       {back ? (
-        <Tap onPress={onBack ?? (() => router.back())} hit style={{ marginLeft: -6 }}>
-          <Icon name="back" color={C.ink} />
-        </Tap>
+        <View style={{ marginLeft: -10 }}>
+          <IconButton icon="back" onPress={onBack ?? (() => router.back())} />
+        </View>
       ) : null}
       <View style={{ flex: 1, minWidth: 0 }}>
         {title ? <H2>{title}</H2> : null}
@@ -177,7 +209,7 @@ export function Card({
   return onPress ? <Tap onPress={onPress}>{body}</Tap> : body;
 }
 
-/** Pressable with sane feedback on both platforms. */
+/** Pressable with feedback that feels native on each platform. */
 export function Tap({
   children,
   onPress,
@@ -191,19 +223,114 @@ export function Tap({
   disabled?: boolean;
   hit?: boolean;
 }) {
+  const interactive = !!onPress && !disabled;
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled || !onPress}
+      disabled={!interactive}
       hitSlop={hit ? 12 : undefined}
+      android_ripple={interactive && !hit ? { color: 'rgba(9,106,139,0.10)', foreground: true } : undefined}
       style={({ pressed }) => [
         style,
-        pressed ? { opacity: 0.72 } : null,
-        isWeb ? ({ cursor: onPress && !disabled ? 'pointer' : 'default' } as ViewStyle) : null,
+        pressed && (Platform.OS !== 'android' || hit) ? { opacity: 0.7 } : null,
+        isWeb ? ({ cursor: interactive ? 'pointer' : 'default' } as ViewStyle) : null,
       ]}
     >
       {children}
     </Pressable>
+  );
+}
+
+/**
+ * Square checkbox for multi-select, round for single-select.
+ * Selected state fills the box — an outline that turns into a floating tick
+ * reads as two different controls, which is the bug this replaces.
+ */
+export function Check({
+  on,
+  round,
+  size = 26,
+  onPress,
+}: {
+  on: boolean;
+  round?: boolean;
+  size?: number;
+  onPress?: () => void;
+}) {
+  const box = (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: round ? size / 2 : 9,
+        borderWidth: on ? 0 : 2,
+        borderColor: '#CBD8D3',
+        backgroundColor: on ? C.teal : 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {on ? <Icon name="check" size={size * 0.62} color="#fff" strokeWidth={3} /> : null}
+    </View>
+  );
+  return onPress ? (
+    <Tap onPress={onPress} hit>
+      {box}
+    </Tap>
+  ) : (
+    box
+  );
+}
+
+/** Circular icon button used in headers — 44dp target, per platform guidance. */
+export function IconButton({
+  icon,
+  onPress,
+  tone = 'plain',
+  badge,
+  size = 44,
+}: {
+  icon: IconName;
+  onPress?: () => void;
+  tone?: 'plain' | 'card' | 'active';
+  badge?: boolean;
+  size?: number;
+}) {
+  const bg = tone === 'card' ? C.card : tone === 'active' ? C.greenTint : 'transparent';
+  const border = tone === 'card' ? C.line : tone === 'active' ? C.green : 'transparent';
+  const color = tone === 'active' ? C.green : C.ink;
+  return (
+    <Tap onPress={onPress}>
+      <View
+        style={{
+          width: size,
+          height: size,
+          borderRadius: 14,
+          backgroundColor: bg,
+          borderWidth: tone === 'plain' ? 0 : 1,
+          borderColor: border,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon name={icon} size={21} color={color} />
+        {badge ? (
+          <View
+            style={{
+              position: 'absolute',
+              top: 9,
+              right: 9,
+              width: 9,
+              height: 9,
+              borderRadius: 99,
+              backgroundColor: C.orange,
+              borderWidth: 2,
+              borderColor: C.card,
+            }}
+          />
+        ) : null}
+      </View>
+    </Tap>
   );
 }
 
@@ -648,7 +775,8 @@ const st = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.line,
     borderRadius: R.lg,
-    padding: S.lg - 2,
+    padding: S.lg,
+    overflow: 'hidden',
   },
   btn: {
     flexDirection: 'row',
@@ -697,7 +825,8 @@ const st = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: S.md,
-    paddingVertical: 13,
+    paddingVertical: 14,
+    minHeight: 62,
     borderBottomWidth: 1,
     borderBottomColor: C.line,
   },

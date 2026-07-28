@@ -142,37 +142,20 @@ export function buildPlan(opts: {
   const weak = weakTopics(opts.attempts)[0];
   const weakCh = weak ? chapterById(weak.chapterId) : undefined;
   const tasks: Omit<PlanTask, 'done'>[] = [
-    {
-      id: `plan-read-${chId}`,
-      subjectId: ch?.subjectId ?? 'phy',
-      chapterId: chId,
-      label: `Read ${ch ? ch.title : 'your chapter'} — 15 min`,
-      kind: 'read',
-    },
-    {
-      id: `plan-mcq-${chId}`,
-      subjectId: ch?.subjectId ?? 'phy',
-      chapterId: chId,
-      label: `10 MCQs on ${ch ? ch.title : 'this chapter'}`,
-      kind: 'mcq',
-    },
+    { id: `plan-read-${chId}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'read' },
+    { id: `plan-mcq-${chId}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'mcq' },
     weak && weakCh
       ? {
           id: `plan-weak-${weak.topic}`,
           subjectId: weak.subjectId,
           chapterId: weak.chapterId,
-          label: `Revise ${weak.topic} — ${weak.accuracy}% so far`,
           kind: 'cards',
+          weakTopic: weak.topic,
+          weakAccuracy: weak.accuracy,
         }
-      : {
-          id: 'plan-cards-default',
-          subjectId: ch?.subjectId ?? 'phy',
-          chapterId: chId,
-          label: 'Flashcards — 10 cards',
-          kind: 'cards',
-        },
+      : { id: 'plan-cards-default', subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'cards' },
   ];
-  return tasks.map((t) => ({ ...t, done: opts.doneIds.includes(t.id) }));
+  return tasks.map((task) => ({ ...task, done: opts.doneIds.includes(task.id) }));
 }
 
 /** Daily AI message quota (D7 — confirm with client). */

@@ -2,16 +2,14 @@ import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
-import { Icon } from '../../src/components/Icon';
+import { Icon, IconName, SUBJECT_ICON } from '../../src/components/Icon';
 import {
   Bar,
-  Body,
   Btn,
   Card,
-  H2,
+  Check,
   H3,
   Kpi,
-  Pill,
   Row,
   Screen,
   SectionTitle,
@@ -22,18 +20,21 @@ import {
 } from '../../src/components/ui';
 import { chapterById, subjectById } from '../../src/core/content';
 import { accuracy, chapterPct } from '../../src/core/domain';
+import { useT } from '../../src/i18n';
+import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
-const QUICK: { label: string; icon: 'target' | 'cards' | 'spark' | 'doc'; href: string }[] = [
-  { label: '10 MCQs', icon: 'target', href: '/session/setup' },
-  { label: 'Flashcards', icon: 'cards', href: '/session/flashcards' },
-  { label: 'Ask AI', icon: 'spark', href: '/(tabs)/tutor' },
-  { label: 'Past papers', icon: 'doc', href: '/session/papers' },
+const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
+  { label: 'dash.quickMcq', icon: 'target', href: '/session/setup' },
+  { label: 'dash.quickCards', icon: 'cards', href: '/session/flashcards' },
+  { label: 'dash.quickAi', icon: 'spark', href: '/(tabs)/tutor' },
+  { label: 'dash.quickPapers', icon: 'doc', href: '/session/papers' },
 ];
 
 export default function Dashboard() {
   const { state, derived, actions } = useApp();
+  const t = useT();
   const firstName = (state.user?.name ?? 'Student').split(' ')[0];
 
   const week = useMemo(() => {
@@ -49,91 +50,111 @@ export default function Dashboard() {
 
   const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
-  const planDone = derived.plan.filter((t) => t.done).length;
-
+  const planDone = derived.plan.filter((task) => task.done).length;
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
 
+  /** Plan labels are composed here so they follow the app language. */
+  function planLabel(task: (typeof derived.plan)[number]) {
+    const chapter = chapterById(task.chapterId);
+    const name = chapter?.title ?? '';
+    if (task.kind === 'read') return t('dash.taskRead', { chapter: name });
+    if (task.kind === 'mcq') return t('dash.taskMcq', { chapter: name });
+    if (task.weakTopic) return t('dash.taskWeak', { topic: task.weakTopic, n: task.weakAccuracy ?? 0 });
+    return t('dash.taskCards');
+  }
+
   return (
-    <Screen>
-      <AppHeader eyebrow={today} title={`Salam, ${firstName} 👋`} />
+    <Screen tabbed>
+      <AppHeader eyebrow={today} title={t('dash.greeting', { name: firstName })} />
 
       {/* Today's plan */}
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         <Row>
-          <H3 style={{ color: '#fff', flex: 1 }}>Aaj ka plan</H3>
+          <H3 style={{ color: '#fff', flex: 1 }}>{t('dash.todayPlan')}</H3>
           <View style={{ backgroundColor: 'rgba(255,255,255,0.18)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 }}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: '#fff' }}>
-              {planDone}/{derived.plan.length} done
+              {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
             </Text>
           </View>
         </Row>
-        <View style={{ marginVertical: S.md }}>
-          <View style={{ height: 7, backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 99, overflow: 'hidden' }}>
-            <View
-              style={{
-                width: `${(planDone / Math.max(1, derived.plan.length)) * 100}%`,
-                height: '100%',
-                backgroundColor: C.orange,
-                borderRadius: 99,
-              }}
-            />
-          </View>
+
+        <View style={{ marginVertical: S.md, height: 7, backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 99, overflow: 'hidden' }}>
+          <View
+            style={{
+              width: `${(planDone / Math.max(1, derived.plan.length)) * 100}%`,
+              height: '100%',
+              backgroundColor: C.orange,
+              borderRadius: 99,
+            }}
+          />
         </View>
-        {derived.plan.map((t) => (
-          <Tap key={t.id} onPress={() => actions.togglePlanTask(t.id)}>
-            <Row style={{ paddingVertical: 8, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.14)' }} gap={S.md}>
+
+        {derived.plan.map((task) => (
+          <View
+            key={task.id}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: S.md,
+              paddingVertical: 10,
+              borderTopWidth: 1,
+              borderTopColor: 'rgba(255,255,255,0.14)',
+            }}
+          >
+            <Tap onPress={() => actions.togglePlanTask(task.id)} hit>
               <View
                 style={{
-                  width: 22,
-                  height: 22,
+                  width: 24,
+                  height: 24,
                   borderRadius: 8,
                   borderWidth: 2,
-                  borderColor: t.done ? C.orange : 'rgba(255,255,255,0.5)',
-                  backgroundColor: t.done ? C.orange : 'transparent',
+                  borderColor: task.done ? C.orange : 'rgba(255,255,255,0.55)',
+                  backgroundColor: task.done ? C.orange : 'transparent',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                {t.done ? <Icon name="check" size={13} color="#fff" strokeWidth={3} /> : null}
+                {task.done ? <Icon name="check" size={14} color="#fff" strokeWidth={3} /> : null}
               </View>
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    fontFamily: F.bodyBold,
-                    fontSize: 13.5,
-                    color: '#fff',
-                    textDecorationLine: t.done ? 'line-through' : 'none',
-                    opacity: t.done ? 0.7 : 1,
-                  }}
-                >
-                  {t.label}
-                </Text>
-                <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>
-                  {subjectById(t.subjectId)?.name}
-                </Text>
-              </View>
-              <Tap
-                onPress={() =>
-                  router.push(
-                    t.kind === 'read'
-                      ? `/learn/reader/${t.chapterId}`
-                      : t.kind === 'mcq'
-                        ? `/session/setup?chapter=${t.chapterId}`
-                        : `/session/flashcards?chapter=${t.chapterId}`
-                  )
-                }
+            </Tap>
+
+            <Tap
+              style={{ flex: 1 }}
+              onPress={() =>
+                router.push(
+                  task.kind === 'read'
+                    ? `/learn/reader/${task.chapterId}`
+                    : task.kind === 'mcq'
+                      ? `/session/setup?chapter=${task.chapterId}`
+                      : `/session/flashcards?chapter=${task.chapterId}`
+                )
+              }
+            >
+              <Text
+                style={{
+                  fontFamily: F.bodyBold,
+                  fontSize: 13.5,
+                  color: '#fff',
+                  textDecorationLine: task.done ? 'line-through' : 'none',
+                  opacity: task.done ? 0.7 : 1,
+                }}
               >
-                <Icon name="chevron" size={18} color="rgba(255,255,255,0.8)" />
-              </Tap>
-            </Row>
-          </Tap>
+                {planLabel(task)}
+              </Text>
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>
+                {subjectById(task.subjectId)?.name}
+              </Text>
+            </Tap>
+
+            <Icon name="chevron" size={18} color="rgba(255,255,255,0.8)" />
+          </View>
         ))}
       </Card>
 
       {/* Continue learning */}
       {lastChapter ? (
         <>
-          <SectionTitle>Continue learning</SectionTitle>
+          <SectionTitle>{t('dash.continueLearning')}</SectionTitle>
           <Card onPress={() => router.push(`/learn/chapter/${lastChapter.id}`)}>
             <Row gap={S.md}>
               <View
@@ -146,15 +167,18 @@ export default function Dashboard() {
                   justifyContent: 'center',
                 }}
               >
-                <Icon name={subjectById(lastChapter.subjectId)?.icon ?? 'book'} color={C.teal} />
+                <Icon name={SUBJECT_ICON[lastChapter.subjectId] ?? 'book'} color={C.teal} />
               </View>
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }} numberOfLines={1}>
-                  Ch {lastChapter.number} · {lastChapter.title}
+                  {lastChapter.title}
                 </Text>
                 <Small>
-                  {subjectById(lastChapter.subjectId)?.name} · section {Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount)} of{' '}
-                  {lastChapter.sectionCount}
+                  {subjectById(lastChapter.subjectId)?.name} ·{' '}
+                  {t('dash.sectionOf', {
+                    a: Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount),
+                    b: lastChapter.sectionCount,
+                  })}
                 </Small>
                 <View style={{ marginTop: 8 }}>
                   <Bar pct={lastPct} />
@@ -167,7 +191,7 @@ export default function Dashboard() {
       ) : null}
 
       {/* Quick actions */}
-      <SectionTitle>Quick actions</SectionTitle>
+      <SectionTitle>{t('dash.quickActions')}</SectionTitle>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: S.sm }}>
         {QUICK.map((q) => (
           <Card
@@ -176,17 +200,17 @@ export default function Dashboard() {
             style={{ flexGrow: 1, flexBasis: '46%', flexDirection: 'row', alignItems: 'center', gap: S.sm }}
           >
             <Icon name={q.icon} color={C.teal} />
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{q.label}</Text>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(q.label)}</Text>
           </Card>
         ))}
       </View>
 
       {/* This week */}
-      <SectionTitle>This week</SectionTitle>
+      <SectionTitle>{t('dash.thisWeek')}</SectionTitle>
       <Row gap={S.sm}>
-        <Kpi value={`${week.accuracy}%`} label="accuracy" small />
-        <Kpi value={`${week.questions}`} label="questions" small />
-        <Kpi value={week.time} label="study time" small />
+        <Kpi value={`${week.accuracy}%`} label={t('dash.accuracy')} small />
+        <Kpi value={`${week.questions}`} label={t('dash.questions')} small />
+        <Kpi value={week.time} label={t('dash.studyTime')} small />
       </Row>
 
       {!state.premium.active ? (
@@ -196,18 +220,18 @@ export default function Dashboard() {
             <Row gap={S.md}>
               <Text style={{ fontSize: 22 }}>👑</Text>
               <View style={{ flex: 1 }}>
-                <H3>Free mode</H3>
-                <Small>5 MCQs and 5 AI questions a day. Go Premium for everything.</Small>
+                <H3>{t('paywall.freeMode')}</H3>
+                <Small>{t('paywall.freeModeSub')}</Small>
               </View>
             </Row>
             <Spacer h={S.md} />
-            <Btn title="See Premium — Rs 1,000/month" variant="orange" sm onPress={() => router.push('/paywall')} />
+            <Btn title={t('paywall.seePremium')} variant="orange" sm onPress={() => router.push('/paywall')} />
           </Card>
         </>
       ) : null}
 
-      <Spacer h={S.xl} />
-      <Tiny style={{ textAlign: 'center' }}>Demo build · sample FBISE Class 9 content</Tiny>
+      <Spacer h={S.lg} />
+      <Tiny style={{ textAlign: 'center' }}>{t('common.demoNote')}</Tiny>
     </Screen>
   );
 }

@@ -2,24 +2,28 @@ import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Header, Label, Screen, Small, Spacer } from '../../../src/components/ui';
 import { PAPER_BODY, PAST_PAPERS, subjectById } from '../../../src/core/content';
+import { useT } from '../../../src/i18n';
 import { C, F, S } from '../../../src/theme';
 
 export default function PaperViewer() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const t = useT();
   const paper = PAST_PAPERS.find((p) => p.id === id);
 
   return (
     <Screen
       footer={
         <Btn
-          title="Practice this paper"
-          onPress={() => router.replace(`/session/exam-intro?subject=${paper?.subjectId ?? 'phy'}&paper=${paper?.year ?? 2025}`)}
+          title={t('session.practiceThisPaper')}
+          onPress={() =>
+            router.replace(`/session/exam-intro?subject=${paper?.subjectId ?? 'phy'}&paper=${paper?.year ?? 2025}`)
+          }
         />
       }
     >
       <Header
-        title={paper ? `FBISE ${paper.year} · ${paper.session}` : 'Paper'}
-        sub={paper ? `${subjectById(paper.subjectId)?.name} · ${paper.marks} marks` : ' '}
+        title={paper ? `FBISE ${paper.year} · ${paper.session}` : ''}
+        sub={paper ? subjectById(paper.subjectId)?.name : ' '}
         back
       />
 
@@ -28,7 +32,11 @@ export default function PaperViewer() {
           FEDERAL BOARD — SSC-I {subjectById(paper?.subjectId ?? 'phy')?.name?.toUpperCase()}
         </Text>
         <Label style={{ textAlign: 'center', marginTop: 2 }}>
-          Time: {Math.floor((paper?.minutes ?? 150) / 60)}h {(paper?.minutes ?? 150) % 60}m · Marks: {paper?.marks ?? 65}
+          {t('session.paperMeta', {
+            marks: paper?.marks ?? 65,
+            h: Math.floor((paper?.minutes ?? 150) / 60),
+            m: (paper?.minutes ?? 150) % 60,
+          })}
         </Label>
         <View style={{ height: 1, backgroundColor: C.line, marginVertical: S.md }} />
         {PAPER_BODY.map((sec) => (
@@ -46,9 +54,7 @@ export default function PaperViewer() {
       </Card>
 
       <Spacer h={S.md} />
-      <Small>
-        In the live app this renders the client’s scanned or typed paper, with pinch-to-zoom and offline download.
-      </Small>
+      <Small>{t('session.paperViewerNote')}</Small>
     </Screen>
   );
 }

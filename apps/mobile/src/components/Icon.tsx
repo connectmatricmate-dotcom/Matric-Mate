@@ -43,8 +43,17 @@ const P = {
   help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM9.5 9.2A2.6 2.6 0 0 1 14.6 10c0 1.8-2.6 2-2.6 3.6M12 17h.01',
   headphones:
     'M4 14a8 8 0 1 1 16 0M4 14v3a2 2 0 0 0 2 2h1v-6H6a2 2 0 0 0-2 1Zm16 0v3a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 1Z',
-  cards: 'M4 7l9-4 7 3.5-9 4L4 7Zm0 0v10l9 4m0-14v14m7-10.5v10L13 21',
-  quill: 'M20 4c-6 0-11 3-13.5 8.5C5 16 4 20 4 20s4-1 7.5-2.5C17 15 20 10 20 4ZM4 20 14 10',
+  /** two stacked cards — reads as flashcards, unlike a 3D box */
+  cards: 'M7.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 6 17V8a1.5 1.5 0 0 1 1.5-1.5ZM4 16V6a2 2 0 0 1 2-2h10',
+  mail: 'M4 5.5h16v13H4zM4 6.5l8 6 8-6',
+  phone: 'M8.5 3.5h7a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19V5a1.5 1.5 0 0 1 1.5-1.5ZM11 17.5h2',
+  calendar: 'M4 6.5h16v14H4zM4 10.5h16M8.5 3.5v4M15.5 3.5v4',
+  key: 'M15 3a6 6 0 1 0-4.2 10.2L9 15H7v2H5v2H2.5v-2.6L10 9.2A6 6 0 0 1 15 3Zm1.2 4.2h.01',
+  award: 'M12 14a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM8.5 13 7 21l5-2.5L17 21l-1.5-8',
+  layers: 'M12 3.5 3 8l9 4.5L21 8l-9-4.5ZM3 13l9 4.5L21 13M3 17l9 4.5L21 17',
+  arrowRight: 'M4 12h15m0 0-5-5m5 5-5 5',
+  /** a pen, distinct from the leaf used for Biology */
+  quill: 'M12.5 20.5H21M16.2 3.3a2.15 2.15 0 0 1 3 3L8.4 17.2l-4 1 1-4L16.2 3.3Z',
   flask: 'M9 3h6M10 3v5.5L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 8.5V3M7 15h10',
   calc: 'M5 3h14v18H5zM8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01',
   leaf: 'M5 20C5 10 11 4 20 4c0 9-6 15-15 16Zm0 0c2-6 6-10 11-12',
@@ -84,3 +93,16 @@ export function Icon({
     </Svg>
   );
 }
+
+/** Icon for each subject, so the same subject always looks the same. */
+export const SUBJECT_ICON: Record<string, IconName> = {
+  phy: 'bolt',
+  chem: 'flask',
+  bio: 'leaf',
+  math: 'calc',
+  eng: 'book',
+  urd: 'quill',
+  isl: 'star',
+  pst: 'globe',
+  cs: 'book2',
+};

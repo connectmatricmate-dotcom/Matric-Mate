@@ -8,6 +8,7 @@ import {
   Btn,
   Card,
   H3,
+  IconButton,
   Label,
   Pill,
   Row,
@@ -15,28 +16,28 @@ import {
   Small,
   Spacer,
   Tap,
-  useToast,
 } from '../../src/components/ui';
 import { XP } from '../../src/core/domain';
 import { Confidence } from '../../src/core/types';
+import { useT } from '../../src/i18n';
+import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
 
-const LEVELS: { value: Confidence; label: string }[] = [
-  { value: 0, label: 'Tukka 🎲' },
-  { value: 1, label: 'Thora sure' },
-  { value: 2, label: 'Pakka ✓' },
+const LEVELS: { value: Confidence; label: StringKey }[] = [
+  { value: 0, label: 'session.conf0' },
+  { value: 1, label: 'session.conf1' },
+  { value: 2, label: 'session.conf2' },
 ];
 
 /**
- * The signature flow: answer → Pakka-meter (how sure are you?) → check.
- * Confidence is stored with every attempt and drives the confidence-vs-accuracy
- * analytics, which is what makes the practice data worth something.
+ * Answer → confidence → check. Confidence is stored with every attempt, which is
+ * what makes the "how sure vs how right" analytics possible.
  */
 export default function McqScreen() {
   const { actions } = useApp();
-  const toast = useToast();
+  const t = useT();
   const s = session.current;
   const [i, setI] = useState(0);
   const [chosen, setChosen] = useState<number | null>(null);
@@ -50,9 +51,9 @@ export default function McqScreen() {
     return (
       <Screen>
         <Card flat style={{ marginTop: S.xl, alignItems: 'center', gap: S.md }}>
-          <H3>No active session</H3>
-          <Small>Start a practice session to see questions here.</Small>
-          <Btn title="Set up a session" sm onPress={() => router.replace('/session/setup')} />
+          <H3>{t('session.noSession')}</H3>
+          <Small style={{ textAlign: 'center' }}>{t('session.noSessionBody')}</Small>
+          <Btn title={t('session.setUpSession')} sm onPress={() => router.replace('/session/setup')} />
         </Card>
       </Screen>
     );
@@ -95,43 +96,47 @@ export default function McqScreen() {
         checked ? (
           <Row gap={S.sm}>
             <View style={{ flex: 1 }}>
-              <Btn title="Ask AI" variant="line" icon="spark" onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`)} />
+              <Btn
+                title={t('session.askAi')}
+                variant="line"
+                icon="spark"
+                onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`)}
+              />
             </View>
             <View style={{ flex: 1 }}>
-              <Btn title={i + 1 >= s.mcqs.length ? 'See result' : 'Next question'} onPress={next} />
+              <Btn title={i + 1 >= s.mcqs.length ? t('session.seeResult') : t('session.nextQuestion')} onPress={next} />
             </View>
           </Row>
         ) : (
-          <Btn title="Check answer" onPress={check} disabled={chosen == null || confidence == null} />
+          <Btn title={t('session.check')} onPress={check} disabled={chosen == null || confidence == null} />
         )
       }
     >
-      {/* progress header */}
-      <Row gap={S.md} style={{ paddingTop: S.sm }}>
-        <Tap onPress={() => (answeredCount ? router.replace('/session/result') : router.back())} hit>
-          <Icon name="close" color={C.ink} />
-        </Tap>
+      <Row gap={S.sm} style={{ paddingTop: S.xs }}>
+        <View style={{ marginLeft: -10 }}>
+          <IconButton icon="close" onPress={() => (answeredCount ? router.replace('/session/result') : router.back())} />
+        </View>
         <View style={{ flex: 1 }}>
           <Bar pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100} tone="teal" h={6} />
-          <Small style={{ fontFamily: F.bodyBold, fontSize: 11, marginTop: 3 }}>
-            Question {i + 1} of {s.mcqs.length}
+          <Small style={{ fontFamily: F.bodyBold, fontSize: 11, marginTop: 4 }}>
+            {t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
           </Small>
         </View>
         <Pill tone="grey">{mcq.topic}</Pill>
       </Row>
 
       <Spacer h={S.md} />
-      <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 26, color: C.ink }}>{mcq.q}</Text>
+      <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 27, color: C.ink }}>{mcq.q}</Text>
       <Spacer h={S.md} />
 
       {mcq.options.map((opt, n) => {
         const isChosen = chosen === n;
         const isAnswer = n === mcq.answer;
-        const state_ = checked ? (isAnswer ? 'ok' : isChosen ? 'bad' : 'idle') : isChosen ? 'sel' : 'idle';
-        const border = { ok: C.green, bad: C.red, sel: C.teal, idle: C.line }[state_];
-        const bg = { ok: C.greenTint, bad: C.redTint, sel: C.tealTint, idle: C.card }[state_];
-        const keyBg = { ok: C.green, bad: C.red, sel: C.teal, idle: C.grey }[state_];
-        const keyFg = state_ === 'idle' ? C.ink2 : '#fff';
+        const kind = checked ? (isAnswer ? 'ok' : isChosen ? 'bad' : 'idle') : isChosen ? 'sel' : 'idle';
+        const border = { ok: C.green, bad: C.red, sel: C.teal, idle: C.line }[kind];
+        const bg = { ok: C.greenTint, bad: C.redTint, sel: C.tealTint, idle: C.card }[kind];
+        const keyBg = { ok: C.green, bad: C.red, sel: C.teal, idle: C.grey }[kind];
+        const keyFg = kind === 'idle' ? C.ink2 : '#fff';
         return (
           <Tap key={n} onPress={checked ? undefined : () => setChosen(n)}>
             <View
@@ -143,25 +148,26 @@ export default function McqScreen() {
                 borderWidth: 1.5,
                 borderColor: border,
                 borderRadius: 15,
-                paddingVertical: 13,
+                paddingVertical: 14,
                 paddingHorizontal: 14,
                 marginBottom: S.sm,
+                minHeight: 56,
               }}
             >
-              <View style={{ width: 26, height: 26, borderRadius: 9, backgroundColor: keyBg, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 27, height: 27, borderRadius: 9, backgroundColor: keyBg, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: keyFg }}>{String.fromCharCode(65 + n)}</Text>
               </View>
-              <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14.5, color: C.ink }}>{opt}</Text>
-              {checked && isAnswer ? <Icon name="check" size={18} color={C.green} strokeWidth={2.6} /> : null}
+              <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14.5, lineHeight: 21, color: C.ink }}>{opt}</Text>
+              {checked && isAnswer ? <Icon name="check" size={19} color={C.green} strokeWidth={2.6} /> : null}
             </View>
           </Tap>
         );
       })}
 
-      {/* Pakka-meter */}
+      {/* confidence */}
       {chosen != null && !checked ? (
         <>
-          <Label style={{ marginTop: S.sm, marginBottom: 6 }}>How sure are you?</Label>
+          <Label style={{ marginTop: S.sm, marginBottom: 8 }}>{t('session.howSure')}</Label>
           <Row gap={S.sm}>
             {LEVELS.map((l) => {
               const on = confidence === l.value;
@@ -169,7 +175,7 @@ export default function McqScreen() {
                 <Tap key={l.value} onPress={() => setConfidence(l.value)} style={{ flex: 1 }}>
                   <View
                     style={{
-                      paddingVertical: 11,
+                      paddingVertical: 13,
                       borderRadius: 13,
                       borderWidth: 1.5,
                       borderColor: on ? C.orange : C.line,
@@ -177,15 +183,19 @@ export default function McqScreen() {
                       alignItems: 'center',
                     }}
                   >
-                    <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: on ? C.orangeDark : C.ink2 }}>{l.label}</Text>
+                    <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: on ? C.orangeDark : C.ink2 }}>{t(l.label)}</Text>
                   </View>
                 </Tap>
               );
             })}
           </Row>
           {confidence != null ? (
-            <Small style={{ marginTop: 6 }}>
-              {confidence === 2 ? `Pakka answers earn ${xpGain} XP — and we track how often you're right.` : confidence === 0 ? 'Honest guess — worth less XP, but it keeps your stats real.' : `Worth ${xpGain} XP.`}
+            <Small style={{ marginTop: 8 }}>
+              {confidence === 2
+                ? t('session.confHintSure', { xp: xpGain })
+                : confidence === 0
+                  ? t('session.confHintGuess')
+                  : t('session.confHintMid', { xp: xpGain })}
             </Small>
           ) : null}
         </>
@@ -194,45 +204,36 @@ export default function McqScreen() {
       {/* feedback */}
       {checked ? (
         <>
-          <Card
-            flat
-            tint={correct ? C.greenTint : C.redTint}
-            border={correct ? C.green : C.red}
-            style={{ marginTop: S.sm }}
-          >
+          <Card flat tint={correct ? C.greenTint : C.redTint} border={correct ? C.green : C.red} style={{ marginTop: S.sm }}>
             <Row gap={S.sm}>
               <Icon name={correct ? 'check' : 'close'} size={20} color={correct ? C.green : C.red} strokeWidth={2.6} />
               <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 14, color: correct ? C.green : C.red }}>
-                {correct ? `Sahi jawab! +${XP.forAnswer(true, confidence)} XP` : 'Ghalat — no tension, dekho kyun.'}
+                {correct ? t('session.correct', { xp: XP.forAnswer(true, confidence) }) : t('session.wrong')}
               </Text>
             </Row>
           </Card>
 
-          {/* the coaching moment: confident and wrong */}
           {!correct && confidence === 2 ? (
             <Card flat tint={C.orangeTint} border={C.orange} style={{ marginTop: S.sm }}>
-              <Body style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.orangeDark }}>
-                You said Pakka — is concept ko dobara dekh lo 👀
-              </Body>
+              <Body style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.orangeDark }}>{t('session.confidentWrong')}</Body>
             </Card>
           ) : null}
           {correct && confidence === 0 ? (
             <Card flat tint={C.tealTint} style={{ marginTop: S.sm }}>
-              <Body style={{ fontSize: 13.5 }}>Tukka lag gaya — but revise it once so next time it’s Pakka.</Body>
+              <Body style={{ fontSize: 13.5 }}>{t('session.luckyGuess')}</Body>
             </Card>
           ) : null}
 
           <Card style={{ marginTop: S.sm }}>
-            <Label style={{ color: C.teal }}>Why</Label>
+            <Label style={{ color: C.teal }}>{t('session.why')}</Label>
             <Body style={{ marginTop: 4 }}>{mcq.explanation}</Body>
             <Spacer h={S.sm} />
-            <Tap onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)}>
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.teal }}>Read this in the chapter →</Text>
+            <Tap onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)} hit>
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.teal }}>{t('session.readInChapter')} →</Text>
             </Tap>
           </Card>
         </>
       ) : null}
-      <Spacer h={S.lg} />
     </Screen>
   );
 }

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bar, Btn, Card, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
 import { api } from '../../src/core/api';
 import { useAsync } from '../../src/core/useAsync';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb } from '../../src/theme';
 
@@ -11,6 +12,7 @@ export default function Flashcards() {
   const { chapter } = useLocalSearchParams<{ chapter?: string }>();
   const chapterId = chapter ?? 'phy-3';
   const { state, actions } = useApp();
+  const t = useT();
   const { data: cards, loading } = useAsync(() => api.getFlashcards(chapterId), [chapterId]);
 
   const [i, setI] = useState(0);
@@ -25,6 +27,7 @@ export default function Flashcards() {
 
   const card = cards?.[i];
   const done = !!cards && i >= cards.length;
+  const total = cards?.length ?? 0;
 
   const frontRotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
   const backRotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['180deg', '360deg'] });
@@ -41,12 +44,10 @@ export default function Flashcards() {
     setI(i + 1);
   }
 
-  const total = cards?.length ?? 0;
-
   if (loading) {
     return (
       <Screen>
-        <Header title="Flashcards" back />
+        <Header title={t('study.flashcards')} back />
         <Skeleton h={320} style={{ borderRadius: 22 }} />
       </Screen>
     );
@@ -55,18 +56,16 @@ export default function Flashcards() {
   if (done) {
     return (
       <Screen>
-        <Header title="Flashcards" sub="Session complete" back onBack={() => router.back()} />
+        <Header title={t('study.flashcards')} back />
         <Card style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
           <Text style={{ fontSize: 40 }}>🎉</Text>
-          <H2>{known.length} yaad, {repeats.length} repeat</H2>
-          <Small style={{ textAlign: 'center' }}>
-            Repeats come back first next time — that’s how spaced repetition keeps them stuck.
-          </Small>
+          <H2 style={{ textAlign: 'center' }}>{t('session.cardsDone', { known: known.length, repeat: repeats.length })}</H2>
+          <Small style={{ textAlign: 'center' }}>{t('session.cardsDoneSub')}</Small>
         </Card>
         <Spacer h={S.lg} />
         {repeats.length ? (
           <Btn
-            title={`Review ${repeats.length} repeats`}
+            title={t('session.reviewRepeats', { n: repeats.length })}
             onPress={() => {
               setI(0);
               setRepeats([]);
@@ -75,7 +74,7 @@ export default function Flashcards() {
           />
         ) : null}
         <Spacer h={S.sm} />
-        <Btn title="Back to chapter" variant="line" onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+        <Btn title={t('session.backToChapter')} variant="line" onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
       </Screen>
     );
   }
@@ -85,15 +84,15 @@ export default function Flashcards() {
       footer={
         <Row gap={S.sm}>
           <View style={{ flex: 1 }}>
-            <Btn title="Repeat 🔁" variant="line" onPress={() => mark(false)} />
+            <Btn title={t('session.repeat')} variant="line" onPress={() => mark(false)} />
           </View>
           <View style={{ flex: 1 }}>
-            <Btn title="Yaad hai ✓" variant="green" onPress={() => mark(true)} />
+            <Btn title={t('session.known')} variant="green" onPress={() => mark(true)} />
           </View>
         </Row>
       }
     >
-      <Header title="Flashcards" sub={`Card ${i + 1} of ${total}`} back />
+      <Header title={t('study.flashcards')} sub={t('session.cardOf', { a: i + 1, b: total })} back />
       <Bar pct={(i / Math.max(1, total)) * 100} tone="teal" />
       <Spacer h={S.lg} />
 
@@ -116,9 +115,11 @@ export default function Flashcards() {
               gap: S.md,
             }}
           >
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: C.ink2 }}>TERM</Text>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: C.ink2 }}>
+              {t('session.cardTerm')}
+            </Text>
             <H2 style={{ fontSize: 23, textAlign: 'center' }}>{card?.front}</H2>
-            <Small>Tap to flip</Small>
+            <Small>{t('session.tapToFlip')}</Small>
           </Animated.View>
 
           <Animated.View
@@ -137,7 +138,7 @@ export default function Flashcards() {
             }}
           >
             <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: 'rgba(255,255,255,0.7)' }}>
-              DEFINITION
+              {t('session.cardDefinition')}
             </Text>
             <Text style={{ fontFamily: F.body, fontSize: 16, lineHeight: 26, color: '#fff', textAlign: 'center' }}>
               {card?.back}
@@ -153,9 +154,8 @@ export default function Flashcards() {
 
       <Spacer h={S.md} />
       <Row gap={S.sm} style={{ justifyContent: 'center' }}>
-        <Pill tone="green">{known.length} yaad</Pill>
-        <Pill tone="orange">{repeats.length} repeat</Pill>
-        <Pill tone="grey">{state.cardsKnown.length} known overall</Pill>
+        <Pill tone="green">{t('session.knownCount', { n: known.length })}</Pill>
+        <Pill tone="orange">{t('session.repeatCount', { n: repeats.length })}</Pill>
       </Row>
     </Screen>
   );

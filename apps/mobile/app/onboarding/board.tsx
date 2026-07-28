@@ -1,22 +1,30 @@
 import { router } from 'expo-router';
 import { ChoiceCard, StepScreen } from '../../src/components/OnboardingStep';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 
 export default function ChooseBoard() {
   const { actions } = useApp();
+  const t = useT();
+
   return (
     <StepScreen
       step={2}
-      title="Your board?"
-      sub="Syllabus and past papers follow your board"
-      cta="Continue"
+      title={t('onboarding.boardTitle')}
+      sub={t('onboarding.boardSub')}
+      cta={t('common.continue')}
       onNext={() => {
         actions.setOnboarding({ board: 'fbise' });
         router.push('/onboarding/medium');
       }}
     >
-      <ChoiceCard title="FBISE" sub="Federal Board — Islamabad" selected />
-      <ChoiceCard title="Punjab Board" sub="BISE Lahore, Rawalpindi & more" disabled />
+      <ChoiceCard title={t('onboarding.fbise')} sub={t('onboarding.fbiseSub')} selected />
+      <ChoiceCard
+        title={t('onboarding.punjab')}
+        sub={t('onboarding.punjabSub')}
+        disabled
+        disabledLabel={t('onboarding.comingSoon')}
+      />
     </StepScreen>
   );
 }

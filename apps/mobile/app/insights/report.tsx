@@ -3,11 +3,13 @@ import { Image, Text, View } from 'react-native';
 import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
 import { subjectById } from '../../src/core/content';
 import { accuracy, grade, subjectPct } from '../../src/core/domain';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function Report() {
   const { state, derived } = useApp();
+  const t = useT();
   const toast = useToast();
 
   const month = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
@@ -21,14 +23,8 @@ export default function Report() {
         const half = Math.floor(set.length / 2);
         const older = set.slice(0, half);
         const recent = set.slice(half);
-        const trend =
-          older.length && recent.length
-            ? accuracy(recent) - accuracy(older) > 4
-              ? '↑'
-              : accuracy(recent) - accuracy(older) < -4
-                ? '↓'
-                : '→'
-            : '→';
+        const delta = older.length && recent.length ? accuracy(recent) - accuracy(older) : 0;
+        const trend = delta > 4 ? '↑' : delta < -4 ? '↓' : '→';
         return { sid, acc, trend, attempted: set.length };
       }),
     [derived.subjects, state.attempts, state.readSections]
@@ -38,13 +34,13 @@ export default function Report() {
 
   return (
     <Screen>
-      <Header title="Report card" sub={month} back />
+      <Header title={t('progress.reportTitle')} sub={month} back />
 
-      <Card border={C.teal} style={{ borderWidth: 2, overflow: 'hidden' }}>
+      <Card border={C.teal} style={{ borderWidth: 2 }}>
         <Row>
           <View style={{ flex: 1 }}>
             <Image source={require('../../assets/wordmark.png')} style={{ width: 120, height: 24 }} resizeMode="contain" />
-            <Label style={{ marginTop: 4 }}>Monthly report · {month}</Label>
+            <Label style={{ marginTop: 6 }}>{t('progress.monthlyReport', { month })}</Label>
           </View>
           <View
             style={{
@@ -61,15 +57,19 @@ export default function Report() {
         </Row>
 
         <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink, marginTop: S.md }}>
-          {state.user?.name ?? 'Student'} · Class {state.onboarding?.classLevel ?? 9} ·{' '}
-          {state.onboarding?.board === 'punjab' ? 'Punjab Board' : 'FBISE'}
+          {state.user?.name ?? 'Student'} ·{' '}
+          {t('account.classLine', {
+            class: state.onboarding?.classLevel ?? 9,
+            board: state.onboarding?.board === 'punjab' ? 'Punjab Board' : 'FBISE',
+            medium: state.onboarding?.medium === 'ur' ? 'Urdu' : 'English',
+          })}
         </Text>
 
         <View style={{ marginTop: S.md }}>
           {rows.map((r) => (
             <Row
               key={r.sid}
-              style={{ paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: C.line, justifyContent: 'space-between' }}
+              style={{ paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: C.line, justifyContent: 'space-between' }}
             >
               <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, color: C.ink }}>{subjectById(r.sid)?.name}</Text>
               <Text style={{ fontFamily: F.display, fontSize: 15, color: C.ink, width: 44, textAlign: 'right' }}>
@@ -91,29 +91,24 @@ export default function Report() {
         </View>
 
         <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
-          <Pill tone="teal">{activeDays} active days</Pill>
-          <Pill tone="teal">{state.attempts.length} questions</Pill>
-          <Pill tone="orange">{state.results.length} tests</Pill>
-          <Pill tone="grey">{state.xp} XP · Level {derived.level}</Pill>
+          <Pill tone="teal">{t('progress.activeDays', { n: activeDays })}</Pill>
+          <Pill tone="teal">{`${state.attempts.length} ${t('common.questions')}`}</Pill>
+          <Pill tone="orange">{`${state.results.length} ${t('progress.tests')}`}</Pill>
+          <Pill tone="grey">{t('account.levelLine', { xp: state.xp, level: derived.level })}</Pill>
         </Row>
       </Card>
 
       <Spacer h={S.lg} />
       <Row gap={S.sm}>
         <View style={{ flex: 1 }}>
-          <Btn
-            title="Share"
-            variant="whatsapp"
-            icon="whatsapp"
-            onPress={() => toast('Share sheet — sends the card as an image (M9)')}
-          />
+          <Btn title={t('progress.share')} variant="whatsapp" icon="whatsapp" onPress={() => toast(t('progress.shareToast'))} />
         </View>
         <View style={{ flex: 1 }}>
-          <Btn title="Save PDF" variant="line" icon="download" onPress={() => toast('PDF export arrives with M9')} />
+          <Btn title={t('progress.savePdf')} variant="line" icon="download" onPress={() => toast(t('progress.pdfToast'))} />
         </View>
       </Row>
       <Spacer h={S.md} />
-      <Small>Grades come from your accuracy this month. Parents can view a shared card without an account.</Small>
+      <Small>{t('progress.reportFootnote')}</Small>
     </Screen>
   );
 }

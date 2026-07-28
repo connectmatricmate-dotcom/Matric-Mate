@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Bar, Btn, Card, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import { Bar, Btn, Card, Header, Pill, Row, Screen, Skeleton, Small, Spacer } from '../../src/components/ui';
 import { api } from '../../src/core/api';
 import { useAsync } from '../../src/core/useAsync';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
@@ -12,6 +13,7 @@ export default function Blanks() {
   const { chapter } = useLocalSearchParams<{ chapter?: string }>();
   const chapterId = chapter ?? 'phy-3';
   const { actions } = useApp();
+  const t = useT();
   const { data: content, loading } = useAsync(() => api.getChapterContent(chapterId), [chapterId]);
 
   const [i, setI] = useState(0);
@@ -33,7 +35,7 @@ export default function Blanks() {
       mcqId: item.id,
       chapterId,
       subjectId: chapterId.split('-')[0],
-      topic: 'Fill in the blanks',
+      topic: t('practice.blanks'),
       correct: ok,
       confidence: null,
       mode: 'blanks',
@@ -43,7 +45,7 @@ export default function Blanks() {
   if (loading) {
     return (
       <Screen>
-        <Header title="Fill in the blanks" back />
+        <Header title={t('practice.blanks')} back />
         <Skeleton h={120} />
       </Screen>
     );
@@ -52,16 +54,16 @@ export default function Blanks() {
   if (done) {
     return (
       <Screen>
-        <Header title="Fill in the blanks" sub="Complete" back />
+        <Header title={t('practice.blanks')} back />
         <Card style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
           <Text style={{ fontSize: 38 }}>{right === items.length ? '🎉' : '👍'}</Text>
           <Text style={{ fontFamily: F.display, fontSize: 21, color: C.ink }}>
-            {right} / {items.length} correct
+            {t('session.blanksDone', { a: right, b: items.length })}
           </Text>
-          <Small>Recall practice counts towards your chapter progress.</Small>
+          <Small style={{ textAlign: 'center' }}>{t('session.blanksDoneSub')}</Small>
         </Card>
         <Spacer h={S.lg} />
-        <Btn title="Back to chapter" onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+        <Btn title={t('session.backToChapter')} onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
       </Screen>
     );
   }
@@ -71,7 +73,7 @@ export default function Blanks() {
       footer={
         checked ? (
           <Btn
-            title={i + 1 >= items.length ? 'See summary' : 'Next'}
+            title={i + 1 >= items.length ? t('session.seeResult') : t('common.next')}
             onPress={() => {
               setI(i + 1);
               setPick(null);
@@ -79,11 +81,11 @@ export default function Blanks() {
             }}
           />
         ) : (
-          <Btn title="Check" onPress={check} disabled={!pick} />
+          <Btn title={t('session.blanksCheck')} onPress={check} disabled={!pick} />
         )
       }
     >
-      <Header title="Fill in the blanks" sub={`Item ${i + 1} of ${items.length}`} back />
+      <Header title={t('practice.blanks')} sub={t('session.blanksItem', { a: i + 1, b: items.length })} back />
       <Bar pct={(i / Math.max(1, items.length)) * 100} tone="teal" />
       <Spacer h={S.lg} />
 
@@ -110,12 +112,7 @@ export default function Blanks() {
           const isAnswer = o === item.answer;
           const tone = checked ? (isAnswer ? 'green' : selected ? 'red' : 'grey') : selected ? 'teal' : 'grey';
           return (
-            <Pill
-              key={o}
-              tone={tone}
-              onPress={checked ? undefined : () => setPick(o)}
-              style={{ paddingVertical: 10, paddingHorizontal: 16 }}
-            >
+            <Pill key={o} tone={tone} onPress={checked ? undefined : () => setPick(o)} style={{ paddingVertical: 11, paddingHorizontal: 16 }}>
               {o}
             </Pill>
           );
@@ -127,7 +124,7 @@ export default function Blanks() {
           <Row gap={S.sm}>
             <Icon name={correct ? 'check' : 'close'} size={18} color={correct ? C.green : C.red} strokeWidth={2.6} />
             <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 13.5, color: correct ? C.green : C.red }}>
-              {correct ? 'Sahi! +8 XP' : `Correct answer: ${item?.answer}`}
+              {correct ? t('session.blanksCorrect') : t('session.blanksWrong', { a: item?.answer ?? '' })}
             </Text>
           </Row>
         </Card>

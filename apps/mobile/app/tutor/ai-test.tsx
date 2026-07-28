@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
 import { router } from 'expo-router';
-import { Btn, Card, Empty, Header, Item, Pill, Screen, SectionTitle, Seg, Small, Spacer } from '../../src/components/ui';
+import { Btn, Card, Check, Empty, Header, Item, Screen, SectionTitle, Seg, Small, Spacer } from '../../src/components/ui';
 import { weakTopics } from '../../src/core/domain';
 import { subjectById } from '../../src/core/content';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
 
 export default function AiTest() {
   const { state } = useApp();
+  const t = useT();
   const weak = useMemo(() => weakTopics(state.attempts).slice(0, 6), [state.attempts]);
   const [picked, setPicked] = useState<string[]>(weak.slice(0, 3).map((w) => w.topic));
   const [count, setCount] = useState<'10' | '15' | '20'>('15');
@@ -17,46 +18,50 @@ export default function AiTest() {
   return (
     <Screen
       footer={
-        <Btn
-          title="Generate my test"
-          variant="orange"
-          icon="spark"
-          disabled={picked.length === 0}
-          onPress={() => router.replace('/session/exam-intro?ai=1')}
-        />
+        weak.length ? (
+          <Btn
+            title={t('tutor.generate')}
+            variant="orange"
+            icon="spark"
+            disabled={picked.length === 0}
+            onPress={() => router.replace('/session/exam-intro?ai=1')}
+          />
+        ) : undefined
       }
     >
-      <Header title="AI test" sub="Built from your weak topics" back />
+      <Header title={t('tutor.aiTestTitle')} sub={t('tutor.aiTestSub')} back />
 
       {weak.length === 0 ? (
         <Empty
           emoji="🎯"
-          title="Not enough data yet"
-          sub="Answer a few questions first — then the AI knows what to drill you on."
-          cta={<Btn title="Practice 10 MCQs" sm onPress={() => router.replace('/session/setup')} />}
+          title={t('tutor.notEnoughTitle')}
+          sub={t('tutor.notEnoughBody')}
+          cta={<Btn title={t('tutor.practiceTen')} sm onPress={() => router.replace('/session/setup')} />}
         />
       ) : (
         <>
-          <SectionTitle action={<Small>{picked.length} selected</Small>}>Focus on</SectionTitle>
-          <Card flat style={{ paddingVertical: 2 }}>
+          <SectionTitle action={<Small>{t('session.selected', { n: picked.length })}</Small>}>
+            {t('tutor.focusOn')}
+          </SectionTitle>
+          <Card flat style={{ paddingVertical: 0 }}>
             {weak.map((w, i) => {
               const on = picked.includes(w.topic);
               return (
                 <Item
                   key={w.topic}
                   title={w.topic}
-                  sub={`${subjectById(w.subjectId)?.name} · ${w.accuracy}% accuracy over ${w.total} questions`}
+                  sub={`${subjectById(w.subjectId)?.name} · ${t('tutor.accuracyOver', { n: w.accuracy, total: w.total })}`}
                   icon="alert"
                   tone={w.accuracy < 50 ? 'red' : 'orange'}
                   last={i === weak.length - 1}
                   onPress={() => setPicked((p) => (on ? p.filter((x) => x !== w.topic) : [...p, w.topic]))}
-                  right={on ? <Pill tone="green" icon="check" /> : <Pill tone="grey">add</Pill>}
+                  right={<Check on={on} />}
                 />
               );
             })}
           </Card>
 
-          <SectionTitle>Questions</SectionTitle>
+          <SectionTitle>{t('common.questions')}</SectionTitle>
           <Seg
             value={count}
             onChange={setCount}
@@ -67,23 +72,20 @@ export default function AiTest() {
             ]}
           />
 
-          <SectionTitle>Difficulty</SectionTitle>
+          <SectionTitle>{t('tutor.difficulty')}</SectionTitle>
           <Seg
             value={difficulty}
             onChange={setDifficulty}
             options={[
-              { value: 'easy', label: 'Easy start' },
-              { value: 'board', label: 'Board level' },
-              { value: 'hard', label: 'Challenge' },
+              { value: 'easy', label: t('tutor.easyStart') },
+              { value: 'board', label: t('tutor.boardLevel') },
+              { value: 'hard', label: t('tutor.challenge') },
             ]}
           />
 
           <Spacer h={S.md} />
           <Card flat tint={C.tealTint}>
-            <Small>
-              In the live app the AI writes fresh questions from your chapter content, and an admin approves them
-              before students see them. This demo picks from the existing bank.
-            </Small>
+            <Small>{t('tutor.aiTestNote')}</Small>
           </Card>
         </>
       )}

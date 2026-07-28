@@ -1,33 +1,18 @@
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../../src/components/Icon';
-import {
-  Bar,
-  Btn,
-  Card,
-  Header,
-  Pill,
-  Ring,
-  Row,
-  Screen,
-  Seg,
-  Skeleton,
-  Small,
-  Spacer,
-  Ur,
-  useToast,
-} from '../../../src/components/ui';
+import { Bar, Btn, Card, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
 import { api } from '../../../src/core/api';
 import { chapterPct, subjectPct } from '../../../src/core/domain';
 import { useAsync } from '../../../src/core/useAsync';
-import { Medium } from '../../../src/core/types';
+import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
 
 export default function Chapters() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { state, actions } = useApp();
-  const toast = useToast();
+  const { state } = useApp();
+  const t = useT();
   const { data: subject } = useAsync(() => api.getSubject(id), [id]);
   const { data: chapters, loading } = useAsync(() => api.getChapters(id), [id]);
 
@@ -37,7 +22,7 @@ export default function Chapters() {
     <Screen
       footer={
         <Btn
-          title="Chapter test — 20 questions"
+          title={t('study.chapterTest')}
           variant="orange"
           icon="clock"
           onPress={() => router.push(`/session/exam-intro?subject=${id}`)}
@@ -45,24 +30,13 @@ export default function Chapters() {
       }
     >
       <Header
-        title={subject?.name ?? 'Chapters'}
-        sub={chapters ? `${chapters.length} chapters · ${pct}% complete` : ' '}
-        back
-        right={
-          <View style={{ width: 116 }}>
-            <Seg<Medium>
-              value={state.settings.contentMedium}
-              onChange={(m) => {
-                actions.setSettings({ contentMedium: m });
-                toast(m === 'en' ? 'English content' : 'اردو مواد');
-              }}
-              options={[
-                { value: 'en', label: 'EN' },
-                { value: 'ur', label: 'اردو', urdu: true },
-              ]}
-            />
-          </View>
+        title={subject?.name ?? ''}
+        sub={
+          chapters
+            ? `${t('study.chapterCount', { n: chapters.length })} · ${t('study.percentComplete', { n: pct })}`
+            : ' '
         }
+        back
       />
 
       {loading ? (
@@ -97,8 +71,8 @@ export default function Chapters() {
                 <Row gap={S.md}>
                   <View
                     style={{
-                      width: 38,
-                      height: 38,
+                      width: 40,
+                      height: 40,
                       borderRadius: 12,
                       backgroundColor: done ? C.greenTint : C.tealTint,
                       alignItems: 'center',
@@ -106,7 +80,7 @@ export default function Chapters() {
                     }}
                   >
                     {done ? (
-                      <Icon name="check" size={18} color={C.green} strokeWidth={2.6} />
+                      <Icon name="check" size={19} color={C.green} strokeWidth={2.6} />
                     ) : (
                       <Text style={{ fontFamily: F.display, fontSize: 16, color: C.teal }}>{c.number}</Text>
                     )}
@@ -115,7 +89,7 @@ export default function Chapters() {
                     {c.urduTitle ? <Ur size={15}>{c.urduTitle}</Ur> : null}
                     <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{c.title}</Text>
                     <Small numberOfLines={1}>
-                      {c.mcqCount} MCQs · {c.audioMinutes} min audio · {c.flashcardCount} cards
+                      {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
                     </Small>
                     {p > 0 && p < 100 ? (
                       <View style={{ marginTop: 7 }}>
@@ -125,10 +99,10 @@ export default function Chapters() {
                   </View>
                   {locked ? (
                     <Pill tone="grey" icon="lock">
-                      Premium
+                      {t('study.premiumChapter')}
                     </Pill>
                   ) : current ? (
-                    <Pill tone="orange">Continue</Pill>
+                    <Pill tone="orange">{t('common.continue')}</Pill>
                   ) : (
                     <Icon name="chevron" size={18} color={C.ink3} />
                   )}
@@ -138,8 +112,8 @@ export default function Chapters() {
           })}
         </View>
       )}
-      <Spacer h={S.lg} />
-      <Small>Chapters 7 and up are Premium in this demo, to show how locking works.</Small>
+      <Spacer h={S.md} />
+      <Small>{t('study.premiumNote')}</Small>
     </Screen>
   );
 }

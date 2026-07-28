@@ -100,7 +100,16 @@ export type TestResult = {
   attemptIds: string[];
 };
 
-export type PlanTask = { id: string; subjectId: string; chapterId: string; label: string; kind: 'read' | 'mcq' | 'cards'; done: boolean };
+/** A daily-plan task. The screen builds the wording, so it follows the app language. */
+export type PlanTask = {
+  id: string;
+  subjectId: string;
+  chapterId: string;
+  kind: 'read' | 'mcq' | 'cards';
+  weakTopic?: string;
+  weakAccuracy?: number;
+  done: boolean;
+};
 
 export type ChatMessage = { id: string; role: 'user' | 'ai'; text: string; steps?: string[]; at: number };
 export type ChatThread = { id: string; title: string; subjectId?: string; contextLabel?: string; messages: ChatMessage[]; at: number };

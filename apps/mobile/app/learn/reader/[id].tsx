@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../../src/components/Icon';
 import {
   Bar,
@@ -8,11 +9,11 @@ import {
   Btn,
   Card,
   H2,
+  IconButton,
   Label,
   Pill,
   Row,
   Screen,
-  Seg,
   Sheet,
   Skeleton,
   Small,
@@ -23,12 +24,14 @@ import {
 } from '../../../src/components/ui';
 import { api } from '../../../src/core/api';
 import { useAsync } from '../../../src/core/useAsync';
-import { Block, Medium } from '../../../src/core/types';
+import { Block } from '../../../src/core/types';
+import { useT } from '../../../src/i18n';
+import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S, isWeb } from '../../../src/theme';
 
 /** One content block → its typographic treatment. */
-function BlockView({ b, scale }: { b: Block; scale: number }) {
+function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { definition: string; example: string } }) {
   switch (b.kind) {
     case 'h':
       return <H2 style={{ marginTop: S.md, marginBottom: S.sm, fontSize: 21 * scale }}>{b.text}</H2>;
@@ -41,7 +44,9 @@ function BlockView({ b, scale }: { b: Block; scale: number }) {
     case 'def':
       return (
         <Card flat tint={C.tealTint} style={{ borderLeftWidth: 4, borderLeftColor: C.teal, marginBottom: S.md }}>
-          <Label style={{ color: C.teal }}>Definition · {b.term}</Label>
+          <Label style={{ color: C.teal }}>
+            {labels.definition} · {b.term}
+          </Label>
           <Text style={{ fontFamily: F.body, fontSize: 14.5 * scale, lineHeight: 24 * scale, color: C.ink, marginTop: 4 }}>
             {b.text}
           </Text>
@@ -76,7 +81,7 @@ function BlockView({ b, scale }: { b: Block; scale: number }) {
     case 'example':
       return (
         <Card flat tint={C.orangeTint} style={{ marginBottom: S.md }}>
-          <Label style={{ color: C.orangeDark }}>Example</Label>
+          <Label style={{ color: C.orangeDark }}>{labels.example}</Label>
           <Text style={{ fontFamily: F.body, fontSize: 14.5 * scale, lineHeight: 24 * scale, color: C.ink, marginTop: 4 }}>
             {b.text}
           </Text>
@@ -85,12 +90,14 @@ function BlockView({ b, scale }: { b: Block; scale: number }) {
   }
 }
 
-const SUGGESTIONS = ['Explain simply', 'Give an example', 'اردو میں سمجھائیں'];
+const SUGGESTIONS: StringKey[] = ['reader.suggest1', 'reader.suggest2', 'reader.suggest3'];
 
 export default function Reader() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, actions, derived } = useApp();
+  const t = useT();
   const toast = useToast();
+  const insets = useSafeAreaInsets();
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content, loading } = useAsync(() => api.getChapterContent(id), [id]);
   const [idx, setIdx] = useState(0);
@@ -113,13 +120,13 @@ export default function Reader() {
 
   async function ask(prompt: string) {
     if (!derived.aiLeft) {
-      toast('Daily AI limit reached — resets at 12 AM');
+      toast(t('tutor.limitToast'));
       return;
     }
     if (!actions.consumeAi()) return;
     setAsking(true);
     setAnswer(null);
-    const res = await api.askTutor(prompt, chapter ? `Ch ${chapter.number} · ${chapter.title}` : undefined);
+    const res = await api.askTutor(prompt, chapter ? chapter.title : undefined);
     setAnswer(res);
     setAsking(false);
   }
@@ -127,44 +134,32 @@ export default function Reader() {
   return (
     <>
       <Screen scroll={false} padded={false}>
-        {/* sticky mini header with progress */}
-        <Row style={{ paddingHorizontal: S.lg, paddingVertical: S.sm, borderBottomWidth: 1, borderBottomColor: C.line }} gap={S.sm}>
-          <Tap onPress={() => router.back()} hit>
-            <Icon name="back" color={C.ink} />
-          </Tap>
+        <Row style={{ paddingHorizontal: S.md, paddingBottom: S.sm, borderBottomWidth: 1, borderBottomColor: C.line }} gap={S.sm}>
+          <IconButton icon="back" onPress={() => router.back()} />
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }} numberOfLines={1}>
-              {chapter ? `Ch ${chapter.number} · ${chapter.title}` : 'Notes'}
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.ink }} numberOfLines={1}>
+              {chapter?.title ?? ''}
             </Text>
             <View style={{ marginTop: 6 }}>
               <Bar pct={readPct} tone="teal" h={4} />
             </View>
           </View>
-          <View style={{ width: 112 }}>
-            <Seg<Medium>
-              value={state.settings.contentMedium}
-              onChange={(m) => actions.setSettings({ contentMedium: m })}
-              options={[
-                { value: 'en', label: 'EN' },
-                { value: 'ur', label: 'اردو', urdu: true },
-              ]}
-            />
-          </View>
           <Tap
             onPress={() => {
               const next = ((state.settings.fontScale + 1) % 3) as 0 | 1 | 2;
               actions.setSettings({ fontScale: next });
-              toast(`Text size: ${['small', 'medium', 'large'][next]}`);
+              toast(t('reader.textSize', { size: [t('reader.small'), t('reader.medium'), t('reader.large')][next] }));
             }}
-            hit
           >
-            <Text style={{ fontFamily: F.display, fontSize: 17, color: C.teal }}>Aa</Text>
+            <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontFamily: F.display, fontSize: 18, color: C.teal }}>Aa</Text>
+            </View>
           </Tap>
         </Row>
 
         <ScrollView
           contentContainerStyle={[
-            { paddingHorizontal: S.lg, paddingTop: S.md, paddingBottom: 110 },
+            { paddingHorizontal: S.lg, paddingTop: S.md, paddingBottom: 120 },
             isWeb && { maxWidth: 720, width: '100%', alignSelf: 'center' },
           ]}
           showsVerticalScrollIndicator={false}
@@ -179,76 +174,76 @@ export default function Reader() {
             </View>
           ) : section ? (
             <>
-              <Label>
-                Section {idx + 1} of {total}
-              </Label>
+              <Label>{t('reader.section', { a: idx + 1, b: total })}</Label>
               <Spacer h={S.sm} />
               {state.settings.contentMedium === 'ur' ? (
                 <Card flat tint={C.tealTint} style={{ marginBottom: S.md }}>
-                  <Small>Urdu-medium content for this section is supplied by the client (dual-medium authoring in the CMS).</Small>
+                  <Small>{t('reader.urduMediumNote')}</Small>
                 </Card>
               ) : null}
               {section.blocks.map((b, i) => (
-                <BlockView key={i} b={b} scale={scale} />
+                <BlockView
+                  key={i}
+                  b={b}
+                  scale={scale}
+                  labels={{ definition: t('reader.definition'), example: t('reader.example') }}
+                />
               ))}
             </>
           ) : null}
         </ScrollView>
 
-        {/* Ask AI */}
-        <View style={{ position: 'absolute', right: S.lg, bottom: 84 }}>
-          <Btn title="Ask AI" icon="spark" sm onPress={() => setAskOpen(true)} style={{ borderRadius: 99 }} />
+        <View style={{ position: 'absolute', right: S.lg, bottom: 92 + insets.bottom }}>
+          <Btn title={t('reader.askAi')} icon="spark" sm onPress={() => setAskOpen(true)} style={{ borderRadius: 99 }} />
         </View>
 
-        {/* section pager */}
         <Row
           style={{
             paddingHorizontal: S.lg,
-            paddingVertical: S.md,
+            paddingTop: S.md,
+            paddingBottom: Math.max(insets.bottom, S.md),
             borderTopWidth: 1,
             borderTopColor: C.line,
             backgroundColor: C.card,
           }}
           gap={S.md}
         >
-          <Tap onPress={() => advance(-1)} disabled={idx === 0}>
-            <View style={{ width: 40, height: 40, borderRadius: 14, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center', opacity: idx === 0 ? 0.4 : 1 }}>
-              <Icon name="back" size={18} color={C.ink} />
-            </View>
-          </Tap>
+          <View style={{ opacity: idx === 0 ? 0.4 : 1 }}>
+            <IconButton icon="back" tone="card" onPress={() => advance(-1)} />
+          </View>
           <Text style={{ flex: 1, textAlign: 'center', fontFamily: F.bodyBold, fontSize: 13, color: C.ink2 }}>
-            Section {idx + 1} / {total}
+            {t('reader.section', { a: idx + 1, b: total })}
           </Text>
           {idx + 1 >= total ? (
             <Btn
-              title="Finish"
+              title={t('reader.finish')}
               sm
               onPress={() => {
                 if (section) actions.markSectionRead(section.id, id, idx);
-                toast('Chapter progress saved');
+                toast(t('reader.progressSaved'));
                 router.back();
               }}
             />
           ) : (
             <Tap onPress={() => advance(1)}>
-              <View style={{ width: 40, height: 40, borderRadius: 14, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name="chevron" size={18} color="#fff" />
+              <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="chevron" size={19} color="#fff" />
               </View>
             </Tap>
           )}
         </Row>
       </Screen>
 
-      <Sheet visible={askOpen} onClose={() => setAskOpen(false)} title="Ask AI about this section">
-        <Row gap={S.sm} style={{ marginBottom: S.md }}>
-          <Pill tone="teal">{chapter ? `Ch ${chapter.number} · ${chapter.title}` : 'This chapter'}</Pill>
-          <Pill tone={derived.aiLeft ? 'grey' : 'red'}>{derived.aiLeft} left today</Pill>
+      <Sheet visible={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>
+        <Row gap={S.sm} style={{ marginBottom: S.md, flexWrap: 'wrap' }}>
+          {chapter ? <Pill tone="teal">{chapter.title}</Pill> : null}
+          <Pill tone={derived.aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: derived.aiLeft })}</Pill>
         </Row>
         <View style={{ gap: S.sm }}>
-          {SUGGESTIONS.map((s) => (
-            <Tap key={s} onPress={() => ask(`${s} — ${section?.title ?? ''}`)}>
-              <Card flat style={{ paddingVertical: 12 }}>
-                {s.includes('اردو') ? <Ur size={14}>{s}</Ur> : <Body>{s}</Body>}
+          {SUGGESTIONS.map((key) => (
+            <Tap key={key} onPress={() => ask(`${t(key)} — ${section?.title ?? ''}`)}>
+              <Card flat style={{ paddingVertical: 14 }}>
+                <Body>{t(key)}</Body>
               </Card>
             </Tap>
           ))}
@@ -262,16 +257,24 @@ export default function Reader() {
         ) : answer ? (
           <Card flat style={{ marginTop: S.md }}>
             <Body style={{ fontFamily: F.bodyBold }}>{answer.text}</Body>
-            {answer.steps.map((s, i) => (
+            {answer.steps.map((step, i) => (
               <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                 <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: C.teal }}>{i + 1}</Text>
                 </View>
-                <Body style={{ flex: 1, fontSize: 14 }}>{s}</Body>
+                <Body style={{ flex: 1, fontSize: 14 }}>{step}</Body>
               </Row>
             ))}
             <Spacer h={S.md} />
-            <Btn title="Open full chat" variant="line" sm onPress={() => { setAskOpen(false); router.push(`/tutor/chat?chapter=${id}`); }} />
+            <Btn
+              title={t('reader.openChat')}
+              variant="line"
+              sm
+              onPress={() => {
+                setAskOpen(false);
+                router.push(`/tutor/chat?chapter=${id}`);
+              }}
+            />
           </Card>
         ) : null}
       </Sheet>

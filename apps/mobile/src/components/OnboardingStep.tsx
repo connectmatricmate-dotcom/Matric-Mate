@@ -1,12 +1,11 @@
 import { View } from 'react-native';
-import { Btn, Card, H3, Pill, Screen, Header, Small, Tap, Ur } from './ui';
+import { Btn, Card, Check, H3, Header, Pill, Screen, Small, Tap, Ur } from './ui';
 import { C, S } from '../theme';
-import { Icon } from './Icon';
 
-export function Steps({ step }: { step: number }) {
+export function Steps({ step, total = 4 }: { step: number; total?: number }) {
   return (
     <View style={{ flexDirection: 'row', gap: 6, justifyContent: 'center', marginBottom: S.lg }}>
-      {[1, 2, 3, 4].map((n) => (
+      {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
         <View
           key={n}
           style={{
@@ -21,23 +20,28 @@ export function Steps({ step }: { step: number }) {
   );
 }
 
-/** Big selectable card used by all four onboarding choice screens. */
+/**
+ * Selectable card used by every onboarding choice.
+ * `round` marks single-choice (class, board, medium); square is multi-select.
+ */
 export function ChoiceCard({
   title,
   sub,
   urduTitle,
-  urduSub,
   selected,
   disabled,
+  disabledLabel,
   onPress,
+  round = true,
 }: {
-  title?: string;
+  title: string;
   sub?: string;
   urduTitle?: string;
-  urduSub?: string;
   selected?: boolean;
   disabled?: boolean;
+  disabledLabel?: string;
   onPress?: () => void;
+  round?: boolean;
 }) {
   return (
     <Tap onPress={disabled ? undefined : onPress}>
@@ -48,18 +52,11 @@ export function ChoiceCard({
         style={{ flexDirection: 'row', alignItems: 'center', gap: S.md, opacity: disabled ? 0.55 : 1 }}
       >
         <View style={{ flex: 1 }}>
-          {urduTitle ? <Ur size={19}>{urduTitle}</Ur> : <H3>{title}</H3>}
-          {urduSub ? <Ur size={13} style={{ color: C.ink2 }}>{urduSub}</Ur> : sub ? <Small>{sub}</Small> : null}
+          <H3>{title}</H3>
+          {urduTitle ? <Ur size={16}>{urduTitle}</Ur> : null}
+          {sub ? <Small style={{ marginTop: 2 }}>{sub}</Small> : null}
         </View>
-        {disabled ? (
-          <Pill tone="grey">Coming soon</Pill>
-        ) : selected ? (
-          <View style={{ width: 26, height: 26, borderRadius: 99, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="check" size={15} color="#fff" strokeWidth={3} />
-          </View>
-        ) : (
-          <View style={{ width: 26, height: 26, borderRadius: 99, borderWidth: 2, borderColor: '#DDE6E1' }} />
-        )}
+        {disabled ? <Pill tone="grey">{disabledLabel}</Pill> : <Check on={!!selected} round={round} />}
       </Card>
     </Tap>
   );
@@ -73,6 +70,7 @@ export function StepScreen({
   cta,
   onNext,
   disabled,
+  footnote,
 }: {
   step: number;
   title: string;
@@ -81,12 +79,14 @@ export function StepScreen({
   cta: string;
   onNext: () => void;
   disabled?: boolean;
+  footnote?: string;
 }) {
   return (
     <Screen footer={<Btn title={cta} onPress={onNext} disabled={disabled} />}>
       <Header title={title} sub={sub} back />
       <Steps step={step} />
       <View style={{ gap: S.md }}>{children}</View>
+      {footnote ? <Small style={{ marginTop: S.lg }}>{footnote}</Small> : null}
     </Screen>
   );
 }

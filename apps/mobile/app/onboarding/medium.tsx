@@ -1,20 +1,26 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { ChoiceCard, StepScreen } from '../../src/components/OnboardingStep';
-import { useApp } from '../../src/store/app';
+import { useT } from '../../src/i18n';
 import { Medium } from '../../src/core/types';
-import { Small } from '../../src/components/ui';
+import { useApp } from '../../src/store/app';
 
+/**
+ * Medium is which version of the FBISE syllabus the student studies — it changes
+ * the content, not the interface. The app's own language is set separately.
+ */
 export default function ChooseMedium() {
   const { actions } = useApp();
+  const t = useT();
   const [value, setValue] = useState<Medium>('en');
 
   return (
     <StepScreen
       step={3}
-      title="English ya Urdu medium?"
-      sub="Notes and audio in your medium"
-      cta="Continue"
+      title={t('onboarding.mediumTitle')}
+      sub={t('onboarding.mediumSub')}
+      cta={t('common.continue')}
+      footnote={t('onboarding.mediumFootnote')}
       onNext={() => {
         actions.setOnboarding({ medium: value });
         actions.setSettings({ contentMedium: value });
@@ -22,18 +28,18 @@ export default function ChooseMedium() {
       }}
     >
       <ChoiceCard
-        title="English medium"
-        sub="Notes, MCQs and audio in English"
+        title={t('onboarding.mediumEn')}
+        sub={t('onboarding.mediumEnSub')}
         selected={value === 'en'}
         onPress={() => setValue('en')}
       />
       <ChoiceCard
+        title={t('onboarding.mediumUr')}
         urduTitle="اردو میڈیم"
-        urduSub="نوٹس، سوالات اور آڈیو اردو میں"
+        sub={t('onboarding.mediumUrSub')}
         selected={value === 'ur'}
         onPress={() => setValue('ur')}
       />
-      <Small>You can switch medium per chapter later, and change this in Settings.</Small>
     </StepScreen>
   );
 }

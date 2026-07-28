@@ -2,17 +2,19 @@ import { useMemo, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
-import { Icon } from '../../src/components/Icon';
-import { Card, Empty, Ring, Row, Screen, Skeleton, Small, Spacer, Ur } from '../../src/components/ui';
+import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
+import { Card, Empty, Ring, Row, Screen, Skeleton, Small, Ur } from '../../src/components/ui';
 import { api } from '../../src/core/api';
+import { CHAPTERS } from '../../src/core/content';
 import { subjectPct } from '../../src/core/domain';
 import { useAsync } from '../../src/core/useAsync';
-import { CHAPTERS } from '../../src/core/content';
+import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb } from '../../src/theme';
 
 export default function Study() {
   const { state, derived } = useApp();
+  const t = useT();
   const [q, setQ] = useState('');
   const { data: subjects, loading } = useAsync(() => api.getSubjects(derived.subjects), [derived.subjects.join()]);
 
@@ -34,14 +36,17 @@ export default function Study() {
   }, [subjects, q, state.readSections, state.attempts, state.lastChapterId]);
 
   const setup = state.onboarding;
+  const eyebrow = setup
+    ? t('study.setupLine', {
+        class: setup.classLevel,
+        board: setup.board === 'fbise' ? 'FBISE' : 'Punjab Board',
+        medium: setup.medium === 'en' ? 'English' : 'Urdu',
+      })
+    : undefined;
 
   return (
-    <Screen>
-      <AppHeader
-        eyebrow={setup ? `Class ${setup.classLevel} · ${setup.board === 'fbise' ? 'FBISE' : 'Punjab Board'} · ${setup.medium === 'en' ? 'English' : 'Urdu'} medium` : undefined}
-        title="Study"
-        showStreak={false}
-      />
+    <Screen tabbed>
+      <AppHeader eyebrow={eyebrow} title={t('study.title')} showStreak={false} />
 
       <View
         style={{
@@ -53,7 +58,7 @@ export default function Study() {
           borderColor: C.line,
           borderRadius: 14,
           paddingHorizontal: 14,
-          paddingVertical: 12,
+          paddingVertical: 13,
           marginBottom: S.md,
         }}
       >
@@ -61,7 +66,7 @@ export default function Study() {
         <TextInput
           value={q}
           onChangeText={setQ}
-          placeholder="Search subject or chapter"
+          placeholder={t('study.searchPlaceholder')}
           placeholderTextColor={C.ink3}
           style={[
             { flex: 1, fontFamily: F.body, fontSize: 15, color: C.ink, paddingVertical: 0 },
@@ -85,14 +90,14 @@ export default function Study() {
           ))}
         </View>
       ) : rows.length === 0 ? (
-        <Empty emoji="🔍" title="Nothing matched" sub={`No subject or chapter for “${q}”.`} />
+        <Empty emoji="🔍" title={t('study.noMatchTitle')} sub={t('study.noMatchBody', { q })} />
       ) : (
         <View style={{ gap: S.md }}>
           {rows.map(({ s, pct, next, chapters }) => (
             <Card key={s.id} onPress={() => router.push(`/learn/subject/${s.id}`)}>
               <Row gap={S.md}>
                 <Ring pct={pct}>
-                  <Icon name={s.icon} size={18} color={C.teal} />
+                  <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={18} color={C.teal} />
                 </Ring>
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Row gap={6}>
@@ -100,11 +105,11 @@ export default function Study() {
                     {s.urduName ? <Ur size={13} style={{ color: C.ink2 }}>{s.urduName}</Ur> : null}
                   </Row>
                   <Small>
-                    {chapters.length} chapters · {pct}% complete
+                    {t('study.chapterCount', { n: chapters.length })} · {t('study.percentComplete', { n: pct })}
                   </Small>
                   {next ? (
                     <Text style={{ fontFamily: F.bodyBold, fontSize: 12, color: C.teal, marginTop: 2 }} numberOfLines={1}>
-                      Continue: Ch {next.number} · {next.title}
+                      {t('study.continueChapter', { chapter: next.title })}
                     </Text>
                   ) : null}
                 </View>
@@ -114,7 +119,6 @@ export default function Study() {
           ))}
         </View>
       )}
-      <Spacer h={S.xl} />
     </Screen>
   );
 }

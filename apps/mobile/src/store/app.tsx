@@ -30,6 +30,8 @@ export type Onboarding = {
 };
 
 export type Settings = {
+  /** Language of the interface. Separate from `contentMedium`, which is the syllabus language. */
+  language: 'en' | 'ur';
   dark: boolean;
   reminders: boolean;
   reminderTime: string;
@@ -59,6 +61,7 @@ export type State = {
 };
 
 const DEFAULT_SETTINGS: Settings = {
+  language: 'en',
   dark: false,
   reminders: true,
   reminderTime: '7:00 PM',

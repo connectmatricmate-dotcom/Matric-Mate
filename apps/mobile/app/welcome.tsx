@@ -1,28 +1,20 @@
 import { useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Btn, Body, H1, Screen, Tap } from '../src/components/ui';
-import { C, F, S } from '../src/theme';
+import { LanguageToggle } from '../src/components/LanguageToggle';
+import { Body, Btn, H1, Screen, Tap, Tiny } from '../src/components/ui';
+import { useT } from '../src/i18n';
+import type { StringKey } from '../src/i18n';
+import { C, S } from '../src/theme';
 
-const SLIDES = [
-  {
-    emoji: '📚',
-    h: 'Poori tayyari, one app',
-    s: 'Chapter-wise notes, audio lessons and examples for FBISE Class 9 — English aur Urdu medium.',
-  },
-  {
-    emoji: '🎯',
-    h: 'Practice till it sticks',
-    s: 'MCQs, flashcards, fill-in-the-blanks, past papers and timed exams — with instant explanations.',
-  },
-  {
-    emoji: '✨',
-    h: 'Your 24/7 AI tutor',
-    s: 'Stuck at 1 AM? Ask a doubt and get step-by-step help, in English or Urdu.',
-  },
+const SLIDES: { emoji: string; title: StringKey; body: StringKey }[] = [
+  { emoji: '📚', title: 'welcome.slide1Title', body: 'welcome.slide1Body' },
+  { emoji: '🎯', title: 'welcome.slide2Title', body: 'welcome.slide2Body' },
+  { emoji: '✨', title: 'welcome.slide3Title', body: 'welcome.slide3Body' },
 ];
 
 export default function Welcome() {
+  const t = useT();
   const [i, setI] = useState(0);
   const slide = SLIDES[i];
   const last = i === SLIDES.length - 1;
@@ -33,27 +25,33 @@ export default function Welcome() {
       footer={
         <View style={{ gap: S.sm }}>
           {last ? (
-            <Btn title="Get started" variant="orange" onPress={() => router.push('/onboarding/class')} />
+            <Btn title={t('welcome.getStarted')} variant="orange" onPress={() => router.push('/onboarding/class')} />
           ) : (
-            <Btn title="Next" onPress={() => setI(i + 1)} />
+            <Btn title={t('common.next')} onPress={() => setI(i + 1)} />
           )}
-          <Btn title="I already have an account" variant="ghost" onPress={() => router.push('/login')} />
+          <Btn title={t('welcome.haveAccount')} variant="ghost" onPress={() => router.push('/login')} />
         </View>
       }
     >
       <View style={{ flex: 1, paddingHorizontal: S.lg }}>
-        <Image
-          source={require('../assets/wordmark.png')}
-          style={{ width: 150, height: 30, alignSelf: 'center', marginTop: S.md }}
-          resizeMode="contain"
-        />
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: S.sm }}>
+          <Image
+            source={require('../assets/wordmark.png')}
+            style={{ width: 132, height: 26 }}
+            resizeMode="contain"
+          />
+          <View style={{ flex: 1 }} />
+          <LanguageToggle compact />
+        </View>
+
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: S.md }}>
-          <Text style={{ fontSize: 84 }}>{slide.emoji}</Text>
-          <H1 style={{ textAlign: 'center', fontSize: 25 }}>{slide.h}</H1>
-          <Body style={{ textAlign: 'center', color: C.ink2, maxWidth: 340 }}>{slide.s}</Body>
+          <Text style={{ fontSize: 80 }}>{slide.emoji}</Text>
+          <H1 style={{ textAlign: 'center', fontSize: 25 }}>{t(slide.title)}</H1>
+          <Body style={{ textAlign: 'center', color: C.ink2, maxWidth: 340 }}>{t(slide.body)}</Body>
+
           <View style={{ flexDirection: 'row', gap: 6, marginTop: S.sm }}>
             {SLIDES.map((_, n) => (
-              <Tap key={n} onPress={() => setI(n)}>
+              <Tap key={n} onPress={() => setI(n)} hit>
                 <View
                   style={{
                     width: n === i ? 22 : 8,
@@ -66,9 +64,8 @@ export default function Welcome() {
             ))}
           </View>
         </View>
-        <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: C.ink3, textAlign: 'center' }}>
-          Demo build · sample content
-        </Text>
+
+        <Tiny style={{ textAlign: 'center' }}>{t('common.demoNote')}</Tiny>
       </View>
     </Screen>
   );
