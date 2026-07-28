@@ -5,7 +5,7 @@
  * is cheap; letting someone hear one costs nothing and settles it.
  */
 import { useEffect, useRef, useState } from 'react';
-import { Icon, Pill } from '@/components/ui';
+import { Icon, PillButton } from '@/components/ui';
 
 const TRACKS = {
   en: { src: '/audio/dynamics-en.mp3', label: 'English narration' },
@@ -61,12 +61,12 @@ export function AudioSample() {
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <Pill tone={lang === 'en' ? 'teal' : 'grey'} onClick={() => setLang('en')}>
+        <PillButton tone={lang === 'en' ? 'teal' : 'grey'} onClick={() => setLang('en')}>
           English
-        </Pill>
-        <Pill tone={lang === 'ur' ? 'teal' : 'grey'} onClick={() => setLang('ur')}>
+        </PillButton>
+        <PillButton tone={lang === 'ur' ? 'teal' : 'grey'} onClick={() => setLang('ur')}>
           <span className="font-urdu leading-[2]">اردو</span>
-        </Pill>
+        </PillButton>
         <span className="ml-auto text-[11.5px] text-ink3">Sample lesson</span>
       </div>
 

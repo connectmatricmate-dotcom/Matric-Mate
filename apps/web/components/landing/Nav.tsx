@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Btn, Icon } from '@/components/ui';
+import { Icon, LinkBtn } from '@/components/ui';
 
 const LINKS = [
   { href: '#inside', label: 'What’s inside' },
@@ -37,7 +37,7 @@ export function Nav() {
           <Link href="/login" className="text-[13.5px] font-extrabold text-ink2 hover:text-teal">
             Log in
           </Link>
-          <Btn title="Start free" href="/signup" sm />
+          <LinkBtn title="Start free" href="/signup" sm />
         </div>
 
         <button
@@ -67,8 +67,8 @@ export function Nav() {
             ))}
           </ul>
           <div className="mt-4 flex gap-2">
-            <Btn title="Log in" href="/login" variant="line" sm className="flex-1" />
-            <Btn title="Start free" href="/signup" sm className="flex-1" />
+            <LinkBtn title="Log in" href="/login" variant="line" sm className="flex-1" />
+            <LinkBtn title="Start free" href="/signup" sm className="flex-1" />
           </div>
         </div>
       ) : null}

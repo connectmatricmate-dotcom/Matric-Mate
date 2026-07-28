@@ -73,3 +73,27 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/**
+ * Tailwind v4 dropped the default `cursor: pointer` on buttons. Every clickable
+ * must feel clickable — this restores it app-wide so no component has to
+ * remember. Disabled controls say so with the cursor too.
+ */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+[role='switch'],
+[role='tab'],
+summary,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+
+/* Numbers that sit in columns should not jitter as they change. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

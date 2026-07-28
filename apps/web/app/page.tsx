@@ -4,7 +4,7 @@ import { PAPER_CONTENT, contentFor } from '@matricmate/core';
 import { AudioSample } from '@/components/landing/AudioSample';
 import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
-import { Btn, Card, Icon, Pill, Ur } from '@/components/ui';
+import { Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
 import type { IconName } from '@matricmate/core';
 
 /** Everything on this page is real product content, not marketing mock-ups. */
@@ -102,8 +102,8 @@ export default function LandingPage() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <Btn title="Start 3 days free" href="/signup" variant="orange" lg />
-                <Btn title="See pricing" href="#pricing" variant="line" lg />
+                <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
+                <LinkBtn title="See pricing" href="#pricing" variant="line" lg />
               </div>
 
               <p className="mt-4 text-[13px] text-ink3">
@@ -391,7 +391,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Btn title="Start free" href="/signup" variant="line" className="mt-5 w-full" />
+              <LinkBtn title="Start free" href="/signup" variant="line" className="mt-5 w-full" />
             </Card>
 
             <Card className="relative flex h-full flex-col border-2 border-orange">
@@ -419,7 +419,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Btn title="Start 3 days free" href="/signup" variant="orange" className="mt-5 w-full" />
+              <LinkBtn title="Start 3 days free" href="/signup" variant="orange" className="mt-5 w-full" />
               <p className="mt-3 text-center text-[12px] text-ink3">JazzCash · EasyPaisa · Debit or credit card</p>
             </Card>
           </div>
@@ -453,7 +453,7 @@ export default function LandingPage() {
               Three days free, then Rs 1,000 a month. Set up in two minutes and study your first chapter tonight.
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <Btn title="Start 3 days free" href="/signup" variant="orange" lg />
+              <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center rounded-[16px] border-[1.5px] border-white/40 px-7 py-4 font-display text-[17px] text-white transition-colors hover:bg-white/10"
