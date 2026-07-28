@@ -1,0 +1,154 @@
+# Deployment
+
+Two services, and nothing else: **Vercel** for the website, **Supabase** for the backend. The
+Android app keeps going through EAS and is unaffected by everything on this page.
+
+The repo is ready for both. What follows is the click-by-click, in the order to do it.
+
+---
+
+## Before you start
+
+Create both accounts under **Adnan's email**, and add yourself as a member. Two reasons: at handover
+there is nothing to migrate, and the monthly bill never lands on your card. Both services need an
+international card once you leave the free tier.
+
+---
+
+# Part 1 · Vercel
+
+## What to click
+
+1. **vercel.com → Add New → Project → Import Git Repository**
+   Pick `connectmatricmate-dotcom/Matric-Mate`.
+
+   If the repo does not appear, the Vercel GitHub app has not been installed on it yet. Vercel shows
+   an "Adjust GitHub App Permissions" link; the repo **owner** account has to approve it. Since the
+   repo lives under `connectmatricmate-dotcom` and the Vercel account is Adnan's, you may have to
+   approve from the GitHub side while logged in as `connectmatricmate-dotcom`.
+
+2. **Configure Project.** Only one setting is not the default:
+
+   | Setting | Value |
+   | :-- | :-- |
+   | Framework Preset | Next.js *(detected)* |
+   | **Root Directory** | **`apps/web`** ← change this |
+   | Build Command | leave default |
+   | Output Directory | leave default |
+   | Install Command | leave default |
+   | Node.js Version | **22.x** |
+
+3. **Root Directory → "Include files outside of the Root Directory in the Build Step" must be ON.**
+
+   This one matters. The website imports `@matricmate/core`, which lives in `packages/core`, outside
+   `apps/web`. With this off the build fails with a module-not-found on the very first deploy. It is
+   on by default when Vercel detects a monorepo, but check it.
+
+4. **Environment Variables: none.** The prototype runs on mock data. Leave the section empty and
+   deploy. `apps/web/.env.example` lists everything that arrives later and what each one is for.
+
+5. **Deploy.**
+
+## After the first deploy
+
+- **Production branch is `main`.** Every push to `main` redeploys production. Every other branch and
+  every pull request gets its own preview URL, which is the good way to show the client a change
+  before it is live.
+- **The site is invisible to Google on purpose.** `robots.txt` returns `Disallow: /` and every page
+  carries `noindex`, because right now the chapters are samples and the checkout takes no money.
+  Being indexed in that state means Google's first impression of MatricMate is a demo, and "no real
+  payment is taken" ends up in a search snippet under the brand name.
+
+  **To turn indexing on at launch:** add `NEXT_PUBLIC_ALLOW_INDEXING` = `true` in Project → Settings
+  → Environment Variables (Production only), and redeploy. That is the whole change.
+
+- **Custom domain.** Project → Settings → Domains → add `matricmate.pk`. Vercel prints the DNS
+  records to add at the registrar. Once it resolves, also set `NEXT_PUBLIC_SITE_URL` to
+  `https://matricmate.pk` so link previews on WhatsApp point at the right place.
+
+## The one thing that will cost money
+
+**Vercel's Hobby tier is licensed for non-commercial use only.** It is fine for a prototype the
+client is reviewing. The moment MatricMate takes a real payment, the project has to be on **Pro,
+$20/month**. Worth telling Adnan now rather than at launch.
+
+---
+
+# Part 2 · Supabase
+
+Nothing in the app talks to Supabase yet, so there is no rush. Create it when we start the backend
+milestone. When you do:
+
+## What to click
+
+1. **supabase.com → New Project**, inside an organisation owned by Adnan's account.
+
+2. | Setting | Value |
+   | :-- | :-- |
+   | Name | `matricmate` |
+   | Region | **South Asia (Mumbai) · `ap-south-1`** |
+   | Database password | generate a strong one |
+
+3. **Save the database password immediately, in a password manager.** Supabase shows it once. You
+   can reset it later, but that means updating it everywhere it is used.
+
+## Why the region is the one irreversible choice
+
+A Supabase project's region is fixed when you create it. Changing it later is a dump and restore of
+the whole database. Mumbai is the closest to Pakistan, which is the call you made.
+
+**Vercel must be told to match.** Once Supabase exists, add this to `apps/web/vercel.json`:
+
+```json
+"regions": ["bom1"]
+```
+
+`bom1` is Vercel's Mumbai region. If the server functions sit in the United States while the
+database sits in Mumbai, every single query crosses two oceans and nothing else we optimise will
+make any difference. Note this needs Vercel **Pro**; on Hobby the region is fixed for you, which is
+another reason to upgrade before launch rather than after.
+
+## What to send me, and what never to send
+
+| | |
+| :-- | :-- |
+| **Safe to paste in chat** | Project URL (`https://xxxx.supabase.co`) and the **publishable / anon key**. These ship inside the browser bundle by design. Row Level Security is what protects the data, not the secrecy of that key. |
+| **Never paste anywhere** | The **service role / secret key** and the **database password**. The service key ignores Row Level Security entirely: anyone holding it can read and change every student's data. Put it straight into Vercel's environment variables yourself, marked Production, and into Supabase Edge Function secrets. I do not need to see it. |
+
+## How I will apply database changes
+
+I write plain SQL files into `supabase/migrations/`, you review the diff like any other code, and
+apply them one of two ways:
+
+- **Dashboard:** SQL Editor → paste → Run. Simplest, no setup.
+- **CLI:** `npx supabase link` once, then `npx supabase db push` for each change.
+
+That way no credentials pass through chat and every schema change is in git.
+
+---
+
+# Part 3 · What we are deliberately not using
+
+| | Why not |
+| :-- | :-- |
+| **Render / Railway / Fly** | They host long-running services. We do not have one: the backend is Postgres plus three small functions, which is what Supabase already is. Render's free tier also spins down when idle, so the first student to open the app in an hour waits about a minute. |
+| **Netlify** | Same job as Vercel, weaker Next.js App Router support. |
+| **A VPS** | Cheapest on paper. You then own patching, backups, TLS renewal and uptime, forever, and it is the hardest thing to hand to a client. |
+| **Cloudflare, Bunny.net** | Vercel and Supabase already give CDN, TLS and DDoS basics. Revisit **only** if audio bandwidth becomes the biggest line on the bill, which is the realistic risk: every offline download pulls a whole file. Supabase Pro includes 250 GB egress a month, which is a long way off. |
+
+---
+
+# Running costs
+
+| | Free tier | Paid | Needed by |
+| :-- | :-- | :-- | :-- |
+| Vercel | Hobby, non-commercial only | **$20/mo** Pro | First real payment taken |
+| Supabase | Pauses after 7 days idle | **$25/mo** Pro | Launch: gives daily backups and no pausing |
+| EAS | Free tier is fine | n/a | n/a |
+| Claude API | n/a | usage-based, capped by the per-student daily quota | AI tutor milestone |
+
+**Roughly $45/month once live**, plus AI usage. Nothing until then.
+
+The Supabase free-tier pause is worth knowing about early: leave a demo project alone for a week and
+it goes to sleep, so the client opens the link and sees an error. Not a problem while we are still
+on mock data, since the website does not touch Supabase at all yet.

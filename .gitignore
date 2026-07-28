@@ -10,6 +10,7 @@ apps/mobile/ios/
 contract/credentials.md
 .env
 .env.*
+!.env.example
 *.keystore
 *.jks
 google-services.json
@@ -34,4 +35,5 @@ builds/
 image.png
 *.apk
 .next/
+.vercel/
 out/

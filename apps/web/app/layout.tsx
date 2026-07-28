@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Baloo_2, Noto_Nastaliq_Urdu, Nunito } from 'next/font/google';
 import { ToastProvider } from '@/components/ui/toast';
+import { ALLOW_INDEXING, SITE_URL } from '@/lib/site';
 import { AppProvider } from '@/lib/store';
 import './globals.css';
 
@@ -10,7 +11,8 @@ const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700', '800']
 const nastaliq = Noto_Nastaliq_Urdu({ subsets: ['arabic'], weight: ['400', '600'], variable: '--font-nastaliq' });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://matricmate.pk'),
+  metadataBase: new URL(SITE_URL),
+  robots: ALLOW_INDEXING ? undefined : { index: false, follow: false },
   title: {
     default: 'MatricMate · FBISE Class 9 exam preparation',
     template: '%s · MatricMate',
