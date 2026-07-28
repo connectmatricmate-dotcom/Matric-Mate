@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
 import { api } from '../../../src/core/api';
+import { AUDIO_TRACKS } from '../../../src/core/content';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -11,7 +13,6 @@ import { C, F, S } from '../../../src/theme';
 
 const SPEEDS = [1, 1.25, 1.5] as const;
 
-/** Transport is simulated in this build; real playback ships with the client's audio. */
 export default function AudioLesson() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, actions } = useApp();
@@ -20,25 +21,36 @@ export default function AudioLesson() {
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
-  const total = (chapter?.audioMinutes ?? 14) * 60;
-  const [pos, setPos] = useState(Math.round(total * 0.35));
-  const [playing, setPlaying] = useState(false);
+  const medium = state.settings.contentMedium;
+  const track = AUDIO_TRACKS[id]?.[medium] ?? AUDIO_TRACKS[id]?.en;
+  const player = useAudioPlayer(track ?? null);
+  const status = useAudioPlayerStatus(player);
   const [speed, setSpeed] = useState(0);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const downloaded = state.downloads.includes(id);
 
+  // Keep playing when the screen locks or the app goes to the background.
   useEffect(() => {
-    if (playing) {
-      timer.current = setInterval(() => setPos((p) => Math.min(total, p + SPEEDS[speed])), 1000);
-    } else if (timer.current) {
-      clearInterval(timer.current);
-    }
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [playing, speed, total]);
+    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(() => {});
+  }, []);
 
+  // Switching medium swaps the recording, so start the new one from the top.
+  useEffect(() => {
+    if (track) player.replace(track);
+  }, [track]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const duration = status.duration || (chapter?.audioMinutes ?? 14) * 60;
+  const position = status.currentTime || 0;
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+  function seek(delta: number) {
+    player.seekTo(Math.max(0, Math.min(duration, position + delta)));
+  }
+
+  function cycleSpeed() {
+    const next = (speed + 1) % SPEEDS.length;
+    setSpeed(next);
+    player.setPlaybackRate(SPEEDS[next]);
+  }
 
   return (
     <Screen>
@@ -63,29 +75,43 @@ export default function AudioLesson() {
         </View>
         <H2 style={{ marginTop: S.md, textAlign: 'center' }}>{content?.audioTitle ?? ''}</H2>
         <Small style={{ textAlign: 'center' }}>
-          {chapter ? t('study.audioSub', { n: chapter.audioMinutes }) : ''}
+          {medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
         </Small>
       </View>
 
       <Spacer h={S.lg} />
-      <Bar pct={(pos / total) * 100} tone="teal" />
+      <Bar pct={duration ? (position / duration) * 100 : 0} tone="teal" />
       <Row style={{ justifyContent: 'space-between', marginTop: 6 }}>
-        <Small style={{ fontFamily: F.bodyBold }}>{fmt(pos)}</Small>
-        <Small style={{ fontFamily: F.bodyBold }}>{fmt(total)}</Small>
+        <Small style={{ fontFamily: F.bodyBold }}>{fmt(position)}</Small>
+        <Small style={{ fontFamily: F.bodyBold }}>{fmt(duration)}</Small>
       </Row>
 
       <Row style={{ justifyContent: 'center', marginTop: S.lg }} gap={S.xl}>
-        <Tap onPress={() => setPos((p) => Math.max(0, p - 15))}>
+        <Tap onPress={() => seek(-15)}>
           <View style={ctl}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>−15</Text>
           </View>
         </Tap>
-        <Tap onPress={() => setPlaying((p) => !p)}>
-          <View style={{ width: 76, height: 76, borderRadius: 99, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name={playing ? 'pause' : 'play'} size={30} color="#fff" strokeWidth={2.2} />
+        <Tap
+          onPress={() => {
+            if (!track) return;
+            if (status.playing) player.pause();
+            else {
+              if (status.didJustFinish) player.seekTo(0);
+              player.play();
+            }
+          }}
+        >
+          <View
+            testID="audio-play"
+            accessibilityRole="button"
+            accessibilityLabel={status.playing ? 'Pause' : 'Play'}
+            style={{ width: 76, height: 76, borderRadius: 99, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Icon name={status.playing ? 'pause' : 'play'} size={30} color="#fff" strokeWidth={2.2} />
           </View>
         </Tap>
-        <Tap onPress={() => setPos((p) => Math.min(total, p + 15))}>
+        <Tap onPress={() => seek(15)}>
           <View style={ctl}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>+15</Text>
           </View>
@@ -93,16 +119,17 @@ export default function AudioLesson() {
       </Row>
 
       <Row style={{ justifyContent: 'center', marginTop: S.md }} gap={S.sm}>
-        <Pill tone="grey" onPress={() => setSpeed((s) => (s + 1) % SPEEDS.length)}>
+        <Pill tone="grey" onPress={cycleSpeed}>
           {t('audio.speed', { n: SPEEDS[speed] })}
         </Pill>
         <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
           {downloaded ? t('audio.offline') : t('audio.stream')}
         </Pill>
+        {!status.isLoaded ? <Pill tone="grey">{t('common.loading')}</Pill> : null}
       </Row>
 
-      <Card flat tint={C.orangeTint} style={{ marginTop: S.lg }}>
-        <Small>{t('audio.demoNote')}</Small>
+      <Card flat tint={C.tealTint} style={{ marginTop: S.lg }}>
+        <Small>{t('audio.sampleNote')}</Small>
       </Card>
     </Screen>
   );

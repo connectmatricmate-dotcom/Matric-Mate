@@ -57,12 +57,16 @@ export type Blank = { id: string; chapterId: string; sentence: [string, string];
 
 export type ChapterContent = {
   sections: Section[];
+  /** Urdu-medium version of the same chapter, when the client has supplied it. */
+  sectionsUr?: Section[];
   mcqs: Mcq[];
   flashcards: Flashcard[];
   shortQs: ShortQ[];
   blanks: Blank[];
   audioTitle: string;
 };
+
+export type PaperSection = { heading: string; marks?: string; lines: string[]; urdu?: boolean };
 
 export type PastPaper = {
   id: string;
@@ -114,12 +118,26 @@ export type PlanTask = {
 export type ChatMessage = { id: string; role: 'user' | 'ai'; text: string; steps?: string[]; at: number };
 export type ChatThread = { id: string; title: string; subjectId?: string; contextLabel?: string; messages: ChatMessage[]; at: number };
 
+/**
+ * Where a notification can send you. A closed union rather than a free string,
+ * so renaming a route breaks the build instead of shipping a dead link.
+ */
+export type NotificationHref =
+  | '/(tabs)'
+  | '/(tabs)/study'
+  | '/(tabs)/practice'
+  | '/(tabs)/progress'
+  | '/session/setup'
+  | '/insights/report'
+  | '/account/payments'
+  | '/account/subscription';
+
 export type Notification = {
   id: string;
   kind: 'streak' | 'reminder' | 'report' | 'payment';
   title: string;
   body: string;
   at: number;
-  href?: string;
+  href?: NotificationHref;
   read: boolean;
 };

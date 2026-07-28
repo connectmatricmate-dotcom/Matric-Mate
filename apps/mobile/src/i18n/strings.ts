@@ -254,6 +254,10 @@ export const en = {
     speed: '{n}× speed',
     offline: 'Offline',
     stream: 'Streaming',
+    narrationEn: 'English narration',
+    narrationUr: 'Urdu narration',
+    sampleNote:
+      'This chapter has a real sample recording in both mediums — switch Study medium in Settings to hear the other one. Remaining chapters use the client’s own recordings.',
     demoNote: 'Demo build: playback is simulated. Real audio ships with the client’s recordings.',
     upNext: 'Up next',
     nextChapter: 'Next chapter audio',
@@ -419,6 +423,8 @@ export const en = {
     practiceAsExam: 'Practise as test',
     papersFootnote: 'Sample papers — the client supplies the real FBISE papers.',
     practiceThisPaper: 'Practise this paper',
+    fullPaper: 'Full paper',
+    realPaperNote: 'A complete sample paper, laid out the way the board prints it. The client’s real papers load the same way.',
     paperViewerNote: 'In the live app this shows the client’s paper, with zoom and offline download.',
   },
 
@@ -868,6 +874,10 @@ export const ur: typeof en = {
     speed: '{n}× speed',
     offline: 'Offline',
     stream: 'Streaming',
+    narrationEn: 'English narration',
+    narrationUr: 'Urdu narration',
+    sampleNote:
+      'Is chapter ki asli sample recording dono mediums mein maujood hai — Settings se Study medium badal kar doosri sunein. Baqi chapters client ki apni recordings se aayein ge.',
     demoNote: 'Demo build: playback abhi simulate ho raha hai. Asli audio client ki recordings ke saath aaye gi.',
     upNext: 'Agla',
     nextChapter: 'Agle chapter ka audio',
@@ -1033,6 +1043,8 @@ export const ur: typeof en = {
     practiceAsExam: 'Test ki tarah karein',
     papersFootnote: 'Yeh sample papers hain — asli FBISE papers client dein ge.',
     practiceThisPaper: 'Yeh paper karein',
+    fullPaper: 'Poora paper',
+    realPaperNote: 'Yeh mukammal sample paper hai, bilkul usi tarah jaise board chhapta hai. Client ke asli papers isi tarah load hon ge.',
     paperViewerNote: 'Live app mein yahan client ka asli paper hoga, zoom aur offline download ke saath.',
   },
 

@@ -6,7 +6,19 @@
  * every other chapter gets plausible generated material so nothing dead-ends.
  * ALL of this is replaced by client-supplied content via the admin CMS (M7).
  */
-import { Blank, Block, Chapter, ChapterContent, Flashcard, Mcq, PastPaper, Section, ShortQ, Subject } from './types';
+import {
+  Blank,
+  Block,
+  Chapter,
+  ChapterContent,
+  Flashcard,
+  Mcq,
+  PaperSection,
+  PastPaper,
+  Section,
+  ShortQ,
+  Subject,
+} from './types';
 
 export const SUBJECTS: Subject[] = [
   { id: 'phy', name: 'Physics', icon: 'bolt', compulsory: false, group: 'science', chapterCount: 9 },
@@ -135,6 +147,18 @@ export const subjectById = (id: string) => SUBJECTS.find((s) => s.id === id);
 
 /* ------------------------------------------------------- authored content */
 
+/**
+ * Real recordings, bundled with the app — one chapter in both mediums, so the
+ * client can hear exactly how an audio lesson behaves. Every other chapter waits
+ * on the client's own recordings.
+ */
+export const AUDIO_TRACKS: Record<string, { en?: number; ur?: number }> = {
+  'phy-3': {
+    en: require('../../assets/audio/dynamics-en.mp3'),
+    ur: require('../../assets/audio/dynamics-ur.mp3'),
+  },
+};
+
 const dynamicsSections: Section[] = [
   {
     id: 'phy-3-s1',
@@ -227,10 +251,83 @@ const dynamicsMcqs: Omit<Mcq, 'chapterId'>[] = [
   { id: 'phy3-m12', topic: 'Force', q: 'Which of these is a vector quantity?', options: ['mass', 'time', 'force', 'temperature'], answer: 2, explanation: 'Force has both magnitude and direction, so it is a vector.', difficulty: 'easy' },
 ];
 
+/**
+ * The same chapter in Urdu medium. Written out in full for one chapter so the
+ * client can see how Urdu-medium content reads in the app (Nastaliq, RTL).
+ */
+const dynamicsSectionsUr: Section[] = [
+  {
+    id: 'phy-3-s1-ur',
+    title: 'قوت اور جڑت',
+    blocks: [
+      { kind: 'h', text: 'قوت کیا ہے؟' },
+      {
+        kind: 'ur',
+        text: 'قوت وہ عامل ہے جو کسی جسم کو حرکت دیتی ہے یا حرکت دینے کی کوشش کرتی ہے، چلتے ہوئے جسم کو روکتی ہے یا روکنے کی کوشش کرتی ہے، اور کسی جسم کی سمت یا شکل تبدیل کر سکتی ہے۔ قوت ایک سمتی مقدار ہے یعنی اس کی مقدار بھی ہوتی ہے اور سمت بھی۔ اس کا بین الاقوامی یونٹ نیوٹن ہے۔',
+      },
+      { kind: 'def', term: 'جڑت (Inertia)', text: 'جسم کی وہ خاصیت جو اس کی حالتِ سکون یا یکساں حرکت میں تبدیلی کی مزاحمت کرتی ہے۔ کمیت جتنی زیادہ، جڑت اتنی ہی زیادہ۔' },
+      {
+        kind: 'example',
+        text: 'بس اچانک چلے تو مسافر پیچھے کی طرف جھٹکا کھاتے ہیں: نچلا دھڑ بس کے ساتھ چل پڑتا ہے جبکہ اوپر کا دھڑ جڑت کی وجہ سے لمحہ بھر ساکن رہتا ہے۔',
+      },
+    ],
+  },
+  {
+    id: 'phy-3-s2-ur',
+    title: 'نیوٹن کا پہلا قانونِ حرکت',
+    blocks: [
+      { kind: 'h', text: 'جڑت کا قانون' },
+      {
+        kind: 'ur',
+        text: 'ہر جسم اپنی حالتِ سکون یا سیدھی لکیر میں یکساں حرکت کی حالت برقرار رکھتا ہے جب تک اس پر کوئی خالص بیرونی قوت عمل نہ کرے۔ اسی لیے اسے جڑت کا قانون بھی کہا جاتا ہے۔',
+      },
+      {
+        kind: 'list',
+        items: [
+          'میز پر رکھی کتاب اُس وقت تک ساکن رہتی ہے جب تک اسے دھکا نہ دیا جائے۔',
+          'ہموار فرش پر لڑھکتی گیند رگڑ کی وجہ سے رُکتی ہے۔',
+          'گاڑی کی اچانک بریک پر سیٹ بیلٹ مسافر کو محفوظ رکھتی ہے۔',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'phy-3-s3-ur',
+    title: 'نیوٹن کا دوسرا قانونِ حرکت',
+    blocks: [
+      { kind: 'h', text: 'قوت، کمیت اور اسراع' },
+      {
+        kind: 'ur',
+        text: 'جب کسی جسم پر خالص قوت عمل کرتی ہے تو وہ قوت کی سمت میں اسراع پیدا کرتی ہے۔ اسراع قوت کے راست متناسب اور جسم کی کمیت کے بالعکس متناسب ہوتا ہے۔',
+      },
+      { kind: 'formula', text: 'F = m a', caption: 'قوت = کمیت × اسراع' },
+      { kind: 'def', term: 'نیوٹن (N)', text: 'وہ قوت جو 1 کلوگرام کمیت میں 1 میٹر فی سیکنڈ مربع اسراع پیدا کرے۔' },
+      {
+        kind: 'example',
+        text: '1,200 کلوگرام کی گاڑی کو 2 میٹر فی سیکنڈ مربع اسراع دینے کے لیے 2,400 نیوٹن خالص قوت درکار ہو گی۔',
+      },
+    ],
+  },
+  {
+    id: 'phy-3-s4-ur',
+    title: 'تیسرا قانون اور معیارِ حرکت',
+    blocks: [
+      { kind: 'h', text: 'عمل اور ردِعمل' },
+      {
+        kind: 'ur',
+        text: 'ہر عمل کا برابر اور مخالف ردِعمل ہوتا ہے۔ عمل اور ردِعمل دو مختلف اجسام پر عمل کرتے ہیں، اسی لیے وہ ایک دوسرے کو ختم نہیں کرتے۔',
+      },
+      { kind: 'def', term: 'معیارِ حرکت (Momentum)', text: 'جسم کی حرکت کی مقدار، جو کمیت اور رفتار کے حاصل ضرب کے برابر ہے۔ یونٹ: kg·m/s' },
+      { kind: 'formula', text: 'p = m v', caption: 'معیارِ حرکت = کمیت × رفتار' },
+    ],
+  },
+];
+
 const AUTHORED: Record<string, ChapterContent> = {
   'phy-3': {
     audioTitle: 'Dynamics — full chapter',
     sections: dynamicsSections,
+    sectionsUr: dynamicsSectionsUr,
     mcqs: dynamicsMcqs.map((m) => ({ ...m, chapterId: 'phy-3' })),
     flashcards: [
       { id: 'phy3-f1', chapterId: 'phy-3', front: 'Inertia', back: 'The property of a body to resist any change in its state of rest or of uniform motion.', urduBack: 'جسم کی وہ خاصیت جو حالت میں تبدیلی کی مزاحمت کرے' },
@@ -479,6 +576,7 @@ export function contentFor(chapterId: string): ChapterContent {
 
 export const PAST_PAPERS: PastPaper[] = [
   { id: 'pp1', subjectId: 'phy', year: 2025, session: 'Annual', marks: 65, minutes: 150, downloaded: true },
+  { id: 'pp-urd', subjectId: 'urd', year: 2025, session: 'Annual', marks: 75, minutes: 180, downloaded: false },
   { id: 'pp2', subjectId: 'phy', year: 2024, session: 'Annual', marks: 65, minutes: 150, downloaded: true },
   { id: 'pp3', subjectId: 'phy', year: 2024, session: 'Supplementary', marks: 65, minutes: 150, downloaded: false },
   { id: 'pp4', subjectId: 'phy', year: 2023, session: 'Annual', marks: 65, minutes: 150, downloaded: false },
@@ -488,9 +586,119 @@ export const PAST_PAPERS: PastPaper[] = [
   { id: 'pp8', subjectId: 'math', year: 2025, session: 'Annual', marks: 75, minutes: 180, downloaded: false },
 ];
 
-/** Section text of a past paper, shown in the paper viewer. */
-export const PAPER_BODY = [
-  { heading: 'SECTION — A (12 marks)', lines: ['Q1. Circle the correct option.', 'i. The SI unit of force is …', 'ii. Rate of change of momentum equals …', 'iii. Rolling friction compared with sliding friction is …'] },
-  { heading: 'SECTION — B (33 marks)', lines: ['Q2. Attempt any eleven parts.', 'i. Define inertia with an example.', 'ii. State Newton’s third law of motion.', 'iii. Why do action and reaction not cancel?'] },
-  { heading: 'SECTION — C (20 marks)', lines: ['Q3. State and explain Newton’s second law of motion and derive F = ma.', 'Q4. A body of mass 5 kg is acted upon by a force of 20 N. Find its acceleration and the distance covered in 4 s.'] },
+/**
+ * Two papers written out in full — one English-medium Physics paper and one Urdu
+ * paper — so the client can see a complete paper in the viewer. The rest are
+ * listed but carry the shared sample body until the real papers arrive.
+ */
+export const PAPER_CONTENT: Record<string, PaperSection[]> = {
+  pp1: [
+    {
+      heading: 'SECTION A — Objective',
+      marks: '12 marks · 20 minutes',
+      lines: [
+        'Q1. Circle the correct option. Each part carries one mark.',
+        'i. The SI unit of force is:  (a) joule  (b) newton  (c) pascal  (d) watt',
+        'ii. The rate of change of momentum of a body is equal to:  (a) work done  (b) net force  (c) power  (d) kinetic energy',
+        'iii. Rolling friction compared with sliding friction is:  (a) greater  (b) less  (c) equal  (d) zero',
+        'iv. A body moving with constant speed in a circle has:  (a) zero acceleration  (b) acceleration towards the centre  (c) constant velocity  (d) no net force',
+        'v. The SI unit of momentum is:  (a) N  (b) kg·m/s  (c) J·s  (d) m/s²',
+        'vi. Inertia of a body depends upon its:  (a) speed  (b) mass  (c) volume  (d) shape',
+      ],
+    },
+    {
+      heading: 'SECTION B — Short answer questions',
+      marks: '33 marks',
+      lines: [
+        'Q2. Attempt any ELEVEN parts. Each part carries three marks.',
+        'i. Define inertia and give one everyday example.',
+        'ii. State Newton’s first law of motion. Why is it called the law of inertia?',
+        'iii. Differentiate between mass and weight.',
+        'iv. Why do action and reaction forces not cancel each other?',
+        'v. A body of mass 4 kg is acted upon by a force of 12 N. Calculate its acceleration.',
+        'vi. Define momentum and write its SI unit.',
+        'vii. Explain why a passenger falls forward when a moving bus stops suddenly.',
+        'viii. What is friction? Write two methods of reducing it.',
+        'ix. Define centripetal force and write its formula.',
+        'x. Why is it dangerous to take a sharp turn at high speed?',
+        'xi. State the law of conservation of momentum.',
+        'xii. A force of 20 N acts on a 5 kg body for 3 s. Find the change in momentum.',
+        'xiii. Distinguish between sliding friction and rolling friction.',
+      ],
+    },
+    {
+      heading: 'SECTION C — Detailed answer questions',
+      marks: '20 marks',
+      lines: [
+        'Note: Attempt ALL questions. Each question carries ten marks.',
+        'Q3. (a) State and explain Newton’s second law of motion and derive F = ma.',
+        '     (b) A car of mass 1,200 kg accelerates from rest to 20 m/s in 8 s. Find the net force acting on it.',
+        'Q4. (a) What is friction? Explain its causes and describe three ways of reducing friction in machines.',
+        '     (b) A block of mass 10 kg is pulled along a horizontal surface by a force of 50 N. If the force of friction is 20 N, find the acceleration of the block.',
+      ],
+    },
+  ],
+  'pp-urd': [
+    {
+      heading: 'حصہ اول — معروضی',
+      marks: '15 نمبر · 20 منٹ',
+      urdu: true,
+      lines: [
+        'سوال نمبر ۱: درست جواب پر دائرہ لگائیں۔ ہر جز کا ایک نمبر ہے۔',
+        '(i) "نصوح" کس افسانے کا کردار ہے؟  (الف) توبۃ النصوح  (ب) امراؤ جان ادا  (ج) گئودان  (د) آگ کا دریا',
+        '(ii) غالبؔ کا اصل نام کیا تھا؟  (الف) اسد اللہ خان  (ب) نظام الدین  (ج) میر تقی  (د) الطاف حسین',
+        '(iii) "قومی ترانہ" کے شاعر کون ہیں؟  (الف) حفیظ جالندھری  (ب) علامہ اقبال  (ج) فیض احمد فیض  (د) احمد ندیم قاسمی',
+        '(iv) اسم کی کتنی اقسام ہیں؟  (الف) دو  (ب) تین  (ج) چار  (د) پانچ',
+        '(v) "دل" کا مترادف لفظ ہے:  (الف) قلب  (ب) جگر  (ج) نظر  (د) سماعت',
+      ],
+    },
+    {
+      heading: 'حصہ دوم — مختصر سوالات',
+      marks: '36 نمبر',
+      urdu: true,
+      lines: [
+        'سوال نمبر ۲: کوئی سے بارہ اجزا کے مختصر جواب لکھیں۔ ہر جز کے تین نمبر ہیں۔',
+        '(i) سبق "توبۃ النصوح" کا مرکزی خیال بیان کریں۔',
+        '(ii) نصوح کے کردار کی تین نمایاں خصوصیات لکھیں۔',
+        '(iii) سلیم کے کردار پر مختصر نوٹ لکھیں۔',
+        '(iv) درج ذیل الفاظ کے معنی لکھیں: نصیحت، ندامت، اصلاح۔',
+        '(v) محاورے کو جملوں میں استعمال کریں: آنکھیں کھلنا، ہاتھ بٹانا۔',
+        '(vi) اسم اور فعل کی تعریف مثال کے ساتھ لکھیں۔',
+        '(vii) واحد جمع بنائیں: کتاب، قلم، شہر۔',
+        '(viii) نعت کی تعریف کریں اور اس کی خصوصیات لکھیں۔',
+      ],
+    },
+    {
+      heading: 'حصہ سوم — تفصیلی سوالات',
+      marks: '24 نمبر',
+      urdu: true,
+      lines: [
+        'نوٹ: تمام سوالات حل کریں۔',
+        'سوال نمبر ۳: درج ذیل اشعار کی تشریح کریں۔ (۸ نمبر)',
+        'سوال نمبر ۴: "علم کی اہمیت" کے موضوع پر مضمون تحریر کریں۔ (۱۰ نمبر)',
+        'سوال نمبر ۵: اپنے ہیڈ ماسٹر کے نام فیس معافی کی درخواست لکھیں۔ (۶ نمبر)',
+      ],
+    },
+  ],
+};
+
+/** Fallback body for papers the client hasn't supplied yet. */
+export const PAPER_BODY: PaperSection[] = [
+  {
+    heading: 'SECTION A — Objective',
+    marks: '12 marks',
+    lines: ['Q1. Circle the correct option.', 'The full paper for this year loads here once the client supplies it.'],
+  },
+  {
+    heading: 'SECTION B — Short answer questions',
+    marks: '33 marks',
+    lines: ['Q2. Attempt any eleven parts.'],
+  },
+  {
+    heading: 'SECTION C — Detailed answer questions',
+    marks: '20 marks',
+    lines: ['Q3. Attempt all questions.'],
+  },
 ];
+
+export const paperContent = (id: string): PaperSection[] => PAPER_CONTENT[id] ?? PAPER_BODY;

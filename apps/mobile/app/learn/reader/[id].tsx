@@ -30,16 +30,39 @@ import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S, isWeb } from '../../../src/theme';
 
+/** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
+const isUrduText = (s: string) => /[؀-ۿ]/.test(s);
+
+/** Body text in whichever script it's written in. */
+function Prose({ text, size, style }: { text: string; size: number; style?: object }) {
+  if (isUrduText(text)) {
+    return (
+      <Ur size={size} style={style}>
+        {text}
+      </Ur>
+    );
+  }
+  return (
+    <Text style={[{ fontFamily: F.bodyReg, fontSize: size, lineHeight: size * 1.72, color: C.ink }, style]}>{text}</Text>
+  );
+}
+
 /** One content block → its typographic treatment. */
 function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { definition: string; example: string } }) {
   switch (b.kind) {
     case 'h':
-      return <H2 style={{ marginTop: S.md, marginBottom: S.sm, fontSize: 21 * scale }}>{b.text}</H2>;
+      return isUrduText(b.text) ? (
+        <View style={{ marginTop: S.md, marginBottom: S.sm }}>
+          <Ur size={20 * scale}>{b.text}</Ur>
+        </View>
+      ) : (
+        <H2 style={{ marginTop: S.md, marginBottom: S.sm, fontSize: 21 * scale }}>{b.text}</H2>
+      );
     case 'p':
       return (
-        <Text style={{ fontFamily: F.bodyReg, fontSize: 15.5 * scale, lineHeight: 27 * scale, color: C.ink, marginBottom: S.md }}>
-          {b.text}
-        </Text>
+        <View style={{ marginBottom: S.md }}>
+          <Prose text={b.text} size={15.5 * scale} />
+        </View>
       );
     case 'def':
       return (
@@ -47,9 +70,9 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           <Label style={{ color: C.teal }}>
             {labels.definition} · {b.term}
           </Label>
-          <Text style={{ fontFamily: F.body, fontSize: 14.5 * scale, lineHeight: 24 * scale, color: C.ink, marginTop: 4 }}>
-            {b.text}
-          </Text>
+          <View style={{ marginTop: 4 }}>
+            <Prose text={b.text} size={14.5 * scale} />
+          </View>
         </Card>
       );
     case 'formula':
@@ -73,7 +96,9 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           {b.items.map((it, i) => (
             <Row key={i} gap={S.sm} style={{ alignItems: 'flex-start' }}>
               <View style={{ width: 6, height: 6, borderRadius: 99, backgroundColor: C.teal, marginTop: 9 }} />
-              <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14.5 * scale, lineHeight: 24 * scale, color: C.ink }}>{it}</Text>
+              <View style={{ flex: 1 }}>
+                <Prose text={it} size={14.5 * scale} />
+              </View>
             </Row>
           ))}
         </View>
@@ -82,9 +107,9 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
       return (
         <Card flat tint={C.orangeTint} style={{ marginBottom: S.md }}>
           <Label style={{ color: C.orangeDark }}>{labels.example}</Label>
-          <Text style={{ fontFamily: F.body, fontSize: 14.5 * scale, lineHeight: 24 * scale, color: C.ink, marginTop: 4 }}>
-            {b.text}
-          </Text>
+          <View style={{ marginTop: 4 }}>
+            <Prose text={b.text} size={14.5 * scale} />
+          </View>
         </Card>
       );
   }
@@ -105,15 +130,17 @@ export default function Reader() {
   const [answer, setAnswer] = useState<{ text: string; steps: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
 
-  const section = content?.sections[idx];
+  // Urdu-medium students get the Urdu sections where the client has supplied them.
+  const urduMedium = state.settings.contentMedium === 'ur';
+  const sections = (urduMedium && content?.sectionsUr) || content?.sections || [];
+  const section = sections[idx];
   const scale = [0.92, 1, 1.12][state.settings.fontScale];
-  const total = content?.sections.length ?? 1;
+  const total = sections.length || 1;
   const readPct = useMemo(() => ((idx + 1) / total) * 100, [idx, total]);
 
   function advance(dir: 1 | -1) {
-    if (!content) return;
     const next = idx + dir;
-    if (next < 0 || next >= content.sections.length) return;
+    if (next < 0 || next >= sections.length) return;
     if (section) actions.markSectionRead(section.id, id, next);
     setIdx(next);
   }
@@ -176,10 +203,15 @@ export default function Reader() {
             <>
               <Label>{t('reader.section', { a: idx + 1, b: total })}</Label>
               <Spacer h={S.sm} />
-              {state.settings.contentMedium === 'ur' ? (
+              {urduMedium && !content?.sectionsUr ? (
                 <Card flat tint={C.tealTint} style={{ marginBottom: S.md }}>
                   <Small>{t('reader.urduMediumNote')}</Small>
                 </Card>
+              ) : null}
+              {urduMedium && content?.sectionsUr ? (
+                <View style={{ marginBottom: S.sm }}>
+                  <Ur size={19}>{section.title}</Ur>
+                </View>
               ) : null}
               {section.blocks.map((b, i) => (
                 <BlockView

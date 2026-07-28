@@ -196,7 +196,7 @@ function seed(): Partial<State> {
       title: 'Study reminder',
       body: '10 MCQs on Dynamics are waiting.',
       at: Date.now() - 5 * 36e5,
-      href: '/practice/setup',
+      href: '/session/setup',
       read: false,
     },
     {
@@ -205,7 +205,7 @@ function seed(): Partial<State> {
       title: 'Your report card is ready',
       body: 'Tap to view and share with your parents.',
       at: daysAgo(3),
-      href: '/progress/report',
+      href: '/insights/report',
       read: true,
     },
   ];
@@ -327,7 +327,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               title: 'Payment received',
               body: 'Rs 1,000 — Premium is active for one month.',
               at: Date.now(),
-              href: '/profile/payments',
+              href: '/account/payments',
               read: false,
             },
             ...s.notifications,
