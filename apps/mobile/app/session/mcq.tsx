@@ -17,8 +17,8 @@ import {
   Spacer,
   Tap,
 } from '../../src/components/ui';
-import { XP } from '../../src/core/domain';
-import { Confidence } from '../../src/core/types';
+import { XP } from '@matricmate/core';
+import { Confidence } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';

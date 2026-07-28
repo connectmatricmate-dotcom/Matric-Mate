@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { BILLING_SITE } from '../core/billing';
+import { BILLING_SITE } from '@matricmate/core';
 import { useT } from '../i18n';
 import { C, S } from '../theme';
 import { Card, Row, Small } from './ui';

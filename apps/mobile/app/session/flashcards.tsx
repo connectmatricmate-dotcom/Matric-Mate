@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bar, Btn, Card, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
-import { api } from '../../src/core/api';
+import { api } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';

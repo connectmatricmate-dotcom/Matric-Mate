@@ -1,10 +1,10 @@
 import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
-import { api } from '../../../src/core/api';
-import { chapterPct } from '../../../src/core/domain';
+import { api } from '@matricmate/core';
+import { chapterPct } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
-import { subjectById } from '../../../src/core/content';
+import { subjectById } from '@matricmate/core';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';

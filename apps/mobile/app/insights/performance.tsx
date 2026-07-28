@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Circle, Polyline, Rect } from 'react-native-svg';
 import { Bar, Card, Header, Item, Label, Row, Screen, SectionTitle, Seg, Small, Spacer } from '../../src/components/ui';
-import { accuracy, confidenceBreakdown } from '../../src/core/domain';
+import { accuracy, confidenceBreakdown } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';

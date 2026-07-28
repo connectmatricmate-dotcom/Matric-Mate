@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { router } from 'expo-router';
 import { Card, Empty, Header, Item, Screen, SectionTitle } from '../src/components/ui';
-import { Notification } from '../src/core/types';
+import { Notification } from '@matricmate/core';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 

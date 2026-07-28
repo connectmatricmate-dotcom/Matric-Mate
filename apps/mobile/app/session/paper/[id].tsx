@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Header, Label, Pill, Screen, Small, Spacer, Ur } from '../../../src/components/ui';
-import { PAPER_CONTENT, PAST_PAPERS, paperContent, subjectById } from '../../../src/core/content';
+import { PAPER_CONTENT, PAST_PAPERS, paperContent, subjectById } from '@matricmate/core';
 import { useT } from '../../../src/i18n';
 import { C, F, S } from '../../../src/theme';
 

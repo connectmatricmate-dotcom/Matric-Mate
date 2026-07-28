@@ -7,7 +7,7 @@
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey } from '../core/domain';
+import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey } from '@matricmate/core';
 import {
   Attempt,
   ChatThread,
@@ -17,7 +17,7 @@ import {
   Notification,
   PlanTask,
   TestResult,
-} from '../core/types';
+} from '@matricmate/core';
 
 const KEY = 'mm.state.v1';
 

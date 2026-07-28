@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { api } from '../src/core/api';
+import { api } from '@matricmate/core';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';

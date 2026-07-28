@@ -148,16 +148,18 @@ export const subjectById = (id: string) => SUBJECTS.find((s) => s.id === id);
 /* ------------------------------------------------------- authored content */
 
 /**
- * Real recordings, bundled with the app — one chapter in both mediums, so the
- * client can hear exactly how an audio lesson behaves. Every other chapter waits
- * on the client's own recordings.
+ * Which chapters have a real recording, and under what name.
+ *
+ * Only the identifier lives here — each app resolves it to an actual file,
+ * because the platforms load media differently (Metro `require` on Android, a
+ * public URL on the web). One chapter is recorded in both mediums so the client
+ * can hear how an audio lesson behaves; the rest wait on their own recordings.
  */
-export const AUDIO_TRACKS: Record<string, { en?: number; ur?: number }> = {
-  'phy-3': {
-    en: require('../../assets/audio/dynamics-en.mp3'),
-    ur: require('../../assets/audio/dynamics-ur.mp3'),
-  },
+export const AUDIO_TRACKS: Record<string, { en?: string; ur?: string }> = {
+  'phy-3': { en: 'dynamics-en', ur: 'dynamics-ur' },
 };
+
+export const hasAudio = (chapterId: string) => !!AUDIO_TRACKS[chapterId];
 
 const dynamicsSections: Section[] = [
   {

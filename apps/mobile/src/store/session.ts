@@ -5,7 +5,7 @@
  * carries a question list and answer history, which URLs shouldn't. Screens read
  * it on mount; it is cleared when a new session starts.
  */
-import { Confidence, Mcq } from '../core/types';
+import { Confidence, Mcq } from '@matricmate/core';
 
 export type Answer = {
   mcqId: string;

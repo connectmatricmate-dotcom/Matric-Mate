@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Bar, Btn, Card, Empty, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
-import { chapterById, subjectById } from '../../src/core/content';
+import { chapterById, subjectById } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';

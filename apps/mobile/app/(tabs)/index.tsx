@@ -19,8 +19,8 @@ import {
   Tiny,
 } from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { chapterById, subjectById } from '../../src/core/content';
-import { accuracy, chapterPct } from '../../src/core/domain';
+import { chapterById, subjectById } from '@matricmate/core';
+import { accuracy, chapterPct } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';

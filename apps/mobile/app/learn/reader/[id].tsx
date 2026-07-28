@@ -22,9 +22,9 @@ import {
   Ur,
   useToast,
 } from '../../../src/components/ui';
-import { api } from '../../../src/core/api';
+import { api } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
-import { Block } from '../../../src/core/types';
+import { Block } from '@matricmate/core';
 import { useT } from '../../../src/i18n';
 import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';

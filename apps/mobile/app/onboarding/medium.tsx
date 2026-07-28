@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { router } from 'expo-router';
 import { ChoiceCard, StepScreen } from '../../src/components/OnboardingStep';
 import { useT } from '../../src/i18n';
-import { Medium } from '../../src/core/types';
+import { Medium } from '@matricmate/core';
 import { useApp } from '../../src/store/app';
 
 /**

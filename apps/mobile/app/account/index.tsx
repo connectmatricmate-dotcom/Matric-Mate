@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Bar, Btn, Card, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Sheet, Small, Spacer } from '../../src/components/ui';
-import { levelProgress, xpToNextLevel } from '../../src/core/domain';
+import { levelProgress, xpToNextLevel } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';

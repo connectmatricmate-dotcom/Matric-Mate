@@ -1,0 +1,14 @@
+{
+  "name": "@matricmate/core",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "description": "Shared between the Android app and the web app: content, domain rules, copy and design tokens. One source of truth so the two surfaces can't drift.",
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}

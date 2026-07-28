@@ -5,8 +5,8 @@ import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-au
 import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
-import { api } from '../../../src/core/api';
-import { AUDIO_TRACKS } from '../../../src/core/content';
+import { AUDIO_TRACKS, api } from '@matricmate/core';
+import { audioSource } from '../../../src/core/audio';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -130,7 +130,7 @@ function RealPlayer({ id }: { id: string }) {
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
   const medium = state.settings.contentMedium;
-  const track = AUDIO_TRACKS[id]?.[medium] ?? AUDIO_TRACKS[id]?.en ?? null;
+  const track = audioSource(AUDIO_TRACKS[id]?.[medium] ?? AUDIO_TRACKS[id]?.en);
   const player = useAudioPlayer(track);
   const status = useAudioPlayerStatus(player);
   const [speed, setSpeed] = useState(0);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { api } from '../src/core/api';
+import { api } from '@matricmate/core';
 import { useT } from '../src/i18n';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
 import { Icon } from '../src/components/Icon';

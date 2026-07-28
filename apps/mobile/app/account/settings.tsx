@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../../src/components/LanguageToggle';
 import { Card, Header, Item, Screen, SectionTitle, Seg, Small, Spacer, Toggle, useToast } from '../../src/components/ui';
-import { Medium } from '../../src/core/types';
+import { Medium } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { S } from '../../src/theme';
