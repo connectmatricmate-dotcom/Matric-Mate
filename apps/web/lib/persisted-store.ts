@@ -36,7 +36,9 @@ export type Settings = {
 export type State = {
   user: { id: string; name: string; contact: string } | null;
   onboarding: Onboarding | null;
-  premium: { active: boolean; validTill: number | null; ref?: string };
+  /** `plan` is the PlanId from lib/plans, so the app can name what was bought
+   * instead of just saying "Premium". */
+  premium: { active: boolean; validTill: number | null; ref?: string; plan?: string };
   readSections: string[];
   attempts: Attempt[];
   results: TestResult[];

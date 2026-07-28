@@ -27,7 +27,7 @@ export default function Payments() {
           {receipts.map((r, i) => (
             <Item
               key={r.id}
-              title={t('account.receiptLine', { amount: r.amount.toLocaleString() })}
+              title={t('billing.premium')}
               sub={`${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · ${r.method}`}
               icon="card"
               last={i === receipts.length - 1}

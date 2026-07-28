@@ -127,7 +127,49 @@ That way no credentials pass through chat and every schema change is in git.
 
 ---
 
-# Part 3 · What we are deliberately not using
+# Part 3 · Safepay
+
+Checkout runs on Safepay's **hosted page**, so a card is entered on Safepay's
+domain and never touches ours. That keeps MatricMate out of PCI scope. It also
+means the checkout screen does not ask for card details, which is not a
+simplification: it is what a student will actually see.
+
+The flow, verified against the sandbox:
+
+1. `POST /order/payments/v3/` with the merchant API key returns a tracker.
+2. The browser goes to `/components?beacon=<tracker>&…`, which offers JazzCash,
+   Easypaisa and card.
+3. Safepay POSTs back to `/checkout/return` with the tracker, a reference and an
+   HMAC signature, which we verify before believing any of it.
+
+## Environment variables
+
+Add these in Vercel alongside the others. Without them the app falls back to the
+old mock confirmation, so a deployment with no keys still runs.
+
+| Name | Value | Environments |
+| :-- | :-- | :-- |
+| `SAFEPAY_ENV` | `sandbox` | Production + Preview |
+| `SAFEPAY_MERCHANT_API_KEY` | the `sec_…` key | Production + Preview |
+| `SAFEPAY_SECRET_KEY` | the 64-character hex key | Production + Preview |
+
+Switch `SAFEPAY_ENV` to `production` and swap both keys for the live pair when
+the client is ready to take real money. Nothing else changes.
+
+## What is still missing, deliberately
+
+**The webhook.** Right now `/checkout/return` verifies that Safepay redirected
+the browser here, and that is all it can prove. It does not prove money settled,
+and anyone can type that URL.
+
+Until there is a database, the Premium flag it sets lives in one browser, which
+is fine for a demo and useless as a source of truth. When Supabase lands, a
+webhook writes entitlement server-side and the return page becomes what it
+should be: a receipt.
+
+---
+
+# Part 4 · What we are deliberately not using
 
 | | Why not |
 | :-- | :-- |

@@ -12,6 +12,7 @@ import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Item, LinkBtn, Pill, SectionTitle } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
+import { planById, rupees } from '@/lib/plans';
 import { useApp, useT } from '@/lib/store';
 
 const PERKS: [IconName, StringKey][] = [
@@ -28,6 +29,7 @@ export function SubscriptionView() {
   const toast = useToast();
   const [confirmCancel, setConfirmCancel] = useState(false);
   const active = state.premium.active;
+  const plan = planById(state.premium.plan ?? 'monthly');
 
   return (
     <Page width="focus">
@@ -36,7 +38,9 @@ export function SubscriptionView() {
       <Card border={active ? 'border-orange' : undefined} className="flex items-center gap-3">
         <span className="text-[24px]">{active ? '👑' : '🔓'}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-extrabold text-ink">{active ? t('billing.statusActive') : t('billing.statusFree')}</p>
+          <p className="text-[15px] font-extrabold text-ink">
+            {active ? `${t('billing.statusActive')} · ${plan.name}` : t('billing.statusFree')}
+          </p>
           <p className="text-[13px] text-ink2">
             {active && state.premium.validTill
               ? t('billing.activeTill', {
@@ -68,14 +72,21 @@ export function SubscriptionView() {
       <div className="mt-6 flex flex-col gap-2.5">
         {active ? (
           <>
-            <LinkBtn title={t('account.renewNow')} href="/checkout" variant="orange" icon="card" />
+            <LinkBtn
+              title={`Renew ${plan.name.toLowerCase()} · ${rupees(plan.price)}`}
+              href={`/checkout?plan=${plan.id}`}
+              variant="orange"
+              icon="card"
+            />
             <Btn title={t('account.cancelSub')} variant="ghost" onClick={() => setConfirmCancel(true)} />
             <p className="text-[13px] text-ink2">{t('account.noAutoCharge')}</p>
           </>
         ) : (
           <>
             <LinkBtn title={t('account.upgrade')} href="/pricing" icon="crown" />
-            <p className="text-[13px] text-ink2">{t('account.planLine')}</p>
+            <p className="text-[13px] text-ink2">
+              From {rupees(750)} a month. Pick the length that suits you.
+            </p>
           </>
         )}
       </div>

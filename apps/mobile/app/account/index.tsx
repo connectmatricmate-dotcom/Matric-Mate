@@ -67,7 +67,12 @@ export default function Account() {
                   : t('account.freeModeSub')}
               </Small>
             </View>
-            {state.premium.active ? null : <Pill tone="orange">{t('account.upgrade')}</Pill>}
+            {/* No "Upgrade" call to action: Play treats that as steering to an
+                out-of-Play purchase. The row still opens the read-only plan
+                screen, which explains the position without selling anything. */}
+            <Pill tone={state.premium.active ? 'green' : 'grey'}>
+              {state.premium.active ? t('account.active') : t('billing.statusFree')}
+            </Pill>
           </Row>
         </Card>
 

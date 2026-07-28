@@ -1,0 +1,122 @@
+import 'server-only';
+import { createHmac, timingSafeEqual } from 'node:crypto';
+
+/**
+ * Safepay hosted checkout.
+ *
+ * The flow, every step verified against the sandbox:
+ *
+ *   1. POST /order/v1/init returns a tracker token, `track_…`.
+ *   2. Send the customer to /checkout/pay/?beacon=<tracker>&…
+ *      Safepay's own page offers JazzCash, Easypaisa and card.
+ *   3. Safepay POSTs back to redirect_url with the tracker, a reference code
+ *      and an HMAC signature, which we verify before believing any of it.
+ *
+ * We never see a card number. Everything sensitive happens on Safepay's domain,
+ * which keeps this app out of PCI scope, and is why checkout no longer asks for
+ * card details.
+ */
+
+const ENV = (process.env.SAFEPAY_ENV ?? 'sandbox') as 'sandbox' | 'production';
+const MERCHANT_API_KEY = process.env.SAFEPAY_MERCHANT_API_KEY;
+const SECRET_KEY = process.env.SAFEPAY_SECRET_KEY;
+
+const HOST = ENV === 'production' ? 'https://api.getsafepay.com' : 'https://sandbox.api.getsafepay.com';
+
+/**
+ * The Payments 2.0 checkout page. The trailing slash is load-bearing: the app
+ * validates its own location with /\/pay\// and refuses the tracker without it.
+ * The older /components path now 301s to Safepay's marketing site, which is a
+ * confusing way to fail because the redirect looks deliberate.
+ */
+const CHECKOUT_PAY = `${HOST}/checkout/pay/`;
+
+/** With no keys the app falls back to the mock flow, so local dev needs no secrets. */
+export const isSafepayConfigured = Boolean(MERCHANT_API_KEY && SECRET_KEY);
+
+type TrackerResponse = {
+  /** v1 returns the token at the top of `data`, v3 nests it under `tracker`. */
+  data?: { token?: string; tracker?: { token?: string; state?: string } };
+  status?: { message?: string; errors?: unknown[] };
+};
+
+/**
+ * Step 1: reserve a payment. Returns the tracker token.
+ *
+ * Two endpoints can mint a tracker and they are not interchangeable:
+ *
+ *   /order/v1/init          leaves `intent` empty, so the hosted page is free
+ *                           to pick the rail once the payer chooses a method.
+ *                           Amounts in rupees.
+ *   /order/payments/v3/     stamps an intent (CYBERSOURCE) and a next action of
+ *                           PAYER_AUTH_SETUP, because Payments 2.0 expects the
+ *                           *merchant* to drive 3-D Secure from its own UI.
+ *                           Amounts in paisa.
+ *
+ * Handing a v3 tracker to the hosted page fails with "Tracker is in an invalid
+ * state", which reads like a bug and is really the page refusing a job that was
+ * assigned to us. Hosted checkout therefore uses v1. Moving to the 2.0 custom
+ * checkout means building the card form and the payer-auth dance ourselves, and
+ * that is a payments-milestone decision, not a prototype one.
+ */
+export async function createTracker(input: { amountRupees: number; orderId: string }): Promise<string> {
+  if (!MERCHANT_API_KEY) throw new Error('Safepay is not configured');
+
+  const res = await fetch(`${HOST}/order/v1/init`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify({
+      client: MERCHANT_API_KEY,
+      // v1 takes whole rupees. v3 takes paisa. Mixing them up is a factor of a
+      // hundred in either direction, so the unit is named at every boundary.
+      amount: input.amountRupees,
+      currency: 'PKR',
+      environment: ENV,
+    }),
+  });
+
+  const body = (await res.json().catch(() => ({}))) as TrackerResponse;
+  const token = body.data?.token ?? body.data?.tracker?.token;
+
+  if (!res.ok || !token) {
+    // Never surface the gateway's raw error to the browser: it can echo the
+    // request back, merchant key and all.
+    console.error('safepay: tracker failed', res.status, JSON.stringify(body).slice(0, 400));
+    throw new Error('Could not start the payment');
+  }
+  return token;
+}
+
+/** Step 2: where to send the customer. */
+export function checkoutUrl(input: {
+  tracker: string;
+  orderId: string;
+  redirectUrl: string;
+  cancelUrl: string;
+}) {
+  const q = new URLSearchParams({
+    env: ENV,
+    beacon: input.tracker,
+    source: 'custom',
+    order_id: input.orderId,
+    redirect_url: input.redirectUrl,
+    cancel_url: input.cancelUrl,
+  });
+  return `${CHECKOUT_PAY}?${q}`;
+}
+
+/**
+ * Step 3: is this really Safepay coming back, or someone who guessed the URL?
+ *
+ * The signature is an HMAC-SHA256 of the tracker under the shared secret.
+ * Compared in constant time, because a plain === leaks how much of a forged
+ * signature was correct.
+ */
+export function verifySignature(tracker: string, signature: string | null | undefined) {
+  if (!SECRET_KEY || !signature) return false;
+  const expected = createHmac('sha256', SECRET_KEY).update(tracker).digest('hex');
+  const a = Buffer.from(expected, 'utf8');
+  const b = Buffer.from(signature, 'utf8');
+  return a.length === b.length && timingSafeEqual(a, b);
+}

@@ -3,15 +3,20 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CheckoutForm } from '@/components/commerce/CheckoutForm';
 import { planById } from '@/lib/plans';
+import { isSafepayConfigured } from '@/lib/safepay';
 
 export const metadata: Metadata = {
   title: 'Checkout',
-  description: 'Start your MatricMate Premium plan. Three days free, then pay by JazzCash, EasyPaisa or card.',
+  description: 'Start your MatricMate Premium plan. Pay by JazzCash, Easypaisa or card.',
   robots: { index: false },
 };
 
-export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
-  const { plan } = await searchParams;
+export default async function CheckoutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ plan?: string; cancelled?: string }>;
+}) {
+  const { plan, cancelled } = await searchParams;
 
   return (
     <div className="min-h-screen">
@@ -26,7 +31,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
         </div>
       </header>
 
-      <CheckoutForm plan={planById(plan ?? 'quarter')} />
+      <CheckoutForm plan={planById(plan ?? 'quarter')} live={isSafepayConfigured} cancelled={cancelled === '1'} />
     </div>
   );
 }

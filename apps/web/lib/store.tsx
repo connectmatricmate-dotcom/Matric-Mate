@@ -44,7 +44,7 @@ type Actions = {
   signIn: (u: { id: string; name: string; contact: string }) => void;
   signOut: () => void;
   setOnboarding: (o: Partial<Onboarding>) => void;
-  subscribePremium: (p: { ref: string; validTill: number }) => void;
+  subscribePremium: (p: { ref: string; validTill: number; plan?: string }) => void;
   cancelSubscription: () => void;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => void;
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
@@ -88,10 +88,10 @@ const actions: Actions = {
         ...o,
       },
     })),
-  subscribePremium: ({ ref, validTill }) =>
+  subscribePremium: ({ ref, validTill, plan }) =>
     update((s) => ({
       ...s,
-      premium: { active: true, validTill, ref },
+      premium: { active: true, validTill, ref, plan },
       notifications: [
         {
           id: `pay-${Date.now()}`,

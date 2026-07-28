@@ -10,10 +10,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@matricmate/core": "*",
     "next": "16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "@matricmate/core": "*"
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

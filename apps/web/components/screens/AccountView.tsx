@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { levelProgress, xpToNextLevel } from '@matricmate/core';
+import { planById } from '@/lib/plans';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, StreakRail } from '@/components/app/rails';
 import { Btn, ItemButton } from '@/components/ui/controls';
@@ -69,7 +70,9 @@ export function AccountView() {
               <span className="text-[28px]">{state.premium.active ? '👑' : '🔓'}</span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-extrabold text-ink">
-                  {state.premium.active ? t('account.premiumActive') : t('account.freeMode')}
+                  {state.premium.active
+                    ? `${t('account.premiumActive')} · ${planById(state.premium.plan ?? 'monthly').name}`
+                    : t('account.freeMode')}
                 </span>
                 <span className="block text-[13px] text-ink2">
                   {state.premium.active && state.premium.validTill

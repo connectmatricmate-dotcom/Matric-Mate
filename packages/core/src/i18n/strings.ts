@@ -134,6 +134,10 @@ export const en = {
     perk3: 'AI tutor: 20 questions a day',
     perk4: 'Weak topics and monthly report card',
     perk5: 'Offline downloads',
+    emailLink: 'Email me the link',
+    emailLinkSent: 'Sent. Check your email for the link.',
+    howToUpgrade:
+      'Plans are handled on our website, not in the app. We can email you the link so you don’t have to type it.',
   },
 
   tabs: {
@@ -734,6 +738,10 @@ export const ur: typeof en = {
     perk3: 'AI tutor: rozana 20 sawal',
     perk4: 'Weak topics aur mahana report card',
     perk5: 'Offline downloads',
+    emailLink: 'Link email karein',
+    emailLinkSent: 'Bhej diya. Email mein link mil jaye ga.',
+    howToUpgrade:
+      'Plan hamari website par manage hote hain, app mein nahi. Hum aap ko link email kar sakte hain taake type na karna pare.',
   },
 
   tabs: {
