@@ -23,6 +23,8 @@
   },
   "overrides": {
     "react-native-worklets": "0.10.0",
-    "react-native-reanimated": "4.5.0"
+    "react-native-reanimated": "4.5.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
   }
 }

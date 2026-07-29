@@ -46,7 +46,8 @@
     "export:web": "expo export -p web",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
-    "start:clear": "expo start --go --clear"
+    "start:clear": "expo start --go --clear",
+    "deps": "CI=1 expo install --check"
   },
   "private": true
 }

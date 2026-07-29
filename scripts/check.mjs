@@ -44,6 +44,10 @@ const CHECKS = [
   { pkg: 'core', workspace: 'packages/core', script: 'lint' },
   { pkg: 'core', workspace: 'packages/core', script: 'typecheck' },
   { pkg: 'mobile', workspace: 'apps/mobile', script: 'lint' },
+  // expo install --check: fails when a declared package drifts from the version
+  // Expo Go ships natively. The worklets segfault was exactly this class of bug,
+  // invisible until a phone produced a tombstone; now it fails the build instead.
+  { pkg: 'mobile', workspace: 'apps/mobile', script: 'deps' },
   { pkg: 'mobile', workspace: 'apps/mobile', script: 'typecheck' },
   { pkg: 'web', workspace: 'apps/web', script: 'lint' },
   { pkg: 'web', workspace: 'apps/web', script: 'typecheck' },
