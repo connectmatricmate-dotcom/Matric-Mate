@@ -13,7 +13,9 @@
     "lint": "npm run lint --workspaces --if-present",
     "build": "npm run build --workspace apps/web",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "mobile:go": "npm run start --workspace apps/mobile -- --go",
+    "mobile:tunnel": "npm run start --workspace apps/mobile -- --go --tunnel"
   },
   "engines": {
     "node": ">=22"
