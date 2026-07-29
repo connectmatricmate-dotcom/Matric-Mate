@@ -155,7 +155,7 @@ export function SettingsView() {
         </Group>
 
         <Group title={t('account.about')}>
-          <Item title={t('account.version', { v: '0.1.0' })} icon="help" />
+          <Item title={t('account.version', { v: '0.2.0' })} icon="help" />
           <Item href="/terms" title={t('account.terms')} icon="doc" last />
         </Group>
       </CardGrid>

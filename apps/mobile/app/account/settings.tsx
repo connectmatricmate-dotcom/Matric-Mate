@@ -135,7 +135,7 @@ export default function Settings() {
 
       <SectionTitle>{t('account.about')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>
-        <Item title={t('account.version', { v: '0.1.0' })} icon="help" />
+        <Item title={t('account.version', { v: '0.2.0' })} icon="help" />
         <Item title={t('account.terms')} icon="doc" last onPress={() => toast(t('account.termsToast'))} />
       </Card>
       <Spacer h={S.md} />
