@@ -60,7 +60,7 @@ export default function Settings() {
                 onChange={(m) => actions.setSettings({ contentMedium: m })}
                 options={[
                   { value: 'en', label: 'English' },
-                  { value: 'ur', label: 'اردو', urdu: true },
+                  { value: 'ur', label: 'Urdu' },
                 ]}
               />
             </View>

@@ -833,8 +833,12 @@ const st = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   seg: { flexDirection: 'row', backgroundColor: C.grey, borderRadius: 13, padding: 3, gap: 3 },
-  segBtn: { flex: 1, height: 36, justifyContent: 'center', borderRadius: R.sm, alignItems: 'center' },
-  segBtnOn: { backgroundColor: C.card, ...(shadow as object) },
+  // overflow hidden clips Android's ripple layer to the radius; without it the
+  // pressed and selected states could paint a square outside the corners. The
+  // elevation shadow went for the same reason: a white pill on a grey track
+  // needs no shadow, and elevation drew its own rectangle behind the radius.
+  segBtn: { flex: 1, height: 36, justifyContent: 'center', borderRadius: R.sm, alignItems: 'center', overflow: 'hidden' },
+  segBtnOn: { backgroundColor: C.card },
   field: {
     flexDirection: 'row',
     alignItems: 'center',

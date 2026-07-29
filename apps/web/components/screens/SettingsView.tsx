@@ -65,7 +65,7 @@ export function SettingsView() {
                 label={t('account.contentMedium')}
                 options={[
                   { value: 'en' as Medium, label: 'Eng' },
-                  { value: 'ur' as Medium, label: 'اردو', urdu: true },
+                  { value: 'ur' as Medium, label: 'Urdu' },
                 ]}
               />
             }

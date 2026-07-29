@@ -11,7 +11,7 @@ export function validateName(v: string) {
 
 export function validateEmail(v: string) {
   if (!v.trim()) return 'Enter your email.';
-  return EMAIL_RE.test(v.trim()) ? null : 'Use an email like ahmed@gmail.com.';
+  return EMAIL_RE.test(v.trim()) ? null : 'Use an email like hassan.ali@gmail.com.';
 }
 
 export function validatePassword(v: string) {
