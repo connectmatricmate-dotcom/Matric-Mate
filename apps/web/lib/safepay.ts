@@ -106,17 +106,28 @@ export function checkoutUrl(input: {
   return `${CHECKOUT_PAY}?${q}`;
 }
 
+const matches = (expected: string, given: string) => {
+  const a = Buffer.from(expected, 'utf8');
+  const b = Buffer.from(given, 'utf8');
+  // Constant time: a plain === leaks how much of a forged signature was right.
+  return a.length === b.length && timingSafeEqual(a, b);
+};
+
 /**
  * Step 3: is this really Safepay coming back, or someone who guessed the URL?
  *
- * The signature is an HMAC-SHA256 of the tracker under the shared secret.
- * Compared in constant time, because a plain === leaks how much of a forged
- * signature was correct.
+ * HMAC-SHA256 of the tracker. Safepay's docs are explicit that *webhooks* are
+ * signed with the endpoint's shared secret, and silent about which key signs
+ * this redirect, so both are accepted rather than guessing and being subtly
+ * wrong. That is a safe thing to be relaxed about here and nowhere else: this
+ * signature decides whether the page shows a warning, never whether anyone gets
+ * access. Only the webhook grants that, and it verifies exactly one secret.
  */
 export function verifySignature(tracker: string, signature: string | null | undefined) {
-  if (!SECRET_KEY || !signature) return false;
-  const expected = createHmac('sha256', SECRET_KEY).update(tracker).digest('hex');
-  const a = Buffer.from(expected, 'utf8');
-  const b = Buffer.from(signature, 'utf8');
-  return a.length === b.length && timingSafeEqual(a, b);
+  if (!signature) return false;
+  const given = signature.trim().toLowerCase();
+
+  return [process.env.SAFEPAY_WEBHOOK_SECRET, SECRET_KEY]
+    .filter((secret): secret is string => Boolean(secret))
+    .some((secret) => matches(createHmac('sha256', secret).update(tracker).digest('hex'), given));
 }
