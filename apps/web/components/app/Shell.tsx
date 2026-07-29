@@ -66,10 +66,23 @@ export function Shell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
+        {/*
+          A named way into settings. It existed only behind the avatar card
+          below, which nothing marks as clickable, and a student who cannot
+          find settings blames the app, not themselves.
+        */}
+        <Link
+          href="/account/settings"
+          className="mt-auto flex min-h-11 items-center gap-3 rounded-[12px] px-3 text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-paper hover:text-ink"
+        >
+          <Icon name="gear" size={20} />
+          {t('account.settings')}
+        </Link>
+
         {/* Level sits in the margin all day, so it stays quiet: a name, a number, a line. */}
         <Link
           href="/account"
-          className="mt-auto rounded-[14px] border border-line px-3 py-3 transition-colors duration-200 hover:border-tealtint2 hover:bg-paper"
+          className="mt-2 rounded-[14px] border border-line px-3 py-3 transition-colors duration-200 hover:border-tealtint2 hover:bg-paper"
         >
           <span className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-orangetint text-[16px]">

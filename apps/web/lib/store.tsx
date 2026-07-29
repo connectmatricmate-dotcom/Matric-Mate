@@ -42,7 +42,8 @@ import { seed } from './seed';
 export type { Onboarding, Settings, State };
 
 type Actions = {
-  signIn: (u: { id: string; name: string; contact: string }) => void;
+  /** Local mirror only; the profiles row is written by the screen that calls this. */
+  setName: (name: string) => void;
   signOut: () => void;
   setOnboarding: (o: Partial<Onboarding>) => void;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => void;
@@ -56,6 +57,8 @@ type Actions = {
   readNotifications: () => void;
   setSettings: (s: Partial<Settings>) => void;
   resetDemo: () => void;
+  /** Re-reads entitlement from the server. Returns whether premium is on. */
+  refreshPremium: () => Promise<boolean>;
 };
 
 type Ctx = {
@@ -68,12 +71,8 @@ type Ctx = {
 const AppCtx = createContext<Ctx | null>(null);
 
 const actions: Actions = {
-  signIn: (user) =>
-    update((s) => {
-      const fresh = s.attempts.length === 0 && s.results.length === 0;
-      return touchToday({ ...s, user, ...(fresh ? seed() : {}) });
-    }),
-  signOut: () => update((s) => ({ ...s, user: null })),
+  setName: (name) => update((s) => (s.user ? { ...s, user: { ...s.user, name } } : s)),
+  signOut: () => update((s) => ({ ...s, user: null, premium: { active: false, validTill: null } })),
   setOnboarding: (o) =>
     update((s) => ({
       ...s,
@@ -145,7 +144,29 @@ const actions: Actions = {
   readNotifications: () => update((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
   setSettings: (patch) => update((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
   resetDemo: () => update((s) => ({ ...EMPTY, hydrated: true, user: s.user, onboarding: s.onboarding, settings: s.settings })),
+  refreshPremium: () => refreshPremium(),
 };
+
+/**
+ * Entitlement is read, never written, on the client.
+ *
+ * The row is written by the payment webhook under the service role, and RLS
+ * gives the student SELECT and nothing else, so this mirrors the database into
+ * the UI; it cannot invent access. A past valid_till counts as inactive even
+ * while the column still says active, because nothing runs at midnight to flip
+ * it. Same rule as the Android app and the gateway confirm.
+ */
+async function refreshPremium(): Promise<boolean> {
+  const supabase = createClient();
+  const { data } = await supabase.from('entitlements').select('active, plan, valid_till').maybeSingle();
+  const till = data?.valid_till ? new Date(data.valid_till).getTime() : null;
+  const active = Boolean(data?.active) && (till === null || till > Date.now());
+  update((s) => ({
+    ...s,
+    premium: active ? { active: true, plan: data?.plan ?? undefined, validTill: till } : { active: false, validTill: null },
+  }));
+  return active;
+}
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
@@ -180,38 +201,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return touchToday({ ...s, user, ...(fresh ? seed() : {}) });
       });
 
-    /**
-     * Entitlement is read, never written, on the client.
-     *
-     * The row is written by the payment webhook under the service role, and RLS
-     * gives the student SELECT and nothing else. So this mirrors the database
-     * into the UI; it cannot invent access. Anything that used to set premium
-     * locally is gone, because a local flag and the database disagreeing is
-     * worse than no flag at all.
-     */
-    const syncEntitlement = async () => {
-      const { data } = await supabase.from('entitlements').select('active, plan, valid_till').maybeSingle();
-      update((s) => ({
-        ...s,
-        premium: data?.active
-          ? {
-              active: true,
-              plan: data.plan ?? undefined,
-              validTill: data.valid_till ? new Date(data.valid_till).getTime() : null,
-              ref: s.premium.ref,
-            }
-          : { active: false, validTill: null },
-      }));
-    };
-
     void supabase.auth.getUser().then(({ data }) => {
       apply(data.user);
-      if (data.user) void syncEntitlement();
+      if (data.user) void refreshPremium();
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       apply(session?.user ?? null);
-      if (session?.user) void syncEntitlement();
+      if (session?.user) void refreshPremium();
+      // Signing out must also drop what the last account was entitled to, or
+      // the next person on a shared computer inherits the crown until their
+      // first sync answers.
+      else update((s) => ({ ...s, premium: { active: false, validTill: null } }));
     });
     return () => sub.subscription.unsubscribe();
   }, []);

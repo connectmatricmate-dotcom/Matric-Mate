@@ -53,6 +53,9 @@ export function AppHeader({
         </Tap>
       ) : null}
 
+      {/* Settings used to live only behind the avatar, which nothing marks as
+          tappable. A gear is the one icon every student already knows. */}
+      <IconButton icon="gear" tone="card" onPress={() => router.push('/account/settings')} />
       <IconButton icon="bell" tone="card" badge={unread} onPress={() => router.push('/notifications')} />
     </View>
   );

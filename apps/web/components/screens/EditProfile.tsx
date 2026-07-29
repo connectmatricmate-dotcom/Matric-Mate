@@ -6,6 +6,7 @@ import { Page, PageHead } from '@/components/app/Page';
 import { Btn, Field } from '@/components/ui/controls';
 import { Card, Item, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
+import { createClient } from '@/lib/supabase/client';
 import { useApp, useT } from '@/lib/store';
 import { validateName } from '@/lib/validation';
 
@@ -19,15 +20,25 @@ export function EditProfile() {
   const [name, setName] = useState(state.user?.name ?? '');
   const [avatar, setAvatar] = useState(0);
   const [touched, setTouched] = useState(false);
+  const [busy, setBusy] = useState(false);
   const setup = state.onboarding;
 
   const nameError = validateName(name);
 
-  function save(e: React.FormEvent) {
+  async function save(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    if (nameError) return;
-    if (state.user) actions.signIn({ ...state.user, name: name.trim() });
+    if (nameError || !state.user || busy) return;
+    setBusy(true);
+    // Written to the profile row, not just to local state: that row is what
+    // the Android app shows and what checkout puts on a receipt.
+    const { error } = await createClient().from('profiles').update({ name: name.trim() }).eq('id', state.user.id);
+    setBusy(false);
+    if (error) {
+      toast(t('states.errorBody'));
+      return;
+    }
+    actions.setName(name.trim());
     toast(t('account.profileSaved'));
     router.push('/account');
   }
@@ -94,7 +105,7 @@ export function EditProfile() {
         <p className="mt-4 text-[13px] text-ink2">{t('account.editFootnote')}</p>
 
         <div className="sticky bottom-0 mt-5 bg-paper/95 py-4 backdrop-blur">
-          <Btn title={t('common.save')} type="submit" disabled={!!nameError} className="w-full md:w-auto" />
+          <Btn title={t('common.save')} type="submit" disabled={!!nameError} className="w-full md:w-auto" loading={busy} />
         </div>
       </form>
     </Page>

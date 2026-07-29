@@ -7,7 +7,10 @@
  */
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { useState } from 'react';
+import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Item, LinkBtn, Pill, SectionTitle } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { planById, rupees } from '@/lib/plans';
 import { useApp, useT } from '@/lib/store';
 
@@ -20,8 +23,10 @@ const PERKS: [IconName, StringKey][] = [
 ];
 
 export function SubscriptionView() {
-  const { state } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
+  const toast = useToast();
+  const [checking, setChecking] = useState(false);
   const active = state.premium.active;
   const plan = planById(state.premium.plan ?? 'monthly');
 
@@ -49,6 +54,24 @@ export function SubscriptionView() {
         </div>
         <Pill tone={active ? 'green' : 'grey'}>{active ? t('account.active') : t('account.inactive')}</Pill>
       </Card>
+
+      {/* For the student who just paid in another tab and does not trust the
+          screen to have noticed. Re-reads the server; it cannot grant anything. */}
+      <div className="mt-3">
+        <Btn
+          title={t('billing.checkAgain')}
+          variant="line"
+          sm
+          icon="refresh"
+          loading={checking}
+          onClick={async () => {
+            setChecking(true);
+            const on = await actions.refreshPremium();
+            setChecking(false);
+            toast(t(on ? 'billing.checkedActive' : 'billing.checkedFree'));
+          }}
+        />
+      </div>
 
       <SectionTitle>{t('billing.whatsIncluded')}</SectionTitle>
       <Card flat>

@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { PayMark } from '@/components/commerce/PayMark';
 import { Btn, ErrorBanner } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useT } from '@/lib/store';
 import { INCLUDED, PAYMENT_METHODS, type Plan, rupees } from '@/lib/plans';
 
 const TRIAL_DAYS = 3;
@@ -37,7 +37,6 @@ export function CheckoutForm({
   /** The account Premium will be added to. Named on screen, see below. */
   accountEmail?: string | null;
 }) {
-  const { state, hydrated } = useApp();
   const t = useT();
 
   const [busy, setBusy] = useState(false);
@@ -72,7 +71,16 @@ export function CheckoutForm({
     }
   }
 
-  if (hydrated && !state.user) {
+  /**
+   * Whether someone is signed in was decided on the server: /checkout is a
+   * protected route, so proxy.ts has already turned strangers away, and the
+   * page passed the session's email down as accountEmail. The old version
+   * asked the localStorage store instead and showed a "log in first" gate
+   * while the client's own Supabase round-trip was still in flight, which for
+   * a signed-in student reads as being locked out of paying. Server truth
+   * only; the client store is a cache, never a doorman.
+   */
+  if (accountEmail === null) {
     return (
       <main className="mx-auto max-w-[460px] px-5 py-16">
         <Card>
@@ -81,8 +89,8 @@ export function CheckoutForm({
             Premium attaches to your account, so create one, or log in, and we will bring you straight back here.
           </p>
           <div className="mt-5 flex flex-col gap-2.5">
-            <LinkBtn title="Create an account" href="/signup" />
-            <LinkBtn title="I already have one" href="/login" variant="line" />
+            <LinkBtn title="Create an account" href="/signup?next=/checkout" />
+            <LinkBtn title="I already have one" href="/login?next=/checkout" variant="line" />
           </div>
         </Card>
       </main>

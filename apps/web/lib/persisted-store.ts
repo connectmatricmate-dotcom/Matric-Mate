@@ -104,7 +104,14 @@ function persist() {
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     try {
-      window.localStorage.setItem(KEY, JSON.stringify(state));
+      /**
+       * Everything except premium. Entitlement is server truth, refreshed on
+       * every load, and caching it here had two failure modes: a signed-out
+       * machine kept showing the last account's plan, and an expired plan
+       * survived until the next sync. A one-render flash of the free state on
+       * reload is the honest trade.
+       */
+      window.localStorage.setItem(KEY, JSON.stringify({ ...state, premium: EMPTY.premium }));
     } catch {
       // storage blocked or full, the session still works in memory
     }
@@ -129,6 +136,8 @@ export function hydrate() {
         ...EMPTY,
         ...parsed,
         settings: { ...DEFAULT_SETTINGS, ...parsed.settings },
+        // Snapshots written before premium was excluded may still carry one.
+        premium: EMPTY.premium,
         hydrated: true,
       };
     }
