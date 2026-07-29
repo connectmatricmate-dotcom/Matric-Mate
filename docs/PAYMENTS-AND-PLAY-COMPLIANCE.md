@@ -129,7 +129,7 @@ return URLs to be registered before they will be honoured.
 
 ---
 
-## Subscriptions: supported, deliberately not shipped yet
+## Subscriptions: supported by Safepay, deliberately not used
 
 They work. A real plan was created in the sandbox to prove it:
 
@@ -145,10 +145,19 @@ POST /client/plans/v1/          header: X-SFPY-MERCHANT-SECRET
 Checkout has a matching `/checkout/subscribe/` route, and
 `/client/subscriptions/v1/…` covers find, update, pause, resume and cancel.
 
-**Why it is not in the prototype.** The subscribe route needs an auth token,
-which means a Safepay **customer** per student, and a customer id has nowhere to
-live until Supabase exists. Shipping it now would mint a throwaway customer on
-every checkout, pollute the merchant account, and be impossible to reconcile.
+**The blocker is gone.** `/checkout/subscribe/` needs `plan_id` and
+`auth_token`, and the auth token now exists: checkout mints a guest session for
+every payment, and each student has a stored Safepay customer.
+
+**It is still not used, and that is the decision, not an omission.** Auto-renew
+would make the app's own promise false. Every screen and both languages say "no
+automatic charge, we remind you two days before it ends and you renew yourself",
+and a Pakistani student on a shared family card loses more trust to one surprise
+debit than auto-renew wins back in retention.
+
+`subscribeUrl()` was written, verified against the sandbox, and then deleted
+rather than left lying around: unused code that can charge people is a liability.
+The contract is recorded here so rebuilding it is an afternoon, not a week.
 
 **Also worth knowing before promising auto-renew:** only cards can be
 auto-debited. JazzCash and Easypaisa have no merchant-initiated debit, so a
@@ -156,9 +165,9 @@ wallet customer must always renew by hand. Auto-renew is therefore a card-only
 feature, not a universal one, and the app's current promise of "no automatic
 charge, we remind you two days before" is a reasonable default for this market.
 
-**The plan for the payments milestone:** card pays via a subscription and renews
-itself; wallet pays once and gets a reminder. Both write entitlement from the
-webhook, never from the return URL.
+**If it is ever revived:** offer it as a choice at checkout, defaulted off, and
+only to card payers. It cannot be universal, and a default-on recurring charge
+would contradict the copy in both apps.
 
 ---
 

@@ -31,9 +31,6 @@ const HOST = ENV === 'production' ? 'https://api.getsafepay.com' : 'https://sand
  */
 const CHECKOUT_PAY = `${HOST}/checkout/pay/`;
 
-/** Subscriptions live on their own path, and it validates a stricter set of params. */
-const CHECKOUT_SUBSCRIBE = `${HOST}/checkout/subscribe/`;
-
 /** With no keys the app falls back to the mock flow, so local dev needs no secrets. */
 export const isSafepayConfigured = Boolean(MERCHANT_API_KEY && SECRET_KEY);
 
@@ -47,8 +44,7 @@ export const isSafepayConfigured = Boolean(MERCHANT_API_KEY && SECRET_KEY);
  *
  * A **guest session** is a short-lived JWT that carries the email in a claim
  * Safepay signed. Passed to checkout as `auth_token`, it is what stops the payer
- * typing a different address at the last step, and it is *required* on the
- * subscribe path. It is minted per checkout and never stored.
+ * typing a different address at the last step. Minted per checkout, never stored.
  */
 
 /** Creates a Safepay customer. Call once per student; store what it returns. */
@@ -188,29 +184,6 @@ export function checkoutUrl(input: {
   return `${CHECKOUT_PAY}?${q}`;
 }
 
-/**
- * Where to send someone starting a recurring plan.
- *
- * The subscribe page validates harder than the pay page: plan_id, auth_token,
- * redirect_url and cancel_url are all mandatory, and the plan id must look like
- * a `plan_…`. A missing auth_token is the usual cause of a blank subscribe page,
- * because a recurring mandate has to belong to somebody.
- */
-export function subscribeUrl(input: {
-  planId: string;
-  authToken: string;
-  redirectUrl: string;
-  cancelUrl: string;
-}) {
-  const q = new URLSearchParams({
-    env: ENV,
-    plan_id: input.planId,
-    auth_token: input.authToken,
-    redirect_url: input.redirectUrl,
-    cancel_url: input.cancelUrl,
-  });
-  return `${CHECKOUT_SUBSCRIBE}?${q}`;
-}
 
 const matches = (expected: string, given: string) => {
   const a = Buffer.from(expected, 'utf8');
