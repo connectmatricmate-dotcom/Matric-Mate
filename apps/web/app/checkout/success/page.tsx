@@ -2,9 +2,13 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CheckoutOutcome } from '@/components/commerce/CheckoutOutcome';
+import { confirmWithGateway } from '@/lib/payments';
 import { createClient, getUser } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Payment', robots: { index: false } };
+
+// Settles a payment and reads the result, so it must never be served from a cache.
+export const dynamic = 'force-dynamic';
 
 /**
  * What actually happened, read from the database rather than inferred from the
@@ -28,6 +32,24 @@ export default async function CheckoutSuccessPage({
   let validTill: string | null = null;
 
   if (user && tracker) {
+    /**
+     * Ask the gateway directly before reading our own row.
+     *
+     * The webhook is supposed to have settled this already. On this merchant
+     * account it never has, so a student who paid sat on "checking" while
+     * Safepay's records showed the money taken and the fee deducted. Asking
+     * costs one server-to-server call on a page nobody loads twice, and it
+     * means access no longer depends on somebody else's webhook configuration.
+     *
+     * It settles nothing on its own: the amount must match the plan and the
+     * payment must already belong to this student. If the webhook wins the
+     * race, this is a no-op.
+     */
+    await confirmWithGateway({ tracker, userId: user.id }).catch((err) => {
+      // Never fail the page over this. The worst case is the old behaviour.
+      console.error('checkout/success: gateway confirm failed', err);
+    });
+
     const supabase = await createClient();
     const [{ data: payment }, { data: entitlement }] = await Promise.all([
       supabase.from('payments').select('status, reference, plan').eq('tracker', tracker).maybeSingle(),

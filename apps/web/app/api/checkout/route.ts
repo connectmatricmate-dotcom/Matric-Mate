@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkoutUrl, createTracker, isSafepayConfigured } from '@/lib/safepay';
-import { ensureSafepayCustomer } from '@/lib/safepay-customer';
+import { gateway } from '@/lib/gateway';
 import { recordPendingPayment } from '@/lib/payments';
 import { PLANS, planById } from '@/lib/plans';
 import { SITE_URL } from '@/lib/site';
 import { getUser } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { toE164, validateMobile } from '@/lib/validation';
 
 /**
  * Starts a Safepay hosted checkout and hands the browser a URL to go to.
@@ -21,9 +19,6 @@ import { toE164, validateMobile } from '@/lib/validation';
 
 const Body = z.object({
   plan: z.enum(PLANS.map((p) => p.id) as [string, ...string[]]).optional(),
-  // Re-validated here and not merely in the form, because a request can arrive
-  // without ever passing through one.
-  phone: z.string().trim().optional(),
 });
 
 export async function POST(request: Request) {
@@ -32,7 +27,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Log in to start a plan.' }, { status: 401 });
   }
 
-  if (!isSafepayConfigured) {
+  if (!gateway.isConfigured) {
     return NextResponse.json({ error: 'Payments are not configured on this deployment.' }, { status: 503 });
   }
 
@@ -40,31 +35,17 @@ export async function POST(request: Request) {
   const plan = planById(parsed.success ? (parsed.data.plan ?? 'quarter') : 'quarter');
 
   /**
-   * Safepay will not create a customer or a guest session without a phone
-   * number, and the guest session is what pins the payer's email. So the number
-   * is required, and reused from the profile once given.
+   * No phone number is asked for any more.
+   *
+   * It was collected because Safepay refuses to mint a guest session without
+   * one, and that session was supposed to pin the payer's email at checkout. It
+   * does not: the hosted page reads `auth_token` only when there is no tracker,
+   * which is the subscribe flow, so on this route it was ignored. With the
+   * session gone the number had no remaining job, and asking a fifteen year old
+   * for their mobile to no purpose is a field that only loses conversions.
    */
   const admin = createAdminClient();
-  const { data: profile } = await admin
-    .from('profiles')
-    .select('phone, name')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  const supplied = parsed.success ? parsed.data.phone : undefined;
-  const phoneError = supplied ? validateMobile(supplied) : null;
-  if (supplied && phoneError) {
-    return NextResponse.json({ error: phoneError }, { status: 400 });
-  }
-
-  const phone = supplied ? toE164(supplied) : (profile?.phone ?? null);
-  if (!phone) {
-    // The form asks for it; this is for anything that did not.
-    return NextResponse.json({ error: 'A mobile number is needed to pay.', needsPhone: true }, { status: 400 });
-  }
-  if (supplied && phone !== profile?.phone) {
-    await admin.from('profiles').update({ phone }).eq('id', user.id);
-  }
+  const { data: profile } = await admin.from('profiles').select('name').eq('id', user.id).maybeSingle();
 
   // Unique per attempt, so a retry after a failure is its own order rather than
   // a duplicate of the last one.
@@ -75,40 +56,34 @@ export async function POST(request: Request) {
 
   try {
     /**
-     * The customer record runs alongside the tracker rather than before it: it
-     * is a directory entry for reconciliation, not part of the payment, and it
-     * must never delay or fail a checkout. The tracker is the only one allowed
-     * to fail the request, because with no tracker there is nothing to pay
-     * against.
+     * Everything gateway-shaped happens behind this one call: reserving the
+     * payment, whatever directory record the provider keeps, and building the
+     * URL. This route's job is deciding who is paying and for what, which is
+     * the part that stays true whoever processes the money.
      *
-     * The payer types their own email on Safepay's page. We cannot prefill it;
-     * see the note in lib/safepay.ts. The payment is tied to the account by the
-     * pending row written below, keyed on the tracker, not by what they type.
+     * The payer types their own email on the provider's page and we cannot
+     * prefill it. The payment is tied to the account by the pending row below,
+     * keyed on the reference, never by what they type.
      */
-    const [tracker] = await Promise.all([
-      createTracker({ amountRupees: plan.price, orderId }),
-      ensureSafepayCustomer({ userId: user.id, email, name, phone }).catch(() => null),
-    ]);
+    const { url, reference } = await gateway.startCheckout({
+      amountRupees: plan.price,
+      orderId,
+      redirectUrl: `${SITE_URL}/checkout/return`,
+      cancelUrl: `${SITE_URL}/checkout?cancelled=1&plan=${plan.id}`,
+      payer: { userId: user.id, email, name },
+    });
 
     // Written before the student leaves, because nothing in the payment itself
     // says who they are. The webhook joins back to this row.
     await recordPendingPayment({
       userId: user.id,
-      tracker,
+      tracker: reference,
       orderId,
       planId: plan.id,
       amountRupees: plan.price,
     });
 
-    return NextResponse.json({
-      url: checkoutUrl({
-        tracker,
-        orderId,
-        redirectUrl: `${SITE_URL}/checkout/return`,
-        cancelUrl: `${SITE_URL}/checkout?cancelled=1&plan=${plan.id}`,
-      }),
-      orderId,
-    });
+    return NextResponse.json({ url, orderId });
   } catch (err) {
     console.error('checkout: could not start payment', err);
     return NextResponse.json({ error: 'Could not reach the payment gateway. Try again in a moment.' }, { status: 502 });

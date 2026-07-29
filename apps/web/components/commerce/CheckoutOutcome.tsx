@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn } from '@/components/ui/primitives';
 import { planById } from '@/lib/plans';
@@ -30,6 +30,7 @@ export function CheckoutOutcome({
 }) {
   const t = useT();
   const router = useRouter();
+  const [rechecking, startRecheck] = useTransition();
   const [waited, setWaited] = useState(0);
 
   // Re-read every 2s while the webhook is in flight, and give up after ~30s so
@@ -87,7 +88,17 @@ export function CheckoutOutcome({
           </p>
           {stuck ? (
             <div className="mt-5 flex flex-col gap-2.5">
-              <Btn title="Check again" onClick={() => router.refresh()} />
+              {/*
+                Re-runs the page, which asks the gateway again. It used to look
+                broken because the answer never changed while the payment sat
+                unsettled; now it can actually resolve, and it says so while it
+                is working.
+              */}
+              <Btn
+                title="Check again"
+                loading={rechecking}
+                onClick={() => startRecheck(() => router.refresh())}
+              />
               <LinkBtn title={t('account.help')} href="/account/help" variant="line" />
             </div>
           ) : null}

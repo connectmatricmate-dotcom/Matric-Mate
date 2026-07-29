@@ -8,6 +8,23 @@ const PROTECTED = ['/dashboard', '/study', '/practice', '/tutor', '/progress', '
 const AUTH_ONLY = ['/login', '/signup'];
 
 /**
+ * Inside a protected branch, but public anyway.
+ *
+ * The payment gateway sends the payer here from its own domain, and a
+ * cross-site arrival cannot be relied on to carry a session cookie: SameSite
+ * Lax sends one on a top-level GET and withholds it on a POST, and which of
+ * those we get depends on a branch of the gateway's checkout we do not control.
+ * Guarding this path means a student who has just paid can land on the login
+ * screen, which is the worst possible moment to ask them to prove who they are.
+ *
+ * Safe to leave open because it decides nothing. It reads two query parameters
+ * and redirects to /checkout/success, which is protected, is reached by a
+ * same-site navigation that does carry the cookie, and reads the payment row
+ * under RLS.
+ */
+const PUBLIC_INSIDE_PROTECTED = ['/checkout/return'];
+
+/**
  * Runs on every request via proxy.ts.
  *
  * Two jobs. It refreshes the auth token, which has to happen here because a
@@ -43,7 +60,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const starts = (list: string[]) => list.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-  if (!user && starts(PROTECTED)) {
+  if (!user && starts(PROTECTED) && !starts(PUBLIC_INSIDE_PROTECTED)) {
     const login = request.nextUrl.clone();
     login.pathname = '/login';
     // Come back to where they were headed once they are in.

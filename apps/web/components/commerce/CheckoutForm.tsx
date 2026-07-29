@@ -17,11 +17,10 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { PayMark } from '@/components/commerce/PayMark';
-import { Btn, ErrorBanner, Field } from '@/components/ui/controls';
+import { Btn, ErrorBanner } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 import { INCLUDED, PAYMENT_METHODS, type Plan, rupees } from '@/lib/plans';
-import { validateMobile } from '@/lib/validation';
 
 const TRIAL_DAYS = 3;
 
@@ -29,14 +28,14 @@ export function CheckoutForm({
   plan,
   live,
   cancelled,
-  knownPhone,
+  accountEmail,
 }: {
   plan: Plan;
   /** True when this deployment has Safepay keys. */
   live: boolean;
   cancelled?: boolean;
-  /** Already on file, so a returning student does not retype it. */
-  knownPhone?: string | null;
+  /** The account Premium will be added to. Named on screen, see below. */
+  accountEmail?: string | null;
 }) {
   const { state, hydrated } = useApp();
   const t = useT();
@@ -45,15 +44,7 @@ export function CheckoutForm({
   const [error, setError] = useState<string | null>(
     cancelled ? 'Payment cancelled. Nothing was charged.' : null
   );
-  // Displayed in the local form, sent to the server as typed, normalised there.
-  const [phone, setPhone] = useState(knownPhone ? knownPhone.replace('+92', '0') : '');
-  const [touched, setTouched] = useState(false);
-
-  const phoneError = validateMobile(phone);
-
   async function pay() {
-    setTouched(true);
-    if (phoneError) return;
     setBusy(true);
     setError(null);
 
@@ -70,7 +61,7 @@ export function CheckoutForm({
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: plan.id, phone }),
+        body: JSON.stringify({ plan: plan.id }),
       });
       const body = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !body.url) throw new Error(body.error ?? 'Could not start the payment');
@@ -180,27 +171,31 @@ export function CheckoutForm({
           </p>
         </Card>
 
-        <div className="mt-4">
-          <Field
-            label="Mobile number"
-            value={phone}
-            onChange={setPhone}
-            placeholder="03001234567"
-            icon="phone"
-            type="tel"
-            autoComplete="tel"
-            required
-            hint="Used for the payment and for your renewal reminder on WhatsApp."
-            error={touched ? (phoneError ?? undefined) : undefined}
-          />
-        </div>
+        {/*
+          Which account gets Premium, said plainly and before they leave.
+
+          Safepay's page asks for an email of its own and we cannot prefill it,
+          so a student can pay under a different address than the one they
+          signed in with. That address only decides where Safepay sends its
+          receipt: Premium follows the payment we recorded against this account,
+          not whatever gets typed on the next screen. Saying so here is cheaper
+          than answering it in support afterwards.
+        */}
+        {accountEmail ? (
+          <p className="mt-4 flex items-start gap-2 rounded-xl bg-tealtint px-3.5 py-3 text-[13px] leading-[1.6] text-ink2">
+            <Icon name="user" size={15} className="mt-0.5 shrink-0 text-teal" />
+            <span>
+              Premium will be added to <strong className="text-ink">{accountEmail}</strong>. The next page may ask for
+              an email for your receipt, and it does not have to be this one.
+            </span>
+          </p>
+        ) : null}
 
         <Btn
           title={live ? `Continue to Safepay · ${rupees(plan.price)}` : `Start ${TRIAL_DAYS} days free`}
           onClick={pay}
           variant="orange"
           loading={busy}
-          disabled={!!phoneError}
           className="w-full"
         />
 

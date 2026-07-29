@@ -26,8 +26,6 @@ export type CheckoutRequest = {
     userId: string;
     email: string;
     name: string;
-    /** E.164. Wallets are keyed on a mobile number, so this is not optional. */
-    phone: string;
   };
 };
 
@@ -52,6 +50,31 @@ export type GatewayEvent =
   /** Signed and understood, but nothing for us to do. Acknowledge, do not retry. */
   | { kind: 'ignored'; note: string };
 
+/** What a return trip home carries, once the provider's field names are off it. */
+export type ReturnParams = {
+  /** The gateway's id for the attempt. Empty when the return carried none. */
+  reference: string;
+  orderId: string;
+  /** Null when the provider does not sign returns at all. */
+  signature: string | null;
+};
+
+/**
+ * What the gateway says about a payment when we ask it directly.
+ *
+ * Asking is not a luxury. A webhook can be misconfigured, delayed, or rejected
+ * because a shared secret was rotated on one side only, and every one of those
+ * looks identical to the student: they paid, and the screen says "checking"
+ * forever. Being able to ask closes that hole, and makes the webhook the fast
+ * path rather than the only path.
+ */
+export type PaymentStatus =
+  | { kind: 'paid'; receipt?: string; amountRupees: number }
+  | { kind: 'pending' }
+  | { kind: 'failed' }
+  /** The gateway has never heard of it, or would not say. */
+  | { kind: 'unknown' };
+
 export type PaymentProvider = {
   /** For logs and for the payment row, so old rows stay readable after a switch. */
   readonly id: string;
@@ -72,6 +95,28 @@ export type PaymentProvider = {
 
   /** Translates a verified webhook into something this app has an opinion about. */
   parseWebhook(rawBody: string): GatewayEvent;
+
+  /**
+   * Asks the gateway what really happened to a payment.
+   *
+   * Server to server, authenticated, and therefore trustworthy in a way the
+   * browser's return trip never is. This is what lets a student who paid stop
+   * waiting on a webhook that may never come.
+   */
+  getPaymentStatus(reference: string): Promise<PaymentStatus>;
+
+  /**
+   * Reads the gateway's return, whatever it chose to call its own fields.
+   *
+   * Providers disagree about almost everything here: the parameter names, GET
+   * versus a cross-site form POST, and whether a signature comes back at all.
+   * Keeping that on the provider's side of the line is the difference between
+   * swapping one and rewriting the route that receives the payer.
+   *
+   * `signature` is null when the provider does not send one, which is not the
+   * same as sending a wrong one, and callers are expected to tell those apart.
+   */
+  parseReturn(params: URLSearchParams): ReturnParams;
 
   /**
    * Is this browser really coming back from the gateway?

@@ -3,8 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CheckoutForm } from '@/components/commerce/CheckoutForm';
 import { planById } from '@/lib/plans';
-import { isSafepayConfigured } from '@/lib/safepay';
-import { createClient, getUser } from '@/lib/supabase/server';
+import { gateway } from '@/lib/gateway';
+import { getUser } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Checkout',
@@ -19,15 +19,7 @@ export default async function CheckoutPage({
 }) {
   const { plan, cancelled } = await searchParams;
 
-  // Asked once. A student who has paid before should not retype their number,
-  // and the row is only readable by them, so RLS does the scoping.
   const user = await getUser();
-  let knownPhone: string | null = null;
-  if (user) {
-    const supabase = await createClient();
-    const { data } = await supabase.from('profiles').select('phone').eq('id', user.id).maybeSingle();
-    knownPhone = data?.phone ?? null;
-  }
 
   return (
     <div className="min-h-screen">
@@ -44,9 +36,9 @@ export default async function CheckoutPage({
 
       <CheckoutForm
         plan={planById(plan ?? 'quarter')}
-        live={isSafepayConfigured}
+        live={gateway.isConfigured}
         cancelled={cancelled === '1'}
-        knownPhone={knownPhone}
+        accountEmail={user?.email ?? null}
       />
     </div>
   );

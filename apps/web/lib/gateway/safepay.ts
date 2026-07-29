@@ -1,9 +1,15 @@
 import 'server-only';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
-import { checkoutUrl, createTracker, isSafepayConfigured, verifySignature } from '@/lib/safepay';
-import { ensureSafepayCustomer } from '@/lib/safepay-customer';
-import type { CheckoutRequest, CheckoutStart, GatewayEvent, PaymentProvider } from './types';
+import { checkoutUrl, createTracker, fetchTracker, isSafepayConfigured, verifySignature } from './safepay-api';
+import type {
+  CheckoutRequest,
+  CheckoutStart,
+  GatewayEvent,
+  PaymentProvider,
+  PaymentStatus,
+  ReturnParams,
+} from './types';
 
 /**
  * Safepay, behind the neutral interface.
@@ -57,23 +63,17 @@ export const safepayProvider: PaymentProvider = {
   },
 
   async startCheckout(req: CheckoutRequest): Promise<CheckoutStart> {
-    const { payer } = req;
-
     /**
-     * The customer record is a directory entry for reconciliation, not part of
-     * the payment, so it runs alongside the tracker and may fail quietly. Only
-     * the tracker can fail the request: with no tracker there is nothing to pay
-     * against.
+     * Just the tracker.
+     *
+     * A Safepay customer record used to be minted here too, but there is no
+     * parameter on the hosted checkout URL that attaches one to a payment, so
+     * every record was an orphan: it cost a round trip, needed a phone number,
+     * and never appeared against the transaction it was meant to explain. It
+     * becomes worth having again with a custom checkout that can use saved
+     * cards.
      */
-    const [tracker] = await Promise.all([
-      createTracker({ amountRupees: req.amountRupees, orderId: req.orderId }),
-      ensureSafepayCustomer({
-        userId: payer.userId,
-        email: payer.email,
-        name: payer.name,
-        phone: payer.phone,
-      }).catch(() => null),
-    ]);
+    const tracker = await createTracker({ amountRupees: req.amountRupees, orderId: req.orderId });
 
     return {
       reference: tracker,
@@ -132,6 +132,44 @@ export const safepayProvider: PaymentProvider = {
       default:
         return { kind: 'ignored', note: `unhandled event ${type}` };
     }
+  },
+
+  async getPaymentStatus(reference): Promise<PaymentStatus> {
+    const data = await fetchTracker(reference);
+    if (!data) return { kind: 'unknown' };
+
+    /**
+     * Two things have to be true, not one.
+     *
+     * `TRACKER_ENDED` on its own only means the tracker is finished, and a
+     * tracker ends when a payment is abandoned as well as when it settles. The
+     * transaction is the part that means money moved: it carries the amount,
+     * the fees taken and the net, and it does not exist until then.
+     */
+    const txn = data.transaction;
+    if (data.state === 'TRACKER_ENDED' && txn && typeof txn.amount === 'number' && txn.amount > 0) {
+      // v1 speaks whole rupees, the same unit the tracker was created in.
+      return { kind: 'paid', receipt: txn.reference, amountRupees: txn.amount };
+    }
+    if (data.state === 'TRACKER_STARTED') return { kind: 'pending' };
+    return { kind: 'unknown' };
+  },
+
+  parseReturn(params): ReturnParams {
+    /**
+     * Safepay is inconsistent about what it calls these depending on which
+     * branch of its checkout sent you, so each is read under every name it has
+     * been seen using. "Order ID" with a space and a capital is not a typo.
+     *
+     * The webhooks=true return sends no signature at all, so null here is the
+     * ordinary case rather than a red flag.
+     */
+    const first = (...names: string[]) => names.map((n) => params.get(n)).find(Boolean) ?? '';
+    return {
+      reference: first('tracker', 'beacon'),
+      orderId: first('order_id', 'Order ID'),
+      signature: first('sig', 'signature') || null,
+    };
   },
 
   verifyReturn(reference, signature) {

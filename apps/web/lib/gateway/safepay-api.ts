@@ -55,36 +55,12 @@ export const isSafepayConfigured = Boolean(MERCHANT_API_KEY && SECRET_KEY);
  * checkout, and that is a milestone decision rather than a prototype one.
  */
 
-/** Creates a Safepay customer. Call once per student; store what it returns. */
-export async function createCustomer(input: { email: string; name: string; phone: string }): Promise<string | null> {
-  const secret = process.env.SAFEPAY_SECRET_KEY;
-  if (!secret) return null;
-
-  const [firstName, ...rest] = input.name.trim().split(/\s+/);
-  const res = await fetch(`${HOST}/user/customers/v1/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-SFPY-MERCHANT-SECRET': secret },
-    cache: 'no-store',
-    body: JSON.stringify({
-      first_name: firstName || 'Student',
-      // Safepay marks last_name mandatory and most students give one name.
-      last_name: rest.join(' ') || firstName || 'Student',
-      email: input.email,
-      // Mandatory. Safepay rejects the call outright without it.
-      phone_number: input.phone,
-      country: 'PK',
-    }),
-  });
-
-  const body = (await res.json().catch(() => ({}))) as { data?: { token?: string } };
-  if (!res.ok || !body.data?.token) {
-    // Not fatal: a payment without a customer attached still works, it is just
-    // harder to reconcile later. Never block checkout on it.
-    console.error('safepay: could not create customer', res.status, JSON.stringify(body).slice(0, 200));
-    return null;
-  }
-  return body.data.token;
-}
+/*
+ * createCustomer lived here and is gone with the rest of the customer path.
+ * Nothing on the hosted checkout URL attaches a customer to a payment, so every
+ * record it made was an orphan that cost a round trip and a phone number. The
+ * endpoint is /user/customers/v1/ if a custom checkout ever needs saved cards.
+ */
 
 type TrackerResponse = {
   /** v1 returns the token at the top of `data`, v3 nests it under `tracker`. */
@@ -201,4 +177,30 @@ export function verifySignature(tracker: string, signature: string | null | unde
   return [process.env.SAFEPAY_WEBHOOK_SECRET, SECRET_KEY]
     .filter((secret): secret is string => Boolean(secret))
     .some((secret) => matches(createHmac('sha256', secret).update(tracker).digest('hex'), given));
+}
+
+/**
+ * Reads a tracker back from Safepay, authenticated with the merchant secret.
+ *
+ * This is how a payment gets confirmed when no webhook arrives, which on this
+ * account is every payment so far. `/order/v1/{tracker}` is the read side of
+ * the same v1 API the tracker was created with, so the amount comes back in
+ * whole rupees and needs no conversion.
+ */
+export async function fetchTracker(tracker: string): Promise<{
+  state?: string;
+  transaction?: { amount?: number; reference?: string; net?: number };
+} | null> {
+  if (!SECRET_KEY || !tracker) return null;
+
+  const res = await fetch(`${HOST}/order/v1/${encodeURIComponent(tracker)}`, {
+    headers: { 'Content-Type': 'application/json', 'X-SFPY-MERCHANT-SECRET': SECRET_KEY },
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    console.error('safepay: could not read tracker', res.status);
+    return null;
+  }
+  const body = (await res.json().catch(() => ({}))) as { data?: { state?: string; transaction?: Record<string, number | string> } };
+  return (body.data as { state?: string; transaction?: { amount?: number; reference?: string; net?: number } }) ?? null;
 }
