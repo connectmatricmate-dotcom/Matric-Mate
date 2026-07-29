@@ -121,5 +121,14 @@ export function Actions({ children, align = 'end' }: { children: React.ReactNode
  * label. Two columns on desktop keeps every row near its natural reading width.
  */
 export function CardGrid({ children, cols = 2 }: { children: React.ReactNode; cols?: 2 | 3 }) {
-  return <div className={`grid gap-4 ${cols === 3 ? 'lg:grid-cols-3' : 'md:grid-cols-2'}`}>{children}</div>;
+  /**
+   * Cells stretch to the row: without it, two cards side by side ended at
+   * whatever height their own text happened to reach, and settings read as
+   * four cards of four heights instead of a grid.
+   */
+  return (
+    <div className={`grid items-stretch gap-4 [&>*]:h-full ${cols === 3 ? 'lg:grid-cols-3' : 'md:grid-cols-2'}`}>
+      {children}
+    </div>
+  );
 }

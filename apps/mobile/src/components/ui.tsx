@@ -594,10 +594,24 @@ export function Ring({
 }
 
 export function Kpi({ value, label, small }: { value: string; label: string; small?: boolean }) {
+  /**
+   * Tiles that share a row share a height. Values wrap differently ("2h 15m"
+   * against "94%"), and without a floor each tile sized to its own content,
+   * so one KPI in a row of three stood taller than its siblings. The floor
+   * plus centred content means ragged text can never move the chrome, and
+   * tabular figures keep the numbers from shifting as they change.
+   */
   return (
-    <View style={[st.kpi, small && { paddingVertical: 10, paddingHorizontal: 10 }]}>
-      <Text style={{ fontFamily: F.display, fontSize: small ? 17 : 22, color: C.ink }}>{value}</Text>
-      <Text style={{ fontFamily: F.bodyBold, fontSize: small ? 10.5 : 11.5, color: C.ink2 }}>{label}</Text>
+    <View style={[st.kpi, small ? { paddingVertical: 10, paddingHorizontal: 10, minHeight: 58 } : { minHeight: 74 }]}>
+      <Text
+        style={{ fontFamily: F.display, fontSize: small ? 17 : 22, color: C.ink, fontVariant: ['tabular-nums'] }}
+        numberOfLines={1}
+      >
+        {value}
+      </Text>
+      <Text style={{ fontFamily: F.bodyBold, fontSize: small ? 10.5 : 11.5, color: C.ink2 }} numberOfLines={1}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -836,6 +850,7 @@ const st = StyleSheet.create({
   knob: { position: 'absolute', width: 20, height: 20, borderRadius: R.pill, backgroundColor: '#fff' },
   kpi: {
     flex: 1,
+    justifyContent: 'center',
     backgroundColor: C.card,
     borderWidth: 1,
     borderColor: C.line,

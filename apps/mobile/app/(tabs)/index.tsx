@@ -206,7 +206,7 @@ export default function Dashboard() {
           <Card
             key={q.label}
             onPress={() => router.push(q.href as never)}
-            style={{ flexGrow: 1, flexBasis: '46%', flexDirection: 'row', alignItems: 'center', gap: S.sm }}
+            style={{ flexGrow: 1, flexBasis: '46%', minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: S.sm }}
           >
             <Icon name={q.icon} color={C.teal} />
             <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(q.label)}</Text>

@@ -219,10 +219,11 @@ export function Ring({
 }
 
 export function Kpi({ value, label }: { value: string; label: string }) {
+  /* Same rule as the Android tile: tiles that share a row share a height. */
   return (
-    <div className="rounded-[16px] border border-line bg-card px-4 py-3">
-      <div className="font-display text-[22px] tabular-nums text-ink">{value}</div>
-      <div className="text-[11.5px] font-extrabold text-ink2">{label}</div>
+    <div className="flex h-full min-h-[74px] flex-col justify-center rounded-[16px] border border-line bg-card px-4 py-3">
+      <div className="truncate font-display text-[22px] leading-tight tabular-nums text-ink">{value}</div>
+      <div className="truncate text-[11.5px] font-extrabold text-ink2">{label}</div>
     </div>
   );
 }
