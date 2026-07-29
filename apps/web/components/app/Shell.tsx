@@ -8,8 +8,7 @@
  */
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import type { IconName, StringKey } from '@matricmate/core';
 import { levelProgress } from '@matricmate/core';
 import { Bar, Icon } from '@/components/ui/primitives';
@@ -33,16 +32,12 @@ function isActive(pathname: string, item: (typeof NAV)[number]) {
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const t = useT();
-  const { state, hydrated, derived } = useApp();
+  const { state, derived } = useApp();
   const unread = state.notifications.some((n) => !n.read);
 
-  // Signed-out visitors don't get the app shell. Real auth arrives with Supabase,
-  // where proxy.ts refuses the route before it ever renders.
-  useEffect(() => {
-    if (hydrated && !state.user) router.replace('/login');
-  }, [hydrated, state.user, router]);
+  // No client-side auth redirect: proxy.ts turns away unauthenticated requests
+  // before this renders, so there is nothing to flash and nothing to guard here.
 
   return (
     <div className="min-h-screen md:flex">

@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { levelProgress, xpToNextLevel } from '@matricmate/core';
+import { signOutAction } from '@/app/(auth)/actions';
 import { planById } from '@/lib/plans';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, StreakRail } from '@/components/app/rails';
@@ -15,7 +15,6 @@ import { useApp, useT } from '@/lib/store';
 export function AccountView() {
   const { state, actions, derived } = useApp();
   const t = useT();
-  const router = useRouter();
   const [confirmOut, setConfirmOut] = useState(false);
   const setup = state.onboarding;
 
@@ -130,7 +129,7 @@ export function AccountView() {
           onClick={() => {
             setConfirmOut(false);
             actions.signOut();
-            router.replace('/');
+            void signOutAction();
           }}
         />
         <Btn title={t('auth.stayLoggedIn')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmOut(false)} />

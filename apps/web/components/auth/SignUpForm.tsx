@@ -1,57 +1,39 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { api } from '@matricmate/core';
-import { Btn, ErrorBanner, Field } from '@/components/ui/controls';
+import { useActionState, useState } from 'react';
+import { type AuthState, signUpAction } from '@/app/(auth)/actions';
+import { ErrorBanner, Field, SubmitButton } from '@/components/ui/controls';
 import { Card } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
-import { isFormValid, validateContact, validateName, validatePassword } from '@/lib/validation';
+import { useT } from '@/lib/store';
+import { isFormValid, validateEmail, validateName, validatePassword } from '@/lib/validation';
 
-export function SignUpForm() {
+export function SignUpForm({ next }: { next?: string }) {
   const t = useT();
-  const router = useRouter();
-  const { actions } = useApp();
+  const [state, action] = useActionState<AuthState, FormData>(signUpAction, {});
+
   const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [touched, setTouched] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const nameError = validateName(name);
-  const contactError = validateContact(contact);
+  const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
-  const canSubmit = isFormValid(nameError, contactError, passwordError);
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setTouched(true);
-    if (!canSubmit) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const user = await api.signUp({ name, contact, password });
-      actions.signIn(user);
-      router.push('/onboarding/class');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not create your account.');
-    } finally {
-      setBusy(false);
-    }
-  }
+  const canSubmit = isFormValid(nameError, emailError, passwordError);
 
   return (
     <Card>
       <h1 className="font-display text-[24px] text-ink">{t('auth.signUpTitle')}</h1>
       <p className="mb-4 mt-0.5 text-[14px] text-ink2">{t('auth.signUpSub')}</p>
 
-      {error ? <ErrorBanner message={error} onDismiss={() => setError(null)} /> : null}
+      {state.error ? <ErrorBanner message={state.error} /> : null}
 
-      <form onSubmit={submit} noValidate>
+      <form action={action} onSubmit={() => setTouched(true)} noValidate>
+        <input type="hidden" name="next" value={next ?? '/onboarding/class'} />
         <Field
           label={t('auth.fullName')}
+          name="name"
           value={name}
           onChange={setName}
           placeholder={t('auth.namePlaceholder')}
@@ -62,16 +44,19 @@ export function SignUpForm() {
         />
         <Field
           label={t('auth.contact')}
-          value={contact}
-          onChange={setContact}
+          name="email"
+          value={email}
+          onChange={setEmail}
           placeholder={t('auth.contactPlaceholder')}
           icon="mail"
-          autoComplete="username"
+          type="email"
+          autoComplete="email"
           required
-          error={touched ? (contactError ?? undefined) : undefined}
+          error={touched ? (emailError ?? undefined) : undefined}
         />
         <Field
           label={t('auth.password')}
+          name="password"
           value={password}
           onChange={setPassword}
           placeholder={t('auth.passwordPlaceholder')}
@@ -82,7 +67,12 @@ export function SignUpForm() {
           error={touched ? (passwordError ?? undefined) : undefined}
         />
         <p className="mb-3 text-[12px] leading-[1.6] text-ink2">{t('auth.terms')}</p>
-        <Btn title={t('auth.createAccount')} type="submit" loading={busy} disabled={!canSubmit} className="w-full" />
+        <SubmitButton
+          title={t('auth.createAccount')}
+          pendingTitle="Creating your account…"
+          disabled={!canSubmit}
+          className="w-full"
+        />
       </form>
 
       <p className="mt-3 text-center text-[13px] text-ink2">

@@ -143,6 +143,7 @@ export function ItemButton(props: React.ComponentProps<typeof ItemBody> & { onCl
 
 export function Field({
   label,
+  name,
   value,
   onChange,
   placeholder,
@@ -155,6 +156,8 @@ export function Field({
   autoComplete,
 }: {
   label: string;
+  /** Required for server-action forms: FormData is keyed on it. */
+  name?: string;
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
@@ -185,6 +188,7 @@ export function Field({
         {icon ? <Icon name={icon} size={18} className="shrink-0 text-ink3" /> : null}
         <input
           id={inputId}
+          name={name}
           type={isPassword && reveal ? 'text' : type}
           value={value}
           required={required}

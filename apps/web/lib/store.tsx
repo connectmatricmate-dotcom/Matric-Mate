@@ -36,6 +36,7 @@ import {
   update,
   xpFor,
 } from './persisted-store';
+import { createClient } from './supabase/client';
 import { seed } from './seed';
 
 export type { Onboarding, Settings, State };
@@ -172,6 +173,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Reads the saved snapshot into the external store; not a setState cascade.
   useEffect(() => {
     hydrate();
+  }, []);
+
+  /**
+   * Identity comes from Supabase, not from localStorage.
+   *
+   * proxy.ts already refuses protected routes server-side, so this is not the
+   * access control; it is how the UI learns the student's name and keeps in
+   * step when a session is refreshed, or ends in another tab.
+   */
+  useEffect(() => {
+    const supabase = createClient();
+
+    const apply = (u: { id: string; email?: string; user_metadata?: { name?: string } } | null) =>
+      update((s) => {
+        if (!u) return s.user ? { ...s, user: null } : s;
+        const user = {
+          id: u.id,
+          name: u.user_metadata?.name?.trim() || (u.email ?? '').split('@')[0] || 'Student',
+          contact: u.email ?? '',
+        };
+        if (s.user?.id === user.id && s.user.name === user.name) return s;
+        // A brand new account gets the sample data once, so the demo is not an
+        // empty dashboard. Real accounts with history are left alone.
+        const fresh = s.attempts.length === 0 && s.results.length === 0;
+        return touchToday({ ...s, user, ...(fresh ? seed() : {}) });
+      });
+
+    void supabase.auth.getUser().then(({ data }) => apply(data.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => apply(session?.user ?? null));
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const derived = useMemo(() => {

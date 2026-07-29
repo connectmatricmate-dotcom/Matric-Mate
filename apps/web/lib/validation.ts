@@ -3,15 +3,15 @@
  * action, so a user never round-trips to learn "min 6 characters".
  */
 
-export const CONTACT_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$|^0?3\d{9}$/;
+export const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export function validateName(v: string) {
   return v.trim().length >= 2 ? null : 'Enter your full name.';
 }
 
-export function validateContact(v: string) {
-  if (!v.trim()) return 'Enter your email or mobile number.';
-  return CONTACT_RE.test(v.trim()) ? null : 'Use an email like ahmed@gmail.com or a number like 03001234567.';
+export function validateEmail(v: string) {
+  if (!v.trim()) return 'Enter your email.';
+  return EMAIL_RE.test(v.trim()) ? null : 'Use an email like ahmed@gmail.com.';
 }
 
 export function validatePassword(v: string) {
