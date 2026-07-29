@@ -10,7 +10,7 @@ export const XP = {
   forAnswer(correct: boolean, confidence: Confidence | null): number {
     if (!correct) return 0;
     if (confidence === 2) return 12; // Pakka
-    if (confidence === 1) return 10; // Thora sure
+    if (confidence === 1) return 10; // Thora pakka
     if (confidence === 0) return 5; // Tukka: right, but own it
     return 10;
   },
@@ -64,7 +64,7 @@ export function confidenceBreakdown(attempts: Attempt[]) {
     const set = attempts.filter((a) => a.confidence === c);
     return {
       confidence: c,
-      label: c === 2 ? 'Pakka ✓' : c === 1 ? 'Thora sure' : 'Tukka 🎲',
+      label: c === 2 ? 'Pakka ✓' : c === 1 ? 'Thora pakka' : 'Tukka 🎲',
       said: set.length,
       accuracy: accuracy(set),
     };
@@ -77,12 +77,12 @@ export function confidenceInsight(rows: ReturnType<typeof confidenceBreakdown>):
   const tukka = rows.find((r) => r.confidence === 0);
   if (!pakka?.said && !tukka?.said) return null;
   if (pakka && pakka.said >= 5 && pakka.accuracy >= 85)
-    return `Jab tum Pakka kehte ho, ${pakka.accuracy}% sahi hota hai, trust yourself.`;
+    return `Jab aap Pakka kehte hain, ${pakka.accuracy}% sahi hota hai. Khud par bharosa rakhein.`;
   if (pakka && pakka.said >= 5 && pakka.accuracy < 65)
-    return `Pakka wale jawab sirf ${pakka.accuracy}% sahi hain. Un topics ko dobara dekho, confidence dhoka de raha hai.`;
+    return `Pakka wale jawab sirf ${pakka.accuracy}% sahi hain. Un topics ko dobara dekh lein, confidence dhoka de raha hai.`;
   if (tukka && tukka.said > 0 && pakka)
-    return `Tukka answers ${tukka.accuracy}% sahi hain vs Pakka ${pakka.accuracy}%. Guessing kam karne ke liye practice barhao.`;
-  return 'Thora aur practice karo, phir confidence ka pattern saaf nazar aayega.';
+    return `Tukka answers ${tukka.accuracy}% sahi hain vs Pakka ${pakka.accuracy}%. Tukkay kam karne ke liye practice barhayein.`;
+  return 'Thori aur practice karein, phir confidence ka pattern saaf nazar aaye ga.';
 }
 
 /** Topics ranked worst-first, from at least 3 attempts each. */

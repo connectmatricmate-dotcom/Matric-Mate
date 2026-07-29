@@ -132,7 +132,7 @@ export const api = {
       };
     if (q.includes('inertia'))
       return {
-        text: 'Inertia, asaan alfaaz mein:',
+        text: 'Inertia, asaan lafzon mein:',
         steps: [
           'Every body resists a change in its state of rest or motion.',
           'That resistance is called inertia, and mass is its measure.',
@@ -142,9 +142,9 @@ export const api = {
     return {
       text: `Let’s work through “${question.trim() || 'your question'}”${context ? ` (${context})` : ''}:`,
       steps: [
-        'Pehle yeh dekho ke question kis concept ka hai, phir usko naam do.',
-        'Us concept ki definition aur formula likho, phir given values daalo.',
-        'Answer ko unit ke saath likho aur ek line mein reason batao.',
+        'Pehle dekhein ke sawal kis concept ka hai, phir usay naam dein.',
+        'Us concept ki definition aur formula likhein, phir given values daalein.',
+        'Jawab unit ke saath likhein aur aik line mein wajah batayein.',
         'Note: this demo returns a sample answer. The live tutor (M3) runs on Claude with a daily quota per student.',
       ],
     };
