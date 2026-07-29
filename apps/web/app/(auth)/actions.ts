@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { SITE_URL } from '@/lib/site';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -86,11 +87,41 @@ export async function resetPasswordAction(_prev: AuthState, formData: FormData):
   if (!parsed.success) return { error: first(parsed.error) };
 
   const supabase = await createClient();
-  await supabase.auth.resetPasswordForEmail(parsed.data);
+  // The link has to land on /auth/callback, which is the only place that can
+  // turn the one-time code into a session. Sending it straight at /reset would
+  // give the student a form with no authority to save anything.
+  await supabase.auth.resetPasswordForEmail(parsed.data, {
+    redirectTo: `${SITE_URL}/auth/callback?next=/reset`,
+  });
 
   // Always the same answer, whether or not the account exists, for the same
   // reason as above.
   return { sent: true };
+}
+
+/**
+ * Sets a new password for whoever the recovery link signed in.
+ *
+ * The user is read from the session, never from the form. A password reset that
+ * took an email address from the request body would let anyone reset anyone's.
+ */
+export async function setPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const parsed = z
+    .object({ password, confirm: z.string() })
+    .refine((v) => v.password === v.confirm, { message: 'Both passwords need to match.' })
+    .safeParse({ password: formData.get('password'), confirm: formData.get('confirm') });
+  if (!parsed.success) return { error: first(parsed.error) };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'That reset link has expired. Ask for a new one.' };
+
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
+  if (error) return { error: error.message };
+
+  redirect('/dashboard');
 }
 
 export async function signOutAction() {

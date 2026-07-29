@@ -15,7 +15,6 @@
  * packages/core/src/billing.ts.
  */
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PayMark } from '@/components/commerce/PayMark';
 import { Btn, ErrorBanner } from '@/components/ui/controls';
@@ -35,9 +34,8 @@ export function CheckoutForm({
   live: boolean;
   cancelled?: boolean;
 }) {
-  const { state, actions, hydrated } = useApp();
+  const { state, hydrated } = useApp();
   const t = useT();
-  const router = useRouter();
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(
@@ -49,13 +47,11 @@ export function CheckoutForm({
     setError(null);
 
     if (!live) {
-      await new Promise((r) => setTimeout(r, 900));
-      actions.subscribePremium({
-        ref: `SP-DEMO-${100000 + (plan.price % 899999)}`,
-        validTill: Date.now() + plan.months * 30 * 864e5,
-        plan: plan.id,
-      });
-      router.push(`/checkout/success?status=ok&order=MM-${plan.id}-demo`);
+      // No gateway on this deployment. Say so rather than faking a receipt:
+      // entitlement is written by the webhook now, and a pretend one here would
+      // disagree with the database the moment anything reloaded.
+      setBusy(false);
+      setError('Payments are not configured on this deployment yet.');
       return;
     }
 

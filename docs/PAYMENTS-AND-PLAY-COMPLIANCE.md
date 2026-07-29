@@ -162,12 +162,67 @@ webhook, never from the return URL.
 
 ---
 
+## The webhook, which is the only thing that grants Premium
+
+### Setting it up in the Safepay dashboard
+
+Webhooks are off until you turn them on: **Developers → Endpoints → enable**,
+then add an endpoint.
+
+| Field | Value |
+| :-- | :-- |
+| URL | `https://matric-mate-web.vercel.app/api/webhooks/safepay` |
+| Events | `payment.succeeded`, `payment.failed`, `payment.refunded`, `authorization.succeeded`, `authorization.reversed`, `void.succeeded` |
+
+Copy the endpoint's **signing secret** into `SAFEPAY_WEBHOOK_SECRET`, locally
+and in Vercel. It is **not** the merchant secret key: Safepay signs each webhook
+with a secret belonging to that endpoint.
+
+### How it verifies
+
+`HMAC-SHA512` of the **raw** request body, hex, in `X-SFPY-SIGNATURE`, compared
+in constant time. The raw text matters: parsing and re-serialising changes key
+order and whitespace, and the signature stops matching for no visible reason.
+
+### Why the payment row is written before the student leaves
+
+Nothing in a Safepay payment says who paid. `/api/checkout` therefore writes a
+`pending` row keyed on the tracker, with the user id taken **from the session,
+never from the request body**, and the price looked up from `PLANS` by id,
+**never from the body**. The webhook joins back to that row. It is also the
+trail to check when a student says they paid and access did not arrive.
+
+### Redelivery must not extend the plan
+
+Webhooks are at-least-once, Safepay retries on any non-2xx, and a single payment
+emits more than one success-shaped event (`authorization.succeeded` then
+`payment.succeeded`).
+
+The first version of this handler extended the plan on every one of them: three
+deliveries turned a three-month plan into nine, and posted three receipts. The
+handler now stops if the payment is already `paid`. A genuine second purchase
+carries a different tracker, so it is unaffected.
+
+Verified: three deliveries, including two different event types, produce one
+grant, one expiry date and one receipt.
+
+### What a bad signature does
+
+Returns 401 and changes nothing. Tested with no signature and with a forged one.
+An unknown tracker returns 200 and grants nothing, because retrying it forever
+would help no one.
+
+---
+
 ## The one rule that must not be broken
 
 `/checkout/return` proves that Safepay redirected the browser here. It does
-**not** prove money settled, and anyone can type the URL. Until the webhook
-writes entitlement server-side, the Premium flag it sets lives in one browser
-and is a prototype convenience, which the success page says out loud.
+**not** prove money settled, and anyone can type the URL. So it grants nothing:
+it carries the tracker across to the success page, which reads the payment row
+under the student's own session and reports what the database says.
 
-When Supabase lands: the webhook becomes the only thing that grants Premium, and
-the return page becomes what it should always have been, a receipt.
+The webhook is the only writer of `entitlements`, and the table has no write
+policy at all, so nothing else *can* write it. The success page shows a waiting
+state while the webhook is in flight, because the browser usually beats it back
+by a second or two, and telling a student who has just paid that something went
+wrong would be both wrong and alarming.

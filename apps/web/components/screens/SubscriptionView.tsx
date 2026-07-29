@@ -5,13 +5,9 @@
  * or cancelled, the Android build shows the same status read-only, because
  * Google Play forbids it from linking to a checkout. See core/billing.ts.
  */
-import { useState } from 'react';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Item, LinkBtn, Pill, SectionTitle } from '@/components/ui/primitives';
-import { Sheet } from '@/components/ui/sheet';
-import { useToast } from '@/components/ui/toast';
 import { planById, rupees } from '@/lib/plans';
 import { useApp, useT } from '@/lib/store';
 
@@ -24,10 +20,8 @@ const PERKS: [IconName, StringKey][] = [
 ];
 
 export function SubscriptionView() {
-  const { state, actions } = useApp();
+  const { state } = useApp();
   const t = useT();
-  const toast = useToast();
-  const [confirmCancel, setConfirmCancel] = useState(false);
   const active = state.premium.active;
   const plan = planById(state.premium.plan ?? 'monthly');
 
@@ -78,8 +72,12 @@ export function SubscriptionView() {
               variant="orange"
               icon="card"
             />
-            <Btn title={t('account.cancelSub')} variant="ghost" onClick={() => setConfirmCancel(true)} />
-            <p className="text-[13px] text-ink2">{t('account.noAutoCharge')}</p>
+            {/* No cancel button, because there is nothing to cancel: plans are
+                paid once and never auto-charge. Offering "Cancel subscription"
+                would imply a recurring charge that does not exist, and worry
+                people into cancelling something imaginary. It comes back when
+                auto-renew does. */}
+            <p className="text-[13px] leading-[1.6] text-ink2">{t('account.noAutoCharge')}</p>
           </>
         ) : (
           <>
@@ -95,20 +93,6 @@ export function SubscriptionView() {
         <Item href="/account/payments" title={t('account.paymentHistory')} icon="card" last />
       </Card>
 
-      <Sheet open={confirmCancel} onClose={() => setConfirmCancel(false)} title={t('account.cancelTitle')}>
-        <p className="text-[13.5px] leading-[1.6] text-ink2">{t('account.cancelBody')}</p>
-        <Btn
-          title={t('account.cancelSub')}
-          variant="danger"
-          className="mt-5 w-full"
-          onClick={() => {
-            actions.cancelSubscription();
-            setConfirmCancel(false);
-            toast(t('account.cancelled'));
-          }}
-        />
-        <Btn title={t('account.keepPremium')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmCancel(false)} />
-      </Sheet>
     </Page>
   );
 }

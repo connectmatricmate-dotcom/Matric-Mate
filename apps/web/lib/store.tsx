@@ -45,8 +45,6 @@ type Actions = {
   signIn: (u: { id: string; name: string; contact: string }) => void;
   signOut: () => void;
   setOnboarding: (o: Partial<Onboarding>) => void;
-  subscribePremium: (p: { ref: string; validTill: number; plan?: string }) => void;
-  cancelSubscription: () => void;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => void;
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
   markSectionRead: (sectionId: string, chapterId: string, index: number) => void;
@@ -89,24 +87,6 @@ const actions: Actions = {
         ...o,
       },
     })),
-  subscribePremium: ({ ref, validTill, plan }) =>
-    update((s) => ({
-      ...s,
-      premium: { active: true, validTill, ref, plan },
-      notifications: [
-        {
-          id: `pay-${Date.now()}`,
-          kind: 'payment',
-          title: 'Payment received',
-          body: 'Premium is active for one month.',
-          at: Date.now(),
-          target: 'payments',
-          read: false,
-        },
-        ...s.notifications,
-      ],
-    })),
-  cancelSubscription: () => update((s) => ({ ...s, premium: { active: false, validTill: null } })),
   recordAttempt: (a) =>
     update((s) =>
       touchToday({
@@ -200,8 +180,39 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return touchToday({ ...s, user, ...(fresh ? seed() : {}) });
       });
 
-    void supabase.auth.getUser().then(({ data }) => apply(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => apply(session?.user ?? null));
+    /**
+     * Entitlement is read, never written, on the client.
+     *
+     * The row is written by the payment webhook under the service role, and RLS
+     * gives the student SELECT and nothing else. So this mirrors the database
+     * into the UI; it cannot invent access. Anything that used to set premium
+     * locally is gone, because a local flag and the database disagreeing is
+     * worse than no flag at all.
+     */
+    const syncEntitlement = async () => {
+      const { data } = await supabase.from('entitlements').select('active, plan, valid_till').maybeSingle();
+      update((s) => ({
+        ...s,
+        premium: data?.active
+          ? {
+              active: true,
+              plan: data.plan ?? undefined,
+              validTill: data.valid_till ? new Date(data.valid_till).getTime() : null,
+              ref: s.premium.ref,
+            }
+          : { active: false, validTill: null },
+      }));
+    };
+
+    void supabase.auth.getUser().then(({ data }) => {
+      apply(data.user);
+      if (data.user) void syncEntitlement();
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      apply(session?.user ?? null);
+      if (session?.user) void syncEntitlement();
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 

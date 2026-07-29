@@ -9,11 +9,9 @@ import { verifySignature } from '@/lib/safepay';
  * then send the browser on to a normal page with a 303 so a refresh does not
  * re-submit the form.
  *
- * What this page must never become is the thing that grants Premium. Anyone can
- * type this URL, and a signature only proves Safepay redirected here, not that
- * money settled. Until the webhook writes entitlement server-side, the flag it
- * sets is a prototype convenience and nothing more, which is exactly why the
- * success page says so out loud.
+ * This page must never be the thing that grants Premium. Anyone can type the
+ * URL, and a valid signature only proves Safepay redirected here, not that money
+ * settled. The webhook is the only writer of entitlement; this is a signpost.
  */
 async function handle(request: Request) {
   const url = new URL(request.url);
@@ -26,7 +24,6 @@ async function handle(request: Request) {
 
   const tracker = get('tracker', 'beacon');
   const signature = get('sig', 'signature');
-  const reference = get('reference', 'reference_code', 'Reference Code');
   const orderId = get('order_id', 'Order ID');
 
   const verified = Boolean(tracker) && verifySignature(tracker, signature);
@@ -34,11 +31,12 @@ async function handle(request: Request) {
     console.warn('checkout/return: signature did not verify', { tracker: tracker.slice(0, 12), orderId });
   }
 
+  // Nothing is granted here. The success page reads the payment row, which only
+  // the webhook can move to "paid". All this does is carry the tracker across so
+  // the page knows which payment to look up.
   const next = new URL('/checkout/success', url.origin);
-  next.searchParams.set('status', verified ? 'ok' : 'unverified');
-  if (reference) next.searchParams.set('ref', reference);
-  if (orderId) next.searchParams.set('order', orderId);
   if (tracker) next.searchParams.set('tracker', tracker);
+  if (!verified) next.searchParams.set('status', 'unverified');
 
   return NextResponse.redirect(next, 303);
 }
