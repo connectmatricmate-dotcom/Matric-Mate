@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { safePath } from '@/lib/safe-path';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -15,8 +16,7 @@ export async function GET(request: Request) {
 
   // Same rule as the login form: a path on this site, never a full URL, or the
   // reset email becomes a redirect anyone can point wherever they like.
-  const requested = url.searchParams.get('next') ?? '';
-  const next = requested.startsWith('/') && !requested.startsWith('//') ? requested : '/dashboard';
+  const next = safePath(url.searchParams.get('next'));
 
   if (!code) {
     return NextResponse.redirect(new URL('/login?error=link', url.origin));

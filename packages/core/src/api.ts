@@ -80,30 +80,16 @@ export const api = {
 
   /* ----------------------------------------------------------------- auth */
 
-  async signUp(input: { name: string; contact: string; password: string }) {
-    await wait(500);
-    if (!input.name.trim()) throw new Error('Enter your full name.');
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$|^0?3\d{9}$/.test(input.contact.trim()))
-      throw new Error('Enter a valid email or 11-digit mobile number.');
-    if (input.password.length < 6) throw new Error('Password must be at least 6 characters.');
-    return { id: 'u_demo', name: input.name.trim(), contact: input.contact.trim() };
-  },
-
-  async signIn(input: { contact: string; password: string }) {
-    await wait(500);
-    if (!input.contact.trim() || input.password.length < 6)
-      throw new Error('Wrong email or password.');
-    const name = input.contact.includes('@')
-      ? input.contact.split('@')[0].replace(/[._-]/g, ' ')
-      : 'Student';
-    return { id: 'u_demo', name: name.replace(/\b\w/g, (m) => m.toUpperCase()), contact: input.contact.trim() };
-  },
-
-  async requestPasswordReset(contact: string) {
-    await wait(500);
-    if (!contact.trim()) throw new Error('Enter your email or mobile number.');
-    return true;
-  },
+  /*
+   * There is no mock auth here any more, deliberately.
+   *
+   * signUp, signIn and requestPasswordReset used to live at this spot and would
+   * accept any email with a six-character password, returning a hardcoded
+   * `u_demo`. Both apps now use Supabase, so leaving working fakes next to the
+   * real thing is an invitation to wire the wrong one back in by accident.
+   *
+   * Web: apps/web/app/(auth)/actions.ts · Android: apps/mobile/src/store/auth.tsx
+   */
 
   /* ------------------------------------------------------------- payments */
 

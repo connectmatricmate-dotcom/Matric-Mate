@@ -17,6 +17,7 @@ import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey ,
   PlanTask,
   TestResult,
 } from '@matricmate/core';
+import { useAuth } from './auth';
 
 const KEY = 'mm.state.v1';
 
@@ -225,12 +226,14 @@ function seed(): Partial<State> {
 
 /* ------------------------------------------------------------------ context */
 
+/**
+ * Note what is missing: there is no signIn, signOut, subscribe or cancel here
+ * any more. Identity and entitlement are owned by store/auth.tsx and come from
+ * the server. A local `subscribe()` would have meant the phone could grant
+ * itself premium, which is both a bug and the thing Play policy exists to stop.
+ */
 type Actions = {
-  signIn: (u: { id: string; name: string; contact: string }) => void;
-  signOut: () => void;
   setOnboarding: (o: Partial<Onboarding>) => void;
-  subscribe: (p: { ref: string; validTill: number }) => void;
-  cancelSubscription: () => void;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => Attempt;
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
   markSectionRead: (sectionId: string, chapterId: string, index: number) => void;
@@ -261,6 +264,12 @@ type Ctx = {
 const AppCtx = createContext<Ctx | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  /**
+   * Study progress is still local. Identity and entitlement are not, and are
+   * merged in below so every screen keeps reading `state.user` and
+   * `state.premium` without knowing where they came from.
+   */
+  const { user: authUser, entitlement } = useAuth();
   const [state, setState] = useState<State>(EMPTY);
   const [hydrated, setHydrated] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -294,14 +303,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return s.activeDays.includes(t) ? s : { ...s, activeDays: [...s.activeDays, t] };
   };
 
+  /**
+   * Seed sample progress the first time a real account is seen on this phone.
+   *
+   * The app is still a prototype on mock content, and an empty dashboard shows
+   * the client nothing. This goes away with the study-state sync, when progress
+   * starts coming from Postgres like entitlement already does.
+   */
+  const seededFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!hydrated || !authUser || seededFor.current === authUser.id) return;
+    seededFor.current = authUser.id;
+    setState((s) => touchToday(s.attempts.length === 0 && s.results.length === 0 ? { ...s, ...seed() } : s));
+  }, [hydrated, authUser]);
+
   const actions = useMemo<Actions>(
     () => ({
-      signIn: (user) =>
-        setState((s) => {
-          const fresh = s.attempts.length === 0 && s.results.length === 0;
-          return touchToday({ ...s, user, ...(fresh ? seed() : {}) });
-        }),
-      signOut: () => setState((s) => ({ ...s, user: null })),
       setOnboarding: (o) =>
         setState((s) => ({
           ...s,
@@ -315,24 +332,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             ...o,
           },
         })),
-      subscribe: ({ ref, validTill }) =>
-        setState((s) => ({
-          ...s,
-          premium: { active: true, validTill, ref },
-          notifications: [
-            {
-              id: `pay-${Date.now()}`,
-              kind: 'payment',
-              title: 'Payment received',
-              body: 'Premium is active for one month.',
-              at: Date.now(),
-              target: 'payments',
-              read: false,
-            },
-            ...s.notifications,
-          ],
-        })),
-      cancelSubscription: () => setState((s) => ({ ...s, premium: { active: false, validTill: null } })),
       recordAttempt: (a) => {
         const full: Attempt = { ...a, id: `a-${Date.now()}-${Math.round(Math.random() * 1e4)}`, at: Date.now() };
         setState((s) =>
@@ -408,28 +407,45 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  /**
+   * What every screen actually sees.
+   *
+   * Identity and entitlement are overlaid from the auth store, so `state.user`
+   * and `state.premium` stay exactly where they have always been while their
+   * source of truth moved to the server. No screen had to change, and none of
+   * them can write to either any more.
+   */
+  const view = useMemo<State>(
+    () => ({
+      ...state,
+      user: authUser ? { id: authUser.id, name: authUser.name, contact: authUser.email } : null,
+      premium: { active: entitlement.active, validTill: entitlement.validTill },
+    }),
+    [state, authUser, entitlement]
+  );
+
   const derived = useMemo(() => {
-    const aiLimit = state.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
-    const usedToday = state.ai.day === todayKey() ? state.ai.used : 0;
-    const subjects = state.onboarding?.subjects?.length
-      ? state.onboarding.subjects
+    const aiLimit = view.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
+    const usedToday = view.ai.day === todayKey() ? view.ai.used : 0;
+    const subjects = view.onboarding?.subjects?.length
+      ? view.onboarding.subjects
       : ['phy', 'chem', 'bio', 'math', 'eng', 'urd', 'isl'];
     return {
-      streak: streakFrom(state.activeDays),
-      level: level(state.xp),
+      streak: streakFrom(view.activeDays),
+      level: level(view.xp),
       aiLeft: Math.max(0, aiLimit - usedToday),
       aiLimit,
       subjects,
       plan: buildPlan({
         subjectIds: subjects,
-        lastChapterId: state.lastChapterId,
-        attempts: state.attempts,
-        doneIds: state.planDone,
+        lastChapterId: view.lastChapterId,
+        attempts: view.attempts,
+        doneIds: view.planDone,
       }),
     };
-  }, [state]);
+  }, [view]);
 
-  return <AppCtx.Provider value={{ state, hydrated, actions, derived }}>{children}</AppCtx.Provider>;
+  return <AppCtx.Provider value={{ state: view, hydrated, actions, derived }}>{children}</AppCtx.Provider>;
 }
 
 export function useApp(): Ctx {

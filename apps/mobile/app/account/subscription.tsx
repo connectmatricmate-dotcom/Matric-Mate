@@ -2,10 +2,11 @@ import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { Card, Header, Item, Pill, Row, Screen, SectionTitle, Small, Spacer } from '../../src/components/ui';
+import { Btn, Card, Header, Item, Pill, Row, Screen, SectionTitle, Small, Spacer, useToast } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
+import { useAuth } from '../../src/store/auth';
 import { C, F, S } from '../../src/theme';
 
 const PERKS: [IconName, StringKey][] = [
@@ -22,6 +23,8 @@ const PERKS: [IconName, StringKey][] = [
  */
 export default function Subscription() {
   const { state } = useApp();
+  const { refresh, checking } = useAuth();
+  const toast = useToast();
   const t = useT();
   const active = state.premium.active;
 
@@ -66,6 +69,25 @@ export default function Subscription() {
           ))}
         </View>
       </Card>
+
+      <Spacer h={S.md} />
+      {/*
+        For the student who has just paid on the website and come back wondering
+        why nothing changed. Entitlement already refreshes when the app returns
+        to the front, but a button they can press is worth more than a rule they
+        cannot see. It re-reads the server; it cannot grant anything.
+      */}
+      <Btn
+        title={t('billing.checkAgain')}
+        variant="line"
+        sm
+        icon="refresh"
+        loading={checking}
+        onPress={async () => {
+          await refresh();
+          toast(t(active ? 'billing.checkedActive' : 'billing.checkedFree'));
+        }}
+      />
 
       <Spacer h={S.lg} />
       <LockedNotice variant={active ? 'locked' : 'free'} />

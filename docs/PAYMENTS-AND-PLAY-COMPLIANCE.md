@@ -235,3 +235,49 @@ policy at all, so nothing else *can* write it. The success page shows a waiting
 state while the webhook is in flight, because the browser usually beats it back
 by a second or two, and telling a student who has just paid that something went
 wrong would be both wrong and alarming.
+
+## Accounts: one login, created in either place
+
+Checked against the policy in July 2026, because the answer decides the shape of
+both apps.
+
+Google's Payments policy says it in as many words: *"Google Play allows any app
+to be consumption-only, even if it is part of a paid service. For example, a
+user could log in when the app opens and access content paid for somewhere
+else."* It also permits limited plain text with no link, its own example being
+*"You can purchase this book directly on our website."* That is exactly what
+LockedNotice renders.
+
+Pakistan has no way out of that, and this was worth confirming rather than
+assuming:
+
+| Programme | Where it applies |
+| :-- | :-- |
+| External payment links | Japan |
+| Alternative / user-choice billing | India, South Korea, EEA |
+| Free link-outs after the US court order | United States |
+
+None of them reach Pakistan, so consumption-only is not the careful option, it
+is the only compliant one.
+
+**Sign-up is allowed in the Android app, and we do it.** The policy governs
+selling, not account creation, and a free account is not a purchase. Copying
+Netflix's refusal to let anyone register in-app would be copying a decision that
+only works because everyone already knows what Netflix is. Nobody knows
+MatricMate, and in Pakistan the APK is the discovery surface, so a dead end
+there is a lost student.
+
+There is a colder reason too. An account is an email address, and email is the
+only channel Play permits for telling someone about a plan they could buy on the
+website. No account means no compliant way to ever reach them.
+
+**Entitlement is read, never written, by the phone.** `entitlements` is
+select-only under RLS for the student it belongs to, which was verified against
+the live database: a signed-in client updating its own row changes nothing, and
+reading another student's returns an empty array rather than an error. The app
+also treats a past `valid_till` as inactive regardless of the `active` column,
+because nothing runs at midnight to flip it.
+
+So the compliance posture and the payment architecture are the same fact stated
+twice: the Android app cannot sell, and it cannot grant. Only the webhook can.
+

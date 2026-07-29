@@ -1,33 +1,70 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { api } from '@matricmate/core';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
+import { useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
+import { Icon } from '../src/components/Icon';
 import { C, S } from '../src/theme';
 
+/**
+ * Creating an account, in the app, on purpose.
+ *
+ * Google Play's payments policy governs selling, not sign-up, so a free account
+ * is allowed here and nothing about it is a purchase. It also matters
+ * commercially: an account is an email address, and email is the only channel
+ * Play permits for telling a student about a plan they could buy on the
+ * website. Without it there is no compliant way to ever reach them.
+ *
+ * What this screen must never grow: a price, a plan, or a way to pay.
+ */
 export default function SignUp() {
-  const { actions } = useApp();
+  const { signUp } = useAuth();
+  const { state } = useApp();
   const t = useT();
   const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmSent, setConfirmSent] = useState(false);
+
+  const valid = name.trim().length >= 2 && email.trim().includes('@') && password.length >= 6;
 
   async function submit() {
+    if (!valid || busy) return;
     setBusy(true);
     setError(null);
     try {
-      const user = await api.signUp({ name, contact, password });
-      actions.signIn(user);
-      router.replace('/(tabs)');
+      const { needsConfirmation } = await signUp(name, email, password);
+      // With confirmation on there is no session yet, so there is nowhere to go.
+      // Saying so is the only honest option; routing into the app would land on
+      // a locked screen and read as a failure.
+      if (needsConfirmation) setConfirmSent(true);
+      // Onboarding runs before sign-up on this app, so anyone arriving here has
+      // already chosen their class and subjects. Sending them back through it
+      // would look like the account did not save.
+      else router.replace(state.onboarding?.subjects?.length ? '/(tabs)' : '/onboarding/class');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not create your account.');
+      setError(e instanceof Error ? e.message : t('states.errorBody'));
     } finally {
       setBusy(false);
     }
+  }
+
+  if (confirmSent) {
+    return (
+      <Screen>
+        <Header title={t('auth.checkInboxTitle')} back />
+        <Card tint={C.greenTint} border={C.green} style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
+          <Icon name="mail" size={34} color={C.green} strokeWidth={2.4} />
+          <Body style={{ textAlign: 'center', fontSize: 15 }}>{t('auth.checkInboxBody', { email: email.trim() })}</Body>
+          <Spacer h={S.sm} />
+          <Btn title={t('auth.backToLogin')} variant="line" sm onPress={() => router.replace('/login')} />
+        </Card>
+      </Screen>
+    );
   }
 
   return (
@@ -48,10 +85,12 @@ export default function SignUp() {
       />
       <Field
         label={t('auth.contact')}
-        value={contact}
-        onChangeText={setContact}
+        value={email}
+        onChangeText={setEmail}
         placeholder={t('auth.contactPlaceholder')}
         icon="mail"
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <Field
         label={t('auth.password')}
@@ -62,9 +101,10 @@ export default function SignUp() {
         secure
       />
       <Small style={{ marginBottom: S.md }}>{t('auth.terms')}</Small>
-      <Btn title={t('auth.createAccount')} onPress={submit} loading={busy} />
+      <Btn title={t('auth.createAccount')} onPress={submit} loading={busy} disabled={!valid} />
       <Spacer h={S.sm} />
       <Btn title={t('welcome.haveAccount')} variant="ghost" onPress={() => router.replace('/login')} />
+      <Small style={{ textAlign: 'center', marginTop: S.xs }}>{t('auth.accountNote')}</Small>
       <View style={{ height: S.md }} />
     </Screen>
   );

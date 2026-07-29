@@ -22,6 +22,29 @@ export function SignUpForm({ next }: { next?: string }) {
   const passwordError = validatePassword(password);
   const canSubmit = isFormValid(nameError, emailError, passwordError);
 
+  /**
+   * The account exists but needs its address confirmed, so there is no session
+   * and nowhere to send them. Before this, the action redirected anyway and
+   * proxy.ts bounced them back to the login page with no explanation, which
+   * looked identical to a failed sign-up.
+   */
+  if (state.sent) {
+    return (
+      <Card>
+        <h1 className="font-display text-[24px] text-ink">{t('auth.checkInboxTitle')}</h1>
+        <p className="mt-2 text-[14.5px] leading-[1.7] text-ink2">
+          {t('auth.checkInboxBody', { email: state.email ?? '' })}
+        </p>
+        <Link
+          href="/login"
+          className="mt-4 inline-flex h-11 items-center rounded-xl border border-line px-4 font-extrabold text-[14px] text-ink transition hover:border-teal hover:text-teal"
+        >
+          {t('auth.backToLogin')}
+        </Link>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <h1 className="font-display text-[24px] text-ink">{t('auth.signUpTitle')}</h1>

@@ -5,10 +5,12 @@ import { Bar, Btn, Card, Header, IconButton, Item, Pill, Row, Screen, SectionTit
 import { levelProgress, xpToNextLevel } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
+import { useAuth } from '../../src/store/auth';
 import { C, F, S } from '../../src/theme';
 
 export default function Account() {
-  const { state, actions, derived } = useApp();
+  const { state, derived } = useApp();
+  const { signOut } = useAuth();
   const t = useT();
   const [confirmOut, setConfirmOut] = useState(false);
   const setup = state.onboarding;
@@ -117,9 +119,11 @@ export default function Account() {
         <Btn
           title={t('auth.logOut')}
           variant="danger"
-          onPress={() => {
+          onPress={async () => {
             setConfirmOut(false);
-            actions.signOut();
+            // Ends the Supabase session and clears the cached entitlement, so
+            // the next person to open this phone starts from nothing.
+            await signOut();
             router.replace('/welcome');
           }}
         />

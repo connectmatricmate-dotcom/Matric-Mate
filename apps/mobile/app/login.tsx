@@ -1,30 +1,39 @@
 import { useState } from 'react';
 import { Image } from 'react-native';
 import { router } from 'expo-router';
-import { api } from '@matricmate/core';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
+import { useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
 import { C, S } from '../src/theme';
 
+/**
+ * Signing in to the same Supabase account the website uses.
+ *
+ * A student who paid on the website and then installed the app arrives here,
+ * and their premium is waiting because entitlement is read from the server. It
+ * is never granted on this device.
+ */
 export default function Login() {
-  const { state, actions } = useApp();
+  const { signIn } = useAuth();
+  const { state } = useApp();
   const t = useT();
-  const [contact, setContact] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const valid = email.trim().includes('@') && password.length >= 6;
+
   async function submit() {
+    if (!valid || busy) return;
     setBusy(true);
     setError(null);
     try {
-      const user = await api.signIn({ contact, password });
-      actions.signIn(user);
+      await signIn(email, password);
       router.replace(state.onboarding?.subjects?.length ? '/(tabs)' : '/onboarding/class');
-    } catch {
-      setError(t('auth.demoHint'));
-    } finally {
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('states.errorBody'));
       setBusy(false);
     }
   }
@@ -44,10 +53,12 @@ export default function Login() {
       ) : null}
       <Field
         label={t('auth.contact')}
-        value={contact}
-        onChangeText={setContact}
+        value={email}
+        onChangeText={setEmail}
         placeholder={t('auth.contactPlaceholder')}
         icon="mail"
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <Field
         label={t('auth.password')}
@@ -57,10 +68,10 @@ export default function Login() {
         icon="key"
         secure
       />
-      <Btn title={t('auth.logIn')} onPress={submit} loading={busy} />
+      <Btn title={t('auth.logIn')} onPress={submit} loading={busy} disabled={!valid} />
       <Spacer h={S.sm} />
       <Btn title={t('auth.forgotPassword')} variant="ghost" onPress={() => router.push('/forgot')} />
-      <Small style={{ textAlign: 'center', marginTop: S.sm }}>{t('auth.demoHint')}</Small>
+      <Small style={{ textAlign: 'center', marginTop: S.sm }}>{t('auth.accountNote')}</Small>
     </Screen>
   );
 }

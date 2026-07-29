@@ -4,12 +4,14 @@ import { router } from 'expo-router';
 import { Btn, Card, Field, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
+import { useAuth } from '../../src/store/auth';
 import { C, S } from '../../src/theme';
 
 const AVATARS = ['🧑🏽‍🎓', '👩🏽‍🎓', '🧕🏽', '👨🏽‍💻', '🦸🏽'];
 
 export default function EditProfile() {
-  const { state, actions } = useApp();
+  const { state } = useApp();
+  const { updateName } = useAuth();
   const t = useT();
   const toast = useToast();
   const [name, setName] = useState(state.user?.name ?? '');
@@ -22,10 +24,14 @@ export default function EditProfile() {
       footer={
         <Btn
           title={t('common.save')}
-          onPress={() => {
-            if (state.user) actions.signIn({ ...state.user, name: name.trim() || state.user.name });
-            toast(t('account.profileSaved'));
-            router.back();
+          onPress={async () => {
+            try {
+              await updateName(name);
+              toast(t('account.profileSaved'));
+              router.back();
+            } catch (e) {
+              toast(e instanceof Error ? e.message : t('states.errorBody'));
+            }
           }}
         />
       }

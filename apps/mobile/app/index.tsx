@@ -2,18 +2,25 @@ import { useEffect } from 'react';
 import { Image, View } from 'react-native';
 import { router } from 'expo-router';
 import { useApp } from '../src/store/app';
+import { useAuth } from '../src/store/auth';
 import { C, F, S } from '../src/theme';
 import { Label } from '../src/components/ui';
 
 /**
  * Splash + route gate. Decides where a returning student lands:
  * no account → welcome · account but no setup → onboarding · otherwise → app.
+ *
+ * Waits for both stores. `hydrated` is the local study cache; `loading` is the
+ * stored Supabase session being read back off the device. Routing on either one
+ * alone would bounce a signed-in student through the welcome screen for a frame
+ * on every cold start.
  */
 export default function Splash() {
   const { state, hydrated } = useApp();
+  const { loading } = useAuth();
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || loading) return;
     const to = !state.user
       ? '/welcome'
       : !state.onboarding?.subjects?.length
@@ -21,7 +28,7 @@ export default function Splash() {
         : '/(tabs)';
     const t = setTimeout(() => router.replace(to), 550);
     return () => clearTimeout(t);
-  }, [hydrated, state.user, state.onboarding]);
+  }, [hydrated, loading, state.user, state.onboarding]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.paper, alignItems: 'center', justifyContent: 'center', gap: S.lg }}>

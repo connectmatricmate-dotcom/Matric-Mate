@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
 import { createClient } from '@/lib/supabase/server';
 
@@ -13,7 +14,13 @@ import { createClient } from '@/lib/supabase/server';
  * the rules below are the real ones. See the security checklist, guard 1.
  */
 
-export type AuthState = { error?: string; sent?: boolean };
+export type AuthState = {
+  error?: string;
+  /** A link was emailed. Used by password reset, and by sign-up when the project confirms addresses. */
+  sent?: boolean;
+  /** Where that link went, so the page can name it rather than saying "your email". */
+  email?: string;
+};
 
 const email = z.string().trim().min(1, 'Enter your email.').email('That does not look like an email address.');
 const password = z.string().min(6, 'Passwords need at least 6 characters.');
@@ -28,17 +35,6 @@ const SignIn = z.object({ email, password });
 
 const first = (err: z.ZodError) => err.issues[0]?.message ?? 'Check the form and try again.';
 
-/**
- * Where to go after signing in.
- *
- * Only a path on this site, never a full URL: an open redirect turns our login
- * page into a convincing launchpad for someone else's.
- */
-function safeNext(value: FormDataEntryValue | null) {
-  const next = typeof value === 'string' ? value : '';
-  return next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
-}
-
 export async function signUpAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = SignUp.safeParse({
     name: formData.get('name'),
@@ -48,7 +44,7 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
   if (!parsed.success) return { error: first(parsed.error) };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     // Read by the on_auth_user_created trigger to seed the profile row.
@@ -63,7 +59,21 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
     return { error: error.message };
   }
 
-  redirect(safeNext(formData.get('next')));
+  /**
+   * No session means the project is set to confirm email addresses. The account
+   * exists but cannot be used yet, so there is nowhere to redirect to.
+   *
+   * Sending them to /dashboard anyway is what this did before, and the result
+   * was a bounce straight back to /login by proxy.ts with no explanation, which
+   * reads exactly like the sign-up failed.
+   *
+   * Supabase also returns this shape for an address that is already registered,
+   * deliberately, so that a stranger cannot use this form to find out who has an
+   * account here. Both cases get the same answer, which is the point.
+   */
+  if (!data.session) return { sent: true, email: parsed.data.email };
+
+  redirect(safePath(formData.get('next'), '/onboarding/class'));
 }
 
 export async function signInAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
@@ -79,7 +89,7 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
     return { error: 'Wrong email or password.' };
   }
 
-  redirect(safeNext(formData.get('next')));
+  redirect(safePath(formData.get('next')));
 }
 
 export async function resetPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {

@@ -1,23 +1,34 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { api } from '@matricmate/core';
 import { useT } from '../src/i18n';
+import { useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
 import { Icon } from '../src/components/Icon';
 import { C, S } from '../src/theme';
 
+/**
+ * Password reset, handled by Supabase.
+ *
+ * The link in the email opens the website, because that is where the form that
+ * can set a password lives. Nothing here touches payment, so this is not a
+ * steering problem: it is account recovery, which Play has no objection to.
+ */
 export default function Forgot() {
+  const { requestPasswordReset } = useAuth();
   const t = useT();
-  const [contact, setContact] = useState('');
+  const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const valid = email.trim().includes('@');
+
   async function submit() {
+    if (!valid || busy) return;
     setBusy(true);
     setError(null);
     try {
-      await api.requestPasswordReset(contact);
+      await requestPasswordReset(email);
       setSent(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : t('states.errorBody'));
@@ -32,7 +43,7 @@ export default function Forgot() {
       {sent ? (
         <Card tint={C.greenTint} border={C.green} style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
           <Icon name="check" size={34} color={C.green} strokeWidth={2.6} />
-          <Body style={{ textAlign: 'center', fontSize: 15 }}>{t('auth.resetSent', { contact })}</Body>
+          <Body style={{ textAlign: 'center', fontSize: 15 }}>{t('auth.resetSent', { contact: email.trim() })}</Body>
           <Spacer h={S.sm} />
           <Btn title={t('auth.backToLogin')} variant="line" sm onPress={() => router.replace('/login')} />
         </Card>
@@ -41,12 +52,14 @@ export default function Forgot() {
           {error ? <Body style={{ color: C.red, marginBottom: S.sm }}>{error}</Body> : null}
           <Field
             label={t('auth.contact')}
-            value={contact}
-            onChangeText={setContact}
+            value={email}
+            onChangeText={setEmail}
             placeholder={t('auth.contactPlaceholder')}
             icon="mail"
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
-          <Btn title={t('auth.sendReset')} onPress={submit} loading={busy} />
+          <Btn title={t('auth.sendReset')} onPress={submit} loading={busy} disabled={!valid} />
           <Small style={{ marginTop: S.sm }}>{t('auth.resetFootnote')}</Small>
         </>
       )}
