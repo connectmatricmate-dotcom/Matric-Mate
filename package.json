@@ -20,5 +20,9 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "overrides": {
+    "react-native-worklets": "0.10.0",
+    "react-native-reanimated": "4.5.0"
   }
 }
