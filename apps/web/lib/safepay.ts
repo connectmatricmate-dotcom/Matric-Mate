@@ -35,16 +35,24 @@ const CHECKOUT_PAY = `${HOST}/checkout/pay/`;
 export const isSafepayConfigured = Boolean(MERCHANT_API_KEY && SECRET_KEY);
 
 /**
- * A student's identity at Safepay, in two parts that are easy to confuse.
+ * A student's identity at Safepay.
  *
  * A **customer** (`cus_…`) is a merchant-scoped record: it owns saved payment
  * methods and it is what a Safepay report joins on. Safepay's docs warn against
  * creating a second one for someone who already exists, so the id is stored on
  * the profile and reused forever.
  *
- * A **guest session** is a short-lived JWT that carries the email in a claim
- * Safepay signed. Passed to checkout as `auth_token`, it is what stops the payer
- * typing a different address at the last step. Minted per checkout, never stored.
+ * There used to be a **guest session** here too, minted per checkout and passed
+ * as `auth_token` to pin the payer's email. It was removed once the hosted
+ * page's own bundle showed it does nothing on this route: `auth_token` is read
+ * only when there is no tracker, which is the `/checkout/subscribe/` flow. With
+ * a tracker present the page is in payment mode and ignores it, so the call was
+ * a round trip on the critical path that bought nothing.
+ *
+ * There is no way to prefill the payer's email on the hosted page. Sending it
+ * on `/order/v1/init` was tried four ways and the tracker stored none of them.
+ * Owning that field means owning the form, which is the Payments 2.0 custom
+ * checkout, and that is a milestone decision rather than a prototype one.
  */
 
 /** Creates a Safepay customer. Call once per student; store what it returns. */
@@ -76,37 +84,6 @@ export async function createCustomer(input: { email: string; name: string; phone
     return null;
   }
   return body.data.token;
-}
-
-/**
- * A signed session for this payer, to hand checkout as `auth_token`.
- *
- * The email lives inside the JWT, so the payer cannot change it on Safepay's
- * page: whatever they type, the signed claim is what the payment is attributed
- * to. That is the whole reason this exists.
- */
-export async function createGuestSession(input: { email: string; name: string; phone: string }): Promise<string | null> {
-  const [firstName, ...rest] = input.name.trim().split(/\s+/);
-  const res = await fetch(`${HOST}/user/v1/guest/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    cache: 'no-store',
-    body: JSON.stringify({
-      first_name: firstName || 'Student',
-      last_name: rest.join(' ') || firstName || 'Student',
-      email: input.email,
-      // Mandatory here too, and the reason a session comes back null without it.
-      phone: input.phone,
-      country: 'PK',
-    }),
-  });
-
-  const body = (await res.json().catch(() => ({}))) as { data?: { session?: string } };
-  if (!res.ok || !body.data?.session) {
-    console.error('safepay: could not create guest session', res.status, JSON.stringify(body).slice(0, 200));
-    return null;
-  }
-  return body.data.session;
 }
 
 type TrackerResponse = {
@@ -163,14 +140,29 @@ export async function createTracker(input: { amountRupees: number; orderId: stri
   return token;
 }
 
-/** Step 2: where to send the customer. */
+/**
+ * Step 2: where to send the customer.
+ *
+ * `webhooks=true` is the load-bearing one, and it is not optional.
+ *
+ * After a successful payment the hosted page picks what to render from a chain
+ * that ends in a bare "Close" button. It reaches the good branches only for a
+ * `source` in its own enum (mobile, shopify, woocommerce, magento2, xcomponent)
+ * or when `webhooks` is set. Our source is "custom", which is not in that enum,
+ * so without this flag the payer paid, saw a dialog, and sat on Safepay's page
+ * forever. With it, the page renders a hidden link to `redirect_url` and clicks
+ * it, which is how the browser gets home.
+ *
+ * That return arrives as a GET carrying `order_id` and `tracker`, and no
+ * signature. Which is survivable, because the return has never been allowed to
+ * grant anything: the success page reads the payment row under RLS, and only
+ * the webhook can move it to paid.
+ */
 export function checkoutUrl(input: {
   tracker: string;
   orderId: string;
   redirectUrl: string;
   cancelUrl: string;
-  /** Signed guest session. Fixes the email on Safepay's page. */
-  authToken?: string | null;
 }) {
   const q = new URLSearchParams({
     env: ENV,
@@ -179,8 +171,8 @@ export function checkoutUrl(input: {
     order_id: input.orderId,
     redirect_url: input.redirectUrl,
     cancel_url: input.cancelUrl,
+    webhooks: 'true',
   });
-  if (input.authToken) q.set('auth_token', input.authToken);
   return `${CHECKOUT_PAY}?${q}`;
 }
 

@@ -26,9 +26,26 @@ async function handle(request: Request) {
   const signature = get('sig', 'signature');
   const orderId = get('order_id', 'Order ID');
 
-  const verified = Boolean(tracker) && verifySignature(tracker, signature);
-  if (!verified) {
-    console.warn('checkout/return: signature did not verify', { tracker: tracker.slice(0, 12), orderId });
+  /**
+   * A signature is checked when one is sent, and its absence is not suspicious.
+   *
+   * Safepay's hosted page returns here by clicking a hidden link built from
+   * `redirect_url`, and that link carries only `order_id` and `tracker`. So the
+   * ordinary, successful return has no signature at all, and flagging it would
+   * put a warning in front of every student who paid.
+   *
+   * A signature that is present and wrong still is suspicious, and says so.
+   *
+   * None of this decides access. The success page reads the payment row under
+   * RLS, so a stranger who guesses a tracker sees nothing, and only the webhook
+   * can move a payment to paid.
+   */
+  const suspicious = Boolean(signature) && !verifySignature(tracker, signature);
+  if (suspicious) {
+    console.warn('checkout/return: signature present but did not verify', {
+      tracker: tracker.slice(0, 12),
+      orderId,
+    });
   }
 
   // Nothing is granted here. The success page reads the payment row, which only
@@ -36,7 +53,7 @@ async function handle(request: Request) {
   // the page knows which payment to look up.
   const next = new URL('/checkout/success', url.origin);
   if (tracker) next.searchParams.set('tracker', tracker);
-  if (!verified) next.searchParams.set('status', 'unverified');
+  if (suspicious) next.searchParams.set('status', 'unverified');
 
   return NextResponse.redirect(next, 303);
 }

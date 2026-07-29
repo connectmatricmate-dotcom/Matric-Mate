@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkoutUrl, createGuestSession, createTracker, isSafepayConfigured } from '@/lib/safepay';
+import { checkoutUrl, createTracker, isSafepayConfigured } from '@/lib/safepay';
 import { ensureSafepayCustomer } from '@/lib/safepay-customer';
 import { recordPendingPayment } from '@/lib/payments';
 import { PLANS, planById } from '@/lib/plans';
@@ -75,20 +75,18 @@ export async function POST(request: Request) {
 
   try {
     /**
-     * The signed guest session is what fixes the email on Safepay's page: the
-     * address lives in a claim Safepay signed, so whatever the payer types, the
-     * payment is attributed to the account that started it. Without it, someone
-     * could pay under one address and expect access on another, and support
-     * would have no way to tell which was meant.
+     * The customer record runs alongside the tracker rather than before it: it
+     * is a directory entry for reconciliation, not part of the payment, and it
+     * must never delay or fail a checkout. The tracker is the only one allowed
+     * to fail the request, because with no tracker there is nothing to pay
+     * against.
      *
-     * Both of these run alongside the tracker rather than before it, because
-     * neither is worth delaying checkout for, and neither is fatal if it fails.
+     * The payer types their own email on Safepay's page. We cannot prefill it;
+     * see the note in lib/safepay.ts. The payment is tied to the account by the
+     * pending row written below, keyed on the tracker, not by what they type.
      */
-    const [tracker, authToken] = await Promise.all([
-      // The only one allowed to fail the request: with no tracker there is
-      // nothing to pay against.
+    const [tracker] = await Promise.all([
       createTracker({ amountRupees: plan.price, orderId }),
-      createGuestSession({ email, name, phone }).catch(() => null),
       ensureSafepayCustomer({ userId: user.id, email, name, phone }).catch(() => null),
     ]);
 
@@ -106,7 +104,6 @@ export async function POST(request: Request) {
       url: checkoutUrl({
         tracker,
         orderId,
-        authToken,
         redirectUrl: `${SITE_URL}/checkout/return`,
         cancelUrl: `${SITE_URL}/checkout?cancelled=1&plan=${plan.id}`,
       }),
