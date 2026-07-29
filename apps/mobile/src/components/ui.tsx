@@ -75,6 +75,16 @@ export function Screen({
   avoidKeyboard?: boolean;
 }) {
   const insets = useSafeAreaInsets();
+
+  /**
+   * Insets are the phone's hard edges, not a design margin. Padding by exactly
+   * insets.top puts the first row of content in the very next pixel after the
+   * clock, which reads as touching it, and the same at the gesture pill. So
+   * every screen gets the inset plus real breathing room. On phones with
+   * hardware buttons the inset is 0 and the fallbacks below keep the same
+   * minimums, so older devices get identical margins rather than broken ones.
+   */
+  const topGap = insets.top + S.sm;
   const bottomGap = tabbed || footer ? S.lg : Math.max(insets.bottom, S.md) + S.sm;
 
   const body = scroll ? (
@@ -97,7 +107,7 @@ export function Screen({
   );
 
   const content = (
-    <View style={{ flex: 1, backgroundColor: C.paper, paddingTop: insets.top }}>
+    <View style={{ flex: 1, backgroundColor: C.paper, paddingTop: topGap }}>
       {body}
       {footer ? (
         <View
@@ -105,7 +115,8 @@ export function Screen({
             {
               paddingHorizontal: S.lg,
               paddingTop: S.sm,
-              paddingBottom: tabbed ? S.md : Math.max(insets.bottom, S.md),
+              // The footer button clears the gesture pill instead of hugging it.
+              paddingBottom: tabbed ? S.md : Math.max(insets.bottom, S.md) + S.sm,
             },
             isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
           ]}

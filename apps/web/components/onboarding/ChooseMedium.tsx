@@ -37,7 +37,6 @@ export function ChooseMedium() {
       />
       <ChoiceCard
         title={t('onboarding.mediumUr')}
-        urduTitle="اردو میڈیم"
         sub={t('onboarding.mediumUrSub')}
         selected={value === 'ur'}
         onClick={() => setValue('ur')}
