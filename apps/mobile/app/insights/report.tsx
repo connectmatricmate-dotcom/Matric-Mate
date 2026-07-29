@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { Image, Text, View } from 'react-native';
 import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
-import { subjectById } from '@matricmate/core';
-import { accuracy, grade, subjectPct } from '@matricmate/core';
+import { subjectById , accuracy, grade, subjectPct } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';

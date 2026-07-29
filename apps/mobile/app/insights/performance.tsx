@@ -15,23 +15,34 @@ export default function Performance() {
   const t = useT();
   const [range, setRange] = useState<Range>('month');
 
+  /**
+   * One clock reading for the whole screen, taken on mount.
+   *
+   * Two things wanted the time here and each was reading it separately, so the
+   * filter below and the day buckets underneath it could land on opposite sides
+   * of midnight and disagree about which day an attempt belonged to. Reading it
+   * once fixes that, and keeps render repeatable, which is what the hooks rule
+   * is really asking for.
+   */
+  const [now] = useState(() => Date.now());
+
   const attempts = useMemo(() => {
     const cut = range === 'week' ? 7 : range === 'month' ? 30 : 3650;
-    const since = Date.now() - cut * 864e5;
+    const since = now - cut * 864e5;
     return state.attempts.filter((a) => a.at >= since);
-  }, [state.attempts, range]);
+  }, [state.attempts, range, now]);
 
   const trend = useMemo(() => {
     const days = range === 'week' ? 7 : 14;
     return Array.from({ length: days }, (_, i) => {
-      const start = new Date();
+      const start = new Date(now);
       start.setHours(0, 0, 0, 0);
       start.setDate(start.getDate() - (days - 1 - i));
       const end = start.getTime() + 864e5;
       const set = attempts.filter((a) => a.at >= start.getTime() && a.at < end);
       return { acc: set.length ? accuracy(set) : null, count: set.length };
     });
-  }, [attempts, range]);
+  }, [attempts, range, now]);
 
   const points = useMemo(() => {
     const w = 300;

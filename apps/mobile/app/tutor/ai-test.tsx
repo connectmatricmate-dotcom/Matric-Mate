@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react';
 import { router } from 'expo-router';
 import { Btn, Card, Check, Empty, Header, Item, Screen, SectionTitle, Seg, Small, Spacer } from '../../src/components/ui';
-import { weakTopics } from '@matricmate/core';
-import { subjectById } from '@matricmate/core';
+import { weakTopics , subjectById } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';

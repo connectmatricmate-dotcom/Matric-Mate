@@ -1,14 +1,11 @@
-import { Text } from 'react-native';
+import { Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
-import { api } from '@matricmate/core';
-import { chapterPct } from '@matricmate/core';
+import { api , chapterPct , subjectById } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
-import { subjectById } from '@matricmate/core';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
-import { View } from 'react-native';
 
 export default function ChapterHub() {
   const { id } = useLocalSearchParams<{ id: string }>();

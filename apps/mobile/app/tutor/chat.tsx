@@ -3,10 +3,8 @@ import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } fro
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
-import { Body, Card, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../src/components/ui';
-import { api } from '@matricmate/core';
-import { chapterById } from '@matricmate/core';
-import { ChatMessage } from '@matricmate/core';
+import { Body, Card, IconButton, Pill, Row, Screen, Small, Tap, useToast } from '../../src/components/ui';
+import { api , chapterById , ChatMessage } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb } from '../../src/theme';
@@ -23,7 +21,9 @@ export default function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>(existing?.messages ?? []);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
-  const threadId = useRef(existing?.id ?? `t-${Date.now()}`);
+  // Minted once, when the screen opens. `useRef(…)` would rebuild the id string
+  // on every render and read it back during render; a lazy initialiser does not.
+  const [threadId] = useState(() => existing?.id ?? `t-${Date.now()}`);
   const contextLabel = chapter ? chapterById(chapter)?.title : existing?.contextLabel;
 
   async function send(text: string) {
@@ -46,7 +46,7 @@ export default function Chat() {
     const next = [...messages, mine, reply];
     setMessages(next);
     actions.saveThread({
-      id: threadId.current,
+      id: threadId,
       title: clean.length > 42 ? `${clean.slice(0, 42)}…` : clean,
       contextLabel,
       messages: next,
@@ -54,8 +54,23 @@ export default function Chat() {
     });
   }
 
+  /**
+   * Arriving with `?q=` means the student asked from somewhere else, so the
+   * question is sent on their behalf.
+   *
+   * Started after the first paint rather than inside the effect body. `send`
+   * writes three pieces of state before it ever awaits, and doing that while
+   * the effect is still running makes the screen re-render before it has shown
+   * anything, so the student watches an empty chat resolve into their own
+   * question. This way the shell paints, then the message appears. The timer is
+   * cleared on unmount so a question is not sent from a screen already left.
+   */
   useEffect(() => {
-    if (q && messages.length === 0) send(String(q));
+    if (!q || messages.length) return;
+    const timer = setTimeout(() => send(String(q)), 0);
+    return () => clearTimeout(timer);
+    // Only a new `?q=` should retrigger this. Including `send` or `messages`
+    // would re-ask the question on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 

@@ -5,10 +5,9 @@
  * app restarts. When Supabase lands this becomes a thin cache over server state;
  * the shape of `state` and the action names stay the same.
  */
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey } from '@matricmate/core';
-import {
+import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey ,
   Attempt,
   ChatThread,
   Confidence,

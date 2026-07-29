@@ -2,7 +2,7 @@
   "name": "matricmate",
   "private": true,
   "version": "0.1.0",
-  "description": "MatricMate · FBISE Class 9 exam prep. Android app, web app and shared domain code.",
+  "description": "MatricMate \u00b7 FBISE Class 9 exam prep. Android app, web app and shared domain code.",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -12,7 +12,8 @@
     "web": "npm run dev --workspace apps/web",
     "lint": "npm run lint --workspaces --if-present",
     "build": "npm run build --workspace apps/web",
-    "typecheck": "npm run lint --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "check": "node scripts/check.mjs"
   },
   "engines": {
     "node": ">=22"

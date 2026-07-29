@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Small, Spacer, useToast } from '../../src/components/ui';
-import { api } from '@matricmate/core';
-import { CHAPTERS, chapterById, subjectById } from '@matricmate/core';
+import { api , CHAPTERS, chapterById, subjectById } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -26,9 +25,20 @@ export default function SessionSetup() {
     [subjectId, state.premium.active]
   );
 
-  useEffect(() => {
+  /**
+   * Switching subject clears the chapter ticks, because a chapter from Physics
+   * means nothing once the student has moved to Chemistry.
+   *
+   * Adjusted during render by comparing against the previous subject, which is
+   * the pattern React documents for this. As an effect it ran a beat late: the
+   * list rendered once showing the new subject's chapters with the old
+   * subject's ticks still on, and only then cleared them.
+   */
+  const [lastSubject, setLastSubject] = useState(subjectId);
+  if (lastSubject !== subjectId) {
+    setLastSubject(subjectId);
     if (!initialChapter) setChapterIds([]);
-  }, [subjectId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   async function start() {
     setBusy(true);

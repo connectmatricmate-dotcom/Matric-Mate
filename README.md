@@ -34,3 +34,17 @@ Docs, mirror these edits there — the local files are the updated source.
 Stripe-via-foreign-entity), TTS voice-over in/out, video in Study in/out ("no video for now" vs
 M7 wording), confidence slider in/out (job post says in, verified diagram says out — settle
 before M3).
+
+### Checking your work
+
+One command runs every check in the repo, in parallel, and reports all of them
+rather than stopping at the first failure:
+
+```bash
+npm run check            # lint + typecheck for all three packages, plus the web build
+npm run check -- --quick # skips the web build, for the inner loop
+npm run check -- --fix   # applies autofixable lint fixes first
+```
+
+Warnings fail the check. Every lint script runs with `--max-warnings 0`, because
+a warning nobody has to act on is a warning nobody reads.

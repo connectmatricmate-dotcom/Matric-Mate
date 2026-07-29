@@ -1,11 +1,9 @@
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Steps } from '../../src/components/OnboardingStep';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, Check, Header, Item, Screen, SectionTitle, Seg, Small, useToast } from '../../src/components/ui';
-import { SUBJECTS } from '@matricmate/core';
-import { Group } from '@matricmate/core';
+import { SUBJECTS , Group } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';

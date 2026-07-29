@@ -1,13 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName, SUBJECT_ICON } from '../../src/components/Icon';
 import {
   Bar,
-  Btn,
   Card,
-  Check,
   H3,
   Kpi,
   Row,
@@ -19,8 +17,7 @@ import {
   Tiny,
 } from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { chapterById, subjectById } from '@matricmate/core';
-import { accuracy, chapterPct } from '@matricmate/core';
+import { chapterById, subjectById , accuracy, chapterPct } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -38,8 +35,19 @@ export default function Dashboard() {
   const t = useT();
   const firstName = (state.user?.name ?? 'Student').split(' ')[0];
 
+  /**
+   * The clock, read once on mount rather than on every render.
+   *
+   * Reading it during render means the same state can produce different output
+   * on two consecutive passes, so React cannot treat the render as repeatable.
+   * A dashboard is a snapshot of the moment it opened, so pinning "now" is also
+   * what the screen means: the seven-day window should not slide underneath the
+   * numbers while somebody is looking at them.
+   */
+  const [now] = useState(() => Date.now());
+
   const week = useMemo(() => {
-    const since = Date.now() - 7 * 864e5;
+    const since = now - 7 * 864e5;
     const recent = state.attempts.filter((a) => a.at >= since);
     const minutes = Math.round(recent.length * 1.6 + state.readSections.length * 4);
     return {
@@ -47,12 +55,12 @@ export default function Dashboard() {
       questions: recent.length,
       time: minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes}m`,
     };
-  }, [state.attempts, state.readSections]);
+  }, [state.attempts, state.readSections, now]);
 
   const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
   const planDone = derived.plan.filter((task) => task.done).length;
-  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+  const today = new Date(now).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
 
   /** Plan labels are composed here so they follow the app language. */
   function planLabel(task: (typeof derived.plan)[number]) {

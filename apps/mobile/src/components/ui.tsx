@@ -646,7 +646,16 @@ export function Item({
 /* ------------------------------------------------------------ feedback */
 
 export function Skeleton({ w = '100%', h = 14, style }: { w?: number | `${number}%`; h?: number; style?: ViewStyle }) {
-  const a = useRef(new Animated.Value(0.5)).current;
+  /**
+   * `useState` with a lazy initialiser, not `useRef(new Animated.Value(…)).current`.
+   *
+   * The ref form is everywhere in React Native tutorials and it is wrong twice
+   * over: it builds a fresh Animated.Value on every render only to discard it,
+   * and reading `.current` while rendering is exactly what refs are not for.
+   * A lazy initialiser runs once and React guarantees the value survives, which
+   * is the property the animation actually needs.
+   */
+  const [a] = useState(() => new Animated.Value(0.5));
   React.useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
@@ -699,7 +708,8 @@ export const useToast = () => useContext(ToastCtx);
 
 export function ToastHost({ children }: { children: React.ReactNode }) {
   const [msg, setMsg] = useState<string | null>(null);
-  const op = useRef(new Animated.Value(0)).current;
+  const [op] = useState(() => new Animated.Value(0));
+  // A real ref: only ever written and read from the show handler, never in render.
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const show = useCallback(

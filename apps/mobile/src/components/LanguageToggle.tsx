@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { useLang } from '../i18n';
-import { C, F, R, S } from '../theme';
+import { C, F, R } from '../theme';
 import { Tap } from './ui';
 
 /**

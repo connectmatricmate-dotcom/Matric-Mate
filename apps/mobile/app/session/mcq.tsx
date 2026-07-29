@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
@@ -17,8 +17,7 @@ import {
   Spacer,
   Tap,
 } from '../../src/components/ui';
-import { XP } from '@matricmate/core';
-import { Confidence } from '@matricmate/core';
+import { XP , Confidence } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -45,7 +44,17 @@ export default function McqScreen() {
   const [checked, setChecked] = useState(false);
 
   const mcq = s?.mcqs[i];
-  const answeredCount = useMemo(() => (s ? Object.keys(s.answers).length : 0), [s, i, checked]);
+  /**
+   * Counted every render, on purpose.
+   *
+   * `session.current` is a module singleton whose `answers` object is mutated
+   * in place, so its identity never changes when a question is answered. A memo
+   * keyed on it would go stale immediately, which is why `i` and `checked` had
+   * been listed as deps: not because the count depends on them, but as a proxy
+   * for "something probably happened". Counting a handful of keys is cheaper
+   * than that guess, and it cannot be wrong.
+   */
+  const answeredCount = s ? Object.keys(s.answers).length : 0;
 
   if (!s || !mcq) {
     return (

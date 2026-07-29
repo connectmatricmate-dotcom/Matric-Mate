@@ -6,9 +6,12 @@
   "types": "src/index.ts",
   "description": "Shared between the Android app and the web app: content, domain rules, copy and design tokens. One source of truth so the two surfaces can't drift.",
   "scripts": {
-    "lint": "tsc --noEmit"
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "~6.0.3"
+    "eslint": "^9.39.5",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.65.0"
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bar, Btn, Card, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
@@ -11,7 +11,7 @@ import { C, F, S, isWeb } from '../../src/theme';
 export default function Flashcards() {
   const { chapter } = useLocalSearchParams<{ chapter?: string }>();
   const chapterId = chapter ?? 'phy-3';
-  const { state, actions } = useApp();
+  const { actions } = useApp();
   const t = useT();
   const { data: cards, loading } = useAsync(() => api.getFlashcards(chapterId), [chapterId]);
 
@@ -19,7 +19,8 @@ export default function Flashcards() {
   const [flipped, setFlipped] = useState(false);
   const [repeats, setRepeats] = useState<string[]>([]);
   const [known, setKnown] = useState<string[]>([]);
-  const spin = useRef(new Animated.Value(0)).current;
+  // Lazy initialiser, so the value is built once. See the note in ui.tsx/Skeleton.
+  const [spin] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     Animated.timing(spin, { toValue: flipped ? 1 : 0, duration: 260, useNativeDriver: !isWeb }).start();
