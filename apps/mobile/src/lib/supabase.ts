@@ -75,19 +75,32 @@ const client = build();
 export const isSupabaseConfigured = client !== null;
 
 /**
- * Always an object, never null, so no caller needs a guard on every line.
+ * A stand-in that survives any depth of chaining.
  *
- * When construction failed every method rejects with the reason, which surfaces
- * as an ordinary error message in the sign-in form instead of a crash.
+ * The first version of this proxy was one level deep: supabase.auth returned a
+ * function, .signInWithPassword on that function was undefined, and calling it
+ * crashed with "undefined is not a function" on the login screen of a client
+ * build. Which is worse than no fallback at all: it converted a configuration
+ * mistake into what looks like a code bug, on the exact screen a first-time
+ * user meets. This one returns itself for every property and every call, and
+ * rejects with the real reason the moment anything in the chain is awaited, so
+ * the student sees "Supabase keys are missing from this build" in the form
+ * instead of a crash.
  */
-export const supabase: SupabaseClient =
-  client ??
-  (new Proxy({} as SupabaseClient, {
-    get() {
-      const reason = supabaseError ?? 'Supabase is not available in this build.';
-      return () => Promise.reject(new Error(reason));
+function unusable(reason: string): SupabaseClient {
+  const target = () => undefined;
+  return new Proxy(target, {
+    apply: () => unusable(reason),
+    get: (_t, prop) => {
+      if (prop === 'then') return (_res: unknown, rej: (e: Error) => void) => rej(new Error(reason));
+      if (typeof prop === 'symbol') return undefined;
+      return unusable(reason);
     },
-  }) as SupabaseClient);
+  }) as unknown as SupabaseClient;
+}
+
+export const supabase: SupabaseClient =
+  client ?? unusable(supabaseError ?? 'Supabase is not available in this build.');
 
 /**
  * Refresh tokens only while the app is in front of someone.
