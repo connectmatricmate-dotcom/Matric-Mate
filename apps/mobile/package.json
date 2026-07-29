@@ -1,7 +1,7 @@
 {
   "name": "matricmate",
   "version": "1.0.0",
-  "main": "expo-router/entry",
+  "main": "index.js",
   "dependencies": {
     "@expo-google-fonts/baloo-2": "^0.4.2",
     "@expo-google-fonts/noto-nastaliq-urdu": "^0.4.2",
@@ -43,7 +43,8 @@
     "web": "expo start --web",
     "export:web": "expo export -p web",
     "lint": "eslint . --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "start:clear": "expo start --go --clear"
   },
   "private": true
 }

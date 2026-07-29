@@ -1,22 +1,18 @@
 /**
- * Must be the first import in this file, and this file is imported before any
+ * Must be the first import here, and this module is imported before any
  * Supabase code runs.
  *
- * React Native ships its own URL class, a string-concatenation stand-in with
- * getter-only properties. `createClient` builds the realtime endpoint by
- * assigning `url.protocol = 'wss'`, which on that class throws "Cannot set
- * property protocol of [object Object] which has only a getter". Because the
- * client is created while this module is evaluating, the throw happens before
- * anything renders and the app closes on launch with no error screen: exactly
- * the symptom, and impossible to diagnose from inside the app.
- *
+ * React Native ships its own URL class, a string-concatenation stand-in whose
+ * properties are getters with no setters. `createClient` builds the realtime
+ * endpoint by assigning `url.protocol = 'wss'`, which on that class throws
+ * "Cannot set property protocol of [object Object] which has only a getter".
  * The polyfill replaces the global with a spec-compliant implementation that
- * has the setters. It is what Supabase's own React Native guide requires.
+ * has the setters, which is what Supabase's own React Native guide requires.
  */
 import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * The Supabase client for the app. Same project, same tables, same rules as the
@@ -31,33 +27,67 @@ import { createClient } from '@supabase/supabase-js';
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-/** Without keys the app still runs, it just cannot sign anyone in. */
-export const isSupabaseConfigured = Boolean(url && key);
+/**
+ * Whatever went wrong setting this up, or null when nothing did.
+ *
+ * Read by the app so it can say so on screen. Anything thrown while this module
+ * is evaluating happens before React mounts, so there is no error boundary to
+ * catch it and no red box: the process just disappears, which is the least
+ * debuggable failure an app can have. Nothing in a client library is worth that,
+ * so the whole construction is wrapped and the app is told rather than killed.
+ */
+export let supabaseError: string | null = null;
+
+function build(): SupabaseClient | null {
+  if (!url || !key) {
+    supabaseError = 'Supabase keys are missing from this build.';
+    return null;
+  }
+  try {
+    return createClient(url, key, {
+      auth: {
+        /**
+         * Sessions live in AsyncStorage so a student is still signed in
+         * tomorrow. The refresh token is the sensitive part; it is scoped to
+         * one device and revoked by signing out.
+         */
+        storage: AsyncStorage,
+        persistSession: true,
+        autoRefreshToken: true,
+        /**
+         * Web only. React Native has no URL bar for Supabase to read a token
+         * out of, and leaving it on makes the client wait on a browser API that
+         * never answers.
+         */
+        detectSessionInUrl: false,
+      },
+    });
+  } catch (err) {
+    supabaseError = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    console.error('supabase: client could not be created', err);
+    return null;
+  }
+}
+
+const client = build();
+
+/** True only when there is a working client to talk to. */
+export const isSupabaseConfigured = client !== null;
 
 /**
- * Built once, and never allowed to throw during module evaluation.
+ * Always an object, never null, so no caller needs a guard on every line.
  *
- * Anything that fails here kills the app before React mounts, which is a blank
- * close rather than an error, so it is worth the belt as well as the braces.
+ * When construction failed every method rejects with the reason, which surfaces
+ * as an ordinary error message in the sign-in form instead of a crash.
  */
-export const supabase = createClient(url ?? 'https://placeholder.supabase.co', key ?? 'public-anon-key', {
-  auth: {
-    /**
-     * Sessions live in AsyncStorage so a student is still signed in tomorrow.
-     * The refresh token is the sensitive part; it is scoped to one device and
-     * revoked by signing out.
-     */
-    storage: AsyncStorage,
-    persistSession: true,
-    autoRefreshToken: true,
-    /**
-     * Web only. React Native has no URL bar for Supabase to read a token out
-     * of, and leaving it on makes the client wait on a browser API that never
-     * answers.
-     */
-    detectSessionInUrl: false,
-  },
-});
+export const supabase: SupabaseClient =
+  client ??
+  (new Proxy({} as SupabaseClient, {
+    get() {
+      const reason = supabaseError ?? 'Supabase is not available in this build.';
+      return () => Promise.reject(new Error(reason));
+    },
+  }) as SupabaseClient);
 
 /**
  * Refresh tokens only while the app is in front of someone.
@@ -68,9 +98,13 @@ export const supabase = createClient(url ?? 'https://placeholder.supabase.co', k
  * and catch up on resume, which is what the Supabase React Native guide
  * recommends and what stops a session expiring while a student is mid-chapter.
  */
-if (isSupabaseConfigured) {
-  AppState.addEventListener('change', (status) => {
-    if (status === 'active') supabase.auth.startAutoRefresh();
-    else supabase.auth.stopAutoRefresh();
-  });
+if (client) {
+  try {
+    AppState.addEventListener('change', (status) => {
+      if (status === 'active') client.auth.startAutoRefresh();
+      else client.auth.stopAutoRefresh();
+    });
+  } catch (err) {
+    console.error('supabase: could not watch app state', err);
+  }
 }
