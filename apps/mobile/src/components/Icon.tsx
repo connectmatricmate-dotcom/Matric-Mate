@@ -1,9 +1,147 @@
-import Svg, { Path } from 'react-native-svg';
-import { ICON_PATHS, IconName } from '@matricmate/core';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Atom,
+  Award,
+  Bell,
+  BookOpen,
+  BookText,
+  Calculator,
+  Calendar,
+  Camera,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  Crown,
+  Dna,
+  Download,
+  Eye,
+  EyeOff,
+  Feather,
+  FileText,
+  Flame,
+  FlaskConical,
+  Globe,
+  Headphones,
+  HelpCircle,
+  House,
+  KeyRound,
+  Landmark,
+  Languages,
+  Layers,
+  Leaf,
+  Lock,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Mic,
+  Monitor,
+  Moon,
+  MoonStar,
+  MoreHorizontal,
+  Pause,
+  Pencil,
+  Phone,
+  Play,
+  Plus,
+  RefreshCw,
+  Search,
+  Send,
+  Settings,
+  Share2,
+  Sparkles,
+  Star,
+  Target,
+  Trash2,
+  TrendingUp,
+  User,
+  WalletCards,
+  WifiOff,
+  X,
+  Zap,
+  type LucideIcon,
+} from 'lucide-react-native';
+import { IconName } from '@matricmate/core';
 import { C } from '../theme';
 
 export type { IconName };
 export { SUBJECT_ICON } from '@matricmate/core';
+
+/**
+ * One icon system for the whole app: Lucide, the maintained successor to
+ * Feather. Rounded caps and a single stroke weight match the app's soft
+ * geometry, and Record<IconName, LucideIcon> means a missing mapping fails
+ * the typecheck instead of rendering an empty square on a student's phone.
+ */
+const GLYPHS: Record<IconName, LucideIcon> = {
+  home: House,
+  book: BookOpen,
+  book2: BookText,
+  target: Target,
+  spark: Sparkles,
+  chart: TrendingUp,
+  user: User,
+  bell: Bell,
+  flame: Flame,
+  back: ChevronLeft,
+  chevron: ChevronRight,
+  close: X,
+  play: Play,
+  pause: Pause,
+  download: Download,
+  check: Check,
+  lock: Lock,
+  search: Search,
+  camera: Camera,
+  mic: Mic,
+  send: Send,
+  doc: FileText,
+  clock: Clock,
+  gear: Settings,
+  card: CreditCard,
+  share: Share2,
+  trash: Trash2,
+  plus: Plus,
+  dots: MoreHorizontal,
+  eye: Eye,
+  eyeOff: EyeOff,
+  wifiOff: WifiOff,
+  refresh: RefreshCw,
+  edit: Pencil,
+  logout: LogOut,
+  help: HelpCircle,
+  headphones: Headphones,
+  cards: WalletCards,
+  mail: Mail,
+  phone: Phone,
+  calendar: Calendar,
+  key: KeyRound,
+  award: Award,
+  layers: Layers,
+  arrowRight: ArrowRight,
+  quill: Feather,
+  flask: FlaskConical,
+  calc: Calculator,
+  leaf: Leaf,
+  globe: Globe,
+  moon: Moon,
+  bolt: Zap,
+  star: Star,
+  whatsapp: MessageCircle,
+  alert: AlertTriangle,
+  crown: Crown,
+  phy: Atom,
+  chem: FlaskConical,
+  bio: Dna,
+  math: Calculator,
+  eng: Languages,
+  urd: Feather,
+  isl: MoonStar,
+  pst: Landmark,
+  cs: Monitor,
+};
 
 export function Icon({
   name,
@@ -16,15 +154,6 @@ export function Icon({
   color?: string;
   strokeWidth?: number;
 }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d={ICON_PATHS[name]}
-        stroke={color}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Svg>
-  );
+  const Glyph = GLYPHS[name];
+  return <Glyph size={size} color={color} strokeWidth={strokeWidth} />;
 }

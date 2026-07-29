@@ -9,7 +9,72 @@
  */
 import Link from 'next/link';
 import React from 'react';
-import { ICON_PATHS, IconName } from '@matricmate/core';
+import { IconName } from '@matricmate/core';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Atom,
+  Award,
+  Bell,
+  BookOpen,
+  BookText,
+  Calculator,
+  Calendar,
+  Camera,
+  Check as CheckGlyph,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  Crown,
+  Dna,
+  Download,
+  Eye,
+  EyeOff,
+  Feather,
+  FileText,
+  Flame,
+  FlaskConical,
+  Globe,
+  Headphones,
+  HelpCircle,
+  House,
+  KeyRound,
+  Landmark,
+  Languages,
+  Layers,
+  Leaf,
+  Lock,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Mic,
+  Monitor,
+  Moon,
+  MoonStar,
+  MoreHorizontal,
+  Pause,
+  Pencil,
+  Phone,
+  Play,
+  Plus,
+  RefreshCw,
+  Search,
+  Send,
+  Settings,
+  Share2,
+  Sparkles,
+  Star,
+  Target,
+  Trash2,
+  TrendingUp,
+  User,
+  WalletCards,
+  WifiOff,
+  X,
+  Zap,
+  type LucideIcon,
+} from 'lucide-react';
 import { Tone, buttonClasses, itemClasses, pillClasses } from './styles';
 import type { BtnVariant } from './styles';
 
@@ -26,18 +91,78 @@ export function Icon({
   className?: string;
   strokeWidth?: number;
 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} aria-hidden focusable="false">
-      <path
-        d={ICON_PATHS[name]}
-        stroke="currentColor"
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  const Glyph = GLYPHS[name];
+  return <Glyph size={size} strokeWidth={strokeWidth} className={className} aria-hidden focusable="false" />;
 }
+
+/** Same contract as the Android app: a missing mapping is a compile error. */
+const GLYPHS: Record<IconName, LucideIcon> = {
+  home: House,
+  book: BookOpen,
+  book2: BookText,
+  target: Target,
+  spark: Sparkles,
+  chart: TrendingUp,
+  user: User,
+  bell: Bell,
+  flame: Flame,
+  back: ChevronLeft,
+  chevron: ChevronRight,
+  close: X,
+  play: Play,
+  pause: Pause,
+  download: Download,
+  check: CheckGlyph,
+  lock: Lock,
+  search: Search,
+  camera: Camera,
+  mic: Mic,
+  send: Send,
+  doc: FileText,
+  clock: Clock,
+  gear: Settings,
+  card: CreditCard,
+  share: Share2,
+  trash: Trash2,
+  plus: Plus,
+  dots: MoreHorizontal,
+  eye: Eye,
+  eyeOff: EyeOff,
+  wifiOff: WifiOff,
+  refresh: RefreshCw,
+  edit: Pencil,
+  logout: LogOut,
+  help: HelpCircle,
+  headphones: Headphones,
+  cards: WalletCards,
+  mail: Mail,
+  phone: Phone,
+  calendar: Calendar,
+  key: KeyRound,
+  award: Award,
+  layers: Layers,
+  arrowRight: ArrowRight,
+  quill: Feather,
+  flask: FlaskConical,
+  calc: Calculator,
+  leaf: Leaf,
+  globe: Globe,
+  moon: Moon,
+  bolt: Zap,
+  star: Star,
+  whatsapp: MessageCircle,
+  alert: AlertTriangle,
+  crown: Crown,
+  phy: Atom,
+  chem: FlaskConical,
+  bio: Dna,
+  math: Calculator,
+  eng: Languages,
+  urd: Feather,
+  isl: MoonStar,
+  pst: Landmark,
+  cs: Monitor,
+};
 
 /* ------------------------------------------------------------------ text */
 
