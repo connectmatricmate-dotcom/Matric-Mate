@@ -17,10 +17,11 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { PayMark } from '@/components/commerce/PayMark';
-import { Btn, ErrorBanner } from '@/components/ui/controls';
+import { Btn, ErrorBanner, Field } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 import { INCLUDED, PAYMENT_METHODS, type Plan, rupees } from '@/lib/plans';
+import { validateMobile } from '@/lib/validation';
 
 const TRIAL_DAYS = 3;
 
@@ -28,11 +29,14 @@ export function CheckoutForm({
   plan,
   live,
   cancelled,
+  knownPhone,
 }: {
   plan: Plan;
   /** True when this deployment has Safepay keys. */
   live: boolean;
   cancelled?: boolean;
+  /** Already on file, so a returning student does not retype it. */
+  knownPhone?: string | null;
 }) {
   const { state, hydrated } = useApp();
   const t = useT();
@@ -41,8 +45,15 @@ export function CheckoutForm({
   const [error, setError] = useState<string | null>(
     cancelled ? 'Payment cancelled. Nothing was charged.' : null
   );
+  // Displayed in the local form, sent to the server as typed, normalised there.
+  const [phone, setPhone] = useState(knownPhone ? knownPhone.replace('+92', '0') : '');
+  const [touched, setTouched] = useState(false);
+
+  const phoneError = validateMobile(phone);
 
   async function pay() {
+    setTouched(true);
+    if (phoneError) return;
     setBusy(true);
     setError(null);
 
@@ -59,7 +70,7 @@ export function CheckoutForm({
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: plan.id }),
+        body: JSON.stringify({ plan: plan.id, phone }),
       });
       const body = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !body.url) throw new Error(body.error ?? 'Could not start the payment');
@@ -169,12 +180,28 @@ export function CheckoutForm({
           </p>
         </Card>
 
+        <div className="mt-4">
+          <Field
+            label="Mobile number"
+            value={phone}
+            onChange={setPhone}
+            placeholder="03001234567"
+            icon="phone"
+            type="tel"
+            autoComplete="tel"
+            required
+            hint="Used for the payment and for your renewal reminder on WhatsApp."
+            error={touched ? (phoneError ?? undefined) : undefined}
+          />
+        </div>
+
         <Btn
           title={live ? `Continue to Safepay · ${rupees(plan.price)}` : `Start ${TRIAL_DAYS} days free`}
           onClick={pay}
           variant="orange"
           loading={busy}
-          className="mt-4 w-full"
+          disabled={!!phoneError}
+          className="w-full"
         />
 
         <p className="mt-3 text-[12.5px] leading-[1.6] text-ink2">

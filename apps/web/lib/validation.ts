@@ -20,7 +20,19 @@ export function validatePassword(v: string) {
 
 export function validateMobile(v: string) {
   const digits = v.replace(/\D/g, '');
-  return /^0?3\d{9}$/.test(digits) ? null : 'Enter an 11-digit number, like 03001234567.';
+  return /^(92)?0?3\d{9}$/.test(digits) ? null : 'Enter an 11-digit number, like 03001234567.';
+}
+
+/**
+ * To E.164, which is what Safepay and every SMS gateway want.
+ *
+ * Students type 03001234567, sometimes 0300-1234567, occasionally +92 300…
+ * All of them mean the same number, so normalise once here rather than let
+ * three formats loose in the database.
+ */
+export function toE164(v: string) {
+  const digits = v.replace(/\D/g, '').replace(/^92/, '').replace(/^0/, '');
+  return `+92${digits}`;
 }
 
 export function validateCardNumber(v: string) {

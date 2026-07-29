@@ -31,8 +31,87 @@ const HOST = ENV === 'production' ? 'https://api.getsafepay.com' : 'https://sand
  */
 const CHECKOUT_PAY = `${HOST}/checkout/pay/`;
 
+/** Subscriptions live on their own path, and it validates a stricter set of params. */
+const CHECKOUT_SUBSCRIBE = `${HOST}/checkout/subscribe/`;
+
 /** With no keys the app falls back to the mock flow, so local dev needs no secrets. */
 export const isSafepayConfigured = Boolean(MERCHANT_API_KEY && SECRET_KEY);
+
+/**
+ * A student's identity at Safepay, in two parts that are easy to confuse.
+ *
+ * A **customer** (`cus_…`) is a merchant-scoped record: it owns saved payment
+ * methods and it is what a Safepay report joins on. Safepay's docs warn against
+ * creating a second one for someone who already exists, so the id is stored on
+ * the profile and reused forever.
+ *
+ * A **guest session** is a short-lived JWT that carries the email in a claim
+ * Safepay signed. Passed to checkout as `auth_token`, it is what stops the payer
+ * typing a different address at the last step, and it is *required* on the
+ * subscribe path. It is minted per checkout and never stored.
+ */
+
+/** Creates a Safepay customer. Call once per student; store what it returns. */
+export async function createCustomer(input: { email: string; name: string; phone: string }): Promise<string | null> {
+  const secret = process.env.SAFEPAY_SECRET_KEY;
+  if (!secret) return null;
+
+  const [firstName, ...rest] = input.name.trim().split(/\s+/);
+  const res = await fetch(`${HOST}/user/customers/v1/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-SFPY-MERCHANT-SECRET': secret },
+    cache: 'no-store',
+    body: JSON.stringify({
+      first_name: firstName || 'Student',
+      // Safepay marks last_name mandatory and most students give one name.
+      last_name: rest.join(' ') || firstName || 'Student',
+      email: input.email,
+      // Mandatory. Safepay rejects the call outright without it.
+      phone_number: input.phone,
+      country: 'PK',
+    }),
+  });
+
+  const body = (await res.json().catch(() => ({}))) as { data?: { token?: string } };
+  if (!res.ok || !body.data?.token) {
+    // Not fatal: a payment without a customer attached still works, it is just
+    // harder to reconcile later. Never block checkout on it.
+    console.error('safepay: could not create customer', res.status, JSON.stringify(body).slice(0, 200));
+    return null;
+  }
+  return body.data.token;
+}
+
+/**
+ * A signed session for this payer, to hand checkout as `auth_token`.
+ *
+ * The email lives inside the JWT, so the payer cannot change it on Safepay's
+ * page: whatever they type, the signed claim is what the payment is attributed
+ * to. That is the whole reason this exists.
+ */
+export async function createGuestSession(input: { email: string; name: string; phone: string }): Promise<string | null> {
+  const [firstName, ...rest] = input.name.trim().split(/\s+/);
+  const res = await fetch(`${HOST}/user/v1/guest/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    body: JSON.stringify({
+      first_name: firstName || 'Student',
+      last_name: rest.join(' ') || firstName || 'Student',
+      email: input.email,
+      // Mandatory here too, and the reason a session comes back null without it.
+      phone: input.phone,
+      country: 'PK',
+    }),
+  });
+
+  const body = (await res.json().catch(() => ({}))) as { data?: { session?: string } };
+  if (!res.ok || !body.data?.session) {
+    console.error('safepay: could not create guest session', res.status, JSON.stringify(body).slice(0, 200));
+    return null;
+  }
+  return body.data.session;
+}
 
 type TrackerResponse = {
   /** v1 returns the token at the top of `data`, v3 nests it under `tracker`. */
@@ -94,6 +173,8 @@ export function checkoutUrl(input: {
   orderId: string;
   redirectUrl: string;
   cancelUrl: string;
+  /** Signed guest session. Fixes the email on Safepay's page. */
+  authToken?: string | null;
 }) {
   const q = new URLSearchParams({
     env: ENV,
@@ -103,7 +184,32 @@ export function checkoutUrl(input: {
     redirect_url: input.redirectUrl,
     cancel_url: input.cancelUrl,
   });
+  if (input.authToken) q.set('auth_token', input.authToken);
   return `${CHECKOUT_PAY}?${q}`;
+}
+
+/**
+ * Where to send someone starting a recurring plan.
+ *
+ * The subscribe page validates harder than the pay page: plan_id, auth_token,
+ * redirect_url and cancel_url are all mandatory, and the plan id must look like
+ * a `plan_…`. A missing auth_token is the usual cause of a blank subscribe page,
+ * because a recurring mandate has to belong to somebody.
+ */
+export function subscribeUrl(input: {
+  planId: string;
+  authToken: string;
+  redirectUrl: string;
+  cancelUrl: string;
+}) {
+  const q = new URLSearchParams({
+    env: ENV,
+    plan_id: input.planId,
+    auth_token: input.authToken,
+    redirect_url: input.redirectUrl,
+    cancel_url: input.cancelUrl,
+  });
+  return `${CHECKOUT_SUBSCRIBE}?${q}`;
 }
 
 const matches = (expected: string, given: string) => {
