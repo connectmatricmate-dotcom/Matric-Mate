@@ -445,15 +445,27 @@ export function Seg<Tv extends string>({
         const on = o.value === value;
         return (
           <Tap key={o.value} onPress={() => onChange(o.value)} style={[st.segBtn, on && st.segBtnOn]}>
+            {/* One line height for both scripts; see LanguageToggle for why. */}
             {o.urdu ? (
-              <Ur size={13} style={{ color: on ? C.teal : C.ink2, textAlign: 'center' }}>
+              <Text
+                style={{
+                  fontFamily: F.urduBold,
+                  fontSize: 14,
+                  lineHeight: 36,
+                  includeFontPadding: false,
+                  color: on ? C.teal : C.ink2,
+                  textAlign: 'center',
+                }}
+              >
                 {o.label}
-              </Ur>
+              </Text>
             ) : (
               <Text
                 style={{
                   fontFamily: F.bodyBold,
                   fontSize: 13,
+                  lineHeight: 36,
+                  includeFontPadding: false,
                   color: on ? C.teal : C.ink2,
                   textAlign: 'center',
                 }}
@@ -807,7 +819,7 @@ const st = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   seg: { flexDirection: 'row', backgroundColor: C.grey, borderRadius: 13, padding: 3, gap: 3 },
-  segBtn: { flex: 1, paddingVertical: 9, borderRadius: R.sm, alignItems: 'center' },
+  segBtn: { flex: 1, height: 36, justifyContent: 'center', borderRadius: R.sm, alignItems: 'center' },
   segBtnOn: { backgroundColor: C.card, ...(shadow as object) },
   field: {
     flexDirection: 'row',

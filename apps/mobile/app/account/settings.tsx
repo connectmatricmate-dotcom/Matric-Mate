@@ -93,6 +93,25 @@ export default function Settings() {
         />
       </Card>
 
+      {/* Plan and invoices, reachable from settings. The gear in the header
+          lands people here, and a student on the free plan still needs a way
+          to find what a plan is and what they have paid before. */}
+      <SectionTitle>{t('billing.premium')}</SectionTitle>
+      <Card flat style={{ paddingVertical: 0 }}>
+        <Item
+          title={t('account.subscriptionTitle')}
+          sub={state.premium.active ? t('billing.statusActive') : t('billing.statusFree')}
+          icon="crown"
+          onPress={() => router.push('/account/subscription')}
+        />
+        <Item
+          title={t('account.paymentHistory')}
+          icon="card"
+          last
+          onPress={() => router.push('/account/payments')}
+        />
+      </Card>
+
       <SectionTitle>{t('account.storage')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>
         <Item

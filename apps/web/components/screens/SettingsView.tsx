@@ -127,6 +127,16 @@ export function SettingsView() {
           />
         </Group>
 
+        <Group title={t('billing.premium')}>
+          <Item
+            href="/account/subscription"
+            title={t('account.subscriptionTitle')}
+            sub={state.premium.active ? t('billing.statusActive') : t('billing.statusFree')}
+            icon="crown"
+          />
+          <Item href="/account/payments" title={t('account.paymentHistory')} icon="card" last />
+        </Group>
+
         <Group title={t('account.storage')}>
           <Item
             href="/learn/downloads"

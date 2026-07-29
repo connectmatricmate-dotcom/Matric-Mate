@@ -28,21 +28,30 @@ export function LanguageToggle({ compact }: { compact?: boolean }) {
         const on = lang === o.value;
         return (
           <Tap key={o.value} onPress={() => setLang(o.value)}>
+            {/*
+              Both pills share one fixed height and one line height, whatever
+              the script. Nastaliq's font metrics are ~2.3x taller than Latin,
+              so letting each label keep its natural leading made the two pills
+              different heights with the text sitting at different depths,
+              which is what made this control look broken.
+            */}
             <View
               style={{
-                paddingVertical: compact ? 7 : 9,
+                height: compact ? 32 : 38,
+                justifyContent: 'center',
                 paddingHorizontal: compact ? 14 : 20,
                 borderRadius: R.pill,
                 backgroundColor: on ? C.card : 'transparent',
-                minWidth: compact ? 62 : 84,
+                minWidth: compact ? 62 : 88,
                 alignItems: 'center',
               }}
             >
               <Text
                 style={{
                   fontFamily: o.urdu ? F.urduBold : F.bodyBold,
-                  fontSize: o.urdu ? 13 : 13.5,
-                  lineHeight: o.urdu ? 24 : 18,
+                  fontSize: o.urdu ? 14 : 13.5,
+                  lineHeight: compact ? 32 : 38,
+                  includeFontPadding: false,
                   color: on ? C.teal : C.ink2,
                 }}
               >
