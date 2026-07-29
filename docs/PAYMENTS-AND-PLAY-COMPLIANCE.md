@@ -108,6 +108,25 @@ code: the wallet rails have to be switched on for the merchant, usually by
 Safepay support for a sandbox account. Ask them to enable JazzCash and Easypaisa
 and quote that capabilities response.
 
+### Testing the redirect back: not over plain http
+
+Safepay's checkout runs on HTTPS and returns the payer with a form POST. A
+browser will not submit a form from an HTTPS page to `http://localhost`: that is
+mixed content, and Chrome drops it with no visible error, so the symptom is
+simply "it never comes back".
+
+Two ways round it:
+
+```bash
+npm run dev:https --workspace apps/web   # local HTTPS, self-signed cert
+```
+
+or test against the deployed HTTPS URL, which is what a student will use anyway.
+The redirect URL follows the deployment automatically, so nothing needs editing.
+
+Also worth checking in the Safepay dashboard: some merchant accounts require
+return URLs to be registered before they will be honoured.
+
 ---
 
 ## Subscriptions: supported, deliberately not shipped yet

@@ -10,13 +10,22 @@
  * and canonical link, so a preview build with the production URL hard-coded
  * tells WhatsApp and Google to go and fetch a page that doesn't exist yet.
  */
-const fromEnv = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const withScheme = (host?: string) => (host ? (host.startsWith('http') ? host : `https://${host}`) : undefined);
 
-export const SITE_URL = fromEnv
-  ? fromEnv.startsWith('http')
-    ? fromEnv
-    : `https://${fromEnv}`
-  : 'http://localhost:3000';
+const configured = withScheme(process.env.NEXT_PUBLIC_SITE_URL);
+const onVercel = withScheme(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+
+/**
+ * A localhost value is only ever meant for a laptop. If one reaches a deployed
+ * build it is a copied .env, and honouring it would be quietly catastrophic:
+ * Safepay would send payers back to localhost after they had paid, and every
+ * share card would point at a machine nobody else can reach. Vercel's own URL
+ * wins in that case, because it is the one thing here that cannot be wrong.
+ */
+const isLocal = (url?: string) => !!url && /^https?:\/\/(localhost|127\.0\.0\.1)/.test(url);
+
+export const SITE_URL =
+  (isLocal(configured) && onVercel ? onVercel : configured) ?? onVercel ?? 'http://localhost:3000';
 
 /**
  * Search engines are kept out until the content is the client's own.
