@@ -60,7 +60,7 @@ export function ReportCard() {
         </p>
 
         <table className="mt-4 w-full">
-          <caption className="sr-only">Grades by subject</caption>
+          <caption className="sr-only">{t('progress.gradesBySubject')}</caption>
           <tbody>
             {rows.map((r) => (
               <tr key={r.sid} className="border-b border-line">
@@ -88,20 +88,35 @@ export function ReportCard() {
         </div>
       </Card>
 
-      <div className="mt-6 flex gap-2.5">
+      <div className="no-print mt-6 flex gap-2.5">
+        {/* Both actions are real. Share opens WhatsApp's own share flow with a
+            text summary; Save opens the print dialog, where every phone and
+            desktop browser offers "Save as PDF". */}
         <Btn
           title={t('progress.share')}
           variant="whatsapp"
           icon="whatsapp"
           className="flex-1"
-          onClick={() => toast(t('progress.shareToast'))}
+          onClick={() => {
+            const summary =
+              `${state.user?.name ?? 'Student'} · MatricMate report card, ${month}\n` +
+              `Overall grade: ${grade(overallAcc)} · ${state.attempts.length} questions this month\n` +
+              rows
+                .filter((r) => r.attempted)
+                .map((r) => `${subjectById(r.sid)?.name}: ${grade(r.acc)}`)
+                .join(' · ');
+            window.open(`https://wa.me/?text=${encodeURIComponent(summary)}`, '_blank', 'noopener');
+          }}
         />
         <Btn
           title={t('progress.savePdf')}
           variant="line"
           icon="download"
           className="flex-1"
-          onClick={() => toast(t('progress.pdfToast'))}
+          onClick={() => {
+            toast(t('progress.pdfToast'));
+            window.print();
+          }}
         />
       </div>
 

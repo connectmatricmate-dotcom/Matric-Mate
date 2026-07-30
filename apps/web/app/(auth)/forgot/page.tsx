@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: 'Send yourself a link to reset your MatricMate password.',
 };
 
-export default function ForgotPage() {
-  return <ForgotForm />;
+export default async function ForgotPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  // The auth callback lands here with ?error=expired when a reset link is too
+  // old to honour; the form explains that instead of silently starting over.
+  const { error } = await searchParams;
+  return <ForgotForm linkExpired={error === 'expired'} />;
 }

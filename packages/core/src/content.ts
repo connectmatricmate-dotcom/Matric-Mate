@@ -570,10 +570,24 @@ function generate(ch: Chapter): ChapterContent {
   return { sections, mcqs, flashcards, shortQs, blanks, audioTitle: `${topic}, full chapter` };
 }
 
+/**
+ * Generated content is deterministic per chapter, so it is built once and kept.
+ * Without this cache every progress sweep (chapterPct, subjectPct, getMcqs)
+ * re-ran generate() per unauthored chapter, ~0.2ms a call, which added up to
+ * 40-90ms per render on a phone once a screen swept all seven subjects.
+ */
+const GENERATED = new Map<string, ChapterContent>();
+const EMPTY_CONTENT: ChapterContent = { sections: [], mcqs: [], flashcards: [], shortQs: [], blanks: [], audioTitle: '' };
+
 export function contentFor(chapterId: string): ChapterContent {
   if (AUTHORED[chapterId]) return AUTHORED[chapterId];
+  const hit = GENERATED.get(chapterId);
+  if (hit) return hit;
   const ch = chapterById(chapterId);
-  return ch ? generate(ch) : { sections: [], mcqs: [], flashcards: [], shortQs: [], blanks: [], audioTitle: '' };
+  if (!ch) return EMPTY_CONTENT;
+  const built = generate(ch);
+  GENERATED.set(chapterId, built);
+  return built;
 }
 
 export const PAST_PAPERS: PastPaper[] = [

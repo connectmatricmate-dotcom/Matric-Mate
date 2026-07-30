@@ -6,6 +6,7 @@
  * apps/mobile/src/components/OnboardingStep.tsx so the two apps read the same.
  */
 import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Check, Icon, Pill, Ur } from '@/components/ui/primitives';
 
@@ -17,7 +18,7 @@ export function Steps({ step, total = 4 }: { step: number; total?: number }) {
           key={n}
           aria-current={n === step ? 'step' : undefined}
           className={`h-2 rounded-full transition-all duration-200 ${n === step ? 'w-[22px]' : 'w-2'} ${
-            n <= step ? 'bg-teal' : 'bg-[#DDE6E1]'
+            n <= step ? 'bg-teal' : 'bg-mute'
           }`}
         />
       ))}
@@ -93,13 +94,17 @@ export function StepScreen({
   back?: boolean;
 }) {
   const router = useRouter();
+  // Every step's forward action is a state write plus a route push. The button
+  // spins until the next step paints, otherwise a slow transition reads as a
+  // dead tap and invites a second click.
+  const [pending, startTransition] = useTransition();
 
   return (
     <div className="mx-auto w-full max-w-[540px] px-5 py-7">
       {back ? (
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => startTransition(() => router.back())}
           className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-[13.5px] font-extrabold text-ink2 hover:text-teal"
         >
           <Icon name="chevron" size={18} className="rotate-180" />
@@ -116,8 +121,8 @@ export function StepScreen({
 
       {footnote ? <p className="mt-6 text-[12.5px] text-ink2">{footnote}</p> : null}
 
-      <div className="sticky bottom-0 mt-7 bg-paper/95 py-4 backdrop-blur">
-        <Btn title={cta} onClick={onNext} disabled={disabled} className="w-full" />
+      <div className="mt-7">
+        <Btn title={cta} onClick={() => startTransition(onNext)} disabled={disabled} loading={pending} className="w-full" />
       </div>
     </div>
   );

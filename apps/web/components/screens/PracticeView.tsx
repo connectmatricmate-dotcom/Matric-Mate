@@ -69,7 +69,7 @@ export function PracticeView() {
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('practice.recent')}</h2>
             {recent.length === 0 ? (
-              <Empty emoji="🎯" title={t('practice.noneTitle')} sub={t('practice.noneBody')} />
+              <Empty icon="target" title={t('practice.noneTitle')} sub={t('practice.noneBody')} />
             ) : (
               <Card flat className="py-0">
                 {recent.map((r, i) => (

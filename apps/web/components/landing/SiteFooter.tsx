@@ -18,7 +18,7 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
     <footer className="border-t border-line bg-card">
       <div className="mx-auto flex max-w-[1100px] flex-col gap-6 px-5 py-10 md:flex-row md:items-start md:justify-between">
         <div className="max-w-[300px]">
-          <Image src="/brand/wordmark.png" alt="MatricMate" width={140} height={28} />
+          <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} />
           <p className="mt-3 text-[13px] leading-[1.6] text-ink2">
             Exam preparation for FBISE Class 9, in English and Urdu medium. Built in Pakistan.
           </p>
@@ -49,15 +49,21 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
                   Terms and privacy
                 </Link>
               </li>
-              <li>WhatsApp · 10am–10pm</li>
-              <li>help@matricmate.pk</li>
+              <li>
+                <a className="hover:text-teal" href="mailto:help@matricmate.pk">
+                  help@matricmate.pk
+                </a>
+              </li>
+              {/* Plain text on purpose: there is no WhatsApp number to link yet,
+                  and ink3 keeps it from reading as a dead link. */}
+              <li className="text-ink3">WhatsApp · 10am to 10pm</li>
             </ul>
           </div>
         </div>
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-[1100px] px-5 py-4 text-[12px] text-ink3">
-          © {new Date().getFullYear()} MatricMate · Prototype build with sample content
+          © {new Date().getFullYear()} MatricMate
         </p>
       </div>
     </footer>

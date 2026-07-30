@@ -38,7 +38,10 @@ export function buttonClasses({
     'transition-[background-color,border-color,transform] duration-200 ease-out active:scale-[0.98]',
     sm ? 'px-4 py-2.5 text-[14px]' : lg ? 'px-7 py-4 text-[17px]' : 'px-5 py-3.5 text-[16px]',
     VARIANTS[variant],
-    disabled ? 'pointer-events-none cursor-not-allowed opacity-45' : 'cursor-pointer',
+    // No pointer-events-none: it suppresses the element's own cursor, so a
+    // disabled control showed the parent's plain arrow instead of not-allowed.
+    // Real buttons already ignore clicks via the disabled attribute.
+    disabled ? 'cursor-not-allowed opacity-45 active:scale-100' : 'cursor-pointer',
     className,
   ].join(' ');
 }
@@ -53,9 +56,13 @@ const TONES: Record<Tone, string> = {
 
 export function pillClasses(tone: Tone = 'teal', interactive = false, className = '') {
   return [
-    'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11.5px] font-extrabold',
+    'inline-flex items-center gap-1.5 rounded-full font-extrabold',
+    // A pill that is a BUTTON needs a finger-sized target; a pill that is a
+    // status chip stays compact. Same look, different hit area.
+    interactive
+      ? 'min-h-10 cursor-pointer px-3.5 text-[12.5px] transition-colors duration-200 hover:brightness-95'
+      : 'px-3 py-1 text-[11.5px]',
     TONES[tone],
-    interactive ? 'cursor-pointer transition-colors duration-200 hover:brightness-95' : '',
     className,
   ].join(' ');
 }

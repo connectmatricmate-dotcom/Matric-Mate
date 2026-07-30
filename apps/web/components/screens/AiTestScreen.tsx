@@ -12,8 +12,16 @@ export function AiTestScreen() {
   const t = useT();
   const weak = useMemo(() => weakTopics(state.attempts).slice(0, 6), [state.attempts]);
   const [picked, setPicked] = useState<string[]>(() => weakTopics(state.attempts).slice(0, 3).map((w) => w.topic));
+  const [touched, setTouched] = useState(false);
   const [count, setCount] = useState<'10' | '15' | '20'>('15');
   const [difficulty, setDifficulty] = useState<'easy' | 'board' | 'hard'>('board');
+
+  // The initial pick runs before the store hydrates, when attempts is still
+  // empty, so the default ticks are adjusted here during render once the data
+  // arrives. Never over a selection the student has made themselves.
+  if (!touched && picked.length === 0 && weak.length) {
+    setPicked(weak.slice(0, 3).map((w) => w.topic));
+  }
 
   return (
     <Page width="focus">
@@ -26,7 +34,7 @@ export function AiTestScreen() {
 
       {weak.length === 0 ? (
         <Empty
-          emoji="🎯"
+          icon="target"
           title={t('tutor.notEnoughTitle')}
           sub={t('tutor.notEnoughBody')}
           cta={<LinkBtn title={t('tutor.practiceTen')} href="/session/setup" sm />}
@@ -48,7 +56,10 @@ export function AiTestScreen() {
                   tone={w.accuracy < 50 ? 'red' : 'orange'}
                   last={i === weak.length - 1}
                   right={<Check on={on} />}
-                  onClick={() => setPicked((p) => (on ? p.filter((x) => x !== w.topic) : [...p, w.topic]))}
+                  onClick={() => {
+                    setTouched(true);
+                    setPicked((p) => (on ? p.filter((x) => x !== w.topic) : [...p, w.topic]));
+                  }}
                 />
               );
             })}
@@ -82,13 +93,14 @@ export function AiTestScreen() {
             <p className="text-[13px] leading-[1.6] text-ink2">{t('tutor.aiTestNote')}</p>
           </Card>
 
-          <div className="sticky bottom-0 mt-5 bg-paper/95 py-4 backdrop-blur">
+          <div className="mt-6">
             <LinkBtn
               title={t('tutor.generate')}
-              href="/session/exam-intro?ai=1"
+              href={`/session/exam-intro?ai=1&topics=${encodeURIComponent(picked.join('|'))}`}
               variant="orange"
               icon="spark"
-              className={`w-full ${picked.length === 0 ? 'pointer-events-none opacity-45' : ''}`}
+              disabled={picked.length === 0}
+              className="w-full"
             />
           </div>
         </>

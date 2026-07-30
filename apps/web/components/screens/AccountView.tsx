@@ -5,10 +5,11 @@ import { useState } from 'react';
 import { levelProgress, xpToNextLevel } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
 import { planById } from '@/lib/plans';
+import { APP_VERSION } from '@/lib/site';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, StreakRail } from '@/components/app/rails';
 import { Btn, ItemButton } from '@/components/ui/controls';
-import { Bar, Card, Item, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Bar, Card, Icon, Item, LinkBtn, Pill } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useApp, useT } from '@/lib/store';
 
@@ -16,6 +17,7 @@ export function AccountView() {
   const { state, actions, derived } = useApp();
   const t = useT();
   const [confirmOut, setConfirmOut] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const setup = state.onboarding;
 
   return (
@@ -30,8 +32,8 @@ export function AccountView() {
       <Split>
         <Work className="flex flex-col gap-4">
           <Card className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] bg-orangetint text-[32px]">
-              🧑🏽‍🎓
+            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-orangetint text-orangedark">
+              <Icon name="gradCap" size={30} />
             </span>
             <div className="min-w-0 flex-1">
               <p className="font-display text-[20px] text-ink">{state.user?.name ?? 'Student'}</p>
@@ -66,7 +68,13 @@ export function AccountView() {
               border={state.premium.active ? 'border-orange' : undefined}
               className="flex items-center gap-4 transition-colors duration-200 hover:border-teal"
             >
-              <span className="text-[28px]">{state.premium.active ? '👑' : '🔓'}</span>
+              <span
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] ${
+                  state.premium.active ? 'bg-orange text-white' : 'bg-grey text-ink2'
+                }`}
+              >
+                <Icon name={state.premium.active ? 'crown' : 'lock'} size={22} />
+              </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-extrabold text-ink">
                   {state.premium.active
@@ -111,7 +119,7 @@ export function AccountView() {
             </Card>
           </div>
 
-          <p className="text-center text-[12.5px] text-ink3">{t('account.version', { v: '0.1.0' })}</p>
+          <p className="text-center text-[12.5px] text-ink3">{t('account.version', { v: APP_VERSION })}</p>
         </Work>
 
         <Rail>
@@ -126,10 +134,17 @@ export function AccountView() {
           title={t('auth.logOut')}
           variant="danger"
           className="mt-5 w-full"
-          onClick={() => {
-            setConfirmOut(false);
+          loading={signingOut}
+          onClick={async () => {
+            // The sheet stays open and the button spins until the server action
+            // redirects; closing first left a signed-out shell with no feedback.
+            setSigningOut(true);
             actions.signOut();
-            void signOutAction();
+            try {
+              await signOutAction();
+            } catch {
+              setSigningOut(false);
+            }
           }}
         />
         <Btn title={t('auth.stayLoggedIn')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmOut(false)} />

@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import type { Blank } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Bar, Card, Icon, LinkBtn } from '@/components/ui/primitives';
+import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 export function BlanksScreen({
@@ -48,7 +49,13 @@ export function BlanksScreen({
       <Page width="focus">
         <PageHead back={`/learn/chapter/${chapterId}`} backLabel={chapterTitle} title={t('practice.blanks')} />
         <Card className="flex flex-col items-center gap-2 py-7 text-center">
-          <span className="text-[38px]">{right === items.length ? '🎉' : '👍'}</span>
+          <span
+            className={`flex h-14 w-14 items-center justify-center rounded-full ${
+              right === items.length ? 'bg-greentint text-green' : 'bg-tealtint text-teal'
+            }`}
+          >
+            <Icon name={right === items.length ? 'party' : 'thumbsUp'} size={26} />
+          </span>
           <p className="font-display text-[21px] text-ink">{t('session.blanksDone', { a: right, b: items.length })}</p>
           <p className="text-[13px] text-ink2">{t('session.blanksDoneSub')}</p>
         </Card>
@@ -59,16 +66,18 @@ export function BlanksScreen({
 
   return (
     <Page width="focus">
-      <PageHead
-        back={`/learn/chapter/${chapterId}`}
+      <SessionHeader
+        backHref={`/learn/chapter/${chapterId}`}
         backLabel={chapterTitle}
-        title={t('practice.blanks')}
-        sub={t('session.blanksItem', { a: i + 1, b: items.length })}
+        pct={(i / Math.max(1, items.length)) * 100}
+        label={`${t('practice.blanks')} · ${t('session.blanksItem', { a: i + 1, b: items.length })}`}
+        right={<Pill tone="grey">{chapterTitle}</Pill>}
       />
-      <Bar pct={(i / Math.max(1, items.length)) * 100} tone="teal" />
 
-      <Card className="mt-6">
-        <p className="font-display text-[18px] leading-[1.9] text-ink">
+      {/* Same task frame as the MCQ and exam screens */}
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <Card className="md:border-0 md:bg-transparent md:p-0 md:shadow-none">
+        <p className="font-display text-[18px] leading-[1.9] text-ink md:text-[20px]">
           {item.sentence[0]}
           <span
             className={`font-body font-extrabold underline ${
@@ -108,6 +117,7 @@ export function BlanksScreen({
           );
         })}
       </div>
+      </div>
 
       {checked ? (
         <Card
@@ -123,7 +133,7 @@ export function BlanksScreen({
         </Card>
       ) : null}
 
-      <div className="sticky bottom-0 mt-5 bg-paper/95 py-4 backdrop-blur">
+      <div className="mt-6">
         {checked ? (
           <Btn
             title={i + 1 >= items.length ? t('session.seeResult') : t('common.next')}

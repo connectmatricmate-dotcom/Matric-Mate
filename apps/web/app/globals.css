@@ -12,10 +12,12 @@
   --color-tealtint2: #d5e7ed;
   --color-ink: #0f3d4c;
   --color-ink2: #517682;
-  --color-ink3: #8aa4ad;
+  --color-ink3: #6e8b96;
   --color-paper: #fafbf7;
   --color-card: #ffffff;
   --color-line: #e4eae6;
+  --color-track: #eaf0ec;
+  --color-mute: #d7e0db;
   --color-orange: #f29329;
   --color-orangedark: #d97b10;
   --color-orangetint: #fdf1e1;
@@ -37,9 +39,12 @@
   color-scheme: light;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+/**
+ * No global smooth scrolling. With client-side routing, every navigation
+ * resets the scroll position, and animating that reset makes each page change
+ * look like the app is dragging itself to the top. Anything that wants a
+ * smooth scroll asks for it explicitly.
+ */
 
 body {
   background: var(--color-paper);
@@ -133,4 +138,28 @@ button:disabled,
 /* Numbers that sit in columns should not jitter as they change. */
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/**
+ * No sticky action bars. They used to pin the primary button over the content
+ * (and under the phone tab bar), which read as broken overlap on every inner
+ * screen. Actions now sit in normal flow at the end of the content; the one
+ * deliberate exception is the chat composer, which is part of the chat
+ * column's fixed layout, not an overlay.
+ */
+
+/**
+ * Printing = the report card's "Save as PDF". Only the page content belongs on
+ * paper; the app chrome and the action buttons do not.
+ */
+@media print {
+  aside,
+  nav,
+  header,
+  .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
 }

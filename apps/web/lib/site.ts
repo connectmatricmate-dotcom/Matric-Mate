@@ -37,3 +37,9 @@ export const SITE_URL =
  * no redeploy of anything else.
  */
 export const ALLOW_INDEXING = process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
+
+/**
+ * The one version string every screen shows. Two screens once carried two
+ * different hard-coded versions, one tap apart.
+ */
+export const APP_VERSION = '0.2.1';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { XP, accuracy, chapterById, grade } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
 import { Card, Pill, Ring } from '@/components/ui/primitives';
@@ -17,6 +17,7 @@ export function ResultScreen() {
   const s = session.current;
   const saved = useRef(false);
   const [shown, setShown] = useState(0);
+  const [leaving, startLeaving] = useTransition();
 
   const answers = useMemo(() => (s ? Object.values(s.answers) : []), [s]);
   const score = answers.filter((a) => a.correct).length;
@@ -45,10 +46,13 @@ export function ResultScreen() {
   }, [s]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The ring counts up rather than snapping, the one flourish on this screen.
+  // The CSS reduced-motion guard cannot reach a JS interval, so under reduced
+  // motion the first (and only) tick jumps straight to the final value.
   useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let n = 0;
     const timer = setInterval(() => {
-      n += Math.max(1, Math.round(pct / 18));
+      n = reduce ? pct : n + Math.max(1, Math.round(pct / 18));
       if (n >= pct) {
         n = pct;
         clearInterval(timer);
@@ -69,10 +73,14 @@ export function ResultScreen() {
     return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
   }, [answers, s]);
 
+  // Memoized: this render runs ~42 times a second while the ring counts up,
+  // and accuracy() walks the full attempts history on every call.
+  const overallAccuracy = useMemo(() => accuracy(state.attempts), [state.attempts]);
+
   if (!s) return <NoSession />;
 
   const good = pct >= 70;
-  const diff = pct - accuracy(state.attempts);
+  const diff = pct - overallAccuracy;
 
   return (
     <Page width="focus">
@@ -104,19 +112,26 @@ export function ResultScreen() {
             variant="danger"
             sm
             className="mt-3"
-            onClick={() => router.replace(`/learn/chapter/${s.chapterId ?? chapterById(s.mcqs[0].chapterId)?.id}`)}
+            loading={leaving}
+            onClick={() => startLeaving(() => router.replace(`/learn/chapter/${s.chapterId ?? chapterById(s.mcqs[0].chapterId)?.id}`))}
           />
         </Card>
       ) : null}
 
       <div className="mt-6 flex gap-2.5">
-        <Btn title={t('session.reviewAnswers')} variant="line" className="flex-1" onClick={() => router.replace('/session/review')} />
+        <Btn
+          title={t('session.reviewAnswers')}
+          variant="line"
+          className="flex-1"
+          onClick={() => startLeaving(() => router.replace('/session/review'))}
+        />
         <Btn
           title={t('common.done')}
           className="flex-1"
+          loading={leaving}
           onClick={() => {
             session.clear();
-            router.replace('/practice');
+            startLeaving(() => router.replace('/practice'));
           }}
         />
       </div>

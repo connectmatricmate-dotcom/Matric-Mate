@@ -58,7 +58,7 @@ export function DashboardView() {
         // `now` is 0 until the client reads its clock, better no date than 1970.
         eyebrow={now ? new Date(now).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : undefined}
         title={t('dash.greeting', { name: firstName })}
-        sub={`${week.questions} ${t('common.questions')} this week · ${week.accuracy}% ${t('dash.accuracy')} · ${week.time}`}
+        sub={t('dash.weekLine', { q: week.questions, acc: week.accuracy, time: week.time })}
       />
 
       <Split>

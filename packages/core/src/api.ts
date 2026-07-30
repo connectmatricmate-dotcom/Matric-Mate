@@ -145,7 +145,7 @@ export const api = {
         'Pehle dekhein ke sawal kis concept ka hai, phir usay naam dein.',
         'Us concept ki definition aur formula likhein, phir given values daalein.',
         'Jawab unit ke saath likhein aur aik line mein wajah batayein.',
-        'Note: this demo returns a sample answer. The live tutor (M3) runs on Claude with a daily quota per student.',
+        'Note: yeh preview ka sample jawab hai. Live tutor aap ke asal sawal ka jawab de ga.',
       ],
     };
   },

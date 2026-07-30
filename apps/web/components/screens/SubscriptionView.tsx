@@ -35,7 +35,13 @@ export function SubscriptionView() {
       <PageHead back="/account" backLabel={t('account.title')} title={t('account.subscriptionTitle')} />
 
       <Card border={active ? 'border-orange' : undefined} className="flex items-center gap-3">
-        <span className="text-[24px]">{active ? '👑' : '🔓'}</span>
+        <span
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+            active ? 'bg-orange text-white' : 'bg-grey text-ink2'
+          }`}
+        >
+          <Icon name={active ? 'crown' : 'lock'} size={21} />
+        </span>
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-extrabold text-ink">
             {active ? `${t('billing.statusActive')} · ${plan.name}` : t('billing.statusFree')}
@@ -90,7 +96,7 @@ export function SubscriptionView() {
         {active ? (
           <>
             <LinkBtn
-              title={`Renew ${plan.name.toLowerCase()} · ${rupees(plan.price)}`}
+              title={t('billing.renewCta', { plan: plan.name, price: rupees(plan.price) })}
               href={`/checkout?plan=${plan.id}`}
               variant="orange"
               icon="card"
@@ -105,9 +111,7 @@ export function SubscriptionView() {
         ) : (
           <>
             <LinkBtn title={t('account.upgrade')} href="/pricing" icon="crown" />
-            <p className="text-[13px] text-ink2">
-              From {rupees(750)} a month. Pick the length that suits you.
-            </p>
+            <p className="text-[13px] text-ink2">{t('billing.fromMonthly', { price: rupees(750) })}</p>
           </>
         )}
       </div>

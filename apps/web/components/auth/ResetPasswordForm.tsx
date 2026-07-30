@@ -20,18 +20,18 @@ export function ResetPasswordForm() {
   const [touched, setTouched] = useState(false);
 
   const passwordError = validatePassword(password);
-  const confirmError = confirm === password ? null : 'Both passwords need to match.';
+  const confirmError = confirm === password ? null : t('auth.passwordsMatch');
 
   return (
     <Card>
-      <h1 className="font-display text-[24px] text-ink">Choose a new password</h1>
-      <p className="mb-4 mt-0.5 text-[14px] text-ink2">You are signed in from the email link. Pick something you will remember.</p>
+      <h1 className="font-display text-[24px] text-ink">{t('auth.newPasswordTitle')}</h1>
+      <p className="mb-4 mt-0.5 text-[14px] text-ink2">{t('auth.newPasswordSub')}</p>
 
       {state.error ? <ErrorBanner message={state.error} /> : null}
 
       <form action={action} onSubmit={() => setTouched(true)} noValidate>
         <Field
-          label="New password"
+          label={t('auth.newPassword')}
           name="password"
           value={password}
           onChange={setPassword}
@@ -43,7 +43,7 @@ export function ResetPasswordForm() {
           error={touched ? (passwordError ?? undefined) : undefined}
         />
         <Field
-          label="New password again"
+          label={t('auth.newPasswordAgain')}
           name="confirm"
           value={confirm}
           onChange={setConfirm}
@@ -55,8 +55,8 @@ export function ResetPasswordForm() {
           error={touched ? (confirmError ?? undefined) : undefined}
         />
         <SubmitButton
-          title="Save new password"
-          pendingTitle="Saving…"
+          title={t('auth.saveNewPassword')}
+          pendingTitle={t('auth.saving')}
           disabled={!isFormValid(passwordError, confirmError)}
           className="w-full"
         />

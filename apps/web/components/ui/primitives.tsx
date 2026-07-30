@@ -36,9 +36,11 @@ import {
   Flame,
   FlaskConical,
   Globe,
+  GraduationCap,
   Headphones,
   HelpCircle,
   House,
+  Inbox,
   KeyRound,
   Landmark,
   Languages,
@@ -47,17 +49,20 @@ import {
   Lock,
   LogOut,
   Mail,
+  Menu,
   MessageCircle,
   Mic,
   Monitor,
   Moon,
   MoonStar,
   MoreHorizontal,
+  PartyPopper,
   Pause,
   Pencil,
   Phone,
   Play,
   Plus,
+  Receipt,
   RefreshCw,
   Search,
   Send,
@@ -66,6 +71,8 @@ import {
   Sparkles,
   Star,
   Target,
+  ThumbsDown,
+  ThumbsUp,
   Trash2,
   TrendingUp,
   User,
@@ -75,6 +82,7 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react';
+import { LinkBtnIcon, NavChevron } from './link-status';
 import { Tone, buttonClasses, itemClasses, pillClasses } from './styles';
 import type { BtnVariant } from './styles';
 
@@ -85,14 +93,28 @@ export function Icon({
   size = 20,
   className = '',
   strokeWidth = 1.9,
+  label,
 }: {
   name: IconName;
   size?: number;
   className?: string;
   strokeWidth?: number;
+  /** Accessible name for an icon that stands alone. Without it the icon is
+   * decoration and hidden from screen readers, which is the right default. */
+  label?: string;
 }) {
   const Glyph = GLYPHS[name];
-  return <Glyph size={size} strokeWidth={strokeWidth} className={className} aria-hidden focusable="false" />;
+  return (
+    <Glyph
+      size={size}
+      strokeWidth={strokeWidth}
+      className={className}
+      aria-hidden={label ? undefined : true}
+      aria-label={label}
+      role={label ? 'img' : undefined}
+      focusable="false"
+    />
+  );
 }
 
 /** Same contract as the Android app: a missing mapping is a compile error. */
@@ -153,6 +175,13 @@ const GLYPHS: Record<IconName, LucideIcon> = {
   whatsapp: MessageCircle,
   alert: AlertTriangle,
   crown: Crown,
+  thumbsUp: ThumbsUp,
+  thumbsDown: ThumbsDown,
+  menu: Menu,
+  inbox: Inbox,
+  receipt: Receipt,
+  gradCap: GraduationCap,
+  party: PartyPopper,
   phy: Atom,
   chem: FlaskConical,
   bio: Dna,
@@ -254,7 +283,12 @@ export function Pill({
   );
 }
 
-/** A button-styled link. Server-safe, so marketing pages ship no JS for their CTAs. */
+/**
+ * A button-styled link. Server-safe; the only client part is the tiny icon
+ * slot, which swaps to a spinner while the navigation is in flight.
+ * `disabled` renders a non-focusable placeholder, because a Link dimmed with
+ * pointer-events-none still activates from the keyboard.
+ */
 export function LinkBtn({
   title,
   href,
@@ -262,6 +296,7 @@ export function LinkBtn({
   icon,
   sm,
   lg,
+  disabled,
   className = '',
 }: {
   title: string;
@@ -270,11 +305,20 @@ export function LinkBtn({
   icon?: IconName;
   sm?: boolean;
   lg?: boolean;
+  disabled?: boolean;
   className?: string;
 }) {
+  if (disabled) {
+    return (
+      <span aria-disabled className={buttonClasses({ variant, sm, lg, disabled: true, className })}>
+        {icon ? <Icon name={icon} size={sm ? 16 : 18} /> : null}
+        {title}
+      </span>
+    );
+  }
   return (
     <Link href={href} className={buttonClasses({ variant, sm, lg, className })}>
-      {icon ? <Icon name={icon} size={sm ? 16 : 18} /> : null}
+      <LinkBtnIcon icon={icon} size={sm ? 16 : 18} />
       {title}
     </Link>
   );
@@ -288,7 +332,7 @@ export function Check({ on, round, size = 26 }: { on: boolean; round?: boolean; 
       className={[
         'inline-flex shrink-0 items-center justify-center transition-colors duration-200',
         round ? 'rounded-full' : 'rounded-[9px]',
-        on ? 'bg-teal text-white' : 'border-2 border-[#CBD8D3]',
+        on ? 'bg-teal text-white' : 'border-2 border-mute',
       ].join(' ')}
     >
       {on ? <Icon name="check" size={size * 0.62} strokeWidth={3} /> : null}
@@ -301,7 +345,7 @@ export function Check({ on, round, size = 26 }: { on: boolean; round?: boolean; 
 export function Bar({ pct, tone = 'orange', h = 7 }: { pct: number; tone?: 'orange' | 'teal' | 'green' | 'red'; h?: number }) {
   const bg = { orange: 'bg-orange', teal: 'bg-teal', green: 'bg-green', red: 'bg-red' }[tone];
   return (
-    <div className="overflow-hidden rounded-full bg-[#EAF0EC]" style={{ height: h }}>
+    <div className="overflow-hidden rounded-full bg-track" style={{ height: h }}>
       <div className={`h-full rounded-full ${bg}`} style={{ width: `${Math.max(0, Math.min(100, pct))}%` }} />
     </div>
   );
@@ -325,7 +369,7 @@ export function Ring({
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="absolute -rotate-90" aria-hidden>
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="#EAF0EC" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--color-track)" strokeWidth={stroke} fill="none" />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -400,7 +444,7 @@ export function ItemBody({
           </span>
         ) : null}
       </span>
-      {right ?? (interactive ? <Icon name="chevron" size={18} className="text-ink3" /> : null)}
+      {right ?? (interactive ? <NavChevron /> : null)}
     </>
   );
 }
@@ -427,24 +471,31 @@ export function Item(
 /* -------------------------------------------------------------- feedback */
 
 export function Skeleton({ className = 'h-4 w-full' }: { className?: string }) {
-  return <div className={`animate-pulse rounded-[12px] bg-[#EAF0EC] ${className}`} />;
+  return <div className={`animate-pulse rounded-[12px] bg-track ${className}`} />;
 }
 
+/**
+ * Empty states draw from the same icon family as everything else. The emoji
+ * that used to sit here was the one place the design system endorsed a second
+ * icon language.
+ */
 export function Empty({
-  emoji = '📭',
+  icon = 'inbox',
   title,
   sub,
   cta,
 }: {
-  emoji?: string;
+  icon?: IconName;
   title: string;
   sub?: string;
   cta?: React.ReactNode;
 }) {
   return (
     <Card flat className="flex flex-col items-center py-7 text-center">
-      <span className="text-[34px]">{emoji}</span>
-      <h3 className="mt-1.5 font-display text-[17px] text-ink">{title}</h3>
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-tealtint text-teal">
+        <Icon name={icon} size={26} />
+      </span>
+      <h3 className="mt-2.5 font-display text-[17px] text-ink">{title}</h3>
       {sub ? <p className="mt-1 max-w-sm text-[13px] text-ink2">{sub}</p> : null}
       {cta ? <div className="mt-3">{cta}</div> : null}
     </Card>

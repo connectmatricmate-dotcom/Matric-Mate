@@ -44,3 +44,7 @@ apps/*/package-lock.json
 
 # Knowledge graph for AI agents (local tooling, never a deliverable)
 graphify-out/
+
+# Session working notes for AI agents, never a deliverable
+handoff.md
+audit-result.md

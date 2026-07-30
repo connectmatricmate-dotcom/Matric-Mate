@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { type Confidence, type StringKey, XP } from '@matricmate/core';
-import { Btn, IconButton } from '@/components/ui/controls';
-import { Bar, Card, Icon, Label, Pill } from '@/components/ui/primitives';
+import { SessionHeader } from '@/components/app/SessionHeader';
+import { Btn } from '@/components/ui/controls';
+import { Card, Icon, Label, Pill } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 import { NoSession } from './NoSession';
@@ -30,6 +31,9 @@ export function McqScreen() {
   const [chosen, setChosen] = useState<number | null>(null);
   const [confidence, setConfidence] = useState<Confidence | null>(null);
   const [checked, setChecked] = useState(false);
+  // Navigation pending state: the button spins until the next route paints,
+  // so there is never a moment where a tap appears to do nothing.
+  const [leaving, startLeaving] = useTransition();
 
   const mcq = s?.mcqs[i];
   if (!s || !mcq) return <NoSession />;
@@ -57,35 +61,32 @@ export function McqScreen() {
   function next() {
     if (!s) return;
     if (i + 1 >= s.mcqs.length) {
-      router.replace('/session/result');
+      startLeaving(() => router.replace('/session/result'));
       return;
     }
     setI(i + 1);
     setChosen(null);
     setConfidence(null);
     setChecked(false);
-    window.scrollTo({ top: 0 });
+    // 'instant', not the default: html has scroll-behavior smooth, and a
+    // question change animating the scroll reads as the app lagging.
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   return (
     <Page width="focus">
-      <div className="flex items-center gap-2.5 pt-1">
-        <IconButton
-          icon="close"
-          label={t('common.close')}
-          tone="plain"
-          onClick={() => router.replace(answeredCount ? '/session/result' : '/practice')}
-        />
-        <div className="min-w-0 flex-1">
-          <Bar pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100} tone="teal" h={6} />
-          <p className="mt-1 text-[11px] font-extrabold text-ink2">
-            {t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
-          </p>
-        </div>
-        <Pill tone="grey">{mcq.topic}</Pill>
-      </div>
+      <SessionHeader
+        onClose={() => startLeaving(() => router.replace(answeredCount ? '/session/result' : '/practice'))}
+        closeLabel={t('common.close')}
+        pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100}
+        label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
+        right={<Pill tone="grey">{mcq.topic}</Pill>}
+      />
 
-      <h1 className="mt-4 mb-4 font-display text-[19px] leading-[1.5] text-ink">{mcq.q}</h1>
+      {/* On a desktop the question earns a surface of its own; unframed, the
+          same markup read as a phone screen stretched across empty paper. */}
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <h1 className="mb-4 font-display text-[19px] leading-[1.5] text-ink md:text-[22px]">{mcq.q}</h1>
 
       <div className="flex flex-col gap-2.5">
         {mcq.options.map((opt, n) => {
@@ -157,6 +158,7 @@ export function McqScreen() {
           ) : null}
         </div>
       ) : null}
+      </div>
 
       {/* feedback */}
       {checked ? (
@@ -197,7 +199,7 @@ export function McqScreen() {
         </div>
       ) : null}
 
-      <div className="sticky bottom-0 mt-5 flex gap-2.5 bg-paper/95 py-4 backdrop-blur">
+      <div className="mt-6 flex gap-2.5">
         {checked ? (
           <>
             <Btn
@@ -205,11 +207,13 @@ export function McqScreen() {
               variant="line"
               icon="spark"
               className="flex-1"
-              onClick={() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`)}
+              loading={leaving}
+              onClick={() => startLeaving(() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`))}
             />
             <Btn
               title={i + 1 >= s.mcqs.length ? t('session.seeResult') : t('session.nextQuestion')}
               onClick={next}
+              loading={leaving && i + 1 >= s.mcqs.length}
               className="flex-1"
             />
           </>

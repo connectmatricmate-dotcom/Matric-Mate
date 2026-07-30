@@ -24,13 +24,13 @@ export function Nav() {
           along by whatever the logo and the buttons happen to measure. */}
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between gap-6 px-5 py-3.5 md:grid md:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="shrink-0 justify-self-start" aria-label="MatricMate home">
-          <Image src="/brand/wordmark.png" alt="MatricMate" width={148} height={29} priority />
+          <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} priority />
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="text-[13.5px] font-extrabold text-ink2 transition-colors hover:text-teal">
+              <Link href={l.href} className="text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
                 {l.label}
               </Link>
             </li>
@@ -38,20 +38,21 @@ export function Nav() {
         </ul>
 
         <div className="hidden items-center gap-3 justify-self-end md:flex">
-          <Link href="/login" className="text-[13.5px] font-extrabold text-ink2 hover:text-teal">
+          <Link href="/login" className="text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
             Log in
           </Link>
           <LinkBtn title="Start free" href="/signup" sm />
         </div>
 
+        {/* -mr-2 keeps the glyph on the bar's right edge while the box stays 44px. */}
         <button
           type="button"
-          className="md:hidden"
+          className="-mr-2 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[14px] text-ink transition-colors duration-200 hover:bg-grey md:hidden"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-label="Menu"
         >
-          <Icon name={open ? 'close' : 'dots'} size={24} className="text-ink" />
+          <Icon name={open ? 'close' : 'menu'} size={24} />
         </button>
       </nav>
 

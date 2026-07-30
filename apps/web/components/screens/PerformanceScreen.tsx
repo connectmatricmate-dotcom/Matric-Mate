@@ -59,7 +59,7 @@ export function PerformanceScreen() {
       <Seg
         value={range}
         onChange={setRange}
-        label="Date range"
+        label={t('progress.dateRange')}
         options={[
           { value: 'week' as const, label: t('progress.week') },
           { value: 'month' as const, label: t('progress.month') },
@@ -72,7 +72,7 @@ export function PerformanceScreen() {
           <Label>{t('progress.accuracyTrend')}</Label>
           <svg viewBox="0 0 300 90" className="mt-2 h-[90px] w-full" role="img" aria-label={t('progress.accuracyTrend')}>
             {[25, 50, 75].map((g) => (
-              <rect key={g} x={0} y={85 - (g / 100) * 80} width={300} height={1} fill="#EFF3F0" />
+              <rect key={g} x={0} y={85 - (g / 100) * 80} width={300} height={1} fill="var(--color-grey)" />
             ))}
             {points ? (
               <polyline points={points} fill="none" stroke="var(--color-teal)" strokeWidth={3} strokeLinecap="round" />
@@ -88,23 +88,27 @@ export function PerformanceScreen() {
 
         <Card>
           <Label>{t('progress.questionsPerDay')}</Label>
-          <svg viewBox="0 0 300 70" className="mt-2 h-[70px] w-full" role="img" aria-label={t('progress.questionsPerDay')}>
-            {trend.map((x, i) => {
-              const bw = 300 / trend.length - 6;
-              const h = (x.count / maxCount) * 58;
-              return (
-                <rect
-                  key={i}
-                  x={(300 / trend.length) * i + 3}
-                  y={64 - h}
-                  width={bw}
-                  height={Math.max(2, h)}
-                  rx={4}
-                  fill={i >= trend.length - 2 ? 'var(--color-orange)' : '#B9D2DB'}
-                />
-              );
-            })}
-          </svg>
+          {attempts.length ? (
+            <svg viewBox="0 0 300 70" className="mt-2 h-[70px] w-full" role="img" aria-label={t('progress.questionsPerDay')}>
+              {trend.map((x, i) => {
+                const bw = 300 / trend.length - 6;
+                const h = (x.count / maxCount) * 58;
+                return (
+                  <rect
+                    key={i}
+                    x={(300 / trend.length) * i + 3}
+                    y={64 - h}
+                    width={bw}
+                    height={Math.max(2, h)}
+                    rx={4}
+                    fill={i >= trend.length - 2 ? 'var(--color-orange)' : 'var(--color-tealtint2)'}
+                  />
+                );
+              })}
+            </svg>
+          ) : (
+            <p className="mt-4 py-4 text-center text-[13px] text-ink2">{t('progress.notEnoughData')}</p>
+          )}
         </Card>
       </div>
 

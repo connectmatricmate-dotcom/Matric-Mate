@@ -53,27 +53,37 @@ export function StudyList({ subjects }: { subjects: Subject[] }) {
       })
     : undefined;
 
+  // Two memos on purpose. The progress sweep (subjectPct across every subject)
+  // is the expensive half and depends only on study data; the search filter is
+  // the cheap half and is the only part keyed on `q`. One combined memo re-ran
+  // the whole sweep on every keystroke.
+  const base = useMemo(
+    () =>
+      subjects
+        .filter((s) => derived.subjects.includes(s.id))
+        .map((s) => {
+          const chapters = CHAPTERS[s.id] ?? [];
+          return {
+            s,
+            chapters,
+            pct: subjectPct(s.id, state.readSections, state.attempts),
+            next: chapters.find((c) => c.id === state.lastChapterId) ?? chapters[0],
+          };
+        }),
+    [subjects, derived.subjects, state.readSections, state.attempts, state.lastChapterId]
+  );
+
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return subjects
-      .filter((s) => derived.subjects.includes(s.id))
-      .map((s) => {
-        const chapters = CHAPTERS[s.id] ?? [];
-        return {
-          s,
-          chapters,
-          pct: subjectPct(s.id, state.readSections, state.attempts),
-          next: chapters.find((c) => c.id === state.lastChapterId) ?? chapters[0],
-        };
-      })
-      .filter(({ s, chapters }) =>
-        !needle ? true : s.name.toLowerCase().includes(needle) || chapters.some((c) => c.title.toLowerCase().includes(needle))
-      );
-  }, [subjects, q, derived.subjects, state.readSections, state.attempts, state.lastChapterId]);
+    if (!needle) return base;
+    return base.filter(
+      ({ s, chapters }) => s.name.toLowerCase().includes(needle) || chapters.some((c) => c.title.toLowerCase().includes(needle))
+    );
+  }, [base, q]);
 
   return (
     <Page>
-      <PageHead eyebrow={eyebrow} title={t('study.title')} sub={`${rows.length} subjects on your list`} />
+      <PageHead eyebrow={eyebrow} title={t('study.title')} sub={t('study.subjectsOnList', { n: rows.length })} />
 
       <Split>
         <Work>
@@ -90,7 +100,7 @@ export function StudyList({ subjects }: { subjects: Subject[] }) {
           </div>
 
           {rows.length === 0 ? (
-            <Empty emoji="🔍" title={t('study.noMatchTitle')} sub={t('study.noMatchBody', { q })} />
+            <Empty icon="search" title={t('study.noMatchTitle')} sub={t('study.noMatchBody', { q })} />
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
               {rows.map(({ s, pct, next, chapters }) => (

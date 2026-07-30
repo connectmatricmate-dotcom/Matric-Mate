@@ -47,6 +47,10 @@ type Actions = {
   signOut: () => void;
   setOnboarding: (o: Partial<Onboarding>) => void;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => void;
+  /** One store update for a whole paper. Submitting a 50-question exam through
+   * recordAttempt would notify every subscriber 50 times in a synchronous
+   * burst; this does it once. */
+  recordAttempts: (list: Omit<Attempt, 'id' | 'at'>[]) => void;
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
   markSectionRead: (sectionId: string, chapterId: string, index: number) => void;
   togglePlanTask: (id: string) => void;
@@ -94,6 +98,16 @@ const actions: Actions = {
         xp: s.xp + xpFor(a.correct, a.confidence),
       })
     ),
+  recordAttempts: (list) =>
+    update((s) => {
+      if (!list.length) return s;
+      const at = Date.now();
+      return touchToday({
+        ...s,
+        attempts: [...s.attempts, ...list.map((a, n) => ({ ...a, id: `a-${at}-${s.attempts.length + n}`, at }))],
+        xp: s.xp + list.reduce((sum, a) => sum + xpFor(a.correct, a.confidence), 0),
+      });
+    }),
   addResult: (r) => {
     const full: TestResult = { ...r, id: `r-${Date.now()}`, at: Date.now() };
     update((s) => touchToday({ ...s, results: [full, ...s.results] }));
@@ -206,9 +220,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (data.user) void refreshPremium();
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       apply(session?.user ?? null);
-      if (session?.user) void refreshPremium();
+      // Entitlement re-checks only when the PERSON might have changed, not on
+      // every TOKEN_REFRESHED. Token rotation happens constantly in the
+      // background, and each re-check is a network query plus a full-store
+      // update for an answer that cannot have changed.
+      if (session?.user) {
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') void refreshPremium();
+      }
       // Signing out must also drop what the last account was entitled to, or
       // the next person on a shared computer inherits the crown until their
       // first sync answers.

@@ -18,11 +18,11 @@ const ROUTE: Record<NotificationTarget, string> = {
   subscription: '/account/subscription',
 };
 
-const ICON: Record<Notification['kind'], { emoji: string; tone: 'orange' | 'teal' | 'green' | 'grey' }> = {
-  streak: { emoji: '🔥', tone: 'orange' },
-  reminder: { emoji: '⏰', tone: 'teal' },
-  report: { emoji: '📊', tone: 'green' },
-  payment: { emoji: '🧾', tone: 'grey' },
+const ICON: Record<Notification['kind'], { icon: 'flame' | 'clock' | 'chart' | 'receipt'; tone: 'orange' | 'teal' | 'green' | 'grey' }> = {
+  streak: { icon: 'flame', tone: 'orange' },
+  reminder: { icon: 'clock', tone: 'teal' },
+  report: { icon: 'chart', tone: 'green' },
+  payment: { icon: 'receipt', tone: 'grey' },
 };
 
 export function NotificationsView() {
@@ -51,7 +51,7 @@ export function NotificationsView() {
         href={n.target ? ROUTE[n.target] : undefined}
         title={n.title}
         sub={n.body}
-        emoji={meta.emoji}
+        icon={meta.icon}
         tone={meta.tone}
         last={last}
       />
@@ -63,7 +63,7 @@ export function NotificationsView() {
       <PageHead back="/dashboard" backLabel={t('tabs.home')} title={t('notifications.title')} />
 
       {state.notifications.length === 0 ? (
-        <Empty emoji="🔔" title={t('notifications.emptyTitle')} sub={t('notifications.emptyBody')} />
+        <Empty icon="bell" title={t('notifications.emptyTitle')} sub={t('notifications.emptyBody')} />
       ) : (
         <>
           {today.length ? (

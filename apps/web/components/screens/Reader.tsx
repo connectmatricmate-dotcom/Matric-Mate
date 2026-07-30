@@ -5,11 +5,12 @@ import { useState } from 'react';
 import { api } from '@matricmate/core';
 import type { Block, Chapter, ChapterContent, StringKey } from '@matricmate/core';
 import { Btn, IconButton } from '@/components/ui/controls';
-import { Bar, Card, Icon, Label, Pill, Skeleton } from '@/components/ui/primitives';
+import { Card, Label, Pill, Skeleton } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
 import { Page } from '@/components/app/Page';
+import { SessionHeader } from '@/components/app/SessionHeader';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
 const isUrduText = (s: string) => /[؀-ۿ]/.test(s);
@@ -140,40 +141,33 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
 
   return (
     <Page width="read">
-      {/* reading chrome */}
-      <div className="sticky top-[57px] z-20 -mx-4 mb-4 flex items-center gap-2 border-b border-line bg-paper/95 px-4 py-2 backdrop-blur md:-mx-7 md:px-7">
-        <Link
-          href={`/learn/chapter/${id}`}
-          aria-label={t('session.backToChapter')}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-line bg-card text-ink hover:bg-paper"
-        >
-          <Icon name="back" size={20} />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[13.5px] font-extrabold text-ink">{chapter.title}</p>
-          <div className="mt-1.5">
-            <Bar pct={((idx + 1) / total) * 100} tone="teal" h={4} />
-          </div>
-        </div>
-        <button
-          type="button"
-          aria-label={t('reader.textSize', { size: t('reader.medium') })}
-          onClick={() => {
-            const next = ((state.settings.fontScale + 1) % 3) as 0 | 1 | 2;
-            actions.setSettings({ fontScale: next });
-            toast(t('reader.textSize', { size: [t('reader.small'), t('reader.medium'), t('reader.large')][next] }));
-          }}
-          className="flex h-11 w-11 shrink-0 items-center justify-center font-display text-[18px] text-teal hover:bg-tealtint"
-        >
-          Aa
-        </button>
-      </div>
+      {/* Same header as every other in-session screen: back, progress, one meta control. */}
+      <SessionHeader
+        backHref={`/learn/chapter/${id}`}
+        backLabel={t('session.backToChapter')}
+        pct={((idx + 1) / total) * 100}
+        label={`${chapter.title} · ${t('reader.section', { a: idx + 1, b: total })}`}
+        right={
+          <button
+            type="button"
+            aria-label={t('account.readingSize')}
+            onClick={() => {
+              const next = ((state.settings.fontScale + 1) % 3) as 0 | 1 | 2;
+              actions.setSettings({ fontScale: next });
+              toast(t('reader.textSize', { size: [t('reader.small'), t('reader.medium'), t('reader.large')][next] }));
+            }}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] font-display text-[18px] text-teal transition-colors duration-200 hover:bg-tealtint"
+          >
+            Aa
+          </button>
+        }
+      />
 
-      <article className="mx-auto max-w-[720px]">
+      {/* Same task frame as the practice screens: the notes read on paper of their own. */}
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:px-8 md:py-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <article>
         {section ? (
           <>
-            <Label>{t('reader.section', { a: idx + 1, b: total })}</Label>
-            <div className="h-2" />
             {urduMedium && !content.sectionsUr ? (
               <Card flat tint="bg-tealtint" border="border-tealtint2" className="mb-4">
                 <p className="text-[13px] text-ink2">{t('reader.urduMediumNote')}</p>
@@ -191,9 +185,15 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
         ) : null}
       </article>
 
+      {/* ask AI: in flow at the end of the reading, never floating over it */}
+      <div className="mt-5 flex justify-end">
+        <Btn title={t('reader.askAi')} icon="spark" sm variant="line" onClick={() => setAskOpen(true)} />
+      </div>
+      </div>
+
       {/* pager */}
-      <div className="sticky bottom-0 mt-6 -mx-4 flex items-center gap-3 border-t border-line bg-card px-4 py-3 md:-mx-7 md:px-7">
-        <IconButton icon="back" label={t('common.back')} onClick={() => advance(-1)} tone={idx === 0 ? 'plain' : 'card'} />
+      <div className="mt-4 flex items-center gap-3 rounded-[16px] border border-line bg-card px-4 py-3">
+        <IconButton icon="back" label={t('common.back')} onClick={() => advance(-1)} disabled={idx === 0} tone="card" />
         <p className="flex-1 text-center text-[13px] font-extrabold text-ink2">{t('reader.section', { a: idx + 1, b: total })}</p>
         {idx + 1 >= total ? (
           <Btn
@@ -207,13 +207,6 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
         ) : (
           <IconButton icon="chevron" label={t('common.next')} tone="active" onClick={() => advance(1)} />
         )}
-      </div>
-
-      {/* ask AI */}
-      <div className="pointer-events-none sticky bottom-[76px] z-10 flex justify-end">
-        <span className="pointer-events-auto">
-          <Btn title={t('reader.askAi')} icon="spark" sm onClick={() => setAskOpen(true)} className="rounded-full shadow-lg" />
-        </span>
       </div>
 
       <Sheet open={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>

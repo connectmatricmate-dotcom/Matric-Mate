@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import type { ShortQ } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Label, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Label, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 type Mark = 'got' | 'partial' | 'missed';
@@ -49,7 +50,9 @@ export function ShortQScreen({
       <Page width="focus">
         <PageHead back={`/learn/chapter/${chapterId}`} backLabel={chapterTitle} title={t('practice.shortQ')} />
         <Card className="flex flex-col items-center gap-2 py-7 text-center">
-          <span className="text-[38px]">📝</span>
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-tealtint text-teal">
+            <Icon name="quill" size={26} />
+          </span>
           <h2 className="font-display text-[22px] text-ink">{t('session.shortQDone', { n: got, total: items.length })}</h2>
           <p className="text-[13px] text-ink2">{t('session.shortQDoneSub')}</p>
         </Card>
@@ -60,19 +63,18 @@ export function ShortQScreen({
 
   return (
     <Page width="focus">
-      <PageHead
-        back={`/learn/chapter/${chapterId}`}
+      <SessionHeader
+        backHref={`/learn/chapter/${chapterId}`}
         backLabel={chapterTitle}
-        title={t('practice.shortQ')}
-        sub={t('session.shortQOf', { a: i + 1, b: items.length })}
+        pct={(i / Math.max(1, items.length)) * 100}
+        label={`${t('practice.shortQ')} · ${t('session.shortQOf', { a: i + 1, b: items.length })}`}
+        right={<Pill tone="grey">{t('session.marks', { n: item.marks })}</Pill>}
       />
 
-      <Card>
-        <div className="flex items-center gap-2.5">
-          <Label className="text-teal">{t('session.shortQOf', { a: i + 1, b: items.length })}</Label>
-          <Pill tone="grey">{t('session.marks', { n: item.marks })}</Pill>
-        </div>
-        <p className="mt-2 font-display text-[17px] leading-[1.55] text-ink">{item.q}</p>
+      {/* Same task frame as the MCQ and exam screens */}
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <Card flat className="md:border-0 md:bg-transparent md:p-0">
+        <p className="font-display text-[17px] leading-[1.55] text-ink md:text-[20px]">{item.q}</p>
       </Card>
 
       {!revealed ? (
@@ -80,7 +82,9 @@ export function ShortQScreen({
           <Card flat tint="bg-tealtint" border="border-tealtint2">
             <p className="text-[13px] text-ink2">{t('session.thinkFirst')}</p>
           </Card>
-          <Btn title={t('session.revealAnswer')} onClick={() => setRevealed(true)} className="mt-4 w-full" />
+          <div className="mt-6">
+            <Btn title={t('session.revealAnswer')} onClick={() => setRevealed(true)} className="w-full" />
+          </div>
         </div>
       ) : (
         <div className="mt-4">
@@ -110,6 +114,7 @@ export function ShortQScreen({
           </div>
         </div>
       )}
+      </div>
     </Page>
   );
 }

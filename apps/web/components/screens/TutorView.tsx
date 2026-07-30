@@ -69,7 +69,7 @@ export function TutorView() {
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('tutor.recentChats')}</h2>
             {state.threads.length === 0 ? (
-              <Empty emoji="💬" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />
+              <Empty icon="whatsapp" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />
             ) : (
               <Card flat className="py-0">
                 {state.threads.slice(0, 8).map((thread, i) => (

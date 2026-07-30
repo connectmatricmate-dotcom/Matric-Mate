@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
-import { Card, Label, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Label, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { session } from '@/lib/session';
 import { NoSession } from './NoSession';
@@ -17,6 +17,7 @@ export function ReviewScreen() {
   const s = session.current;
   const [filter, setFilter] = useState<Filter>('wrong');
   const [open, setOpen] = useState<string | null>(null);
+  const [leaving, startLeaving] = useTransition();
 
   const rows = useMemo(() => {
     if (!s) return [];
@@ -49,9 +50,11 @@ export function ReviewScreen() {
 
       <div className="mt-4 flex flex-col gap-2.5">
         {rows.length === 0 ? (
-          <Card flat className="py-6 text-center">
-            <span className="text-[30px]">🎉</span>
-            <p className="mt-1.5 text-[14.5px] text-ink">
+          <Card flat className="flex flex-col items-center py-6 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-greentint text-green">
+              <Icon name="party" size={24} />
+            </span>
+            <p className="mt-2 text-[14.5px] text-ink">
               {filter === 'wrong' ? t('session.allCorrect') : t('session.nothingFlagged')}
             </p>
           </Card>
@@ -107,9 +110,10 @@ export function ReviewScreen() {
       <Btn
         title={t('common.done')}
         className="mt-6 w-full md:w-auto"
+        loading={leaving}
         onClick={() => {
           session.clear();
-          router.replace('/practice');
+          startLeaving(() => router.replace('/practice'));
         }}
       />
     </Page>

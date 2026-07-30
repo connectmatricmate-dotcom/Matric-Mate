@@ -15,7 +15,7 @@ export function PayMark({ logo, label, size = 28 }: { logo: string | null; label
       {logo ? (
         <Image src={logo} alt="" width={size} height={size} className="object-contain" style={{ width: size, height: size }} />
       ) : (
-        <Icon name="card" size={size - 6} className="text-ink2" aria-label={label} />
+        <Icon name="card" size={size - 6} className="text-ink2" label={label} />
       )}
     </span>
   );

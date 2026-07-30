@@ -80,10 +80,12 @@ export function AudioLesson({
           <IconButton
             icon={downloaded ? 'check' : 'download'}
             tone={downloaded ? 'active' : 'card'}
-            label={downloaded ? t('study.removedOffline') : t('study.saveOffline')}
+            // The label names the ACTION a press performs; the toast reports
+            // the RESULT. They used to be the same string in the wrong tense.
+            label={downloaded ? t('study.removeOffline') : t('study.saveOffline')}
             onClick={() => {
               actions.toggleDownload(id);
-              toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
+              toast(downloaded ? t('study.removedOffline') : t('study.savedOffline'));
             }}
           />
         }
@@ -125,7 +127,7 @@ export function AudioLesson({
           type="button"
           onClick={() => seek(-15)}
           disabled={!src}
-          aria-label="Back 15 seconds"
+          aria-label={t('audio.back15')}
           className="flex h-[54px] w-[54px] items-center justify-center rounded-full border border-line bg-card text-[13px] font-extrabold text-ink transition-colors duration-200 hover:bg-paper disabled:opacity-40"
         >
           −15
@@ -134,10 +136,8 @@ export function AudioLesson({
           type="button"
           onClick={toggle}
           disabled={!src}
-          aria-label={playing ? 'Pause' : 'Play'}
-          className={`flex h-[76px] w-[76px] items-center justify-center rounded-full text-white transition-[background-color,transform] duration-200 ease-out active:scale-[0.97] ${
-            src ? 'bg-teal hover:bg-tealdark' : 'bg-ink3'
-          }`}
+          aria-label={playing ? t('audio.pause') : t('audio.play')}
+          className="flex h-[76px] w-[76px] items-center justify-center rounded-full bg-teal text-white transition-[background-color,transform] duration-200 ease-out active:scale-[0.97] hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
         >
           <Icon name={playing ? 'pause' : 'play'} size={30} strokeWidth={2.2} />
         </button>
@@ -145,7 +145,7 @@ export function AudioLesson({
           type="button"
           onClick={() => seek(15)}
           disabled={!src}
-          aria-label="Forward 15 seconds"
+          aria-label={t('audio.forward15')}
           className="flex h-[54px] w-[54px] items-center justify-center rounded-full border border-line bg-card text-[13px] font-extrabold text-ink transition-colors duration-200 hover:bg-paper disabled:opacity-40"
         >
           +15
@@ -157,7 +157,7 @@ export function AudioLesson({
           type="button"
           onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
           disabled={!src}
-          className="inline-flex items-center gap-1.5 rounded-full bg-grey px-3 py-1 text-[11.5px] font-extrabold text-ink2 hover:brightness-95 disabled:opacity-50"
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-grey px-3.5 text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-45"
         >
           {t('audio.speed', { n: SPEEDS[speed] })}
         </button>

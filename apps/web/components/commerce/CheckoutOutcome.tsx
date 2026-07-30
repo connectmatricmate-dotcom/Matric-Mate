@@ -52,17 +52,18 @@ export function CheckoutOutcome({
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-greentint text-green">
             <Icon name="check" size={28} strokeWidth={2.6} />
           </span>
-          <h1 className="mt-3 font-display text-[24px] text-ink">Premium is on</h1>
+          <h1 className="mt-3 font-display text-[24px] text-ink">{t('checkout.paidTitle')}</h1>
           <p className="mt-1 text-[14px] leading-[1.6] text-ink2">
-            Your {p.name.toLowerCase()} plan runs until{' '}
-            {validTill
-              ? new Date(validTill).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-              : 'the end of the period'}
-            . Every chapter is unlocked on this website and in the Android app.
+            {t('checkout.paidBody', {
+              plan: p.name.toLowerCase(),
+              date: validTill
+                ? new Date(validTill).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                : t('checkout.periodEnd'),
+            })}
           </p>
-          {reference ? <p className="mt-3 text-[12.5px] text-ink3">Receipt {reference}</p> : null}
+          {reference ? <p className="mt-3 text-[12.5px] text-ink3">{t('checkout.receiptRef', { ref: reference })}</p> : null}
           <div className="mt-5 flex flex-col gap-2.5">
-            <LinkBtn title="Start studying" href="/dashboard" />
+            <LinkBtn title={t('checkout.startStudying')} href="/dashboard" />
             <LinkBtn title={t('account.paymentHistory')} href="/account/payments" variant="ghost" />
           </div>
         </Card>
@@ -79,12 +80,10 @@ export function CheckoutOutcome({
             <Icon name="refresh" size={26} className={stuck ? '' : 'animate-spin'} />
           </span>
           <h1 className="mt-3 font-display text-[22px] text-ink">
-            {stuck ? 'Still confirming' : 'Confirming your payment'}
+            {stuck ? t('checkout.stillConfirming') : t('checkout.confirming')}
           </h1>
           <p className="mt-1 text-[14px] leading-[1.6] text-ink2">
-            {stuck
-              ? 'Your bank has taken longer than usual to confirm. Nothing is lost: Premium switches on by itself the moment it clears, and we will email you.'
-              : 'This usually takes a few seconds. Leave this page open.'}
+            {stuck ? t('checkout.stuckBody') : t('checkout.confirmingBody')}
           </p>
           {stuck ? (
             <div className="mt-5 flex flex-col gap-2.5">
@@ -95,7 +94,7 @@ export function CheckoutOutcome({
                 is working.
               */}
               <Btn
-                title="Check again"
+                title={t('billing.checkAgain')}
                 loading={rechecking}
                 onClick={() => startRecheck(() => router.refresh())}
               />
@@ -113,15 +112,13 @@ export function CheckoutOutcome({
         <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[16px] bg-redtint text-red">
           <Icon name="alert" size={24} />
         </span>
-        <h1 className="font-display text-[23px] text-ink">That payment did not go through</h1>
+        <h1 className="font-display text-[23px] text-ink">{t('checkout.failedTitle')}</h1>
         <p className="mt-1 text-[14px] leading-[1.6] text-ink2">
-          {signatureOk
-            ? 'Nothing has been charged that we can see. If money did leave your account, send us the reference and we will sort it out the same day.'
-            : 'We could not confirm this came from our payment provider, so nothing has been changed on your account.'}
+          {signatureOk ? t('checkout.failedBody') : t('checkout.failedUnverified')}
         </p>
-        {reference ? <p className="mt-3 text-[12.5px] text-ink3">Reference {reference}</p> : null}
+        {reference ? <p className="mt-3 text-[12.5px] text-ink3">{t('checkout.reference', { ref: reference })}</p> : null}
         <div className="mt-5 flex flex-col gap-2.5">
-          <LinkBtn title="Try again" href="/pricing" />
+          <LinkBtn title={t('common.retry')} href="/pricing" />
           <Link href="/account/help" className="text-center text-[13px] font-extrabold text-teal hover:underline">
             {t('account.help')}
           </Link>

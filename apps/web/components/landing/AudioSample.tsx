@@ -5,11 +5,11 @@
  * is cheap; letting someone hear one costs nothing and settles it.
  */
 import { useEffect, useRef, useState } from 'react';
-import { Icon, PillButton } from '@/components/ui';
+import { Bar, Card, Icon, pillClasses } from '@/components/ui';
 
 const TRACKS = {
-  en: { src: '/audio/dynamics-en.mp3', label: 'English narration' },
-  ur: { src: '/audio/dynamics-ur.mp3', label: 'Urdu narration' },
+  en: { src: '/audio/dynamics-en.mp3', label: 'English narration', name: 'English' },
+  ur: { src: '/audio/dynamics-ur.mp3', label: 'Urdu narration', name: 'Urdu' },
 };
 
 export function AudioSample() {
@@ -31,7 +31,7 @@ export function AudioSample() {
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
   return (
-    <div className="rounded-[16px] border border-line bg-card p-5">
+    <Card>
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -42,7 +42,7 @@ export function AudioSample() {
             if (playing) a.pause();
             else void a.play();
           }}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-teal text-white transition-transform hover:scale-105"
+          className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full bg-teal text-white transition-colors duration-200 hover:bg-tealdark"
         >
           <Icon name={playing ? 'pause' : 'play'} size={24} strokeWidth={2.2} />
         </button>
@@ -50,23 +50,30 @@ export function AudioSample() {
         <div className="min-w-0 flex-1">
           <p className="text-[14.5px] font-extrabold text-ink">Chapter 3 · Dynamics</p>
           <p className="text-[12.5px] text-ink2">{TRACKS[lang].label} · full chapter</p>
-          <div className="mt-2 h-[6px] overflow-hidden rounded-full bg-[#EAF0EC]">
-            <div className="h-full rounded-full bg-orange" style={{ width: `${progress}%` }} />
+          <div className="mt-2">
+            <Bar pct={progress} tone="orange" h={6} />
           </div>
           <div className="mt-1 flex justify-between text-[11px] font-extrabold text-ink3">
             <span>{fmt((progress / 100) * duration)}</span>
-            <span>{duration ? fmt(duration) : "0:00"}</span>
+            <span>{duration ? fmt(duration) : '0:00'}</span>
           </div>
         </div>
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <PillButton tone={lang === 'en' ? 'teal' : 'grey'} onClick={() => setLang('en')}>
-          English
-        </PillButton>
-        <PillButton tone={lang === 'ur' ? 'teal' : 'grey'} onClick={() => setLang('ur')}>
-          Urdu
-        </PillButton>
+        {(['en', 'ur'] as const).map((l) => (
+          <button
+            key={l}
+            type="button"
+            aria-pressed={lang === l}
+            onClick={() => setLang(l)}
+            className={pillClasses(lang === l ? 'teal' : 'grey', true, 'min-h-10')}
+          >
+            {/* The check is the non-colour cue for which narration is selected. */}
+            {lang === l ? <Icon name="check" size={12} strokeWidth={2.8} /> : null}
+            {TRACKS[l].name}
+          </button>
+        ))}
         <span className="ml-auto text-[11.5px] text-ink3">Sample lesson</span>
       </div>
 
@@ -80,6 +87,6 @@ export function AudioSample() {
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         onTimeUpdate={(e) => setProgress((e.currentTarget.currentTime / (e.currentTarget.duration || 1)) * 100)}
       />
-    </div>
+    </Card>
   );
 }

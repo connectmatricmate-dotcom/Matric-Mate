@@ -92,6 +92,36 @@ let state: State = EMPTY;
 const listeners = new Set<() => void>();
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
+/**
+ * Caps on the histories that only ever grow. Without them a student answering
+ * 30 MCQs a day crosses ~700KB of localStorage in a school term, every save
+ * re-serialises all of it on the main thread, and the 5MB quota ends the story
+ * with a silently swallowed write error and no more saved progress. Recent
+ * history is what the analytics read anyway; XP and streak live in their own
+ * counters and lose nothing when old rows fall off.
+ */
+const CAP = { attempts: 1000, results: 100, notifications: 50, activeDays: 400 };
+
+function prune(s: State): State {
+  if (
+    s.attempts.length <= CAP.attempts &&
+    s.results.length <= CAP.results &&
+    s.notifications.length <= CAP.notifications &&
+    s.activeDays.length <= CAP.activeDays
+  ) {
+    return s;
+  }
+  return {
+    ...s,
+    // attempts and activeDays append newest-last; results and notifications
+    // insert newest-first. Both slices keep the newest rows.
+    attempts: s.attempts.slice(-CAP.attempts),
+    results: s.results.slice(0, CAP.results),
+    notifications: s.notifications.slice(0, CAP.notifications),
+    activeDays: s.activeDays.slice(-CAP.activeDays),
+  };
+}
+
 export const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
@@ -119,7 +149,7 @@ function persist() {
 }
 
 export function update(fn: (s: State) => State) {
-  state = fn(state);
+  state = prune(fn(state));
   listeners.forEach((l) => l());
   if (typeof window !== 'undefined' && state.hydrated) persist();
 }
@@ -144,7 +174,8 @@ export function hydrate() {
   } catch {
     // corrupt snapshot, start clean rather than crash
   }
-  state = restored;
+  // Snapshots written before the caps existed may carry oversized histories.
+  state = prune(restored);
   listeners.forEach((l) => l());
 }
 

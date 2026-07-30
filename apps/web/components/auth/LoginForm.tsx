@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { isFormValid, validateEmail, validatePassword } from '@/lib/validation';
 
-export function LoginForm({ next }: { next?: string }) {
+export function LoginForm({ next, linkFailed }: { next?: string; linkFailed?: boolean }) {
   const t = useT();
   const [state, action] = useActionState<AuthState, FormData>(signInAction, {});
 
@@ -27,7 +27,7 @@ export function LoginForm({ next }: { next?: string }) {
       <h1 className="font-display text-[24px] text-ink">{t('auth.loginTitle')}</h1>
       <p className="mb-4 mt-0.5 text-[14px] text-ink2">{t('auth.loginSub')}</p>
 
-      {state.error ? <ErrorBanner message={state.error} /> : null}
+      {state.error ? <ErrorBanner message={state.error} /> : linkFailed ? <ErrorBanner message={t('auth.linkError')} /> : null}
 
       <form action={action} onSubmit={() => setTouched(true)} noValidate>
         <input type="hidden" name="next" value={next ?? ''} />
@@ -55,7 +55,7 @@ export function LoginForm({ next }: { next?: string }) {
           required
           error={touched ? (passwordError ?? undefined) : undefined}
         />
-        <SubmitButton title={t('auth.logIn')} pendingTitle="Signing in…" disabled={!canSubmit} className="w-full" />
+        <SubmitButton title={t('auth.logIn')} pendingTitle={t('auth.signingIn')} disabled={!canSubmit} className="w-full" />
       </form>
 
       <div className="mt-3 flex items-center justify-between gap-3 text-[13px]">
@@ -63,7 +63,7 @@ export function LoginForm({ next }: { next?: string }) {
           {t('auth.forgotPassword')}
         </Link>
         <Link href="/signup" className="font-extrabold text-ink2 hover:text-teal">
-          Create an account
+          {t('auth.createAccount')}
         </Link>
       </div>
     </Card>

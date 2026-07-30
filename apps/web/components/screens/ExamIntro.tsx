@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { api, chapterById, subjectById } from '@matricmate/core';
+import { api, chapterById, subjectById, weakTopics } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
@@ -17,11 +17,14 @@ export function ExamIntro({
   chapter,
   paper,
   ai,
+  topics,
 }: {
   subject?: string;
   chapter?: string;
   paper?: string;
   ai?: boolean;
+  /** The weak topics the student ticked on the AI test screen. */
+  topics?: string[];
 }) {
   const { state, derived } = useApp();
   const t = useT();
@@ -44,14 +47,18 @@ export function ExamIntro({
 
   async function start() {
     setBusy(true);
+    // The picked topics arrive from the AI test screen; when someone lands
+    // here directly, fall back to their actual weakest topics.
+    const focus = topics?.length ? topics : weakTopics(state.attempts).map((w) => w.topic).slice(0, 3);
     const mcqs = ai
-      ? await api.generateTest(['Circular motion', 'Turning Effect of Forces', 'Transport'], COUNT)
+      ? await api.generateTest(focus, COUNT)
       : await api.getMcqs({
           chapterIds: chapter ? [chapter] : undefined,
           subjectId: chapter ? undefined : subjectId,
           count: COUNT,
         });
-    setBusy(false);
+    // busy stays true through router.replace: re-enabling the button while the
+    // route transition runs is the double-click window.
     session.start({
       mode: 'exam',
       label: `${label} · ${t('session.examTitle')}`,
@@ -92,7 +99,7 @@ export function ExamIntro({
         </ul>
       </Card>
 
-      <div className="sticky bottom-0 mt-5 bg-paper/95 py-4 backdrop-blur">
+      <div className="mt-6">
         <Btn title={t('session.startExam')} variant="orange" onClick={start} loading={busy} className="w-full" />
       </div>
     </Page>

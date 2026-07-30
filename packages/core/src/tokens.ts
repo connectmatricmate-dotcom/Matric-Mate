@@ -13,10 +13,17 @@ export const colors = {
   tealTint2: '#D5E7ED',
   ink: '#0F3D4C',
   ink2: '#517682',
-  ink3: '#8AA4AD',
+  /** Fine print and placeholders only; meaningful copy uses ink2. Darkened
+   * from #8AA4AD, which sat at 2.5:1 on paper and was unreadable in sunlight. */
+  ink3: '#6E8B96',
   paper: '#FAFBF7',
   card: '#FFFFFF',
   line: '#E4EAE6',
+  /** The one neutral for empty progress tracks, rings and skeletons. Five
+   * hand-picked greys used to share this role; this is the survivor. */
+  track: '#EAF0EC',
+  /** Inactive control surfaces: an off toggle, an unchecked box, a step dot. */
+  mute: '#D7E0DB',
   orange: '#F29329',
   orangeDark: '#D97B10',
   orangeTint: '#FDF1E1',

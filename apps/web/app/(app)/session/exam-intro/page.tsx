@@ -9,8 +9,16 @@ export const metadata: Metadata = {
 export default async function ExamIntroPage({
   searchParams,
 }: {
-  searchParams: Promise<{ subject?: string; chapter?: string; paper?: string; ai?: string }>;
+  searchParams: Promise<{ subject?: string; chapter?: string; paper?: string; ai?: string; topics?: string }>;
 }) {
-  const { subject, chapter, paper, ai } = await searchParams;
-  return <ExamIntro subject={subject} chapter={chapter} paper={paper} ai={ai === '1'} />;
+  const { subject, chapter, paper, ai, topics } = await searchParams;
+  return (
+    <ExamIntro
+      subject={subject}
+      chapter={chapter}
+      paper={paper}
+      ai={ai === '1'}
+      topics={topics ? topics.split('|').filter(Boolean) : undefined}
+    />
+  );
 }

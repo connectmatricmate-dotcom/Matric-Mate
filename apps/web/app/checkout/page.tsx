@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Icon } from '@/components/ui/primitives';
 import { CheckoutForm } from '@/components/commerce/CheckoutForm';
 import { planById } from '@/lib/plans';
 import { gateway } from '@/lib/gateway';
@@ -26,10 +27,11 @@ export default async function CheckoutPage({
       <header className="border-b border-line bg-card">
         <div className="mx-auto flex max-w-[980px] items-center gap-3 px-5 py-3.5">
           <Link href="/" aria-label="MatricMate home">
-            <Image src="/brand/wordmark.png" alt="MatricMate" width={140} height={28} priority />
+            <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} priority />
           </Link>
           <span className="ml-auto inline-flex items-center gap-1.5 text-[12.5px] font-extrabold text-ink2">
-            🔒 Secure checkout
+            <Icon name="lock" size={14} strokeWidth={2.4} className="text-green" />
+            Secure checkout
           </span>
         </div>
       </header>

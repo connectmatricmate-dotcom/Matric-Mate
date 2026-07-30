@@ -38,6 +38,7 @@ export function Btn({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       className={buttonClasses({ variant, sm, lg, disabled: disabled || loading, className })}
     >
       {loading ? <Icon name="refresh" size={sm ? 16 : 18} className="animate-spin" /> : icon ? <Icon name={icon} size={sm ? 16 : 18} /> : null}
@@ -70,6 +71,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending || disabled}
+      aria-busy={pending || undefined}
       className={buttonClasses({ variant, lg, disabled: pending || disabled, className })}
     >
       {pending ? <Icon name="refresh" size={18} className="animate-spin" /> : null}
@@ -85,12 +87,14 @@ export function IconButton({
   onClick,
   tone = 'card',
   size = 44,
+  disabled,
 }: {
   icon: IconName;
   label: string;
   onClick: () => void;
   tone?: 'card' | 'active' | 'plain';
   size?: number;
+  disabled?: boolean;
 }) {
   const tones = {
     card: 'border border-line bg-card text-ink hover:bg-paper',
@@ -101,10 +105,11 @@ export function IconButton({
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       aria-label={label}
       title={label}
       style={{ width: size, height: size }}
-      className={`flex shrink-0 items-center justify-center rounded-[14px] transition-colors duration-200 ${tones[tone]}`}
+      className={`flex shrink-0 items-center justify-center rounded-[14px] transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-45 ${tones[tone]}`}
     >
       <Icon name={icon} size={20} />
     </button>
@@ -266,7 +271,7 @@ export function Toggle({ on, onClick, label }: { on: boolean; onClick: () => voi
       aria-label={label}
       onClick={onClick}
       className={`relative h-[26px] w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${
-        on ? 'bg-teal' : 'bg-[#D7E0DB]'
+        on ? 'bg-teal' : 'bg-mute'
       }`}
     >
       <span className={`absolute top-[3px] h-5 w-5 rounded-full bg-white transition-all duration-200 ${on ? 'left-[23px]' : 'left-[3px]'}`} />
@@ -274,13 +279,30 @@ export function Toggle({ on, onClick, label }: { on: boolean; onClick: () => voi
   );
 }
 
-/** Transient error banner, announced to screen readers, gone after ~7s. */
+/**
+ * Transient error banner, announced to screen readers, gone after ~7s.
+ * The timer runs whether or not the caller passes onDismiss: it used to depend
+ * on it, and every auth form left the banner pinned forever.
+ */
 export function ErrorBanner({ message, onDismiss }: { message: string; onDismiss?: () => void }) {
+  const [hidden, setHidden] = useState(false);
+  // A new message re-shows a banner that had timed out. Adjusted during
+  // render, not in an effect, per the set-state-in-effect rule.
+  const [prevMessage, setPrevMessage] = useState(message);
+  if (message !== prevMessage) {
+    setPrevMessage(message);
+    setHidden(false);
+  }
+
   useEffect(() => {
-    if (!onDismiss) return;
-    const t = setTimeout(onDismiss, 7000);
+    const t = setTimeout(() => {
+      setHidden(true);
+      onDismiss?.();
+    }, 7000);
     return () => clearTimeout(t);
   }, [message, onDismiss]);
+
+  if (hidden) return null;
 
   return (
     <div role="alert" className="mb-3 flex items-start gap-2 rounded-[16px] border border-red bg-redtint px-4 py-3">

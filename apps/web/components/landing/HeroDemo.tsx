@@ -9,7 +9,7 @@
  */
 import { useState } from 'react';
 import type { Mcq } from '@matricmate/core';
-import { Card, Icon, Pill } from '@/components/ui';
+import { Btn, Card, Icon, Pill } from '@/components/ui';
 
 const CONFIDENCE = [
   { value: 0, en: 'Guess', ur: 'Tukka' },
@@ -76,9 +76,9 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
               type="button"
               disabled={checked}
               onClick={() => setChosen(i)}
-              className={`flex items-center gap-3 rounded-[14px] border-[1.5px] px-3.5 py-2.5 text-left transition-colors ${style}`}
+              className={`flex items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-2.5 text-left transition-colors duration-200 ${style}`}
             >
-              <span className={`flex h-[25px] w-[25px] shrink-0 items-center justify-center rounded-[8px] text-[12px] font-extrabold ${key}`}>
+              <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12px] font-extrabold ${key}`}>
                 {String.fromCharCode(65 + i)}
               </span>
               <span className="text-[14px] text-ink">{opt}</span>
@@ -88,7 +88,9 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
         })}
       </div>
 
-      <div className="flex min-h-[142px] min-w-0 flex-1 flex-col justify-end overflow-y-auto">
+      {/* Scroll allowance only where the card height is fixed (md). On mobile the
+          card grows with its content, so an inner scrollbar would be a bug. */}
+      <div className="flex min-h-[142px] min-w-0 flex-1 flex-col justify-end md:overflow-y-auto">
       {/* The confidence step, the thing that makes the practice data worth something */}
       {chosen !== null && !checked ? (
         <div className="mt-4">
@@ -99,7 +101,7 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
                 key={c.value}
                 type="button"
                 onClick={() => setConfidence(c.value)}
-                className={`flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[12.5px] font-extrabold transition-colors ${
+                className={`min-h-10 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[12.5px] font-extrabold transition-colors duration-200 ${
                   confidence === c.value ? 'border-orange bg-orangetint text-orangedark' : 'border-line bg-card text-ink2 hover:border-orange/40'
                 }`}
               >
@@ -111,14 +113,12 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
       ) : null}
 
       {!checked ? (
-        <button
-          type="button"
-          disabled={chosen === null || confidence === null}
+        <Btn
+          title="Check answer"
           onClick={() => setChecked(true)}
-          className="mt-4 w-full rounded-[16px] bg-teal px-5 py-3.5 font-display text-[16px] text-white transition-colors hover:bg-tealdark disabled:pointer-events-none disabled:opacity-40"
-        >
-          Check answer
-        </button>
+          disabled={chosen === null || confidence === null}
+          className="mt-4 w-full"
+        />
       ) : (
         // Verdict, reason and reset in one block. Two stacked cards plus a
         // dangling link would double the space this state has to reserve, and
@@ -143,7 +143,7 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
             <button
               type="button"
               onClick={reset}
-              className="-mr-1 flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[12px] font-extrabold text-ink2 transition-colors hover:bg-card hover:text-teal"
+              className="-mr-1 flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[12px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-card hover:text-teal"
             >
               <Icon name="refresh" size={13} strokeWidth={2.6} />
               Try again

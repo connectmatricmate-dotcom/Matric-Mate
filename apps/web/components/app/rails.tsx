@@ -47,12 +47,14 @@ export function ConfidenceRail() {
           ))}
         </div>
       ) : (
-        <p className="mt-2 text-[13px] leading-[1.6] text-ink2">
-          Answer a few questions and this shows whether being sure means being right.
-        </p>
+        <p className="mt-2 text-[13px] leading-[1.6] text-ink2">{t('progress.confidenceEmpty')}</p>
       )}
-      <Link href="/insights/performance" className="mt-3 inline-block text-[12.5px] font-extrabold text-teal hover:underline">
-        {t('common.details')} →
+      <Link
+        href="/insights/performance"
+        className="mt-3 inline-flex min-h-9 items-center gap-1 text-[12.5px] font-extrabold text-teal hover:underline"
+      >
+        {t('common.details')}
+        <Icon name="arrowRight" size={13} strokeWidth={2.4} />
       </Link>
     </Card>
   );
@@ -67,7 +69,9 @@ export function StreakRail() {
   return (
     <Card flat>
       <div className="flex items-center gap-2">
-        <span className="text-[18px]">🔥</span>
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orangetint text-orangedark">
+          <Icon name="flame" size={15} strokeWidth={2.4} />
+        </span>
         <p className="min-w-0 flex-1 text-[13.5px] font-extrabold text-ink">
           {derived.streak > 0 ? t('progress.streakAlive', { n: derived.streak }) : t('progress.noStreak')}
         </p>
@@ -77,7 +81,7 @@ export function StreakRail() {
           <span key={i} className={`h-6 flex-1 rounded-[4px] ${on ? 'bg-orange' : 'bg-grey'}`} />
         ))}
       </div>
-      <p className="mt-1.5 text-[11.5px] text-ink3">Last 14 days</p>
+      <p className="mt-1.5 text-[11.5px] text-ink3">{t('progress.last14')}</p>
     </Card>
   );
 }
@@ -86,13 +90,19 @@ export function StreakRail() {
 export function SyllabusRail({ limit = 5 }: { limit?: number }) {
   const { state, derived } = useApp();
   const t = useT();
+  const rows = useMemo(
+    () =>
+      derived.subjects
+        .slice(0, limit)
+        .map((sid) => ({ sid, pct: subjectPct(sid, state.readSections, state.attempts) })),
+    [derived.subjects, limit, state.readSections, state.attempts]
+  );
 
   return (
     <Card flat>
       <Label>{t('progress.bySubject')}</Label>
       <div className="mt-3 flex flex-col gap-2.5">
-        {derived.subjects.slice(0, limit).map((sid) => {
-          const pct = subjectPct(sid, state.readSections, state.attempts);
+        {rows.map(({ sid, pct }) => {
           return (
             <Link key={sid} href={`/learn/subject/${sid}`} className="block">
               <span className="flex items-baseline justify-between gap-2">
@@ -131,8 +141,12 @@ export function WeakRail({ limit = 3 }: { limit?: number }) {
           </li>
         ))}
       </ul>
-      <Link href="/insights/weak" className="mt-3 inline-block text-[12.5px] font-extrabold text-red hover:underline">
-        {t('common.seeAll')} →
+      <Link
+        href="/insights/weak"
+        className="mt-3 inline-flex min-h-9 items-center gap-1 text-[12.5px] font-extrabold text-red hover:underline"
+      >
+        {t('common.seeAll')}
+        <Icon name="arrowRight" size={13} strokeWidth={2.4} />
       </Link>
     </Card>
   );
@@ -146,6 +160,7 @@ export function CoverageRail() {
     () => (derived.subjects.length ? Math.round(derived.subjects.reduce((n, s) => n + subjectPct(s, state.readSections, state.attempts), 0) / derived.subjects.length) : 0),
     [derived.subjects, state.readSections, state.attempts]
   );
+  const acc = useMemo(() => accuracy(state.attempts), [state.attempts]);
 
   return (
     <Card flat className="flex items-center gap-4">
@@ -155,7 +170,7 @@ export function CoverageRail() {
       <div className="min-w-0 flex-1">
         <p className="text-[13.5px] font-extrabold text-ink">{t('progress.syllabusCovered')}</p>
         <p className="text-[12.5px] text-ink2">
-          {accuracy(state.attempts)}% {t('dash.accuracy')} · {state.attempts.length} {t('common.questions')}
+          {acc}% {t('dash.accuracy')} · {state.attempts.length} {t('common.questions')}
         </p>
       </div>
     </Card>
@@ -201,7 +216,7 @@ export function UpgradeRail() {
       <p className="mt-1.5 text-[12.5px] leading-[1.6] text-ink2">{t('billing.freeBody')}</p>
       <Link
         href="/pricing"
-        className="mt-3 inline-flex min-h-9 items-center rounded-[12px] bg-teal px-3.5 text-[13px] font-extrabold text-white transition-colors duration-200 hover:bg-tealdark"
+        className="mt-3 inline-flex min-h-10 items-center rounded-[12px] bg-teal px-3.5 text-[13px] font-extrabold text-white transition-colors duration-200 hover:bg-tealdark"
       >
         {t('account.upgrade')}
       </Link>

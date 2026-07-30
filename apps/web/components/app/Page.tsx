@@ -61,7 +61,7 @@ export function PageHead({
       {back ? (
         <Link
           href={back}
-          className="-ml-1 mb-1 inline-flex min-h-9 items-center gap-1 pr-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
+          className="-ml-1 mb-1 inline-flex min-h-11 items-center gap-1 pr-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
         >
           <Icon name="chevron" size={17} className="rotate-180" />
           {backLabel ?? 'Back'}
@@ -97,16 +97,15 @@ export function Rail({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The primary action for a screen. On a phone it docks to the bottom, where a
- * thumb is; on a desktop it sits inline under the content, where the eye already
- * is. Same component, so no screen has to remember the rule.
+ * The primary action row for a screen. Always in normal flow at the end of the
+ * content: full-width buttons on a phone, regular-size aligned buttons on a
+ * desktop. Nothing sticks or floats over the content.
  */
 export function Actions({ children, align = 'end' }: { children: React.ReactNode; align?: 'start' | 'end' | 'full' }) {
   return (
     <div
       className={[
-        'sticky bottom-0 z-10 -mx-4 mt-6 flex gap-2.5 border-t border-line bg-paper/95 px-4 py-3 backdrop-blur',
-        'md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-filter-none',
+        'mt-6 flex gap-2.5',
         align === 'full' ? '' : align === 'start' ? 'md:justify-start' : 'md:justify-end',
         '[&>*]:flex-1 md:[&>*]:flex-none',
       ].join(' ')}

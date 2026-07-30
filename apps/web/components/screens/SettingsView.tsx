@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import type { Language, Medium } from '@matricmate/core';
+import { APP_VERSION } from '@/lib/site';
 import { CardGrid, Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
-import { Card, Item, Label } from '@/components/ui/primitives';
+import { Card, Item, Label, Pill } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
@@ -109,21 +110,14 @@ export function SettingsView() {
         </Group>
 
         <Group title={t('account.appearance')}>
+          {/* No toggle until dark mode exists. A switch that visibly flips and
+              changes nothing is the fastest way to lose a user's trust. */}
           <Item
             title={t('account.darkMode')}
             sub={t('account.darkModeSub')}
             icon="moon"
             last
-            right={
-              <Toggle
-                on={s.dark}
-                label={t('account.darkMode')}
-                onClick={() => {
-                  actions.setSettings({ dark: !s.dark });
-                  toast(t('account.darkToast'));
-                }}
-              />
-            }
+            right={<Pill tone="grey">{t('onboarding.comingSoon')}</Pill>}
           />
         </Group>
 
@@ -155,7 +149,7 @@ export function SettingsView() {
         </Group>
 
         <Group title={t('account.about')}>
-          <Item title={t('account.version', { v: '0.2.1' })} icon="help" />
+          <Item title={t('account.version', { v: APP_VERSION })} icon="help" />
           <Item href="/terms" title={t('account.terms')} icon="doc" last />
         </Group>
       </CardGrid>

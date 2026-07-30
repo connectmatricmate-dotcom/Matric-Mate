@@ -44,10 +44,10 @@ export function ChapterHub({
             <IconButton
               icon={downloaded ? 'check' : 'download'}
               tone={downloaded ? 'active' : 'card'}
-              label={downloaded ? t('study.removedOffline') : t('study.saveOffline')}
+              label={downloaded ? t('study.removeOffline') : t('study.saveOffline')}
               onClick={() => {
                 actions.toggleDownload(id);
-                toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
+                toast(downloaded ? t('study.removedOffline') : t('study.savedOffline'));
               }}
             />
             <LinkBtn
@@ -114,7 +114,7 @@ export function ChapterHub({
             <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
               {downloaded ? t('study.savedOffline') : t('study.notDownloaded')}
             </Pill>
-            <Pill tone="grey">≈ 2 MB</Pill>
+            <Pill tone="grey">{t('study.sizeApprox')}</Pill>
           </div>
 
           <Actions>
@@ -132,21 +132,21 @@ export function ChapterHub({
               <span className="font-display text-[16px] text-ink tabular">{pct}%</span>
             </Ring>
             <div className="min-w-0 flex-1">
-              <p className="text-[13.5px] font-extrabold text-ink">This chapter</p>
+              <p className="text-[13.5px] font-extrabold text-ink">{t('study.thisChapter')}</p>
               <p className="text-[12.5px] text-ink2">
-                {readCount} of {content.sections.length} sections read
+                {t('study.sectionsRead', { read: readCount, total: content.sections.length })}
               </p>
             </div>
           </Card>
 
           <Card flat>
-            <Label>Up next</Label>
+            <Label>{t('study.upNext')}</Label>
             <p className="mt-2 text-[13px] leading-[1.6] text-ink2">
               {readCount === 0
-                ? 'Start with the notes. The MCQs draw from the same sections.'
+                ? t('study.coachStart')
                 : readCount < content.sections.length
-                  ? 'Finish the notes, then try the chapter MCQs while it’s fresh.'
-                  : 'Notes done. A timed test is the fastest way to find what didn’t stick.'}
+                  ? t('study.coachKeepGoing')
+                  : t('study.coachDone')}
             </p>
             <LinkBtn
               title={readCount >= content.sections.length ? t('study.chapterTest') : t('study.mcqs')}

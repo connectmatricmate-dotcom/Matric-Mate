@@ -17,7 +17,13 @@ export function ProgressView() {
     [derived.subjects, state.readSections, state.attempts]
   );
   const weak = useMemo(() => weakTopics(state.attempts).slice(0, 4), [state.attempts]);
-  const acc = accuracy(state.attempts);
+  const acc = useMemo(() => accuracy(state.attempts), [state.attempts]);
+  // The per-subject sweep walks contentFor + attempts for every subject, so it
+  // runs once per data change, not once per render.
+  const bySubject = useMemo(
+    () => derived.subjects.map((sid) => ({ sid, pct: subjectPct(sid, state.readSections, state.attempts) })),
+    [derived.subjects, state.readSections, state.attempts]
+  );
   const minutes = state.attempts.length * 1.6 + state.readSections.length * 4;
   const month = new Date().toLocaleDateString('en-GB', { month: 'long' });
 
@@ -57,8 +63,7 @@ export function ProgressView() {
               </Link>
             </div>
             <div className="grid gap-x-6 gap-y-3.5 md:grid-cols-2">
-              {derived.subjects.map((sid) => {
-                const pct = subjectPct(sid, state.readSections, state.attempts);
+              {bySubject.map(({ sid, pct }) => {
                 return (
                   <Link key={sid} href={`/learn/subject/${sid}`} className="block">
                     <span className="flex items-baseline justify-between gap-2">
@@ -108,7 +113,9 @@ export function ProgressView() {
               border="border-orange"
               className="flex items-center gap-4 transition-colors duration-200 hover:brightness-[0.99]"
             >
-              <span className="text-[30px]">🎓</span>
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-orangetint text-orangedark">
+                <Icon name="gradCap" size={24} />
+              </span>
               <span className="min-w-0 flex-1">
                 <span className="block font-display text-[16px] text-ink">{t('progress.reportCard', { month })}</span>
                 <span className="block text-[13px] text-ink2">{t('progress.reportCardSub', { grade: grade(acc) })}</span>

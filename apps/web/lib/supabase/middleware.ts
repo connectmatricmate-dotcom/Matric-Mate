@@ -25,21 +25,65 @@ const AUTH_ONLY = ['/login', '/signup'];
 const PUBLIC_INSIDE_PROTECTED = ['/checkout/return'];
 
 /**
- * Runs on every request via proxy.ts.
+ * How long the auth server gets before we stop waiting. Without a limit, a
+ * paused Supabase project or a bad network turns every navigation into an
+ * indefinite hang; the fetch has no timeout of its own.
+ */
+const AUTH_TIMEOUT_MS = 5000;
+
+/**
+ * Runs via proxy.ts, but only on the routes that need a session decision.
  *
  * Two jobs. It refreshes the auth token, which has to happen here because a
  * Server Component cannot set a cookie, and without it sessions expire and the
  * app starts behaving strangely for no visible reason. And it turns away
  * unauthenticated requests to protected routes before a page renders, so a
  * paywalled screen never flashes its contents on the way to the login page.
+ *
+ * What it deliberately does NOT do any more: call the auth server for every
+ * request. A dashboard visit prefetches ~20 links and every prefetch runs this
+ * function, so an unconditional getUser() multiplied one round trip (measured
+ * 110 to 360ms) by twenty. Now a request with no auth cookie is decided
+ * locally, and the network is only consulted when a cookie exists and the
+ * route actually needs to know who is asking.
  */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+
+  const { pathname } = request.nextUrl;
+  const starts = (list: string[]) => list.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
+  const isProtected = starts(PROTECTED) && !starts(PUBLIC_INSIDE_PROTECTED);
+  const isAuthOnly = starts(AUTH_ONLY);
+
+  // Public pages make no session decision. The browser client keeps its own
+  // token fresh for signed-in visitors browsing the marketing pages.
+  if (!isProtected && !isAuthOnly) return response;
+
+  // No cookie means no session, and asking the auth server cannot change that.
+  // Decide locally: protected routes bounce to login, login/signup render.
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some((c) => c.name.startsWith('sb-') && c.name.includes('-auth-token'));
+  if (!hasAuthCookie) {
+    if (isProtected) {
+      const login = request.nextUrl.clone();
+      login.pathname = '/login';
+      // Come back to where they were headed once they are in.
+      login.search = `?next=${encodeURIComponent(pathname + request.nextUrl.search)}`;
+      return NextResponse.redirect(login);
+    }
+    return response;
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+          fetch(input, { ...init, signal: AbortSignal.timeout(AUTH_TIMEOUT_MS) }),
+      },
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (toSet) => {
@@ -53,22 +97,31 @@ export async function updateSession(request: NextRequest) {
 
   // Must be getUser(), not getSession(): this call is what refreshes the token,
   // and it is the only one that validates the cookie rather than trusting it.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  let authRejected = false;
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    user = data.user;
+    // A definite "no" from the auth server (expired refresh token, revoked
+    // session) is a sign-out. A network failure or timeout is not; error.status
+    // is absent or 0 in that case and we fail open below.
+    authRejected = !user && !!error && typeof error.status === 'number' && error.status >= 400;
+  } catch {
+    // Timeout or transport failure. Fail open rather than hang or lock out:
+    // every screen's data still sits behind RLS, so an unauthenticated pass
+    // through the shell reveals nothing. The alternative, waiting forever,
+    // is the "app frozen for minutes" bug.
+    return response;
+  }
 
-  const { pathname } = request.nextUrl;
-  const starts = (list: string[]) => list.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-
-  if (!user && starts(PROTECTED) && !starts(PUBLIC_INSIDE_PROTECTED)) {
+  if (!user && isProtected && authRejected) {
     const login = request.nextUrl.clone();
     login.pathname = '/login';
-    // Come back to where they were headed once they are in.
     login.search = `?next=${encodeURIComponent(pathname + request.nextUrl.search)}`;
     return NextResponse.redirect(login);
   }
 
-  if (user && starts(AUTH_ONLY)) {
+  if (user && isAuthOnly) {
     const home = request.nextUrl.clone();
     home.pathname = '/dashboard';
     home.search = '';

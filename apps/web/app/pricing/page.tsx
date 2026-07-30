@@ -33,7 +33,7 @@ const QUESTIONS = [
   },
   {
     q: 'Can I pay from a mobile account?',
-    a: 'Yes. JazzCash and EasyPaisa both work, as does any debit or credit card. Payments are handled by Safepay, so your details never touch our servers.',
+    a: 'Yes. JazzCash and Easypaisa both work, as does any debit or credit card. Payments are handled by Safepay, so your details never touch our servers.',
   },
   {
     q: 'Does one payment cover the phone and the website?',
@@ -41,7 +41,7 @@ const QUESTIONS = [
   },
   {
     q: 'Can I cancel?',
-    a: 'Any time, from Profile → Subscription. You keep access until the date you’ve already paid for, and downloads stay on your device.',
+    a: 'Any time, from Profile, then Subscription. You keep access until the date you’ve already paid for, and downloads stay on your device.',
   },
   {
     q: 'Is there a discount for a whole class or school?',
@@ -145,9 +145,9 @@ export default function PricingPage() {
             <div className="mt-7 flex flex-col gap-3">
               {QUESTIONS.map((f) => (
                 <details key={f.q} className="group rounded-[16px] border border-line bg-paper px-5 py-4">
-                  <summary className="flex list-none items-center justify-between gap-4 text-[15px] font-extrabold text-ink">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-extrabold text-ink">
                     {f.q}
-                    <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform group-open:rotate-45" />
+                    <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform duration-200 group-open:rotate-45" />
                   </summary>
                   <p className="mt-2.5 text-[14px] leading-[1.7] text-ink2">{f.a}</p>
                 </details>

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import type { PastPaper } from '@matricmate/core';
 import { subjectById } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Card, Empty, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 const PAPER_SUBJECTS = ['phy', 'chem', 'bio', 'math', 'urd', 'eng'];
@@ -41,6 +41,12 @@ export function PapersScreen({ papers }: { papers: PastPaper[] }) {
           </button>
         ))}
       </div>
+
+      {shown.length === 0 ? (
+        <div className="mt-4">
+          <Empty icon="doc" title={t('session.papersEmptyTitle')} sub={t('session.papersEmptyBody')} />
+        </div>
+      ) : null}
 
       <div className="mt-4 grid gap-2.5 lg:grid-cols-2">
         {shown.map((p) => (

@@ -28,6 +28,18 @@ export function SessionSetup({ initialChapterId }: { initialChapterId?: string }
     [subjectId, state.premium.active]
   );
 
+  // The default subject is picked before the store hydrates, when the subject
+  // list is still the fallback. Adjusted during render when the real list
+  // arrives: if the current pick isn't a subject the student studies, move to
+  // their first one. A pick they made from the chips is always in the list.
+  const [seenSubjects, setSeenSubjects] = useState(derived.subjects);
+  if (seenSubjects !== derived.subjects) {
+    setSeenSubjects(derived.subjects);
+    if (!initialChapter && derived.subjects.length && !derived.subjects.includes(subjectId)) {
+      setSubjectId(derived.subjects[0]);
+    }
+  }
+
   // Chapter picks belong to the subject they were made in. Cleared during
   // render so the list below never shows a tick against another subject.
   if (subjectId !== pickedSubject) {
@@ -42,11 +54,13 @@ export function SessionSetup({ initialChapterId }: { initialChapterId?: string }
       subjectId: chapterIds.length ? undefined : subjectId,
       count: Number(count),
     });
-    setBusy(false);
     if (!mcqs.length) {
+      setBusy(false);
       toast(t('session.noQuestions'));
       return;
     }
+    // busy stays true through router.replace: re-enabling the button while the
+    // route transition runs is the double-click window.
     session.start({
       mode: 'practice',
       label:
@@ -138,7 +152,7 @@ export function SessionSetup({ initialChapterId }: { initialChapterId?: string }
         {state.premium.active ? t('session.premiumActive') : t('session.premiumNote')}
       </p>
 
-      <div className="sticky bottom-0 mt-5 bg-paper/95 py-4 backdrop-blur">
+      <div className="mt-6">
         <Btn title={t('session.start', { n: count })} onClick={start} loading={busy} className="w-full md:w-auto" />
       </div>
     </Page>

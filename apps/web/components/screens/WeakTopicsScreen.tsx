@@ -27,7 +27,7 @@ export function WeakTopicsScreen() {
 
       {rows.length === 0 ? (
         <Empty
-          emoji="🔍"
+          icon="search"
           title={t('progress.weakNoneTitle')}
           sub={t('progress.weakNoneBody')}
           cta={<LinkBtn title={t('tutor.practiceTen')} href="/session/setup" sm />}

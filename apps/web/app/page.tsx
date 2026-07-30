@@ -5,7 +5,7 @@ import { AudioSample } from '@/components/landing/AudioSample';
 import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
-import { Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
+import { Bar, Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
 import type { IconName } from '@matricmate/core';
 
 /** Everything on this page is real product content, not marketing mock-ups. */
@@ -13,19 +13,19 @@ const dynamics = contentFor('phy-3');
 const heroMcq = dynamics.mcqs.find((m) => m.topic === 'Circular motion') ?? dynamics.mcqs[0];
 const physicsPaper = PAPER_CONTENT.pp1;
 
-const PAINS = [
+const PAINS: { icon: IconName; title: string; body: string }[] = [
   {
-    emoji: '📖',
+    icon: 'book',
     title: 'Parh liya, phir bhool gaya',
     body: 'Reading a chapter twice feels like studying. Then the test asks something slightly different and it’s gone.',
   },
   {
-    emoji: '❓',
+    icon: 'help',
     title: 'Raat ko koi poochne wala nahi',
     body: 'You get stuck at 11pm on one step of a numerical. The tutor comes on Thursday. The test is Monday.',
   },
   {
-    emoji: '🎯',
+    icon: 'target',
     title: 'Pata hi nahi kya kamzor hai',
     body: 'You revise what already feels comfortable, because nothing tells you which topics are quietly costing you marks.',
   },
@@ -62,7 +62,7 @@ const FAQ = [
   },
   {
     q: 'How do I pay from Pakistan?',
-    a: 'JazzCash, EasyPaisa or any debit/credit card, through Safepay. You can also renew from a link we send on WhatsApp.',
+    a: 'JazzCash, Easypaisa or any debit/credit card, through Safepay. You can also renew from a link we send on WhatsApp.',
   },
   {
     q: 'Can I use it on both phone and computer?',
@@ -105,8 +105,8 @@ export default function LandingPage() {
                 <LinkBtn title="See pricing" href="#pricing" variant="line" lg />
               </div>
 
-              <p className="mt-4 text-[13px] text-ink3">
-                Rs 1,000/month after the trial · cancel any time · JazzCash, EasyPaisa or card
+              <p className="mt-4 text-[13px] text-ink2">
+                Rs 1,000/month after the trial · cancel any time · JazzCash, Easypaisa or card
               </p>
             </div>
 
@@ -147,7 +147,9 @@ export default function LandingPage() {
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {PAINS.map((p) => (
               <Card key={p.title} flat className="h-full">
-                <span className="text-[28px]">{p.emoji}</span>
+                <span className="flex h-[42px] w-[42px] items-center justify-center rounded-[13px] bg-tealtint text-teal">
+                  <Icon name={p.icon} size={22} />
+                </span>
                 <h3 className="mt-2 font-display text-[18px] text-ink">{p.title}</h3>
                 <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2">{p.body}</p>
               </Card>
@@ -240,11 +242,13 @@ export default function LandingPage() {
                 How sure you were vs how right you were
               </p>
               <div className="mt-4 flex flex-col gap-4">
-                {[
-                  { label: 'Certain', pct: 91, bar: 'bg-green', said: '96×' },
-                  { label: 'Fairly sure', pct: 68, bar: 'bg-orange', said: '74×' },
-                  { label: 'Guess', pct: 39, bar: 'bg-red', said: '41×' },
-                ].map((r) => (
+                {(
+                  [
+                    { label: 'Certain', pct: 91, tone: 'green', said: '96×' },
+                    { label: 'Fairly sure', pct: 68, tone: 'orange', said: '74×' },
+                    { label: 'Guess', pct: 39, tone: 'red', said: '41×' },
+                  ] as const
+                ).map((r) => (
                   <div key={r.label}>
                     <div className="flex justify-between text-[12.5px] font-extrabold text-ink">
                       <span>{r.label}</span>
@@ -252,8 +256,8 @@ export default function LandingPage() {
                         {r.pct}% right · said {r.said}
                       </span>
                     </div>
-                    <div className="mt-1.5 h-[7px] overflow-hidden rounded-full bg-[#EAF0EC]">
-                      <div className={`h-full rounded-full ${r.bar}`} style={{ width: `${r.pct}%` }} />
+                    <div className="mt-1.5">
+                      <Bar pct={r.pct} tone={r.tone} />
                     </div>
                   </div>
                 ))}
@@ -347,12 +351,14 @@ export default function LandingPage() {
                 </span>
               </div>
               <div className="mt-4">
-                {[
-                  ['Physics', 'A', '↑'],
-                  ['Chemistry', 'B+', '↑'],
-                  ['Biology', 'B', '→'],
-                  ['Mathematics', 'A−', '↑'],
-                ].map(([subject, grade, trend]) => (
+                {(
+                  [
+                    ['Physics', 'A', 'up'],
+                    ['Chemistry', 'B+', 'up'],
+                    ['Biology', 'B', 'steady'],
+                    ['Mathematics', 'A−', 'up'],
+                  ] as const
+                ).map(([subject, grade, trend]) => (
                   // Fixed tracks, so grades sit in a column instead of drifting
                   // with the length of the subject name.
                   <div
@@ -361,8 +367,14 @@ export default function LandingPage() {
                   >
                     <span className="text-[13.5px] text-ink">{subject}</span>
                     <span className="text-right font-display text-[15px] text-ink tabular">{grade}</span>
-                    <span className={`text-right text-[14px] font-extrabold ${trend === '↑' ? 'text-green' : 'text-ink3'}`}>
-                      {trend}
+                    <span className="flex justify-end">
+                      <Icon
+                        name={trend === 'up' ? 'chart' : 'arrowRight'}
+                        size={14}
+                        strokeWidth={2.4}
+                        className={trend === 'up' ? 'text-green' : 'text-ink3'}
+                      />
+                      <span className="sr-only">{trend === 'up' ? 'improved' : 'steady'}</span>
                     </span>
                   </div>
                 ))}
@@ -425,8 +437,8 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <LinkBtn title="Start 3 days free" href="/checkout?plan=quarter" variant="orange" className="mt-5 w-full" />
-              <p className="mt-3 text-center text-[12px] text-ink3">JazzCash · EasyPaisa · Debit or credit card</p>
+              <LinkBtn title="Start 3 days free" href="/checkout?plan=monthly" variant="orange" className="mt-5 w-full" />
+              <p className="mt-3 text-center text-[12px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
               <Link href="/pricing" className="mt-2 text-center text-[12.5px] font-extrabold text-teal hover:underline">
                 Compare plan lengths
               </Link>
@@ -443,7 +455,7 @@ export default function LandingPage() {
                 <details key={f.q} className="group rounded-[16px] border border-line bg-paper px-5 py-4">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-extrabold text-ink">
                     {f.q}
-                    <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform group-open:rotate-45" />
+                    <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform duration-200 group-open:rotate-45" />
                   </summary>
                   <p className="mt-2.5 text-[14px] leading-[1.7] text-ink2">{f.a}</p>
                 </details>
@@ -463,9 +475,12 @@ export default function LandingPage() {
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
+              {/* White-outline sibling of the orange LinkBtn. No BtnVariant covers a
+                  dark band, so the full button recipe is written out here: same
+                  min height, radius, press cue and timing as buttonClasses. */}
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center rounded-[16px] border-[1.5px] border-white/40 px-7 py-4 font-display text-[17px] text-white transition-colors hover:bg-white/10"
+                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[16px] border-[1.5px] border-white/40 px-7 py-4 font-display text-[17px] text-white transition-[background-color,border-color,transform] duration-200 ease-out hover:border-white/70 hover:bg-white/10 active:scale-[0.98]"
               >
                 I already have an account
               </Link>

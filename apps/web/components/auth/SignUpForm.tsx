@@ -92,16 +92,16 @@ export function SignUpForm({ next }: { next?: string }) {
         <p className="mb-3 text-[12px] leading-[1.6] text-ink2">{t('auth.terms')}</p>
         <SubmitButton
           title={t('auth.createAccount')}
-          pendingTitle="Creating your account…"
+          pendingTitle={t('auth.creatingAccount')}
           disabled={!canSubmit}
           className="w-full"
         />
       </form>
 
       <p className="mt-3 text-center text-[13px] text-ink2">
-        Already have an account?{' '}
+        {t('auth.haveAccountShort')}{' '}
         <Link href="/login" className="font-extrabold text-teal hover:underline">
-          Log in
+          {t('auth.logIn')}
         </Link>
       </p>
     </Card>

@@ -8,7 +8,7 @@ import { Card, Icon } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { isFormValid, validateEmail } from '@/lib/validation';
 
-export function ForgotForm() {
+export function ForgotForm({ linkExpired }: { linkExpired?: boolean }) {
   const t = useT();
   const [state, action] = useActionState<AuthState, FormData>(resetPasswordAction, {});
   const [email, setEmail] = useState('');
@@ -37,7 +37,7 @@ export function ForgotForm() {
       <h1 className="font-display text-[24px] text-ink">{t('auth.resetTitle')}</h1>
       <p className="mb-4 mt-0.5 text-[14px] text-ink2">{t('auth.resetSub')}</p>
 
-      {state.error ? <ErrorBanner message={state.error} /> : null}
+      {state.error ? <ErrorBanner message={state.error} /> : linkExpired ? <ErrorBanner message={t('auth.linkExpired')} /> : null}
 
       <form action={action} onSubmit={() => setTouched(true)} noValidate>
         <Field
@@ -54,7 +54,7 @@ export function ForgotForm() {
         />
         <SubmitButton
           title={t('auth.sendReset')}
-          pendingTitle="Sending…"
+          pendingTitle={t('auth.sending')}
           disabled={!isFormValid(emailError)}
           className="w-full"
         />

@@ -18,7 +18,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'Your account',
     paragraphs: [
-      'One account, one student. You are responsible for keeping your password to yourself; if you think someone else has it, change it from Profile → Settings.',
+      'One account, one student. You are responsible for keeping your password to yourself; if you think someone else has it, change it from Profile, then Settings.',
       'Students under 18 should have a parent or guardian read this page. Parents can see a shared report card without needing an account of their own.',
     ],
   },
@@ -26,7 +26,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     heading: 'Paying, renewing and cancelling',
     paragraphs: [
       'Premium is sold on this website only. Nothing renews automatically: two days before your plan ends we send a reminder, and you choose whether to pay again.',
-      'You can cancel any time from Profile → Subscription. Access continues to the date you have already paid for, and chapters you downloaded stay on your device.',
+      'You can cancel any time from Profile, then Subscription. Access continues to the date you have already paid for, and chapters you downloaded stay on your device.',
       'Payments are processed by Safepay. Card and mobile-wallet details go to them, not to us, and we store only the reference number shown on your receipt.',
     ],
   },
@@ -51,7 +51,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   },
   {
     heading: 'Getting in touch',
-    paragraphs: ['help@matricmate.pk · WhatsApp support, 10am–10pm.'],
+    paragraphs: ['help@matricmate.pk · WhatsApp support, 10am to 10pm.'],
   },
 ];
 

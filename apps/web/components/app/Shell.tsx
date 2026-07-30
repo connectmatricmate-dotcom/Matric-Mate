@@ -82,11 +82,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {/* Level sits in the margin all day, so it stays quiet: a name, a number, a line. */}
         <Link
           href="/account"
-          className="mt-2 rounded-[14px] border border-line px-3 py-3 transition-colors duration-200 hover:border-tealtint2 hover:bg-paper"
+          className="mt-2 rounded-[16px] border border-line px-3 py-3 transition-colors duration-200 hover:border-tealtint2 hover:bg-paper"
         >
           <span className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-orangetint text-[16px]">
-              🧑🏽‍🎓
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-orangetint text-orangedark">
+              <Icon name="gradCap" size={17} strokeWidth={2.1} />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-extrabold text-ink">{state.user?.name ?? 'Account'}</span>
@@ -103,7 +103,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* utility strip, streak, AI budget, notifications */}
-        <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-paper/90 px-4 py-2 backdrop-blur md:px-8">
+        {/* Fixed h-14: screen-level sticky headers pin themselves to top-14,
+            so the shell's height is a contract, not a measurement. */}
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-paper/90 px-4 backdrop-blur md:px-8">
           <Link href="/dashboard" className="md:hidden">
             <Image src="/brand/wordmark.png" alt="MatricMate" width={116} height={23} />
           </Link>
@@ -115,14 +117,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 title={t('progress.streakAlive', { n: derived.streak })}
                 className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-orangetint px-3 text-[13px] font-extrabold text-orangedark transition-colors duration-200 hover:brightness-95"
               >
-                🔥 {derived.streak}
+                <Icon name="flame" size={14} strokeWidth={2.4} />
+                {derived.streak}
               </Link>
             ) : null}
 
             <Link
               href="/tutor"
               title={t('tutor.leftToday', { n: derived.aiLeft })}
-              className={`hidden min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-extrabold transition-colors duration-200 hover:brightness-95 sm:inline-flex ${
+              className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-extrabold transition-colors duration-200 hover:brightness-95 ${
                 derived.aiLeft ? 'bg-tealtint text-teal' : 'bg-redtint text-red'
               }`}
             >
@@ -133,7 +136,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Link
               href="/notifications"
               aria-label={t('notifications.title')}
-              className="relative flex h-10 w-10 items-center justify-center rounded-[13px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper"
+              className="relative flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper"
             >
               <Icon name="bell" size={19} />
               {unread ? (
@@ -155,8 +158,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
               key={item.href}
               href={item.href}
               aria-current={on ? 'page' : undefined}
-              className={`flex min-h-[58px] flex-1 flex-col items-center justify-center gap-1 text-[10.5px] font-extrabold ${
-                on ? 'text-teal' : 'text-ink3'
+              className={`flex min-h-[58px] flex-1 flex-col items-center justify-center gap-1 text-[11px] font-extrabold ${
+                on ? 'text-teal' : 'text-ink2'
               }`}
             >
               <Icon name={item.icon} size={22} />
