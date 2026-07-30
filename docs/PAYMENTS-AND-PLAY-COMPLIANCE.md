@@ -281,3 +281,28 @@ because nothing runs at midnight to flip it.
 So the compliance posture and the payment architecture are the same fact stated
 twice: the Android app cannot sell, and it cannot grant. Only the webhook can.
 
+## Wallets are Raast, and Raast is production-only (Safepay support, 30 Jul 2026)
+
+Safepay's answer to the missing JazzCash and Easypaisa options, verbatim in effect:
+
+- Easypaisa and JazzCash are supported **only through Raast**, never as direct wallet rails.
+- **Raast is not available in sandbox at all.** The sandbox stays card-only forever; there is
+  nothing to enable and nothing more to test there.
+- Raast is unlocked by creating a **production account and completing the onboarding form**;
+  after approval the Raast options appear.
+
+What this changes:
+
+1. Production onboarding is no longer an M10 task, it is the **only wallet test environment**.
+   Start it immediately; the first wallet payment anyone sees will be a real one, so budget a
+   Rs 100 smoke-test session right after approval.
+2. The hosted checkout should surface Raast without code changes once the account has it (the
+   page reads rails from the account's capabilities; their own bundle already carries an IBFT
+   rail). Verify with the capabilities probe against a production tracker on day one.
+3. Unanswered by support and still needed: wallet-vs-card MDR at low volume, KYC document
+   checklist, lead time from approval to Raast being live, and whether the KYC application can
+   name the final domain before it is live. Follow-up sent.
+4. The PayFast fallback behind lib/gateway stays priced at one day. Decision point: if Raast's
+   payer experience in production is poor for students (QR-only, bank-app-only), PayFast's direct
+   wallet integration becomes the launch path instead.
+

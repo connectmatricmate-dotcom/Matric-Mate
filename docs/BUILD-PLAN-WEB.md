@@ -101,9 +101,12 @@ Tasks:
 1. **Go live with Safepay**: production merchant keys (client's KYC must be finished; chase now,
    this is the M10 long pole), `SAFEPAY_ENV=production`, live webhook endpoint registered, new
    shared secret in Vercel, one real Rs 100 test payment end to end.
-2. **Wallets**: JazzCash/Easypaisa enablement is a Safepay support ticket (capabilities currently:
-   CARD false, CYBERSOURCE true, PAYFAST enabled but empty, EASYPAISA absent). If Safepay stalls,
-   the `lib/gateway` seam is the PayFast escape hatch; budget one day for a `payfast.ts` provider.
+2. **Wallets = Raast, production only** (Safepay support, 30 Jul): JazzCash/Easypaisa arrive
+   solely via Raast, and Raast does not exist in sandbox, so the sandbox stays card-only and
+   wallet flows can only ever be tested in production. Consequence: task 1 starts NOW, and the
+   first action after approval is a capabilities probe plus a Rs 100 Raast smoke test from a real
+   Easypaisa/JazzCash app. If the Raast payer experience is bad for students, the `lib/gateway`
+   seam is the PayFast escape hatch; budget one day for a `payfast.ts` provider.
 3. **Security sweep before indexing**: rotate every shared key (Supabase service, Safepay,
    anything in `.env.local` the user pasted in chat), delete demo accounts, re-run RLS spot checks
    (scripts exist in session history; recreate as `scripts/rls-check.mjs` and add to check.mjs as a

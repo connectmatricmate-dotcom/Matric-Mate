@@ -64,9 +64,10 @@ sign-in. Build it once in `packages/core` for both apps (mobile plan M2.5 and M3
 
 1. **Play Console closed testing** (12 testers, 14 days, personal accounts) back-counts from
    29 Aug to a testing build live by ~8 Aug. Account and testers are client actions; raise daily.
-2. **Safepay production**: merchant KYC for live keys (M10) and wallet enablement (JazzCash and
-   Easypaisa are absent from the sandbox account's capabilities; it is a support ticket, not
-   code). Fallback: a PayFast provider behind the existing gateway seam, budgeted at one day.
+2. **Safepay production**: wallets come only via Raast, and Raast has no sandbox (support,
+   30 Jul), so production onboarding is the only place wallet flows can be tested at all. KYC
+   must start immediately; wallet UX gets verified with real Rs 100 payments after approval.
+   Fallback: a PayFast provider behind the existing gateway seam, budgeted at one day.
 3. **Client content** for M2: at least 2 real chapters by ~5 Aug. Fallback: the shipped FBISE
    sample, honestly labelled.
 4. **Key hygiene before any external user**: rotate the Supabase service key and Safepay secrets
@@ -76,8 +77,8 @@ sign-in. Build it once in `packages/core` for both apps (mobile plan M2.5 and M3
 
 ## 5. Needed from client/user, by date
 
-- **This week:** Google Play Console account ($25) + 12 tester emails; Safepay production KYC
-  started; JazzCash/Easypaisa support ticket filed; key rotation done.
+- **This week:** Google Play Console account ($25) + 12 tester emails; Safepay production onboarding form submitted (Raast has no sandbox, so this is the only
+  wallet test environment); key rotation done.
 - **By 5 Aug:** first 2 real chapters (text plus any audio), or approve the sample as M2 content.
 - **By 10 Aug:** Anthropic API key (into Vercel as `ANTHROPIC_API_KEY`, server-only, never
   EXPO_PUBLIC or NEXT_PUBLIC).
