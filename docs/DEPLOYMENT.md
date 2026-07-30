@@ -134,40 +134,47 @@ domain and never touches ours. That keeps MatricMate out of PCI scope. It also
 means the checkout screen does not ask for card details, which is not a
 simplification: it is what a student will actually see.
 
-The flow, verified against the sandbox:
+The flow, verified against the sandbox and corrected twice since this doc was
+first written (an earlier version of this section described the v3 endpoint and
+the /components URL; both are the broken path, kept here only as a warning):
 
-1. `POST /order/payments/v3/` with the merchant API key returns a tracker.
-2. The browser goes to `/components?beacon=<tracker>&…`, which offers JazzCash,
-   Easypaisa and card.
-3. Safepay POSTs back to `/checkout/return` with the tracker, a reference and an
-   HMAC signature, which we verify before believing any of it.
+1. `POST /order/v1/init` with the merchant API key returns a tracker (amounts
+   in whole rupees). Never `/order/payments/v3/`: that tracker family is for
+   Payments 2.0 custom checkouts and the hosted page rejects it with
+   "Tracker is in an invalid state".
+2. The browser goes to `/checkout/pay/?beacon=<tracker>&…&webhooks=true`. The
+   trailing slash and the `webhooks=true` are both load-bearing: without the
+   flag the payer finishes on a dead "Close" dialog and never returns. The old
+   `/components` path 301s to Safepay's marketing site.
+3. The page sends the payer back to `/checkout/return` as a GET carrying
+   `order_id` and `tracker` and **no signature**, which is normal. A signature
+   is verified only when one is present.
+4. The return page asks Safepay directly what happened
+   (`confirmWithGateway`, guarded by owner and amount checks) and the
+   **webhook** (`/api/webhooks/safepay`, HMAC-SHA512 of the raw body,
+   idempotent grants) settles independently. Whichever lands first wins;
+   the second is a no-op.
+
+Payment methods: the sandbox is **card-only, permanently**. JazzCash and
+Easypaisa exist on Safepay only as **Raast** rails, and Raast has no sandbox;
+it appears after production onboarding. See PAYMENTS-AND-PLAY-COMPLIANCE.md.
 
 ## Environment variables
 
-Add these in Vercel alongside the others. Without them the app falls back to the
-old mock confirmation, so a deployment with no keys still runs.
+Add these in Vercel alongside the others. With no keys, checkout says plainly
+that payments are not configured on the deployment; there is no mock fallback.
 
 | Name | Value | Environments |
 | :-- | :-- | :-- |
 | `SAFEPAY_ENV` | `sandbox` | Production + Preview |
 | `SAFEPAY_MERCHANT_API_KEY` | the `sec_…` key | Production + Preview |
 | `SAFEPAY_SECRET_KEY` | the 64-character hex key | Production + Preview |
+| `SAFEPAY_WEBHOOK_SECRET` | shared secret from the dashboard webhook page | Production + Preview |
 
-Switch `SAFEPAY_ENV` to `production` and swap both keys for the live pair when
-the client is ready to take real money. Nothing else changes.
-
-## What is still missing, deliberately
-
-**The webhook.** Right now `/checkout/return` verifies that Safepay redirected
-the browser here, and that is all it can prove. It does not prove money settled,
-and anyone can type that URL.
-
-Until there is a database, the Premium flag it sets lives in one browser, which
-is fine for a demo and useless as a source of truth. When Supabase lands, a
-webhook writes entitlement server-side and the return page becomes what it
-should be: a receipt.
-
----
+Going live is not just swapping keys: set `SAFEPAY_ENV=production`, swap both
+keys for the live pair, register the production webhook endpoint in Safepay's
+dashboard and put its new shared secret in Vercel, then make one real Rs 100
+payment end to end before telling anyone it works.
 
 # Part 4 · What we are deliberately not using
 
