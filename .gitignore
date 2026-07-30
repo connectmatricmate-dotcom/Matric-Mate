@@ -41,3 +41,6 @@ out/
 # nested lockfile is worse than useless: it goes stale silently and describes a
 # tree that cannot install, since @matricmate/core exists only in this repo.
 apps/*/package-lock.json
+
+# Knowledge graph for AI agents (local tooling, never a deliverable)
+graphify-out/
