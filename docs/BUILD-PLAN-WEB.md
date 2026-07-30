@@ -108,8 +108,9 @@ Tasks:
    Easypaisa/JazzCash app. In parallel, while KYC is in flight, open a Paymob Pakistan sandbox
    (reported to expose JazzCash/Easypaisa as separate, sandbox-testable integrations) so the
    fallback is evidence, not a guess. Either alternative sits behind `lib/gateway` at about one
-   day. The deciding question, already asked of Safepay: can a wallet-only payer with no bank
-   account complete a Raast payment?
+   day. Both wallets are Raast participants, so the deciding questions are now UX friction (how
+   many steps, does the payer return to our site) and lead time from KYC approval to Raast live,
+   both asked of Safepay on 30 Jul.
 3. **Security sweep before indexing**: rotate every shared key (Supabase service, Safepay,
    anything in `.env.local` the user pasted in chat), delete demo accounts, re-run RLS spot checks
    (scripts exist in session history; recreate as `scripts/rls-check.mjs` and add to check.mjs as a

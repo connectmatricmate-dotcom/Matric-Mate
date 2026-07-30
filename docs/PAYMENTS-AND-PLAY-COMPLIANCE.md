@@ -311,7 +311,9 @@ What this changes:
    JazzCash and Easypaisa as separate integration IDs with a testable sandbox (verify by opening
    one; account creation is a user action), which would give a tested direct-wallet flow before
    go-live. PayFast remains the second candidate (docs were unreadable to us, 403). Either sits
-   behind lib/gateway at roughly one day of provider work. Decide after Safepay answers whether a
-   wallet-only payer with no bank account can complete a Raast payment; if the answer is no,
-   Safepay cannot serve this product and the decision makes itself.
+   behind lib/gateway at roughly one day of provider work. Both wallets are Raast participants,
+   so wallet users CAN pay; the decision now rests on friction and speed: how many steps the
+   payer sees, whether they return to our site automatically, and the lead time from KYC
+   approval to Raast being live. If the answers are QR-only with no return trip, or weeks of
+   lead time, Paymob's direct, sandbox-testable wallets win.
 
