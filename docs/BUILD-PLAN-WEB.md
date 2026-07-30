@@ -105,8 +105,11 @@ Tasks:
    solely via Raast, and Raast does not exist in sandbox, so the sandbox stays card-only and
    wallet flows can only ever be tested in production. Consequence: task 1 starts NOW, and the
    first action after approval is a capabilities probe plus a Rs 100 Raast smoke test from a real
-   Easypaisa/JazzCash app. If the Raast payer experience is bad for students, the `lib/gateway`
-   seam is the PayFast escape hatch; budget one day for a `payfast.ts` provider.
+   Easypaisa/JazzCash app. In parallel, while KYC is in flight, open a Paymob Pakistan sandbox
+   (reported to expose JazzCash/Easypaisa as separate, sandbox-testable integrations) so the
+   fallback is evidence, not a guess. Either alternative sits behind `lib/gateway` at about one
+   day. The deciding question, already asked of Safepay: can a wallet-only payer with no bank
+   account complete a Raast payment?
 3. **Security sweep before indexing**: rotate every shared key (Supabase service, Safepay,
    anything in `.env.local` the user pasted in chat), delete demo accounts, re-run RLS spot checks
    (scripts exist in session history; recreate as `scripts/rls-check.mjs` and add to check.mjs as a

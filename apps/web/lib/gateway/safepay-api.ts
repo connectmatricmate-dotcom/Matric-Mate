@@ -8,7 +8,10 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
  *
  *   1. POST /order/v1/init returns a tracker token, `track_…`.
  *   2. Send the customer to /checkout/pay/?beacon=<tracker>&…
- *      Safepay's own page offers JazzCash, Easypaisa and card.
+ *      In sandbox the page offers card only. JazzCash and Easypaisa exist on
+ *      Safepay solely as Raast rails, and Raast has no sandbox at all
+ *      (support, 30 Jul 2026), so wallets appear only on an approved
+ *      production account and can only ever be tested with real money.
  *   3. Safepay POSTs back to redirect_url with the tracker, a reference code
  *      and an HMAC signature, which we verify before believing any of it.
  *

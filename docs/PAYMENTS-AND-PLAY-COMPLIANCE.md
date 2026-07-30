@@ -103,10 +103,15 @@ GET /order/payments/v2/capabilities?tracker=<tracker>
 
 The checkout page renders `wallets = easypaisa || payfast || abhi`. `EASYPAISA`
 is absent from this account entirely, and `PAYFAST` is enabled with **no methods
-provisioned**. Nothing in our code restricts this, so it cannot be fixed in
-code: the wallet rails have to be switched on for the merchant, usually by
-Safepay support for a sandbox account. Ask them to enable JazzCash and Easypaisa
-and quote that capabilities response.
+provisioned**. Nothing in our code restricts this.
+
+**Superseded 30 Jul 2026, see the Raast section at the end of this file.** We
+asked support to enable the wallets and the answer was that there is nothing to
+enable: Safepay has no direct JazzCash or Easypaisa rails at all, on any
+account. Wallets exist only as Raast, Raast has no sandbox, and this
+capabilities response is what a sandbox account permanently looks like. The
+diagnosis above (account provisioning, not code) was right; the assumed remedy
+(a support toggle) never existed.
 
 ### Testing the redirect back: not over plain http
 
@@ -302,7 +307,11 @@ What this changes:
 3. Unanswered by support and still needed: wallet-vs-card MDR at low volume, KYC document
    checklist, lead time from approval to Raast being live, and whether the KYC application can
    name the final domain before it is live. Follow-up sent.
-4. The PayFast fallback behind lib/gateway stays priced at one day. Decision point: if Raast's
-   payer experience in production is poor for students (QR-only, bank-app-only), PayFast's direct
-   wallet integration becomes the launch path instead.
+4. Fallback path, in order of evidence available: **Paymob Pakistan** reportedly exposes
+   JazzCash and Easypaisa as separate integration IDs with a testable sandbox (verify by opening
+   one; account creation is a user action), which would give a tested direct-wallet flow before
+   go-live. PayFast remains the second candidate (docs were unreadable to us, 403). Either sits
+   behind lib/gateway at roughly one day of provider work. Decide after Safepay answers whether a
+   wallet-only payer with no bank account can complete a Raast payment; if the answer is no,
+   Safepay cannot serve this product and the decision makes itself.
 

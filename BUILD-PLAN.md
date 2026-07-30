@@ -67,7 +67,8 @@ sign-in. Build it once in `packages/core` for both apps (mobile plan M2.5 and M3
 2. **Safepay production**: wallets come only via Raast, and Raast has no sandbox (support,
    30 Jul), so production onboarding is the only place wallet flows can be tested at all. KYC
    must start immediately; wallet UX gets verified with real Rs 100 payments after approval.
-   Fallback: a PayFast provider behind the existing gateway seam, budgeted at one day.
+   Fallback: Paymob (sandbox-testable direct wallets, to verify) or PayFast, either behind the
+   existing gateway seam at about one day.
 3. **Client content** for M2: at least 2 real chapters by ~5 Aug. Fallback: the shipped FBISE
    sample, honestly labelled.
 4. **Key hygiene before any external user**: rotate the Supabase service key and Safepay secrets

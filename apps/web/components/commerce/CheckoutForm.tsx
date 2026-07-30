@@ -175,7 +175,8 @@ export function CheckoutForm({
           </ul>
           <p className="mt-4 flex items-start gap-2 border-t border-line pt-3 text-[12.5px] leading-[1.6] text-ink2">
             <Icon name="lock" size={15} className="mt-0.5 shrink-0 text-teal" />
-            You choose which one on the next page. Card and wallet details go to Safepay, never to MatricMate.
+            Payment happens on Safepay’s page; details go to Safepay, never to MatricMate. Wallets ride on
+            Raast, which only exists on the live account, so this sandbox shows card only.
           </p>
         </Card>
 

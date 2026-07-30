@@ -67,9 +67,15 @@ export const rupees = (n: number) => `Rs ${n.toLocaleString('en-PK')}`;
  * to Google Play that reads as steering a user to an alternative payment method.
  * See packages/core/src/billing.ts.
  */
+/**
+ * Raast replaced the two wallet logos on 30 Jul 2026. Safepay has no direct
+ * JazzCash or Easypaisa rails; both arrive only through Raast on a production
+ * account, so Raast is the mark the payer will actually see, and showing the
+ * wallet brands as if they were direct options over-promised. The hint keeps
+ * the wallets' names because that is what students recognise.
+ */
 export const PAYMENT_METHODS = [
-  { id: 'jazzcash' as const, label: 'JazzCash', hint: 'Mobile account', logo: '/brand/pay/jazzcash.png' },
-  { id: 'easypaisa' as const, label: 'EasyPaisa', hint: 'Mobile account', logo: '/brand/pay/easypaisa.png' },
+  { id: 'raast' as const, label: 'Raast', hint: 'JazzCash, Easypaisa and bank apps · no extra fee', logo: '/brand/pay/raast.png' },
   { id: 'card' as const, label: 'Debit or credit card', hint: 'Visa, Mastercard', logo: null },
 ];
 
