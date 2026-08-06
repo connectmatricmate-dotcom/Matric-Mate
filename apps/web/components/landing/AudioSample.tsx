@@ -48,12 +48,12 @@ export function AudioSample() {
         </button>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[14.5px] font-extrabold text-ink">Chapter 3 · Dynamics</p>
-          <p className="text-[12.5px] text-ink2">{TRACKS[lang].label} · full chapter</p>
+          <p className="text-[15.5px] font-extrabold text-ink">Chapter 3 · Dynamics</p>
+          <p className="text-[13.5px] text-ink2">{TRACKS[lang].label} · full chapter</p>
           <div className="mt-2">
             <Bar pct={progress} tone="orange" h={6} />
           </div>
-          <div className="mt-1 flex justify-between text-[11px] font-extrabold text-ink3">
+          <div className="mt-1 flex justify-between text-[11.5px] font-extrabold text-ink3">
             <span>{fmt((progress / 100) * duration)}</span>
             <span>{duration ? fmt(duration) : '0:00'}</span>
           </div>
@@ -74,7 +74,7 @@ export function AudioSample() {
             {TRACKS[l].name}
           </button>
         ))}
-        <span className="ml-auto text-[11.5px] text-ink3">Sample lesson</span>
+        <span className="ml-auto text-[12.5px] text-ink3">Sample lesson</span>
       </div>
 
       <audio

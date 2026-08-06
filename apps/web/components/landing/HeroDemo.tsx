@@ -45,13 +45,20 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
     // re-centre and the headline would jump under the reader's cursor. The
     // verdict and the explanation share one block so the reserved space stays
     // small enough that the card doesn't tower over the copy beside it.
-    <Card className="flex w-full max-w-[430px] flex-col md:h-[486px]">
+    // Height sized to the marketing type scale; re-measure if sizes move.
+    <Card className="relative flex w-full max-w-[430px] flex-col md:h-[500px]">
+      {/* The product hands out XP for practice; so does its demo. */}
+      {checked && correct ? (
+        <span className="fx-xp pointer-events-none absolute -top-3 right-5 rounded-full bg-greentint px-3 py-1 text-[12px] font-extrabold text-green">
+          +10 XP
+        </span>
+      ) : null}
       <div className="flex items-center justify-between">
         <Pill tone="grey">{mcq.topic}</Pill>
-        <span className="text-[11.5px] font-extrabold text-ink3">FBISE · Physics 9</span>
+        <span className="text-[12px] font-extrabold text-ink3">FBISE · Physics 9</span>
       </div>
 
-      <p className="mt-2.5 font-display text-[16px] leading-[1.45] text-ink">{mcq.q}</p>
+      <p className="mt-2.5 font-display text-[17px] leading-[1.45] text-ink">{mcq.q}</p>
 
       <div className="mt-3 flex flex-col gap-2">
         {mcq.options.map((opt, i) => {
@@ -81,7 +88,7 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
               <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12px] font-extrabold ${key}`}>
                 {String.fromCharCode(65 + i)}
               </span>
-              <span className="text-[14px] text-ink">{opt}</span>
+              <span className="text-[15px] text-ink">{opt}</span>
               {checked && isAnswer ? <Icon name="check" size={18} className="ml-auto text-green" strokeWidth={2.6} /> : null}
             </button>
           );
@@ -90,18 +97,18 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
 
       {/* Scroll allowance only where the card height is fixed (md). On mobile the
           card grows with its content, so an inner scrollbar would be a bug. */}
-      <div className="flex min-h-[142px] min-w-0 flex-1 flex-col justify-end md:overflow-y-auto">
+      <div className="flex min-h-[150px] min-w-0 flex-1 flex-col justify-end md:overflow-y-auto">
       {/* The confidence step, the thing that makes the practice data worth something */}
       {chosen !== null && !checked ? (
         <div className="mt-4">
-          <p className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">How sure are you?</p>
+          <p className="mb-2 text-[12px] font-extrabold uppercase tracking-[0.08em] text-ink2">How sure are you?</p>
           <div className="flex gap-2">
             {CONFIDENCE.map((c) => (
               <button
                 key={c.value}
                 type="button"
                 onClick={() => setConfidence(c.value)}
-                className={`min-h-10 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[12.5px] font-extrabold transition-colors duration-200 ${
+                className={`min-h-10 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[13px] font-extrabold transition-colors duration-200 ${
                   confidence === c.value ? 'border-orange bg-orangetint text-orangedark' : 'border-line bg-card text-ink2 hover:border-orange/40'
                 }`}
               >
@@ -137,7 +144,7 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
               strokeWidth={2.8}
               className={`shrink-0 ${correct ? 'text-green' : 'text-red'}`}
             />
-            <span className={`min-w-0 flex-1 text-[13px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}>
+            <span className={`min-w-0 flex-1 text-[14px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}>
               {verdict}
             </span>
             <button
@@ -149,7 +156,7 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
               Try again
             </button>
           </div>
-          <p className="px-3.5 py-2.5 text-[13px] leading-[1.6] text-ink2">{mcq.explanation}</p>
+          <p className="px-3.5 py-2.5 text-[14px] leading-[1.6] text-ink2">{mcq.explanation}</p>
         </div>
       )}
       </div>

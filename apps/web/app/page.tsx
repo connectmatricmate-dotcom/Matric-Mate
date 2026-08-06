@@ -2,8 +2,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PAPER_CONTENT, contentFor } from '@matricmate/core';
 import { AudioSample } from '@/components/landing/AudioSample';
+import { CountUp } from '@/components/landing/CountUp';
 import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
+import { Reveal } from '@/components/landing/Reveal';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { Bar, Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
 import type { IconName } from '@matricmate/core';
@@ -38,13 +40,14 @@ const STEPS = [
   { n: 4, title: 'Fix what’s weak', body: 'The app names the topics costing you marks and builds a test out of exactly those.' },
 ];
 
-const INSIDE: { icon: IconName; title: string; body: string }[] = [
-  { icon: 'book', title: 'Chapter-wise notes', body: 'Every chapter split into short sections with definitions, formulas and worked examples, in your medium.' },
-  { icon: 'headphones', title: 'Audio lessons', body: 'Listen to the whole chapter in English or Urdu. Works offline, so it costs no data on the second listen.' },
-  { icon: 'cards', title: 'Flashcards', body: 'Active recall for the definitions that show up in Section A. Cards you miss come back first.' },
-  { icon: 'target', title: 'MCQs with explanations', body: 'Every question tells you why the right answer is right, which is the part that actually teaches.' },
-  { icon: 'edit', title: 'Blanks and short questions', body: 'Model answers with the marking points, so you know what earns each mark.' },
-  { icon: 'clock', title: 'Timed tests', body: 'Full paper conditions with a question palette and flagging, so exam day isn’t the first time.' },
+/** Chip tones rotate so the feature grid carries colour, not just copy. */
+const INSIDE: { icon: IconName; tone: string; title: string; body: string }[] = [
+  { icon: 'book', tone: 'bg-tealtint text-teal', title: 'Chapter-wise notes', body: 'Every chapter split into short sections with definitions, formulas and worked examples, in your medium.' },
+  { icon: 'headphones', tone: 'bg-orangetint text-orangedark', title: 'Audio lessons', body: 'Listen to the whole chapter in English or Urdu. Works offline, so it costs no data on the second listen.' },
+  { icon: 'cards', tone: 'bg-greentint text-green', title: 'Flashcards', body: 'Active recall for the definitions that show up in Section A. Cards you miss come back first.' },
+  { icon: 'target', tone: 'bg-greentint text-green', title: 'MCQs with explanations', body: 'Every question tells you why the right answer is right, which is the part that actually teaches.' },
+  { icon: 'edit', tone: 'bg-tealtint text-teal', title: 'Blanks and short questions', body: 'Model answers with the marking points, so you know what earns each mark.' },
+  { icon: 'clock', tone: 'bg-orangetint text-orangedark', title: 'Timed tests', body: 'Full paper conditions with a question palette and flagging, so exam day isn’t the first time.' },
 ];
 
 const FAQ = [
@@ -81,49 +84,67 @@ export default function LandingPage() {
 
       <main>
         {/* ---------------------------------------------------------- hero */}
-        <section className="mx-auto max-w-[1100px] px-5 pt-12 pb-14 md:pt-20">
+        {/* The entrance is pure CSS (fx-*), so it plays before hydration and
+            costs no JS. Six beats, ending on the demo card: the signature. */}
+        {/* The clip lives on the full-bleed wrapper, so the brand geometry can
+            drift into the page margin and is only ever cut at the viewport
+            edge, never mid-page. It exists so that bleed can't hand the page
+            a horizontal scrollbar. */}
+        <section className="overflow-x-clip">
+          <div className="mx-auto max-w-[1100px] px-5 pt-12 pb-14 md:pt-20">
           <div className="grid items-center gap-12 md:grid-cols-[1.05fr_0.95fr]">
             <div>
-              <Pill tone="orange">FBISE Class 9 · English &amp; Urdu medium</Pill>
+              <Pill tone="orange" className="fx-rise fx-d1">
+                FBISE Class 9 · English &amp; Urdu medium
+              </Pill>
 
-              <h1 className="mt-4 font-display text-[40px] leading-[1.05] text-ink md:text-[54px]">
-                Know what you know
-                <br />
-                <span className="text-teal">before the board does.</span>
+              {/* Balanced wrap instead of a hard break: the second phrase is
+                  too long to promise its own line at every width in between
+                  the breakpoints, and an orphaned "does." reads as a typo. */}
+              <h1 className="fx-rise fx-d2 mt-4 font-display text-mk-hero text-balance text-ink">
+                Know what you know <span className="text-teal">before the board does.</span>
               </h1>
 
-              <p className="mt-3 max-w-[520px] text-[16.5px] leading-[1.65] text-ink2">
+              <p className="fx-rise fx-d3 mt-4 max-w-[560px] text-mk-lead text-ink2">
                 Chapter notes, audio lessons, past papers and a tutor that answers at midnight. Every question you
                 practise also records how sure you were, so MatricMate can show you the topics you only{' '}
                 <em>think</em> you know.
               </p>
 
-              <p className="mt-3 text-[15px] font-extrabold text-ink2">Poori tayyari, aik hi jagah.</p>
+              <p className="fx-rise fx-d4 mt-3 text-[16px] font-extrabold text-ink2">Poori tayyari, aik hi jagah.</p>
 
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="fx-rise fx-d5 mt-7 flex flex-wrap gap-3">
                 <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
                 <LinkBtn title="See pricing" href="#pricing" variant="line" lg />
               </div>
 
-              <p className="mt-4 text-[13px] text-ink2">
+              <p className="fx-rise fx-d6 mt-4 text-mk-small text-ink2">
                 Rs 1,000/month after the trial · cancel any time · JazzCash, Easypaisa or card
               </p>
             </div>
 
-            <div className="flex flex-col items-center">
-              <HeroDemo mcq={heroMcq} />
+            <div className="fx-card relative flex flex-col items-center">
+              {/* Soft brand geometry, so the live card sits in a scene rather
+                  than on bare paper. Decorative, hence aria-hidden and md-up. */}
+              <div aria-hidden className="absolute -right-14 -top-12 hidden h-[230px] w-[230px] rounded-full border-[26px] border-tealtint md:block" />
+              <div aria-hidden className="absolute -left-8 bottom-10 hidden h-[70px] w-[70px] rounded-full bg-orangetint md:block" />
+              <div aria-hidden className="absolute -right-4 bottom-28 hidden h-4 w-4 rounded-full bg-orange/60 md:block" />
+              <div className="relative w-full max-w-[430px]">
+                <HeroDemo mcq={heroMcq} />
+              </div>
             </div>
+          </div>
           </div>
         </section>
 
         {/* --------------------------------------------------- trust strip */}
-        <section className="border-y border-line bg-card">
-          <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-center gap-x-14 gap-y-3 px-5 py-5 text-[13px] font-extrabold text-ink2">
+        <section className="border-y border-tealtint2 bg-tealtint">
+          <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-center gap-x-14 gap-y-3 px-5 py-5 text-mk-small font-extrabold text-ink2">
             <span className="flex items-center gap-2">
-              <Icon name="book2" size={16} className="text-teal" /> FBISE syllabus, chapter by chapter
+              <Icon name="book2" size={17} className="text-teal" /> FBISE syllabus, chapter by chapter
             </span>
             <span className="flex items-center gap-2">
-              <Icon name="globe" size={16} className="shrink-0 text-teal" />
+              <Icon name="globe" size={17} className="shrink-0 text-teal" />
               {/* One inline run, so vertical-align lines the two scripts up.
                   Split across flex items they would each centre on their own box. */}
               <span>
@@ -131,114 +152,125 @@ export default function LandingPage() {
               </span>
             </span>
             <span className="flex items-center gap-2">
-              <Icon name="download" size={16} className="text-teal" /> Works offline
+              <Icon name="download" size={17} className="text-teal" /> Works offline
             </span>
             <span className="flex items-center gap-2">
-              <Icon name="star" size={16} className="text-teal" /> Built in Pakistan
+              <Icon name="star" size={17} className="text-teal" /> Built in Pakistan
             </span>
           </div>
         </section>
 
         {/* -------------------------------------------------------- problem */}
-        <section className="mx-auto max-w-[1100px] px-5 py-16">
-          <h2 className="max-w-[620px] font-display text-[30px] leading-[1.15] text-ink md:text-[36px]">
-            Studying harder isn’t the problem. Studying blind is.
-          </h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <section className="mx-auto max-w-[1100px] px-5 py-16 md:py-20">
+          <Reveal>
+            <h2 className="max-w-[680px] font-display text-mk-h2 text-ink">
+              Studying harder isn’t the problem. Studying blind is.
+            </h2>
+          </Reveal>
+          <Reveal stagger className="mt-9 grid gap-4 md:grid-cols-3">
             {PAINS.map((p) => (
-              <Card key={p.title} flat className="h-full">
-                <span className="flex h-[42px] w-[42px] items-center justify-center rounded-[13px] bg-tealtint text-teal">
+              <Card key={p.title} className="lift h-full">
+                <span className="flex h-[44px] w-[44px] items-center justify-center rounded-[13px] bg-tealtint text-teal">
                   <Icon name={p.icon} size={22} />
                 </span>
-                <h3 className="mt-2 font-display text-[18px] text-ink">{p.title}</h3>
-                <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2">{p.body}</p>
+                <h3 className="mt-2.5 font-display text-mk-h3 text-ink">{p.title}</h3>
+                <p className="mt-1.5 text-mk-body text-ink2">{p.body}</p>
               </Card>
             ))}
-          </div>
+          </Reveal>
         </section>
 
         {/* ---------------------------------------------------- how it works */}
-        <section className="border-y border-line bg-card">
-          <div className="mx-auto max-w-[1100px] px-5 py-16">
-            <h2 className="font-display text-[30px] text-ink md:text-[36px]">How a week with MatricMate goes</h2>
-            <ol className="mt-8 grid gap-6 md:grid-cols-4">
+        <section className="border-y border-tealtint2 bg-tealtint">
+          <div className="mx-auto max-w-[1100px] px-5 py-16 md:py-20">
+            <Reveal>
+              <h2 className="font-display text-mk-h2 text-ink">How a week with MatricMate goes</h2>
+            </Reveal>
+            <Reveal as="ol" stagger className="mt-9 grid gap-6 md:grid-cols-4">
               {STEPS.map((s) => (
                 <li key={s.n}>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-tealtint font-display text-[16px] text-teal">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal font-display text-[17px] text-white">
                     {s.n}
                   </span>
-                  <h3 className="mt-3 font-display text-[17px] text-ink">{s.title}</h3>
-                  <p className="mt-1 text-[13.5px] leading-[1.6] text-ink2">{s.body}</p>
+                  <h3 className="mt-3 font-display text-mk-h3 text-ink">{s.title}</h3>
+                  <p className="mt-1 text-mk-body text-ink2">{s.body}</p>
                 </li>
               ))}
-            </ol>
+            </Reveal>
           </div>
         </section>
 
         {/* --------------------------------------------------------- inside */}
-        <section id="inside" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16">
-          <h2 className="font-display text-[30px] text-ink md:text-[36px]">What’s inside every chapter</h2>
-          <p className="mt-2 max-w-[560px] text-[15px] text-ink2">
-            Not a video library you never open. Each chapter is one place with everything the exam asks of it.
-          </p>
+        <section id="inside" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16 md:py-20">
+          <Reveal>
+            <h2 className="font-display text-mk-h2 text-ink">What’s inside every chapter</h2>
+            <p className="mt-3 max-w-[620px] text-mk-lead text-ink2">
+              Not a video library you never open. Each chapter is one place with everything the exam asks of it.
+            </p>
+          </Reveal>
 
-          <div className="mt-8 grid gap-8 md:grid-cols-[1fr_380px]">
-            <div className="grid gap-4 sm:grid-cols-2">
+          <div className="mt-9 grid gap-8 md:grid-cols-[1fr_380px]">
+            <Reveal stagger className="grid content-start gap-4 sm:grid-cols-2">
               {INSIDE.map((f) => (
-                <Card key={f.title} flat className="h-full">
-                  <Icon name={f.icon} size={22} className="text-teal" />
-                  <h3 className="mt-2 font-display text-[16.5px] text-ink">{f.title}</h3>
-                  <p className="mt-1 text-[13.5px] leading-[1.6] text-ink2">{f.body}</p>
+                <Card key={f.title} className="lift h-full">
+                  <span className={`flex h-[44px] w-[44px] items-center justify-center rounded-[13px] ${f.tone}`}>
+                    <Icon name={f.icon} size={22} />
+                  </span>
+                  <h3 className="mt-2.5 font-display text-mk-h3 text-ink">{f.title}</h3>
+                  <p className="mt-1 text-mk-body text-ink2">{f.body}</p>
                 </Card>
               ))}
-            </div>
+            </Reveal>
 
-            <div className="flex flex-col gap-4">
+            <Reveal className="flex flex-col gap-4">
               <AudioSample />
 
               {/* a real slice of the chapter, not lorem */}
               <Card className="flex-1">
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-teal">
+                <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-teal">
                   From Chapter 3 · Dynamics
                 </p>
-                <h3 className="mt-1.5 font-display text-[18px] text-ink">Newton’s second law of motion</h3>
-                <p className="mt-2 text-[14px] leading-[1.7] text-ink">
+                <h3 className="mt-1.5 font-display text-[20px] text-ink">Newton’s second law of motion</h3>
+                <p className="mt-2 text-mk-body text-ink">
                   When a net force acts on a body it produces acceleration in the direction of the force. The
                   acceleration is directly proportional to the force and inversely proportional to the mass.
                 </p>
                 <div className="mt-3 rounded-[14px] bg-tealtint px-4 py-3 text-center">
-                  <span className="font-display text-[22px] tracking-wide text-ink">F = m a</span>
-                  <p className="text-[12px] text-ink2">force = mass × acceleration</p>
+                  <span className="font-display text-[24px] tracking-wide text-ink">F = m a</span>
+                  <p className="text-[13px] text-ink2">force = mass × acceleration</p>
                 </div>
                 {/* Roman Urdu, the way students actually write it in their notes. */}
-                <p className="mt-3 text-[14px] leading-[1.7] text-ink2">
+                <p className="mt-3 text-mk-body text-ink2">
                   Jab kisi jism par net force lagti hai to us force ki simt mein acceleration paida hoti hai.
                 </p>
               </Card>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ------------------------------------------------------ confidence */}
-        <section className="border-y border-line bg-card">
-          <div className="mx-auto grid max-w-[1100px] items-center gap-12 px-5 py-16 md:grid-cols-2">
+        {/* The one dark band on the page. This is the product's differentiator,
+            and the deep ground is what makes the page's sections legible as
+            sections; light tints alone measure near-identical (1.1:1). */}
+        <section className="bg-tealdark">
+          <Reveal stagger className="mx-auto grid max-w-[1100px] items-center gap-12 px-5 py-16 md:grid-cols-2 md:py-24">
             <div>
               <Pill tone="orange">The part other apps skip</Pill>
-              <h2 className="mt-3 font-display text-[30px] leading-[1.15] text-ink md:text-[36px]">
+              <h2 className="mt-4 font-display text-mk-h2 text-white">
                 It tracks how sure you were, not just what you got right.
               </h2>
-              <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
+              <p className="mt-4 text-mk-lead text-tealtint">
                 Every answer carries a confidence tag. Over a few hundred questions that turns into something a score
                 can’t tell you: the difference between a topic you’ve genuinely learned, one you’re guessing well at,
                 and one you’re confidently wrong about, which is the kind that ruins a paper.
               </p>
-              <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
+              <p className="mt-3 text-mk-lead text-tealtint">
                 Confidently wrong answers get flagged first, because they’re the ones you’d never revise on your own.
               </p>
             </div>
 
             <Card>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-orangedark">
+              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">
                 How sure you were vs how right you were
               </p>
               <div className="mt-4 flex flex-col gap-4">
@@ -250,90 +282,93 @@ export default function LandingPage() {
                   ] as const
                 ).map((r) => (
                   <div key={r.label}>
-                    <div className="flex justify-between text-[12.5px] font-extrabold text-ink">
+                    <div className="flex justify-between text-[13.5px] font-extrabold text-ink">
                       <span>{r.label}</span>
-                      <span className="text-ink2">
-                        {r.pct}% right · said {r.said}
+                      <span className="text-ink2 tabular">
+                        <CountUp to={r.pct} />% right · said {r.said}
                       </span>
                     </div>
-                    <div className="mt-1.5">
-                      <Bar pct={r.pct} tone={r.tone} />
+                    {/* rv-bar: draws from zero to the real value on reveal */}
+                    <div className="rv-bar mt-1.5">
+                      <Bar pct={r.pct} tone={r.tone} h={8} />
                     </div>
                   </div>
                 ))}
               </div>
-              <p className="mt-4 text-[13px] leading-[1.6] text-ink2">
+              <p className="mt-4 text-mk-small text-ink2">
                 “When you say you’re certain, you’re right 91% of the time, so trust that. The guessing is where the
                 marks are leaking.”
               </p>
             </Card>
-          </div>
+          </Reveal>
         </section>
 
         {/* ---------------------------------------------------------- papers */}
-        <section id="papers" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16">
+        <section id="papers" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16 md:py-20">
           <div className="grid gap-10 md:grid-cols-[1fr_1fr]">
-            <div>
-              <h2 className="font-display text-[30px] leading-[1.15] text-ink md:text-[36px]">
+            <Reveal>
+              <h2 className="font-display text-mk-h2 text-ink">
                 Real board papers, in the board’s own shape.
               </h2>
-              <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
+              <p className="mt-4 text-mk-lead text-ink2">
                 Section A objective, Section B short answers, Section C detailed, with the marks distribution the
                 examiner actually uses. Read a paper, or sit it under a timer with a question palette and flagging.
               </p>
-              <ul className="mt-5 flex flex-col gap-2.5">
+              <ul className="mt-6 flex flex-col gap-3">
                 {['FBISE papers from 2019 onwards', 'Attempt as a timed test with double XP', 'Answers reviewed question by question', 'Download to read offline'].map((li) => (
-                  <li key={li} className="flex items-center gap-2.5 text-[14.5px] text-ink">
-                    <Icon name="check" size={17} className="text-green" strokeWidth={2.6} />
+                  <li key={li} className="flex items-center gap-2.5 text-[15.5px] text-ink">
+                    <Icon name="check" size={18} className="text-green" strokeWidth={2.6} />
                     {li}
                   </li>
                 ))}
               </ul>
-            </div>
+            </Reveal>
 
             {/* a genuine excerpt, typeset the way the board prints it */}
-            <Card>
-              <p className="text-center font-display text-[15px] text-ink">FEDERAL BOARD SSC-I EXAMINATION</p>
-              <p className="text-center text-[13px] font-extrabold text-ink">PHYSICS · 2025</p>
-              <p className="mt-1 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">
-                65 marks · 2h 30m
-              </p>
-              <div className="my-4 border-t border-line" />
-              {physicsPaper.slice(0, 2).map((sec) => (
-                <div key={sec.heading} className="mb-4">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="text-[13px] font-extrabold text-ink">{sec.heading}</p>
-                    {sec.marks ? <span className="text-[11px] font-extrabold text-ink3">{sec.marks}</span> : null}
+            <Reveal>
+              <Card>
+                <p className="text-center font-display text-[16px] text-ink">FEDERAL BOARD SSC-I EXAMINATION</p>
+                <p className="text-center text-mk-small font-extrabold text-ink">PHYSICS · 2025</p>
+                <p className="mt-1 text-center text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
+                  65 marks · 2h 30m
+                </p>
+                <div className="my-4 border-t border-line" />
+                {physicsPaper.slice(0, 2).map((sec) => (
+                  <div key={sec.heading} className="mb-4">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-[14px] font-extrabold text-ink">{sec.heading}</p>
+                      {sec.marks ? <span className="text-[12px] font-extrabold text-ink3">{sec.marks}</span> : null}
+                    </div>
+                    <div className="mt-1.5 flex flex-col gap-1">
+                      {sec.lines.slice(0, 4).map((line, i) => (
+                        <p key={line} className={`text-[13.5px] leading-[1.65] ${i === 0 ? 'text-ink' : 'text-ink2'}`}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                  <div className="mt-1.5 flex flex-col gap-1">
-                    {sec.lines.slice(0, 4).map((line, i) => (
-                      <p key={line} className={`text-[12.5px] leading-[1.65] ${i === 0 ? 'text-ink' : 'text-ink2'}`}>
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <p className="text-[12px] text-ink3">…continues to Section C</p>
-            </Card>
+                ))}
+                <p className="text-[13px] text-ink3">…continues to Section C</p>
+              </Card>
+            </Reveal>
           </div>
         </section>
 
         {/* --------------------------------------------------------- parents */}
-        <section id="parents" className="scroll-mt-20 border-y border-line bg-tealtint">
-          <div className="mx-auto grid max-w-[1100px] items-center gap-10 px-5 py-16 md:grid-cols-[1fr_360px]">
+        <section id="parents" className="scroll-mt-20 border-y border-tealtint2 bg-tealtint">
+          <Reveal stagger className="mx-auto grid max-w-[1100px] items-center gap-10 px-5 py-16 md:grid-cols-[1fr_380px] md:py-20">
             <div>
               {/* A label, not a badge, a pill's padding would indent it off the heading's edge. */}
-              <p className="text-[11.5px] font-extrabold uppercase tracking-[0.09em] text-teal">For parents</p>
-              <h2 className="mt-2 font-display text-[30px] leading-[1.15] text-ink md:text-[36px]">
+              <p className="text-mk-label font-extrabold uppercase tracking-[0.09em] text-teal">For parents</p>
+              <h2 className="mt-2 font-display text-mk-h2 text-ink">
                 You’ll actually know whether it’s working.
               </h2>
-              <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
+              <p className="mt-4 text-mk-lead text-ink2">
                 At the end of every month your child can share a report card: a grade per subject, how it moved,
                 how many days they actually studied, and which topics still need work. No login needed to view it:
                 it arrives on WhatsApp like any other message.
               </p>
-              <p className="mt-3 text-[15.5px] leading-[1.7] text-ink2">
+              <p className="mt-3 text-mk-lead text-ink2">
                 One price, no upsells inside the app, and nothing your child can buy on their own.
               </p>
             </div>
@@ -342,11 +377,11 @@ export default function LandingPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <Image src="/brand/wordmark.png" alt="" width={110} height={22} />
-                  <p className="mt-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">
+                  <p className="mt-1.5 text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
                     Monthly report · June
                   </p>
                 </div>
-                <span className="flex h-[58px] w-[58px] items-center justify-center rounded-full bg-orangetint font-display text-[22px] text-orangedark">
+                <span className="flex h-[62px] w-[62px] items-center justify-center rounded-full bg-orangetint font-display text-[24px] text-orangedark">
                   A−
                 </span>
               </div>
@@ -363,14 +398,14 @@ export default function LandingPage() {
                   // with the length of the subject name.
                   <div
                     key={subject}
-                    className="grid grid-cols-[1fr_40px_20px] items-center border-b border-line py-2 last:border-0"
+                    className="grid grid-cols-[1fr_44px_20px] items-center border-b border-line py-2 last:border-0"
                   >
-                    <span className="text-[13.5px] text-ink">{subject}</span>
-                    <span className="text-right font-display text-[15px] text-ink tabular">{grade}</span>
+                    <span className="text-[15px] text-ink">{subject}</span>
+                    <span className="text-right font-display text-[16px] text-ink tabular">{grade}</span>
                     <span className="flex justify-end">
                       <Icon
                         name={trend === 'up' ? 'chart' : 'arrowRight'}
-                        size={14}
+                        size={15}
                         strokeWidth={2.4}
                         className={trend === 'up' ? 'text-green' : 'text-ink3'}
                       />
@@ -384,27 +419,27 @@ export default function LandingPage() {
                 <Pill tone="orange">9 tests</Pill>
               </div>
             </Card>
-          </div>
+          </Reveal>
         </section>
 
         {/* --------------------------------------------------------- pricing */}
-        <section id="pricing" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16">
-          <div className="text-center">
-            <h2 className="font-display text-[30px] text-ink md:text-[36px]">One plan. Everything in it.</h2>
-            <p className="mx-auto mt-2 max-w-[520px] text-[15px] text-ink2">
+        <section id="pricing" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16 md:py-20">
+          <Reveal className="text-center">
+            <h2 className="font-display text-mk-h2 text-ink">One plan. Everything in it.</h2>
+            <p className="mx-auto mt-3 max-w-[560px] text-mk-lead text-ink2">
               No tiers, no per-subject charges, no surprise upgrades. Less than one hour of tuition a month.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="mx-auto mt-10 grid max-w-[860px] gap-5 md:grid-cols-[1fr_1fr]">
+          <Reveal stagger className="mx-auto mt-10 grid max-w-[880px] gap-5 md:grid-cols-[1fr_1fr]">
             <Card flat className="flex h-full flex-col">
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">Free</p>
-              <p className="mt-1 font-display text-[30px] text-ink">Rs 0</p>
-              <p className="text-[13px] text-ink2">Keep it as long as you like</p>
+              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">Free</p>
+              <p className="mt-1 font-display text-[34px] text-ink">Rs 0</p>
+              <p className="text-mk-small text-ink2">Keep it as long as you like</p>
               <ul className="mt-4 flex flex-1 flex-col gap-2.5">
                 {['Browse every subject and chapter', 'One full chapter per subject', '5 MCQs a day', '5 AI tutor questions a day'].map((li) => (
-                  <li key={li} className="flex items-start gap-2.5 text-[14px] text-ink2">
-                    <Icon name="check" size={16} className="mt-0.5 shrink-0 text-ink3" strokeWidth={2.6} />
+                  <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink2">
+                    <Icon name="check" size={17} className="mt-0.5 shrink-0 text-ink3" strokeWidth={2.6} />
                     {li}
                   </li>
                 ))}
@@ -416,12 +451,12 @@ export default function LandingPage() {
               <span className="absolute -top-3 right-5">
                 <Pill tone="orange">Most students pick this</Pill>
               </span>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium</p>
-              <p className="mt-1 font-display text-[38px] leading-none text-ink">
+              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium</p>
+              <p className="mt-1 font-display text-[44px] leading-none text-ink">
                 Rs 1,000
-                <span className="ml-1 text-[15px] font-normal text-ink2">/ month</span>
+                <span className="ml-1 text-[16px] font-normal text-ink2">/ month</span>
               </p>
-              <p className="text-[13px] text-ink2">First 3 days free · cancel any time</p>
+              <p className="text-mk-small text-ink2">First 3 days free · cancel any time</p>
               <ul className="mt-4 flex flex-1 flex-col gap-2.5">
                 {[
                   'Every chapter, note and audio lesson',
@@ -431,61 +466,68 @@ export default function LandingPage() {
                   'Offline downloads',
                   'Android app and website, one account',
                 ].map((li) => (
-                  <li key={li} className="flex items-start gap-2.5 text-[14px] text-ink">
-                    <Icon name="check" size={16} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
+                  <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink">
+                    <Icon name="check" size={17} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
                     {li}
                   </li>
                 ))}
               </ul>
               <LinkBtn title="Start 3 days free" href="/checkout?plan=monthly" variant="orange" className="mt-5 w-full" />
-              <p className="mt-3 text-center text-[12px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
-              <Link href="/pricing" className="mt-2 text-center text-[12.5px] font-extrabold text-teal hover:underline">
+              <p className="mt-3 text-center text-[13px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
+              <Link href="/pricing" className="mt-2 text-center text-[13.5px] font-extrabold text-teal hover:underline">
                 Compare plan lengths
               </Link>
             </Card>
-          </div>
+          </Reveal>
         </section>
 
         {/* ------------------------------------------------------------- faq */}
-        <section id="faq" className="border-t border-line bg-card">
-          <div className="mx-auto max-w-[760px] scroll-mt-20 px-5 py-16">
-            <h2 className="font-display text-[30px] text-ink md:text-[36px]">Questions parents and students ask</h2>
-            <div className="mt-8 flex flex-col gap-3">
+        <section id="faq" className="border-t border-tealtint2 bg-tealtint">
+          <div className="mx-auto max-w-[760px] scroll-mt-20 px-5 py-16 md:py-20">
+            <Reveal>
+              <h2 className="font-display text-mk-h2 text-ink">Questions parents and students ask</h2>
+            </Reveal>
+            <Reveal stagger className="mt-9 flex flex-col gap-3">
               {FAQ.map((f) => (
-                <details key={f.q} className="group rounded-[16px] border border-line bg-paper px-5 py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-extrabold text-ink">
+                <details key={f.q} className="group rounded-[16px] border border-line bg-card px-5 py-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-extrabold text-ink">
                     {f.q}
                     <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform duration-200 group-open:rotate-45" />
                   </summary>
-                  <p className="mt-2.5 text-[14px] leading-[1.7] text-ink2">{f.a}</p>
+                  <p className="faq-a mt-3 text-mk-body text-ink2">{f.a}</p>
                 </details>
               ))}
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* -------------------------------------------------------- final CTA */}
-        <section className="mx-auto max-w-[1100px] px-5 py-20">
-          <div className="rounded-[24px] bg-teal px-6 py-14 text-center">
-            <h2 className="mx-auto max-w-[620px] font-display text-[32px] leading-[1.15] text-white md:text-[40px]">
-              The exam is a date. Start before it’s a deadline.
-            </h2>
-            <p className="mx-auto mt-3 max-w-[480px] text-[15.5px] leading-[1.7] text-white/85">
-              Three days free, then Rs 1,000 a month. Set up in two minutes and study your first chapter tonight.
-            </p>
-            <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
-              {/* White-outline sibling of the orange LinkBtn. No BtnVariant covers a
-                  dark band, so the full button recipe is written out here: same
-                  min height, radius, press cue and timing as buttonClasses. */}
-              <Link
-                href="/login"
-                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[16px] border-[1.5px] border-white/40 px-7 py-4 font-display text-[17px] text-white transition-[background-color,border-color,transform] duration-200 ease-out hover:border-white/70 hover:bg-white/10 active:scale-[0.98]"
-              >
-                I already have an account
-              </Link>
+        <section className="mx-auto max-w-[1100px] px-5 py-20 md:py-24">
+          <Reveal>
+            <div className="relative overflow-hidden rounded-[28px] bg-teal px-6 py-16 text-center md:py-20">
+              {/* Same geometry family as the hero, in the band's own ink. */}
+              <div aria-hidden className="absolute -left-16 -top-16 h-[220px] w-[220px] rounded-full border-[24px] border-white/10" />
+              <div aria-hidden className="absolute -bottom-12 -right-10 h-[170px] w-[170px] rounded-full border-[20px] border-white/10" />
+              <h2 className="relative mx-auto max-w-[680px] font-display text-mk-h1 text-white">
+                The exam is a date. Start before it’s a deadline.
+              </h2>
+              <p className="relative mx-auto mt-4 max-w-[520px] text-mk-lead text-white/90">
+                Three days free, then Rs 1,000 a month. Set up in two minutes and study your first chapter tonight.
+              </p>
+              <div className="relative mt-8 flex flex-wrap justify-center gap-3">
+                <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
+                {/* White-outline sibling of the orange LinkBtn. No BtnVariant covers a
+                    dark band, so the full button recipe is written out here: same
+                    min height, radius, press cue and timing as buttonClasses. */}
+                <Link
+                  href="/login"
+                  className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[16px] border-[1.5px] border-white/40 px-7 py-4 font-display text-[18px] text-white transition-[background-color,border-color,transform] duration-200 ease-out hover:border-white/70 hover:bg-white/10 active:scale-[0.98]"
+                >
+                  I already have an account
+                </Link>
+              </div>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
 

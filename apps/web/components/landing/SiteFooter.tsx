@@ -19,14 +19,14 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
       <div className="mx-auto flex max-w-[1100px] flex-col gap-6 px-5 py-10 md:flex-row md:items-start md:justify-between">
         <div className="max-w-[300px]">
           <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} />
-          <p className="mt-3 text-[13px] leading-[1.6] text-ink2">
+          <p className="mt-3 text-mk-small text-ink2">
             Exam preparation for FBISE Class 9, in English and Urdu medium. Built in Pakistan.
           </p>
         </div>
         <div className="flex gap-12">
           <div>
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink3">Product</p>
-            <ul className="mt-2.5 flex flex-col gap-2 text-[13.5px] text-ink2">
+            <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink3">Product</p>
+            <ul className="mt-2.5 flex flex-col gap-2 text-mk-small text-ink2">
               {PRODUCT.map((l) => (
                 <li key={l.label}>
                   <Link className="hover:text-teal" href={to(l)}>
@@ -37,8 +37,8 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
             </ul>
           </div>
           <div>
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink3">Support</p>
-            <ul className="mt-2.5 flex flex-col gap-2 text-[13.5px] text-ink2">
+            <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink3">Support</p>
+            <ul className="mt-2.5 flex flex-col gap-2 text-mk-small text-ink2">
               <li>
                 <Link className="hover:text-teal" href={home ? '#faq' : '/#faq'}>
                   FAQ
@@ -62,7 +62,7 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
         </div>
       </div>
       <div className="border-t border-line">
-        <p className="mx-auto max-w-[1100px] px-5 py-4 text-[12px] text-ink3">
+        <p className="mx-auto max-w-[1100px] px-5 py-4 text-[12.5px] text-ink3">
           © {new Date().getFullYear()} MatricMate
         </p>
       </div>

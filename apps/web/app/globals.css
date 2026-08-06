@@ -11,15 +11,15 @@
   --color-tealtint: #e9f2f5;
   --color-tealtint2: #d5e7ed;
   --color-ink: #0f3d4c;
-  --color-ink2: #517682;
-  --color-ink3: #6e8b96;
+  --color-ink2: #3e6473;
+  --color-ink3: #587a87;
   --color-paper: #fafbf7;
   --color-card: #ffffff;
-  --color-line: #e4eae6;
+  --color-line: #d9e2dc;
   --color-track: #eaf0ec;
   --color-mute: #d7e0db;
   --color-orange: #f29329;
-  --color-orangedark: #d97b10;
+  --color-orangedark: #ad5f03;
   --color-orangetint: #fdf1e1;
   --color-green: #2e9e5b;
   --color-greentint: #e7f5ec;
@@ -33,6 +33,29 @@
   --font-urdu: var(--font-nastaliq), serif;
 
   --radius-card: 16px;
+
+  /**
+   * Marketing type scale (`text-mk-*`), used on the landing page, pricing,
+   * terms, nav and footer. One deliberate tier larger than the app screens:
+   * a marketing page is read at arm's length, an app screen is worked in.
+   * Display sizes are fluid so there is no breakpoint jump mid-resize.
+   */
+  --text-mk-hero: clamp(2.75rem, 2.1rem + 1.8vw, 3.25rem); /* 44 to 52px */
+  --text-mk-hero--line-height: 1.06;
+  --text-mk-h1: clamp(2.25rem, 1.85rem + 1.6vw, 3rem); /* 36 to 48px */
+  --text-mk-h1--line-height: 1.1;
+  --text-mk-h2: clamp(2rem, 1.7rem + 1.25vw, 2.625rem); /* 32 to 42px */
+  --text-mk-h2--line-height: 1.12;
+  --text-mk-h3: 1.1875rem; /* 19px, card titles */
+  --text-mk-h3--line-height: 1.35;
+  --text-mk-lead: 1.125rem; /* 18px, hero sub + section intros */
+  --text-mk-lead--line-height: 1.65;
+  --text-mk-body: 0.96875rem; /* 15.5px, card and list copy */
+  --text-mk-body--line-height: 1.65;
+  --text-mk-small: 0.875rem; /* 14px, fine print and footer */
+  --text-mk-small--line-height: 1.6;
+  --text-mk-label: 0.75rem; /* 12px, uppercase eyebrows */
+  --text-mk-label--line-height: 1.3;
 }
 
 :root {
@@ -111,8 +134,151 @@ body {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* Delays too, or the landing page's staggered entrances would still make
+       content trickle in, just without the motion. */
+    animation-delay: 0s !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/**
+ * Landing-page motion system. The app keeps the ~200ms rule from the
+ * engineering doc; a marketing page earns longer, orchestrated reveals because
+ * its job is a first impression, not a hundredth interaction. Everything here
+ * animates only opacity and transform, degrades to fully-visible content
+ * without JavaScript (the hiding is gated on `scripting: enabled`), and goes
+ * still under prefers-reduced-motion via the block above.
+ */
+
+/* One easing for the whole page: fast start, long soft landing. */
+:root {
+  --fx-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* -- hero entrance: pure CSS, runs before hydration ----------------------- */
+
+.fx-rise {
+  animation: fx-rise 0.7s var(--fx-ease) both;
+}
+
+.fx-card {
+  animation: fx-card 0.8s var(--fx-ease) 0.3s both;
+}
+
+/* Beats of the hero sequence, 90ms apart. */
+.fx-d1 { animation-delay: 0.05s; }
+.fx-d2 { animation-delay: 0.14s; }
+.fx-d3 { animation-delay: 0.23s; }
+.fx-d4 { animation-delay: 0.32s; }
+.fx-d5 { animation-delay: 0.41s; }
+.fx-d6 { animation-delay: 0.5s; }
+
+@keyframes fx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fx-card {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* -- scroll reveals -------------------------------------------------------
+ *
+ * CSS never hides anything here. Reveal.tsx adds .rv-wait, but only to
+ * elements still below the viewport at hydration time, and reveals by
+ * removing it again. So a no-JS visitor, a crawler, a blocked bundle and a
+ * fast scroller all get the same thing: a complete, visible page. Anything
+ * on screen at load never flashes, because it is never hidden.
+ */
+
+.rv:not(.rv-stagger),
+.rv-stagger > * {
+  transition:
+    opacity 0.65s var(--fx-ease),
+    transform 0.65s var(--fx-ease);
+}
+
+.rv-wait:not(.rv-stagger),
+.rv-wait.rv-stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* Grid children land one after another, left to right. */
+.rv-stagger > :nth-child(2) { transition-delay: 70ms; }
+.rv-stagger > :nth-child(3) { transition-delay: 140ms; }
+.rv-stagger > :nth-child(4) { transition-delay: 210ms; }
+.rv-stagger > :nth-child(5) { transition-delay: 280ms; }
+.rv-stagger > :nth-child(6) { transition-delay: 350ms; }
+.rv-stagger > :nth-child(n + 7) { transition-delay: 420ms; }
+
+/**
+ * A Bar inside .rv-bar draws from zero to its real value on reveal. The
+ * !important beats the inline width while waiting; once .rv-wait is removed
+ * the rule stops applying and the width transitions out to the measured
+ * value. Data you watch arrive reads as data, not as decoration.
+ */
+.rv-bar > div > div {
+  transition: width 0.9s var(--fx-ease) 0.2s;
+}
+
+.rv-wait .rv-bar > div > div {
+  width: 0% !important;
+}
+
+/* -- micro-interactions ---------------------------------------------------- */
+
+/* Cards lift a touch under the cursor. Touch screens never see it. */
+@media (hover: hover) {
+  .lift {
+    transition:
+      transform 0.25s var(--fx-ease),
+      box-shadow 0.25s var(--fx-ease);
+  }
+
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(15, 80, 100, 0.11);
+  }
+}
+
+/* FAQ answers ease in when a question opens. Closing is instant on purpose. */
+details[open] .faq-a {
+  animation: fx-rise 0.3s ease-out both;
+}
+
+/* The XP chip pops in once when an answer checks out correct. */
+.fx-xp {
+  animation: fx-xp 0.45s var(--fx-ease) both;
+}
+
+@keyframes fx-xp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.8);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
 

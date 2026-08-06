@@ -61,17 +61,17 @@ export default function TermsPage() {
       <Nav />
 
       <main className="mx-auto max-w-[720px] px-5 py-14">
-        <h1 className="font-display text-[34px] leading-tight text-ink">Terms and privacy</h1>
-        <p className="mt-2 text-[14px] text-ink2">
+        <h1 className="font-display text-mk-h1 text-ink">Terms and privacy</h1>
+        <p className="mt-3 text-mk-lead text-ink2">
           Written to be read. If anything here is unclear, ask us and we will explain it, and fix the wording.
         </p>
 
         <div className="mt-10 flex flex-col gap-9">
           {SECTIONS.map((s) => (
             <section key={s.heading}>
-              <h2 className="font-display text-[20px] text-ink">{s.heading}</h2>
+              <h2 className="font-display text-[22px] text-ink">{s.heading}</h2>
               {s.paragraphs.map((p, i) => (
-                <p key={i} className="mt-2 text-[14.5px] leading-[1.75] text-ink2">
+                <p key={i} className="mt-2 text-mk-body leading-[1.75] text-ink2">
                   {p}
                 </p>
               ))}

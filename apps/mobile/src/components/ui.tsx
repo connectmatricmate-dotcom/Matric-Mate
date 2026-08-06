@@ -376,8 +376,10 @@ export function Btn({
     ghost: 'transparent',
     line: C.card,
   };
+  // Ink on orange, not white: white sits at 2.3:1 on this orange and washes
+  // out in daylight. Ink reads at 5:1. Same rule as the web button recipe.
   const fg =
-    variant === 'ghost' ? C.teal : variant === 'line' ? C.teal : '#fff';
+    variant === 'ghost' || variant === 'line' ? C.teal : variant === 'orange' ? C.ink : '#fff';
   return (
     <Tap onPress={onPress} disabled={disabled || loading} style={[{ opacity: disabled ? 0.45 : 1 }, style]}>
       <View

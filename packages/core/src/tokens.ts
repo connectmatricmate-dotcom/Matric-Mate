@@ -12,20 +12,26 @@ export const colors = {
   tealTint: '#E9F2F5',
   tealTint2: '#D5E7ED',
   ink: '#0F3D4C',
-  ink2: '#517682',
+  /** Secondary copy. Darkened from #517682 (4.7:1 on paper) after the client
+   * reported the greyer text was hard to read; now 6.2:1. */
+  ink2: '#3E6473',
   /** Fine print and placeholders only; meaningful copy uses ink2. Darkened
-   * from #8AA4AD, which sat at 2.5:1 on paper and was unreadable in sunlight. */
-  ink3: '#6E8B96',
+   * twice: #8AA4AD sat at 2.5:1, #6E8B96 at 3.5:1 still failed AA. Now 4.4:1. */
+  ink3: '#587A87',
   paper: '#FAFBF7',
   card: '#FFFFFF',
-  line: '#E4EAE6',
+  /** Borders. #E4EAE6 read as invisible (1.2:1 against card), so grouped
+   * content looked like one sheet; this step keeps borders quiet but present. */
+  line: '#D9E2DC',
   /** The one neutral for empty progress tracks, rings and skeletons. Five
    * hand-picked greys used to share this role; this is the survivor. */
   track: '#EAF0EC',
   /** Inactive control surfaces: an off toggle, an unchecked box, a step dot. */
   mute: '#D7E0DB',
   orange: '#F29329',
-  orangeDark: '#D97B10',
+  /** Orange as TEXT (labels on tints and cards). #D97B10 sat at 3.1:1 on
+   * white; this passes AA at 4.8:1. Fills stay `orange`; text uses this. */
+  orangeDark: '#AD5F03',
   orangeTint: '#FDF1E1',
   green: '#2E9E5B',
   greenTint: '#E7F5EC',

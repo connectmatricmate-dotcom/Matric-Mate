@@ -30,7 +30,7 @@ export function Nav() {
         <ul className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
+              <Link href={l.href} className="text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
                 {l.label}
               </Link>
             </li>
@@ -38,7 +38,7 @@ export function Nav() {
         </ul>
 
         <div className="hidden items-center gap-3 justify-self-end md:flex">
-          <Link href="/login" className="text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
+          <Link href="/login" className="text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
             Log in
           </Link>
           <LinkBtn title="Start free" href="/signup" sm />
@@ -61,7 +61,7 @@ export function Nav() {
           <ul className="flex flex-col gap-3">
             {LINKS.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} onClick={() => setOpen(false)} className="text-[15px] font-extrabold text-ink">
+                <Link href={l.href} onClick={() => setOpen(false)} className="text-[16px] font-extrabold text-ink">
                   {l.label}
                 </Link>
               </li>

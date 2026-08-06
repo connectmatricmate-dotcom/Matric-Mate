@@ -57,10 +57,10 @@ export default function PricingPage() {
       <main>
         <section className="mx-auto max-w-[1100px] px-5 pb-4 pt-14 text-center">
           <Pill tone="orange">First 3 days free</Pill>
-          <h1 className="mx-auto mt-3 max-w-[640px] font-display text-[34px] leading-[1.12] text-ink md:text-[46px]">
+          <h1 className="mx-auto mt-3 max-w-[640px] font-display text-mk-h1 text-ink">
             One plan. Every subject, every chapter, both apps.
           </h1>
-          <p className="mx-auto mt-3 max-w-[540px] text-[15.5px] leading-[1.7] text-ink2">
+          <p className="mx-auto mt-3 max-w-[560px] text-mk-lead text-ink2">
             A month of MatricMate costs less than one hour of home tuition, and it doesn’t go home at nine.
           </p>
         </section>
@@ -68,10 +68,10 @@ export default function PricingPage() {
         <PlanPicker />
 
         {/* ------------------------------------------------------- comparison */}
-        <section className="border-t border-line bg-card">
+        <section className="border-t border-tealtint2 bg-tealtint">
           <div className="mx-auto max-w-[860px] px-5 py-16">
-            <h2 className="font-display text-[28px] text-ink md:text-[32px]">Free and Premium, side by side</h2>
-            <p className="mt-2 text-[14.5px] text-ink2">
+            <h2 className="font-display text-mk-h2 text-ink">Free and Premium, side by side</h2>
+            <p className="mt-3 text-mk-lead text-ink2">
               The free plan is a real plan, not a countdown. It stays free for as long as you want it.
             </p>
 
@@ -93,11 +93,11 @@ export default function PricingPage() {
                 <tbody>
                   {COMPARE.map((row) => (
                     <tr key={row.feature} className="border-b border-line">
-                      <th scope="row" className="py-3 text-[14px] font-normal text-ink">
+                      <th scope="row" className="py-3 text-[15px] font-normal text-ink">
                         {row.feature}
                       </th>
-                      <td className="py-3 text-[14px] text-ink2">{row.free}</td>
-                      <td className="py-3 text-[14px] font-extrabold text-ink">{row.premium}</td>
+                      <td className="py-3 text-[15px] text-ink2">{row.free}</td>
+                      <td className="py-3 text-[15px] font-extrabold text-ink">{row.premium}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -105,10 +105,10 @@ export default function PricingPage() {
             </div>
 
             <Card flat className="mt-7">
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">Staying on free</p>
+              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">Staying on free</p>
               <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
                 {FREE_INCLUDED.map((li) => (
-                  <li key={li} className="flex items-start gap-2.5 text-[14px] text-ink2">
+                  <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink2">
                     <Icon name="check" size={16} strokeWidth={2.6} className="mt-0.5 shrink-0 text-ink3" />
                     {li}
                   </li>
@@ -120,40 +120,40 @@ export default function PricingPage() {
 
         {/* ---------------------------------------------------------- payment */}
         <section className="mx-auto max-w-[860px] px-5 py-16">
-          <h2 className="font-display text-[28px] text-ink md:text-[32px]">Pay the way you already pay</h2>
+          <h2 className="font-display text-mk-h2 text-ink">Pay the way you already pay</h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {PAYMENT_METHODS.map((m) => (
               <Card key={m.id} flat className="flex items-center gap-3">
                 <PayMark logo={m.logo} label={m.label} size={30} />
                 <span>
-                  <span className="block text-[14px] font-extrabold text-ink">{m.label}</span>
-                  <span className="block text-[12.5px] text-ink2">{m.hint}</span>
+                  <span className="block text-[15px] font-extrabold text-ink">{m.label}</span>
+                  <span className="block text-[13.5px] text-ink2">{m.hint}</span>
                 </span>
               </Card>
             ))}
           </div>
-          <p className="mt-4 text-[13px] text-ink2">
+          <p className="mt-4 text-mk-small text-ink2">
             Handled by Safepay. We never see or store your card or wallet details, and nothing renews on its own. We
             remind you two days before your plan ends and you decide.
           </p>
         </section>
 
         {/* -------------------------------------------------------------- faq */}
-        <section className="border-t border-line bg-card">
+        <section className="border-t border-tealtint2 bg-tealtint">
           <div className="mx-auto max-w-[760px] px-5 py-16">
-            <h2 className="font-display text-[28px] text-ink md:text-[32px]">Before you pay</h2>
+            <h2 className="font-display text-mk-h2 text-ink">Before you pay</h2>
             <div className="mt-7 flex flex-col gap-3">
               {QUESTIONS.map((f) => (
-                <details key={f.q} className="group rounded-[16px] border border-line bg-paper px-5 py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-extrabold text-ink">
+                <details key={f.q} className="group rounded-[16px] border border-line bg-card px-5 py-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-extrabold text-ink">
                     {f.q}
                     <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform duration-200 group-open:rotate-45" />
                   </summary>
-                  <p className="mt-2.5 text-[14px] leading-[1.7] text-ink2">{f.a}</p>
+                  <p className="faq-a mt-3 text-mk-body text-ink2">{f.a}</p>
                 </details>
               ))}
             </div>
-            <p className="mt-6 text-[13.5px] text-ink2">
+            <p className="mt-6 text-[14.5px] text-ink2">
               Still unsure?{' '}
               <Link href="/signup" className="font-extrabold text-teal hover:underline">
                 Start on the free plan
