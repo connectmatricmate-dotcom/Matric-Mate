@@ -132,11 +132,15 @@ Phone screens unless marked (web). Milestone = when it ships functional (all exi
   subjects pre-checked & locked (English, Urdu, Islamiyat, Pak Studies*, Math); electives per group
   (Science: Physics, Chemistry, Biology, Computer Science). Min 6 to continue; counter in CTA
   ("Continue with 8 subjects"). *Confirm exact FBISE-9 compulsory list with client content (D2).
-- **`signup`** — Full name, Email **or phone**, Password (show/hide). Terms line. CTA "Create
-  account". Secondary: "Log in". States: inline validation on blur; duplicate-account error banner.
-  Phone-OTP variant is deferred (D3): schema stores phone now, OTP later.
-- **`login`** — email/phone + password, "Forgot password?", CTA. Error: "Wrong email or password."
-- **`forgot`** — email/phone input → success state "Reset link sent — check your inbox."
+- **`signup`** · Full name, **phone number**, Password (show/hide). Terms line plus a consent
+  checkbox for SMS and WhatsApp. CTA "Create account". Secondary: "Log in". States: inline
+  validation on blur; duplicate-account error banner. **No email field** (D3, settled 10 Aug).
+  Students type `03001234567`; storage is `+923001234567`. A verification code follows.
+- **`verify`** · six-digit code entry, resend with a cooldown, "Change number" back-link. Sits
+  between signup and the app, and again in the middle of the password reset.
+- **`login`** · phone + password, "Forgot password?", CTA. Error: "Wrong number or password."
+- **`forgot`** · phone input, then the `verify` screen, then a new-password screen. There is no
+  reset link and no inbox: the code arrives by SMS.
 - **`paywall`** — hero: everything unlocked list (6 rows with icons); price card **Rs 1,000/month**
   (orange highlight "Most popular" if multiple plans later); trial copy "First 3 days free" (D4 —
   confirm trial with client); CTA "Start Premium"; ghost "Not now" (goes to limited free mode —
@@ -328,7 +332,7 @@ Phone screens unless marked (web). Milestone = when it ships functional (all exi
 | :- | :---- | :---- |
 | D1 | 5 tabs + profile in header (vs 6 in diagram)? | 5 tabs |
 | D2 | Exact FBISE-9 compulsory/elective subject list | Science group default |
-| D3 | Phone OTP timing | Email/phone + password now, OTP later |
+| D3 | Phone OTP timing | **Settled 10 Aug: phone + password, code at signup and reset only** |
 | D4 | Free trial (3 days)? | Shown |
 | D5 | Free tier limits | 1 chapter/subject + 5 MCQs + 5 AI msgs/day |
 | D6 | Exam anti-cheat strictness | Soft (pause once) |

@@ -16,8 +16,12 @@ Ground rules that already exist and must not regress:
 
 ## M1 · Prototype + app on client's phone (due 1 Aug) · STATUS: DONE, submit it
 
-Everything contracted for M1 exists: onboarding, real Supabase auth (email + password),
-navigation, curriculum browse, APK on the client's phone.
+Everything contracted for M1 exists: onboarding, real Supabase auth, navigation, curriculum browse,
+APK on the client's phone.
+
+**Change request, 10 Aug: sign-in moves from email to phone number.** This was in the original job
+post and was carried as an open question; Adnan has now settled it. See M1.5 below. It is a change
+to delivered work, not new scope, and it does not reopen the milestone.
 
 Remaining before submitting the milestone:
 
@@ -26,6 +30,45 @@ Remaining before submitting the milestone:
    Nothing gets hosted; repo rule.
 3. Known M1 debts to disclose honestly: content is sample FBISE data from
    `packages/core/src/content.ts`, not client content; study progress is device-local until M2.
+
+## M1.5 · Phone number sign-in (change request, 10 Aug)
+
+Students sign up with a phone number and a password. No email field anywhere in signup. **Decided
+and locked**, with the reasoning in `docs/NOTIFICATIONS.md`.
+
+Two decisions that are settled and should not be reopened:
+
+- **We stay on Supabase.** No auth provider ships with a Pakistani SMS company built in, so moving
+  to Clerk, Auth0, Appwrite or Firebase would land on the same wiring job after weeks of rework.
+  Supabase's **Send SMS Hook** is generally available on the Pro plan and hands the code to our own
+  function, which is about twenty lines.
+- **Phone plus a password, not a code on every login.** A code goes out at signup to prove the
+  number is real, and again on password reset. Sending one on every login would cost Rs 51,250 a
+  month at 2,000 students against Rs 2,100, for the same student experience.
+
+Tasks:
+
+1. **Send SMS Hook** as a Supabase Edge Function: verify the webhook signature, compose the message
+   text (this hook is also the only way to control the wording, which Pakistani branded SMS rules
+   require), and call the SMS provider. Return a retryable status if the provider is down.
+2. **Phone entry** on both apps. Students type `03001234567`; storage is `+923001234567`. The
+   conversion happens once, on the way in. The `profiles.phone` column already exists and is
+   validated, but nothing writes to it yet.
+3. **Password reset, built by hand.** Supabase has no phone equivalent of its email reset. It is
+   three calls: send a code, verify it to get a session, then set the new password.
+4. **Abuse protection.** CAPTCHA on signup and on code requests, keep the per-user cooldown, and add
+   a per-number limit inside the hook, which Supabase does not provide. Every code is real money, so
+   an unprotected endpoint is a way to spend ours. If web auth calls go through our own server,
+   enable the forwarding header or every student looks like one computer.
+5. **Migrate the existing accounts.** While email sign-in still works, add a phone to each account
+   and verify it. This keeps the same user ID and all their data. Only then turn email off. Doing it
+   the other way round can lock those accounts out, so test on a throwaway project first.
+6. **Sweep for email assumptions.** For a phone-only account the email field is empty. Check every
+   screen showing the signed-in identity, every database rule or trigger referring to email, and
+   anything that mails the account address.
+
+Acceptance: a new student signs up with a phone number, receives a code, sets a password, and signs
+in on a second device. An existing account keeps its data and its progress.
 
 ## M2 · Study module + offline (due 12 Aug)
 
@@ -100,12 +143,20 @@ device-local data; M2/M3 sync makes them account-true automatically.
 
 Tasks:
 
-1. **Push notifications**: `expo-notifications` + Expo Push Service. Needs Firebase project +
-   FCM V1 service account uploaded to EAS (client's Google account; user action). Native module
-   addition = version bump 0.3.0 + new APK. Store `expo_push_tokens(user_id, token, platform)`.
+1. **Push notifications**, confirmed by the client and free to run: `expo-notifications` + Expo Push
+   Service. Needs a Firebase project and an FCM V1 service account uploaded to EAS (client's Google
+   account, their action). Firebase Cloud Messaging has no message limit and needs no card; we
+   enable Cloud Messaging only, so nothing there can start charging. Adding the native module means
+   a version bump to 0.3.0 and a new APK, it cannot ship over the air. Store
+   `expo_push_tokens(user_id, token, platform)`.
 2. **Renewal reminder job**: Vercel cron (`apps/web/app/api/cron/reminders/route.ts`, protected by
-   `CRON_SECRET`) selects entitlements expiring in 2 days, sends push + email. This makes the
-   app's own promise ("we remind you two days before") true.
+   `CRON_SECRET`) selects entitlements expiring in 2 days. This makes the app's own promise
+   ("we remind you two days before") true.
+
+   **Note the consequence of phone sign-in: there is no email address for most students.** The
+   reminder goes by push first, because it is free, and falls back to WhatsApp for anyone who has
+   notifications turned off or never granted permission. Email only applies to the few accounts
+   that have one. Do not write this job assuming `user.email` exists.
 3. **Streak reminder** (settings toggle already exists): same cron, respects
    `settings.streakAlerts`, which must therefore sync to `profiles`/`user_settings` (small table,
    same queue pattern).
@@ -143,5 +194,8 @@ credentials in production data.
 - Expo Go native drift: guarded by the `mobile · deps` check; never add a native dependency
   without a version bump and rebuild (see `handoff.md` for the worklets incident).
 - Content dependency on the client from M2 onward; the fallback content is already shippable.
-- Phone OTP is still an open client question; email + password is the shipped answer, revisit only
-  if Adnan funds an SMS provider.
+- **Sign-in now depends on the SMS provider.** If they are down, nobody can create an account. Email
+  sign-in never had that dependency. This argues for the best-documented provider over the cheapest,
+  and for the hook returning a retryable status rather than failing the signup outright.
+- The branded sender name takes two to four weeks to clear. This need not block launch: a shared
+  pre-approved sender works the same day at Rs 4.00 and we switch when ours is approved.

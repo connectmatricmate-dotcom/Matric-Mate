@@ -4,6 +4,19 @@ Phone number sign-in, plus SMS, WhatsApp and email messaging. What each one need
 and what has to be built. Researched 10 Aug 2026 against Supabase's documentation, the providers'
 own pricing pages, and PTA sources.
 
+## Decisions, locked 10 Aug 2026
+
+| | |
+| :-- | :-- |
+| Sign-in | Phone number and a password. No email field at signup. |
+| Verification codes | At signup and password reset only, never on every login. |
+| Platform | **Stay on Supabase.** Its Send SMS Hook routes codes to a local provider. |
+| Channels | SMS, WhatsApp, email, and push notifications from the app. |
+| Vendors | Two: SendPK for SMS and WhatsApp, Resend for email. |
+
+The reasoning behind each is below. These are settled and should not be reopened without a reason
+that is not already covered here.
+
 ## Short answer
 
 **All of it works in Pakistan.** Nothing here is blocked by regulation or by any provider refusing
@@ -11,7 +24,7 @@ Pakistani businesses. The cost is paperwork and lead time, not technology.
 
 **Two vendors are enough**, because SendPK sells both branded SMS and WhatsApp under one account.
 Adding a third buys cheaper WhatsApp at the price of another relationship and another set of
-paperwork. Section 7 sets out the choice.
+paperwork. Section 8 sets out the choice.
 
 ## 1. Phone number sign-in
 
@@ -185,10 +198,26 @@ after that date.
 
 **Lead time:** one to three weeks for verification, and it needs the domain live first.
 
-## 4. Email
+## 4. Push notifications
+
+Confirmed by the client, and the cheapest channel by a distance: **free, with no message limit**.
+
+Sent through Firebase Cloud Messaging, on Google's free plan, with no card required. We enable
+Cloud Messaging only, so nothing else in Firebase can start charging. Needed from the client: a
+Firebase project on their Google account and a service account key uploaded to our build service.
+
+Two things to know. Adding push means a new version of the app, because it is a native change and
+cannot be delivered over the air. And it only reaches students who installed the app and allowed
+notifications, so it can never be the only channel for anything that matters, such as a renewal
+reminder. It is the first thing we try and WhatsApp is the fallback.
+
+## 5. Email
 
 Still needed even without email sign-in: payment receipts, invoices, and anything a student wants a
 written record of.
+
+Note that with phone sign-in **most students will not have an email address on file at all**, so
+nothing may be built on the assumption that one exists.
 
 **Provider: Resend.** Free for 3,000 messages a month, $20 for 50,000. No restriction on Pakistani
 senders or a `.com.pk` domain.
@@ -197,7 +226,7 @@ senders or a `.com.pk` domain.
 `matricmate.com.pk`. Every mail record must be set to "DNS only" in Cloudflare rather than proxied,
 or authentication fails silently.
 
-## 5. What the client must provide
+## 6. What the client must provide
 
 | Item | Needed for |
 | :-- | :-- |
@@ -209,7 +238,7 @@ or authentication fails silently.
 | A card that works internationally, or willingness to use a local reseller | Meta billing |
 | Decision: password, or code on every login | Determines whether SMS costs Rs 2,100 or Rs 51,250 a month |
 
-## 6. Costs
+## 7. Costs
 
 **One-time**
 
@@ -240,7 +269,7 @@ or authentication fails silently.
 That last line is worth reading twice. One SMS to every student costs about Rs 7,700, while the
 same message by email costs nothing. SMS should carry things that must arrive, not routine updates.
 
-## 7. Vendor count: two or three
+## 8. Vendor count: two or three
 
 SendPK sells WhatsApp as well as SMS, so the channels can be collapsed. The trade is a small
 per-message fee against one fewer account to open and maintain.

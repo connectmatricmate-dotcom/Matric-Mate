@@ -25,12 +25,20 @@ images, security headers, robots off until launch.
 
 Remaining tasks:
 
-1. **Legal pages for real**: `/terms` and `/privacy` as actual content pages (Play Store and
+1. **Phone sign-in on the web too.** The auth screens currently take an email address. They move to
+   a phone number and a password, matching the mobile app, because both surfaces share one account.
+   The shared work (the Send SMS Hook, the hand-built password reset) is done once in the mobile
+   stage under M1.5; this is the web screens consuming it. Also sweep the web app for anywhere it
+   assumes `user.email` is populated, because for a phone-only account it is empty.
+2. **Account deletion page**, a public URL that deletes an account without the app installed. Google
+   Play requires it for any app with accounts, so the Android submission depends on this web page
+   existing. It is currently nowhere in the plan.
+3. **Legal pages for real**: `/terms` and `/privacy` as actual content pages (Play Store and
    checkout both point at them). Plain language, both mediums eventually; English first.
-2. **SEO pass held behind the flag**: metadata is done; keep `NEXT_PUBLIC_ALLOW_INDEXING` false
+4. **SEO pass held behind the flag**: metadata is done; keep `NEXT_PUBLIC_ALLOW_INDEXING` false
    until M10 go-live. Add sitemap entries for legal pages.
-3. **Analytics**: enable Vercel Web Analytics (zero-config) so the client sees traffic at handover.
-4. Housekeeping: user fixes `NEXT_PUBLIC_SITE_URL` in Vercel env (the `lib/site.ts` guard makes
+5. **Analytics**: enable Vercel Web Analytics (zero-config) so the client sees traffic at handover.
+6. Housekeeping: user fixes `NEXT_PUBLIC_SITE_URL` in Vercel env (the `lib/site.ts` guard makes
    this cosmetic, but tidy it).
 
 Acceptance: milestone demo is just the live URL plus auth round-trip on a phone browser.

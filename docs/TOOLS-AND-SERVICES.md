@@ -62,12 +62,18 @@ of build credit a month, which covers about 45 Android builds against the free t
 
 ### Firebase · free
 
-Push notifications, through Cloud Messaging. Confirmed free in 2026 with no message limit and no
-credit card, on the free Spark plan. We enable Cloud Messaging only, so nothing in Firebase can
-start charging.
+Push notifications from the app, which the client has confirmed he wants. Free in 2026 with no
+message limit and no credit card, on Google's free plan. We enable Cloud Messaging only, so nothing
+else in Firebase can start charging. Expo requires a Firebase project for Android push, there is no
+way around it.
 
-Two files come from it: an FCM service account key (secret, kept out of the code) and
+Two files come from it: a service account key (secret, kept out of the code) and
 `google-services.json` (not secret).
+
+Two limits worth knowing. Adding push means a new version of the app, because it is a native change
+that cannot be delivered over the air. And it only reaches students who installed the app and
+allowed notifications, so it can never be the only channel for something that matters, such as a
+renewal reminder.
 
 ### App signing · free, but ownership matters
 
@@ -179,8 +185,10 @@ revenue. Caching repeated context cuts the realistic figure by roughly 40%.
 
 ### SMS · Rs 5,000 a year plus per message
 
-Students sign up with a phone number, so a verification code has to reach them. That makes SMS part
-of signing in, not an optional extra.
+Students sign up with a phone number and a password, so a verification code has to reach them at
+signup and at password reset. That makes SMS part of signing in, not an optional extra, and it means
+**the app cannot create accounts if the SMS provider is down**. Detail and reasoning in
+`NOTIFICATIONS.md`.
 
 | | |
 | :-- | --: |

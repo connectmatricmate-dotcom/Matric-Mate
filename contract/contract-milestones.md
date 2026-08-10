@@ -1,4 +1,4 @@
-# AI Edutech App — Upwork Contract & Milestones
+# AI Edutech App · Upwork Contract & Milestones
 
 > Snapshot of the live Upwork contract (as of **Sat, 19 Jul 2026**). Job post: `contract-description.md` (same folder).
 > Companion docs: Scoping / SOW / Feasibility in `../docs/`. Product name: **Matric Mate**.
@@ -19,7 +19,7 @@
 
 ## Milestones (10)
 
-**Ordering is a client decision:** the original plan (feasibility doc / SOW) was **web first, then mobile**. When the contract was created, the client (Adnan) said no — **mobile first (Android only), then web**. So milestones 1–5 = native Android app (maps to SOW Stage B M1–M5), milestones 6–10 = web (maps to Stage A W1–W5). Consequence: there is no pre-built web backend to reuse — the backend gets stood up during the mobile stage instead.
+**Ordering is a client decision:** the original plan (feasibility doc / SOW) was **web first, then mobile**. When the contract was created, the client (Adnan) said no: **mobile first (Android only), then web**. So milestones 1–5 = native Android app (maps to SOW Stage B M1–M5), milestones 6–10 = web (maps to Stage A W1–W5). Consequence: there is no pre-built web backend to reuse, so the backend gets stood up during the mobile stage instead.
 
 | # | Deliverable | Amount | Due (2026) | Status |
 | :-: | :---- | ---: | :---- | :---- |
@@ -43,10 +43,14 @@
 
 ## Timeline log
 
-- **Sat, 18 Jul 2026** — Adnan created the milestone; Adnan activated and funded milestone 1 ($278).
+- **Sat, 18 Jul 2026:** Adnan created the milestone; Adnan activated and funded milestone 1 ($278).
 
 ## Divergences to keep in mind (job post vs. our docs)
 
 The Upwork job post (`contract-description.md`) narrows/changes the doc scope: **FBISE Class 9 only** at MVP (Class 10 + other boards later); **audio lessons in, video library future-phase**; **confidence slider + confidence analytics required** (verified diagram/SOW had it out of scope); curriculum hierarchy includes **Medium** (Board → Medium → Class → Subject → Chapter, i.e. dual English/Urdu medium is in); **phone OTP auth**; admin **content review before publish**; **AI usage quotas** required.
 
-**19 Jul 2026:** the three docs in `../docs/` were updated to the signed reality (mobile-first Android-only, ~11-wk Upwork schedule, M1 $278 incl. clickable prototype, referral/dual-medium/Class-9-first resolved). **Still to reconcile with Adnan before the affected milestones:** video in Study (M2/M7), confidence slider (M3/M8), phone OTP vs email+password (M1+), TTS voice-over, payments entity (M4).
+**19 Jul 2026:** the three docs in `../docs/` were updated to the signed reality (mobile-first Android-only, ~11-wk Upwork schedule, M1 $278 incl. clickable prototype, referral/dual-medium/Class-9-first resolved). **Still to reconcile with Adnan before the affected milestones:** video in Study (M2/M7), confidence slider (M3/M8), TTS voice-over, payments entity (M4).
+
+**10 Aug 2026, resolved:** **phone OTP vs email + password** is settled. Sign-in is by phone number with a password, no email field at signup, matching what the job post originally asked for. A verification code goes out at signup and at password reset only, not on every login, which is the difference between roughly Rs 2,100 and Rs 51,250 a month at 2,000 students. We stay on Supabase; its Send SMS Hook routes the code through a Pakistani provider. Adnan also confirmed he wants SMS, WhatsApp and email messaging, and push notifications from the mobile app. Detail in `../docs/NOTIFICATIONS.md`, tasks in the mobile plan under M1.5.
+
+This is a change to delivered M1 work rather than new scope, and it does not reopen the milestone. It does add a client dependency: the SMS sender name needs an FBR NTN carrying the trade name "MatricMate", and takes two to four weeks to clear.
