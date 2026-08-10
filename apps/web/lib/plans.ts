@@ -91,6 +91,5 @@ export const INCLUDED = [
 export const FREE_INCLUDED = [
   'Browse every subject and chapter',
   'One full chapter per subject',
-  '5 MCQs a day',
-  '5 AI tutor questions a day',
+  'A sample of the practice questions',
 ];

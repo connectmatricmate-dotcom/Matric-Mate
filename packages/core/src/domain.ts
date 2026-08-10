@@ -159,7 +159,12 @@ export function buildPlan(opts: {
 }
 
 /** Daily AI message quota (D7, confirm with client). */
-export const AI_QUOTA = { premium: 20, free: 5 };
+/**
+ * The tutor is the most expensive thing in the product, roughly Rs 1 a
+ * question, so it is subscriber-only. A free account can read the sample
+ * chapter but cannot spend our money asking questions.
+ */
+export const AI_QUOTA = { premium: 20, free: 0 };
 
 export const grade = (pct: number) =>
   pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B+' : pct >= 60 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';

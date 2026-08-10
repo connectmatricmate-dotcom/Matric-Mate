@@ -28,8 +28,8 @@ const COMPARE: { feature: string; free: string; premium: string }[] = [
 
 const QUESTIONS = [
   {
-    q: 'What happens after the three free days?',
-    a: 'Nothing is charged automatically. We message you two days before the trial ends; if you want to carry on, you pay then. If you don’t, the account drops back to the free plan and your progress stays.',
+    q: 'What happens when my plan runs out?',
+    a: 'Nothing renews on its own. We message you two days before your plan runs out; if you want to carry on, you pay then. If you don’t, your progress stays on the account and it simply stops unlocking new chapters.',
   },
   {
     q: 'Can I pay from a mobile account?',
@@ -56,7 +56,7 @@ export default function PricingPage() {
 
       <main>
         <section className="mx-auto max-w-[1100px] px-5 pb-4 pt-14 text-center">
-          <Pill tone="orange">First 3 days free</Pill>
+          <Pill tone="orange">Cancel any time</Pill>
           <h1 className="mx-auto mt-3 max-w-[640px] font-display text-mk-h1 text-ink">
             One plan. Every subject, every chapter, both apps.
           </h1>

@@ -1,30 +1,105 @@
 'use client';
 
 /**
- * The landing hero is a working question, not a picture of one.
+ * The landing hero is a working question, and it answers itself.
  *
  * Everything MatricMate claims, real board questions, an honest confidence
- * check, an explanation that teaches, is provable in about ten seconds, so the
- * hero proves it instead of describing it. This is the page's signature.
+ * check, an explanation that teaches, is provable in about ten seconds. So
+ * the card demonstrates it on a loop rather than waiting for a visitor who
+ * may never click: pick an option, admit how sure you were, check, read why,
+ * move to the next question.
+ *
+ * The loop yields the moment anyone touches the card, and never resumes.
+ * A demo that fights the person trying to use it is worse than no demo.
  */
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { Mcq } from '@matricmate/core';
 import { Btn, Card, Icon, Pill } from '@/components/ui';
 
 const CONFIDENCE = [
-  { value: 0, en: 'Guess', ur: 'Tukka' },
-  { value: 1, en: 'Fairly sure', ur: 'Thora pakka' },
-  { value: 2, en: 'Certain', ur: 'Pakka' },
+  { value: 0, en: 'Guess' },
+  { value: 1, en: 'Fairly sure' },
+  { value: 2, en: 'Certain' },
 ] as const;
 
-export function HeroDemo({ mcq }: { mcq: Mcq }) {
+/** How the self-playing loop is paced, in milliseconds. */
+const BEAT = { option: 1100, confidence: 950, check: 900, read: 3600, blank: 450 };
+
+/**
+ * Subscribes to the reduced-motion media query. Read during render rather than
+ * set from an effect, so the demo never starts a loop it should not run and
+ * then cancels it a frame later.
+ */
+function usePrefersReducedMotion() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const q = window.matchMedia('(prefers-reduced-motion: reduce)');
+      q.addEventListener('change', onChange);
+      return () => q.removeEventListener('change', onChange);
+    },
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () => false,
+  );
+}
+
+export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
+  const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<number | null>(null);
   const [confidence, setConfidence] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
+  const [playing, setPlaying] = useState(true);
+  const reduced = usePrefersReducedMotion();
+  const auto = playing && !reduced;
 
+  const mcq = mcqs[index % mcqs.length];
   const correct = chosen === mcq.answer;
 
-  // Four short verdicts, because being right for the wrong reason is the whole point.
+  /** Every pending step, so stopping the loop cannot leave one queued. */
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const clearAll = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  };
+
+  const stopAuto = useCallback(() => {
+    clearAll();
+    setPlaying(false);
+  }, []);
+
+  useEffect(() => {
+    if (!auto) return;
+
+    // The demo deliberately answers the second question wrongly while claiming
+    // to be certain. That is the product's whole argument, and a demo that is
+    // always right never shows it.
+    const wrongOnPurpose = index % mcqs.length === 1;
+    const pick = wrongOnPurpose ? (mcq.answer + 1) % mcq.options.length : mcq.answer;
+    const sureness = wrongOnPurpose ? 2 : index % 3 === 0 ? 2 : 1;
+
+    const at = (ms: number, fn: () => void) => {
+      timers.current.push(setTimeout(fn, ms));
+    };
+
+    let t = BEAT.option;
+    at(t, () => setChosen(pick));
+    t += BEAT.confidence;
+    at(t, () => setConfidence(sureness));
+    t += BEAT.check;
+    at(t, () => setChecked(true));
+    t += BEAT.read;
+    at(t, () => {
+      setChosen(null);
+      setConfidence(null);
+      setChecked(false);
+    });
+    t += BEAT.blank;
+    at(t, () => setIndex((i) => i + 1));
+
+    return clearAll;
+  }, [auto, index, mcq.answer, mcq.options.length, mcqs.length]);
+
+  useEffect(() => clearAll, []);
+
   const verdict = correct
     ? confidence === 0
       ? 'Right, but you guessed.'
@@ -34,6 +109,7 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
       : 'Not quite.';
 
   function reset() {
+    stopAuto();
     setChosen(null);
     setConfidence(null);
     setChecked(false);
@@ -41,24 +117,28 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
 
   return (
     // Exact height on desktop, not a minimum. Answering swaps a button for an
-    // explanation; if the card could grow by even a pixel the hero grid would
-    // re-centre and the headline would jump under the reader's cursor. The
-    // verdict and the explanation share one block so the reserved space stays
-    // small enough that the card doesn't tower over the copy beside it.
-    // Height sized to the marketing type scale; re-measure if sizes move.
-    <Card className="relative flex w-full max-w-[430px] flex-col md:h-[500px]">
-      {/* The product hands out XP for practice; so does its demo. */}
+    // explanation; if the card could grow by a pixel the hero grid would
+    // re-centre and the headline would jump under the reader's cursor.
+    // The wrapper carries the handler because Card is a server-safe primitive
+    // with no event props, and one listener here beats one per control.
+    <div onPointerDown={stopAuto} className="w-full max-w-[430px]">
+    <Card
+      className="relative flex w-full flex-col shadow-[0_24px_70px_rgba(4,34,47,0.45)] md:h-[512px]"
+    >
       {checked && correct ? (
         <span className="fx-xp pointer-events-none absolute -top-3 right-5 rounded-full bg-greentint px-3 py-1 text-[12px] font-extrabold text-green">
           +10 XP
         </span>
       ) : null}
+
       <div className="flex items-center justify-between">
         <Pill tone="grey">{mcq.topic}</Pill>
         <span className="text-[12px] font-extrabold text-ink3">FBISE · Physics 9</span>
       </div>
 
-      <p className="mt-2.5 font-display text-[17px] leading-[1.45] text-ink">{mcq.q}</p>
+      <p key={mcq.q} className="fx-rise mt-2.5 font-display text-[17px] leading-[1.45] text-ink">
+        {mcq.q}
+      </p>
 
       <div className="mt-3 flex flex-col gap-2">
         {mcq.options.map((opt, i) => {
@@ -82,10 +162,13 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
               key={opt}
               type="button"
               disabled={checked}
-              onClick={() => setChosen(i)}
-              className={`flex items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-2.5 text-left transition-colors duration-200 ${style}`}
+              onClick={() => {
+                stopAuto();
+                setChosen(i);
+              }}
+              className={`flex items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-2.5 text-left transition-all duration-300 ${style}`}
             >
-              <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12px] font-extrabold ${key}`}>
+              <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12px] font-extrabold transition-colors duration-300 ${key}`}>
                 {String.fromCharCode(65 + i)}
               </span>
               <span className="text-[15px] text-ink">{opt}</span>
@@ -95,71 +178,72 @@ export function HeroDemo({ mcq }: { mcq: Mcq }) {
         })}
       </div>
 
-      {/* Scroll allowance only where the card height is fixed (md). On mobile the
-          card grows with its content, so an inner scrollbar would be a bug. */}
       <div className="flex min-h-[150px] min-w-0 flex-1 flex-col justify-end md:overflow-y-auto">
-      {/* The confidence step, the thing that makes the practice data worth something */}
-      {chosen !== null && !checked ? (
-        <div className="mt-4">
-          <p className="mb-2 text-[12px] font-extrabold uppercase tracking-[0.08em] text-ink2">How sure are you?</p>
-          <div className="flex gap-2">
-            {CONFIDENCE.map((c) => (
-              <button
-                key={c.value}
-                type="button"
-                onClick={() => setConfidence(c.value)}
-                className={`min-h-10 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[13px] font-extrabold transition-colors duration-200 ${
-                  confidence === c.value ? 'border-orange bg-orangetint text-orangedark' : 'border-line bg-card text-ink2 hover:border-orange/40'
-                }`}
-              >
-                {c.en}
-              </button>
-            ))}
+        {chosen !== null && !checked ? (
+          <div className="fx-rise mt-4">
+            <p className="mb-2 text-[12px] font-extrabold uppercase tracking-[0.08em] text-ink2">How sure are you?</p>
+            <div className="flex gap-2">
+              {CONFIDENCE.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => {
+                    stopAuto();
+                    setConfidence(c.value);
+                  }}
+                  className={`min-h-10 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[13px] font-extrabold transition-all duration-300 ${
+                    confidence === c.value
+                      ? 'border-orange bg-orangetint text-orangedark'
+                      : 'border-line bg-card text-ink2 hover:border-orange/40'
+                  }`}
+                >
+                  {c.en}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
 
-      {!checked ? (
-        <Btn
-          title="Check answer"
-          onClick={() => setChecked(true)}
-          disabled={chosen === null || confidence === null}
-          className="mt-4 w-full"
-        />
-      ) : (
-        // Verdict, reason and reset in one block. Two stacked cards plus a
-        // dangling link would double the space this state has to reserve, and
-        // the explanation reads better in ink than in red on red.
-        <div
-          className={`mt-4 overflow-hidden rounded-[16px] border border-l-[3px] bg-card ${
-            correct ? 'border-green' : 'border-red'
-          }`}
-        >
+        {!checked ? (
+          <Btn
+            title="Check answer"
+            onClick={() => {
+              stopAuto();
+              setChecked(true);
+            }}
+            disabled={chosen === null || confidence === null}
+            className="mt-4 w-full"
+          />
+        ) : (
           <div
-            className={`flex items-center gap-2 px-3.5 py-2 ${correct ? 'bg-greentint' : 'bg-redtint'}`}
+            className={`fx-rise mt-4 overflow-hidden rounded-[16px] border border-l-[3px] bg-card ${
+              correct ? 'border-green' : 'border-red'
+            }`}
           >
-            <Icon
-              name={correct ? 'check' : 'close'}
-              size={16}
-              strokeWidth={2.8}
-              className={`shrink-0 ${correct ? 'text-green' : 'text-red'}`}
-            />
-            <span className={`min-w-0 flex-1 text-[14px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}>
-              {verdict}
-            </span>
-            <button
-              type="button"
-              onClick={reset}
-              className="-mr-1 flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[12px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-card hover:text-teal"
-            >
-              <Icon name="refresh" size={13} strokeWidth={2.6} />
-              Try again
-            </button>
+            <div className={`flex items-center gap-2 px-3.5 py-2 ${correct ? 'bg-greentint' : 'bg-redtint'}`}>
+              <Icon
+                name={correct ? 'check' : 'close'}
+                size={16}
+                strokeWidth={2.8}
+                className={`shrink-0 ${correct ? 'text-green' : 'text-red'}`}
+              />
+              <span className={`min-w-0 flex-1 text-[14px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}>
+                {verdict}
+              </span>
+              <button
+                type="button"
+                onClick={reset}
+                className="-mr-1 flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[12px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-card hover:text-teal"
+              >
+                <Icon name="refresh" size={13} strokeWidth={2.6} />
+                Try again
+              </button>
+            </div>
+            <p className="px-3.5 py-2.5 text-[14px] leading-[1.6] text-ink2">{mcq.explanation}</p>
           </div>
-          <p className="px-3.5 py-2.5 text-[14px] leading-[1.6] text-ink2">{mcq.explanation}</p>
-        </div>
-      )}
+        )}
       </div>
     </Card>
+    </div>
   );
 }

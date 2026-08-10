@@ -22,7 +22,6 @@ import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { INCLUDED, PAYMENT_METHODS, type Plan, rupees } from '@/lib/plans';
 
-const TRIAL_DAYS = 3;
 
 /**
  * Copy for each payment method lives in the i18n dictionaries; plans.ts keeps
@@ -132,14 +131,12 @@ export function CheckoutForm({
             </div>
             <div className="flex justify-between border-t border-line pt-2">
               <dt className="font-extrabold text-ink">{t('checkout.dueToday')}</dt>
-              <dd className="font-display text-[19px] text-green">{live ? rupees(plan.price) : 'Rs 0'}</dd>
+              <dd className="font-display text-[19px] text-green">{rupees(plan.price)}</dd>
             </div>
           </dl>
 
           <p className="mt-3 text-[12.5px] leading-[1.6] text-ink2">
-            {live
-              ? t('checkout.liveNote', { days: TRIAL_DAYS })
-              : t('checkout.trialNote', { days: TRIAL_DAYS })}
+            {live ? t('checkout.liveNote') : t('checkout.payNote')}
           </p>
 
           <ul className="mt-4 flex flex-col gap-2 border-t border-line pt-4">
@@ -215,7 +212,7 @@ export function CheckoutForm({
           title={
             live
               ? t('checkout.continueToSafepay', { price: rupees(plan.price) })
-              : t('checkout.startTrial', { days: TRIAL_DAYS })
+              : t('checkout.subscribeNow', { price: rupees(plan.price) })
           }
           onClick={pay}
           variant="orange"

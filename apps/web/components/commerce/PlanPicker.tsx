@@ -4,9 +4,8 @@ import { useCallback, useState, useSyncExternalStore } from 'react';
 import { type StringKey, translate } from '@matricmate/core';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { getServerSnapshot, getSnapshot, subscribe } from '@/lib/persisted-store';
-import { INCLUDED, PLANS, type PlanId, rupees } from '@/lib/plans';
+import { INCLUDED, PLANS, type PlanId, planById, rupees } from '@/lib/plans';
 
-const TRIAL_DAYS = 3;
 
 /**
  * Length of plan, not tier of plan. Everyone gets the same product; the only
@@ -90,7 +89,7 @@ export function PlanPicker() {
         </div>
         <div className="shrink-0 md:w-[220px]">
           <LinkBtn
-            title={t('checkout.startTrial', { days: TRIAL_DAYS })}
+            title={t('checkout.subscribeNow', { price: rupees(planById(picked).price) })}
             href={`/checkout?plan=${picked}`}
             variant="orange"
             className="w-full"

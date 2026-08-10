@@ -3,16 +3,20 @@ import Link from 'next/link';
 import { PAPER_CONTENT, contentFor } from '@matricmate/core';
 import { AudioSample } from '@/components/landing/AudioSample';
 import { CountUp } from '@/components/landing/CountUp';
+import { CursorGlow } from '@/components/landing/CursorGlow';
 import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
 import { Reveal } from '@/components/landing/Reveal';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { SubjectMarquee } from '@/components/landing/SubjectMarquee';
+import { Tilt } from '@/components/landing/Tilt';
 import { Bar, Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
 import type { IconName } from '@matricmate/core';
 
 /** Everything on this page is real product content, not marketing mock-ups. */
 const dynamics = contentFor('phy-3');
-const heroMcq = dynamics.mcqs.find((m) => m.topic === 'Circular motion') ?? dynamics.mcqs[0];
+/** Four questions for the self-playing hero, so the loop does not repeat fast. */
+const heroMcqs = dynamics.mcqs.slice(0, 4);
 const physicsPaper = PAPER_CONTENT.pp1;
 
 const PAINS: { icon: IconName; title: string; body: string }[] = [
@@ -72,110 +76,112 @@ const FAQ = [
     a: 'Yes. The Android app and this website share one account, so your progress follows you.',
   },
   {
-    q: 'What if it doesn’t suit us?',
-    a: 'The first three days are free, and there’s no lock-in. You pay month to month and can stop whenever you like.',
+    q: 'Can I stop whenever I want?',
+    a: 'Yes. You pay month to month, nothing renews on its own, and there is no lock-in. Cancel from Profile, then Subscription, and you keep access until the date you have already paid for.',
   },
 ];
 
 export default function LandingPage() {
   return (
     <>
+      {/* Fills across the top as the page scrolls. Pure CSS where the browser
+          supports scroll-driven animation, invisible where it does not. */}
+      <div className="read-bar" aria-hidden />
+      <CursorGlow />
+
       <Nav />
 
       <main>
         {/* ---------------------------------------------------------- hero */}
-        {/* The entrance is pure CSS (fx-*), so it plays before hydration and
-            costs no JS. Six beats, ending on the demo card: the signature. */}
-        {/* The clip lives on the full-bleed wrapper, so the brand geometry can
-            drift into the page margin and is only ever cut at the viewport
-            edge, never mid-page. It exists so that bleed can't hand the page
-            a horizontal scrollbar. */}
-        <section className="overflow-x-clip">
-          <div className="mx-auto max-w-[1100px] px-5 pt-12 pb-14 md:pt-20">
-          <div className="grid items-center gap-12 md:grid-cols-[1.05fr_0.95fr]">
-            <div>
-              <Pill tone="orange" className="fx-rise fx-d1">
-                FBISE Class 9 · English &amp; Urdu medium
-              </Pill>
+        {/* The one dark screen, and the page's whole first impression. Light
+            drifts behind it, a ring turns as you scroll, and the demo card
+            answers itself. Everything below returns to paper. */}
+        <section className="relative isolate overflow-hidden bg-night">
+          <div className="aurora">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="scroll-arc arc-dark absolute -right-[22rem] -top-[26rem] h-[52rem] w-[52rem]" aria-hidden />
+          <div className="scroll-arc arc-dark absolute -bottom-[34rem] -left-[20rem] h-[46rem] w-[46rem]" aria-hidden />
 
-              {/* Balanced wrap instead of a hard break: the second phrase is
-                  too long to promise its own line at every width in between
-                  the breakpoints, and an orphaned "does." reads as a typo. */}
-              <h1 className="fx-rise fx-d2 mt-4 font-display text-mk-hero text-balance text-ink">
-                Know what you know <span className="text-teal">before the board does.</span>
-              </h1>
+          <div className="relative mx-auto max-w-[1100px] px-5 pt-14 pb-10 md:pt-20">
+            <div className="grid items-center gap-12 md:grid-cols-[1.05fr_0.95fr]">
+              <div>
+                {/* One inline run for the two scripts, so vertical-align lines
+                    them up. Split across flex items they each centre on their
+                    own box and the Nastaliq drops half a line. */}
+                <span className="fx-rise fx-d1 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3.5 py-1.5 text-[12.5px] font-extrabold text-tealtint">
+                  <Icon name="gradCap" size={14} className="shrink-0 text-cyan" />
+                  <span>
+                    FBISE Class 9 · English &amp; <Ur>اردو</Ur> medium
+                  </span>
+                </span>
 
-              <p className="fx-rise fx-d3 mt-4 max-w-[560px] text-mk-lead text-ink2">
-                Chapter notes, audio lessons, past papers and a tutor that answers at midnight. Every question you
-                practise also records how sure you were, so MatricMate can show you the topics you only{' '}
-                <em>think</em> you know.
-              </p>
+                <h1 className="fx-rise fx-d2 mt-5 font-display text-mk-hero text-balance text-white">
+                  Know what you know{' '}
+                  <span className="bg-gradient-to-r from-cyan via-cyan to-orange bg-clip-text text-transparent">
+                    before the board does.
+                  </span>
+                </h1>
 
-              <p className="fx-rise fx-d4 mt-3 text-[16px] font-extrabold text-ink2">Poori tayyari, aik hi jagah.</p>
+                <p className="fx-rise fx-d3 mt-4 max-w-[560px] text-mk-lead text-tealtint">
+                  Chapter notes, audio lessons, past papers and a tutor that answers at midnight. Every question you
+                  practise also records how sure you were, so MatricMate can show you the topics you only{' '}
+                  <em>think</em> you know.
+                </p>
 
-              <div className="fx-rise fx-d5 mt-7 flex flex-wrap gap-3">
-                <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
-                <LinkBtn title="See pricing" href="#pricing" variant="line" lg />
+                <p className="fx-rise fx-d4 mt-3 text-[16px] font-extrabold text-cyan">Poori tayyari, aik hi jagah.</p>
+
+                <div className="fx-rise fx-d5 mt-7 flex flex-wrap gap-3">
+                  <span className="pulse-glow rounded-[16px]">
+                    <LinkBtn title="Get started" href="/signup" variant="orange" lg />
+                  </span>
+                  <Link
+                    href="#pricing"
+                    className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[16px] border-[1.5px] border-white/25 px-7 py-4 font-display text-[18px] text-white transition-[background-color,border-color,transform] duration-200 ease-out hover:border-white/60 hover:bg-white/10 active:scale-[0.98]"
+                  >
+                    See pricing
+                  </Link>
+                </div>
+
+                <p className="fx-rise fx-d6 mt-4 text-mk-small text-tealtint/80">
+                  Rs 1,000/month · cancel any time · JazzCash, Easypaisa or card
+                </p>
               </div>
 
-              <p className="fx-rise fx-d6 mt-4 text-mk-small text-ink2">
-                Rs 1,000/month after the trial · cancel any time · JazzCash, Easypaisa or card
-              </p>
-            </div>
-
-            <div className="fx-card relative flex flex-col items-center">
-              {/* Soft brand geometry, so the live card sits in a scene rather
-                  than on bare paper. Decorative, hence aria-hidden and md-up. */}
-              <div aria-hidden className="absolute -right-14 -top-12 hidden h-[230px] w-[230px] rounded-full border-[26px] border-tealtint md:block" />
-              <div aria-hidden className="absolute -left-8 bottom-10 hidden h-[70px] w-[70px] rounded-full bg-orangetint md:block" />
-              <div aria-hidden className="absolute -right-4 bottom-28 hidden h-4 w-4 rounded-full bg-orange/60 md:block" />
-              <div className="relative w-full max-w-[430px]">
-                <HeroDemo mcq={heroMcq} />
+              <div className="fx-card flex justify-center md:justify-end">
+                <HeroDemo mcqs={heroMcqs} />
               </div>
             </div>
           </div>
-          </div>
-        </section>
 
-        {/* --------------------------------------------------- trust strip */}
-        <section className="border-y border-tealtint2 bg-tealtint">
-          <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-center gap-x-14 gap-y-3 px-5 py-5 text-mk-small font-extrabold text-ink2">
-            <span className="flex items-center gap-2">
-              <Icon name="book2" size={17} className="text-teal" /> FBISE syllabus, chapter by chapter
-            </span>
-            <span className="flex items-center gap-2">
-              <Icon name="globe" size={17} className="shrink-0 text-teal" />
-              {/* One inline run, so vertical-align lines the two scripts up.
-                  Split across flex items they would each centre on their own box. */}
-              <span>
-                English &amp; <Ur>اردو</Ur> medium
-              </span>
-            </span>
-            <span className="flex items-center gap-2">
-              <Icon name="download" size={17} className="text-teal" /> Works offline
-            </span>
-            <span className="flex items-center gap-2">
-              <Icon name="star" size={17} className="text-teal" /> Built in Pakistan
-            </span>
+          {/* The syllabus, moving. Sits on the seam between the dark hero and
+              the page, so the eye is already following something. */}
+          <div className="relative border-t border-white/10 py-5">
+            <SubjectMarquee />
           </div>
         </section>
 
         {/* -------------------------------------------------------- problem */}
-        <section className="mx-auto max-w-[1100px] px-5 py-16 md:py-20">
+        <section className="relative mx-auto max-w-[1100px] overflow-hidden px-5 py-16 md:py-20">
+          <div className="scroll-arc absolute -right-[30rem] top-[6rem] hidden h-[44rem] w-[44rem] md:block" aria-hidden />
           <Reveal>
             <h2 className="max-w-[680px] font-display text-mk-h2 text-ink">
               Studying harder isn’t the problem. Studying blind is.
             </h2>
           </Reveal>
-          <Reveal stagger className="mt-9 grid gap-4 md:grid-cols-3">
+          <Reveal stagger className="relative mt-9 grid gap-4 md:grid-cols-3">
             {PAINS.map((p) => (
-              <Card key={p.title} className="lift h-full">
-                <span className="flex h-[44px] w-[44px] items-center justify-center rounded-[13px] bg-tealtint text-teal">
-                  <Icon name={p.icon} size={22} />
-                </span>
-                <h3 className="mt-2.5 font-display text-mk-h3 text-ink">{p.title}</h3>
-                <p className="mt-1.5 text-mk-body text-ink2">{p.body}</p>
-              </Card>
+              <Tilt key={p.title}>
+                <Card className="lift h-full">
+                  <span className="flex h-[44px] w-[44px] items-center justify-center rounded-[13px] bg-tealtint text-teal">
+                    <Icon name={p.icon} size={22} />
+                  </span>
+                  <h3 className="mt-2.5 font-display text-mk-h3 text-ink">{p.title}</h3>
+                  <p className="mt-1.5 text-mk-body text-ink2">{p.body}</p>
+                </Card>
+              </Tilt>
             ))}
           </Reveal>
         </section>
@@ -189,7 +195,7 @@ export default function LandingPage() {
             <Reveal as="ol" stagger className="mt-9 grid gap-6 md:grid-cols-4">
               {STEPS.map((s) => (
                 <li key={s.n}>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal font-display text-[17px] text-white">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-teal to-cyan font-display text-[18px] text-white shadow-[0_6px_18px_rgba(10,126,164,0.35)]">
                     {s.n}
                   </span>
                   <h3 className="mt-3 font-display text-mk-h3 text-ink">{s.title}</h3>
@@ -212,13 +218,15 @@ export default function LandingPage() {
           <div className="mt-9 grid gap-8 md:grid-cols-[1fr_380px]">
             <Reveal stagger className="grid content-start gap-4 sm:grid-cols-2">
               {INSIDE.map((f) => (
-                <Card key={f.title} className="lift h-full">
-                  <span className={`flex h-[44px] w-[44px] items-center justify-center rounded-[13px] ${f.tone}`}>
-                    <Icon name={f.icon} size={22} />
-                  </span>
-                  <h3 className="mt-2.5 font-display text-mk-h3 text-ink">{f.title}</h3>
-                  <p className="mt-1 text-mk-body text-ink2">{f.body}</p>
-                </Card>
+                <Tilt key={f.title} max={5}>
+                  <Card className="lift h-full">
+                    <span className={`flex h-[44px] w-[44px] items-center justify-center rounded-[13px] ${f.tone}`}>
+                      <Icon name={f.icon} size={22} />
+                    </span>
+                    <h3 className="mt-2.5 font-display text-mk-h3 text-ink">{f.title}</h3>
+                    <p className="mt-1 text-mk-body text-ink2">{f.body}</p>
+                  </Card>
+                </Tilt>
               ))}
             </Reveal>
 
@@ -235,7 +243,7 @@ export default function LandingPage() {
                   When a net force acts on a body it produces acceleration in the direction of the force. The
                   acceleration is directly proportional to the force and inversely proportional to the mass.
                 </p>
-                <div className="mt-3 rounded-[14px] bg-tealtint px-4 py-3 text-center">
+                <div className="mt-3 rounded-[14px] bg-gradient-to-br from-tealtint to-tealtint2 px-4 py-3 text-center">
                   <span className="font-display text-[24px] tracking-wide text-ink">F = m a</span>
                   <p className="text-[13px] text-ink2">force = mass × acceleration</p>
                 </div>
@@ -249,11 +257,14 @@ export default function LandingPage() {
         </section>
 
         {/* ------------------------------------------------------ confidence */}
-        {/* The one dark band on the page. This is the product's differentiator,
-            and the deep ground is what makes the page's sections legible as
-            sections; light tints alone measure near-identical (1.1:1). */}
-        <section className="bg-tealdark">
-          <Reveal stagger className="mx-auto grid max-w-[1100px] items-center gap-12 px-5 py-16 md:grid-cols-2 md:py-24">
+        <section className="relative isolate overflow-hidden bg-night">
+          <div className="aurora">
+            <span />
+            <span />
+          </div>
+          <div className="scroll-arc arc-dark absolute -left-[26rem] top-[-14rem] h-[48rem] w-[48rem]" aria-hidden />
+
+          <Reveal stagger className="relative mx-auto grid max-w-[1100px] items-center gap-12 px-5 py-16 md:grid-cols-2 md:py-24">
             <div>
               <Pill tone="orange">The part other apps skip</Pill>
               <h2 className="mt-4 font-display text-mk-h2 text-white">
@@ -269,43 +280,46 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <Card>
-              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">
-                How sure you were vs how right you were
-              </p>
-              <div className="mt-4 flex flex-col gap-4">
-                {(
-                  [
-                    { label: 'Certain', pct: 91, tone: 'green', said: '96×' },
-                    { label: 'Fairly sure', pct: 68, tone: 'orange', said: '74×' },
-                    { label: 'Guess', pct: 39, tone: 'red', said: '41×' },
-                  ] as const
-                ).map((r) => (
-                  <div key={r.label}>
-                    <div className="flex justify-between text-[13.5px] font-extrabold text-ink">
-                      <span>{r.label}</span>
-                      <span className="text-ink2 tabular">
-                        <CountUp to={r.pct} />% right · said {r.said}
-                      </span>
+            <Tilt max={6}>
+              <Card className="shadow-[0_24px_70px_rgba(4,34,47,0.5)]">
+                <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">
+                  How sure you were vs how right you were
+                </p>
+                <div className="mt-4 flex flex-col gap-4">
+                  {(
+                    [
+                      { label: 'Certain', pct: 91, tone: 'green', said: '96×' },
+                      { label: 'Fairly sure', pct: 68, tone: 'orange', said: '74×' },
+                      { label: 'Guess', pct: 39, tone: 'red', said: '41×' },
+                    ] as const
+                  ).map((r) => (
+                    <div key={r.label}>
+                      <div className="flex justify-between text-[13.5px] font-extrabold text-ink">
+                        <span>{r.label}</span>
+                        <span className="text-ink2 tabular">
+                          <CountUp to={r.pct} />% right · said {r.said}
+                        </span>
+                      </div>
+                      {/* rv-bar: draws from zero to the real value on reveal */}
+                      <div className="rv-bar mt-1.5">
+                        <Bar pct={r.pct} tone={r.tone} h={8} />
+                      </div>
                     </div>
-                    {/* rv-bar: draws from zero to the real value on reveal */}
-                    <div className="rv-bar mt-1.5">
-                      <Bar pct={r.pct} tone={r.tone} h={8} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-4 text-mk-small text-ink2">
-                “When you say you’re certain, you’re right 91% of the time, so trust that. The guessing is where the
-                marks are leaking.”
-              </p>
-            </Card>
+                  ))}
+                </div>
+                <p className="mt-4 text-mk-small text-ink2">
+                  “When you say you’re certain, you’re right 91% of the time, so trust that. The guessing is where the
+                  marks are leaking.”
+                </p>
+              </Card>
+            </Tilt>
           </Reveal>
         </section>
 
         {/* ---------------------------------------------------------- papers */}
-        <section id="papers" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16 md:py-20">
-          <div className="grid gap-10 md:grid-cols-[1fr_1fr]">
+        <section id="papers" className="relative mx-auto max-w-[1100px] scroll-mt-20 overflow-hidden px-5 py-16 md:py-20">
+          <div className="scroll-arc absolute -left-[32rem] bottom-[2rem] hidden h-[42rem] w-[42rem] md:block" aria-hidden />
+          <div className="relative grid gap-10 md:grid-cols-[1fr_1fr]">
             <Reveal>
               <h2 className="font-display text-mk-h2 text-ink">
                 Real board papers, in the board’s own shape.
@@ -326,30 +340,32 @@ export default function LandingPage() {
 
             {/* a genuine excerpt, typeset the way the board prints it */}
             <Reveal>
-              <Card>
-                <p className="text-center font-display text-[16px] text-ink">FEDERAL BOARD SSC-I EXAMINATION</p>
-                <p className="text-center text-mk-small font-extrabold text-ink">PHYSICS · 2025</p>
-                <p className="mt-1 text-center text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
-                  65 marks · 2h 30m
-                </p>
-                <div className="my-4 border-t border-line" />
-                {physicsPaper.slice(0, 2).map((sec) => (
-                  <div key={sec.heading} className="mb-4">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <p className="text-[14px] font-extrabold text-ink">{sec.heading}</p>
-                      {sec.marks ? <span className="text-[12px] font-extrabold text-ink3">{sec.marks}</span> : null}
+              <Tilt max={5}>
+                <Card>
+                  <p className="text-center font-display text-[16px] text-ink">FEDERAL BOARD SSC-I EXAMINATION</p>
+                  <p className="text-center text-mk-small font-extrabold text-ink">PHYSICS · 2025</p>
+                  <p className="mt-1 text-center text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
+                    65 marks · 2h 30m
+                  </p>
+                  <div className="my-4 border-t border-line" />
+                  {physicsPaper.slice(0, 2).map((sec) => (
+                    <div key={sec.heading} className="mb-4">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="text-[14px] font-extrabold text-ink">{sec.heading}</p>
+                        {sec.marks ? <span className="text-[12px] font-extrabold text-ink3">{sec.marks}</span> : null}
+                      </div>
+                      <div className="mt-1.5 flex flex-col gap-1">
+                        {sec.lines.slice(0, 4).map((line, i) => (
+                          <p key={line} className={`text-[13.5px] leading-[1.65] ${i === 0 ? 'text-ink' : 'text-ink2'}`}>
+                            {line}
+                          </p>
+                        ))}
+                      </div>
                     </div>
-                    <div className="mt-1.5 flex flex-col gap-1">
-                      {sec.lines.slice(0, 4).map((line, i) => (
-                        <p key={line} className={`text-[13.5px] leading-[1.65] ${i === 0 ? 'text-ink' : 'text-ink2'}`}>
-                          {line}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                <p className="text-[13px] text-ink3">…continues to Section C</p>
-              </Card>
+                  ))}
+                  <p className="text-[13px] text-ink3">…continues to Section C</p>
+                </Card>
+              </Tilt>
             </Reveal>
           </div>
         </section>
@@ -373,52 +389,54 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <Card className="border-2 border-teal">
-              <div className="flex items-start justify-between">
-                <div>
-                  <Image src="/brand/wordmark.png" alt="" width={110} height={22} />
-                  <p className="mt-1.5 text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
-                    Monthly report · June
-                  </p>
-                </div>
-                <span className="flex h-[62px] w-[62px] items-center justify-center rounded-full bg-orangetint font-display text-[24px] text-orangedark">
-                  A−
-                </span>
-              </div>
-              <div className="mt-4">
-                {(
-                  [
-                    ['Physics', 'A', 'up'],
-                    ['Chemistry', 'B+', 'up'],
-                    ['Biology', 'B', 'steady'],
-                    ['Mathematics', 'A−', 'up'],
-                  ] as const
-                ).map(([subject, grade, trend]) => (
-                  // Fixed tracks, so grades sit in a column instead of drifting
-                  // with the length of the subject name.
-                  <div
-                    key={subject}
-                    className="grid grid-cols-[1fr_44px_20px] items-center border-b border-line py-2 last:border-0"
-                  >
-                    <span className="text-[15px] text-ink">{subject}</span>
-                    <span className="text-right font-display text-[16px] text-ink tabular">{grade}</span>
-                    <span className="flex justify-end">
-                      <Icon
-                        name={trend === 'up' ? 'chart' : 'arrowRight'}
-                        size={15}
-                        strokeWidth={2.4}
-                        className={trend === 'up' ? 'text-green' : 'text-ink3'}
-                      />
-                      <span className="sr-only">{trend === 'up' ? 'improved' : 'steady'}</span>
-                    </span>
+            <Tilt max={6}>
+              <Card className="border-2 border-teal">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <Image src="/brand/wordmark.png" alt="" width={110} height={22} />
+                    <p className="mt-1.5 text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
+                      Monthly report · June
+                    </p>
                   </div>
-                ))}
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Pill tone="teal">22 active days</Pill>
-                <Pill tone="orange">9 tests</Pill>
-              </div>
-            </Card>
+                  <span className="flex h-[62px] w-[62px] items-center justify-center rounded-full bg-orangetint font-display text-[24px] text-orangedark">
+                    A−
+                  </span>
+                </div>
+                <div className="mt-4">
+                  {(
+                    [
+                      ['Physics', 'A', 'up'],
+                      ['Chemistry', 'B+', 'up'],
+                      ['Biology', 'B', 'steady'],
+                      ['Mathematics', 'A−', 'up'],
+                    ] as const
+                  ).map(([subject, grade, trend]) => (
+                    // Fixed tracks, so grades sit in a column instead of drifting
+                    // with the length of the subject name.
+                    <div
+                      key={subject}
+                      className="grid grid-cols-[1fr_44px_20px] items-center border-b border-line py-2 last:border-0"
+                    >
+                      <span className="text-[15px] text-ink">{subject}</span>
+                      <span className="text-right font-display text-[16px] text-ink tabular">{grade}</span>
+                      <span className="flex justify-end">
+                        <Icon
+                          name={trend === 'up' ? 'chart' : 'arrowRight'}
+                          size={15}
+                          strokeWidth={2.4}
+                          className={trend === 'up' ? 'text-green' : 'text-ink3'}
+                        />
+                        <span className="sr-only">{trend === 'up' ? 'improved' : 'steady'}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Pill tone="teal">22 active days</Pill>
+                  <Pill tone="orange">9 tests</Pill>
+                </div>
+              </Card>
+            </Tilt>
           </Reveal>
         </section>
 
@@ -431,53 +449,47 @@ export default function LandingPage() {
             </p>
           </Reveal>
 
-          <Reveal stagger className="mx-auto mt-10 grid max-w-[880px] gap-5 md:grid-cols-[1fr_1fr]">
-            <Card flat className="flex h-full flex-col">
-              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">Free</p>
-              <p className="mt-1 font-display text-[34px] text-ink">Rs 0</p>
-              <p className="text-mk-small text-ink2">Keep it as long as you like</p>
-              <ul className="mt-4 flex flex-1 flex-col gap-2.5">
-                {['Browse every subject and chapter', 'One full chapter per subject', '5 MCQs a day', '5 AI tutor questions a day'].map((li) => (
-                  <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink2">
-                    <Icon name="check" size={17} className="mt-0.5 shrink-0 text-ink3" strokeWidth={2.6} />
-                    {li}
-                  </li>
-                ))}
-              </ul>
-              <LinkBtn title="Start free" href="/signup" variant="line" className="mt-5 w-full" />
-            </Card>
+          <Reveal className="mx-auto mt-10 max-w-[560px]">
+            <Tilt max={4}>
+              <Card className="relative flex h-full flex-col border-2 border-orange shadow-[0_18px_50px_rgba(255,138,0,0.16)]">
+                <span className="absolute -top-3 right-5">
+                  <Pill tone="orange">Most students pick monthly</Pill>
+                </span>
+                <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium</p>
+                <p className="mt-1 font-display text-[52px] leading-none text-ink">
+                  Rs 1,000
+                  <span className="ml-1 text-[16px] font-normal text-ink2">/ month</span>
+                </p>
+                <p className="text-mk-small text-ink2">Cancel any time · nothing renews on its own</p>
+                <ul className="mt-5 flex flex-1 flex-col gap-2.5">
+                  {[
+                    'Every chapter, note and audio lesson',
+                    'Unlimited MCQs, tests and past papers',
+                    'AI tutor: 20 questions a day',
+                    'Weak topics and monthly report card',
+                    'Offline downloads',
+                    'Android app and website, one account',
+                  ].map((li) => (
+                    <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink">
+                      <Icon name="check" size={17} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+                <span className="pulse-glow mt-6 rounded-[16px]">
+                  <LinkBtn title="Subscribe now" href="/checkout?plan=monthly" variant="orange" className="w-full" />
+                </span>
+                <p className="mt-3 text-center text-[13px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
+                <Link href="/pricing" className="mt-2 text-center text-[13.5px] font-extrabold text-teal hover:underline">
+                  Compare plan lengths
+                </Link>
+              </Card>
+            </Tilt>
 
-            <Card className="relative flex h-full flex-col border-2 border-orange">
-              <span className="absolute -top-3 right-5">
-                <Pill tone="orange">Most students pick this</Pill>
-              </span>
-              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium</p>
-              <p className="mt-1 font-display text-[44px] leading-none text-ink">
-                Rs 1,000
-                <span className="ml-1 text-[16px] font-normal text-ink2">/ month</span>
-              </p>
-              <p className="text-mk-small text-ink2">First 3 days free · cancel any time</p>
-              <ul className="mt-4 flex flex-1 flex-col gap-2.5">
-                {[
-                  'Every chapter, note and audio lesson',
-                  'Unlimited MCQs, tests and past papers',
-                  'AI tutor: 20 questions a day',
-                  'Weak topics and monthly report card',
-                  'Offline downloads',
-                  'Android app and website, one account',
-                ].map((li) => (
-                  <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink">
-                    <Icon name="check" size={17} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
-                    {li}
-                  </li>
-                ))}
-              </ul>
-              <LinkBtn title="Start 3 days free" href="/checkout?plan=monthly" variant="orange" className="mt-5 w-full" />
-              <p className="mt-3 text-center text-[13px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
-              <Link href="/pricing" className="mt-2 text-center text-[13.5px] font-extrabold text-teal hover:underline">
-                Compare plan lengths
-              </Link>
-            </Card>
+            <p className="mt-6 text-center text-mk-small text-ink2">
+              Making an account is free, and lets you see the syllabus and a sample chapter. Studying the full course
+              needs a subscription.
+            </p>
           </Reveal>
         </section>
 
@@ -504,24 +516,26 @@ export default function LandingPage() {
         {/* -------------------------------------------------------- final CTA */}
         <section className="mx-auto max-w-[1100px] px-5 py-20 md:py-24">
           <Reveal>
-            <div className="relative overflow-hidden rounded-[28px] bg-teal px-6 py-16 text-center md:py-20">
-              {/* Same geometry family as the hero, in the band's own ink. */}
-              <div aria-hidden className="absolute -left-16 -top-16 h-[220px] w-[220px] rounded-full border-[24px] border-white/10" />
-              <div aria-hidden className="absolute -bottom-12 -right-10 h-[170px] w-[170px] rounded-full border-[20px] border-white/10" />
+            <div className="relative isolate overflow-hidden rounded-[28px] bg-night px-6 py-16 text-center md:py-20">
+              <div className="aurora">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="scroll-arc arc-dark absolute -right-[16rem] -top-[18rem] h-[36rem] w-[36rem]" aria-hidden />
               <h2 className="relative mx-auto max-w-[680px] font-display text-mk-h1 text-white">
                 The exam is a date. Start before it’s a deadline.
               </h2>
-              <p className="relative mx-auto mt-4 max-w-[520px] text-mk-lead text-white/90">
-                Three days free, then Rs 1,000 a month. Set up in two minutes and study your first chapter tonight.
+              <p className="relative mx-auto mt-4 max-w-[520px] text-mk-lead text-tealtint">
+                Rs 1,000 a month, cancel whenever you like. Set up in two minutes and study your first chapter tonight.
               </p>
               <div className="relative mt-8 flex flex-wrap justify-center gap-3">
-                <LinkBtn title="Start 3 days free" href="/signup" variant="orange" lg />
-                {/* White-outline sibling of the orange LinkBtn. No BtnVariant covers a
-                    dark band, so the full button recipe is written out here: same
-                    min height, radius, press cue and timing as buttonClasses. */}
+                <span className="pulse-glow rounded-[16px]">
+                  <LinkBtn title="Get started" href="/signup" variant="orange" lg />
+                </span>
                 <Link
                   href="/login"
-                  className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[16px] border-[1.5px] border-white/40 px-7 py-4 font-display text-[18px] text-white transition-[background-color,border-color,transform] duration-200 ease-out hover:border-white/70 hover:bg-white/10 active:scale-[0.98]"
+                  className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[16px] border-[1.5px] border-white/25 px-7 py-4 font-display text-[18px] text-white transition-[background-color,border-color,transform] duration-200 ease-out hover:border-white/60 hover:bg-white/10 active:scale-[0.98]"
                 >
                   I already have an account
                 </Link>

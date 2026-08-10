@@ -7,10 +7,18 @@
  */
 
 export const colors = {
-  teal: '#096A8B',
-  tealDark: '#0F5064',
-  tealTint: '#E9F2F5',
-  tealTint2: '#D5E7ED',
+  /** Primary. Brightened from #096A8B: the old one read as grey-blue on a
+   * phone in daylight and the client could not tell it apart from the ink. */
+  teal: '#0A7EA4',
+  tealDark: '#063D52',
+  /** The darkest ground, for the landing hero and any full-bleed dark band.
+   * White sits on it at 16:1. */
+  night: '#04222F',
+  /** Glow accent. Only ever appears on a dark ground, where it reads at 8:1,
+   * in gradients, focus glows and the live-demo highlight. Never on paper. */
+  cyan: '#22C7D6',
+  tealTint: '#E4F1F6',
+  tealTint2: '#C9E4EE',
   ink: '#0F3D4C',
   /** Secondary copy. Darkened from #517682 (4.7:1 on paper) after the client
    * reported the greyer text was hard to read; now 6.2:1. */
@@ -28,11 +36,12 @@ export const colors = {
   track: '#EAF0EC',
   /** Inactive control surfaces: an off toggle, an unchecked box, a step dot. */
   mute: '#D7E0DB',
-  orange: '#F29329',
-  /** Orange as TEXT (labels on tints and cards). #D97B10 sat at 3.1:1 on
-   * white; this passes AA at 4.8:1. Fills stay `orange`; text uses this. */
-  orangeDark: '#AD5F03',
-  orangeTint: '#FDF1E1',
+  /** Hotter than the old #F29329, which went muddy next to the brighter
+   * primary. Reads at 7:1 on night, and carries ink at 5:1. */
+  orange: '#FF8A00',
+  /** Orange as TEXT (labels on tints and cards). Fills stay `orange`. */
+  orangeDark: '#A85700',
+  orangeTint: '#FFF0DC',
   green: '#2E9E5B',
   greenTint: '#E7F5EC',
   red: '#D9534F',

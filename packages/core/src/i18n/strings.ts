@@ -141,7 +141,7 @@ export const en = {
     checkedFree: 'Still on the free plan.',
     renewCta: 'Renew {plan} · {price}',
     fromMonthly: 'From {price} a month. Pick the length that suits you.',
-    freeBody: 'You’re on the free plan: one full chapter per subject, 5 MCQs and 5 AI questions a day.',
+    freeBody: 'You’re on a free account: chapter one of every subject, so you can see how it works. Subscribe to open the rest.',
     lockedBody: 'This chapter is part of Premium, so it isn’t included in your plan yet.',
     expiredBody: 'Your plan has ended, so Premium chapters are locked.',
     manageNote: 'Subscriptions are managed on our website, {site}.',
@@ -177,8 +177,8 @@ export const en = {
     worksOutTo: 'Works out to',
     perMonth: '{price} / month',
     dueToday: 'Due today',
-    liveNote: 'Test payment: no real money moves in this preview. In the live app the {days}-day trial applies and the total shows as Rs 0 today.',
-    trialNote: '{days} days free. We message you two days before the trial ends, and nothing is charged until you say so.',
+    liveNote: 'Test payment: no real money moves in this preview. In the live app this amount is charged once, today.',
+    payNote: 'One payment for the whole plan. Nothing renews on its own, and we message you before it runs out.',
     changePlan: 'Change plan',
 
     payWith: 'Pay with',
@@ -191,7 +191,7 @@ export const en = {
     accountNote: 'Premium will be added to {email}. The next page may ask for an email for your receipt, and it does not have to be this one.',
 
     continueToSafepay: 'Continue to Safepay · {price}',
-    startTrial: 'Start {days} days free',
+    subscribeNow: 'Subscribe · {price}',
     agreeTerms: 'By continuing you agree to the {terms}.',
     termsLink: 'Terms and Privacy Policy',
     testNote: 'Test payment: no real money moves in this preview.',
@@ -227,7 +227,7 @@ export const en = {
     selected: 'Selected',
     chooseLength: 'Choose this length',
     premiumIncludes: 'Premium includes',
-    noChargeToday: 'No charge today · cancel any time',
+    noChargeToday: 'Cancel any time · nothing renews on its own',
   },
 
   tabs: {
@@ -631,7 +631,7 @@ export const en = {
     premiumActive: 'Premium active',
     premiumTill: 'Till {date} · renews manually',
     freeMode: 'Free mode',
-    freeModeSub: '5 MCQs and 5 AI questions a day',
+    freeModeSub: 'Chapter one of every subject',
     upgrade: 'Upgrade',
     levelLine: '{xp} XP · Level {level}',
     toNextLevel: '{n} to go',
@@ -862,7 +862,7 @@ export const ur: typeof en = {
     checkedFree: 'Abhi aap free plan par hain.',
     renewCta: '{plan} renew karein · {price}',
     fromMonthly: '{price} mahana se shuru. Jitni muddat chahein chunein.',
-    freeBody: 'Aap free plan par hain: har subject ka aik chapter, roz 5 MCQs aur AI se 5 sawal.',
+    freeBody: 'Aap free account par hain: har subject ka pehla chapter, taake aap dekh sakein kaise chalta hai. Baaqi kholne ke liye subscribe karein.',
     lockedBody: 'Yeh chapter Premium ka hissa hai, is liye abhi aap ke plan mein shamil nahi.',
     expiredBody: 'Aap ka plan khatam ho gaya hai, is liye Premium chapters lock hain.',
     manageNote: 'Subscription hamari website {site} par manage hoti hai.',
@@ -898,8 +898,8 @@ export const ur: typeof en = {
     worksOutTo: 'Yani',
     perMonth: '{price} / mahana',
     dueToday: 'Aaj ka total',
-    liveNote: 'Test payment hai: is preview mein asli paise nahi katte. Live app mein yahan {days} din ka trial lagta hai aur aaj ka total Rs 0 hota hai.',
-    trialNote: '{days} din free. Trial khatam hone se do din pehle hum message karte hain, aur jab tak aap na kahein paise nahi katte.',
+    liveNote: 'Test payment hai: is preview mein asli paise nahi katte. Live app mein yeh raqam aaj aik dafa kat ti hai.',
+    payNote: 'Poore plan ki aik hi payment. Khud se kuch renew nahi hota, aur khatam hone se pehle hum message karte hain.',
     changePlan: 'Plan badlein',
 
     payWith: 'Payment ka tareeqa',
@@ -912,7 +912,7 @@ export const ur: typeof en = {
     accountNote: 'Premium {email} mein shamil hoga. Agla page receipt ke liye email maang sakta hai, aur zaroori nahi ke woh yehi ho.',
 
     continueToSafepay: 'Safepay par jaari rakhein · {price}',
-    startTrial: '{days} din free shuru karein',
+    subscribeNow: 'Subscribe karein · {price}',
     agreeTerms: 'Aagey barhne ka matlab hai ke aap {terms} ko maante hain.',
     termsLink: 'Terms aur Privacy Policy',
     testNote: 'Test payment hai: is preview mein asli paise nahi katte.',
@@ -948,7 +948,7 @@ export const ur: typeof en = {
     selected: 'Chun liya',
     chooseLength: 'Yeh muddat chunein',
     premiumIncludes: 'Premium mein shamil',
-    noChargeToday: 'Aaj koi paise nahi · jab chahein cancel karein',
+    noChargeToday: 'Jab chahein cancel karein · khud se kuch renew nahi hota',
   },
 
   tabs: {
@@ -1352,7 +1352,7 @@ export const ur: typeof en = {
     premiumActive: 'Premium active hai',
     premiumTill: '{date} tak · renew aap khud karte hain',
     freeMode: 'Free mode',
-    freeModeSub: 'Roz 5 MCQs aur AI se 5 sawal',
+    freeModeSub: 'Har subject ka pehla chapter',
     upgrade: 'Upgrade karein',
     levelLine: '{xp} XP · Level {level}',
     toNextLevel: '{n} baqi',

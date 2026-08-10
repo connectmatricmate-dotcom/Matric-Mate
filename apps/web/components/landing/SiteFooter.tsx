@@ -50,6 +50,16 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
                 </Link>
               </li>
               <li>
+                <Link className="hover:text-teal" href="/refunds">
+                  Refunds and cancellation
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-teal" href="/delete-account">
+                  Delete your account
+                </Link>
+              </li>
+              <li>
                 <a className="hover:text-teal" href="mailto:help@matricmate.pk">
                   help@matricmate.pk
                 </a>

@@ -30,7 +30,10 @@ export function Nav() {
         <ul className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
+              <Link
+                href={l.href}
+                className="text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
+              >
                 {l.label}
               </Link>
             </li>
@@ -38,10 +41,13 @@ export function Nav() {
         </ul>
 
         <div className="hidden items-center gap-3 justify-self-end md:flex">
-          <Link href="/login" className="text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal">
+          <Link
+            href="/login"
+            className="text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
+          >
             Log in
           </Link>
-          <LinkBtn title="Start free" href="/signup" sm />
+          <LinkBtn title="Create account" href="/signup" sm />
         </div>
 
         {/* -mr-2 keeps the glyph on the bar's right edge while the box stays 44px. */}
@@ -61,7 +67,11 @@ export function Nav() {
           <ul className="flex flex-col gap-3">
             {LINKS.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} onClick={() => setOpen(false)} className="text-[16px] font-extrabold text-ink">
+                <Link
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className="text-[16px] font-extrabold text-ink"
+                >
                   {l.label}
                 </Link>
               </li>
@@ -69,7 +79,7 @@ export function Nav() {
           </ul>
           <div className="mt-4 flex gap-2">
             <LinkBtn title="Log in" href="/login" variant="line" sm className="flex-1" />
-            <LinkBtn title="Start free" href="/signup" sm className="flex-1" />
+            <LinkBtn title="Create account" href="/signup" sm className="flex-1" />
           </div>
         </div>
       ) : null}

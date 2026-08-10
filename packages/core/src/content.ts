@@ -132,7 +132,10 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       title: subjectId === 'urd' || subjectId === 'isl' ? (r[2] as string) : r[0],
       urduTitle: subjectId === 'urd' || subjectId === 'isl' ? r[0] : undefined,
       blurb: subjectId === 'urd' || subjectId === 'isl' ? r[1] : r[1],
-      premium: i >= 6,
+      // Chapter one of every subject is the free sample; everything after it
+      // needs a subscription. Was `i >= 6`, which quietly gave away six
+      // chapters per subject and contradicted the pricing page.
+      premium: i >= 1,
       mcqCount: 24 + ((i * 7) % 19),
       flashcardCount: 12 + ((i * 5) % 14),
       audioMinutes: 11 + ((i * 3) % 9),
