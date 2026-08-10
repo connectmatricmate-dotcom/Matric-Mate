@@ -9,8 +9,9 @@ own pricing pages, and PTA sources.
 **All of it works in Pakistan.** Nothing here is blocked by regulation or by any provider refusing
 Pakistani businesses. The cost is paperwork and lead time, not technology.
 
-Three separate vendors are needed, and they cannot be collapsed into one: an SMS aggregator, Meta
-for WhatsApp, and an email sender.
+**Two vendors are enough**, because SendPK sells both branded SMS and WhatsApp under one account.
+Adding a third buys cheaper WhatsApp at the price of another relationship and another set of
+paperwork. Section 7 sets out the choice.
 
 ## 1. Phone number sign-in
 
@@ -239,15 +240,35 @@ or authentication fails silently.
 That last line is worth reading twice. One SMS to every student costs about Rs 7,700, while the
 same message by email costs nothing. SMS should carry things that must arrive, not routine updates.
 
-## 7. Vendor count
+## 7. Vendor count: two or three
 
-Three, and they cannot be merged:
+SendPK sells WhatsApp as well as SMS, so the channels can be collapsed. The trade is a small
+per-message fee against one fewer account to open and maintain.
 
-| Vendor | Channel |
-| :-- | :-- |
-| SendPK or similar | SMS, including sign-in codes |
-| Meta, direct or through a local reseller | WhatsApp |
-| Resend | Email |
+**Two vendors, simpler**
+
+| Vendor | Channels | Cost |
+| :-- | :-- | :-- |
+| SendPK | SMS, sign-in codes, WhatsApp | SMS as above, plus Rs 1.00 to 1.50 per WhatsApp message on top of Meta's own rate |
+| Resend | Email | Free, then $20/mo |
+
+**Three vendors, cheaper WhatsApp**
+
+| Vendor | Channels | Cost |
+| :-- | :-- | :-- |
+| SendPK | SMS and sign-in codes | as above |
+| Meta directly | WhatsApp | Meta's rate only, no markup |
+| Resend | Email | Free, then $20/mo |
+
+At the volumes we expect the markup is small, roughly Rs 2,000 a year at 500 subscribers, so **the
+two-vendor route is the sensible default** unless WhatsApp usage grows well beyond renewal
+reminders.
+
+One thing that may force the decision anyway: **Meta does not bill in rupees.** Their supported
+currencies do not include PKR, they take only Visa and Mastercard, and they do not accept PayPal.
+If the client's card will not work internationally, going direct is not an option and the choice is
+made for us. A local reseller charging around $10 a month and accepting JazzCash or Easypaisa is
+the other way around that.
 
 ## Not confirmed
 
