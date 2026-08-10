@@ -10,8 +10,8 @@ not use so the question does not come back later.
 
 | | Cost |
 | :-- | --: |
-| One-time setup | **Rs 10,450** |
-| Fixed monthly | **$64, about Rs 17,800** |
+| One-time setup | **Rs 25,450** |
+| Fixed monthly | **about Rs 18,200** |
 | Per payment and per use | see section 5 |
 
 ## 2. Required accounts
@@ -27,6 +27,7 @@ not use so the question does not come back later.
 | Firebase | Push notifications | Free | Client |
 | Anthropic (Claude) | The AI tutor | Per use | Client |
 | Safepay | Taking payments | Per payment | Client |
+| SMS aggregator (SendPK) | Sign-in codes and text messages | Rs 5,000/yr plus per message | Client |
 | Resend | Sending email | Free to $20/mo | Client |
 | WhatsApp Business API | Renewal reminders | Per message | Client |
 | GitHub | Code storage | Free | Us, transferred at handover |
@@ -129,9 +130,10 @@ DNS pointing at Vercel. The free plan covers it fully.
 
 ### Resend · free, $20/month if outgrown
 
-Password resets, payment receipts, and reminders. Free covers 3,000 emails a month; $20 buys
-50,000. Needed because Supabase's built-in sender is limited to two emails an hour and is not
-meant for real users.
+Payment receipts, invoices, and anything a student wants a written record of. Still needed even
+though students sign up with a phone number rather than an email address. Free covers 3,000 emails
+a month; $20 buys 50,000. Supabase's own sender is limited to two emails an hour and is not meant
+for real users.
 
 ### Sentry and UptimeRobot · free
 
@@ -175,6 +177,23 @@ The largest cost that grows with students.
 The 20-question daily limit is what keeps this affordable. Without it, AI alone would reach 58% of
 revenue. Caching repeated context cuts the realistic figure by roughly 40%.
 
+### SMS · Rs 5,000 a year plus per message
+
+Students sign up with a phone number, so a verification code has to reach them. That makes SMS part
+of signing in, not an optional extra.
+
+| | |
+| :-- | --: |
+| Sender name registration, one-time | Rs 5,000 |
+| Sender name, annual | Rs 5,000 |
+| First top-up | about Rs 10,000 |
+| Sign-in code | Rs 4.70 to 4.80 each |
+| Ordinary branded message | Rs 3.80 to 3.90 each |
+
+Codes cost more than ordinary messages, not less. Registration needs an FBR NTN, CNIC and a stamped
+letterhead, takes two to four weeks, and a registered company is not required. Full detail in
+`NOTIFICATIONS.md`.
+
 ### WhatsApp Business API · about Rs 3.50 per message
 
 Used only for renewal reminders, roughly Rs 1,750 a month at 500 subscribers. Business verification
@@ -203,16 +222,22 @@ Beyond that it is $0.09 per GB.
 | | 100 paying | 500 paying | 2,000 paying |
 | :-- | --: | --: | --: |
 | Revenue | Rs 100,000 | Rs 500,000 | Rs 2,000,000 |
-| Fixed services | Rs 17,800 | Rs 17,800 | Rs 17,800 |
+| Fixed services | Rs 18,200 | Rs 18,200 | Rs 18,200 |
 | AI tutor | Rs 10,500 | Rs 54,000 | Rs 216,000 |
 | Safepay | Rs 4,000 | Rs 19,000 | Rs 75,000 |
 | WhatsApp | Rs 350 | Rs 1,750 | Rs 7,000 |
+| Sign-in codes | Rs 100 | Rs 525 | Rs 2,100 |
 | Extra transfer | Rs 0 | Rs 0 | Rs 15,000 |
-| **Total** | **Rs 33,000** | **Rs 93,000** | **Rs 331,000** |
+| **Total** | **Rs 33,000** | **Rs 93,000** | **Rs 333,000** |
 | Share of revenue | 33% | 19% | 17% |
 
-Cost falls as a share of revenue as students are added, because the fixed Rs 17,800 spreads out.
+Cost falls as a share of revenue as students are added, because the fixed Rs 18,200 spreads out.
 The figure that decides everything is AI usage per student, which the daily limit controls.
+
+Two things the table does not show. Sign-in codes assume students have passwords; sending a code on
+every login instead would cost Rs 51,250 a month at 2,000 students rather than Rs 2,100. And every
+**free** student also costs a sign-in code at signup while generating no revenue, so the real code
+bill follows total signups, not paying ones.
 
 ## 8. Account ownership
 

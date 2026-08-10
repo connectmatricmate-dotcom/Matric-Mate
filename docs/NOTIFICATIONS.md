@@ -1,183 +1,264 @@
-# MatricMate · Notification channels in Pakistan
+# MatricMate · Sign-in and messaging requirements
 
-Research and decision record, 6 Aug 2026. Client asked for SMS, WhatsApp and email notifications.
-Rates verified against provider pricing pages that day; anything not confirmed on a primary source is
-marked. Rupee figures use Rs 278 = $1.
+Phone number sign-in, plus SMS, WhatsApp and email messaging. What each one needs, what it costs,
+and what has to be built. Researched 10 Aug 2026 against Supabase's documentation, the providers'
+own pricing pages, and PTA sources.
 
-## The short version
+## Short answer
 
-Email and push cover almost everything MatricMate needs, and both are effectively free at our scale.
-WhatsApp is worth paying for at exactly one moment: the renewal reminder. SMS is not worth buying at
-all right now, and it is the only channel with a registration fee and an annual renewal.
+**All of it works in Pakistan.** Nothing here is blocked by regulation or by any provider refusing
+Pakistani businesses. The cost is paperwork and lead time, not technology.
 
-## Cost per 1,000 messages, delivered to a Pakistani user
+Three separate vendors are needed, and they cannot be collapsed into one: an SMS aggregator, Meta
+for WhatsApp, and an email sender.
 
-| Channel | Cost per 1,000 | Setup cost | Notes |
-| :-- | --: | :-- | :-- |
-| Push (FCM) | Rs 0 | Rs 0 | App users only, and only if they allow notifications |
-| Email (Resend) | Rs 0 to 111 | Rs 0 | Free to 3,000/month, then $20/month covers 50,000 |
-| WhatsApp utility | Rs 2,800 to 4,450 | Rs 0 platform fee | Meta Cloud API direct, no reseller markup |
-| WhatsApp marketing | Rs 13,100 to 13,900 | Rs 0 platform fee | Anything promotional, roughly 3x utility |
-| SMS, local aggregator | Rs 3,850 | Rs 5,000 once, Rs 5,000/yr | Branded sender, needs NTN and CNIC paperwork |
-| SMS, Twilio and similar | Rs 131,600 | Rs 0 | Verified on Twilio's and Plivo's own Pakistan pages |
+## 1. Phone number sign-in
 
-The last row is not a typo. International CPaaS routes into Pakistan cost roughly 34 times a local
-aggregator, and Twilio's own Pakistan guide warns that our sender name can be silently replaced with
-a random short code because it is not registered locally. International SMS is off the table.
+### It is supported, and we can use a cheap Pakistani SMS provider
 
-The gap that actually decides the architecture is the one between rows 2 and 3: a WhatsApp message
-costs around a thousand times an email. Every message we can honestly deliver by email or push
-should go by email or push.
+Supabase supports phone as the only identifier, with no email at all. The important question was
+whether we could send the verification code through a Pakistani provider, because Supabase's
+built-in options are Twilio, Vonage, MessageBird and TextLocal, and Twilio charges about Rs 132 per
+message to Pakistan against roughly Rs 4.75 locally.
 
-## What each channel is for
+**We can.** Supabase's **Send SMS Hook** is generally available, works on the Pro plan we are
+already paying for, and hands the code to our own function instead of a built-in provider. Our
+function receives the user and the six-digit code, composes the message text, and calls whichever
+Pakistani provider we choose.
 
-**Push (FCM).** Study reminders, streaks, "your test starts in 10 minutes". Free and unlimited.
-Already planned for M4. Reaches only app users who granted permission, so it can never be the
-channel for anything commercially important.
+That hook is also the **only** way to control the wording of the message, which we need anyway,
+because Pakistani branded SMS has content rules and we want the text in the student's own language.
 
-**Email.** The default for everything transactional: password reset, email confirmation, the
-"email me the link" flow in the mobile app, payment receipts, and the monthly report card link.
-Recommended provider is **Resend**: 3,000/month free permanently, $20/month for 50,000, an official
-Supabase custom-SMTP guide, and an official Vercel Marketplace integration. It is the only provider
-on Supabase's supported list that combines a permanent free tier with immediate production access
-and no manual approval queue.
+### The one decision that has to be made first
 
-This is also a live bug, not just a nice-to-have. Supabase's built-in email sender is capped at
-**2 messages per hour** and Supabase's own docs say it is for demos and team testing only. Password
-reset is effectively broken for real users until custom SMTP is configured.
+"Sign up with a phone number" can mean two things, and the difference is large:
 
-**WhatsApp.** Worth its cost only where reach directly protects revenue, which in practice means the
-subscription expiry reminder, and arguably the payment confirmation. Use Meta's **Cloud API
-directly**: there is no platform fee and no reseller markup, so we pay Meta the per-message rate and
-nothing else.
+| At 2,000 students | Code on every login | Phone plus a password |
+| :-- | --: | --: |
+| Signup codes | Rs 1,850/mo | Rs 1,850/mo |
+| Login codes | Rs 49,400/mo | Rs 0 |
+| **Total** | **Rs 51,250/mo** | **Rs 2,100/mo** |
 
-**SMS.** Skip for now. It costs about the same per message as WhatsApp, adds Rs 5,000 setup plus
-Rs 5,000 a year, needs a PTA-allocated short code behind the brand name, and delivers a worse
-experience. Telenor and Ufone historically show a short code instead of the brand name, so
-"MatricMate" is not even guaranteed to appear. The only thing that would justify it is phone-number
-login with SMS OTP, which we do not have and should avoid adding.
+Verification codes go through a dedicated short code, the most expensive SMS type in Pakistan at
+about Rs 4.75 each, and roughly 1.3 messages are sent per successful verification once resends are
+counted.
 
-## What we already get for free, and should not accidentally pay for
+**Recommendation: phone number plus a password.** A code is sent once at signup to prove the number
+is real, and again if the student forgets their password. The student still signs up with a phone
+number and never sees an email field, which is what was asked for, but the bill does not grow every
+time someone opens the app.
 
-The report card is the clearest example. `components/screens/ReportCard.tsx` already shares it
-through **WhatsApp's own share sheet**, which the student taps. That satisfies the landing page's
-promise that the report "arrives on WhatsApp like any other message" at zero cost and with no API,
-no template approval and no opt-in requirement. Only switch it to a pushed API message if the client
-specifically wants it delivered without the student doing anything.
+### What has to be built
 
-Applying the same test to every planned notification leaves a very small paid surface:
+| Item | Why |
+| :-- | :-- |
+| Send SMS Hook function | Routes the code to a Pakistani provider and sets the message wording |
+| Phone entry with +92 handling | Students type `03001234567`, storage needs `+923001234567` |
+| Forgot-password flow, by hand | Supabase has no phone equivalent of its email reset. It has to be assembled: send a code, verify it, then set the new password |
+| CAPTCHA on signup and code requests | Every code costs real money, so an unprotected endpoint is a way to spend ours |
+| Per-number sending limit inside the hook | Supabase limits per user and per hour, but not per destination number |
+| Phone field in the profile | The column already exists and is validated, but nothing writes to it |
+| Consent checkbox | Required before any WhatsApp message, and for SMS opt-out rules |
+| Per-channel notification settings | Students must be able to turn each channel off |
 
-| Job | Channel | Cost |
-| :-- | :-- | :-- |
-| Password reset, email confirm | Email | Free |
-| "Email me the link" to checkout | Email | Free |
-| Payment receipt | Email, optionally WhatsApp | Free, or Rs 3.50 |
-| Expiry reminder, 2 days before | WhatsApp, email fallback | Rs 3.50 each |
-| Monthly report card | WhatsApp share sheet, already built | Free |
-| Study reminders, streaks | Push | Free |
+### What breaks, and has to be changed
 
-At 500 paying users on monthly plans that is roughly **Rs 1,750 to 3,500 a month**, inside the
-Rs 0 to 15k run-cost ceiling the client cares about. The same volume on SMS would cost about the
-same per message but add the setup and annual fees and look worse.
+- **Password reset.** The existing email reset does not apply. There is no phone equivalent, it must
+  be built from three separate calls.
+- **Anything reading the user's email.** For a phone-only account that field is empty. Any screen
+  showing "signed in as", any database rule or trigger referring to email, and anything sending mail
+  to the account address all need checking.
+- **Magic links** do not exist for phone. That feature is gone.
+- **Existing accounts.** A handful of real accounts exist, including ours. The safe path is to add a
+  phone to each while email sign-in still works, which keeps the same user ID and all their data,
+  and only then turn email off. Turning email off first may lock those accounts out, so it must be
+  tested on a throwaway project before touching the live one.
+- **Social sign-in later.** Google sign-in matches people by email. A phone-only student who later
+  uses Google would get a second, separate account.
 
-## Play Store position
+### Abuse protection, which is now a money question
 
-Unchanged and already documented in `PAYMENTS-AND-PLAY-COMPLIANCE.md`: Google Play forbids linking
-to external payment from **inside the Android app**, and explicitly permits reaching the same user
-by email, SMS or WhatsApp outside it. WhatsApp's own Commerce Policy restricts completing a
-transaction inside the chat thread, not linking out to our website. So a WhatsApp or email message
-carrying a checkout link is compliant on both sides. This is the whole reason the "email me the
-link" flow exists.
+Supabase allows 30 codes per hour across the whole project by default, and one per user per minute.
+Both are adjustable. The 30 per hour is the real spending backstop, and it should not be raised
+without CAPTCHA in place first.
 
-## What Meta charges, and the deadline that matters
+One trap: if the website sends auth requests through its own server rather than straight from the
+browser, every student looks like the same computer to Supabase and one person can exhaust the
+limit for everyone. A forwarding header fixes it and has to be switched on.
 
-Pakistan rates after Meta's 1 April 2026 increase, triangulated across sources that agree within
-about 30 percent. Confirm the exact figure in WhatsApp Manager once the account exists.
+### Availability
 
-- Utility: $0.010 to $0.016 per delivered message
-- Authentication: same as utility
-- Marketing: $0.047 to $0.050
-- Service messages, meaning free-form replies inside the 24 hour window: free today
+With phone sign-in, **the SMS provider becomes part of logging in**. If they go down, nobody can
+create an account. This is a real dependency that email sign-in did not have, and it argues for
+choosing the best-documented provider rather than the cheapest.
 
-**On 1 October 2026 that last line goes away.** Service messages become chargeable, and utility
-templates sent inside an open service window lose their free status too. Meta publishes final rates
-by 1 September 2026. This lands squarely in our launch window, so budget on the assumption that
-nothing is free after 1 October.
+## 2. SMS
 
-A second change is still rolling out: messaging limits are now pooled across the whole Business
-Portfolio rather than per number, and Meta is collapsing the old 2k and 10k daily tiers so a
-verified business jumps straight to a 100,000/day baseline.
+### Provider
 
-## Setup requirements, and who has to do them
+**SendPK** is the recommendation: real published API documentation, transparent pricing, self-serve
+signup, and it accepts sole proprietors. RoboSMS is a reasonable fallback. The mobile operators'
+own corporate SMS products are quote-only with no public API and are a poor fit.
 
-WhatsApp Cloud API is the long pole. It is a client action, in the same category as the Play Console
-account, and it should start now.
+Twilio and other international services are not viable: about Rs 132 per message against Rs 3.85
+locally, and the sender name gets replaced en route.
 
-1. **Meta Business Portfolio** in the business's legal name.
-2. **Business verification**: SECP registration certificate or sole-proprietor documents, FBR NTN,
-   and a live website whose footer shows the same legal name and address. Reported turnaround ranges
-   from one day to thirty; 1 to 3 weeks is the realistic planning assumption.
-3. **Display name approval**: the WhatsApp display name must match the verified legal entity and
-   appear on the website. Promotional names such as "Best Exam Prep" get rejected.
-4. **A dedicated phone number** that has never been used on consumer WhatsApp, and cannot be reused
-   afterwards.
-5. **A billable card.** Meta bills in USD. Some Pakistani cards fail here, which is the main reason
-   local resellers exist. If it blocks us, a local reseller advertising 0 percent markup costs about
-   $10 a month and accepts JazzCash and Easypaisa.
+### Documents needed
 
-This chains onto the domain purchase already in flight: verification wants a live site at the
-business's own domain, so `matricmate.com.pk` should be resolving before we file.
+**A registered company is not required.** A sole proprietorship can get a branded sender name. What
+is needed:
 
-**PTA risk worth designing around.** PTA warned in May and June 2026 that WhatsApp accounts tied to
-inactive, unregistered or non-biometrically-verified SIMs may be blocked. If the business number
-sits on a SIM that lapses, the notification channel dies with it. Verifying the number as a landline
-over a voice call avoids the biometric SIM regime entirely, and is the safer choice.
+- Application form on **business letterhead, signed and stamped**
+- **CNIC**, front and back
+- **FBR NTN certificate**, or an SECP certificate, or a Chamber of Commerce document
 
-## Opt-in, which we do not currently collect
+**The catch that causes rejections:** the sender name must match the business name on the NTN. If
+the NTN is registered only in a personal name, an application for "MatricMate" is likely to be
+queried or refused. A sole-proprietor NTN can carry a trade name, so registering "MatricMate" as
+the trade name before applying avoids this.
 
-Meta requires explicit permission, tied to our business name, before any template message. A single
-opt-in is enough and it does not have to say the word WhatsApp, but it has to be real. Sending
-without it produces blocks, blocks lower the quality rating, and a low rating now throttles the
-whole Business Portfolio rather than one number.
+### The sender name
 
-We do not collect this today. Signup takes name, email and password only. Adding WhatsApp means
-adding an optional phone field plus a consent checkbox, and storing both.
+Eleven characters maximum, letters and numbers only, nothing that looks like a web address.
+**"MatricMate" is ten characters and fits.**
 
-## Recommended build order
+Jazz and Zong display the name as text. Ufone and the former Telenor network have historically
+shown a number instead, so some students may not see the brand. Worth confirming with the provider
+at signup. Note that Telenor merged into Ufone's parent company on 1 July 2026, so there are now
+three operator groups to register with rather than four.
 
-1. **Resend for email, this week.** Unblocks password reset, which is currently capped at 2 an hour,
-   plus the "email me the link" flow that today only shows a toast and sends nothing. Free.
-2. **A `lib/notify/` seam**, built the same way `lib/gateway/` was built for payments: one interface,
-   swappable channel implementations, no route or component naming a vendor. Start with email only.
-   Adding WhatsApp later then costs an implementation, not a rewrite.
-3. **FCM push in M4**, as already planned.
-4. **WhatsApp Cloud API before launch.** Start business verification immediately because of the lead
-   time, and use it only for expiry reminders and payment confirmations as Utility templates.
-5. **SMS: not now.** Revisit only if phone login is added, or if measurement shows renewal reminders
-   failing to reach a meaningful share of users.
+### Two registrations, not one
 
-## Domain and deliverability groundwork
+A sender name cannot be used for both service messages and marketing. Sending "your plan expires
+tomorrow" and "new mock test available" under the same name needs **two separate registrations**.
 
-Independent of provider choice, on `matricmate.com.pk` with Cloudflare DNS:
+### Opt-outs
 
-- SPF, DKIM and DMARC on a dedicated sending subdomain such as `mail.matricmate.com.pk`, keeping the
-  root domain's reputation separate.
-- Exactly one SPF record, under 10 DNS lookups. Two records is a hard failure.
-- DKIM at 2048 bits.
-- DMARC starting at `p=none` with a reporting address, tightened later.
-- **Every mail record set to DNS only, the grey cloud, never proxied.** A proxied CNAME-based DKIM
-  record fails silently with no error at creation time. This is the most common Cloudflare mistake.
-- No dedicated IP. Those pay off above roughly 200,000 emails a month, and below that they hurt,
-  because there is not enough volume to build a reputation.
+Pakistan has a national Do Not Call register, and since July 2022 promotional SMS must carry an
+opt-out and only go to people who agreed to receive it. The provider screens against the register,
+but the responsibility for not spamming sits with us. Service messages a student triggered
+themselves are treated differently from marketing.
 
-Gmail's bulk sender rules bite at 5,000 messages a day to personal Gmail addresses. We are far below
-that, so one-click unsubscribe is not required for transactional mail, but SPF and DKIM are required
-of every sender regardless of volume.
+### Cost
 
-## Open items
+| | |
+| :-- | --: |
+| Branded SMS | Rs 3.80 to 3.90 each |
+| Verification code SMS (short code) | Rs 4.70 to 4.80 each |
+| Sender name, one-time | Rs 5,000 |
+| Sender name, annual | Rs 5,000 |
+| Minimum top-up | about Rs 10,000 |
 
-- Exact Pakistan per-message rates: confirm in WhatsApp Manager, sources vary by up to 30 percent.
-- Meta's post 1 October 2026 service message rate: not published until 1 September 2026.
-- Whether the client's card works with Meta's USD billing.
-- Whether the client has SECP registration or is operating as a sole proprietor, which changes the
-  verification documents.
+Note that verification codes cost **more** than ordinary branded SMS, not less.
+
+### Lead time
+
+Two to four weeks for the branded name, and it can go live on one network before another. Providers
+quote between 14 days and 30 working days.
+
+**This does not have to block anything.** SendPK offers a shared, pre-approved sender at Rs 4.00 to
+4.10 that works the same day. We can launch on that and switch to "MatricMate" when it clears.
+
+## 3. WhatsApp
+
+Used for renewal reminders and payment confirmations, where reaching the student actually protects
+revenue.
+
+**What is needed:**
+
+- Meta Business account
+- Business verification: SECP certificate or sole-proprietor documents, FBR NTN, and a live website
+  whose footer shows the same legal name
+- A phone number that has never been used on ordinary WhatsApp, and cannot be reused afterwards
+- Display name approval, matching the verified business name
+- Message templates approved in advance
+- Explicit consent from each student before any message
+
+**Cost:** about Rs 3 to 4.50 per service message, Rs 13 to 14 for anything promotional. No monthly
+fee if we use Meta directly.
+
+**Two practical points.** Meta bills in US dollars and some Pakistani cards fail, in which case a
+local reseller charging around $10 a month accepts JazzCash and Easypaisa. And Meta is making some
+currently-free message types chargeable from 1 October 2026, so nothing should be budgeted as free
+after that date.
+
+**Lead time:** one to three weeks for verification, and it needs the domain live first.
+
+## 4. Email
+
+Still needed even without email sign-in: payment receipts, invoices, and anything a student wants a
+written record of.
+
+**Provider: Resend.** Free for 3,000 messages a month, $20 for 50,000. No restriction on Pakistani
+senders or a `.com.pk` domain.
+
+**What is needed:** a verified sending domain, which means SPF, DKIM and DMARC records on
+`matricmate.com.pk`. Every mail record must be set to "DNS only" in Cloudflare rather than proxied,
+or authentication fails silently.
+
+## 5. What the client must provide
+
+| Item | Needed for |
+| :-- | :-- |
+| FBR NTN, with "MatricMate" as the registered trade name | SMS sender name, WhatsApp verification |
+| CNIC, front and back | SMS sender name |
+| Business letterhead with a stamp | SMS application form |
+| SECP certificate, if the business is registered | WhatsApp verification, alternative to NTN for SMS |
+| A phone number never used on WhatsApp | WhatsApp business number |
+| A card that works internationally, or willingness to use a local reseller | Meta billing |
+| Decision: password, or code on every login | Determines whether SMS costs Rs 2,100 or Rs 51,250 a month |
+
+## 6. Costs
+
+**One-time**
+
+| | |
+| :-- | --: |
+| SMS sender name registration | Rs 5,000 |
+| First SMS top-up | Rs 10,000 |
+
+**Recurring**
+
+| | |
+| :-- | --: |
+| SMS sender name, annual | Rs 5,000/yr |
+| Email (Resend) | Free, $20/mo above 3,000 messages |
+| WhatsApp | No fixed fee |
+| Supabase phone auth | No extra charge |
+
+**Per use, at 2,000 students**
+
+| | Monthly |
+| :-- | --: |
+| Sign-in codes, with passwords | Rs 2,100 |
+| Sign-in codes, without passwords | Rs 51,250 |
+| WhatsApp renewal reminders | Rs 7,000 |
+| Notification SMS, if sent to everyone | Rs 7,700 per message sent to all |
+| Email | Free at this volume |
+
+That last line is worth reading twice. One SMS to every student costs about Rs 7,700, while the
+same message by email costs nothing. SMS should carry things that must arrive, not routine updates.
+
+## 7. Vendor count
+
+Three, and they cannot be merged:
+
+| Vendor | Channel |
+| :-- | :-- |
+| SendPK or similar | SMS, including sign-in codes |
+| Meta, direct or through a local reseller | WhatsApp |
+| Resend | Email |
+
+## Not confirmed
+
+Stated plainly rather than guessed:
+
+- Whether Ufone and the former Telenor network display a text sender name or substitute a number.
+  Confirm with the provider at signup.
+- The exact hours during which promotional SMS may be sent. A 9am to 9pm window is widely repeated
+  but traces back to a single source and may be describing India's rule. Get it in writing.
+- Whether SendPK and BulkSMS.com.pk are the same company. Their pricing pages are identical.
+- SendPK's own site quotes two different sender-name fees. Get the figure in writing before paying.
+- The exact phone number format Supabase sends to the hook, with or without the leading plus. Needs
+  testing with a real +92 number.
+- Whether Pakistani cards work reliably for Meta's billing.
