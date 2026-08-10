@@ -105,8 +105,9 @@ the whole database. Mumbai is the closest to Pakistan, which is the call you mad
 
 `bom1` is Vercel's Mumbai region. If the server functions sit in the United States while the
 database sits in Mumbai, every single query crosses two oceans and nothing else we optimise will
-make any difference. Note this needs Vercel **Pro**; on Hobby the region is fixed for you, which is
-another reason to upgrade before launch rather than after.
+make any difference. Region selection works on Hobby too, so this is not a reason to upgrade. The
+real reason is licensing: Vercel's Fair Use terms restrict Hobby to non-commercial use, and taking
+a payment crosses that line. See `TOOLS-AND-SERVICES.md`.
 
 ## What to send me, and what never to send
 
