@@ -432,9 +432,19 @@ function sift(out, slos) {
   });
 
   const asked = (out.mcqs ?? []).length;
+
+  // A chapter with no MCQs is not automatically broken.
+  //
+  // The board forbids MCQs on Islamiyat strand 6 outright, so isl-6 ships with
+  // an empty mcqs array on purpose and its short and extended answers carry the
+  // chapter. Rejecting it for having none would drop a chapter for obeying a
+  // rule. What actually makes a chapter unusable is having nothing to read, or
+  // nothing to practise at all, or most of the questions it did write being
+  // defective, which means the model misunderstood rather than slipped.
+  const practice = mcqs.length + shortQs.length;
   const fatal =
     (!sections.length && 'no usable sections') ||
-    (!mcqs.length && 'no usable questions') ||
+    (!practice && 'nothing to practise: no questions of any kind') ||
     (asked && mcqs.length / asked < 0.6 && `only ${mcqs.length} of ${asked} questions usable`) ||
     null;
 
