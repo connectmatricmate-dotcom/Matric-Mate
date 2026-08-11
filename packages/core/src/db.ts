@@ -237,11 +237,41 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
     at,
     `chapters:${subjectId}:${medium}`,
     async () => {
+      // The counts are part of the row, not an afterthought. A chapter list
+      // that says "0 questions" next to a chapter holding twenty of them reads
+      // as a broken app, and that is exactly what shipped when this select
+      // returned the chapter without them. PostgREST can aggregate the related
+      // tables in the same round trip, and the medium filter has to be applied
+      // to the embedded resource or English and Urdu are summed together and
+      // every count doubles.
       const { data, error } = await table('chapters', at!)
-        .select('id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes')
+        .select(
+          'id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+            'mcqs(count),flashcards(count),chapter_sections(count)',
+        )
         .eq('subject_id', subjectId)
+        .eq('mcqs.medium', medium)
+        .eq('flashcards.medium', medium)
+        .eq('chapter_sections.medium', medium)
         .order('number');
-      return { error, data: (data as ChapterRow[] | null)?.map((r) => toChapter(r)) ?? null };
+
+      type Counted = ChapterRow & {
+        mcqs: { count: number }[];
+        flashcards: { count: number }[];
+        chapter_sections: { count: number }[];
+      };
+
+      return {
+        error,
+        data:
+          (data as Counted[] | null)?.map((r) =>
+            toChapter(r, {
+              mcqs: r.mcqs?.[0]?.count ?? 0,
+              cards: r.flashcards?.[0]?.count ?? 0,
+              sections: r.chapter_sections?.[0]?.count ?? 0,
+            }),
+          ) ?? null,
+      };
     },
     () => CHAPTERS[subjectId] ?? [],
   );

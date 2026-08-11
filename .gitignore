@@ -52,3 +52,6 @@ audit-result.md
 # Content drops from the client and the FBISE curriculum pull. Source
 # material, often large PDFs, never a deliverable.
 content/
+
+# Screenshots dropped in the repo root while checking the app
+image*.png

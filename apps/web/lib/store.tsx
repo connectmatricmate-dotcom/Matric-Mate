@@ -37,7 +37,6 @@ import {
   xpFor,
 } from './persisted-store';
 import { createClient } from './supabase/client';
-import { seed } from './seed';
 
 export type { Onboarding, Settings, State };
 
@@ -209,10 +208,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           contact: u.email ?? '',
         };
         if (s.user?.id === user.id && s.user.name === user.name) return s;
-        // A brand new account gets the sample data once, so the demo is not an
-        // empty dashboard. Real accounts with history are left alone.
-        const fresh = s.attempts.length === 0 && s.results.length === 0;
-        return touchToday({ ...s, user, ...(fresh ? seed() : {}) });
+        return touchToday({ ...s, user });
       });
 
     void supabase.auth.getUser().then(({ data }) => {

@@ -1,8 +1,8 @@
 /**
  * App state, session, onboarding choices, progress, attempts, AI usage, settings.
  *
- * Persisted to AsyncStorage (localStorage on web) so the demo survives reloads and
- * app restarts. When Supabase lands this becomes a thin cache over server state;
+ * Persisted to AsyncStorage (localStorage on web) so real progress survives reloads
+ * and app restarts. When Supabase lands this becomes a thin cache over server state;
  * the shape of `state` and the action names stay the same.
  */
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -10,7 +10,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey ,
   Attempt,
   ChatThread,
-  Confidence,
   Group,
   Medium,
   Notification,
@@ -19,7 +18,11 @@ import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey ,
 } from '@matricmate/core';
 import { useAuth } from './auth';
 
-const KEY = 'mm.state.v1';
+// v2: the fake "demo seed" that used to write sample attempts, results and a
+// streak on first sign-in is gone. Bumping the key throws away anything a
+// device already had stored under v1, so nobody's dashboard still shows the
+// fabricated history. Do not revert this to v1.
+const KEY = 'mm.state.v2';
 
 export type Onboarding = {
   classLevel: 9 | 10;
@@ -88,141 +91,6 @@ const EMPTY: State = {
   xp: 0,
   cardsKnown: [],
 };
-
-/* --------------------------------------------------------------- demo seed */
-
-const daysAgo = (n: number) => Date.now() - n * 864e5;
-
-/**
- * Seeded once at first sign-in so the client sees a lived-in app: real streak,
- * real accuracy, real weak topics. Cleared by "Reset demo data" in Settings.
- */
-function seed(): Partial<State> {
-  const topics: [string, string, string, number][] = [
-    // topic, subjectId, chapterId, accuracy target out of 6
-    ['Newton’s laws', 'phy', 'phy-3', 5],
-    ['Momentum', 'phy', 'phy-3', 4],
-    ['Circular motion', 'phy', 'phy-3', 2],
-    ['Friction', 'phy', 'phy-3', 3],
-    ['Force', 'phy', 'phy-3', 6],
-    ['Turning Effect of Forces', 'phy', 'phy-4', 2],
-    ['Atomic models', 'chem', 'chem-2', 5],
-    ['Isotopes', 'chem', 'chem-2', 4],
-    ['Electronic configuration', 'chem', 'chem-2', 3],
-    ['Organelles', 'bio', 'bio-4', 5],
-    ['Transport', 'bio', 'bio-4', 3],
-  ];
-  const attempts: Attempt[] = [];
-  let i = 0;
-  // Confidence pattern per topic. Correctness runs k < right, so Pakka answers
-  // land mostly right and Tukka mostly wrong, but not perfectly, which is what
-  // makes the confidence-vs-accuracy chart believable.
-  const CONF: Confidence[] = [2, 1, 2, 0, 1, 2];
-  topics.forEach(([topic, subjectId, chapterId, right]) => {
-    for (let k = 0; k < 6; k++) {
-      const correct = k < right;
-      const confidence: Confidence = CONF[k];
-      attempts.push({
-        id: `seed-a${i}`,
-        mcqId: `seed-m${i}`,
-        chapterId,
-        subjectId,
-        topic,
-        correct,
-        confidence,
-        mode: k % 5 === 0 ? 'exam' : 'practice',
-        at: daysAgo(13 - (i % 13)),
-      });
-      i += 1;
-    }
-  });
-
-  const results: TestResult[] = [
-    {
-      id: 'seed-r1',
-      subjectId: 'phy',
-      chapterId: 'phy-2',
-      label: 'Kinematics, timed exam',
-      score: 15,
-      total: 20,
-      xp: 150,
-      mode: 'exam',
-      at: daysAgo(5),
-      attemptIds: [],
-    },
-    {
-      id: 'seed-r2',
-      subjectId: 'phy',
-      chapterId: 'phy-3',
-      label: 'Dynamics, practice',
-      score: 16,
-      total: 20,
-      xp: 168,
-      mode: 'practice',
-      at: daysAgo(2),
-      attemptIds: [],
-    },
-    {
-      id: 'seed-r3',
-      subjectId: 'chem',
-      chapterId: 'chem-2',
-      label: 'Structure of Atoms, practice',
-      score: 12,
-      total: 15,
-      xp: 120,
-      mode: 'practice',
-      at: daysAgo(1),
-      attemptIds: [],
-    },
-  ];
-
-  const activeDays = [0, 1, 2, 4, 5, 7, 8, 9, 11, 13].map((n) =>
-    new Date(daysAgo(n)).toISOString().slice(0, 10)
-  );
-
-  const notifications: Notification[] = [
-    {
-      id: 'n1',
-      kind: 'streak',
-      title: 'Streak alive, shabash!',
-      body: 'Keep it going: one lesson today counts.',
-      at: Date.now() - 2 * 36e5,
-      target: 'progress',
-      read: false,
-    },
-    {
-      id: 'n2',
-      kind: 'reminder',
-      title: 'Study reminder',
-      body: '10 MCQs on Dynamics are waiting.',
-      at: Date.now() - 5 * 36e5,
-      target: 'session-setup',
-      read: false,
-    },
-    {
-      id: 'n3',
-      kind: 'report',
-      title: 'Your report card is ready',
-      body: 'Tap to view and share with your parents.',
-      at: daysAgo(3),
-      target: 'report',
-      read: true,
-    },
-  ];
-
-  return {
-    attempts,
-    results,
-    activeDays,
-    notifications,
-    readSections: ['phy-3-s1', 'phy-3-s2', 'phy-3-s3', 'phy-1-gs1', 'chem-2-s1'],
-    lastChapterId: 'phy-3',
-    lastSectionIndex: 3,
-    xp: 2840,
-    downloads: ['phy-2', 'phy-3'],
-    cardsKnown: ['phy3-f1', 'phy3-f2', 'phy3-f4'],
-  };
-}
 
 /* ------------------------------------------------------------------ context */
 
@@ -302,20 +170,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const t = todayKey();
     return s.activeDays.includes(t) ? s : { ...s, activeDays: [...s.activeDays, t] };
   };
-
-  /**
-   * Seed sample progress the first time a real account is seen on this phone.
-   *
-   * The app is still a prototype on mock content, and an empty dashboard shows
-   * the client nothing. This goes away with the study-state sync, when progress
-   * starts coming from Postgres like entitlement already does.
-   */
-  const seededFor = useRef<string | null>(null);
-  useEffect(() => {
-    if (!hydrated || !authUser || seededFor.current === authUser.id) return;
-    seededFor.current = authUser.id;
-    setState((s) => touchToday(s.attempts.length === 0 && s.results.length === 0 ? { ...s, ...seed() } : s));
-  }, [hydrated, authUser]);
 
   const actions = useMemo<Actions>(
     () => ({

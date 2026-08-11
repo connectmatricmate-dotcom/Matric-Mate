@@ -13,7 +13,11 @@
  */
 import { AI_QUOTA, Attempt, ChatThread, Language, Medium, Group, Notification, TestResult, XP, todayKey } from '@matricmate/core';
 
-const KEY = 'mm.web.v1';
+// v2: the fake "demo seed" that used to write sample attempts, results and a
+// streak on first sign-in is gone. Bumping the key throws away anything a
+// browser already had stored under v1, so nobody's dashboard still shows the
+// fabricated history. Do not revert this to v1.
+const KEY = 'mm.web.v2';
 
 export type Onboarding = {
   classLevel: 9 | 10;
