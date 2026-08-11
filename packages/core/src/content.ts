@@ -27,7 +27,7 @@ export const SUBJECTS: Subject[] = [
   { id: 'math', name: 'Mathematics', icon: 'calc', compulsory: true, chapterCount: 17 },
   { id: 'eng', name: 'English', icon: 'book', compulsory: true, chapterCount: 8 },
   { id: 'urd', name: 'Urdu', urduName: 'اردو', icon: 'quill', compulsory: true, chapterCount: 8 },
-  { id: 'isl', name: 'Islamiyat', urduName: 'اسلامیات', icon: 'star', compulsory: true, chapterCount: 6 },
+  { id: 'isl', name: 'Islamiyat', urduName: 'اسلامیات', icon: 'star', compulsory: true, chapterCount: 7 },
   { id: 'pst', name: 'Pakistan Studies', icon: 'globe', compulsory: true, chapterCount: 4 },
   { id: 'cs', name: 'Computer Science', icon: 'book2', compulsory: false, group: 'science', chapterCount: 6 },
 ];
@@ -108,13 +108,18 @@ const CH: Record<string, [string, string, string?][]> = {
     ['خط نویسی', 'درخواست اور خط کے نمونے', 'Letter and application writing.'],
     ['مضمون نویسی', 'مضامین کے خاکے اور نمونے', 'Essay writing.'],
   ],
+  // The board's seven دائرہ ہائے کار (strands), not the six approximations that
+  // were here. Note strand 1 covers only the introduction to the Quran and the
+  // preservation of hadith: ترجمۂ قرآن مجید is a separate 50 mark paper and is
+  // not part of Islamiyat compulsory at all.
   isl: [
-    ['قرآن مجید', 'منتخب آیات، ترجمہ اور تشریح', 'Selected verses with translation.'],
-    ['حدیثِ نبوی', 'احادیث کا مفہوم اور اطلاق', 'Ahadith: meaning and application.'],
-    ['توحید و رسالت', 'بنیادی عقائد', 'Core beliefs.'],
-    ['عبادات', 'نماز، روزہ، زکوٰۃ، حج', 'Acts of worship.'],
-    ['سیرتِ طیبہ', 'مکی و مدنی دور', 'Life of the Prophet ﷺ.'],
-    ['اخلاقیات', 'حقوق العباد اور معاشرتی اخلاق', 'Ethics and social rights.'],
+    ['قرآن مجید و حدیثِ نبوی ﷺ', 'تعارفِ قرآن مجید، حفاظت و تدوینِ حدیث، بیس احادیثِ مبارکہ اور سینتیس اسمائے حسنیٰ', 'Quran and Hadith.'],
+    ['ایمانیات و عبادات', 'توحید، رسالت، ملائکہ، کتبِ سماویہ، آخرت، نماز، روزہ، زکوٰۃ، حج اور قربانی', 'Beliefs and acts of worship.'],
+    ['سیرتِ رسول خاتم النبیین ﷺ', 'مدنی دور کے واقعات اور اُسوۂ رسول ﷺ کی روشنی میں عملی زندگی', 'Life of the Prophet ﷺ.'],
+    ['اخلاق و آداب', 'شکر و قناعت، امانت و دیانت، اخلاص و تقویٰ، اور بری عادات سے اجتناب', 'Morals and manners.'],
+    ['حسنِ معاملات و معاشرت', 'قسم، گواہی، ہمسایوں کے حقوق، سود کی حرمت، اسلامی ریاست اور جہاد', 'Dealings and society.'],
+    ['ہدایت کے سرچشمے اور مشاہیرِ اسلام', 'اہلِ بیت، صحابہ کرام، صحابیاتِ کرام، صوفیائے کرام اور علما و مفکرین', 'Sources of guidance and eminent figures.'],
+    ['اسلامی تعلیمات اور عصرِ حاضر کے تقاضے', 'خود اعتمادی، صحت و ریاضت، منصوبہ بندی اور اسلامی تہذیب کے امتیازات', 'Islamic teachings today.'],
   ],
   // Four chapters, not six. Constitution and Government, Economy of Pakistan
   // and Population and Society are Class 10, and were never on the Class 9

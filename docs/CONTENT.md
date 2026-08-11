@@ -62,14 +62,34 @@ genuinely do not know. It is **not** the same as formative. Treat it as unknown 
 | Pakistan Studies | 35 | 6 | 4 units | assessment column merged, mostly unknown |
 | English | 56 | 31 | none | organised by competency, not chapters |
 | Computer Science | 18 | 17 | 6 units | few but broad outcomes, detail is in bullets |
-| Urdu | 0 | 0 | none | **needs OCR** |
-| Islamiyat | 0 | 0 | none | **needs OCR** |
+| Urdu | 31 | 25 | none | transcribed by hand, skills not chapters |
+| Islamiyat | 54 | 54 | 7 strands | transcribed by hand |
 
-**561 outcomes across seven subjects.**
+**646 outcomes across all nine subjects.**
 
-Urdu and Islamiyat are typeset in Urdu with no usable character map: the PDF draws the right glyphs
-but reports the wrong code points, so extraction returns scrambled text. That is a property of
-those files, not of the extractor, and no parser setting fixes it. They need OCR or manual entry.
+### Urdu and Islamiyat were transcribed, not parsed
+
+Their PDFs draw the right glyphs and report the wrong code points, so every extractor returns
+scrambled text and no parser setting fixes it. Reversing it recovers some words and mangles others.
+Four documents were tried and all four fail. But the pages render perfectly legibly, so they were
+read off the rendered images by hand into `data/fbise/urd.json` and `data/fbise/isl.json`.
+`content:build` detects those two files and leaves them alone rather than overwriting them.
+
+Three things that transcription found, which no parser would have:
+
+- **Urdu's listening and speaking skills are wholly formative.** The board assesses them in class
+  and neither ever appears on the annual paper. Writing exam questions for them would waste a
+  student's time. The examinable subject is reading, writing and grammar.
+- **Urdu has no chapters.** It is five مہارتیں (skills), each with benchmarks. The app should
+  present it as skills to practise, not chapters to read.
+- **Tarjuma Quran is a separate 50 mark paper**, not part of Islamiyat compulsory. Islamiyat itself
+  is 100 marks over 3 hours, with a compulsory 20 mark MCQ section. Its 7 strands carry paper rules
+  worth respecting: strand 6 takes no MCQs at all, and the Asma-e-Husna get exactly two.
+
+Islamiyat publishes no SLO codes, only strands and topics, so the codes in `isl.json` are ours and
+`codeSource: "assigned"` says so on the file. Never show them to a student as board codes.
+`data/fbise/isl-asma-ul-husna.json` holds the 37 names with their meanings, which is a finished
+flashcard deck needing no generation at all.
 
 ## Corrections this made to the app
 
@@ -80,6 +100,7 @@ The chapter lists in `packages/core/src/content.ts` were approximations and thre
   Related with Area and Practical Geometry were all missing.
 - **Pakistan Studies had 6 chapters; FBISE examines 4.** Constitution and Government, Economy of
   Pakistan, and Population and Society are Class 10.
+- **Islamiyat had 6 chapters; FBISE examines 7 strands.**
 - **Computer Science had a different board's syllabus**: Problem Solving, Binary System, Designing
   Website. The FBISE units are Fundamentals of Computer, Fundamentals of Operating System, Office
   Automation, Data Communication, Computer Networks, and Computer Security and Ethics.
@@ -133,11 +154,6 @@ quietly swallowed by the fallback, so it needs a real query to catch.
   place; the notes, questions, flashcards and short questions written against them are not. That is
   a one-off Claude pass, costed in the low thousands of rupees, and it lands as draft. Until it
   runs, the plumbing is real and the content is not.
-- **Urdu and Islamiyat.** Four FBISE documents were tried and all four fail: two report the wrong
-  code points for the glyphs they draw, and three are scans, one of them with bad OCR already baked
-  in. Reversing the extracted text recovers some words and mangles others, so it is not a fix. The
-  pages render legibly though, so the answer is transcription rather than OCR:
-  `content/fbise/pages/{isl,urd}-06.png` onward, 38 pages, already rendered.
 - **Urdu medium for the other seven subjects** is not blocked. Schema, ingestion and fetch layer all
   carry `medium` already; the Urdu content is written by the generator, not extracted.
 - **Mapping outcomes to chapters.** `curriculum_slos.chapter_id` is null everywhere. The board's

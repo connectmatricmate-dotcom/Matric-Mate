@@ -96,14 +96,18 @@
     {
       "subject": "urd",
       "name": "Urdu",
-      "status": "needs-ocr",
-      "slos": 0
+      "status": "transcribed",
+      "domains": 5,
+      "slos": 31,
+      "summative": 25
     },
     {
       "subject": "isl",
       "name": "Islamiyat",
-      "status": "needs-ocr",
-      "slos": 0
+      "status": "transcribed",
+      "domains": 7,
+      "slos": 54,
+      "summative": 54
     }
   ]
 }

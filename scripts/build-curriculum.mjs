@@ -58,8 +58,9 @@ const C = {
  * `script: 'urdu'` marks the two documents that are typeset in Urdu with no
  * usable character map: the PDF draws the right glyphs but tells us the wrong
  * code points, so extraction returns scrambled text. That is a property of the
- * file, not of the extractor, and no parser setting fixes it. They are skipped
- * loudly rather than silently, and need OCR or manual entry.
+ * file, not of the extractor, and no parser setting fixes it. Both were read off
+ * the rendered pages by hand instead, and this script leaves their committed
+ * JSON alone rather than overwriting it.
  */
 const SUBJECTS = [
   { id: 'phy', name: 'Physics', prefix: 'P' },
@@ -427,11 +428,31 @@ async function main() {
   for (const subject of SUBJECTS) {
     if (only && subject.id !== only) continue;
 
+    // Urdu and Islamiyat are not parsed, they are transcribed.
+    //
+    // Their PDFs draw the right glyphs and report the wrong code points, so
+    // every extractor returns scrambled text and no parser setting fixes it.
+    // Both files were read off the rendered pages by hand and committed. This
+    // step must never overwrite them: read what is there, count it, and move on.
     if (subject.script === 'urdu') {
-      console.log(
-        `${C.yellow('skip')} ${subject.id.padEnd(5)} ${C.dim(`${subject.name}: Urdu-script PDF with no usable character map, needs OCR`)}`,
-      );
-      index.push({ subject: subject.id, name: subject.name, status: 'needs-ocr', slos: 0 });
+      try {
+        const doc = JSON.parse(await readFile(resolve(OUT, `${subject.id}.json`), 'utf8'));
+        const slos = (doc.domains ?? []).flatMap((d) => d.slos);
+        index.push({
+          subject: subject.id,
+          name: subject.name,
+          status: doc.complete === false ? 'transcribed-partial' : 'transcribed',
+          domains: (doc.domains ?? []).length,
+          slos: slos.length,
+          summative: slos.filter((s) => s.assessment === 'summative').length,
+        });
+        console.log(
+          `${C.green('kept')} ${subject.id.padEnd(5)} ${C.dim(`${slos.length} SLOs, transcribed by hand, left untouched`)}`,
+        );
+      } catch {
+        console.log(`${C.yellow('skip')} ${subject.id.padEnd(5)} ${C.dim(`${subject.name}: not transcribed yet, see docs/CONTENT.md`)}`);
+        index.push({ subject: subject.id, name: subject.name, status: 'needs-transcription', slos: 0 });
+      }
       continue;
     }
 
