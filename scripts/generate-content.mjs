@@ -208,10 +208,17 @@ function mapByCode(spec, slos) {
   for (const s of slos) {
     // Codes look like P-09-B-30, or PS-09-A1-03 where the domain carries a
     // sub-digit. Split from the right so a two-letter subject prefix is safe.
+    // Pakistan Studies and English carry a sub-domain digit in the code
+    // (PS-09-A1-03), and their ToS names chapters by that sub-domain, so match
+    // the full "A1" first and fall back to the bare domain letter. Matching
+    // only the letter files every Pakistan Studies outcome under one chapter.
     const parts = s.code.split('-');
-    const domain = (parts[2] ?? '').replace(/\d+$/, '');
+    const full = parts[2] ?? '';
+    const bare = full.replace(/\d+$/, '');
     const number = Number(parts[3]);
-    const hit = rules.find((r) => r.domain === domain && (r.lo === null || (number >= r.lo && number <= r.hi)));
+    const hit =
+      rules.find((r) => r.domain === full && (r.lo === null || (number >= r.lo && number <= r.hi))) ??
+      rules.find((r) => r.domain === bare && (r.lo === null || (number >= r.lo && number <= r.hi)));
     if (hit) mapping[s.code] = hit.chapter;
     else missed.push(s.code);
   }

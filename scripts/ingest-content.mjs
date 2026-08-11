@@ -45,6 +45,17 @@ const DATA = resolve(ROOT, 'data/fbise');
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
 const PUBLISH = args.includes('--publish');
+/**
+ * The placeholder study material from packages/core, off by default.
+ *
+ * It was the point of this script when nothing real existed. Now that
+ * generate-content writes genuine, outcome-grounded content, pushing the
+ * placeholder in as well collides with it: both want position 0 of the same
+ * chapter and medium, and the whole run fails on a unique constraint. Worse,
+ * where it did not collide it would sit alongside real content as filler.
+ * Kept behind a flag for bootstrapping an empty database, nothing else.
+ */
+const WITH_SAMPLE = args.includes('--with-sample-content');
 
 const C = {
   dim: (s) => `\x1b[2m${s}\x1b[0m`,
@@ -287,11 +298,15 @@ async function main() {
     ['subjects', subjects, 'id'],
     ['chapters', chapters, 'id'],
     ['curriculum_slos', slos, 'code'],
-    ['chapter_sections', sections, 'id'],
-    ['mcqs', mcqs, 'id'],
-    ['flashcards', flashcards, 'id'],
-    ['short_questions', shortQs, 'id'],
-    ['blanks', blanks, 'id'],
+    ...(WITH_SAMPLE
+      ? [
+          ['chapter_sections', sections, 'id'],
+          ['mcqs', mcqs, 'id'],
+          ['flashcards', flashcards, 'id'],
+          ['short_questions', shortQs, 'id'],
+          ['blanks', blanks, 'id'],
+        ]
+      : []),
   ];
 
   console.log(C.bold(`\ningest ${DRY ? '(dry run)' : ''}\n`));
@@ -345,6 +360,28 @@ async function main() {
       done += batch.length;
     }
     console.log(`${C.green('  ok')} ${table.padEnd(18)} ${C.dim(`${done} rows`)}`);
+  }
+
+  // Retire chapters that no longer exist in the app.
+  //
+  // Subjects shrank when they moved to the board's structure: English 8 to 4,
+  // Urdu 8 to 3. This script never deletes, on purpose, because student
+  // attempts and reading progress point at those chapter ids. But leaving them
+  // published means a student sees four English chapters that are not on the
+  // syllabus. Unpublishing hides them from every RLS-gated read while keeping
+  // the rows, and it is one UPDATE to undo.
+  if (!DRY) {
+    const live = new Set(chapters.map((c) => c.id));
+    const { data: existing } = await db.from('chapters').select('id,subject_id').eq('review_status', 'published');
+    const stale = (existing ?? []).filter((r) => !live.has(r.id));
+    if (stale.length) {
+      const { error } = await db.from('chapters').update({ review_status: 'draft' }).in('id', stale.map((r) => r.id));
+      if (error) console.error(`${C.red('fail')} retiring stale chapters: ${error.message}`);
+      else
+        console.log(
+          `${C.yellow('retire')} ${stale.length} chapters no longer on the syllabus ${C.dim(stale.map((r) => r.id).join(', '))}`,
+        );
+    }
   }
 
   console.log(C.dim('\n  done\n'));
