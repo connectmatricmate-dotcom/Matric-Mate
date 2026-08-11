@@ -107,12 +107,39 @@ Nothing generated reaches a student without a person passing it.
   any content table at all: ingestion runs under the service role, which bypasses RLS. A student
   who could write an MCQ could write its answer key too.
 
+## Where the apps read from
+
+Both apps now read content from Postgres through `packages/core/src/db.ts`, with the bundled
+content in `packages/core/src/content.ts` as the fallback. No screen changed: they all still call
+`api.getChapter` and friends, which is what that seam was for.
+
+Reads degrade in three steps, and never to a blank screen: live rows, then the last good answer,
+then the bundle. A student on two bars gets a chapter, not a spinner.
+
+Medium is app state rather than a per-call argument. It is set once from the profile with
+`setContentMedium`, and Urdu falls back to English **per resource**, so a translated chapter whose
+flashcards are not translated yet still reads in Urdu.
+
+`npm run db:migrate` applies the schema (there is no Supabase CLI on this machine and the direct
+database host is IPv6-only, so it goes through the Mumbai pooler). `npm run content:verify` proves
+the round trip: that every column `db.ts` names in a string still exists, and that a signed-out
+visitor can reach nothing. A renamed column is not a type error anywhere, it is an empty list
+quietly swallowed by the fallback, so it needs a real query to catch.
+
 ## What is not done
 
-- **Generation.** The outcomes are in place; the notes, questions, flashcards and short questions
-  written against them are not. That is a one-off Claude pass, costed in the low thousands of
-  rupees, and it lands as draft.
-- **Urdu and Islamiyat**, per the OCR note above.
+- **Generation, and this is the one that matters.** `content:verify` reports **0 published sections
+  and 0 published questions**, so the apps still render the bundled sample. The outcomes are in
+  place; the notes, questions, flashcards and short questions written against them are not. That is
+  a one-off Claude pass, costed in the low thousands of rupees, and it lands as draft. Until it
+  runs, the plumbing is real and the content is not.
+- **Urdu and Islamiyat.** Four FBISE documents were tried and all four fail: two report the wrong
+  code points for the glyphs they draw, and three are scans, one of them with bad OCR already baked
+  in. Reversing the extracted text recovers some words and mangles others, so it is not a fix. The
+  pages render legibly though, so the answer is transcription rather than OCR:
+  `content/fbise/pages/{isl,urd}-06.png` onward, 38 pages, already rendered.
+- **Urdu medium for the other seven subjects** is not blocked. Schema, ingestion and fetch layer all
+  carry `medium` already; the Urdu content is written by the generator, not extracted.
 - **Mapping outcomes to chapters.** `curriculum_slos.chapter_id` is null everywhere. The board's
   2022-23 domains do not line up one-to-one with the 2006 units, so this needs a human pass rather
   than a fuzzy match that would look right and be wrong.
