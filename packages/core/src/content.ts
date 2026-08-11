@@ -92,25 +92,34 @@ const CH: Record<string, [string, string, string?][]> = {
   ],
   // Seventeen units, not ten. FBISE examines units 1-7, 14, 15 and 17-23 and 29
   // of the IX-X mathematics scheme in Class 9; the gaps are Class 10's. The
-  // board's own numbering is kept in data/fbise/math.json, because a student
-  // looking for "Unit 22 Pythagoras" needs to recognise it.
+  // board's own numbering is kept in data/fbise/math.json for reference.
+  // Titles and blurbs below follow what the 2024-25 Assessment Framework
+  // (built on NCP 2022-23) actually examines, not the 2006 unit name, where
+  // the two disagree: math-2 is sets and rational numbers, not complex
+  // numbers; math-8 is relations, not linear graphs; math-14 is statistics
+  // and probability, not ratio and proportion; math-15 is trigonometry, not
+  // just Pythagoras; math-16 is areas and volumes of similar figures, not
+  // area theorems generally. Chapters 1, 10 and 13 (Matrices, Congruent
+  // Triangles, Sides and Angles of a Triangle) have no outcomes the board
+  // examines in Class 9 under NCP 2022-23; their titles stay so a student
+  // with an older textbook can still find them, but the blurb says so.
   math: [
-    ['Matrices and Determinants', 'Types of matrices, addition and multiplication, determinants, inverse.'],
-    ['Real and Complex Numbers', 'Number systems, properties, radicals and laws of exponents.'],
+    ['Matrices and Determinants', 'Matrix types, operations and determinants: the board does not examine this in Class 9 under NCP 2022-23.'],
+    ['Sets and Rational Numbers', 'Three-set Venn diagrams and set laws, plus real-life problems using rational numbers.'],
     ['Logarithms', 'Scientific notation, common and natural logs, laws of logarithms.'],
     ['Algebraic Expressions and Formulas', 'Rational expressions, surds, useful algebraic identities.'],
     ['Factorization', 'Factorising quadratics, cubes, remainder and factor theorems.'],
     ['Algebraic Manipulation', 'HCF and LCM, square root of an algebraic expression.'],
     ['Linear Equations and Inequalities', 'Solving equations, absolute value, inequality solution sets.'],
-    ['Linear Graphs & Their Application', 'Cartesian plane, conversion graphs, simultaneous equations.'],
+    ['Relations', 'Binary relations and their domain and range, shown as tables, ordered pairs or graphs.'],
     ['Introduction to Coordinate Geometry', 'Distance formula, collinear points, midpoint.'],
-    ['Congruent Triangles', 'Congruence postulates and theorems with proofs.'],
+    ['Congruent Triangles', 'Congruence postulates and proofs for triangles: the board does not examine this in Class 9 under NCP 2022-23.'],
     ['Parallelograms and Triangles', 'Properties of parallelograms, midpoint theorem and its converse.'],
     ['Line Bisectors and Angle Bisectors', 'Perpendicular bisectors, angle bisectors and their concurrency.'],
-    ['Sides and Angles of a Triangle', 'Angle-side inequalities and the triangle inequality.'],
-    ['Ratio and Proportion', 'Ratio, proportion and the theorems on parallel lines cutting sides.'],
-    ['Pythagoras’ Theorem', 'The theorem, its converse and problems on right-angled triangles.'],
-    ['Theorems Related with Area', 'Areas of parallelograms and triangles on the same base.'],
+    ['Sides and Angles of a Triangle', 'Angle-side inequalities and the triangle inequality: the board does not examine this in Class 9 under NCP 2022-23.'],
+    ['Statistics and Probability', 'Mean, median, mode and modal class, plus probability and relative frequency.'],
+    ['Trigonometry', 'Angles, trig ratios and identities, plus bearings and angles of elevation and depression.'],
+    ['Areas and Volumes of Similar Figures', 'How the areas and volumes of similar figures and solids compare by scale factor.'],
     ['Practical Geometry: Triangles', 'Constructing triangles, and drawing their circles and bisectors.'],
   ],
   // Four chapters, not eight. Now follows the board's Table of Specification:
