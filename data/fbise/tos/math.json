@@ -1,0 +1,10 @@
+{
+  "subject": "math",
+  "totalMarks": 135,
+  "sourcePage": "Table of Specification, Model Question Paper Mathematics - Grade IX (SSC-I), content/fbise/text/framework-math.txt lines 1011-1036 (PDF page 26 of framework-math.pdf)",
+  "chapters": [
+    { "number": 1, "title": "Numbers and Algebra", "slos": ["A"], "marks": 41, "share": 30 },
+    { "number": 2, "title": "Geometry", "slos": ["B"], "marks": 71, "share": 53 },
+    { "number": 3, "title": "Information Handling", "slos": ["C"], "marks": 23, "share": 17 }
+  ]
+}

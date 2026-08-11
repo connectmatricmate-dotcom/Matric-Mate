@@ -34,7 +34,7 @@ const C = {
 /** Exactly the selects in packages/core/src/db.ts. Keep them in step. */
 const SELECTS = {
   subjects: 'id,name,urdu_name,icon,compulsory,study_group',
-  chapters: 'id,subject_id,number,board_unit,title,urdu_title,blurb,premium,audio_minutes',
+  chapters: 'id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes',
   curriculum_slos: 'code,text,cognitive,assessment,domain,title',
   chapter_sections: 'id,medium,position,title,blocks',
   mcqs: 'id,medium,topic,q,options,answer,explanation,difficulty,source',

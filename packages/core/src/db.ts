@@ -161,6 +161,8 @@ type ChapterRow = {
   subject_id: string;
   number: number;
   board_unit: number | null;
+  exam_marks: number | null;
+  exam_share: number | null;
   title: string;
   urdu_title: string | null;
   blurb: string;
@@ -183,6 +185,8 @@ const toChapter = (r: ChapterRow, counts?: { mcqs: number; cards: number; sectio
   subjectId: r.subject_id,
   number: r.number,
   boardUnit: r.board_unit ?? undefined,
+  examMarks: r.exam_marks ?? undefined,
+  examShare: r.exam_share ?? undefined,
   title: r.title,
   urduTitle: r.urdu_title ?? undefined,
   blurb: r.blurb,
@@ -225,7 +229,7 @@ export async function fetchChapters(subjectId: string): Promise<Chapter[]> {
     `chapters:${subjectId}:${medium}`,
     async () => {
       const { data, error } = await table('chapters')
-        .select('id,subject_id,number,board_unit,title,urdu_title,blurb,premium,audio_minutes')
+        .select('id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes')
         .eq('subject_id', subjectId)
         .order('number');
       return { error, data: (data as ChapterRow[] | null)?.map((r) => toChapter(r)) ?? null };

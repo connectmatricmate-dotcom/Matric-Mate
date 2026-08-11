@@ -1,0 +1,27 @@
+{
+  "subject": "chem",
+  "totalMarks": 108,
+  "sourcePage": "Table of Specification, Model Paper Chemistry Grade IX (SSC-I), content/fbise/text/framework-chem.txt lines 1380-1429 (PDF pages 36-37 of framework-chem.pdf)",
+  "chapters": [
+    { "number": 1, "title": "Nature of Science in Chemistry", "slos": ["A"], "marks": 4, "share": 3.7 },
+    { "number": 2, "title": "Matter", "slos": ["B:1-7"], "marks": 10, "share": 9.25 },
+    { "number": 3, "title": "Atomic Structure", "slos": ["B:8-29"], "marks": 8, "share": 7.4 },
+    { "number": 4, "title": "Chemical Bonding", "slos": ["B:30-46"], "marks": 7, "share": 6.48 },
+    { "number": 5, "title": "Stoichiometry", "slos": ["B:47-51"], "marks": 4, "share": 3.7 },
+    { "number": 6, "title": "Electrochemistry", "slos": ["B:52-61"], "marks": 4, "share": 3.7 },
+    { "number": 7, "title": "Energetics", "slos": ["B:62-71"], "marks": 7, "share": 6.48 },
+    { "number": 8, "title": "Chemical Equilibrium", "slos": ["B:72-74"], "marks": 6, "share": 5.55 },
+    { "number": 9, "title": "Acids, Bases chemistry and pH", "slos": ["B:75-83"], "marks": 9, "share": 8.3 },
+    { "number": 10, "title": "Periodic Table and Periodicity", "slos": ["C:1-8"], "marks": 10, "share": 9.25 },
+    { "number": 11, "title": "Group Properties and Elements", "slos": ["C:9-20"], "marks": 6, "share": 5.5 },
+    { "number": 12, "title": "Environmental Chemistry-Air", "slos": ["D:1-11"], "marks": 2, "share": 1.85 },
+    { "number": 13, "title": "Environmental Chemistry-Water", "slos": ["D:12-23"], "marks": 6, "share": 5.55 },
+    { "number": 14, "title": "Organic Chemistry", "slos": ["E:1-9"], "marks": 6, "share": 5.55 },
+    { "number": 15, "title": "Hydrocarbons", "slos": ["E:10-14"], "marks": 10, "share": 9.25 },
+    { "number": 16, "title": "Biochemistry", "slos": ["E:15-17"], "marks": 9, "share": 8.3 },
+    { "number": 17, "title": "Scientific Notation/Standard Form", "slos": ["F:1-10"], "marks": 0, "share": 0 },
+    { "number": 18, "title": "Separation Techniques", "slos": ["F:11-14"], "marks": 0, "share": 0 },
+    { "number": 19, "title": "Qualitative Analysis", "slos": ["F:15-16"], "marks": 0, "share": 0 },
+    { "number": 20, "title": "Chromatography", "slos": ["F:17-20"], "marks": 0, "share": 0 }
+  ]
+}

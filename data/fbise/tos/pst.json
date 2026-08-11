@@ -1,0 +1,15 @@
+{
+  "subject": "pst",
+  "totalMarks": 90,
+  "sourcePage": "Table of Specification, Model Paper Pakistan Studies Grade IX (SSC-I), content/fbise/text/framework-pst.txt lines 891-919 (PDF page 24 of framework-pst.pdf); the ToS marks only Domain A/B/C, so content-area (Standard) titles and their sub-domain codes are taken from the Details of Content Areas/SLOs table in the same file, lines 208-460 (PDF pages 9-14)",
+  "chapters": [
+    { "number": 1, "title": "Ideological Basis, Struggle, Creation and the Political Developments in Pakistan", "slos": ["A1"], "marks": 20, "share": 22.2 },
+    { "number": 2, "title": "Land of Pakistan", "slos": ["B1"], "marks": null, "share": null },
+    { "number": 3, "title": "The Natural Topography and Vegetation of Pakistan", "slos": ["B2"], "marks": null, "share": null },
+    { "number": 4, "title": "Climate of Pakistan and Environmental Hazards", "slos": ["B3"], "marks": null, "share": null },
+    { "number": 5, "title": "Water, Mineral and Power Resources", "slos": ["C1"], "marks": null, "share": null },
+    { "number": 6, "title": "Population Structure, Growth, Employment and Industry", "slos": ["C2"], "marks": null, "share": null },
+    { "number": 7, "title": "Agriculture, Livestock and Fisheries", "slos": ["C3"], "marks": null, "share": null },
+    { "number": 8, "title": "Transport, Trade and Telecommunication", "slos": ["C4"], "marks": null, "share": null }
+  ]
+}

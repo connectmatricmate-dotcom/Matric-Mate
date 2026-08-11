@@ -1,0 +1,10 @@
+{
+  "subject": "urd",
+  "totalMarks": 75,
+  "sourcePage": "Table of Specification, Model Paper Urdu (Compulsory) Grade IX (SSC-I), PDF page 26 of 27 of content/fbise/pdf/framework-urd.pdf (rendered to PNG and read by hand; the PDF's text layer reports the wrong code points for Urdu script, so pdftotext/the .txt extract cannot be used). totalMarks (75) is the paper's own scored total, read off the part headers on PDF pages 18, 21 and 24 (حصہ اول 15 + حصہ دوم 34 + حصہ سوم 26 = 75; the Part 1 cover states 'کل نمبر 15', the Parts 2-3 cover states 'کل نمبر 60'). The ToS table's own row and column totals foot to 87, not 75: its own key explains why, it lists both branches of every OR-choice question ('Q2(i/f) 2' and 'Q2(i/s) 2'), so alternative questions are double-counted by design, to show the full range of content the paper draws from, even though a student answers only one branch and is scored out of 75. marks/share on each chapter below are the ToS table's own per-domain figures (columns قواعد/زبان شناسی, لکھنا, پڑھنا) and intentionally do not sum to totalMarks.",
+  "chapters": [
+    { "number": 1, "title": "پڑھنا", "slos": ["C"], "marks": 15, "share": 20 },
+    { "number": 2, "title": "لکھنا", "slos": ["D"], "marks": 43, "share": 46.7 },
+    { "number": 3, "title": "قواعد / زبان شناسی", "slos": ["E"], "marks": 29, "share": 33.3 }
+  ]
+}

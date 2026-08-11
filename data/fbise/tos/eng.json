@@ -1,0 +1,11 @@
+{
+  "subject": "eng",
+  "totalMarks": 84,
+  "sourcePage": "Table of Specification of the Model Paper English SSC-I, content/fbise/text/framework-eng.txt lines 1622-1639 (PDF page 43 of framework-eng.pdf). Domain A (Oral Communication Skills, Details of Content Areas/SLOs table, lines 222-253, PDF page 1) is explicitly marked 'part of regular teaching and learning... It will not be assessed in Annual Examinations' and does not appear in the ToS table, so it carries no marks or share.",
+  "chapters": [
+    { "number": 1, "title": "Oral Communication Skills", "slos": ["A"], "marks": null, "share": null },
+    { "number": 2, "title": "Reading and Critical Thinking", "slos": ["B"], "marks": 12, "share": 14 },
+    { "number": 3, "title": "Vocabulary and Grammar", "slos": ["C"], "marks": 28, "share": 34 },
+    { "number": 4, "title": "Writing", "slos": ["D"], "marks": 44, "share": 52 }
+  ]
+}

@@ -1,0 +1,714 @@
+{
+  "_note": [
+    "Chapter structure taken from the board's Table of Specifications, not from the 2006 syllabus.",
+    "",
+    "WHY THIS FILE EXISTS. The app's chapter lists were the 2006 nine-unit scheme while the outcomes",
+    "are NCP 2022-23, and the two do not line up. Forcing one onto the other left Transfer of Heat",
+    "with zero outcomes, Gravitation with two, and all fifteen Electricity and Magnetism outcomes,",
+    "16% of the paper, filed under Properties of Matter. The ToS in each Assessment Framework states",
+    "how the board actually builds the paper, so that is what a chapter should be.",
+    "",
+    "THE MAPPING IS NOW DETERMINISTIC. A chapter is a domain, or a stated range within one, so every",
+    "outcome lands in exactly one chapter by its own code. No model call, no guesswork, and the same",
+    "answer every run. `slos` is a list of domain letters or CODE-RANGE strings like 'B:1-15'.",
+    "",
+    "`marks` and `share` are the board's own weightings from the ToS. They are worth surfacing to a",
+    "student: knowing Dynamics is 22% of the paper and Modern Physics is 3% is exam strategy.",
+    "",
+    "MARKS ARE NOT PAPER MARKS. Several ToS tables list both branches of every either/or",
+    "question, so their columns foot to well above the paper's real total: Physics 108 against",
+    "a 48 mark paper, Urdu 87 against 75, Islamiyat 180 against 100. `share` is the number to",
+    "trust and to show a student, because the board states it directly. Treat `marks` as relative",
+    "weight within a subject, never as 'this chapter is worth N marks on your paper'."
+  ],
+  "source": "ModelPaper/2025/Assessment Frameworks/SSC-I/*, Table of Specification pages",
+  "retrieved": "2026-08-11",
+  "subjects": {
+    "phy": {
+      "totalMarks": 108,
+      "_note": "Domain B (Mechanics) carries 86 of the 141 outcomes, far too many for one chapter. The ToS splits it into four named content areas, and those ranges partition B1-B86 exactly.",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Measurements",
+          "slos": [
+            "A"
+          ],
+          "marks": 10,
+          "share": 9
+        },
+        {
+          "number": 2,
+          "title": "Kinematics",
+          "slos": [
+            "B:1-15"
+          ],
+          "marks": 14,
+          "share": 13
+        },
+        {
+          "number": 3,
+          "title": "Dynamics",
+          "slos": [
+            "B:16-54"
+          ],
+          "marks": 24,
+          "share": 22
+        },
+        {
+          "number": 4,
+          "title": "Pressure and Deformation in Solids",
+          "slos": [
+            "B:55-59",
+            "B:77-86"
+          ],
+          "marks": 21,
+          "share": 19
+        },
+        {
+          "number": 5,
+          "title": "Work and Energy",
+          "slos": [
+            "B:60-76"
+          ],
+          "marks": 8,
+          "share": 7
+        },
+        {
+          "number": 6,
+          "title": "Heat and Thermodynamics",
+          "slos": [
+            "C"
+          ],
+          "marks": 6,
+          "share": 6
+        },
+        {
+          "number": 7,
+          "title": "Electricity and Magnetism",
+          "slos": [
+            "E"
+          ],
+          "marks": 17,
+          "share": 16
+        },
+        {
+          "number": 8,
+          "title": "Modern Physics",
+          "slos": [
+            "F"
+          ],
+          "marks": 3,
+          "share": 3
+        },
+        {
+          "number": 9,
+          "title": "Nature of Science",
+          "slos": [
+            "G"
+          ],
+          "marks": 5,
+          "share": 5
+        }
+      ]
+    },
+    "bio": {
+      "totalMarks": 108,
+      "sourcePage": "Table of specifications (ToS), Model Paper Biology Grade IX (SSC I), content/fbise/text/framework-bio.txt lines 930-958 (PDF page 27 of framework-bio.pdf)",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The science of biology",
+          "slos": [
+            "A"
+          ],
+          "marks": 13,
+          "share": 12
+        },
+        {
+          "number": 2,
+          "title": "Biodiversity",
+          "slos": [
+            "B:7-13"
+          ],
+          "marks": 7,
+          "share": 6.5
+        },
+        {
+          "number": 3,
+          "title": "Cell",
+          "slos": [
+            "D:1-7",
+            "D:13-13"
+          ],
+          "marks": 13,
+          "share": 12
+        },
+        {
+          "number": 4,
+          "title": "Cell cycle",
+          "slos": [
+            "D:8-12"
+          ],
+          "marks": 10,
+          "share": 9.3
+        },
+        {
+          "number": 5,
+          "title": "Tissues, organs & organ system",
+          "slos": [
+            "E"
+          ],
+          "marks": 11,
+          "share": 10.2
+        },
+        {
+          "number": 6,
+          "title": "Molecular biology",
+          "slos": [
+            "C"
+          ],
+          "marks": 8,
+          "share": 7.4
+        },
+        {
+          "number": 7,
+          "title": "Metabolism",
+          "slos": [
+            "F"
+          ],
+          "marks": 17,
+          "share": 15.7
+        },
+        {
+          "number": 8,
+          "title": "Plant physiology",
+          "slos": [
+            "Q:1-14"
+          ],
+          "marks": 9,
+          "share": 8.3
+        },
+        {
+          "number": 9,
+          "title": "Plant reproduction",
+          "slos": [
+            "Q:15-21"
+          ],
+          "marks": 13,
+          "share": 12
+        },
+        {
+          "number": 10,
+          "title": "Evolution",
+          "slos": [
+            "B:1-6"
+          ],
+          "marks": 7,
+          "share": 6.5
+        }
+      ]
+    },
+    "chem": {
+      "totalMarks": 108,
+      "sourcePage": "Table of Specification, Model Paper Chemistry Grade IX (SSC-I), content/fbise/text/framework-chem.txt lines 1380-1429 (PDF pages 36-37 of framework-chem.pdf)",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Nature of Science in Chemistry",
+          "slos": [
+            "A"
+          ],
+          "marks": 4,
+          "share": 3.7
+        },
+        {
+          "number": 2,
+          "title": "Matter",
+          "slos": [
+            "B:1-7"
+          ],
+          "marks": 10,
+          "share": 9.25
+        },
+        {
+          "number": 3,
+          "title": "Atomic Structure",
+          "slos": [
+            "B:8-29"
+          ],
+          "marks": 8,
+          "share": 7.4
+        },
+        {
+          "number": 4,
+          "title": "Chemical Bonding",
+          "slos": [
+            "B:30-46"
+          ],
+          "marks": 7,
+          "share": 6.48
+        },
+        {
+          "number": 5,
+          "title": "Stoichiometry",
+          "slos": [
+            "B:47-51"
+          ],
+          "marks": 4,
+          "share": 3.7
+        },
+        {
+          "number": 6,
+          "title": "Electrochemistry",
+          "slos": [
+            "B:52-61"
+          ],
+          "marks": 4,
+          "share": 3.7
+        },
+        {
+          "number": 7,
+          "title": "Energetics",
+          "slos": [
+            "B:62-71"
+          ],
+          "marks": 7,
+          "share": 6.48
+        },
+        {
+          "number": 8,
+          "title": "Chemical Equilibrium",
+          "slos": [
+            "B:72-74"
+          ],
+          "marks": 6,
+          "share": 5.55
+        },
+        {
+          "number": 9,
+          "title": "Acids, Bases chemistry and pH",
+          "slos": [
+            "B:75-83"
+          ],
+          "marks": 9,
+          "share": 8.3
+        },
+        {
+          "number": 10,
+          "title": "Periodic Table and Periodicity",
+          "slos": [
+            "C:1-8"
+          ],
+          "marks": 10,
+          "share": 9.25
+        },
+        {
+          "number": 11,
+          "title": "Group Properties and Elements",
+          "slos": [
+            "C:9-20"
+          ],
+          "marks": 6,
+          "share": 5.5
+        },
+        {
+          "number": 12,
+          "title": "Environmental Chemistry-Air",
+          "slos": [
+            "D:1-11"
+          ],
+          "marks": 2,
+          "share": 1.85
+        },
+        {
+          "number": 13,
+          "title": "Environmental Chemistry-Water",
+          "slos": [
+            "D:12-23"
+          ],
+          "marks": 6,
+          "share": 5.55
+        },
+        {
+          "number": 14,
+          "title": "Organic Chemistry",
+          "slos": [
+            "E:1-9"
+          ],
+          "marks": 6,
+          "share": 5.55
+        },
+        {
+          "number": 15,
+          "title": "Hydrocarbons",
+          "slos": [
+            "E:10-14"
+          ],
+          "marks": 10,
+          "share": 9.25
+        },
+        {
+          "number": 16,
+          "title": "Biochemistry",
+          "slos": [
+            "E:15-17"
+          ],
+          "marks": 9,
+          "share": 8.3
+        },
+        {
+          "number": 17,
+          "title": "Scientific Notation/Standard Form",
+          "slos": [
+            "F:1-10"
+          ],
+          "marks": 0,
+          "share": 0
+        },
+        {
+          "number": 18,
+          "title": "Separation Techniques",
+          "slos": [
+            "F:11-14"
+          ],
+          "marks": 0,
+          "share": 0
+        },
+        {
+          "number": 19,
+          "title": "Qualitative Analysis",
+          "slos": [
+            "F:15-16"
+          ],
+          "marks": 0,
+          "share": 0
+        },
+        {
+          "number": 20,
+          "title": "Chromatography",
+          "slos": [
+            "F:17-20"
+          ],
+          "marks": 0,
+          "share": 0
+        }
+      ]
+    },
+    "cs": {
+      "totalMarks": 108,
+      "sourcePage": "Table of Specification, Model Paper Computer Science - Grade IX (SSC-I), content/fbise/text/framework-cs.txt lines 1168-1199 (PDF page 30 of framework-cs.pdf). The ToS also lists Domain G: Digital Literacy (0 marks) and Domain H: Entrepreneurship in the digital age (5 marks), but data/fbise/cs.json has no SLOs recorded for either domain, so they are not represented as chapters here.",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Computer Systems",
+          "slos": [
+            "A"
+          ],
+          "marks": 22,
+          "share": 20.4
+        },
+        {
+          "number": 2,
+          "title": "Computational Thinking and Algorithms",
+          "slos": [
+            "B"
+          ],
+          "marks": 17,
+          "share": 15.7
+        },
+        {
+          "number": 3,
+          "title": "Programming Fundamentals",
+          "slos": [
+            "C"
+          ],
+          "marks": 21,
+          "share": 19.4
+        },
+        {
+          "number": 4,
+          "title": "Data and Analysis",
+          "slos": [
+            "D"
+          ],
+          "marks": 16,
+          "share": 14.8
+        },
+        {
+          "number": 5,
+          "title": "Applications of Computer Science",
+          "slos": [
+            "E"
+          ],
+          "marks": 13,
+          "share": 12
+        },
+        {
+          "number": 6,
+          "title": "Impacts of Computing",
+          "slos": [
+            "F"
+          ],
+          "marks": 14,
+          "share": 13
+        }
+      ]
+    },
+    "eng": {
+      "totalMarks": 84,
+      "sourcePage": "Table of Specification of the Model Paper English SSC-I, content/fbise/text/framework-eng.txt lines 1622-1639 (PDF page 43 of framework-eng.pdf). Domain A (Oral Communication Skills, Details of Content Areas/SLOs table, lines 222-253, PDF page 1) is explicitly marked 'part of regular teaching and learning... It will not be assessed in Annual Examinations' and does not appear in the ToS table, so it carries no marks or share.",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Oral Communication Skills",
+          "slos": [
+            "A"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 2,
+          "title": "Reading and Critical Thinking",
+          "slos": [
+            "B"
+          ],
+          "marks": 12,
+          "share": 14
+        },
+        {
+          "number": 3,
+          "title": "Vocabulary and Grammar",
+          "slos": [
+            "C"
+          ],
+          "marks": 28,
+          "share": 34
+        },
+        {
+          "number": 4,
+          "title": "Writing",
+          "slos": [
+            "D"
+          ],
+          "marks": 44,
+          "share": 52
+        }
+      ]
+    },
+    "isl": {
+      "totalMarks": 100,
+      "sourcePage": "Table of Specification (ToS) Islamiat-IX, Model Paper Islamiyat (Compulsory) Grade IX (SSC-I), PDF page 24 of 25 of content/fbise/pdf/framework-isl.pdf (rendered to PNG and read by hand). totalMarks (100) is the paper's own scored total, Section A 20 marks (MCQ) plus Sections B-D 80 marks, matching data/fbise/isl.json paper.totalMarks and the model paper's own cover pages ('کل نمبر 20' then 'کل نمبر 80'). The ToS table's own totals foot to 180, not 100: same reason as the Urdu ToS, its key lists both branches of every OR-choice SRQ/ERQ ('Q2(i/f) 3' and 'Q2(i/s) 3'), double-counting alternative questions by design even though a student answers only one branch. marks on each chapter below are the ToS table's own per-strand figures (columns دائرہ کار اول through دائرہ کار ہفتم, row کل نمبر) and intentionally do not sum to totalMarks. share is null throughout: the ToS gives a فی صد (percent) column only for its three cognitive-level rows (جاننا/سمجھنا/اطلاق, knowledge/understanding/application), not per strand, so no board-stated percentage exists per strand to record. Strand order and titles match data/fbise/isl.json's examUnits/domains (دائرہ کار اول = Strand 1 = domain A, and so on); all seven strands are examinable, Islamiyat has no formative-only strand the way Urdu's سننا/بولنا are.",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "قرآن مجید و حدیثِ نبوی ﷺ",
+          "slos": [
+            "A"
+          ],
+          "marks": 33,
+          "share": null
+        },
+        {
+          "number": 2,
+          "title": "ایمانیات و عبادات",
+          "slos": [
+            "B"
+          ],
+          "marks": 28,
+          "share": null
+        },
+        {
+          "number": 3,
+          "title": "سیرتِ رسول خاتم النبیین ﷺ",
+          "slos": [
+            "C"
+          ],
+          "marks": 24,
+          "share": null
+        },
+        {
+          "number": 4,
+          "title": "اخلاق و آداب",
+          "slos": [
+            "D"
+          ],
+          "marks": 26,
+          "share": null
+        },
+        {
+          "number": 5,
+          "title": "حسنِ معاملات و معاشرت",
+          "slos": [
+            "E"
+          ],
+          "marks": 25,
+          "share": null
+        },
+        {
+          "number": 6,
+          "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
+          "slos": [
+            "F"
+          ],
+          "marks": 22,
+          "share": null
+        },
+        {
+          "number": 7,
+          "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
+          "slos": [
+            "G"
+          ],
+          "marks": 22,
+          "share": null
+        }
+      ]
+    },
+    "math": {
+      "totalMarks": 135,
+      "sourcePage": "Table of Specification, Model Question Paper Mathematics - Grade IX (SSC-I), content/fbise/text/framework-math.txt lines 1011-1036 (PDF page 26 of framework-math.pdf)",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Numbers and Algebra",
+          "slos": [
+            "A"
+          ],
+          "marks": 41,
+          "share": 30
+        },
+        {
+          "number": 2,
+          "title": "Geometry",
+          "slos": [
+            "B"
+          ],
+          "marks": 71,
+          "share": 53
+        },
+        {
+          "number": 3,
+          "title": "Information Handling",
+          "slos": [
+            "C"
+          ],
+          "marks": 23,
+          "share": 17
+        }
+      ]
+    },
+    "pst": {
+      "totalMarks": 90,
+      "sourcePage": "Table of Specification, Model Paper Pakistan Studies Grade IX (SSC-I), content/fbise/text/framework-pst.txt lines 891-919 (PDF page 24 of framework-pst.pdf); the ToS marks only Domain A/B/C, so content-area (Standard) titles and their sub-domain codes are taken from the Details of Content Areas/SLOs table in the same file, lines 208-460 (PDF pages 9-14)",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Ideological Basis, Struggle, Creation and the Political Developments in Pakistan",
+          "slos": [
+            "A1"
+          ],
+          "marks": 20,
+          "share": 22.2
+        },
+        {
+          "number": 2,
+          "title": "Land of Pakistan",
+          "slos": [
+            "B1"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 3,
+          "title": "The Natural Topography and Vegetation of Pakistan",
+          "slos": [
+            "B2"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 4,
+          "title": "Climate of Pakistan and Environmental Hazards",
+          "slos": [
+            "B3"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 5,
+          "title": "Water, Mineral and Power Resources",
+          "slos": [
+            "C1"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 6,
+          "title": "Population Structure, Growth, Employment and Industry",
+          "slos": [
+            "C2"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 7,
+          "title": "Agriculture, Livestock and Fisheries",
+          "slos": [
+            "C3"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 8,
+          "title": "Transport, Trade and Telecommunication",
+          "slos": [
+            "C4"
+          ],
+          "marks": null,
+          "share": null
+        }
+      ]
+    },
+    "urd": {
+      "totalMarks": 75,
+      "sourcePage": "Table of Specification, Model Paper Urdu (Compulsory) Grade IX (SSC-I), PDF page 26 of 27 of content/fbise/pdf/framework-urd.pdf (rendered to PNG and read by hand; the PDF's text layer reports the wrong code points for Urdu script, so pdftotext/the .txt extract cannot be used). totalMarks (75) is the paper's own scored total, read off the part headers on PDF pages 18, 21 and 24 (حصہ اول 15 + حصہ دوم 34 + حصہ سوم 26 = 75; the Part 1 cover states 'کل نمبر 15', the Parts 2-3 cover states 'کل نمبر 60'). The ToS table's own row and column totals foot to 87, not 75: its own key explains why, it lists both branches of every OR-choice question ('Q2(i/f) 2' and 'Q2(i/s) 2'), so alternative questions are double-counted by design, to show the full range of content the paper draws from, even though a student answers only one branch and is scored out of 75. marks/share on each chapter below are the ToS table's own per-domain figures (columns قواعد/زبان شناسی, لکھنا, پڑھنا) and intentionally do not sum to totalMarks.",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "پڑھنا",
+          "slos": [
+            "C"
+          ],
+          "marks": 15,
+          "share": 20
+        },
+        {
+          "number": 2,
+          "title": "لکھنا",
+          "slos": [
+            "D"
+          ],
+          "marks": 43,
+          "share": 46.7
+        },
+        {
+          "number": 3,
+          "title": "قواعد / زبان شناسی",
+          "slos": [
+            "E"
+          ],
+          "marks": 29,
+          "share": 33.3
+        }
+      ]
+    }
+  }
+}

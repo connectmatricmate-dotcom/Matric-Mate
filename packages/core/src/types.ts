@@ -24,6 +24,14 @@ export type Chapter = {
    * gaps being Class 10's, so a student looking for "unit 22" needs this.
    */
   boardUnit?: number;
+  /**
+   * What this chapter is worth in the annual paper, from the board's Table of
+   * Specification. Undefined means we have not read that subject's table yet,
+   * which is not the same as zero, so anything rendering it must hide rather
+   * than show a nought.
+   */
+  examMarks?: number;
+  examShare?: number;
   title: string;
   urduTitle?: string;
   blurb: string;

@@ -130,13 +130,19 @@ async function main() {
     curriculum[doc.subject] = doc;
   }
 
+  // Mark weights from the board's Table of Specification, where we have read it.
+  const spec = JSON.parse(await readFile(resolve(DATA, 'chapters.json'), 'utf8')).subjects ?? {};
+
   const chapters = ALL_CHAPTERS.map((c) => {
     const units = curriculum[c.subjectId]?.examUnits?.units;
+    const weight = spec[c.subjectId]?.chapters?.find((x) => x.number === c.number);
     return {
       id: c.id,
       subject_id: c.subjectId,
       number: c.number,
       board_unit: units?.[c.number - 1]?.number ?? null,
+      exam_marks: weight?.marks ?? null,
+      exam_share: weight?.share ?? null,
       title: c.title,
       urdu_title: c.urduTitle ?? null,
       blurb: c.blurb,

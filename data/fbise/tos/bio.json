@@ -1,0 +1,17 @@
+{
+  "subject": "bio",
+  "totalMarks": 108,
+  "sourcePage": "Table of specifications (ToS), Model Paper Biology Grade IX (SSC I), content/fbise/text/framework-bio.txt lines 930-958 (PDF page 27 of framework-bio.pdf)",
+  "chapters": [
+    { "number": 1, "title": "The science of biology", "slos": ["A"], "marks": 13, "share": 12 },
+    { "number": 2, "title": "Biodiversity", "slos": ["B:7-13"], "marks": 7, "share": 6.5 },
+    { "number": 3, "title": "Cell", "slos": ["D:1-7", "D:13-13"], "marks": 13, "share": 12 },
+    { "number": 4, "title": "Cell cycle", "slos": ["D:8-12"], "marks": 10, "share": 9.3 },
+    { "number": 5, "title": "Tissues, organs & organ system", "slos": ["E"], "marks": 11, "share": 10.2 },
+    { "number": 6, "title": "Molecular biology", "slos": ["C"], "marks": 8, "share": 7.4 },
+    { "number": 7, "title": "Metabolism", "slos": ["F"], "marks": 17, "share": 15.7 },
+    { "number": 8, "title": "Plant physiology", "slos": ["Q:1-14"], "marks": 9, "share": 8.3 },
+    { "number": 9, "title": "Plant reproduction", "slos": ["Q:15-21"], "marks": 13, "share": 12 },
+    { "number": 10, "title": "Evolution", "slos": ["B:1-6"], "marks": 7, "share": 6.5 }
+  ]
+}

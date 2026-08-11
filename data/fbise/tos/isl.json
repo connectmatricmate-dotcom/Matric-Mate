@@ -1,0 +1,14 @@
+{
+  "subject": "isl",
+  "totalMarks": 100,
+  "sourcePage": "Table of Specification (ToS) Islamiat-IX, Model Paper Islamiyat (Compulsory) Grade IX (SSC-I), PDF page 24 of 25 of content/fbise/pdf/framework-isl.pdf (rendered to PNG and read by hand). totalMarks (100) is the paper's own scored total, Section A 20 marks (MCQ) plus Sections B-D 80 marks, matching data/fbise/isl.json paper.totalMarks and the model paper's own cover pages ('کل نمبر 20' then 'کل نمبر 80'). The ToS table's own totals foot to 180, not 100: same reason as the Urdu ToS, its key lists both branches of every OR-choice SRQ/ERQ ('Q2(i/f) 3' and 'Q2(i/s) 3'), double-counting alternative questions by design even though a student answers only one branch. marks on each chapter below are the ToS table's own per-strand figures (columns دائرہ کار اول through دائرہ کار ہفتم, row کل نمبر) and intentionally do not sum to totalMarks. share is null throughout: the ToS gives a فی صد (percent) column only for its three cognitive-level rows (جاننا/سمجھنا/اطلاق, knowledge/understanding/application), not per strand, so no board-stated percentage exists per strand to record. Strand order and titles match data/fbise/isl.json's examUnits/domains (دائرہ کار اول = Strand 1 = domain A, and so on); all seven strands are examinable, Islamiyat has no formative-only strand the way Urdu's سننا/بولنا are.",
+  "chapters": [
+    { "number": 1, "title": "قرآن مجید و حدیثِ نبوی ﷺ", "slos": ["A"], "marks": 33, "share": null },
+    { "number": 2, "title": "ایمانیات و عبادات", "slos": ["B"], "marks": 28, "share": null },
+    { "number": 3, "title": "سیرتِ رسول خاتم النبیین ﷺ", "slos": ["C"], "marks": 24, "share": null },
+    { "number": 4, "title": "اخلاق و آداب", "slos": ["D"], "marks": 26, "share": null },
+    { "number": 5, "title": "حسنِ معاملات و معاشرت", "slos": ["E"], "marks": 25, "share": null },
+    { "number": 6, "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام", "slos": ["F"], "marks": 22, "share": null },
+    { "number": 7, "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے", "slos": ["G"], "marks": 22, "share": null }
+  ]
+}

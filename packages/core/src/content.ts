@@ -33,16 +33,22 @@ export const SUBJECTS: Subject[] = [
 ];
 
 const CH: Record<string, [string, string, string?][]> = {
+  // The board's own content areas, from the Table of Specification in the SSC-I
+  // Assessment Framework, not the 2006 nine-unit scheme that used to be here.
+  // The two disagree, and forcing NCP 2022-23 outcomes onto the old units left
+  // Transfer of Heat with nothing in it, Gravitation with two outcomes, and all
+  // fifteen Electricity and Magnetism outcomes, 16% of the paper, filed under
+  // Properties of Matter. Mark weights per chapter live in data/fbise/chapters.json.
   phy: [
-    ['Physical Quantities & Measurement', 'Base and derived quantities, SI units, measuring instruments, significant figures.'],
-    ['Kinematics', 'Rest and motion, scalars and vectors, distance–time and speed–time graphs, equations of motion.'],
-    ['Dynamics', 'Force, inertia, momentum, Newton’s three laws, friction and circular motion.'],
-    ['Turning Effect of Forces', 'Torque, parallel forces, centre of mass and gravity, equilibrium.'],
-    ['Gravitation', 'Law of gravitation, mass of Earth, satellites, variation of g with altitude.'],
-    ['Work and Energy', 'Work, power, kinetic and potential energy, efficiency, energy sources.'],
-    ['Properties of Matter', 'Density, pressure, Pascal’s and Archimedes’ principles, elasticity.'],
-    ['Thermal Properties of Matter', 'Temperature and heat, specific heat, latent heat, thermal expansion.'],
-    ['Transfer of Heat', 'Conduction, convection, radiation and everyday applications.'],
+    ['Measurements', 'Physical quantities, SI units, prefixes, scientific notation, lab instruments and significant figures.'],
+    ['Kinematics', 'Types of motion, distance and displacement, speed, velocity, acceleration, and motion graphs.'],
+    ['Dynamics', 'Mass and weight, forces and free body diagrams, Newton’s laws, friction, momentum and equilibrium.'],
+    ['Pressure and Deformation in Solids', 'Pressure in solids and fluids, density, Archimedes and Pascal, stress, strain and Hooke’s law.'],
+    ['Work and Energy', 'Work, power, kinetic and potential energy, conservation of energy and efficiency.'],
+    ['Heat and Thermodynamics', 'Temperature and heat, specific and latent heat, thermal expansion, and heat transfer.'],
+    ['Electricity and Magnetism', 'Charge, current, voltage, resistance, circuits, magnetic fields and electromagnetism.'],
+    ['Modern Physics', 'Beyond classical physics: the atom, radioactivity and the limits of everyday models.'],
+    ['Nature of Science', 'How physics is done: evidence, models, uncertainty, and the place of science in society.'],
   ],
   chem: [
     ['Fundamentals of Chemistry', 'Branches of chemistry, atom and molecule, mole concept, Avogadro’s number.'],
