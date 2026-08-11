@@ -18,6 +18,12 @@ export type Chapter = {
   id: string;
   subjectId: string;
   number: number;
+  /**
+   * The board's own unit number, where it differs from our position in the
+   * list. Mathematics Class 9 is FBISE units 1-7, 14, 15, 17-23 and 29, the
+   * gaps being Class 10's, so a student looking for "unit 22" needs this.
+   */
+  boardUnit?: number;
   title: string;
   urduTitle?: string;
   blurb: string;

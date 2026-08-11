@@ -1,82 +1,49 @@
 /**
- * MOCK API, the single seam between the UI and the backend.
+ * The seam between the UI and the backend.
  *
- * Every function here is async with a little latency so real loading states are
- * exercised. When Supabase arrives (M2) only this file changes: each function
- * becomes a query/RPC call and the screens stay exactly as they are.
+ * Every screen in both apps calls these functions and none of them knows where
+ * the answer came from. That was the point of the mock: when real content
+ * arrived, only this file would change. It has now, and it did.
+ *
+ * Content reads go to Postgres through ./db, which falls back to the bundled
+ * sample whenever the database is unreachable, so the apps still work on a bad
+ * connection and still work with no connection at all. The tutor and the
+ * generator below are still mocks and are labelled as such.
  */
 import {
-  ALL_CHAPTERS,
-  CHAPTERS,
-  PAST_PAPERS,
-  SUBJECTS,
-  chapterById,
-  contentFor,
-  isAuthored,
-  subjectById,
-} from './content';
+  fetchChapter,
+  fetchChapterContent,
+  fetchChapters,
+  fetchFlashcards,
+  fetchMcqs,
+  fetchPastPapers,
+  fetchSubject,
+  fetchSubjects,
+} from './db';
+import { ALL_CHAPTERS, contentFor } from './content';
 import { Chapter, ChapterContent, Flashcard, Mcq, PastPaper, Subject } from './types';
 
+/** Still needed by the two mocks below, which fake their own latency. */
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-/** Simulated network latency, keep small so the demo feels quick but honest. */
-const LATENCY = 180;
 
 export const api = {
-  async getSubjects(ids?: string[]): Promise<Subject[]> {
-    await wait(LATENCY);
-    return ids?.length ? SUBJECTS.filter((s) => ids.includes(s.id)) : SUBJECTS;
-  },
+  getSubjects: (ids?: string[]): Promise<Subject[]> => fetchSubjects(ids),
 
-  async getSubject(id: string): Promise<Subject | undefined> {
-    await wait(60);
-    return subjectById(id);
-  },
+  getSubject: (id: string): Promise<Subject | undefined> => fetchSubject(id),
 
-  async getChapters(subjectId: string): Promise<Chapter[]> {
-    await wait(LATENCY);
-    return CHAPTERS[subjectId] ?? [];
-  },
+  getChapters: (subjectId: string): Promise<Chapter[]> => fetchChapters(subjectId),
 
-  async getChapter(id: string): Promise<Chapter | undefined> {
-    await wait(90);
-    return chapterById(id);
-  },
+  getChapter: (id: string): Promise<Chapter | undefined> => fetchChapter(id),
 
-  async getChapterContent(chapterId: string): Promise<ChapterContent> {
-    await wait(LATENCY);
-    return contentFor(chapterId);
-  },
+  getChapterContent: (chapterId: string): Promise<ChapterContent> => fetchChapterContent(chapterId),
 
   /** Question set for a practice session or exam. */
-  async getMcqs(opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] }): Promise<Mcq[]> {
-    await wait(LATENCY);
-    let pool: Mcq[] = [];
-    const chapters = opts.chapterIds?.length
-      ? (opts.chapterIds.map(chapterById).filter(Boolean) as Chapter[])
-      : ALL_CHAPTERS.filter((c) => (opts.subjectId ? c.subjectId === opts.subjectId : true));
-    chapters.forEach((c) => pool.push(...contentFor(c.id).mcqs));
-    if (opts.topics?.length) {
-      const t = pool.filter((m) => opts.topics!.includes(m.topic));
-      if (t.length >= 4) pool = t;
-    }
-    // Fully authored chapters come first so a session leads with real questions;
-    // within each group the order is deterministic so review stays reproducible.
-    const out = [...pool].sort((a, b) => {
-      const rank = Number(isAuthored(b.chapterId)) - Number(isAuthored(a.chapterId));
-      return rank !== 0 ? rank : a.id.localeCompare(b.id);
-    });
-    return out.slice(0, opts.count);
-  },
+  getMcqs: (opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] }): Promise<Mcq[]> =>
+    fetchMcqs(opts),
 
-  async getFlashcards(chapterId: string): Promise<Flashcard[]> {
-    await wait(LATENCY);
-    return contentFor(chapterId).flashcards;
-  },
+  getFlashcards: (chapterId: string): Promise<Flashcard[]> => fetchFlashcards(chapterId),
 
-  async getPastPapers(subjectId?: string): Promise<PastPaper[]> {
-    await wait(LATENCY);
-    return subjectId ? PAST_PAPERS.filter((p) => p.subjectId === subjectId) : PAST_PAPERS;
-  },
+  getPastPapers: (subjectId?: string): Promise<PastPaper[]> => fetchPastPapers(subjectId),
 
   /* ----------------------------------------------------------------- auth */
 

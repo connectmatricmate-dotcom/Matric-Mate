@@ -13,6 +13,7 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { connectContent } from '@matricmate/core';
 
 /**
  * The Supabase client for the app. Same project, same tables, same rules as the
@@ -101,6 +102,17 @@ function unusable(reason: string): SupabaseClient {
 
 export const supabase: SupabaseClient =
   client ?? unusable(supabaseError ?? 'Supabase is not available in this build.');
+
+/**
+ * Point the shared content layer at this client, once, before any screen runs.
+ *
+ * Module scope rather than a provider on purpose: a screen can render before an
+ * effect has fired, and a chapter list that flashes bundled sample content and
+ * then swaps to the real thing looks like a bug. Null when Supabase is not
+ * configured, which leaves the app on bundled content instead of on a client
+ * that throws on every call.
+ */
+connectContent(client);
 
 /**
  * Refresh tokens only while the app is in front of someone.

@@ -265,15 +265,17 @@ async function main() {
 
   // Order matters: chapters reference subjects, outcomes reference chapters,
   // and everything with prose references a chapter.
+  // Third element is the conflict target: every table keys on `id` except the
+  // outcomes, whose primary key is the board's own code.
   const plan = [
-    ['subjects', subjects],
-    ['chapters', chapters],
-    ['curriculum_slos', slos],
-    ['chapter_sections', sections],
-    ['mcqs', mcqs],
-    ['flashcards', flashcards],
-    ['short_questions', shortQs],
-    ['blanks', blanks],
+    ['subjects', subjects, 'id'],
+    ['chapters', chapters, 'id'],
+    ['curriculum_slos', slos, 'code'],
+    ['chapter_sections', sections, 'id'],
+    ['mcqs', mcqs, 'id'],
+    ['flashcards', flashcards, 'id'],
+    ['short_questions', shortQs, 'id'],
+    ['blanks', blanks, 'id'],
   ];
 
   console.log(C.bold(`\ningest ${DRY ? '(dry run)' : ''}\n`));
@@ -315,11 +317,11 @@ async function main() {
   const db = createClient(url, key, { auth: { persistSession: false } });
 
   console.log('');
-  for (const [table, rows] of plan) {
+  for (const [table, rows, key] of plan) {
     if (!rows.length) continue;
     let done = 0;
     for (const batch of chunk(rows)) {
-      const { error } = await db.from(table).upsert(batch, { onConflict: 'id' });
+      const { error } = await db.from(table).upsert(batch, { onConflict: key });
       if (error) {
         console.error(`${C.red('fail')} ${table}: ${error.message}`);
         process.exit(1);

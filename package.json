@@ -17,6 +17,8 @@
     "content:fetch": "node scripts/fetch-fbise.mjs",
     "content:build": "node scripts/build-curriculum.mjs",
     "content:ingest": "node scripts/ingest-content.mjs",
+    "content:verify": "node scripts/verify-content.mjs",
+    "db:migrate": "node scripts/db-migrate.mjs",
     "mobile:go": "npm run start --workspace apps/mobile -- --go",
     "mobile:tunnel": "npm run start --workspace apps/mobile -- --go --tunnel",
     "android:log": "bash scripts/android-crashlog.sh"
@@ -29,5 +31,8 @@
     "react-native-reanimated": "4.5.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "pg": "^8.23.0"
   }
 }

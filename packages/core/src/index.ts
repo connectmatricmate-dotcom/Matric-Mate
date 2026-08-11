@@ -12,4 +12,6 @@ export * from './billing';
 export * from './tokens';
 export * from './icons';
 export { api } from './api';
+export { connectContent, setContentMedium, contentMedium, isLive, fetchSlos } from './db';
+export type { ContentClient, Slo } from './db';
 export * from './i18n';
