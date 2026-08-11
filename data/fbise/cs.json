@@ -1,0 +1,201 @@
+{
+  "subject": "cs",
+  "name": "Computer Science",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Computer Science SSC-I.pdf",
+    "sha256": "d68610990a4fd1332d547b5cb281e1238659515a9f0e622d0080d48502265728",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 6,
+    "slos": 18,
+    "summative": 17,
+    "formative": 0,
+    "unclassified": 1,
+    "untitledDomains": 6,
+    "shortText": 0,
+    "examUnits": 6
+  },
+  "notes": [
+    "6 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Computer Science IX-X-XI-XIIalong with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Fundamentals of Computer"
+      },
+      {
+        "number": 2,
+        "title": "Fundamentals of Operating System"
+      },
+      {
+        "number": 3,
+        "title": "Office Automation"
+      },
+      {
+        "number": 4,
+        "title": "Data Communication"
+      },
+      {
+        "number": 5,
+        "title": "Computer Networks"
+      },
+      {
+        "number": 6,
+        "title": "Computer Security and Ethics"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-09-A-01",
+          "text": "Students will define and describe types of systems (artificial, natural), computer hardware components such as computer architecture (CPU, microprocessors, etc.) Student will understand that • Brief history of computer systems and generation of computers • Basic concept of a system, types of systems • Name and identify the core components of a computer (input/output devices, system unit(motherboard, memory, CPU, power supply, etc.), and data storage devices for Theory A: and Computer Systems Practical computer system Based • What are some of the requirements for a functioning computer systems and what are some key concepts • The core parts of a computer system and how they all work together, including definitions and key functions of computer architecture such as central processing unit (CPU), arithmetic logic unit (ALU), control unit (CU), memory, operating system and application software, and data representation in computers (bit, byte, binary, denary/ decimal, hexadecimal) • Difference between hardware engineering and software engineering Content (Knowledge, Area • Difference between natural and artificial systems • Types and hierarchy of memory with respect to their volatility/retention, speed, storage capacity, cost • Difference between necessary and auxiliary components of a computer system Students will be able to • Recognize and describe key components of a computer system, such as: o Differentiate between natural and artificial systems o Outline the architecture of the central processing unit (CPU) and the functions of the arithmetic logic unit (ALU) and the control unit(CU) and the registers within the CPU. o Differentiate between primary memory, cache, and secondary memory. o Describe the main functions of operating systems and • Explain how the various components interact together to transmit data and instructions • Illustrate the hierarchy of memory and storage devices with respect to their volatility/retention, speed, storage capacity, cost • Differentiate between necessary and auxiliary components of a computer system",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-A-02",
+          "text": "Students will be able to identify and explain system software, application software, low-level and high-level programming languages, and their uses. Practical Students will understand that • The main functions of systems software with some examples Content (Knowledge, Area • The main functions of operating systems and application software • Outline the uses of various application software. Students will be able to • Select an appropriate medium to create artifacts (Planning the document / information flow, editing and alignment of page, paragraphs, text, tables, and graphics) to communicate ideas in various digital tools such as: ○ Image processing tools (like Photoshop, Canva.com, GIMP etc.) ○ Word processors (like MS Word, Google Docs etc.) ○ Presentations (like MS PowerPoint or Google Slides etc.) ○ Spreadsheets(like MS Excel or Google Sheets)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-A-03",
+          "text": "Students will be able to identify and analyze data communication, computer networks, networking devices, basic networking systems and understand how data is transmitted and key concepts such as protocols, speeds, etc. Students will understand • How data is transmitted across a computer network for example circuit switching, packet switching, layering, encapsulation, and protocols • Common network topologies and transmission modes • Outline the advantages and disadvantages of wireless networks • Outline the advantages and evolution of the Internet • Outline common applications of the Internet • The internet is the largest computer network ever built and learn how it works Content (Knowledge, Area • Identify common network problems and provide possible solutions",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-09-B-01",
+          "text": "Understand and apply techniques to decompose problems.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "CS-09-B-02",
+          "text": "Solve simple and complex problems computationally. Students will understand • The importance of computational thinking and problem-solving in computer science. • Principles of computational thinking: a) Logical thinking b) Algorithmic thinking • How to identify steps in identifying a computing problem B: Computati • How to identify the inputs, processes, and outputs of a problem onal Thinking and Algorithms a) The structure of a problem b) Subsections and their links to other subsections Students will be able to • Explain the role of computational thinking in computer science • Read and interpret simple computational problems • Apply computational thinking principles to define and refine problems • Identify the procedure appropriate to solving a problem • Evaluate whether the order in which activities are undertaken will result in the required outcome. • Identify the inputs and outputs required in a solution Content (Knowledge, Area",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-09-C-01",
+          "text": "Students will understand web development and differentiate between a website and a web application. Students will • Grasp the basic concepts and principles of web development, including the technologies, languages, and frameworks commonly used in building websites and web applications. • Understand the distinctive features of web applications. They should learn that web applications are dynamic in nature, offering interactive functionalities, data processing, user authentication, and real-time updates. • Comprehend that websites primarily provide information and C: Program ming Fundame ntals • Determine which technology is appropriate for making static and dynamic web pages and web applications • Identify and describe the features and characteristics of a website. This may include static content, informational pages, navigation menus, multimedia elements, and contact forms. • Distinguish between websites and web applications based on specific criteria.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-C-02",
+          "text": "Students should be able to create a static website using HTML/CSS in an appropriate environment. Students will know • What is HTML Content (Knowledge, Area • What is CSS • What is JavaScript Students will understand • Characteristics, examples, similarities & differences between of static and dynamic website • The purpose of HTML i.e. to display text and image content over the Internet • The capability of HTML documents to hyperlink to other documents/pages • The structure of an HTML document including the underlying DOM tree (Document Object Model) • How JavaScript is used to modify a website Students will be able to • Differentiate between a static and dynamic website • Create a static website using HTML & CSS in an IDE like Visual Studio, NetBeans etc.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-C-03",
+          "text": "Students should be able to create dynamic websites using JavaScript as the frontend scripting. Students will understand • Variables, Data Types and Arrays in JavaScript and • Variable assignment in JavaScript Practical • What aspects of HTML can be changed with JavaScript Based • What aspects of CSS can be changed with JavaScript Students will be able to • Use JavaScript to modify an HTML website to create a dynamic website Content (Knowledge, Area",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-C-04",
+          "text": "Students should be able to implement common algorithms that use sequence, selection, and repetition in JavaScript. Students will understand • An algorithm is a set of instructions and • How the sequence of instructions affects the result Practical • Sequence, Selection and Repetition in JavaScript Based • Arrays in JavaScript • Students will be able to • Construct an array and populate its values using a loop in JavaScript",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-C-05",
+          "text": "Students will determine ways of debugging their code in JavaScript Students will understand • Code written outside of a function is hard to test • Code written inside a function can be tested for Theory • That they can write code that calls functions to ensure the and results are correct Practical • Using a debugger allows programmers to set a breakpoint to Based stop execution of their code to see the state of variables mid- execution for the purpose of discovering errors in their code Students will be able to • Write code to invoke functions and check their return values for correctness • Set a breakpoint to debug mistakes in their code",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "D",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-09-D-01",
+          "text": "Students will explain the scope of the data Data and Analysis for Theory mathematics & statistics, and business knowledge & understanding). Content (Knowledge, Area • Students will understand the key concepts and principles of data science • Students will know definitions of key terms: data science, data analytics, computer science, mathematics, statistics, and business Students will be able to: • Identify the difference between data science, data analytics, computer science, mathematics, statistics, and business • Students will develop analytical thinking skills by reading case studies on data science applications • Read a case study or a newspaper article or online paper to identify a problem that can be solved using data science",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-D-02",
+          "text": "Students will define and explain data types, data collection, and data storage. Students will understand: • Data is observations or measurements represented as numbers, text, or multimedia(image, sound, video, etc.)and the dataset is a collection of this data that is related in some context. • Different sources of data like sensors for Theory • The concept of dataset ○ Table (relation) ○ Rows (record, tuple, object) ○ Column (object attributes, properties) • Types Object attributes or properties: Categorical or Qualitative Attribute ○ Nominal Content (Knowledge, Area ○ Binary ○ Ordinal • Numeric or Quantitative ○ Interval-scaled, ○ Ratio-scaled, ○ Discrete ○ Continuous • Data collection, analysis, and visualization. • Students will know how to use summary statistics to formulate sentences and describe the data, data collection methodology, how the data will be used Students will be able to: • Explain how data, information, and knowledge are represented for computational use. • Collect, upload, and share personal data collected in class(e.g., Stick Figure exercise in Learning Activity#2) • Learn about different representations of distributions using software. • Utilize software to begin to analyze plots of data collected • Interpret different types of data: Numerical and graphical summaries. • Understand that rows and columns area form of data structure. • Explain why the relationship between the variables might exist, or, if there is no relationship, why that might be so • Construct and interpret a frequency table. • (Advanced) Load data into RStudio. Students will be able to: • Distinguish between data and dataset • Collect data from different sources Content (Knowledge, Area • Identify missing data in a dataset • Construct summary statements about the data, how it is collected, how it is used, and how to work with it • Explain why the relationship between the variables might exist, or if there is no relationship, why that might be so. • (Advanced) Construct and interpret a frequency table • (Advanced) Understand the connection of databases to machine learning. • (Advanced) Understand the differences between structured and unstructured data, quantitative and qualitative data)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-D-03",
+          "text": "Students will be able to define and explain big data, and applications of big data in real-world business Students will understand • What insights big data can provide to businesses • What tools and systems are used by big data scientists and engineers • How predictive modeling and graph analytics can be leveraged to model problems? • (Advanced) Be able to ask the right questions about data and do for Theory basic exploration of large, complex datasets. • Students will know… • Applications of bigdata • What makes big data valuable? • Characteristics of big data • How data science gets value out of big data • Introduction to concepts such as the Internet of Things(IoT) and the role of the cloud. Students will be able to Content (Knowledge, Area • Identify the different types of big data • Recognize if big data is used to solve a business problem • Read and critique published stories by interpreting the visualizations and experimental conclusions • Formulate questions, identify existing or similar business cases, and evaluate how the new business solutions that leverage big data stack up against the old.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "E",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-09-E-01",
+          "text": "Students will be able to describe uses and Computing Students will understand… • What is AI and Machine learning and the kind of problems each is able to solve • Different areas of AI–Speech recognition, Computer Vision, E: Applicati ons of Computer Science • Identify applications that can be solved using these technologies and techniques • Identify different applications of AI",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-E-02",
+          "text": "Students will be able to discuss the social implication of the usage of AI in decision making that affects humans for Theory Students will understand… Content (Knowledge, Area • AI algorithms make decisions that work for most people but harm or disadvantage others. • Designers to AI algorithms should keep their focus on benefiting people Students will know… • Ethical issues in some popular AI tools Students will be able to… • Explain what some ethical issues are when computers make decisions for humans • Identify decisions that might harm humanity • Identify decisions that might be biased towards are certain group of individuals",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "F",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-09-F-01",
+          "text": "Understand and apply safe and responsible use of computers (responsible use of hardware, appropriate use of software, and safe use of digital platforms like data searches, social networking, etc.) F: Impacts platforms for safe use depending on the tasks to be executed of for Theory Computin g • What is meant by the key concepts of data ethics and intellectual property rights • How to safely use data searches and social networking sites • Legal issues related to computing such as software piracy laws Students will be able to… Content (Knowledge, Area • Discuss how ethics are guidelines that dictate the responsible use of computing systems • Identify computer related laws • Interpret software agreements, licenses, and application terms",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-F-02",
+          "text": "Analyse the beneficial and harmful effects of computing innovations such as social networking, fake news, etc. Students will understand… • Every computing innovation will solve a need but can cause harm to users as well o Benefits can be the need being solved and the societal & user benefits o Harmful effects of computing innovations on users, society, environment, etc. • The tradeoffs between information privacy, system security and usability • The importance of designing computing systems that will protect user privacy and increase system security Students will know… • What is meant by key concepts and be able to differentiate between them: scams, software piracy, freeware, shareware, opensource, malware, phishing, hacking • The tensions between censorship of internet and freedom of speech • Common types of security problems such as spam, spyware, pharming, cookies etc. Students will be able to… • Explain basics of reliable and unreliable sources of information Content (Knowledge, Area • Distinguish between fake news and credible sources of information • Identify malicious internet scams, phishing, pharming, fraudulent activity, fake websites • Evaluate designs of computing technologies(e.g. social media, generative AI etc.) based on their user privacy policies and agreements",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-F-03",
+          "text": "Evaluate the ways computing impacts personal, ethical, social, economic, and cultural practices. Students will understand… • Environmental impacts of computing • Computing has changed the way we live and conduct business • Impact of computing on globalization and e-commerce Students will know… • The key terms: patents, trademarks, copyrights Students will be able to… • Strategize on how to minimize the environmental impacts of computing • Search and identify patents, trademarks, and copyright information for computing applications • Determine if technology design maybe infringing on intellectual property • Evaluate designs of computing technologies in terms of personal, environmental, ethical, legal, social, economic, and cultural impacts G: Digital - Literacy Content (Knowledge, Area",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

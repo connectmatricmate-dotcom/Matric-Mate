@@ -1,0 +1,389 @@
+{
+  "subject": "eng",
+  "name": "English",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework + Model Question Paper English SSC-I.pdf",
+    "sha256": "288cd612b7aaaeedc89f47484814f9f1aecf306b0602efae8f5baa389159f7ef",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 4,
+    "slos": 56,
+    "summative": 31,
+    "formative": 8,
+    "unclassified": 17,
+    "untitledDomains": 4,
+    "shortText": 1,
+    "examUnits": 0
+  },
+  "notes": [
+    "17 of 56 outcomes have no formative/summative marking: the source table merges that column across a content area. Treat them as unknown, not as excluded.",
+    "4 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": null,
+  "domains": [
+    {
+      "code": "A",
+      "title": null,
+      "slos": [
+        {
+          "code": "E-09-A1-01",
+          "text": "[SLO: E-10-A1-01] Explore simple to complex ideas and issues in a two to three-act play.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-A1-02",
+          "text": "[SLO: E-10-A1-02] Respond to text through discussion, short stories and plays.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-A2-01",
+          "text": "[SLO: E-10-A2-01] Demonstrate attentive listening’ skills to respond orally with standard pronunciation.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-A2-02",
+          "text": "standard pronunciation.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-A2-03",
+          "text": "information and a variety of communicative Communication",
+          "cognitive": null,
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-A2-04",
+          "text": "[SLO: E-10-A2-03] Perform a drama/ role play/play script.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-A3-01",
+          "text": "audiences.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-A3-02",
+          "text": "Speak confidently and fluently in a wide range of Engage effectively in a range of collaborative discussions (one-onone, in groups, and teacher-led) with diverse partners.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-A4-01",
+          "text": "Engage in extended discussions. Student Learning Outcomes (SLOs) Competency IX",
+          "cognitive": null,
+          "assessment": null
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": null,
+      "slos": [
+        {
+          "code": "E-09-B2-00",
+          "text": "l] Discuss how authors use language, including figurative language, considering the impact on the reader. B2. Reading for",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B2-02",
+          "text": "[SLO: E-10-B2-02] Analyse that text comprises a group of paragraphs that develop on the main idea addressed by the author throughout the text. Examinations. Student Learning Outcomes (SLOs) Competency IX",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B2-03",
+          "text": "[SLO: E-10-B2-03] Make recommendations and develop an interest in fiction and poetry. texts and poetry.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-B2-04",
+          "text": "[SLO: E-10-B2-04] Analyse organisational patterns in a text: learning. It will be a. list/ sequence of ideas/ events comparison-contrast b. cause-effect c. problem-solution d. reasons/ assumptions-conclusion",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B3-01",
+          "text": "[SLO: E-10-B3-01] Provide an objective summary of fiction and poetry texts.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B3-02",
+          "text": "[SLO: E-10-B3-02] Use pre-reading and while reading strategies to analyse and explore different layers of meaning within texts including biases and opinions. Read and use inference and deduction to B3. Reading for Meaning prior knowledge and contextual clues effectively. Link new facts, terms, and concepts with prior Choose words and phrases for effect. Comment on implied meanings, e.g. writer’s view point, relationships between characters etc.",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "E-09-B3-03",
+          "text": "view point, relationships between characters Explain whether predictions about the content Student Learning Outcomes (SLOs) Competency IX of a text are acceptable or should be modified",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-B3-04",
+          "text": "U Distinguish cause from effect, fact from opinion (e.g., by noting outcomes, personal comments, beliefs and biases), and generalized statements from evidence-based information with specific reference to informational texts.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-B3-05",
+          "text": "Apply skimming and scanning strategies for relevant information and main points in texts to identify the writer's purpose and U intended audience. Infer the theme/main idea of the text, distinguishing between fact and opinion where necessary.",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "E-09-B3-06",
+          "text": "[SLO: E-10-B3-06] • Examine how an author develops and contrasts point of view of different characters or point of view of different characters or narrative narrative in text. in text. in • Critique the plot development with respect to Examinations. different aspects of the story.",
+          "cognitive": null,
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-B3-07",
+          "text": "[SLO: E-10-B3-07] • story or drama (e.g., how the setting shapes the characters or plot). Student Learning Outcomes (SLOs) Competency IX • rhyming scheme and language in poems. language in poems. • • fictional text (exposition, setting, climax, character development, resolution) resolution) • those with multiple or conflicting motivations) develop over the course of a text, interact with other characters, and advance the plot or develop the theme. develop the theme.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B3-10",
+          "text": "[SLO: E-10-B3-10] Give an informed personal and analytical Student Learning Outcomes (SLOs) Competency IX response to a descriptive and informative text. and poetry. Examination. [SLO: E-09-B3- l 1] Reading to analyse descriptive/argumentative essays. Examine different points of view (e.g., first- person, third-person narrative) Determine an author's point of view or purpose in a text. Analyse how the author distinguishes his or her position from that of others. purpose in a text. Analyse how the author distinguishes his or her position from that of others",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B3-12",
+          "text": "[SLO: E-10-B3-12] Summarise complex concepts, processes, or information by paraphrasing them using correct language structure, transitional devices, own words and relevant punctuation marks. Make inferences to draw conclusions from, e.g. a. contextual information b. writer’s viewpoint c. implied information",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B3-13",
+          "text": "[SLO: E-10-B3-13] Interpret and integrate information from a variety of sources for comprehension (e.g., maps, graphs, charts, diagrams) learning. These will be Student Learning Outcomes (SLOs) Competency IX",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-B3-14",
+          "text": "[SLO: E-10-B3-14] Analyze various types of biographies and autobiographies connected to different fields and professions. (e.g., a person's life story in print and multimedia), determining which details are emphasized in each type.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-B3-15",
+          "text": "Read, view and analyse a variety of reading Read, view and analyse a variety of reading grade-appropriate and high-interest books grade-appropriate and high-interest books and and texts from print and non-print sources: texts from print and non-print sources: a. Poetry (free verse, narrative and a. Poetry (free verse, narrative and rhythmic rhythmic b. Personal recounts (e.g., diary entries, b. Personal recounts (e.g., diary entries, biographies) biographies) c. Narratives (e.g., fables, historical c. Narratives (e.g., fables, historical fiction, science fiction, legends) fiction, science fiction, legends) d. Procedures (e.g., recipes, directions, d. Procedures (e.g., recipes, directions, instruction manuals) instruction manuals) e. Information reports (e.g., project e. Information reports (e.g., project reports, fact sheets, brochures reports, fact sheets, brochures f. Interpersonal text (informal/formal f. Interpersonal text (informal/formal letters, notices, emails) letters, notices, emails) g. Factual recounts g. Factual recounts h. Drama / playscript h. Drama / playscript i. Explanation i. Explanation j. Expositions j. expositions",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-B3-16",
+          "text": "[SLO: E-10-B3-16] Cite strong and thorough textual evidence to Cite strong and thorough textual evidence to Student Learning Outcomes (SLOs) Competency IX support analysis of what the text says explicitly as well as inferences drawn from the text.",
+          "cognitive": null,
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": null,
+      "slos": [
+        {
+          "code": "E-09-C1-01",
+          "text": "SLO: E-10-C1-01] Clarify the meaning of unknown and multiple- meaning words and phrases based on grades 9 &10 and 11 & 12 reading and content, choosing flexibly from a range of strategies. & Use context (e.g., the overall meaning of a Use context (e.g., the overall meaning of a sentence, paragraph, or text; a word’s position or sentence, paragraph, or text; a word’s position function in a sentence) as a clue to the meaning or function in a sentence) as a clue to the of a word or phrase. meaning of a word or phrase. Identify and correctly use patterns of word changes that indicate different meanings or parts C1: of speech (e.g., analyze, analysis, analytical; VOCABULARY advocate, advocacy). analytical; advocate, advocacy). Consult general and specialized reference materials (e.g., dictionaries, glossaries, thesauruses), both print and digital, to find the pronunciation of a word or determine or clarify its precise meaning, Its part of speech, or its etymology. etymology. Verify the preliminary determination of the meaning of a word or phrase (e.g., by checking the inferred meaning in context or in a dictionary). Student Learning Outcomes (SLOs) Competency IX meaning in context or in a dictionary.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C1-02",
+          "text": "SLO: E-10-C1-02] Comprehend and use contemporary Idioms and proverbs in the different texts and in their speech. the Examination. However it will be assessed at HSSC level. SLO: E-09-Cl-03] Identify and use adjectival, prepositional and adverbial phrases in reading and writing tasks. It will be assessed in the Annual Examination. SLO: E-09-Cl-04] Distinguish between the connotative and denotative meanings of words, both similar and dissimilar denotations and their appropriate use in a variety of writing and texts. texts.",
+          "cognitive": null,
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-C1-03",
+          "text": "K Identify and use adjectival, prepositional and adverbial phrases in reading and writing tasks.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "E-09-C1-05",
+          "text": "SLO: E-10-Cl-05] Demonstrate understanding of figurative language, word relationships, and nuances in word meanings. Interpret figures of speech (e.g., euphemism, oxymoron) in context and analyze their role in the text. Analyze nuances in the meaning of words Analyze nuances in the meaning of words with similar denotations. Student Learning Outcomes (SLOs) Competency IX simile, metaphor, imagery, personification, alliteration SLO: E-09-Cl-06] Acquire and use appropriate words and phrases for reading, writing, speaking, and listening; independently gather vocabulary when considering a word or phrase important for comprehension or expression.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C2-01",
+          "text": "SLO: E-10-C2-01] Demonstrate knowledge and application of parts of speech in oral and written communication in varying degrees of complexity.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C2-02",
+          "text": "1 Apply knowledge of parts of speech, tenses, sentence structure and other features of grammar and vocabulary to understand how language functions in different contexts, make effective choices for meaning or style while reading, listening and writing.",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "E-09-C2-03",
+          "text": "SLO: E-10-C2-03] Identify and use compound prepositions and prepositional phrases in writing. It will be assessed in the Annual Examination.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C2-04",
+          "text": "[SLO: E-10-C2-04] Examine and interpret the use of conjunctions and transitional devices in speech and writing It will be assessed in the to create the effect. Annual Recognise and use subordinating conjunctions However, Transitional Student Learning Outcomes (SLOs) Competency IX to connect independent clause/s to dependent clause/s e.g., He could not attend the meeting because he was sick. part of Class 10. Recognize and use correlative conjunctions including pairs such as \"both/and,\" \"either/or,\" neither/nor,\" \"not/but\" and\" not only/but also.\" etc.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C3-00",
+          "text": "l] Demonstrate command of the conventions of Demonstrate command of the conventions of Standard English capitalization, punctuation, and C3. PUNCTUATION • Observe hyphenation conventions. • correct spelling of the conventions of punctuation and capitalization.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C4-01",
+          "text": "SLO: E-10-C4-01] Use all types of tenses correctly in speech and writing. Use gerunds, infinitives, and participles. C4. TENSES Use the aspect of time correctly in speech and writing. writing.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C5-02",
+          "text": "SLO: E-10-C5-02] Construct sentences using the sentence patterns and structures learnt in earlier classes. C5. SENTENCE classes. STRUCTURE Annual Examination.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C5-03",
+          "text": "SLO: E-10-C5-03] Construct complex sentences and paragraphs Student Learning Outcomes (SLOs) Competency IX using main and subordinate clauses with appropriate transitional devices and correct punctuation in varying degrees of complexity. complexity.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-C5-04",
+          "text": "SLO: E-10-C5-04] Change tense in indirect/direct Change into indirect/direct speech (present, past and perfect tenses, future, modals, time and questions, orders, requests, suggestions and advice) in speech and writing.",
+          "cognitive": null,
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "D",
+      "title": null,
+      "slos": [
+        {
+          "code": "E-09-D1-01",
+          "text": "SLO: E-10-D1-01] Apply editing and proofreading skills to a Apply editing and proofreading skills to a range of different texts and contexts Dl. Writing",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D1-02",
+          "text": "SLO: E-10-D1-02] Fluency Use hyphens (hyphenated nouns and adjectives) in words, letter string -ough words. words. Examination.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D2-00",
+          "text": "l] Follow the steps of the process approach to D2. Writing for graphic organizers, freewriting, and note- taking. Student Learning Outcomes (SLOs) Competency IX",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-D2-02",
+          "text": "SLO: E-10-D2-02] Write a dialogue between multiple people, giving narration/background in brackets, using conventions of the director's notes. Use vocabulary, tone and style appropriate to the context and relationship between the addresser and addressee.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D2-03",
+          "text": "SLO: E-10-D2-03] Apply the technique of writing first draft with sufficient details: proofreading and editing details to suit the purpose and audience. the Examination.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D2-04",
+          "text": "SLO: E-10-D2-04] Write and critique (self/peer checking) the final draft after complete editing and proofreading. Ensure each paragraph develops the main idea of the essay/piece of writing and the topic sentence of each paragraph. Use the technique of hook, and lead-in sentences to develop the flow of thought. flow of thought.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D3-01",
+          "text": "SLO: E-10-D3-01] Write multiple paragraphs essays/stories; multi- stanza poems or playscript using mechanics of D3. Writing for Meaning Examination.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D3-02",
+          "text": "SLO: E-10-D3-02] Write narratives to develop real or imagined Student Learning Outcomes (SLOs) Competency IX experiences or events using effective techniques, well-chosen details, and well-structured event sequences. • Engage and orient the reader by setting • out a problem, situation, or observation and its significance, establishing one or multiple point(s) of view, and introducing a narrator and/or characters; create a smooth progression of experiences or events. • dialogue, pacing, description, reflection, and multiple plot lines, to develop experiences, events, and/or characters. • events so that they build on one another to create a coherent whole and build toward a particular tone and outcome (e.g., a sense of mystery, suspense, growth, or resolution). • details, and sensory language to convey a vivid picture of the experiences, events, setting, and/or characters. • and reflects on what is experienced, observed, or resolved over the course of the narrative. • which the development, organization, and Student Learning Outcomes (SLOs) Competency IX style are appropriate to the task, purpose, and audience. • by planning, revising, editing, rewriting, or trying a new approach, focusing on addressing what is most significant for a specific purpose and audience. audience.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D3-03",
+          "text": "SLO: E-10-D3-03] • examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization and analysis of the content. • concepts, and information so that each new element builds on that which precedes • formatting (e.g., headings), graphics (e.g., figures, tables), and multimedia when useful to aiding comprehension. • the most significant and relevant facts, extended definitions, concrete details, quotations, or other information and examples appropriate to the audience’s • syntax to link the major sections of the text, create cohesion, and clarify the relationships among complex ideas and concepts. • vocabulary, and techniques such as metaphor, simile, and analogy to manage Student Learning Outcomes (SLOs) Competency IX the complexity of the topic. • objective tone while attending to the norms and conventions of the discipline in which they are writing. • that follows from and supports the information or explanation presented (e.g., articulating implications or the significance of the topic). and objective tone while attending to the norms and conventions of the discipline in which they are writing. • Provide a concluding statement or section that follows from and supports the information or explanation presented (e.g., articulating implications or the significance of the topic).",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D3-04",
+          "text": "SLO: E-10-D3-04] Write arguments to support claims in an analysis of substantive topics or texts, using valid reasoning of substantive topics or texts, using valid and relevant and sufficient evidence. • Introduce precise, knowledgeable • claim(s), establish the significance of the claim(s), distinguish the claim(s) from from alternate opposing claims, and alternate opposing claims, and create an organization that logically sequences claim(s), counterclaims, reasons, and evidence. • fairly and thoroughly, supplying the most relevant evidence for each while pointing out the strengths and limitations of both in a manner that anticipates the audience’s knowledge level, concerns, values, and possible biases. • as varied syntax to link the major as varied syntax to link the major sections Student Learning Outcomes (SLOs) Competency IX of the text, create cohesion, and clarify the relationships between claim(s) and reasons, between reasons and evidence, and between claim(s) and counterclaims. • objective tone while attending to the norms and conventions of the discipline in which they are writing. • that follows from and supports the argument presented. the argument presented.",
+          "cognitive": null,
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-D3-05",
+          "text": "SLO: E-10-D3-05] Write a descriptive composition (giving physical description and characteristics/traits of a person/object/place moving from general to specific), using correct punctuation and spelling, by using the process approach - brainstorming, mind mapping, and writing a first draft.",
+          "cognitive": null,
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-D3-06",
+          "text": "- Write a formal letter to people in extended academic and professional environments for various purposes. in Examination of Class 9.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D3-07",
+          "text": "SLO: E-10-D3-07] Research for short projects to answer a question (including a self- generated question) Research for short projects to answer a or solve a problem; synthesize multiple sources on the subject, demonstrating understanding of the subject under investigation while writing or presenting their assignment. demonstrating understanding of the subject under investigation while writing or Student Learning Outcomes (SLOs) Competency IX presenting their assignment.",
+          "cognitive": null,
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-D3-08",
+          "text": "SLO: E-10-D3-08] • Examine the mechanics of developing a book review report. • Write a book review report. the Examination.",
+          "cognitive": null,
+          "assessment": "formative"
+        },
+        {
+          "code": "E-09-D3-10",
+          "text": "[SLO: E-10-D3-10] Use paraphrasing skills to paraphrase a poem. learning. It will be assessed in the Annual Examination.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D3-11",
+          "text": "[SLO: E-10-D3-11] Use summary skills to write an objective summary of the given text and poems. skill writing will be assessed based on a passage of comprehension. Student Learning Outcomes (SLOs) Competency IX",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "E-09-D3-12",
+          "text": "[ SLO: E-10-D3-12] Write multiple paragraphs of free writing for fluency, creativity, brainstorming or pleasure. Proofread and edit texts for errors in: • sentence structure. • subject/verb agreement. • noun/pronoun agreement • reference words, connectives/transitional devices. punctuation and spelling. • reference words, connectives/transitional devices. punctuation and spelling. Text Types Texts are written to communicate information, ideas, feelings etc; therefore, they are shaped by the purpose of writing, the context of communication, and the reader. These elements are interdependent so that, for example, the form of writing in a particular text type is adapted to the writer's aim and the intended reader. It is essential that the students are exposed to a variety of writing, its readership and variations in form and style of expression; only then will students acquire flexible strategies to understand various texts, and to display their understanding by producing well-written texts for various purposes and audiences. This section gives various text types; their examples, the range of purposes or intentions and the focus of writing of each text type. Suggested themes and sub-themes are also listed to enable teachers and materials writers to build text content. Context should be designed so as to build a wide range of reading experiences that have literary, informational, persuasive, analytical, and practical purposes. Text Types Text Type Narrative/expressive/reflective texts (Literary texts) as to get the reader involved in the story and characters.  Biographies  Anecdotes  Diary, journal entries  Fantasy, adventure, science, fiction Persuasive/ argumentative texts to change their minds about something.  Letters to the editor conveying opinions  Editorials  Campaign literature  Magazine articles supporting a position Expository( factual/ Informative texts) Page | 1 print and computer-based informative and reference texts.  Menus, blurbs, memes  Indices, forms  Maps  Recipes  Minutes  Tables  Flowcharts  Diagrams  Fact sheets  Information leaflets  Prospectuses  Plans  Summaries  Records Expository (analytical texts) views of ideas and issues  Essays and reports  Reviews Texts used for Interpersonal / Transactional Communication purposes.  E-mails  Notices  Talks  Interviews  Job advertisements  Resumes Themes and Sub-Themes: The following themes along with their sub-themes are suggested for the selection of topics and development of content for English Textbooks. These themes should primarily nurture ethical and social attitudes relevant to the Global Context required for the 21st century. and also create awareness, Page | 2 tolerance and understanding of global audiences. The chosen material should demonstrate gender and cultural neutrality, and should not contain any hate material. Content relevant to the recommended themes should be used to teach various language skills. There is no direct relation between a thematic topic and a particular skill. Any topic can be utilized for teaching any number of skills, and at a higher grade should incorporate wider content areas and a higher vocabulary range justifying the spiral approach of the curriculum. Some of the listed themes lend themselves better to teaching basic transactional skills by providing an immediate communicative purpose and are, therefore, more suitable for conversational and functional texts. Several themes can also be combined in one unit e.g. Nature and Environmental Education can be dealt with through a range of text types and activities on Environmental Pollution in one unit. Authors can and must use other themes to teach language appropriately. An indicative list of themes is given below. Themes Entrepreneurship  Success stories of entrepreneurs women empowerment Digital Globalization (The theme can be covered in Grades 9 & 10)  Impact on culture and economy  MOOC (Massive Open Online Courses)  Twitter/LinkedIn Digital Media (Grade 11 & 12)  Digital marketing  Google/Facebook/YouTube (knowledge hub)  MOOC (educational resource)  websites  narrative text type SDG-Millineum Development Goals  Quality Education  Gender Equality  Good Health and well-being  Global Partnership  Climate action  sustainable cities and communities Page | 3  Clean water & sanitation  affordable and clean energy  decent work and economic growth  Industry, innovation and infrastructure  life on land  life below water  peace, justice, freedom for all and strong institutions. Innovation and Creativity  Innovation & creativity in science/ business/work.  Innovation, Creativity and success  articles/blogs  narrative stories Drug Education  refusal skills  prevention of drugs  advertisements  stories Soft Skills  team work  Stress management  Communication and collaboration  Decision making  biography/autobiography Nature and natural resources  Wonder Green  Smart and Sustainable  Wildlife Vignette  Environment Matters Travel and Tourism  Hospitality  Transportation  leaflet/brochure/ advertisement  poems/novel Literature & Poetry Page | 4  War and Peace  Technology  Bravery  Freedom  Nature  Industrial Revolution  Spiritualism (Rubaiyat) Page | 5 POLICY GUIDELINES Paper Pattern and Distribution of Marks (Curriculum-2022-23) English SSC-I The question paper is organized into three sections, namely: \"Section A, B & C\". Questions posed may be of the IQ level of SSC-I students with regard to content and difficulty level. Distribution of the questions with respect to cognitive level shall approximately be 30% Knowledge (K), 50% SECTION – A(Marks 15) While writing MCQs, sufficient representation may be given to the various assessable areas of competencies and their SLOs with particular focus on the competency of ‘Vocabulary and Grammar’. SECTION – B(Marks 40) This part of the question paper will consist of a comprehensionpassage of 250 to 350 words having similar levels of difficulty, complexity, essence, and relevance as well as compatibility with the content taught in the classroom. There will be five questions appended to it based on various SLOs and Cognitive Levels as specified in the Q.2 Question (i) about summary writing bearing six marks. The other parts will be of three marks each. The passage of the SSC-I level will be aligned with text types, themes and subthemes mentioned in the curriculum 2022-23. The religious, ethnic, cultural and gender biases must be avoided while selecting / setting the passage in line with the guidelines for appropriate ethical and social development mentioned in the curriculum. a. difficulty level of SSC-I. Q.3 given stanzas aligned with assessable SLOs given in the Curriculum 2022-23. a. This part of the question consists of a short para with multiple blanks with any four to be filled correctly with appropriate conjunctions / transitional devices given in the list. However, it may be noted that other grammatical items of identical nature mentioned in SLOs for SSC-I may also be asked in the question. b. This part of the question consists of eight sentences; each of the sentences is Q.4 focus on the use of tenses and other structural aspects. Candidates are required to correct / fill any six of the given sentences as per directions given in the parenthesis. It may be noted that this part of the question may include other grammatical items of identical nature. c. This part of the question requires the students to punctuate correctly and rewrite the given para/lines containing six mistakes/omissions of punctuation. SECTION – C (Marks 20) Q.5 and professional environments for various purposes. 1. A response with only the format and without any content/body of the letter will not be awarded any marks. 2. This question will be evaluated as per the format given below: Sender’s Address Receiver’s Address Subject Body of the Letter Closing: e.g Yours Sincerely, X.Y.Z. Students are required to write a paragraph of approximately 80 to 100 Q.6 words on any one of the given topics. Students are required to write a dialogue between multiple people on Q.7 any one of the two given topics. relevant to the topic other than the opening & closing remarks. The dialogue must cover the following: i. Multiple people (from different walks of life) ii. Settings/background details must be written in brackets iii. the context and relationship between the addresser and the addressee. Federal Board SSC-I Examination English Compulsory Model Question Paper (Curriculum 2022-23) ROLL NUMBER Section - A (Marks 15) ⓪ ② Section – A is compulsory. All parts of ③ this section are to be answered on this page and handed over to the Centre ⑥ Superintendent. Deleting/overwriting is ⑦ not allowed. Do not use lead pencil. ⑨ Invigilator Sign. Q-1: Fill the relevant bubble against each question according to the curriculum. Sr Which of the following The book on the 1. table is new. an adverb? Pick out the sentence with correct use of main and 2. subordinate clause alongwith appropriate transitional device. The red car sped down the highway. 3. The underlined part of the sentence is: Choose the option illustrating He loves to read 4. short stories. Participle. He has been Which one of the following 5. options contains a clause? hours. Choose the option illustrating 6. of the word luxury? Pick out the option which Her smile was as 7. bright as the sun. metaphor. Which of the following sentences is imperative? 8. and play? She felt a surge Choose the option which of happiness 9. when she heard noun. the news. The correct synonym of the 10. word ‘elated’ is: Either stay here or go out. This 11. sentence illustrates the use of: Sr Choose the sentence which illustrates the use of compound preposition? 12. store. promotion. She worked throughout the year. The underlined part of the 13. given sentence is a/an: The sentence illustrating the correct use of tense and aspect He had come to 14. see me yesterday. yesterday. There was the field. 15. complete the sentence. Federal Board SSC-I Examination Model Question Paper English (Compulsory) (Curriculum 2022-23) Write your answers on the allotted /given spaces. SECTION–B (Marks 40) Q-2: [6+4×3=18] each. We frequently observe garbage in our streets and neighborhood, creating unhygienic conditions. Moreover, massive quantity of trash and industrial waste is often disposed of recklessly, ending up in streams, canals, rivers, and seas. This not only leads to unsanitary environment but also adversely impacts marine life by contaminating water bodies. Additionally, all forms of pollution contribute to health issues such as cholera, typhoid, asthma, and skin cancer. Plastic bags pose a particular threat to our environment. They are excessively used in daily life and can detrimentally affect land, waterways, sanitation systems, and oceans. Furthermore, these bags release toxic chemicals, posing serious health risk to humans. Efforts are underway to minimise their consumption and promote recycling. Noise pollution, caused by machinery, airplanes, road traffic and crowded public places like bazaars, is another pressing concern. The constant noise from vehicles, horns, and machines in cities and industrial areas disrupts peace and harms hearing ability. The misuse of amplifiers for music further aggravates this issue. Immediate action is necessary to address these types of pollution. Measures should include controlling population growth and reducing emissions of carbon dioxide and other harmful gases. Vehicles emitting excessive smoke and carbon particles must be restricted from roads. Proper disposal practices for garbage and industrial waste are essential to prevent further contamination of rivers and seas. Governments should enforce strict regulations, including banning factories that contribute significantly to pollution. Additionally, efforts should focus on promoting the growth of plants and trees and curtailing deforestation by declaring it a criminal act. Questions: i. ii. What are some of the consequences of improper disposal of garbage and industrial waste mentioned in the passage? OR How do plastic bags add to environmental pollution, according to the passage? iii. What measures are suggested in the given passage to minimize environmental pollution? OR What has been suggested to dispose of garbage and industrial waste? iv. Describe the impact of noise pollution on our environment as mentioned in the given passage. v. OR How does the writer make it obligatory upon the individuals, communities, and governments to play their role in implementing the measures to control pollution? Q-3: He claps the crag with crooked hands; i) Ring’d with the azure world, he stands. In spite of war, in spite of death! b. (6) (I) Beneath all uniforms, a single body breaths Like ours: the land our brothers walk upon Is earth like this, in which we all shall lie. Questions: i. ii. iii. OR (II) Nature’s orchestra, a serenade divine. Rippling streams with a silvery sheen, A liquid poetry within the soul of Wonder Green. Questions: i. How imagery is used in the given stanza, explain with two examples? ii. What elements of nature are depicted in the stanza that contribute to the lush and vibrant landscape of Wonder Green? iii. Identify the rhyming scheme of the given stanza? Q-4: As a result , we embarked on our journey through the dense forest, , the path ahead seemed both mysterious and inviting, making us eager to explore further. thick with the earthy scent of damp moss, where a gentle stream trickled over smooth stones, marking a peaceful pause in our expedition. b. i. ii. iii. iv. v. vi. vii. viii. The work (finish) in time. (Convert the verb into passive form) c. A candidate is supposed to spot at least six mistakes of punctuation and rewrite the para/lines after correcting the mistakes. Well there is still some hope once I’ve got the money together to pay off my parents debt to him – another five or six years I suppose – that’s definitely what I’ll do that s when I’ll make the big change. SECTION – C (Marks 20) Q-5: Class IX and X. OR Write a letter to the Editor to highlight the drawbacks of excessive use of social media by the youth. Q-6: A Memorable Journey OR The Role of Technology in Education Q-7: OR Write a dialogue between two friends on ‘The Choice of Career’. Federal Board SSC-I Examination English Compulsory Model Question Paper (Curriculum 2022-23) Alignment of Questions with Student Learning Outcomes Sr No (Part no.) Paper",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

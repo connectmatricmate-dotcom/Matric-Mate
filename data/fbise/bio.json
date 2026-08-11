@@ -1,0 +1,609 @@
+{
+  "subject": "bio",
+  "name": "Biology",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Biology SSC-I.pdf",
+    "sha256": "b03be5a1fd46c2434428db0bdb0c9c3897b93cd2537183a2e06de0da51f74fb2",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 7,
+    "slos": 83,
+    "summative": 80,
+    "formative": 1,
+    "unclassified": 2,
+    "untitledDomains": 7,
+    "shortText": 0,
+    "examUnits": 9
+  },
+  "notes": [
+    "7 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Biology IX-X along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Introduction to Biology"
+      },
+      {
+        "number": 2,
+        "title": "Solving a Biological Problem"
+      },
+      {
+        "number": 3,
+        "title": "Biodiversity"
+      },
+      {
+        "number": 4,
+        "title": "Cells and Tissues"
+      },
+      {
+        "number": 5,
+        "title": "Cell Cycle"
+      },
+      {
+        "number": 6,
+        "title": "Enzymes"
+      },
+      {
+        "number": 7,
+        "title": "Bioenergetics"
+      },
+      {
+        "number": 8,
+        "title": "Nutrition"
+      },
+      {
+        "number": 9,
+        "title": "Transport"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-09-A-01",
+          "text": "Define biology annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-02",
+          "text": "State Quran instructs to reveal the study of Life annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-03",
+          "text": "Define major fields of biology as Botany, zoology and Microbiology",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-04",
+          "text": "Define with examples that biology has many sub- fields. (Cytology) (Embryology) (Genetics) (Molecular Biology) (Pathology) (Ecology) (Marine Biology) (Immunology) (Morphology) (Anatomy) (Histology) (Physiology) (Taxonomy) (Palaeontology) (Pharmacology)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-05",
+          "text": "Relate that biology connects with other natural sciences. Students should be able to distinguish in terms of the broad subject matter the below fields: (Biophysics) (Biochemistry) (Computational Biology) (Biogeography) (Biostatistics) (Biotechnology) (Bio economics)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-06",
+          "text": "Identify the careers in Biology and Explain with examples how biology is a subset of the natural sciences and of the life sciences.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-07",
+          "text": "Justify with examples that science is a collaborative field that requires interdisciplinary researchers working together to share knowledge and critique ideas",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-08",
+          "text": "Describe the steps of the scientific method that is: Recognition Observation Hypothesis Deduction Experiments Results Content / Area",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-A-09",
+          "text": "Evaluate the terms 'hypothesis', 'theory' and 'law' in the context of research in the natural sciences",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-09-B-01",
+          "text": "Explain the theory of evolution by natural selection with example",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-02",
+          "text": "Define Species annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-03",
+          "text": "Describe speciation annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-04",
+          "text": "Discuss briefly the observations Darwin made during his voyage on HMS Beagle not be assessed in annual examination. (As numerous observations were done in this voyage so it is included in",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "B-09-B-05",
+          "text": "Describe sources of variation which can lead to speciation and evolution",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-06",
+          "text": "Describe evidence of evolution with regards to the following - Palaeontology (fossil record) - Comparative anatomy (homologous structures, vestigial structures) - Selective breeding",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-07",
+          "text": "Define biodiversity and classification annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-08",
+          "text": "Describe advantages of classification annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-09",
+          "text": "Discuss the history of classification schemes annual examination. Content / Area",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-10",
+          "text": "List the three distinct domains into which living organisms are broadly classified into",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-11",
+          "text": "List the taxonomic ranks of classification annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-12",
+          "text": "Outline the binomial nomenclature system annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-B-13",
+          "text": "Describe the complications of classifying viruses annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-09-C-01",
+          "text": "Define Biochemistry/molecular biology annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-02",
+          "text": "Outline the various types of common biomolecules (DNA, RNA, Proteins, Lipids, Carbohydrates) including their locations inside the cell and main roles",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-03",
+          "text": "Outline the structure and function and sources of proteins with structure of amino acids",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-04",
+          "text": "Outline the structure, function and sources of lipids All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-05",
+          "text": "Define Carbohydrates and Outline the structure, function and sources of Carbohydrates This SLO is compound SLO. All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-06",
+          "text": "Identify carbohydrates as monosaccharides, disaccharides and polysaccharides",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-07",
+          "text": "Describe briefly the structure of DNA as a double helix macromolecule made of nucleotides with base pairing in between the two helices through complementary base pairing Content / Area",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-08",
+          "text": "Outline function of DNA as carrier of, hereditary information",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-09",
+          "text": "Describe briefly the structure of RNA as single stranded macromolecule made of nucleotides with nitrogenous base overhangs",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-10",
+          "text": "Outline the function of RNA as aid in converting hereditary information into useful proteins",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-C-11",
+          "text": "Outline how information in the DNA is converted to information on RNA and then into proteins",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "D",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-09-D-00",
+          "text": "} Explain meiosis, mitosis and stages of mitosis, meiosis (by use of sketch of diagrams)",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "B-09-D-01",
+          "text": "Describe cell as the basic unit of life annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-02",
+          "text": "Compare with diagrams the structure of animal and plant cells All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-03",
+          "text": "Sketch different sub-cellular organelles (nucleus, mitochondria, cell membranes, etc.) and outline their roles All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-04",
+          "text": "Outline structural advantages of plant and animal cells",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-05",
+          "text": "Identify different types of cells (mesophyll cell, epidermal cell, neurons, muscle, red blood cell, liver cell) and sketch their structures All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-06",
+          "text": "Describe the concept of division of labour and how it applies to - within cells (across subcellular organelles) - multicellular organisms (across cells)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-07",
+          "text": "Describe Cell Specialization. annual examination. Content / Area",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-08",
+          "text": "Describe Cell cycle annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-09",
+          "text": "Explain mitosis, meiosis and stages of mitosis, meiosis (by use of sketch and diagrams) All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-11",
+          "text": "Compare the processes of mitosis and meiosis annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-12",
+          "text": "Outline the significance of mitosis and meiosis annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-D-012",
+          "text": "outline the significance of mitosis and meiosis.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "B-09-D-13",
+          "text": "Define stem cells as unspecialized cell annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "E",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-09-E-01",
+          "text": "Distinguish between tissues, organs and system with examples from animals and plants",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-E-02",
+          "text": "Describe the concept of emergent properties as gain in functionalities and how it applies to the following going from sub- cellular organelles to cells - going from cells to tissues - going from tissues to organs - going from organs to systems - going from systems to living organisms",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-E-03",
+          "text": "Enlist the different types of tissue come together to form the stomach organ in the human body",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-E-04",
+          "text": "Discuss the different types of tissue come together to form the leaf",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-E-05",
+          "text": "Discuss the organ system come together to form the human body",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-E-06",
+          "text": "Describe the advantages of homeostasis annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-E-07",
+          "text": "Discuss the various organs and systems of the human body work to maintain homeostasis Content / Area",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-E-08",
+          "text": "Explain plant physiology in terms of structures and roles of various plant organs",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "F",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-09-F-01",
+          "text": "Define metabolism, catabolism and anabolism with examples",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-F-02",
+          "text": "Define Enzymes and describe their characteristics This SLO is compound SLO. Both levels can be asked. [SLO: B:09-F-03] Show the mechanism of enzyme action annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-F-04",
+          "text": "Assess the factors which could influence enzyme activity",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-F-05",
+          "text": "Describe competitive, and non-competitive inhibition",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-F-06",
+          "text": "Discuss the role of ATP as energy currency annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-F-07",
+          "text": "Describe photosynthesis in plants All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-F-08",
+          "text": "Explain aerobic respiration and anaerobic respiration annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "Q",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-09-Q-01",
+          "text": "Define mineral nutrition in plants annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-02",
+          "text": "Categorize minerals nutrients of plants into macronutrients and micronutrients",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-03",
+          "text": "State that nitrogen is important in protein synthesis and magnesium for chlorophyll formation",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-04",
+          "text": "Conceptualize transport and its needs annual examination. Content / Area",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-05",
+          "text": "Explain the internal structure of root and root hair annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-06",
+          "text": "Describe how roots take up water and mineral salts by active and passive absorption",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-07",
+          "text": "Describe transpiration and relate this process with cell surface and stomatal opening and closing",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-08",
+          "text": "Describe temperature, wind and humidity as the factors affecting the rate of transpiration All three levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-09",
+          "text": "Describe the mechanism of transport of water and salt in plants",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-10",
+          "text": "Explain the mechanism of food translocation by, the theory of Pressure Flow Mechanism",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-11",
+          "text": "Describe the process of gaseous exchange in plants annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-12",
+          "text": "Define homeostasis and describe its importance This SLO is compound SLO. Both levels can be asked.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-13",
+          "text": "Describe the mechanism and adaptations in plants for the excretion",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-14",
+          "text": "Explain osmotic adjustments in plants annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-15",
+          "text": "Describe different types of asexual reproduction i.e. binary fission, budding, spore formation and vegetative propagation",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-16",
+          "text": "Distinguish between vegetative propagation and artificial propagation",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-17",
+          "text": "Explain vegetative propagation in plants (through stem, suckers and leaves) Content / Area",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-18",
+          "text": "Describe the two methods of artificial vegetative propagation (stem cuttings and grafting)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-19",
+          "text": "Rationalize how parthenogenesis is a type of asexual reproduction",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-20",
+          "text": "Define cloning annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-09-Q-21",
+          "text": "Explain sexual reproduction in plants All three levels can be asked. PRACTICAL SLOs Required (1 period=40 X SI Units of:  volumes of gases or solutions/liquids  masses  temperatures  times  lengths [SLO: B-09-10-X-02] Students should be able to carry out simple experiments of:  diffusion  osmosis  food tests Required (1 period=40   universal indicator  photosynthesis (rate and limiting factors)  heart rate and breathing rate  effect of mineral ions on plant growth  Respiration  Nervous responses  transpiration  tropic responses  observation and dissection of seeds and flowers  germination  continuous and discontinuous variation  sampling techniques [SLO: B-09-10-X-03] Should be able to use of a microscope to examine biological specimens [SLO: B-09-10-X-04] Calculating the magnification of biological specimens [SLO: B-09-10-X-05] Students should be able to:  select and safely use techniques, apparatus and materials  identify apparatus from diagrams or descriptions  draw, complete or label diagrams of apparatus and biological specimens  use, or explain the use of common techniques, apparatus and materials  select the most appropriate apparatus or method for the task and justify the choice made  describe food tests Required (1 period=40  using a universal indicator  describe and explain techniques  describe and explain hazards and identify safety precautions  to ensure the accuracy of observations and data [SLO: B-09-10-X-06] Students should be able to understand for:  safety measurements and precautions  understand the need to wear PPE  tie up long hair  wear goggles when dealing with caustic materials [SLO: B-09-10-X-07] Students are able to Understand and express scientific ideas using the below terms: -True value: the value that would be obtained in an ideal measurement -Measurement error the difference between a measured value and the true value of a quantity -Accuracy: a measurement result is described as accurate if it is close to the true value -Precision, how close the measured values of a quantity are to each other -Repeatability a measurement is repeatable ifthe same or similar result is obtained when the measurement is repeated under the same conditions, using the same method, within the same experiment - Reproducibility: a measurement is reproducible If the same or similar result is obtained when the measurement is made under either different conditions or by a different method or in a different experiment - Validity of experimental design: an experiment is valid if the experiment tests what it says it will test. The experiment must be a fair test where only the independent variable and dependent variable may change, and controlled variables are kept constant -Range: the maximum and minimum value of the independent or dependent variables Required (1 period=40 - Anomaly: an anomaly is a value in a set of results that appears to be outside the general pattern of the results, i.e. an extreme value that is either very high or very low in comparison to others -Independent variables: independent variables are the variables that are changed in a scientific experiment by the scientist. Changing an independent variable may cause a change in the dependent variable -Dependent variables, dependent variables are the variables that are observed or measured in a scientific experiment. Dependent variables may change based on changes made to the independent variables [SLO: B-09-10-X-08] Students are able to: a. Identify the independent variable and dependent variable b. describe how and explain why variables should be controlled c. suggest an appropriate number and range of values for the independent variable d. suggest the most appropriate apparatus or technique and justify the choice made e. describe experimental procedures f. identify risks and suggest appropriate safety precautions g. describe how to record the results of an experiment h. describe how to process the results of an experiment to form a conclusion or to evaluate a prediction make reasoned predictions of expected results — take readings from apparatus (analogue and digital) or from diagrams of apparatus — take readings with appropriate precision, reading to the nearest half- scale division where required — correct for zero errors where required — make observations, measurements or estimates that are in agreement with expected results or values — take sufficient observations or measurements — repeat observations or measurements where appropriate — record qualitative observations from tests Required (1 period=40 — record observations and measurements systematically, for example in a suitable table, to an appropriate degree of precision and using appropriate units — process data, including for use in further calculations or for graph plotting, using a calculator as appropriate — present data graphically, including the use of best-fit lines where appropriate — analyse and interpret observations and data, including data presented graphically — use interpolation and extrapolation graphically to determine a gradient or intercept — form conclusions justified by reference to observations and data and with appropriate explanation — evaluate the quality of observations and data, identifying any anomalous results and taking appropriate action — comment on and explain whether results are equal within the limits of experimental accuracy (assumed to be + 10% at this level of study) — evaluate experimental arrangements, methods and techniques, including the control of variables — identify sources of error, including measurement error, random error and systematic error — identify possible causes of uncertainty in data or in a conclusion — suggest possible improvements to the apparatus, experimental arrangements, methods or techniques i. examinations ii. examinations. PBA STAND FOR “PRACTICAL BASED ASSESSMENT” Federal Board SSC-I Examination Biology Model Question Paper Curriculum 2022-2023 (Inclusive Scheme of Studies 2024) Section - A (Marks 12) Section – A is compulsory. All ① parts of this section are to be ② answered on this page and ③ handed over to the Centre Superintendent. ⑥ overwriting is not allowed. Do not ⑦ use lead pencil. ⑨ Candidate Sign.________ Q1. Fill the relevant bubble against each question. Each part carries one mark. S# Which of the following organelle (i) is NOT present in plant cell? The statement on the basis of (ii) observations is called: G1- Identify the correctly matched pair Preparation (iii) for cell two division The scientific study of organisms Classificati (iv) on is called: The diagram shows cells in part of the leaf of a green plant. Which (v) region contains cells which are responsible for the transport of water? Non-competitive inactivate the enzyme. Identify (vi) non-competitive inhibitor in this figure. If tissue level is not developed in Molecular (vii) next level will not form? Which combination of molecules (viii) and is related to lipids? glycerol Which one of the following is (ix) NOT the part of embryo in a seed? The diagram shows an overview of aerobic respiration. (x) In which labelled process oxygen is used? Wing of a (xi) bird The nitrogenous bases between Ionic (xii) Bonds by: Federal Board SSC-I Examination Model Question Paper Biology Curriculum 2022-2023 (Inclusive Scheme of Studies 2024) Write your answers on the allotted /given spaces. SECTION–B (Marks 30) Q.2 Q# (i) the branch of biology with the aspect of 6 living things it describes. Branch of Aspect of living things biology Pharmacology Defense against pathogens Physiology Classification and naming Relations organisms environment Pathology (ii) respiration. Answer the questions related to 6 it: 1+1 +1 a. Name the parts labelled as I and II. b. Name the type of vegetative (a) Name the (b) Label the phases of aerobic products respiration A. B. C. (iii) manner for any six features (iv) currency for living systems. (v) biology with other sciences. Interdiscipli Aspect of living nary science organisms Analysis of data related to organisms Biochemistry Cost and benefit analysis of organisms Computation al biology Distribution of organisms in geographic regions Biophysics (vi) mechanism through phloem. 2+1 2+1 a. Name the parts labelled as A, B, C and D. b. Name the carbohydrates that is mainly transported through C. I, II, III and IV and mention which one is organic? (vii) Why multiple organs are needed to develop 3 an organ system? through xylem. 1+2 a. Identify forces A and B. b. Despite the gravitational force, how the upward movement of water takes place through xylem. (viii List the osmotic adaptations found in 3 ) (ix) Following is the diagram of female gametophyte of flowering plant. 1.5 a. Correctly name the types of cells 2+1 b. Mention the location of these cell types in the body. a. Correctly name the parts labelled as A, B, C and D. b. What is the fate of X and Y after fertilization? (x) lead to evolution. feature of each? SECTION– C(Marks18) Q.3 the cause of any infectious disease using different steps of biological method. Q.4 the role of cofactors and give types of +3 cofactors with examples. Q.5 animal and two plant cells. better for rapid propagation? Give reasons. Federal Board SSC-I Examination Biology Model Question Paper (Curriculum 2022-2023) Alignment of Questions with Student Learning Outcomes Sr Section: Q. No No. (Part no.) / Area Paper",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

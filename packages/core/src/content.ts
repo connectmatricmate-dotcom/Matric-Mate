@@ -24,12 +24,12 @@ export const SUBJECTS: Subject[] = [
   { id: 'phy', name: 'Physics', icon: 'bolt', compulsory: false, group: 'science', chapterCount: 9 },
   { id: 'chem', name: 'Chemistry', icon: 'flask', compulsory: false, group: 'science', chapterCount: 8 },
   { id: 'bio', name: 'Biology', icon: 'leaf', compulsory: false, group: 'science', chapterCount: 9 },
-  { id: 'math', name: 'Mathematics', icon: 'calc', compulsory: true, chapterCount: 10 },
+  { id: 'math', name: 'Mathematics', icon: 'calc', compulsory: true, chapterCount: 17 },
   { id: 'eng', name: 'English', icon: 'book', compulsory: true, chapterCount: 8 },
   { id: 'urd', name: 'Urdu', urduName: 'اردو', icon: 'quill', compulsory: true, chapterCount: 8 },
   { id: 'isl', name: 'Islamiyat', urduName: 'اسلامیات', icon: 'star', compulsory: true, chapterCount: 6 },
-  { id: 'pst', name: 'Pakistan Studies', icon: 'globe', compulsory: true, chapterCount: 6 },
-  { id: 'cs', name: 'Computer Science', icon: 'book2', compulsory: false, group: 'science', chapterCount: 5 },
+  { id: 'pst', name: 'Pakistan Studies', icon: 'globe', compulsory: true, chapterCount: 4 },
+  { id: 'cs', name: 'Computer Science', icon: 'book2', compulsory: false, group: 'science', chapterCount: 6 },
 ];
 
 const CH: Record<string, [string, string, string?][]> = {
@@ -47,7 +47,7 @@ const CH: Record<string, [string, string, string?][]> = {
   chem: [
     ['Fundamentals of Chemistry', 'Branches of chemistry, atom and molecule, mole concept, Avogadro’s number.'],
     ['Structure of Atoms', 'Rutherford and Bohr models, isotopes, electronic configuration.'],
-    ['Periodic Table & Periodicity', 'Mendeleev to modern table, periods and groups, periodic trends.'],
+    ['Periodic Table and Periodicity of Properties', 'Mendeleev to modern table, periods and groups, periodic trends.'],
     ['Structure of Molecules', 'Chemical bonds: ionic, covalent, coordinate, metallic; intermolecular forces.'],
     ['Physical States of Matter', 'Gas laws, evaporation, vapour pressure, boiling and melting points.'],
     ['Solutions', 'Solute and solvent, concentration units, colloids and suspensions.'],
@@ -65,6 +65,10 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Nutrition', 'Nutrients, human digestive system, malnutrition and vitamins.'],
     ['Transport', 'Transport in plants, human heart and blood, circulatory disorders.'],
   ],
+  // Seventeen units, not ten. FBISE examines units 1-7, 14, 15 and 17-23 and 29
+  // of the IX-X mathematics scheme in Class 9; the gaps are Class 10's. The
+  // board's own numbering is kept in data/fbise/math.json, because a student
+  // looking for "Unit 22 Pythagoras" needs to recognise it.
   math: [
     ['Matrices and Determinants', 'Types of matrices, addition and multiplication, determinants, inverse.'],
     ['Real and Complex Numbers', 'Number systems, properties, radicals and laws of exponents.'],
@@ -76,6 +80,13 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Linear Graphs & Their Application', 'Cartesian plane, conversion graphs, simultaneous equations.'],
     ['Introduction to Coordinate Geometry', 'Distance formula, collinear points, midpoint.'],
     ['Congruent Triangles', 'Congruence postulates and theorems with proofs.'],
+    ['Parallelograms and Triangles', 'Properties of parallelograms, midpoint theorem and its converse.'],
+    ['Line Bisectors and Angle Bisectors', 'Perpendicular bisectors, angle bisectors and their concurrency.'],
+    ['Sides and Angles of a Triangle', 'Angle-side inequalities and the triangle inequality.'],
+    ['Ratio and Proportion', 'Ratio, proportion and the theorems on parallel lines cutting sides.'],
+    ['Pythagoras’ Theorem', 'The theorem, its converse and problems on right-angled triangles.'],
+    ['Theorems Related with Area', 'Areas of parallelograms and triangles on the same base.'],
+    ['Practical Geometry: Triangles', 'Constructing triangles, and drawing their circles and bisectors.'],
   ],
   eng: [
     ['The Saviour of Mankind', 'Reading comprehension, vocabulary and summary writing.'],
@@ -105,20 +116,24 @@ const CH: Record<string, [string, string, string?][]> = {
     ['سیرتِ طیبہ', 'مکی و مدنی دور', 'Life of the Prophet ﷺ.'],
     ['اخلاقیات', 'حقوق العباد اور معاشرتی اخلاق', 'Ethics and social rights.'],
   ],
+  // Four chapters, not six. Constitution and Government, Economy of Pakistan
+  // and Population and Society are Class 10, and were never on the Class 9
+  // paper.
   pst: [
     ['Ideological Basis of Pakistan', 'Two-nation theory, Allama Iqbal and Quaid-e-Azam.'],
-    ['Pakistan Movement', 'Key milestones from 1857 to 1947.'],
+    ['Making of Pakistan', 'Key milestones from 1857 to 1947.'],
     ['Land and Environment', 'Physical features, climate and rivers of Pakistan.'],
-    ['Constitution and Government', 'Constitutional development and structure of government.'],
-    ['Economy of Pakistan', 'Agriculture, industry, trade and resources.'],
-    ['Population and Society', 'Population trends, languages and culture.'],
+    ['History of Pakistan', 'Pakistan from independence to the making of the constitution.'],
   ],
+  // The previous list here was a different board's syllabus. These six are the
+  // FBISE Class 9 units.
   cs: [
-    ['Problem Solving', 'Algorithms, flowcharts, pseudocode and testing.'],
-    ['Binary System', 'Number systems, conversions, ASCII and Unicode.'],
-    ['Networks', 'LAN and WAN, topologies, transmission media, protocols.'],
-    ['Data Protection', 'Malware, backups, authentication and cyber ethics.'],
-    ['Designing Website', 'HTML basics, tags, lists, images and forms.'],
+    ['Fundamentals of Computer', 'Computer generations, hardware components and Von Neumann architecture.'],
+    ['Fundamentals of Operating System', 'What an operating system does, its types and its user interfaces.'],
+    ['Office Automation', 'Word processing, spreadsheets and presentation software.'],
+    ['Data Communication', 'Transmission media and modes, bandwidth, and communication devices.'],
+    ['Computer Networks', 'LAN and WAN, topologies, network devices and protocols.'],
+    ['Computer Security and Ethics', 'Malware, authentication, backups, and cyber ethics and law.'],
   ],
 };
 

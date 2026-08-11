@@ -1,0 +1,277 @@
+{
+  "subject": "pst",
+  "name": "Pakistan Studies",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2024New/pst/Final_Assessment_Framework_Model_Question_Paper_PakistanStudies_SSC-I.pdf",
+    "sha256": "014cb4a97687e286ab3c0234b62bed41be30fb2e04a4e9dec3c6bc2c4fa8d6e4",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 3,
+    "slos": 35,
+    "summative": 6,
+    "formative": 0,
+    "unclassified": 29,
+    "untitledDomains": 0,
+    "shortText": 2,
+    "examUnits": 4
+  },
+  "notes": [
+    "29 of 35 outcomes have no formative/summative marking: the source table merges that column across a content area. Treat them as unknown, not as excluded."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Pakistan Studies IX-X along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Ideological Basis of Pakistan"
+      },
+      {
+        "number": 2,
+        "title": "Making of Pakistan"
+      },
+      {
+        "number": 3,
+        "title": "Land and Environment"
+      },
+      {
+        "number": 4,
+        "title": "History of Pakistan"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": "History of Pakistan",
+      "slos": [
+        {
+          "code": "PS-09-A1-01",
+          "text": "Relate the basis of Pakistan's ideology to the [SL basic values of Islam and the economic and social deprivations of Muslims in India, using historical evidence and scholarly analysis.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-A1-02",
+          "text": "Evaluate Pakistan's ideology with reference to the statements of History Quaid Azam and Allama Iqbal, including their vision for a Muslim state and the role of of Pakistan Islam in Pakistan's identity and governance.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-09-A1-03",
+          "text": "[SLO: PS-09-C1- A C aspects of life in the Indo-Pakistan subcontinent. suggest sustainable solutions to water resource management in order to deal with threatening issues of water pollution, water shortage and wastage.",
+          "cognitive": "application",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-A1-04",
+          "text": "[SLO:PS-09-C4-04] A C Syed Ahmed Khan as a economy including reformer whose efforts, benefits such as connections with the increased Western world and establishment of the access to global Aligarh Movement played a crucial role in the success of the Pakistan Movement. B C arid, semiarid, humid, coastal, and highland climates in Pakistan, including seasonal changes, and evaluate their impact on the physical and human geography of the country. agricultural output to benefit both the economy and the population. *Cognitive Domain K: Knowledge U: Understanding A: Application Table of Specification Model Paper Pakistan Studies – Grade IX (SSC-I) Content Domain / Area Pakistan Q1(ii)1 Q1(iii)1 Q3(f)8 Q1(iv)1 Q1(v)1 Q1(ix)1 Q1(i)1 Q1(vii)1 Q1(vi)1 Q1(viii)1 Q2(iv/f)3 Q2(iii/s)3 Q2(iv/s)3 Q2(ii/f)3 Q2(v/s)3 Q4(f)8 Q4(s)8 Q2(vii/f)3 Q2(viii/s)3 Total Marks Total Percentages  Difficulty levels of two alternative questions of the internal choice will be same  SLOs of the two alternative questions of the internal choice must be different Question Number (part/ second choice) marks 111 032 473 For more information, please visit www.fbise.edu.pk / Federal.BISE.Official",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-A1-05",
+          "text": "Analyze the important political developments between 1906- 1920 (from Simla deputation till Khilafat Movement) (Knowledge, Content Area 40 minutes)",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-A1-06",
+          "text": "Analyze the important political developments between 1920- 1939 (from Khilafat Movement till Day of Deliverance) deliverance.",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-A1-07",
+          "text": "Evaluate the political developments that undertook during 1940 till 1947.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-A1-08",
+          "text": "Discuss the role of political leaders including women and minorities, in the making of Pakistan. (Quaid- i-Azam, Allama Iqbal, Fatima Jinnah and SP Singha) B: Geograph y of Pakistan Students will be able to:",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": "Geography of Pakistan",
+      "slos": [
+        {
+          "code": "PS-09-B1-01",
+          "text": "Explain Pakistan's precise cardinal location on a world map.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B1-02",
+          "text": "Evaluate significance of location in terms of its proximity to neighboring countries, seas and oceans.",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B1-03",
+          "text": "Describe the significance of Pakistan's major cities based on their geographical location, including their relationship to surrounding physical features such Examination as rivers, mountains, and coastal areas. Standard 2: The Natural Topography and Vegetation of Pakistan Student’s Learning Outcomes: Students will be able to:",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-09-B2-01",
+          "text": "Label the significant mountain ranges, plateaus, rivers, and plains of Pakistan on a physical map, and explain their importance to the country's physical and human geography. (Knowledge, Content Area 40 minutes)",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B2-02",
+          "text": "Analyze the natural topography of Pakistan, including the spatial distribution of physical features such as mountains, plateaus, rivers, and plains, using appropriate geographical vocabulary and terminology.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B2-03",
+          "text": "Investigate the weather patterns, economy, natural vegetation, drainage systems, lifestyles, and cultures of people living in various landforms of Pakistan, using geographic representations and geospatial technologies to analyze the similarities and differences.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B2-04",
+          "text": "Construct well-supported arguments with relevant evidence to assess the potential of Pakistan's natural topography for future growth and sustainability, considering opportunities for leisure, commercial, and economic development. Standard 3: Climate of Pakistan and Environmental Hazards Student’s Learning Outcomes: Students will be able to:",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B3-01",
+          "text": "Compare the climatic zones of Pakistan in terms of the distribution of temperature, precipitation, including monsoons, cyclones (Western Depressions), and convectional rain, using a variety of resources such as newspapers, weather charts, geographic representations, and geospatial technologies.",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B3-02",
+          "text": "Interpret the data collected on Pakistan's climatic zones to evaluate their impact on the country's physical and human geography, including agriculture, infrastructure, and transportation systems.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-09-B3-03",
+          "text": "OR",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-B3-04",
+          "text": "Assess the ramifications of seasonal shifts in temperature, pressure, and wind patterns on Pakistan's economy taking into consideration the effects of cold, (Knowledge, Content Area 40 minutes) ice and snow on mountainous areas as well as the effects of storms, floods and droughts on agriculture, industry and communication Standard 1: Water, Mineral and Power Resources Student’s Learning Outcomes: Students will be able to:",
+          "cognitive": "understanding",
+          "assessment": null
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": "Resources and Economic Development of Pakistan",
+      "slos": [
+        {
+          "code": "PS-09-C1-01",
+          "text": "OR",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C1-02",
+          "text": "Evaluate the advantages and disadvantages of the extensive irrigation system in Pakistan and suggest sustainable solutions to water resource management in order to deal with threatening issues of water pollution, water shortage and wastage.",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C1-03",
+          "text": "Analyze the vital role of dams, barrages. canals. and water reservoirs offer towards sustainable solutions, (including hydroelectric power C: generation, flood control, and irrigation.) and their potential impacts on the agriculture Resourc environment, industry and human activities. es and Economi Standard 2: Population Structure, Growth, Employment and Industry c Student’s Learning Outcomes: Develop Students will be able to: ment of Pakistan",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-09-C2-01",
+          "text": "Analyze the demographic changes occurring in Pakistan, specifically in terms of population growth, density and structure, (using the demographic transition model and population pyramids) to interpret statistical trends, and consider the various social, religious, educational, economic, and political factors that contribute to sustainable population growth. (Knowledge, Content Area 40 minutes)",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C2-02",
+          "text": "Analyze the causative factors of rural-urban and seasonal migrations, their influence on population distribution consequential geographic and socio- economic impediments e [SLO:PS-09-C2- 03]Evaluate t demographic changes occurring in Pakistan, specifically in terms of population growth, density and structure, (using the demographic transition model and population pyramids) to interpret statistical trends, and consider the various social, religious, educational, economic, and political factors that contribute to sustainable population growth.",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C2-03",
+          "text": "Evaluate the problems of youth and dependent population in Pakistan and the role of the government/ NGOs in addressing the issue while identifying measures for sustainable human resource development. Standard 3: Agriculture , Livestock and Fisheries Student’s Learning Outcomes: Students will be able to:",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C3-01",
+          "text": "Demonstrate understanding of the different categories of agriculture recognizing agriculture as a complex system that involves various inputs, processes, and outputs.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C3-02",
+          "text": "Demonstrate understanding of the major and minor food and cash crops cultivated in Pakistan, as well as their respective growing areas, and classify them based on their importance and economic significance to the country's agricultural sector.",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C3-03",
+          "text": "Evaluate agriculture's contributions to employment, processing industries, and exports in boosting the country's economy. Offer sustainable approaches to agricultural development, including organic farming.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-09-C3-04",
+          "text": "Identify challenges the agriculture sector is facing, including the threat of arable land being converted to housing societies and propose sustainable strategies to address these challenges as well as enhance agricultural output to benefit both the economy and the population. Standard 4: Transport, Trade and Telecommunication Students' Learning Outcomes: (Knowledge, Content Area 40 minutes) Students will be able to:",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C4-01",
+          "text": "Categorize the modes of transportation in Pakistan based on their purpose, and assess the regional differences in the concentration and arrangement of road, rail, and air transportation networks throughout Pakistan, taking into account factors such as topography, population, and economic activity.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C4-02",
+          "text": "Analyze the concept of dry ports in urban areas of Pakistan, highlighting their advantages in streamlining the transportation of goods for export while reducing dependence on conventional seaports. *Cognitive Level K: Knowledge U: Understanding A: Application Section B and C",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C4-03",
+          "text": "Compare and contrast the advantages and disadvantages of different transport modes for the movement of both goods and people within Pakistan, considering factors such as speed, cost, reliability, and environmental impact.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C4-04",
+          "text": "Analyze the role of trade in Pakistan's economy, including benefits such as increased competitiveness and access to global markets.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C4-05",
+          "text": "Assess the influence of Pakistan's trade routes, such as the Gwadar Port, CPEC, and Karachi Port, on global trade with China, Central Asia, and the Middle East to comprehend the factors that impact international trade, including trade, agreements, tariffs, transportation expenses, political stability and market demand.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "PS-09-C4-06",
+          "text": "Analyze the internal challenges that developing countries like Pakistan may face in maintaining or increasing their share of trade with other nations and suggest some sustainable solutions. Federal Board SSC-I Examination Pakistan Studies Model Paper (Curriculum 2022-23) ROLL NUMBER Section - A (Marks 10) ⓪ ② Section – A is compulsory. All parts of this section are to be answered on this page and handed over to the Centre Superintendent. Deleting/overwriting allowed. Do not use lead pencil. Candidate Sign.________ Q1. Fill the relevant bubble against each question. Each part carries one mark. Sr Question no. Quaid Azam demanded separation of Sindh from Bombay in his Fourteen He wanted Points because: to favor his i. native of Sindh province will not be protected in Bombay The entity which initiated The British control over the ii. Indo-Pak subcontinent Crown was: The country located at iii. Northwest of Pakistan is: Which of the following rivers flow in Pakistan? iv. Mississippi river Which geographical region Eastern v. plains to frequent droughts? The concessions granted to Second Muslims through the Nehru vi. Report revoked by the Congress in Conference what manner? What are the primary Economic factors driving rural-urban and social and seasonal migrations, vii. which in turn impact ies population distribution and , lead to various geographic and socio-economic challenges? Which factor is directly Population viii. growth of a country? What percentage of the population depends on ix. agriculture for their livelihood? Which port exerts a substantial influence on x. advantageous location? Federal Board SSC-I Examination Pakistan Studies Model Question Paper (Curriculum 2022-23) Write your answers on the allotted/given spaces. SECTION – B (Marks 24) Attempt all parts. Q.2 Write the names of any two dams of 1.5+1.5 OR i. are located? ii. Iqbal’s vision regarding Two Nation Theory. Analyze any three characteristics of iii. Pakistan? How did SP Singha contribute for Pakistan before and after partition? iv. of various forms of transportation? (Any three points) How can dry ports contribute to the country’s economic growth and v. competitiveness in the global market? (Any three points) Analyze any two far-reaching impacts of British vi. landscape of the Indo- Pakistan subcontinent.\" vii. suggested to minimize the impacts of climate change? Write briefly. viii. Pakistan’s climatic zones affect the human geography? Explain any two points. SECTION – C (Marks 16) Q. No. Write a detailed note on Aligarh Q.3 Movement. Q.4 semi-arid, humid, coastal and highland climates in Pakistan. challenges. Federal Board SSC-I Examination Pakistan Studies Model Question Paper (Curriculum 2022-23) Alignment of Questions with Student Learning Outcomes Sr Section: No Q. No. (Part no.) Paper",
+          "cognitive": "application",
+          "assessment": null
+        }
+      ]
+    }
+  ]
+}

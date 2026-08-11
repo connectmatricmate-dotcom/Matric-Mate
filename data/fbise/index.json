@@ -1,0 +1,109 @@
+{
+  "grade": 9,
+  "board": "fbise",
+  "subjects": [
+    {
+      "subject": "phy",
+      "name": "Physics",
+      "status": "ok",
+      "domains": 6,
+      "slos": 141,
+      "summative": 129,
+      "formative": 0,
+      "unclassified": 12,
+      "untitledDomains": 0,
+      "shortText": 1,
+      "examUnits": 9
+    },
+    {
+      "subject": "chem",
+      "name": "Chemistry",
+      "status": "ok",
+      "domains": 6,
+      "slos": 167,
+      "summative": 154,
+      "formative": 12,
+      "unclassified": 1,
+      "untitledDomains": 6,
+      "shortText": 0,
+      "examUnits": 8
+    },
+    {
+      "subject": "bio",
+      "name": "Biology",
+      "status": "ok",
+      "domains": 7,
+      "slos": 83,
+      "summative": 80,
+      "formative": 1,
+      "unclassified": 2,
+      "untitledDomains": 7,
+      "shortText": 0,
+      "examUnits": 9
+    },
+    {
+      "subject": "math",
+      "name": "Mathematics",
+      "status": "ok",
+      "domains": 3,
+      "slos": 61,
+      "summative": 46,
+      "formative": 13,
+      "unclassified": 2,
+      "untitledDomains": 0,
+      "shortText": 0,
+      "examUnits": 17
+    },
+    {
+      "subject": "cs",
+      "name": "Computer Science",
+      "status": "ok",
+      "domains": 6,
+      "slos": 18,
+      "summative": 17,
+      "formative": 0,
+      "unclassified": 1,
+      "untitledDomains": 6,
+      "shortText": 0,
+      "examUnits": 6
+    },
+    {
+      "subject": "pst",
+      "name": "Pakistan Studies",
+      "status": "ok",
+      "domains": 3,
+      "slos": 35,
+      "summative": 6,
+      "formative": 0,
+      "unclassified": 29,
+      "untitledDomains": 0,
+      "shortText": 2,
+      "examUnits": 4
+    },
+    {
+      "subject": "eng",
+      "name": "English",
+      "status": "ok",
+      "domains": 4,
+      "slos": 56,
+      "summative": 31,
+      "formative": 8,
+      "unclassified": 17,
+      "untitledDomains": 4,
+      "shortText": 1,
+      "examUnits": 0
+    },
+    {
+      "subject": "urd",
+      "name": "Urdu",
+      "status": "needs-ocr",
+      "slos": 0
+    },
+    {
+      "subject": "isl",
+      "name": "Islamiyat",
+      "status": "needs-ocr",
+      "slos": 0
+    }
+  ]
+}

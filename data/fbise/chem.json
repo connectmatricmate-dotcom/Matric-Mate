@@ -1,0 +1,1103 @@
+{
+  "subject": "chem",
+  "name": "Chemistry",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Chemistry SSC-I.pdf",
+    "sha256": "4decc4a565712eb271127fc5a5098d1c581ed6932ed7463ff3a86e8113d9a36e",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 6,
+    "slos": 167,
+    "summative": 154,
+    "formative": 12,
+    "unclassified": 1,
+    "untitledDomains": 6,
+    "shortText": 0,
+    "examUnits": 8
+  },
+  "notes": [
+    "6 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Chemistry IX-X along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Fundamentals of Chemistry"
+      },
+      {
+        "number": 2,
+        "title": "Structure of Atoms"
+      },
+      {
+        "number": 3,
+        "title": "Periodic Table and Periodicity of Properties"
+      },
+      {
+        "number": 4,
+        "title": "Structure of Molecules"
+      },
+      {
+        "number": 5,
+        "title": "Physical States of Matter"
+      },
+      {
+        "number": 6,
+        "title": "Solutions"
+      },
+      {
+        "number": 7,
+        "title": "Electrochemistry"
+      },
+      {
+        "number": 8,
+        "title": "Chemical Reactivity"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-09-A-01",
+          "text": "Define chemistry as the study of matter, its properties, composition and A (gases), Sea (liquids) and sky (plasma) and their interaction with each other.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-A-02",
+          "text": "Explain with examples that chemistry has many sub-fields and example, and interdisciplinary fields. (Some examples includes). Biochemistry. Medicinal Chemistry. Polymer Chemistry. Geochemistry. Environmental Chemistry. Analytical Chemistry. Physical Chemistry. Organic Chemistry. Inorganic Chemistry. Nuclear Chemistry. Astrochemistry).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-A-03",
+          "text": "Formulate examples of essential question(s) that are important for the branches of Chemistry. e.g. for Analytical Chemistry a question would be 'how can we accurately determine the chemical composition of a sample?’)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-A-04",
+          "text": "Differentiate between 'science’, ‘technology' and ‘engineering’ by making reference to examples from the physical sciences. (Science is a process of exploring new knowledge methodically through observation and experiments, technology refers to the process of applying scientific knowledge in practical applications, for various purposes. Engineering is the application of knowledge in order to design, build and maintain a product or a process. that solves a problem and fulfills a need. Science provides the fundamental knowledge and understanding whole engineering applies that knowledge to develop practical solutions.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-09-B-01",
+          "text": "Define matter as a substance having mass and occupying space. B",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-02",
+          "text": "State the distinguishing macroscopic properties of commonly observed states of solids, liquids and gasses in particular density, compressibility and fluidity. (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-03",
+          "text": "Identify that state is a distinct form of matter (examples could include familiarity with plasma, intermediate states and exotic states e.g. BEC or liquid crystals).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-04",
+          "text": "Explain the allotropic forms of solids(some examples may include diamond, graphite, and fullerenes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-05",
+          "text": "Explain the differences between elements, compounds and mixtures. annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-06",
+          "text": "Identify solutions, colloids, and suspensions as mixtures and give an example of each.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-07",
+          "text": "Explain the effect of temperature on solubility and formation of unsaturated and saturated solutions required daily intake for young adults Table of Specification of the Model Paper Chemistry ---- Grade – IX (SSC-I) Scheme of Studies 2024 Content Chemistry and pH Levels Q2(i/f) (3) (3) (1) Q2(iii/f) (3) Q5(f) (6) Q2(ix/f) (3) Total Percentage Cont…. Table of Specification of the Model Paper Chemistry ---- Grade – IX (SSC-I) Content Water Levels theory and only (3)",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-B-08",
+          "text": "Explain the structure of the atom as a central nucleus containing neutrons and Atomic structure",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-09",
+          "text": "State that, orbits (shells) are energy levels of electrons and a larger shell implies higher energy and greater average distance from nucleus.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-10",
+          "text": "State that electrons are quantum particles with probabilistic paths whose exact paths and locations cannot be mapped (with reference to the uncertainty principle).",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-B-11",
+          "text": "Explain that a nucleus is made up of protons and neutrons held together by strong nuclear force.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-12",
+          "text": "Explain that an atomic model is an aid to understand the structure of an atom. in annual examination,",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-B-13",
+          "text": "State the relative charge and relative masses of a subatomic particles (an electron, proton and neutron).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-14",
+          "text": "Interpret the relationship between a subatomic particle, their mass and charge annual examination. (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-15",
+          "text": "Illustrate the path that positively and negatively charged particles would take under the influence of a uniform electric field.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-16",
+          "text": "Define proton number/atomic number as the number of protons in the nucleus of an atom.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-17",
+          "text": "Explain that the proton number is unique to each element and used to arrange elements in periodic table.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-18",
+          "text": "State that radioactivity can change the proton number and alter an atom's identity.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-19",
+          "text": "Define nucleon number/atomic mass as sum of number of protons and neutrons in the nucleus of an atom.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-20",
+          "text": "Define isotopes as different atoms of the same element that have same",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-21",
+          "text": "State that isotopes can affect molecular mass but not chemical properties of an atom.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-22",
+          "text": "Determine the number of protons and neutrons of different isotopes. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-23",
+          "text": "Define relative atomic mass as the average mass of isotopes of an element compared to 1/12th of mass of an atom of Carbon-12.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-24",
+          "text": "State that isotopes can exhibit radioactivity. annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-25",
+          "text": "Discuss the importance of isotopes using carbon dating and medical imaging as examples.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-26",
+          "text": "Describe the formation of positive (cation) and negative (anion) ions from atoms.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-27",
+          "text": "Interpret and use the symbols for atoms and ions. annual examination. (Periods",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-28",
+          "text": "Calculate relative atomic mass of an element from relative masses and abundance of isotopes.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-29",
+          "text": "Calculate relative atomic mass of an element from relative masses and abundance of all stable isotopes.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-30",
+          "text": "Describe that noble gas electronic configuration, octet and duplet rules help Bonding",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-31",
+          "text": "Compare between the formation of cations and anions. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-32",
+          "text": "Account for the electropositive and electronegative nature of metals and non- metals.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-33",
+          "text": "Define ionic, covalent, coordinate covalent and metallic bonds. annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-34",
+          "text": "Differentiate between ionic compounds and covalent compounds.(The following points need to be included in the respective, a, ionic bond as strong electrostatic attraction between oppositely charged ions b. Covalent bond as strong electrostatic attraction between shared electrons and two nuclei. C. Metallic bond as strong electrostatic attraction between cloud/sea of delocalized electrons and positively charged cations).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-35",
+          "text": "Explain the properties of compounds in terms of bonding and structure. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-36",
+          "text": "Compare uses and properties of materials such as strength and conductivity as determined by the type of chemical bond present between their atoms.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-37",
+          "text": "Interpret the strength of forces of attraction and their impact on melting and boiling points of ionic and covalent compounds.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-38",
+          "text": "Justify the availability of free charged particles (electrons or ions) for conduction of electricity in ionic compounds (solid in molten) covalent compounds and metallic bonds.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-39",
+          "text": "Recognize that some substances can ionize when dissolved in water.(e.g. acids dissolves in water and conduct electricity). (Periods",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-40",
+          "text": "Justify the suitability of usage of graphite, diamond and metals for industrial purposes. Some examples may include : a.graphite as lubricant or an electrode. b. Diamond in cutting tools. c. Metals for wires, and sheets).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-41",
+          "text": "Draw the structure of ionic and covalent compounds along with their formation. (some examples can include: a. ionic bonds in binary compounds such as NaBr, NaF, CaCl2 using dot-and cross diagrams and Lewis dot structures b. simple molecules including H2, Cl2, O2, N2, H2O, CH4, NH3, HCI, CH3OH, C2H4, CO2, HCN, and similar molecules using dot-and- cross diagrams and Lewis dot structures).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-42",
+          "text": "State the formulae of common elements and compounds. annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-43",
+          "text": "Define molecular formula of a compound as the number and type of different atoms in one molecule.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-44",
+          "text": "Define empirical formula of a compound as the simplest whole number ratio of different atoms in a molecule.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-45",
+          "text": "Deduce the formula and name of a binary ionic compounds from ions given relevant information.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-46",
+          "text": "Deduce the formula of a molecular substance from the given structure of molecules.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-47",
+          "text": "Use the relationship. Amount of substance = mass / molar mass to calculate number of moles, mass, molar mass, relative mass (atomic/molecular/formula) and number of particles.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-48",
+          "text": "Define mole as amount of substance containing Avogadro’s number (6.02x10^23) of particles. (Periods",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-49",
+          "text": "Explain the relationship between a mole and Avogadro's constant. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-50",
+          "text": "Construct chemical equations and ionic equations to show reactants forming products, including state symbols.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-51",
+          "text": "Deduce the symbol equation with state symbols for a chemical reaction given relevant information.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-52",
+          "text": "Define redox reactions as simultaneous oxidation and reduction in terms of oxygen, hydrogen, electrons and changes in oxidation state.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-53",
+          "text": "Use roman numerals to indicate oxidation number of an element in a compound.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "C-09-B-54",
+          "text": "Identify oxidizing and reducing agents in a redox reaction. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-55",
+          "text": "Recognize that the oxidation number of elements in their free state is zero. annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-56",
+          "text": "Derive the formula of ionic compounds from ionic charges and oxidation numbers.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-57",
+          "text": "Identify that the oxidation number of monatomic ion is the same as the charge on the ion.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-58",
+          "text": "Explain that the sum of the oxidation numbers in a neutral compound is zero. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-59",
+          "text": "Explain that the sum of the oxidation numbers in an ion is equal to the charge on the ion.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-60",
+          "text": "Identify redox reactions by the colour changes involved when using acidified aqueous potassium manganate (VIl) to (II) or aqueous potassium iodide. (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-61",
+          "text": "Define corrosion and discuss methods to prevent it. (Some examples may include barrier method such as using paint galvanizing, electroplating; sacrificial protection such as using magnesium blocks in ships).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-62",
+          "text": "Explain the idea of a chemical system and its connection with its surroundings influences energy transfer during a chemical reaction.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-63",
+          "text": "Differentiate between exothermic and endothermic reactions by giving examples.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-64",
+          "text": "State that thermal energy is called enthalpy change and recognize its sign as negative for exothermic and positive for endothermic reactions.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-65",
+          "text": "Define activation energy as the minimum energy that colliding particles must have for a successful collision.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-66",
+          "text": "Explain that activation energy depends on reaction pathway which can be changed using catalysts or enzyme (detailed pathways not required).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-67",
+          "text": "Draw, label and interpret reaction pathway diagram for exothermic and endothermic reaction which includes enthalpy change, activation energy (un- catalyzed and catalyzed), reactants and products.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-68",
+          "text": "Recognize that bond breaking is endothermic and bond making is exothermic processes.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-69",
+          "text": "Explain that enthalpy change is sum of energies absorbed and released in bond breaking and bond forming.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-70",
+          "text": "Calculate enthalpy change of a reaction given bond energy values. annual examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-71",
+          "text": "Explain how respiration (aerobic and anaerobic), an exothermic process, provides energy for biological systems and lipids as reserve stores of energy.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-72",
+          "text": "Recognize that reversible reaction are shown by symbol Equilibrium (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-73",
+          "text": "Describe how changing the physical conditions of a chemical equilibrium system can redirect reversible reactions. a. effect of heat on hydrated compounds b. addition of water to anhydrous substances in particular copper(II) sulfate and cobalt (II) chloride",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-74",
+          "text": "State that reversible reaction can achieve equilibrium in a closed system when rate of forward and backward reactions are equal.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-75",
+          "text": "Define Bronsted-Lowry acids as proton donors and Bronsted-Lowry bases as Chemistry and pH",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-76",
+          "text": "Recognize that aqueous solutions of acids contain H+ ions and aqueous solutions of alkalis contain OH- ions.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-77",
+          "text": "Define a strong acid and bases as an acid or base that completely dissociates in aqueous solution and weak acid and base that partially dissociates in aqueous solution. (Some examples include: Student writing symbol equations to show these for hydrochloric acid, sulphuric acid, nitric acid, and ethanoic acid.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-78",
+          "text": "Formulate dissociation equations for an acid or base in aqueous solution. annual examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-79",
+          "text": "Recognize that bases are oxides or hydroxides of metals and that alkalis are water-soluble bases.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-80",
+          "text": "Describe the characteristic properties of acids in terms of their reactions with metals, bases and carbonates.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-81",
+          "text": "Identify the characteristic properties of bases in terms of their reactions with acids and ammonium salts.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-82",
+          "text": "Define acid rain. annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-B-83",
+          "text": "Discuss effects of acid rain and relate them with properties of acids. annual examination. (Periods",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-09-C-01",
+          "text": "Define the periodic table as an arrangement of elements in periods and groups C",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-02",
+          "text": "Identify the group or period or block of an element using its electronic configuration (only the idea of subshells related to the blocks can be introduced).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-03",
+          "text": "Explain the relationship between group number and the charge of ions formed from elements in the group in terms of their outermost shells.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-04",
+          "text": "Explain similarities in the chemical properties of elements in the same group in terms of their electronic configuration.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-05",
+          "text": "Identify trends in group and periods, given information about the elements, including trends for atomic radius, electron affinity, electronegativity, ionization energy, metallic character, reactivity and density.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-06",
+          "text": "Use terms alkali metals, alkaline earth metals, halogens, noble gases, transition metals, lanthanides and actinides in reference to the periodic table.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-07",
+          "text": "Predict the characteristic properties of an element in a given group by using",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-08",
+          "text": "Deduce the nature, possible position in the Periodic Table and the identity of unknown elements from given information about their physical and chemical properties. Group Properties",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-09",
+          "text": "Define Group 1, Alkali metals as relatively soft metals with general trends down the group limited to decreasing melting point, increasing density and increasing reactivity.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-10",
+          "text": "Predict properties of other elements in group I, given information about the elements.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-11",
+          "text": "Predict properties of elements in group I in order of reactivity given relevant information.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-12",
+          "text": "Group VII Properties Define Group-VIl, halogens as diatomic non-metals with general trends limited to increasing density, and decreasing reactivity. (Periods",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-13",
+          "text": "Identify the appearance of halogens as fluorine as pale yellow gas, chlorine as yellow-green gas, bromine as red-brown liquid, iodine as grey black solid.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-14",
+          "text": "Explain the displacement reactions of halogens with other halide ions and also as reducing agents.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-15",
+          "text": "Predict the properties of elements in group VII, given information about the elements.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-16",
+          "text": "Analyze the relative thermal stabilities of the hydrogen halides and explain these in terms of bond strengths.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-17",
+          "text": "Transition elements Describe Transition elements as metals that: have high densities, high melting points, variable oxidation numbers, form colored compounds and act as catalysts for industrial purposes. (some examples include catalysts being used are the Haber process, catalytic converters, Contact process and manufacturing of margarine).",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-18",
+          "text": "Noble gases Define the Group 18 noble gases as unreactive, monatomic gases.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-19",
+          "text": "Explain this (Nobel gases) in terms of electronic configuration. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-C-20",
+          "text": "Properties of metals Compare the general physical properties of metals and non-metals. (Specifically in terms of, a. thermal conductivity, b. electrical conductivity, c. malleability and ductility. d. melting points and boiling points)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "D",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-09-D-01",
+          "text": "State that composition of clean, dry air is approximately 78% Nitrogen N2, D dioxide CO2. (Periods",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-02",
+          "text": "State the major sources of air pollutants. (Some examples include: a. Carbon dioxide from the complete combustion of carbon-containing fuels, b. Carbon monoxide and particulates from the incomplete combustion of carbon-containing fuels, c. methane from the decomposition of vegetation and waste gasses from digestion in animals. d, Oxides of nitrogen from car engines, e. Sulfur dioxide from the combustion of fossil fuels which contain sulfur compounds f. Ground level ozone from reactions of oxides of nitrogen, from car engines, and volatile organic compounds, in presence of light).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-03",
+          "text": "State the adverse effects of air pollutants (Some examples include: a. carbon dioxide: higher levels of carbon dioxide leading to increased global warming, which leads to climate change b. carbon monoxide: toxic gas c. particulates: increased risk of respiratory problems and cancer d. methane: higher levels of methane leading to increased global warming, which leads to climate change e. oxides of nitrogen: acid rain, photochemical smog and respiratory problems, f. sulfur dioxide: acid rain and haze).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-04",
+          "text": "Explain how the greenhouse gasses carbon dioxide and methane cause global warming? (Some examples include : a. The absorption, reflection and emission of thermal energy, b. Reducing thermal energy loss to space).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-05",
+          "text": "Describe the role of sulfur in the formation of acid rain and its impact on the environment.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-06",
+          "text": "Describe the strategies to reduce the effects of major environmental issues. (Some examples include: a. climate change: planting trees, reduction in livestock farming, decreasing use of fossil fuels, increasing use of hydrogen and renewable energy, e.g. wind, solar. b. acid rain: use of catalytic converters in vehicles, reducing emissions of sulfur dioxide by using low sulfur fuels and flue gas desulfurization with calcium oxide).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-07",
+          "text": "Describe the role of NO and NO2 in the formation of acid rain, both directly and through their catalytic role in the oxidation of atmospheric sulfur dioxide.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-08",
+          "text": "Explain how oxides of nitrogen form in car engines and describe their removal by catalytic converters, e.g. CO + 2NO (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-09",
+          "text": "Define photosynthesis as the reaction between carbon dioxide and water to produce glucose and oxygen in the presence of chlorophyll and using, energy from light.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-10",
+          "text": "Analyze how to use tools to reduce personal exposure to harmful pollutants. (Some examples include the usage of masks, air quality indices and CO detectors).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-11",
+          "text": "Identify high risk situations in life including those where long-term exposure to these pollutants can lead to respiratory issues and reduction in quality and longevity of life.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-12",
+          "text": "Investigate chemical tests for the presence of water using anhydrous copper Chemistry-Water (Practical Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-13",
+          "text": "Explain how to test the purity of water using melting point and boiling point. for PBA",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-14",
+          "text": "Distinguish between Distilled water and tap water with their applications in practical chemistry.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-15",
+          "text": "State that water from natural sources may contain useful and harmful substances. (Some examples include: a. dissolved oxygen b. metal compounds. c. plastics d. sewage. e. harmful microbes. f. nitrates from fertilizers. g. phosphates from fertilizers and detergents)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-16",
+          "text": "Recognize that some naturally occurring substances in water are beneficial. (Some examples include, : a. Dissolved oxygen for aquatic life. b. Some metal compounds provide essential minerals for life.)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-17",
+          "text": "Recognize that some naturally occurring substances in water are potentially harmful. (Some examples include: a. some metal compounds that are toxic, b. some plastics that harm aquatic life. c. sewage that contains harmful microbes (Periods which cause diseases. d. nitrates and phosphates that lead to deoxygenation of water and damage to aquatic life. Details of the eutrophication process are not required).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-18",
+          "text": "Explain the treatment of the domestic water supply. (Some examples of this includes. a. Sedimentation and filtration to remove solids. b. Use of carbon to remove tastes and odors. c. chlorination to kill microbes).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-19",
+          "text": "Describe various water-borne diseases and the steps that can be taken to avoid them.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-20",
+          "text": "Identify the negative effects of water pollutants on life and the ways to avoid them.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-21",
+          "text": "Explain water scarcity as an important issue faced by Pakistan and the ways in which it can be resolved.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-22",
+          "text": "Fertilizers State that urea, ammonium salts and nitrates are used as fertilizers.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-D-23",
+          "text": "Explain the use of NPK fertilizers to provide the elements nitrogen, phosphorus and potassium for improved plant growth.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "E",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-09-E-01",
+          "text": "Describe organic molecules as either straight-chained, branched or cyclic. E",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-02",
+          "text": "State that a structural formula is an unambiguous description of the way the atoms in a molecule are arranged, including CH2=CH2, CH3CH2OH, CH3COOCH3.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-03",
+          "text": "Identify and draw structural formulae for molecules. annual examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-04",
+          "text": "Interpret general formulae of compounds in the same homologous series including alkanes, alkenes, alkynes, alcohols and carboxylic acids.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-05",
+          "text": "Define structural isomers as compounds with the same molecular formula, but different structural formulae, including C4H10 as CH3CH2CH2CH3 and CH3CH(CH3)CH3 ; and C4H8 as CH3CH2CH=CH2 and CH3CH=CHCH3 (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-06",
+          "text": "Identify a functional group as an atom or group of atoms that determine the chemical properties of a homologous series, including alcohols, aldehydes, ketones, phenols, carboxylic acids, amine, esters, and amide.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-07",
+          "text": "Describe the general characteristics of a homologous series (These can include: a Having the same functional group. b. Having the same general formula. c. Differing from one member to the next by a—CH2— unit. d. displaying a trend in physical properties. e. Sharing similar chemical properties).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-08",
+          "text": "State that a saturated compound has molecules in which all carbon-carbon bonds are single bonds.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-09",
+          "text": "State that an unsaturated compound has molecules in which one or more carbon-—carbon bonds are not single bonds.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-10",
+          "text": "State that the bonding in alkanes is single covalent and that alkanes are saturated hydrocarbons.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-11",
+          "text": "Describe the properties of alkanes as being generally unreactive, except in terms of combustion and substitution by chlorine.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-12",
+          "text": "State that in a substitution reaction one atom or group of atoms is replaced by another atom or group of atoms.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-13",
+          "text": "Describe the substitution reaction of alkanes with chlorine as a photochemical reaction, and draw the structural or displayed formulae of the products, limited to monosubstitution.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-14",
+          "text": "Describe, using symbol equations, preparation of alkanes from cracking of larger hydrocarbons, hydrogenation of alkenes and alkynes, and reduction of alkyl halides.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-15",
+          "text": "Explain the importance and basics of nutrition and healthy eating. annual examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-16",
+          "text": "Recognize the main biomolecules; carbohydrates, proteins, lipids and nucleic acids, their sources, along with the required daily intake for young adults.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-E-17",
+          "text": "Identify carbohydrates as a source of energy. annual examination. (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "F",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-09-F-01",
+          "text": "Explain that units are standardized for better communication and F Notation/ (Some examples may include: Standard Form measure physical quantities such as mass, volume, and temperature. This standardized system ensures that chemists worldwide can use the same units to measure and communicate their results, facilitating communication and collaboration in the field. -Without standardized units, it would be difficult for chemists to compare their results with one another, and it would be challenging to develop consistent and accurate scientific models. For example, imagine if one chemist measured the mass of a substance in grams, while another used ounces. The two measurements would be difficult to compare and combine, potentially leading to inaccurate or inconsistent results.)",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-02",
+          "text": "Identify SI units for abstract and physical quantities. (Some examples include mass, time and amount of matter.)",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-03",
+          "text": "Apply the concept that units can be combined with terms for magnitude, especially kilo, deci, and milli.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-04",
+          "text": "Justify why chemists use cm3, g and s as more practical units when working with small amounts in lab.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-05",
+          "text": "Explain with examples how different tools and techniques can be used to manage accuracy and precision for inherent errors that arise during measurement.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-06",
+          "text": "Use the standard form A x 10n where n s a positive or negative integer, and 1 <=A< 10.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-07",
+          "text": "Convert quantitative values into and out of the scientific notation form. in annual examination, (Periods",
+          "cognitive": "application",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-08",
+          "text": "Calculate with values in standard form. in annual examination,",
+          "cognitive": "application",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-09",
+          "text": "Identify appropriate apparatus for the measurement of time, temperature, mass and volume, including: a. stop watches. b. thermometers. c. balances, d. burettes, e. volumetric pipettes, f. measuring cylinders. g, gas syringes.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-10",
+          "text": "Suggest advantages and disadvantages of experimental methods and apparatus. Lab work.",
+          "cognitive": "application",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-09-F-11",
+          "text": "Define important terms associated with creating chemical solutions.(Some Techniques a. Solvent as a substance that dissolves a solute. b. Solute as a substance that is dissolved in a solvent. c. Solution as a mixture of one or more solutes dissolved in a solvent. d. Saturated solution as a solution containing the maximum concentration of a solute dissolved in the solvent at a specified temperature. e. Residue as a substance that remains after evaporation, distillation, filtration or any similar process. f. Filtrate as a liquid or solution that has passed through a filter).",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-12",
+          "text": "Explain methods of separation and purification (some example include: a. Using a suitable solvent. b. Filtration. c. Crystallization. d. simple distillation & fractional distillation).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-13",
+          "text": "Suggest suitable separation and purification techniques, given information about the substances involved, and their usage in daily life.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-14",
+          "text": "Identify substances and assess their purity using melting point and boiling point information. (Periods",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-15",
+          "text": "Describe tests to identify important gasses (Some examples include a. Ammonia, NH3, using damp red litmus paper. Analysis c. Chlorine, Cl2, using damp litmus paper. d. . Hydrogen, H2, using a lighter, splint. e. Oxygen, O2, using a glowing splint. f. Sulfur dioxide, SO2, using acidified aqueous potassium manganite (VIl)).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-16",
+          "text": "Explain the use of a flame test to identify important cations:(Some examples include: a) lithium, Li+ b) sodium, Na+ c) potassium, K+ d) calcium, Ca2+ e) copper (ll), Cu2+ f) barium, Ba2+",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-17",
+          "text": "Describe how paper chromatography is used to separate mixtures of soluble substances, using a suitable solvent.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-18",
+          "text": "Describe the use of locating agents when separating mixtures in Chromatography containing colorless substances.(For context, knowledge of specific locating agents is not required)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-19",
+          "text": "Interpret simple chromatograms (For context, students should identify: a) unknown substances by comparison with known substances, b) pure and impure substances)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-09-F-20",
+          "text": "State and use the equation for Rf. for PBA Lab and G Practical Skills (Types of chemical hazards to be identified: flammable or explosive hazards, corrosive hazards, toxic hazards, reactive hazards, radiation hazards and asphyxiation hazards). SLO: C-09-10-G- (Periods Lab work SLO: C-09-10-G- different lab activities. Lab work SLO: C-09-10-G- Lab work SLO: C-09-10-G- Lab work. SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- Lab work. SLO: C-09-10-G-  Non-metal ions and gases.  Chemical test for water.  Test-tube reactions of dilute acids, including ethanoic acid. (Periods  Tests for oxidizing and reducing agents.  Melting points and boiling points.  Displacement reactions of metals and halogens.  Temperature changes during reactions. SLO: C-09-10-G-  Filtration.  Crystallization.  Simple distillation, fractional distillation.  Chromatography.  Electrolysis). SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- SLO: C-09-10-G- units). SLO: C-09-10-G- SLO: C-09-10-G- Lab work. SLO: C-09-10-G- (Periods Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- (Periods Lab work. SLO: C-09-10-G- Lab work. SLO: C-09-10-G- Lab work. Total =175 Federal Board SSC-I Examination Chemistry Model Question Paper Curriculum 2022-2023 (Inclusive Scheme of Studies 2024) ROLL NUMBER Section - A (Marks 12) ⓪ ① Section – A is compulsory. All parts ② of this section are to be answered on ③ this page and handed over to the ④ Centre Superintendent. ⑤ Deleting/overwriting is not allowed. Do not use lead pencil. ⑧ ⑨ Candidate Sign.________ Q1. Fill the relevant bubble against each question according to curriculum. Each part carries one mark. Question (i) of organic chemistry? salts and their reactions (ii) elements has the largest atomic size? (iii)    compound. (iv) reagents in the reduction of alkyl halides. (v) following element in the H given reaction is oxidized H2S+Cl2→2HCl + S (vi) unique to each element and determine the used to arrange elements in mass of the the periodic table? the element (vii) Predict which one of the following pairs has the    same mass? H₂O₂ What is the usual effect of Temperature (viii) an exothermic reaction on decreases    the temperature of the surroundings? (ix) Chlorine has two isotopes:  Cl-35 (abundance = 75%) 36.0  Cl-37 (abundance = 25%) What is the relative atomic chlorine? What is the purpose of (x) in vehicles? (xi) Which compound is most likely to damage marble CaSO4 buildings due to the reaction with acid rain? (xii) Suggest which statement about INCORRECT? dissolve in a    solvent nature of the solute and solvent. Federal Board SSC-I Examination Model Question Paper Chemistry Curriculum 2022-2023 (Inclusive Scheme of Studies 2024) Write your answers on the allotted /given spaces. SECTION–B (Marks 30) Q.2 Q# (i) during bond breaking? Name the process. b. Write one difference between bond breaking and bond making in terms of energy change. (ii) halide ions. a. Br-1 a. 13𝑋 b. I-1 (iii) Crystals with liquids. a. Molecular arrangement b. Fluidity (iv) living organisms? 1. House hold wastes 2. Agricultural wastes 3. Metals (v) where they act as catalysts. and nitrates when used as fertilizers? (vi) and structural formula using the example 5 of structural isomers of C₄H₁₀. a. 𝟏𝟐𝟔𝑨 𝟏𝟗𝑩 (vii) Consider following equilibrium. CoCl2.2H2O( s) + Heat H2O(g) Predict the direction of reaction when following changes are applied on this system at equilibrium. a. Heating the system. b. Addition of water c. Removal of water (viii) Give the ways a closed system contribute 03 to the establishment of equilibrium in reversible reactions? (ix) the following samples. a. 3.4 moles of nitrogen gas b. 15 g of Sodium metal energy and enthalpy change? (x) isotopes of hydrogen, give their atomic and mass numbers. b. Geochemistry c. Physical chemistry SECTION– C (Marks18) Predict the trend of atomic size, ionization 2+2+2 OR Q.3 periodic table by using knowledge of chemical periodicity. Q.4 following. A. Zn B. NaOH C. Na2CO3 C. CH3CH2CH2Cl Q.5 the change in temperature? Explain with graph. SLOs of Model Paper Chemistry--- Grade—IX (SSC-I) Sr. SLOs N0",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

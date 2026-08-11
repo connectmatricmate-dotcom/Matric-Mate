@@ -1,0 +1,949 @@
+{
+  "subject": "phy",
+  "name": "Physics",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Physics SSC-I.pdf",
+    "sha256": "2b2a1fac76cfe76c5408d67f402b120e26e05863eb946efdd3c0a9d3feb1a4b1",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 6,
+    "slos": 141,
+    "summative": 129,
+    "formative": 0,
+    "unclassified": 12,
+    "untitledDomains": 0,
+    "shortText": 1,
+    "examUnits": 9
+  },
+  "notes": [],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Physics - IX-X along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Physical Quantities and Measurement"
+      },
+      {
+        "number": 2,
+        "title": "Kinematics"
+      },
+      {
+        "number": 3,
+        "title": "Dynamics"
+      },
+      {
+        "number": 4,
+        "title": "Turning Effect of Forces"
+      },
+      {
+        "number": 5,
+        "title": "Gravitation"
+      },
+      {
+        "number": 6,
+        "title": "Work and Energy"
+      },
+      {
+        "number": 7,
+        "title": "Properties of Matter"
+      },
+      {
+        "number": 8,
+        "title": "Thermal Properties of Matter"
+      },
+      {
+        "number": 9,
+        "title": "Transfer of Heat"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": "Measurements",
+      "slos": [
+        {
+          "code": "P-09-A-01",
+          "text": "Differentiate Between physical and non-physical quantities",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-02",
+          "text": "Explain with examples that physics is based on physical quantities [Including that these consist of a magnitude and a unit]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-03",
+          "text": "Differentiate between base and derived physical quantities and units.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-04",
+          "text": "Apply the seven units of System International (SI) [along with their symbols and physical quantities (standard definitions of SI units are not required]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-05",
+          "text": "Analyze and express numerical data using scientific notation [In measurements and calculations]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-06",
+          "text": "Analyze and express numerical data, using prefixes. [including use of their symbol to indicate decimal submultiples or multiples of both base and derived units. Specially: Pico (p), nano (n) micro (𝜇), milli (m), centi (c) deci (d), kilo (k), mega (M), giga (G), tera (T). This also includes: interconverting the prefixes and their symbol to indicate multiples and sub-multiples for both base and drive units.]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-07",
+          "text": "Differentiate between scalar and vector quantities. [A scalar has magnitude (size) only and that a vector quantity has magnitude and direction. students should be able to represent vectors graphically]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-08",
+          "text": "Justify that distance, speed, time, mass, energy, and temperature are scalar quantities.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-09",
+          "text": "Justify that displacement, force; weight, velocity, acceleration, momentum, electric field strength and gravitational field strength are vector quantities.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-10",
+          "text": "Determine, by calculation or graphically, the resultant of two vectors at right angles",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-11",
+          "text": "Make reasonable estimates of physical quantities [of those that are discussed in the topics of this grade level] (1 period=40 minutes)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-12",
+          "text": "Justify and illustrate the use of common lab instruments to measure length [including how to measure a variety of lengths with appropriate precision using tapes, (Practical rulers, micrometers, and Vernier calipers (including reading the scales on analogue Based calipers and micrometers)]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-13",
+          "text": "Justify and illustrate the use of measuring cylinders to measure volume [including both measurement of volume of liquid and determining the volume of a solid by displacement] Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-14",
+          "text": "Justify and illustrate how to measure time intervals using lab instruments [including clocks and digital timers] Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-15",
+          "text": "Determine an average value for an empirical reading [including small distance and for a short interval of time by measuring multiples (including the period of oscillations of a pendulum)] Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-16",
+          "text": "Round off and justify calculational estimates [Based on empirical data to an appropriate number of significant figures] (Practical Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-17",
+          "text": "Critique and analyze experiments for sources of error [including identifying sources of systematic and random error in measurements and suggesting steps to correct them]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-18",
+          "text": "Differentiate between precision and accuracy final examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-A-19",
+          "text": "Determine the least count of a data collection instrument (analog) from its scale (Practical Based (1 period=40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": "Mechanics",
+      "slos": [
+        {
+          "code": "P-09-B-01",
+          "text": "Differentiate between different types of motion [i.e. translatory (linear, random and circular), rotatory and vibratory motions and distinguish among them]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-02",
+          "text": "Differentiate between distance and displacement, speed and velocity",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-03",
+          "text": "Define and Calculate Speed [using the equation speed = distance/time, v = ∆s/∆t (this should include an understanding of term instantaneous) speed]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-04",
+          "text": "Define and Calculate average speed [average speed = (total distance travelled)/(total time taken)]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-05",
+          "text": "Differentiate between average and instantaneous speed final examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-06",
+          "text": "Differentiate between uniform velocity and non- uniform velocity final examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-07",
+          "text": "Define and calculate acceleration [includes deriving the units of acceleration as m/s2 from the formula a = ∆v/∆t and using the formula to solve problems. This also includes knowing that deceleration is negative acceleration and using fact in calculations.]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-08",
+          "text": "Differentiate between uniform acceleration and non-uniform acceleration",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-09",
+          "text": "Sketch, plot and interpret distance— time and Speed-time graphs. This includes determining from the shape of a distance-time graph when an object is: [(a) at rest, (b) moving with constant speed, (c) accelerating, (d) decelerating, Students are Also required to know how to calculate speed from gradient of a distance- object is: (a) at rest, (b) Moving with constant speed (c) moving with constant acceleration (d) moving with changing acceleration]",
+          "cognitive": "application",
+          "assessment": null
+        },
+        {
+          "code": "P-09-B-10",
+          "text": "Use the approximate value 9.8m/s2 for free fall acceleration near Earth to solve problems",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-11",
+          "text": "Justify how the gradient of a distance Vs. time graph gives the speed + Application (1 period=40 minutes) [Without using calculus]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-12",
+          "text": "Analyze the Distance travelled in speed vs time graphs [by determining the area under the graph for cases of motion with constant speed or constant acceleration]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-13",
+          "text": "Derive how the area beneath a speed Vs. time graph gives the distance traveled (without calculus)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-14",
+          "text": "Calculate acceleration from the gradient of a speed—time graph final examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-15",
+          "text": "Justify how the gradient of the speed vs time graph gives the acceleration [Without using calculus]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-16",
+          "text": "State that there is a universal speed limit for any object in the universe that is approximately 3 x 108m/s [Students should just be aware that this phenomenon is true; they do not need to study relativity in any depth. The purpose is that students appreciate that there is a universal speed limit.]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-17",
+          "text": "Illustrate that mass is a measure of the quantity of matter in an object annual examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-18",
+          "text": "Explain that the mass of an object resists change from its state of rest or motion (inertia)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-19",
+          "text": "Define and calculate weight [weight is the force exerted on an object with mass by a planet’s gravity, and use W=mg]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-20",
+          "text": "Define and calculate gravitational field strength [this includes being able to state that a gravitational field is a region in which a mass experiences a force due to gravitational attraction. Student should be able to define gravitational field strength (g) as force per unit mass. Use the equation gravitational field strength = weight/mass g = W/m [and know that this is equivalent to the acceleration of free fall)]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-21",
+          "text": "Justify and illustrate the use of electronic balances to measure mass [Understand the internal workings of the electronic balance is not required: just how to practically used instrument in appropriate situations] Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-22",
+          "text": "Justify and illustrate the use of a force meter to measure weight for PBA (Practical Based (1 period=40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-23",
+          "text": "Differentiate between contact and noncontact forces",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-24",
+          "text": "Differentiate between different types of forces [Including weight (gravitational force), friction, drag, air resistance, tension (elastic force), electrostatic force, magnetic force, trust (driving force) and contact force]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-25",
+          "text": "State that there are three fundamental forces and describe them in terms of their relative strengths [These are gravitational strong and electro weak forces. Student should know that Pakistani scientist won the prize Nobel Prize for helping prove that the week force and electromagnetic force are actually unified]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-26",
+          "text": "Represent the forces acting on a body using free body diagrams final examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-27",
+          "text": "State and apply Newton’s first law + Application",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-28",
+          "text": "Identify the effect of force on velocity [It may change the velocity of an object by changing its direction of motion or its speed]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-29",
+          "text": "Determine the resultant of two or more forces acting along the same straight line",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-30",
+          "text": "State and apply Newton's second law in terms of acceleration +",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-31",
+          "text": "State and apply Newton’s third law + Application",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-32",
+          "text": "Explain with examples how Newton’s third law describes pairs of forces of the same type acting on different objects",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-33",
+          "text": "State the limitations of Newton’s laws of motion. [That they are not exact but provide a good approximation, unless and object is moving close to the speed of light or is small enough that quantum effects becomes significant (for example, in the case of high speed bodies, the theory of relativistic mechanics is used. In the case of very small objects at the subatomic level, quantum mechanics is used] (1 period=40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-34",
+          "text": "Describe and identify states of equilibrium [This include the types, conditions, and states of equilibrium and identifying examples of them in our daily life ]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-35",
+          "text": "Analyze the dissipative effect of friction [this include identifying where dissipation may occur and giving example such as rubbing hands together produces heat, asteroids that enter the Earth’s atmosphere disintegrate due to high temperature generated from air resistance]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-36",
+          "text": "Analyze the dynamics of an object reaching terminal velocity final examination.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "P-09-B-37",
+          "text": "Differentiate qualitatively between rolling and sliding friction [no need for coefficient of friction]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-38",
+          "text": "Justify methods to reduce friction. + Application",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-39",
+          "text": "Define and calculate momentum",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-40",
+          "text": "Define and calculate impulse [use the equation impulse = F∆t = m∆v] +Application",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-41",
+          "text": "Apply the principle of the conservation of momentum to solve simple problems in one dimension",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-42",
+          "text": "Define resultant force in terms of momentum [As the change in momentum per unit time; recall and use the equation resultant force = change in momentum/time taken F = ∆p/∆𝑡]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-43",
+          "text": "Differentiate between like and unlike Parallel forces. final examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-44",
+          "text": "Analyze problems involving turning effects of forces [Students should know that moment of a force = force x perpendicular distance from the pivot and be able to use this in simple problems and be able to give examples and",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-45",
+          "text": "Analyze objects in equilibrium using the (Dynamics) OR",
+          "cognitive": "application",
+          "assessment": null
+        },
+        {
+          "code": "P-09-B-46",
+          "text": "Justify experiment to verify the principle of moments final examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-47",
+          "text": "State what is meant by center of mass and center of gravity (1 period=40 minutes)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-48",
+          "text": "Describe how to determine the position of the center of gravity of a plane lamina using a plumb Line (Practical Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-49",
+          "text": "Analyze, qualitatively, the effect of the position of the center of gravity on the stability of simple objects",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-50",
+          "text": "Propose how the stability of an object can be improved [by lowering the centre of mass and increasing the base area of the object]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-51",
+          "text": "Illustrate the applications of stability physics in real life [such as this concept is Central to Engineering Technology such as balancing toys and racing cars]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-52",
+          "text": "Predict qualitatively the motion of rotating bodies [describe qualitatively that analogous to Newton's first law for translational motion, an object that is rotating will continue to do so at the same rate unless acted upon by resultant moment (in which case it would begin to accelerate or decelerate its rotational motion]",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "P-09-B-53",
+          "text": "Describe qualitatively motion in a circular path due to a centripetal force",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-54",
+          "text": "identify the sources of centripetal force in real life examples [e.g. tension in a string for a stone being swirled around, gravity for the Moon orbiting the Earth]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-55",
+          "text": "Illustrate that forces may produce a change in size and shape of an object",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-56",
+          "text": "Define and calculate the spring constant [Apply the equation, Spring Constant = force/extension k= F/x to solve problem involving simple Springs]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-57",
+          "text": "Sketch, plot and interpret load—extension graphs for an elastic solid and describe the associated experimental procedures (Practical Based",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-58",
+          "text": "Define and use the term ‘limit of proportionality’ for a load—extension (1 period=40 minutes) graph [Including identifying this point on the graph (an understanding of the elastic limit is not required)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-59",
+          "text": "Illustrate the applications of Hooke's Law [such as that it is the fundamental principle behind engineering many measurement instruments such as the spring scale, the Galvanometer and the balance wheel of the mechanical clock",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-60",
+          "text": "Define work done.",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "P-09-B-61",
+          "text": "Use the equation work done = force x distance moved in the direction of the force W = F x d to solve problems",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-62",
+          "text": "Define energy as the ability to do work final examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-63",
+          "text": "Explain that energy may be stored [Such as gravitational potential, chemical, elastic (strain), nuclear, electrostatic and internal (thermal) energies]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-64",
+          "text": "Prove that Kinetic Energy Ek = 1/2 mv^2 [use of equations of motion not `needed; proof through kinematic graphs will suffice]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-65",
+          "text": "Prove and use the formula for Gravitational potential energy final examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-66",
+          "text": "Use the formulas for kinetic and Gravitational potential energy to solve problems involving simple energy conversions [Make use of the conversion of energy from one form to the other, including case involving loss of energy to the surroundings]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-67",
+          "text": "Describe how energy is transferred and stored during events and processes [e.g. work done during transfer by mechanical work done, electrical work done and heat]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-68",
+          "text": "State and apply the principle of the conservation of energy + Application",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-69",
+          "text": "Justify why perpetual energy machines do not work final examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-70",
+          "text": "Differentiate between and list renewable and non- renewable energy (1 period=40 minutes) sources",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-71",
+          "text": "Describe how useful energy may be obtained from natural resources [including the cases of (chemical energy stored in fossil fuels, chemical energy stored in biofuels, hydroelectric resources, solar radiation, nuclear fuel, geothermal resources, wind, tides, waves in the seas [while including references to a boiler, turbine and generator where they are used]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-72",
+          "text": "Describe advantages and disadvantages of methods of energy generation [Limited to whether it is renewable, when and whether it is available, and its impact on the environment]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-73",
+          "text": "Define and calculate power [as work done per unit time and also as energy transferred per unit time. This also include applying the equations: (a) power = work done/time taken, P = W/t. Power = energy transferred/time taken, P = W/t to solve simple problems]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-74",
+          "text": "Define and calculate efficiency [Including: (a) percentage efficiency = (useful energy output) /(Total energy input)(x100%) (b) percentage efficiency = (useful power output) /(Total power input)(x100%)]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-75",
+          "text": "Apply the concept of efficiency to simple problems involving energy transfer",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-76",
+          "text": "State that a system cannot have an efficiency of 100% due to unavoidable energy losses",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-77",
+          "text": "Define and calculate pressure [As force per unit area. Use equation pressure = force/area P = F/A to solve simple problem] + Application",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-78",
+          "text": "Describe how pressure varies with force and area in the context of everyday examples",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-79",
+          "text": "Analyze in situations how pressure at surface produces a force in a direction at right angles to the surface [Can make reference to experiments to verify this principle]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-80",
+          "text": "Justify that the atmosphere exerts a pressure. final examination.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "P-09-B-81",
+          "text": "Describe that atmospheric pressure decreases with the increase in height above the Earth’s surface.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-82",
+          "text": "Explain that changes in atmospheric pressure in a region may indicate a , change in the weather. (1 period=40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-83",
+          "text": "Analyze the workings and applications of a liquid barometer final examination.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "P-09-B-84",
+          "text": "Justify why and analyze quantitatively how pressure varies with depth in a liquid.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-85",
+          "text": "Analyze the workings and applications of a manometer",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-B-86",
+          "text": "Define and apply Pascal’s law (Pressure and [Apply Pascal's law to systems such as the transmission of deformation in pressure in hydraulic system with particular reference to solids) hydraulic press and Hydraulic brakes on vehicles.] *Cognitive Level K: Knowledge U: Understanding A: Application Table of Specification Model Paper Physics SSC-I ynamics C Objectives in Solids (B77-B86 & B55-B59) K (Knowledge) Q1(12)1 U (Understanding) Q2(i/f)3 Q1(2)1 Q4(f)6 A (Application) Total Marks Total Percentages  Difficulty levels of two alternative questions of the internal choice will be same  SLOs of the two alternative questions of the internal choice must be different Question Number (part/ second choice) marks Q2 ( i / s) 2 111 032 473 For more information, please visit www.fbise.edu.pk / Federal.BISE.Official",
+          "cognitive": "application",
+          "assessment": null
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": "Heat and Thermodynamics",
+      "slos": [
+        {
+          "code": "P-09-C-01",
+          "text": "Define and calculate density",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-02",
+          "text": "Justify and illustrate how to determine the density of a substance [Including for a liquid of regular shaped solid and of an irregularly shaped solids which sinks in a liquid (volume by a displacement), including appropriate calculations]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-03",
+          "text": "Describe, qualitatively, the particle structure of solids, liquids and gasses. [including relating their properties to the forces and distance between particles and to the motion of the particles (atoms, molecules, ions and electrons)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-04",
+          "text": "Describe plasma as a fourth state of matter [in which a significant portion of the material is made up of ions or electrons e.g. in stars neon lights and lighting streamers]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-05",
+          "text": "Describe the relationship between the motion of particles and temperature [Including the idea that there is lowest possible temperature (approximately -273 oC), known as absolute zero, where the particles have least kinetic energy]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-06",
+          "text": "State that an increase in the temperature of an object increases its internal energy",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-07",
+          "text": "Explain, with examples, how a physical property which varies with temperature may be used for the measurement of temperature",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-08",
+          "text": "Justify the need for fixed points in the calibration of thermometers [Including what is meant by the ice point and steam point.]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-09",
+          "text": "illustrate what is meant by the sensitivity, range and linearity of (1 period=40 minutes) thermometers.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-10",
+          "text": "Differentiate between the structure and function of liquid-in-glass and of thermocouple thermometers",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-C-11",
+          "text": "Analyze how the structure of a liquid in-glass thermometer affects its final examination. sensitivity, range and linearity",
+          "cognitive": null,
+          "assessment": null
+        }
+      ]
+    },
+    {
+      "code": "E",
+      "title": "Electricity and Magnetism",
+      "slos": [
+        {
+          "code": "P-09-E-01",
+          "text": "Describe the forces between magnetic poles and between magnets and magnetic materials [including the use of the terms north pole (N pole), South Pole (S pole), attraction and repulsion, magnetized and un-magnetized]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-02",
+          "text": "Describe induced magnetism final examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-03",
+          "text": "State the difference between magnetic and non- magnetic materials",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-04",
+          "text": "Differentiate Between Temporary and Permanent Magnets",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-05",
+          "text": "Describe magnetic fields [As a region in which a magnetic pole experiences a force]",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "P-09-E-06",
+          "text": "Illustrate the plotting of magnetic field lines with a compass or iron filings",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-07",
+          "text": "Draw the pattern and direction of the magnetic field lines around a bar magnet",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-08",
+          "text": "State that the direction of the magnetic field at a point is the direction of the force on the N pole of a magnet at that point",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-09",
+          "text": "state that the relative strength of a magnetic field is represented by the spacing of the magnetic field lines",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-10",
+          "text": "Describe uses of permanent magnets and electromagnets",
+          "cognitive": "application",
+          "assessment": null
+        },
+        {
+          "code": "P-09-E-11",
+          "text": "Explain qualitatively in terms of the domain theory of magnetism how materials can be magnetized and demagnetized [Stroking method, heating, orienting in north-south direction and striking, use of a solenoid] (1 period=40 minutes)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-12",
+          "text": "Differentiate between ferromagnetic, paramagnetic and diamagnetic materials. OR",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "P-09-E-13",
+          "text": "Describe the nature of the Earth’s magnetic field [Specifically that: - is opposite to its geographical north-south orientation - protects life on the planet from cosmic radiation - allows animals that make use of biomagnetism (e.g. many birds and turtles) to navigate during migration)]",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-14",
+          "text": "Analyze applications of magnets in recording technology. [and illustrate how electronic devices need to be kept safe from strong magnetic field]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-E-15",
+          "text": "State that soft magnetic materials such as soft iron) can be used to provide shielding from magnetic fields",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "F",
+      "title": "Modern Physics",
+      "slos": [
+        {
+          "code": "P-09-F-01",
+          "text": "Define and calculate average orbital speed [from the equation v = 2𝜋r/T Where r is the average radius of the orbit and T is the orbital",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-F-02",
+          "text": "Interpret and compare given planetary data [about orbital distance, orbital period, density, surface temperature and uniform gravitational field strength at the planet’s surface]",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "G",
+      "title": "Nature of Science",
+      "slos": [
+        {
+          "code": "P-09-G-01",
+          "text": "Describe physics as the study of matter, energy, space, time and their mutual connections and interactions",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-G-02",
+          "text": "Explain with examples that physics has many sub- fields, and in today’s world involves interdisciplinary fields. (Students should be able to distinguish in terms of the broad subject matter that is studied between the fields: Biophysics, Astronomy, Astrophysics, Cosmology, Thermal Physics, Optics, Classical Mechanics, Quantum Mechanics, Relativistic Mechanics, Nuclear Physics, Particle Physics, Electromagnetism, Acoustics, Computational Physics, Geophysics, Climate Physics)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-G-03",
+          "text": "Explain with examples how Physics is a subset of the Physical Sciences and of the natural sciences (1 period=40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-G-04",
+          "text": "State that scientists who specialize in the research of physics are called Physicists",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-G-05",
+          "text": "Brief with examples that science is a collaborative field that requires interdisciplinary researchers working together to share knowledge and critique ideas",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-G-06",
+          "text": "Understand the terms 'hypothesis’, theory' and 'law' in the context of research in the physics",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-G-07",
+          "text": "Explain, with examples in Physics, falsifiability as the idea that a theory is scientific only if it makes assertions that can be disproven",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "P-09-G-08",
+          "text": "Differentiate the terms 'science’, ‘technology' and 'engineering' with suitable examples [SLO: P-09-10-N-01] explain, with examples, how hazards in a science lab can be classified into: ((i) physical hazards, (ii) chemical hazards, (iii) biological hazards, (v) safety hazards) [SLO: P-09-10-N-02] Identify for a given experimental procedure -what would be the most appropriate personal protective equipment to wear before setting up the apparatus. [SLO: P-09-10-N-03] Identify the meaning of common hazard signs in the laboratory will be part of Lab work. [SLO: P-09-10-N-04] call emergency services in case of an accident in the lab for PBA will be part of Lab work. [SLO: P-09-10-N-05] Define and use the below terms: -True value: the value that would be obtained in an ideal measurement - Measurement error: the difference between a measured value and the true value of a quantity -Accuracy: a measurement result is described as accurate if it is close to the true value -Precision: how close the measured values of a quantity are to each other -Repeatability: a measurement is repeatable if the same or similar result is obtained when the measurement is repeated under the same conditions, using the same method, within the same experiment -Reproducibility: a measurement is reproducible if the same or similar result is obtained when the measurement is made under either different conditions or by a (1 period=40 minutes) different method or in a different experiment -Validity of experimental design: an experiment is valid if the experiment tests what it says it will test. The experiment must be a fair test where only the independent variable and dependent variable may change, and controlled variables are kept constant -Range: the maximum and minimum value of the independent or dependent variables - Anomaly: an anomaly is a value in a set of results that appears to be outside the general pattern of the results, i.e., an extreme value that is either very high or very low in comparison to others - Independent variables: independent variables are the variable that are changed in a scientific experiment by the scientist. Changing an independent variable may cause a change in the dependent variable - Dependent variables: dependent variables are the variable that are observed or measured in a scientific experiment. Dependent variable may change based on changes made to the independent variables [SLO: P-09-10-N-06] identify appropriate apparatus for collecting the data. for PBA will be part of Lab work. [SLO: P-09-10-N-07] visualize how the collected data would be tabulated or graphed for PBA will be part of Lab work. [SLO: P-09-10-N-08] explain step by step the methodology for analyzing the data (e.g. gradient of line of best fit, plugging average value of dependent Variable into a formula etc.) [SLO: P-09-10-N-09] suggest how sources of human and systematic error could be mitigated [SLO: P-09-10-N-10] set up experimental apparatus under supervision from an instructor [SLO: P-09-10-N-11] take steps to avoid parallax error will be part of Lab work. [SLO: P-09-10-N-12] identify and correct for potential zero error (1 period=40 minutes) will be part of Lab work. [SLO: P-09-10-N-13] take an appropriate number of readings to average out errors will be part of Lab work. [SLO: P-09-10-N-14] take correct meniscus readings will be part of Lab work. [SLO: P-09-10-N-15] record sources of potential error (e.g. lack of lighting due to power outage) will be part of Lab work. [SLO: P-09-10-N-16] take steps to avoid systematic error in specific context of the experiment e.g. ensuring that the table the set-up in on is level [SLO: P-09-10-N-17] make measurements using common laboratory apparatus, such as millimetre scales, protractors, top-pan balances, newton meters, analogue or digital electrical meters, measuring cylinders, vernier calipers, micrometer screw gauges and thermometers (PBA) [SLO: P-09-10-N-18] use a stop-watch to measure intervals of time, including the oscillations [SLO: P-09-10-N-19] use both analogue scales and digital displays. Be familiar with the following experimental contexts Based [SLO: P-09-10-N-20] measurement of physical quantities such as length, volume or for Practical force Based [SLO: P-09-10-N-21] measurement of small distances or short intervals of time for Practical Based (1 period=40 minutes) [SLO: P-09-10-N-22] determining a derived quantity such as the extension per unit load for a spring, the value of a known resistance or the acceleration of an object Based [SLO: P-09-10-N-23] testing and identifying the relationship between two variables such as between the potential difference across a wire and its length [SLO: P-09-10-N-24] comparing measured quantities such as angles of reflection for Practical Based [SLO: P-09-10-N-25] comparing derived quantities such as density Based [SLO: P-09-10-N-26] cooling and heating, including measurement of temperature Based [SLO: P-09-10-N-27] experiments using springs and balances for Practical Based [SLO: P-09-10-N-28] timing motion or oscillations for Practical Based [SLO: P-09-10-N-29] electric circuits, including the connection and reconnection of these circuits, and the measurement of current and potential difference Based [SLO: P-09-10-N-30] optics experiments using equipment such as optics pins, mirrors, (1 period=40 minutes) prisms, lenses, glass or Perspex blocks (both rectangular and semi- circular), including the use of transparent, translucent and opaque substances to investigate the transmission of light [SLO: P-09-10-N-31] procedures using simple apparatus, in situations where the method may not be familiar to the candidate Based Use the below good practices in tabulating data [SLO: P-09-10-N-32] to [SLO: P-09- 10-N-37]: [SLO: P-09-10-N-32] Record measured and calculated quantities with correct units accompanying them [SLO: P-09-10-N-33] Organize tabulated results with the following elements present: the heading of each column, the name or symbol of the measured or calculated quantity, together with the appropriate unit [SLO: P-09-10-N-34] Label axes with quantities and units Based [SLO: P-09-10-N-35] Use scales for the axes that allow the majority of the graph paper to be used in both directions, and be based on sensible ratios, e.g. 2cm on the graph paper representing 1, 2 or 5 units of the variable (or 10, 20 or 50, etc.). [SLO: P-09-10-N-36] Plot data points to an accuracy of better than one half of one of the smallest squares on the grid. Based [SLO: P-09-10-N-37] Plot data points using small crosses or fine dots with a circle drawn around them. [SLO: P-09-10-N-38] Use measuring instruments to their full precision (1 period=40 minutes) Based [SLO: P-09-10-N-39] Estimate the number of significant figures for calculated quantities as being the same as the least number of significant figures in the raw data used. [SLO: P-09-10-N-40] Show clear working in calculations, and key steps in reasoning for Practical Based [SLO: P-09-10-N-41] Express calculated ratios as decimal numbers, of two or three for Practical significant figures. Based [SLO: P-09-10-N-42] Sketch lines of best fit with an equal number of points on either side of the line over its entire length (the points should not be seen to lie all above the line at one end, and all below the line at the other end) [SLO: P-09-10-N-43] Convey the calculations for the gradient of a straight line by using a triangle whose hypotenuse extends over at least half the length of the plotted graph line. [SLO: P-09-10-N-44] Determine the intercept of a straight-line graph Based [SLO: P-09-10-N-45] Take readings from graphs by extrapolation or interpolation for Practical Based [SLO: P-09-10-N-46] Identify whether an experimental procedure has validity for Practical (whether the results really do represent what they are supposed to measure) regarding Based the hypothesis being tested, and suggest changes to ensure validity as appropriate (1 period=40 minutes) [SLO: P-09-10-N-47] identify whether an experimental procedure is reliable (whether the results can be reproduced under the same conditions), and suggest changes to ensure reliability as appropriate [SLO: P-09-10-N-48] recommend how to mitigate sources of random and systematic error inherent in the given experimental design Based [SLO: P-09-10-N-49] identify unsafe procedure in an experimental design and suggest ways to mitigate any hazards Based PBA STANDS FOR “PRACTICAL BASED ASSESSMENT”. Federal Board SSC-I Examination Physics Model Question Paper Curriculum 2022-2023 (Inclusive Scheme of Studies 2024) ROLL NUMBER Section - A (Marks 12) Section – A is compulsory. All parts of this section are to be answered on this page and handed over to the Centre Superintendent. Deleting/ overwriting is not allowed. Do not use lead pencil. ⑦ ⑧ ⑨ Candidate Sign.________ Q1. Fill the relevant bubble against each question according to curriculum. Each part carries one mark. S# 1. path, its velocity is: 2. motion between two surfaces in contact is known as: 3. comes to a stop in 40 seconds. What is the magnitude of deceleration of the train? 4. light, are dropped from the same height, neglecting air resistance, which object will hit the ground first? 5. on moon where gravitational acceleration is 1.6 ms-2? 6. through an air-cored coil, the compass needle placed nearby ⃝ deflects due to the magnetic field. If an iron nail is inserted into the coil, the compass needle will: 7. prefix? 8. equal to: 9. have same kinetic energies. Which of these have greater speed? 10. at poles other 11. important when studying how glasses help people see: 12. tested idea in physics? Federal Board SSC-I Examination Physics Model Question Paper Curriculum 2022-2023 (Inclusive Scheme of Studies 2024) Write your answers on the allotted/given spaces. SECTION – B (Marks 30) Q.2 Q# (i) accuracy (ii) acceleration. Use this graph to show that gradient of speed time graph gives acceleration. (iii) force and electromagnetic force. (iv) unit. (v) life, elaborate that how pressure exerts perpendicular force on any surface? (vi) materials and diamagnetic materials. (vii) un magnetized materials. (viii) gas pressure? 5minutes? (ix) How does it cut vegetables easily? of a satellite? (x) random error from measurement? discs? SECTION – C (Marks 18) Q.3 What are different types of motion? Give two examples of each. soft magnetic materials. Q.4 State and prove Newton’s second law of 01+05 motion Q.5 A long uniform steel bar of length of 100 cm is balanced on a wedge at its middle. Two weights W1 and W2 are suspended at distance of 0.2 m and 0.4 cm, find the radius of its large piston. m respectively form the wedge. If weight W1 is 70 N then find weight W2 Federal Board SSC-I Examination Physics Model Question Paper (Curriculum 2022-23) Alignment of Questions with Student Learning Outcomes Sr No (Part no.) Paper",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

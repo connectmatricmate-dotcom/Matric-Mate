@@ -1,0 +1,160 @@
+{
+  "_comment": [
+    "Every FBISE document the content pipeline reads, with the subject it belongs to.",
+    "SSC-I is Class 9 and SSC-II is Class 10: the site mixes them in the same folders,",
+    "so only SSC-I entries belong here. Paths are literal, spaces and all; the fetcher",
+    "URL-encodes them. Verified returning HTTP 200 on 11 Aug 2026.",
+    "kind: 'curriculum' carries the SLOs, 'framework' carries the mark distribution,",
+    "'practicals' the examinable experiments, 'reference' is background we read but do not parse."
+  ],
+  "base": "https://fbise.edu.pk/",
+  "files": [
+    {
+      "id": "curriculum-phy",
+      "subject": "phy",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of Physics - IX-X along with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-chem",
+      "subject": "chem",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of Chemistry IX-X along with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-bio",
+      "subject": "bio",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of Biology IX-X along with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-math",
+      "subject": "math",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of Mathematics I-XII along with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-cs",
+      "subject": "cs",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of Computer Science IX-X-XI-XIIalong with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-pst",
+      "subject": "pst",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of Pakistan Studies IX-X along with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-eng",
+      "subject": "eng",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of English I-XII along with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-urd",
+      "subject": "urd",
+      "kind": "curriculum",
+      "path": "notifications/ssc/Curriculum of Urdu Nisab Grades I - XII along with SLOs.pdf"
+    },
+    {
+      "id": "curriculum-isl",
+      "subject": "isl",
+      "kind": "curriculum",
+      "path": "Curriculum/22-23/Islamiat 9-12 Curriculum 2022-23.pdf"
+    },
+
+    {
+      "id": "framework-phy",
+      "subject": "phy",
+      "kind": "framework",
+      "path": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Physics SSC-I.pdf"
+    },
+    {
+      "id": "framework-chem",
+      "subject": "chem",
+      "kind": "framework",
+      "path": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Chemistry SSC-I.pdf"
+    },
+    {
+      "id": "framework-bio",
+      "subject": "bio",
+      "kind": "framework",
+      "path": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Biology SSC-I.pdf"
+    },
+    {
+      "id": "framework-cs",
+      "subject": "cs",
+      "kind": "framework",
+      "path": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Computer Science SSC-I.pdf"
+    },
+    {
+      "id": "framework-eng",
+      "subject": "eng",
+      "kind": "framework",
+      "path": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework + Model Question Paper English SSC-I.pdf"
+    },
+    {
+      "id": "framework-math",
+      "subject": "math",
+      "kind": "framework",
+      "path": "ModelPaper/2024New/maths/Final_Assessment_Framework_Model_Question_Paper_Mathematics_SSC-I.pdf"
+    },
+    {
+      "id": "framework-urd",
+      "subject": "urd",
+      "kind": "framework",
+      "path": "ModelPaper/2024New/urdu/Final_Assessment_Framework_Model_Question_Paper_Urdu_SSC-I.pdf"
+    },
+    {
+      "id": "framework-pst",
+      "subject": "pst",
+      "kind": "framework",
+      "path": "ModelPaper/2024New/pst/Final_Assessment_Framework_Model_Question_Paper_PakistanStudies_SSC-I.pdf"
+    },
+    {
+      "id": "framework-isl",
+      "subject": "isl",
+      "kind": "framework",
+      "path": "ModelPaper/2024New/islamiyat/Final Assessemnt Framework + Model Question Paper SSC-I.pdf"
+    },
+
+    {
+      "id": "practicals-phy",
+      "subject": "phy",
+      "kind": "practicals",
+      "path": "ModelPaper/2024/List of Practicals/SSC physics List of Practical and Questions.pdf"
+    },
+    {
+      "id": "practicals-chem",
+      "subject": "chem",
+      "kind": "practicals",
+      "path": "ModelPaper/2024/List of Practicals/SSC Chemitry List of Practical and Questions.pdf"
+    },
+    {
+      "id": "practicals-bio",
+      "subject": "bio",
+      "kind": "practicals",
+      "path": "ModelPaper/2024/List of Practicals/SSC BIOLOGY List of Practical and Questions.pdf"
+    },
+    {
+      "id": "practicals-cs",
+      "subject": "cs",
+      "kind": "practicals",
+      "path": "ModelPaper/2024/List of Practicals/SSC Computer Science List of Practical and Questions.pdf"
+    },
+
+    {
+      "id": "slo-digest",
+      "subject": null,
+      "kind": "reference",
+      "path": "Downloads/SSC_SLO.pdf"
+    },
+    {
+      "id": "scheme-of-studies",
+      "subject": null,
+      "kind": "reference",
+      "path": "Syllabus/Scheme-of-Studies.pdf"
+    }
+  ]
+}

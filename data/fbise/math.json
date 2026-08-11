@@ -1,0 +1,483 @@
+{
+  "subject": "math",
+  "name": "Mathematics",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2024New/maths/Final_Assessment_Framework_Model_Question_Paper_Mathematics_SSC-I.pdf",
+    "sha256": "b3d43c2b893dbcffec9394448f20e8cb8f040aa8825a245dc366175a4cc99729",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 3,
+    "slos": 61,
+    "summative": 46,
+    "formative": 13,
+    "unclassified": 2,
+    "untitledDomains": 0,
+    "shortText": 0,
+    "examUnits": 17
+  },
+  "notes": [],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Mathematics I-XII along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Matrices and Determinants"
+      },
+      {
+        "number": 2,
+        "title": "Real and Complex Numbers"
+      },
+      {
+        "number": 3,
+        "title": "Logarithms"
+      },
+      {
+        "number": 4,
+        "title": "Algebraic Expressions and Algebraic Formulas"
+      },
+      {
+        "number": 5,
+        "title": "Factorization"
+      },
+      {
+        "number": 6,
+        "title": "Algebraic Manipulation"
+      },
+      {
+        "number": 7,
+        "title": "Linear Equations and Inequalities"
+      },
+      {
+        "number": 14,
+        "title": "Linear Graphs and Their Application"
+      },
+      {
+        "number": 15,
+        "title": "Introduction to Coordinate Geometry"
+      },
+      {
+        "number": 17,
+        "title": "Congruent Triangles"
+      },
+      {
+        "number": 18,
+        "title": "Parallelograms and Triangles"
+      },
+      {
+        "number": 19,
+        "title": "Line Bisectors and Angle Bisectors"
+      },
+      {
+        "number": 20,
+        "title": "Sides and Angles of a Triangle"
+      },
+      {
+        "number": 21,
+        "title": "Ratio and Proportion"
+      },
+      {
+        "number": 22,
+        "title": "Pythagoras’ Theorem"
+      },
+      {
+        "number": 23,
+        "title": "Theorems Related with Area"
+      },
+      {
+        "number": 29,
+        "title": "Practical Geometry – Triangles"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": "Numbers and Algebra",
+      "slos": [
+        {
+          "code": "M-09-A-01",
+          "text": "Explain, with examples, that civilizations throughout history have systematically studied living things [e.g., the history of numbers from Sumerians and its development to the present Arabic system.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-A-02",
+          "text": "Describe the set of real numbers as a combination of rational and irrational numbers.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-A-03",
+          "text": "Demonstrate and verify the properties of equality and inequality of real numbers.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-A-04",
+          "text": "Apply laws of indices to simplify radical expressions.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-05",
+          "text": "Express a number in scientific notations and vice versa.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-06",
+          "text": "Describe logarithm of a number.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-A-07",
+          "text": "Differentiate between common and natural logarithm.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-08",
+          "text": "Apply laws of logarithm to real life situations such as growth and decay, loudness of sound.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-09",
+          "text": "Apply concepts of rational numbers to real word problems (such as inventory (stock taking), temperature, banking, measures of gain and loss, sources of income and expenditure).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-10",
+          "text": "Describe mathematics as the Functions study of pattern, structure, and relationships.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-11",
+          "text": "Identify sets and apply operations on three sets (Subsets, overlapping sets and disjoint sets), using Venn diagrams",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-12",
+          "text": "Solve problems on classification and cataloguing by using Venn diagrams for Scenarios involving two sets and three sets. Further",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-A-13",
+          "text": "Verify and apply properties/laws of union and intersection of three sets through analytical and Venn diagram method.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-14",
+          "text": "Apply concepts from set theory to real world problems (such as in demographic classification, categorizing products in shopping malls and music playlist by genre) Relation.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-15",
+          "text": "Explain product, Binary Relations K and its domain and range.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-16",
+          "text": "Recognize that a relation can be represented by table, order pair and graphs.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-17",
+          "text": "Identify common factors, trinomial factoring, concretely, pictorially and symbolically.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-A-18",
+          "text": "Factorize quadratic and cubic algebraic expressions.  𝑎4 + 𝑎2 𝑏 2 + 𝑏 4 or 𝑎4 + 𝑏 4  𝑥 2 + 𝑝𝑥 + 𝑞  𝑎𝑥 2 + 𝑏𝑥 + 𝑐  (𝑎𝑥 2 + 𝑏𝑥 + 𝑐)(𝑎𝑥 2 + 𝑏𝑥 + 𝑑) + 𝑘  (𝑥 + 𝑎)(𝑥 + 𝑏)(𝑥 + 𝑐) + 𝑘  (𝑥 + 𝑎)(𝑥 + 𝑏)(𝑥 + 𝑐)(𝑥 + 𝑑) + 𝑘𝑥 2  𝑎3 + 3𝑎2 𝑏 + 3𝑎𝑏 2 + 𝑏 3  𝑎3 − 3𝑎2 𝑏 + 3𝑎𝑏 2 − 𝑏 3  𝑎3 ± 𝑏 3",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-19",
+          "text": "Find highest common factor and least common multiple of algebraic expressions and know relationship of LCM and HCF.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-20",
+          "text": "Find square root of algebraic U/K expression by factorization and division.",
+          "cognitive": null,
+          "assessment": null
+        },
+        {
+          "code": "M-09-A-21",
+          "text": "Apply the concepts of factorization of quadratic and cubic algebraic A expressions to real world problems (such as engineering, physics, and finance.) Linear",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-A-22",
+          "text": "Solve linear equations and Inequalities in one variable",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": "Geometry",
+      "slos": [
+        {
+          "code": "M-09-B-01",
+          "text": "Derive distance formula by Geometry locating the position of two points in coordinate plane",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-02",
+          "text": "Calculate the midpoint of a line segment",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-03",
+          "text": "Find the gradient of a straight line when coordinates of two points are given.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-04",
+          "text": "Find the equation of a straight K line in the form 𝒚 = 𝒎𝒙 + 𝒄",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-05",
+          "text": "Find the gradient of parallel and U perpendicular lines.",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "M-09-B-06",
+          "text": "Apply distance and midpoint formulas to solve real life situations such as physical measurements or distances between locations.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-07",
+          "text": "Apply concepts from coordinate Geometry to real world problems (such as, aviation and A navigation, landscaping, map reading, longitude and latitude).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-08",
+          "text": "Derive equation of a straight line in slope-intercept form, point-slope form, two-point form, intercepts form, symmetric form, normal form.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-09",
+          "text": "Show that a linear equation in two variables represents a straight line and reduce the U general form of the equation of a straight line to the other standard forms.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-10",
+          "text": "Find the angle between two Lines coplanar intersecting straight lines.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-11",
+          "text": "Find the equation of the family of lines passing through the point of intersection of two given lines.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-12",
+          "text": "Calculate angles of the triangle when the slopes of the sides are given. Logic",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-13",
+          "text": "Differentiate between a mathematical statement and its proof.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-B-14",
+          "text": "Differentiate between an axiom, conjecture and theorem.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-B-15",
+          "text": "Formulate simple deductive proofs [algebraic proofs that require showing the LHS to be equal to the RHS. E.g., showing (𝒙 − 𝟑)𝟐 + 𝟓 = 𝒙𝟐 — 𝟔𝒙",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-B-16",
+          "text": "Identify similarity of polygons. Area and Volume of Similar Figures",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-17",
+          "text": "Solve problems using the relationship between areas of similar figures and volume of different solids",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-18",
+          "text": "Solve real life problems that Properties of regular Polygons, Triangles and Parallelograms",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-19",
+          "text": "Solve real life problems using the following loci and the method of intersecting loci for sets of points in two dimensions which are: at a given distance from a given point, at a given distance from a given straight line, equidistant from two given points equidistant from two given intersecting straight lines. Trigonometry",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-20",
+          "text": "Identify angles in standard position, expressed in degrees and radians.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-21",
+          "text": "Apply Pythagoras’ theorem and the sine, cosine and tangent ratios for acute angles to find a side or of an angle of a right-angled triangle.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-22",
+          "text": "Solve real life trigonometric problems in two dimensions involving angles of elevation and depression.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-23",
+          "text": "Prove the trigonometric identities Identities relations.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-24",
+          "text": "Solve real life problems involving trigonometric identities.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-25",
+          "text": "Interpret and use three figure bearings.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-26",
+          "text": "Solve problems involving bearing.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-27",
+          "text": "Apply the concepts of trigonometry Construction of",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-B-28",
+          "text": "Construct a triangle having given two sides and the included angle.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-B-29",
+          "text": "Construct a triangle having given one side and two of the angles.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-B-30",
+          "text": "Construct a triangle having given two of its sides and the angle opposite to one of them (with all the three possibilities).",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-B-31",
+          "text": "Draw angle bisectors, perpendicular bisectors, medians, altitudes of a given triangle and verify their concurrency. Frequency",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": "Information Handling",
+      "slos": [
+        {
+          "code": "M-09-C-01",
+          "text": "Construct a grouped frequency Distribution table, histogram (with unequal class intervals) and frequency polygon. Measure of",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-09-C-02",
+          "text": "Calculate the mean modal class Tendency",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-C-03",
+          "text": "Solve real life situations involving mean, weighted mean, median, and mode for given data (such as allocation of funds in different projects, forecasting future demographics, marketing, forecasting government budgets).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-C-04",
+          "text": "Calculate the probability of a single event and the probability of event not occurring",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-C-05",
+          "text": "Solve real life problems involving probability",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-C-06",
+          "text": "Calculate relative frequency as an estimate of probability.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-C-07",
+          "text": "Calculate expected frequencies. expected",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "M-09-C-08",
+          "text": "Solve real life problems involving relative and expected frequencies. Federal Board SSC-I Examination Model Question Paper Mathematics (Curriculum 2022-23) ROLL NUMBER Section - A (Marks 15) ⓪ ② Section – A is compulsory. All parts of this section are to be answered on this page and handed over to the Centre Superintendent. Deleting/overwriting allowed. Do not use lead pencil. Candidate Sign. _________ Q1. Fill the relevant bubble against each question. Each part carries one mark. Sr Question no. i. √𝑥 2 √𝑥 2 √𝑥 3 Which of the given options ii. notation of 0.252 ? If 𝐴 = {2,4,6} and 𝐵 = {0,1}, iii. in 𝐴 × 𝐵. What is the least common (7 − 6𝑦) × iv. (5𝑥 3 − 3𝑥) 5𝑥𝑦 3 − 3𝑥 2 ? Solution of inequality v. −2𝑥 − ≤ What is the radian measure of vi. 15𝑜 50′ ? If a navigator gives bearing vii. he travel? In the figure, if 𝛼 = 𝛽 then what is the value of 𝑏? 𝑐𝑑 viii. What is the value of ix. trigonometric function? Which of the following points x. bisectors of a triangle? Each of the internal angle of a xi. regular hexagon is: Locus of points equidistant xii. from 𝑃(5,4) and 𝑄(5, −6) is: The mean of 11 numbers is 7. One of the numbers 13 is xiii. deleted. What is the mean of the remaining 10 numbers? What is the probability of xiv. shuffled 52 playing cards? A fair coin is tossed twice, xv. appearing head twice is: Federal Board SSC-I Examination Model Question Paper Mathematics (Curriculum 2022-23) Write your answers on the allotted/given spaces. SECTION – B (Marks 36) (9 × 4 = 36) Q.2 i. −2 [(125)3 × (25)2 + (64)3 × 6 + (8)3 ] 𝑋 ∪ (𝑌 ∩ 𝑍) = (𝑋 ∪ 𝑌) ∩ (𝑋 ∪ 𝑍) ii. of three points 𝐴, 𝐵, and 𝐶. State the bearing of: 𝐵 from 𝐴; 𝐴 from 𝐵; 𝐵 from 𝐶, and 𝐶 from 𝐵. OR (c) Find domain and range of the relation R. iii. people in the year 2015. The population has been growing exponentially at a rate of 2.5% per year. Using the OR 𝑥 + 2𝑦 − 10 = 0 and exponential growth formula 𝑃(𝑡) = 𝑃o 𝑒 𝑟𝑡 , apply laws of logarithm to 2𝑥 + 𝑦 − 2 = 0. determine the year when population reaches up to 25,000. iv. Simplify (𝑥 − 2) + v. + 1 + 𝑐𝑜𝑠𝑥 1 − 𝑐𝑜𝑠𝑥 OR vi. horizontal distance of 2 kilometers. What is the slope of a trail? Express the slope in percentage. vii. 𝑋(−4, −4), 𝑌(12,0) and 𝑍(4,8) geometrically. Find locus of the corners equidistant from 𝑋𝑍 and 𝑌𝑍. is perpendicular to the given line? Express your final answer in the form 𝑦 = 𝑚𝑥 + 𝑐 viii. In the adjacent similar figures, appears up 20 times, what is the relative frequency of appearing any number up except 5. OR find the value of 𝑥 and the ratio of volumes 𝑣1 and 𝑣2 . ix. runs scored by Pakistani team for 𝑥 3 + 2𝑥 2 − 4𝑥 − 8 and different sessions of the innings is 2𝑥 3 + 7𝑥 2 + 4𝑥 − 4 given below: The score in OR 01 to 10 overs: 12 runs per over, 11 to 35 overs: 06 runs per over, 36 to 50 overs: 13 runs per over. Find average runs scored by the team in an innings. SECTION – C (Marks 24) (3 × 8 = 24) Q. No. Marks Q3 𝑦 + 4𝑦 + 𝑘 + 𝑦 2 + 𝑦 4 becomes a perfect square. Q4 location varies over a day, modeled 2𝜋𝑡 by 𝐻 = 𝐻𝑜 + 𝐴 ∙ 𝑠𝑖𝑛 ( 𝑇 ), with (iii) Symmetric form and 𝐻𝑜 : the average tide height, (iv) Normal form 𝐴: the amplitude of tidal variation, 𝑡: the time in hours, and 𝑇: the period of tidal cycle in hours. If 𝐻𝑜 = 2𝑚, 𝐴 = 1𝑚, 𝑇 = 24ℎ𝑜𝑢𝑟𝑠 use trigonometry to find the tide’s height at 𝑡 = 0, 6, 18 hours. Q5 with side measures 𝑚𝐴𝐵 ̅̅̅̅ = 3.5𝑐𝑚, 𝑚𝐴𝐶 𝑚𝐵𝐶 C-I show that the altitudes are concurrent. OR Write down the construction steps also. 24 months. Federal Board SSC-I Examination Mathematics Model Question Paper (Curriculum 2022-23) Alignment of Questions with Student Learning Outcomes OBJECTIVE PART SECTION A Q. No. (Part no.)",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}
