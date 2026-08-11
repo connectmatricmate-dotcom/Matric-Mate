@@ -152,13 +152,23 @@ async function main() {
     };
   });
 
-  // A chapter list that has drifted from the board's is worth saying out loud
-  // rather than quietly writing a null board_unit for.
+  // A chapter list that has drifted from the board's is worth saying out loud.
+  //
+  // Compared against the Table of Specification, not against `examUnits`. The
+  // unit lists come off the 2006 curriculum cover pages and were deliberately
+  // superseded, so checking against them now reports every corrected subject as
+  // broken. A subject with no ToS block recorded yet is skipped rather than
+  // guessed at.
   const drift = [];
-  for (const [id, doc] of Object.entries(curriculum)) {
+  for (const id of Object.keys(curriculum)) {
     const ours = CHAPTERS[id]?.length ?? 0;
-    const theirs = doc.examUnits?.units?.length;
-    if (theirs && ours !== theirs) drift.push(`${id}: app has ${ours} chapters, FBISE examines ${theirs}`);
+    const theirs = spec[id]?.chapters?.length;
+    // Mathematics differs on purpose: its ToS has only three broad domains, and
+    // "Geometry" as a single chapter of thirty-one outcomes is not something a
+    // student can revise from, so the seventeen units stay and the marks roll
+    // down from the domain.
+    if (id === 'math') continue;
+    if (theirs && ours !== theirs) drift.push(`${id}: app has ${ours} chapters, the ToS has ${theirs}`);
   }
 
   // ── learning outcomes ───────────────────────────────────────────────────

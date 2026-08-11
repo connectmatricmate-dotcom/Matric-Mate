@@ -22,13 +22,13 @@ import {
 
 export const SUBJECTS: Subject[] = [
   { id: 'phy', name: 'Physics', icon: 'bolt', compulsory: false, group: 'science', chapterCount: 9 },
-  { id: 'chem', name: 'Chemistry', icon: 'flask', compulsory: false, group: 'science', chapterCount: 8 },
-  { id: 'bio', name: 'Biology', icon: 'leaf', compulsory: false, group: 'science', chapterCount: 9 },
+  { id: 'chem', name: 'Chemistry', icon: 'flask', compulsory: false, group: 'science', chapterCount: 20 },
+  { id: 'bio', name: 'Biology', icon: 'leaf', compulsory: false, group: 'science', chapterCount: 10 },
   { id: 'math', name: 'Mathematics', icon: 'calc', compulsory: true, chapterCount: 17 },
-  { id: 'eng', name: 'English', icon: 'book', compulsory: true, chapterCount: 8 },
-  { id: 'urd', name: 'Urdu', urduName: 'اردو', icon: 'quill', compulsory: true, chapterCount: 8 },
+  { id: 'eng', name: 'English', icon: 'book', compulsory: true, chapterCount: 4 },
+  { id: 'urd', name: 'Urdu', urduName: 'اردو', icon: 'quill', compulsory: true, chapterCount: 3 },
   { id: 'isl', name: 'Islamiyat', urduName: 'اسلامیات', icon: 'star', compulsory: true, chapterCount: 7 },
-  { id: 'pst', name: 'Pakistan Studies', icon: 'globe', compulsory: true, chapterCount: 4 },
+  { id: 'pst', name: 'Pakistan Studies', icon: 'globe', compulsory: true, chapterCount: 8 },
   { id: 'cs', name: 'Computer Science', icon: 'book2', compulsory: false, group: 'science', chapterCount: 6 },
 ];
 
@@ -50,26 +50,45 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Modern Physics', 'Beyond classical physics: the atom, radioactivity and the limits of everyday models.'],
     ['Nature of Science', 'How physics is done: evidence, models, uncertainty, and the place of science in society.'],
   ],
+  // Twenty chapters, not eight. Now follows the board's Table of Specification:
+  // each chapter is a content area from the SSC-I Assessment Framework, not the
+  // old nine-unit scheme. See data/fbise/chapters.json for the mark weights.
   chem: [
-    ['Fundamentals of Chemistry', 'Branches of chemistry, atom and molecule, mole concept, Avogadro’s number.'],
-    ['Structure of Atoms', 'Rutherford and Bohr models, isotopes, electronic configuration.'],
-    ['Periodic Table and Periodicity of Properties', 'Mendeleev to modern table, periods and groups, periodic trends.'],
-    ['Structure of Molecules', 'Chemical bonds: ionic, covalent, coordinate, metallic; intermolecular forces.'],
-    ['Physical States of Matter', 'Gas laws, evaporation, vapour pressure, boiling and melting points.'],
-    ['Solutions', 'Solute and solvent, concentration units, colloids and suspensions.'],
-    ['Electrochemistry', 'Oxidation and reduction, electrolytic and galvanic cells, corrosion.'],
-    ['Chemical Reactivity', 'Metals and non-metals, reactivity series, extraction of metals.'],
+    ['Nature of Science in Chemistry', 'What chemistry studies, its many branches, and how science differs from technology and engineering.'],
+    ['Matter', 'States of matter, allotropes, mixtures versus pure substances, and how temperature affects solubility.'],
+    ['Atomic Structure', 'The nucleus and electron shells, subatomic particles, isotopes, ions, and relative atomic mass.'],
+    ['Chemical Bonding', 'Ionic, covalent, coordinate and metallic bonding, and how bond type explains a compound’s properties.'],
+    ['Stoichiometry', 'The mole, Avogadro’s number, molar mass calculations, and balancing chemical and ionic equations.'],
+    ['Electrochemistry', 'Oxidation and reduction, oxidation numbers, identifying redox agents, and preventing corrosion.'],
+    ['Energetics', 'Exothermic and endothermic reactions, enthalpy change, activation energy, and reaction pathway diagrams.'],
+    ['Chemical Equilibrium', 'Reversible reactions, how changing conditions shifts them, and what equilibrium means in a closed system.'],
+    ['Acids, Bases chemistry and pH', 'Bronsted-Lowry acids and bases, strong versus weak, their reactions with metals and carbonates, acid rain.'],
+    ['Periodic Table and Periodicity', 'How the periodic table is arranged, periodic trends, and predicting an element’s properties from its group.'],
+    ['Group Properties and Elements', 'Alkali metals, halogens, transition elements and noble gases, and how metals differ from non-metals.'],
+    ['Environmental Chemistry-Air', 'Air pollutants, the greenhouse effect, acid rain, and how catalytic converters cut vehicle emissions.'],
+    ['Environmental Chemistry-Water', 'Testing and treating water, water-borne disease, and fertilisers as a source of water pollution.'],
+    ['Organic Chemistry', 'Structural formulae, homologous series, isomers, functional groups, and saturated versus unsaturated compounds.'],
+    ['Hydrocarbons', 'Alkanes as saturated hydrocarbons, their substitution reactions with chlorine, and how alkanes are prepared.'],
+    ['Biochemistry', 'Carbohydrates, proteins, lipids and nucleic acids as biomolecules, and the basics of healthy nutrition.'],
+    ['Scientific Notation/Standard Form', 'SI units, standard form for very large or small numbers, and choosing the right lab apparatus.'],
+    ['Separation Techniques', 'Filtration, crystallisation and distillation, and choosing the right technique to separate a mixture.'],
+    ['Qualitative Analysis', 'Tests to identify common gases, and the flame test used to identify metal cations.'],
+    ['Chromatography', 'Paper chromatography, locating agents for colourless substances, and calculating the Rf value.'],
   ],
+  // Ten chapters, not nine. Now follows the board's Table of Specification:
+  // each chapter is a content area from the SSC-I Assessment Framework, not the
+  // old scheme. See data/fbise/chapters.json for the mark weights.
   bio: [
-    ['Introduction to Biology', 'Branches of biology, careers, levels of organisation, Muslim scientists.'],
-    ['Solving a Biological Problem', 'Scientific method, hypothesis, malaria as a case study, data handling.'],
-    ['Biodiversity', 'Classification, five kingdoms, binomial nomenclature, conservation.'],
-    ['Cells and Tissues', 'Microscopy, cell organelles, plant and animal tissues, cell membrane transport.'],
-    ['Cell Cycle', 'Interphase, mitosis, meiosis, apoptosis and necrosis.'],
-    ['Enzymes', 'Characteristics, mechanism, lock-and-key model, factors affecting activity.'],
-    ['Bioenergetics', 'Photosynthesis, respiration, ATP as energy currency.'],
-    ['Nutrition', 'Nutrients, human digestive system, malnutrition and vitamins.'],
-    ['Transport', 'Transport in plants, human heart and blood, circulatory disorders.'],
+    ['The science of biology', 'Biology’s branches and sub-fields, its links to other sciences, and the steps of the scientific method.'],
+    ['Biodiversity', 'Why living things are classified, the three domains, taxonomic ranks, and binomial nomenclature.'],
+    ['Cell', 'Animal and plant cell structure, organelles, specialised cell types, and what makes a stem cell unspecialised.'],
+    ['Cell cycle', 'The cell cycle, the stages of mitosis and meiosis, and why each process matters to the organism.'],
+    ['Tissues, organs & organ system', 'How cells build tissues, organs and systems, and how the body maintains homeostasis.'],
+    ['Molecular biology', 'DNA, RNA, proteins, lipids and carbohydrates as biomolecules, and how DNA’s code becomes a protein.'],
+    ['Metabolism', 'Enzymes and how they work, ATP as the cell’s energy currency, and photosynthesis and respiration.'],
+    ['Plant physiology', 'Mineral nutrition, water and salt transport, transpiration, gas exchange and excretion in plants.'],
+    ['Plant reproduction', 'Asexual and sexual reproduction in plants, vegetative propagation, artificial propagation, and cloning.'],
+    ['Evolution', 'Natural selection, speciation, and the fossil and anatomical evidence for evolution.'],
   ],
   // Seventeen units, not ten. FBISE examines units 1-7, 14, 15 and 17-23 and 29
   // of the IX-X mathematics scheme in Class 9; the gaps are Class 10's. The
@@ -94,25 +113,23 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Theorems Related with Area', 'Areas of parallelograms and triangles on the same base.'],
     ['Practical Geometry: Triangles', 'Constructing triangles, and drawing their circles and bisectors.'],
   ],
+  // Four chapters, not eight. Now follows the board's Table of Specification:
+  // each chapter is a content area from the SSC-I Assessment Framework, a skill
+  // strand rather than a set of prescribed readings. Oral Communication Skills
+  // is taught but, per the framework, not assessed in the annual exam.
   eng: [
-    ['The Saviour of Mankind', 'Reading comprehension, vocabulary and summary writing.'],
-    ['Patriotism', 'Comprehension, parts of speech, paragraph writing.'],
-    ['Media and Its Impact', 'Comprehension, active and passive voice.'],
-    ['Hazrat Asma (RA)', 'Comprehension, tenses revision, letter writing.'],
-    ['Daffodils', 'Poem: theme, figures of speech, appreciation.'],
-    ['Fitness First', 'Comprehension, punctuation, dialogue writing.'],
-    ['Sultan Ahmad Masjid', 'Comprehension, prepositions, translation.'],
-    ['Grammar & Composition', 'Sentence structure, essays, précis and idioms.'],
+    ['Oral Communication Skills', 'Listening and speaking practice through discussion, role play and drama. Not assessed in the annual exam.'],
+    ['Reading and Critical Thinking', 'Reading strategies for fiction and non-fiction, the author’s purpose and point of view, and summarising a text.'],
+    ['Vocabulary and Grammar', 'Vocabulary in context, idioms, parts of speech, punctuation, tenses, and direct and indirect speech.'],
+    ['Writing', 'Editing and proofreading, and writing narrative, descriptive and argumentative essays, letters and book reviews.'],
   ],
+  // Three chapters, not eight. Now follows the board's Table of Specification:
+  // پڑھنا، لکھنا اور قواعد, the three domains the SSC-I paper actually examines,
+  // not a set of prescribed lessons. See data/fbise/chapters.json for weights.
   urd: [
-    ['نعت', 'نعت کی تشریح، مشکل الفاظ اور معنی', 'Naat: explanation and vocabulary.'],
-    ['ہجرتِ نبوی', 'سبق کا خلاصہ اور سوالات', 'Prose lesson with summary.'],
-    ['مرزا غالب', 'شخصیت، غزل کی تشریح', 'Ghalib: life and ghazal.'],
-    ['نصوح اور سلیم', 'کردار نگاری، سبق کا خلاصہ', 'Character sketch and summary.'],
-    ['قومی ترانہ', 'مطالعہ اور تشریح', 'National anthem: study and explanation.'],
-    ['گرامر', 'اسم، فعل، حروف، محاورات', 'Grammar: parts of speech and idioms.'],
-    ['خط نویسی', 'درخواست اور خط کے نمونے', 'Letter and application writing.'],
-    ['مضمون نویسی', 'مضامین کے خاکے اور نمونے', 'Essay writing.'],
+    ['پڑھنا', 'نظم و نثر کو سمجھ کر پڑھنا، اشعار کی تشریح اور رائے دینا، غزل میں مطلع و مقطع کی شناخت، اور متن پر تبصرہ۔', 'Reading.'],
+    ['لکھنا', 'املا کی درستی، خط و درخواست، تلخیص و ترجمہ، مضمون و تقریر نویسی، اور نادیدہ اقتباس کا تجزیہ۔', 'Writing.'],
+    ['قواعد / زبان شناسی', 'تذکیر و تانیث، اسم و فعل، تراکیب اور محاورات، جملوں کی درستی، اور اصنافِ سخن و علمِ بیان کی بنیادی اصطلاحات۔', 'Grammar and linguistics.'],
   ],
   // The board's seven دائرہ ہائے کار (strands), not the six approximations that
   // were here. Note strand 1 covers only the introduction to the Quran and the
@@ -127,24 +144,29 @@ const CH: Record<string, [string, string, string?][]> = {
     ['ہدایت کے سرچشمے اور مشاہیرِ اسلام', 'اہلِ بیت، صحابہ کرام، صحابیاتِ کرام، صوفیائے کرام اور علما و مفکرین', 'Sources of guidance and eminent figures.'],
     ['اسلامی تعلیمات اور عصرِ حاضر کے تقاضے', 'خود اعتمادی، صحت و ریاضت، منصوبہ بندی اور اسلامی تہذیب کے امتیازات', 'Islamic teachings today.'],
   ],
-  // Four chapters, not six. Constitution and Government, Economy of Pakistan
-  // and Population and Society are Class 10, and were never on the Class 9
-  // paper.
+  // Eight chapters, not four. Now follows the board's Table of Specification:
+  // each chapter is a content area from the SSC-I Assessment Framework. See
+  // data/fbise/chapters.json for the mark weights.
   pst: [
-    ['Ideological Basis of Pakistan', 'Two-nation theory, Allama Iqbal and Quaid-e-Azam.'],
-    ['Making of Pakistan', 'Key milestones from 1857 to 1947.'],
-    ['Land and Environment', 'Physical features, climate and rivers of Pakistan.'],
-    ['History of Pakistan', 'Pakistan from independence to the making of the constitution.'],
+    ['Ideological Basis, Struggle, Creation and the Political Developments in Pakistan', 'The two-nation theory, Iqbal and Jinnah’s vision, and the events of 1906 to 1947 that led to Pakistan.'],
+    ['Land of Pakistan', 'Pakistan’s location on the world map, its neighbours, and the geography behind its major cities.'],
+    ['The Natural Topography and Vegetation of Pakistan', 'Pakistan’s mountains, plateaus, rivers and plains, and how they shape climate, vegetation and ways of life.'],
+    ['Climate of Pakistan and Environmental Hazards', 'Pakistan’s climatic zones, monsoons and cyclones, and how seasonal weather affects agriculture and the economy.'],
+    ['Water, Mineral and Power Resources', 'Pakistan’s irrigation system, dams and reservoirs, and their role in power generation and flood control.'],
+    ['Population Structure, Growth, Employment and Industry', 'Population growth and structure, rural to urban migration, and the challenges of a large youth population.'],
+    ['Agriculture, Livestock and Fisheries', 'Pakistan’s major food and cash crops, agriculture’s role in the economy, and the threats facing farmland.'],
+    ['Transport, Trade and Telecommunication', 'Pakistan’s transport networks, and how routes like Gwadar Port and CPEC connect it to global trade.'],
   ],
-  // The previous list here was a different board's syllabus. These six are the
-  // FBISE Class 9 units.
+  // The previous list here was a different board's syllabus. Now follows the
+  // board's Table of Specification: six content areas from the SSC-I Assessment
+  // Framework. See data/fbise/chapters.json for the mark weights.
   cs: [
-    ['Fundamentals of Computer', 'Computer generations, hardware components and Von Neumann architecture.'],
-    ['Fundamentals of Operating System', 'What an operating system does, its types and its user interfaces.'],
-    ['Office Automation', 'Word processing, spreadsheets and presentation software.'],
-    ['Data Communication', 'Transmission media and modes, bandwidth, and communication devices.'],
-    ['Computer Networks', 'LAN and WAN, topologies, network devices and protocols.'],
-    ['Computer Security and Ethics', 'Malware, authentication, backups, and cyber ethics and law.'],
+    ['Computer Systems', 'Computer hardware and architecture, system versus application software, and data communication basics.'],
+    ['Computational Thinking and Algorithms', 'Breaking problems down and solving them computationally using logical and algorithmic thinking.'],
+    ['Programming Fundamentals', 'Building static and dynamic web pages with HTML, CSS and JavaScript, and debugging simple programs.'],
+    ['Data and Analysis', 'What data science covers, how data is collected and stored, and how businesses use big data.'],
+    ['Applications of Computer Science', 'Where AI and machine learning are used, and the social questions raised by AI making decisions about people.'],
+    ['Impacts of Computing', 'Safe and responsible computer use, and the beneficial and harmful effects of computing on society.'],
   ],
 };
 
@@ -354,6 +376,16 @@ const dynamicsSectionsUr: Section[] = [
   },
 ];
 
+/**
+ * Hand-written sample lessons, keyed by chapter id.
+ *
+ * The ids are positional (`${subjectId}-${number}`), so renumbering a subject
+ * moves the ground under this map. That happened when chemistry and biology
+ * moved to the board's Table of Specification structure: the atoms lesson was
+ * sitting under chem-2, which is now "Matter", and the cells lesson under
+ * bio-4, which is now "Cell cycle". Both are retargeted below to the chapter
+ * whose title they actually match. If you renumber a subject again, check here.
+ */
 const AUTHORED: Record<string, ChapterContent> = {
   'phy-3': {
     audioTitle: 'Dynamics, full chapter',
@@ -382,7 +414,7 @@ const AUTHORED: Record<string, ChapterContent> = {
       { id: 'phy3-b4', chapterId: 'phy-3', sentence: ['The force keeping a body on a circular path is called ', ' force.'], answer: 'centripetal', options: ['centrifugal', 'centripetal', 'frictional', 'normal'] },
     ],
   },
-  'chem-2': {
+  'chem-3': {
     audioTitle: 'Structure of Atoms, full chapter',
     sections: [
       {
@@ -414,28 +446,28 @@ const AUTHORED: Record<string, ChapterContent> = {
       },
     ],
     mcqs: [
-      { id: 'chem2-m1', chapterId: 'chem-2', topic: 'Atomic models', q: 'Rutherford’s gold-foil experiment proved the existence of the…', options: ['electron', 'nucleus', 'neutron', 'orbital'], answer: 1, explanation: 'The rebounding of a few alpha particles showed a tiny, dense, positively charged nucleus.', difficulty: 'easy' },
-      { id: 'chem2-m2', chapterId: 'chem-2', topic: 'Electronic configuration', q: 'The maximum number of electrons in the L shell is…', options: ['2', '8', '18', '32'], answer: 1, explanation: 'Using 2n² with n = 2 gives 8 electrons.', difficulty: 'easy' },
-      { id: 'chem2-m3', chapterId: 'chem-2', topic: 'Isotopes', q: 'Isotopes of an element differ in the number of…', options: ['protons', 'electrons', 'neutrons', 'shells'], answer: 2, explanation: 'Same atomic number (protons) but different mass number means a different neutron count.', difficulty: 'easy' },
-      { id: 'chem2-m4', chapterId: 'chem-2', topic: 'Atomic structure', q: 'Which particle has approximately the same mass as a proton?', options: ['electron', 'neutron', 'positron', 'photon'], answer: 1, explanation: 'Protons and neutrons both have mass close to 1 amu; the electron is about 1836 times lighter.', difficulty: 'medium' },
-      { id: 'chem2-m5', chapterId: 'chem-2', topic: 'Isotopes', q: 'The number of isotopes of hydrogen is…', options: ['1', '2', '3', '4'], answer: 2, explanation: 'Protium, deuterium and tritium.', difficulty: 'easy' },
+      { id: 'chem3-m1', chapterId: 'chem-3', topic: 'Atomic models', q: 'Rutherford’s gold-foil experiment proved the existence of the…', options: ['electron', 'nucleus', 'neutron', 'orbital'], answer: 1, explanation: 'The rebounding of a few alpha particles showed a tiny, dense, positively charged nucleus.', difficulty: 'easy' },
+      { id: 'chem3-m2', chapterId: 'chem-3', topic: 'Electronic configuration', q: 'The maximum number of electrons in the L shell is…', options: ['2', '8', '18', '32'], answer: 1, explanation: 'Using 2n² with n = 2 gives 8 electrons.', difficulty: 'easy' },
+      { id: 'chem3-m3', chapterId: 'chem-3', topic: 'Isotopes', q: 'Isotopes of an element differ in the number of…', options: ['protons', 'electrons', 'neutrons', 'shells'], answer: 2, explanation: 'Same atomic number (protons) but different mass number means a different neutron count.', difficulty: 'easy' },
+      { id: 'chem3-m4', chapterId: 'chem-3', topic: 'Atomic structure', q: 'Which particle has approximately the same mass as a proton?', options: ['electron', 'neutron', 'positron', 'photon'], answer: 1, explanation: 'Protons and neutrons both have mass close to 1 amu; the electron is about 1836 times lighter.', difficulty: 'medium' },
+      { id: 'chem3-m5', chapterId: 'chem-3', topic: 'Isotopes', q: 'The number of isotopes of hydrogen is…', options: ['1', '2', '3', '4'], answer: 2, explanation: 'Protium, deuterium and tritium.', difficulty: 'easy' },
     ],
     flashcards: [
-      { id: 'chem2-f1', chapterId: 'chem-2', front: 'Isotopes', back: 'Atoms of the same element with the same atomic number but different mass numbers.' },
-      { id: 'chem2-f2', chapterId: 'chem-2', front: 'Max electrons in a shell', back: '2n², where n is the shell number: K=2, L=8, M=18, N=32.' },
-      { id: 'chem2-f3', chapterId: 'chem-2', front: 'Atomic number (Z)', back: 'The number of protons in the nucleus, which identifies the element.' },
-      { id: 'chem2-f4', chapterId: 'chem-2', front: 'Mass number (A)', back: 'Total number of protons and neutrons in the nucleus.' },
+      { id: 'chem3-f1', chapterId: 'chem-3', front: 'Isotopes', back: 'Atoms of the same element with the same atomic number but different mass numbers.' },
+      { id: 'chem3-f2', chapterId: 'chem-3', front: 'Max electrons in a shell', back: '2n², where n is the shell number: K=2, L=8, M=18, N=32.' },
+      { id: 'chem3-f3', chapterId: 'chem-3', front: 'Atomic number (Z)', back: 'The number of protons in the nucleus, which identifies the element.' },
+      { id: 'chem3-f4', chapterId: 'chem-3', front: 'Mass number (A)', back: 'Total number of protons and neutrons in the nucleus.' },
     ],
     shortQs: [
-      { id: 'chem2-q1', chapterId: 'chem-2', marks: 2, q: 'State two conclusions of Rutherford’s atomic model.', answer: 'The atom is mostly empty space, and all the positive charge with nearly all the mass is concentrated in a tiny nucleus at the centre.', points: ['mostly empty space (1)', 'dense positive nucleus (1)'] },
-      { id: 'chem2-q2', chapterId: 'chem-2', marks: 2, q: 'Why do isotopes of an element have identical chemical properties?', answer: 'Chemical properties depend on the number and arrangement of electrons, which is the same for all isotopes of an element; only the neutron count differs.', points: ['same electronic configuration (1)', 'only neutrons differ (1)'] },
+      { id: 'chem3-q1', chapterId: 'chem-3', marks: 2, q: 'State two conclusions of Rutherford’s atomic model.', answer: 'The atom is mostly empty space, and all the positive charge with nearly all the mass is concentrated in a tiny nucleus at the centre.', points: ['mostly empty space (1)', 'dense positive nucleus (1)'] },
+      { id: 'chem3-q2', chapterId: 'chem-3', marks: 2, q: 'Why do isotopes of an element have identical chemical properties?', answer: 'Chemical properties depend on the number and arrangement of electrons, which is the same for all isotopes of an element; only the neutron count differs.', points: ['same electronic configuration (1)', 'only neutrons differ (1)'] },
     ],
     blanks: [
-      { id: 'chem2-b1', chapterId: 'chem-2', sentence: ['The maximum number of electrons in the M shell is ', '.'], answer: '18', options: ['8', '18', '32', '2'] },
-      { id: 'chem2-b2', chapterId: 'chem-2', sentence: ['Atoms with the same atomic number but different mass numbers are called ', '.'], answer: 'isotopes', options: ['isotopes', 'isobars', 'ions', 'isomers'] },
+      { id: 'chem3-b1', chapterId: 'chem-3', sentence: ['The maximum number of electrons in the M shell is ', '.'], answer: '18', options: ['8', '18', '32', '2'] },
+      { id: 'chem3-b2', chapterId: 'chem-3', sentence: ['Atoms with the same atomic number but different mass numbers are called ', '.'], answer: 'isotopes', options: ['isotopes', 'isobars', 'ions', 'isomers'] },
     ],
   },
-  'bio-4': {
+  'bio-3': {
     audioTitle: 'Cells and Tissues, full chapter',
     sections: [
       {
@@ -466,25 +498,25 @@ const AUTHORED: Record<string, ChapterContent> = {
       },
     ],
     mcqs: [
-      { id: 'bio4-m1', chapterId: 'bio-4', topic: 'Organelles', q: 'The “power house” of the cell is the…', options: ['nucleus', 'mitochondrion', 'ribosome', 'vacuole'], answer: 1, explanation: 'Mitochondria carry out aerobic respiration, producing most of the cell’s ATP.', difficulty: 'easy' },
-      { id: 'bio4-m2', chapterId: 'bio-4', topic: 'Cell structure', q: 'Which structure is present in a plant cell but absent in an animal cell?', options: ['ribosome', 'chloroplast', 'nucleus', 'mitochondrion'], answer: 1, explanation: 'Chloroplasts (and a cellulose cell wall) are plant-specific.', difficulty: 'easy' },
-      { id: 'bio4-m3', chapterId: 'bio-4', topic: 'Transport', q: 'Movement of water through a selectively permeable membrane is called…', options: ['diffusion', 'osmosis', 'active transport', 'plasmolysis'], answer: 1, explanation: 'Osmosis is specifically the diffusion of water across a selectively permeable membrane.', difficulty: 'easy' },
-      { id: 'bio4-m4', chapterId: 'bio-4', topic: 'Transport', q: 'Active transport differs from diffusion because it…', options: ['needs no energy', 'requires ATP', 'only moves water', 'is always faster'], answer: 1, explanation: 'Active transport moves substances against the gradient and consumes ATP.', difficulty: 'medium' },
-      { id: 'bio4-m5', chapterId: 'bio-4', topic: 'Microscopy', q: 'Who first observed and named cells?', options: ['Robert Brown', 'Robert Hooke', 'Louis Pasteur', 'Rudolf Virchow'], answer: 1, explanation: 'Robert Hooke described “cells” in cork in 1665.', difficulty: 'easy' },
+      { id: 'bio3-m1', chapterId: 'bio-3', topic: 'Organelles', q: 'The “power house” of the cell is the…', options: ['nucleus', 'mitochondrion', 'ribosome', 'vacuole'], answer: 1, explanation: 'Mitochondria carry out aerobic respiration, producing most of the cell’s ATP.', difficulty: 'easy' },
+      { id: 'bio3-m2', chapterId: 'bio-3', topic: 'Cell structure', q: 'Which structure is present in a plant cell but absent in an animal cell?', options: ['ribosome', 'chloroplast', 'nucleus', 'mitochondrion'], answer: 1, explanation: 'Chloroplasts (and a cellulose cell wall) are plant-specific.', difficulty: 'easy' },
+      { id: 'bio3-m3', chapterId: 'bio-3', topic: 'Transport', q: 'Movement of water through a selectively permeable membrane is called…', options: ['diffusion', 'osmosis', 'active transport', 'plasmolysis'], answer: 1, explanation: 'Osmosis is specifically the diffusion of water across a selectively permeable membrane.', difficulty: 'easy' },
+      { id: 'bio3-m4', chapterId: 'bio-3', topic: 'Transport', q: 'Active transport differs from diffusion because it…', options: ['needs no energy', 'requires ATP', 'only moves water', 'is always faster'], answer: 1, explanation: 'Active transport moves substances against the gradient and consumes ATP.', difficulty: 'medium' },
+      { id: 'bio3-m5', chapterId: 'bio-3', topic: 'Microscopy', q: 'Who first observed and named cells?', options: ['Robert Brown', 'Robert Hooke', 'Louis Pasteur', 'Rudolf Virchow'], answer: 1, explanation: 'Robert Hooke described “cells” in cork in 1665.', difficulty: 'easy' },
     ],
     flashcards: [
-      { id: 'bio4-f1', chapterId: 'bio-4', front: 'Osmosis', back: 'Diffusion of water through a selectively permeable membrane from dilute to concentrated solution.' },
-      { id: 'bio4-f2', chapterId: 'bio-4', front: 'Mitochondrion', back: 'Site of aerobic respiration, produces ATP. Has its own DNA and a folded inner membrane (cristae).' },
-      { id: 'bio4-f3', chapterId: 'bio-4', front: 'Cell theory', back: 'All organisms are made of cells; the cell is the basic unit of structure and function; all cells arise from pre-existing cells.' },
-      { id: 'bio4-f4', chapterId: 'bio-4', front: 'Plant vs animal cell', back: 'Plant: cell wall, chloroplasts, large central vacuole. Animal: centrioles, no cell wall, small vacuoles.' },
+      { id: 'bio3-f1', chapterId: 'bio-3', front: 'Osmosis', back: 'Diffusion of water through a selectively permeable membrane from dilute to concentrated solution.' },
+      { id: 'bio3-f2', chapterId: 'bio-3', front: 'Mitochondrion', back: 'Site of aerobic respiration, produces ATP. Has its own DNA and a folded inner membrane (cristae).' },
+      { id: 'bio3-f3', chapterId: 'bio-3', front: 'Cell theory', back: 'All organisms are made of cells; the cell is the basic unit of structure and function; all cells arise from pre-existing cells.' },
+      { id: 'bio3-f4', chapterId: 'bio-3', front: 'Plant vs animal cell', back: 'Plant: cell wall, chloroplasts, large central vacuole. Animal: centrioles, no cell wall, small vacuoles.' },
     ],
     shortQs: [
-      { id: 'bio4-q1', chapterId: 'bio-4', marks: 3, q: 'Differentiate between diffusion and osmosis.', answer: 'Diffusion is the movement of any molecules from higher to lower concentration; osmosis is specifically the movement of water molecules from a dilute to a concentrated solution through a selectively permeable membrane. Neither requires energy.', points: ['diffusion = any molecule down gradient (1)', 'osmosis = water through membrane (1)', 'both passive (1)'] },
-      { id: 'bio4-q2', chapterId: 'bio-4', marks: 2, q: 'Give two differences between plant and animal cells.', answer: 'Plant cells have a cellulose cell wall and chloroplasts; animal cells have neither and instead contain centrioles.', points: ['cell wall / chloroplast in plants (1)', 'centrioles / no wall in animals (1)'] },
+      { id: 'bio3-q1', chapterId: 'bio-3', marks: 3, q: 'Differentiate between diffusion and osmosis.', answer: 'Diffusion is the movement of any molecules from higher to lower concentration; osmosis is specifically the movement of water molecules from a dilute to a concentrated solution through a selectively permeable membrane. Neither requires energy.', points: ['diffusion = any molecule down gradient (1)', 'osmosis = water through membrane (1)', 'both passive (1)'] },
+      { id: 'bio3-q2', chapterId: 'bio-3', marks: 2, q: 'Give two differences between plant and animal cells.', answer: 'Plant cells have a cellulose cell wall and chloroplasts; animal cells have neither and instead contain centrioles.', points: ['cell wall / chloroplast in plants (1)', 'centrioles / no wall in animals (1)'] },
     ],
     blanks: [
-      { id: 'bio4-b1', chapterId: 'bio-4', sentence: ['Protein synthesis takes place on the ', '.'], answer: 'ribosomes', options: ['ribosomes', 'lysosomes', 'chloroplasts', 'centrioles'] },
-      { id: 'bio4-b2', chapterId: 'bio-4', sentence: ['Movement of substances against a concentration gradient needs ', '.'], answer: 'energy', options: ['water', 'energy', 'enzymes', 'light'] },
+      { id: 'bio3-b1', chapterId: 'bio-3', sentence: ['Protein synthesis takes place on the ', '.'], answer: 'ribosomes', options: ['ribosomes', 'lysosomes', 'chloroplasts', 'centrioles'] },
+      { id: 'bio3-b2', chapterId: 'bio-3', sentence: ['Movement of substances against a concentration gradient needs ', '.'], answer: 'energy', options: ['water', 'energy', 'enzymes', 'light'] },
     ],
   },
 };
