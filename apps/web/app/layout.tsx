@@ -1,18 +1,48 @@
 import type { Metadata, Viewport } from 'next';
-import { Baloo_2, Noto_Nastaliq_Urdu, Nunito } from 'next/font/google';
+import localFont from 'next/font/local';
 import { ToastProvider } from '@/components/ui/toast';
 import { ALLOW_INDEXING, SITE_URL } from '@/lib/site';
 import './globals.css';
 
-// Self-hosted at build time, no runtime request to a font CDN.
-const baloo = Baloo_2({ subsets: ['latin'], weight: ['500', '600', '700', '800'], variable: '--font-baloo' });
-const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700', '800'], variable: '--font-nunito' });
+/*
+ * The font files live in this repo, and that is the point.
+ *
+ * These were `next/font/google`, which downloads from fonts.gstatic.com during
+ * the build. That worked until Google started returning 404 for the pinned
+ * Baloo 2 revision, and every Vercel deploy failed: a production build that
+ * cannot ship because a third party changed a URL. The local build passed only
+ * because it had the files cached from an earlier run, which is the worst kind
+ * of green.
+ *
+ * All three are variable fonts, so one file each covers the whole weight range
+ * we use. Total 384KB, and the Nastaliq is 236KB of it.
+ */
+const baloo = localFont({
+  src: './fonts/baloo2.woff2',
+  weight: '500 800',
+  display: 'swap',
+  variable: '--font-baloo',
+});
+
+const nunito = localFont({
+  src: './fonts/nunito.woff2',
+  weight: '400 800',
+  display: 'swap',
+  variable: '--font-nunito',
+});
+
 // preload:false on purpose: the Nastaliq woff2 is ~240KB, an order of magnitude
 // heavier than the Latin faces, and preloading it put a high-priority fetch on
 // every route for every visitor, including English-medium students who never
 // render an Urdu glyph. Without the hint the browser fetches it lazily, only
 // when Urdu text actually appears.
-const nastaliq = Noto_Nastaliq_Urdu({ subsets: ['arabic'], weight: ['400', '600'], variable: '--font-nastaliq', preload: false });
+const nastaliq = localFont({
+  src: './fonts/nastaliq.woff2',
+  weight: '400 700',
+  display: 'swap',
+  variable: '--font-nastaliq',
+  preload: false,
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
