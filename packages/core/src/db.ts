@@ -58,7 +58,7 @@ export type ContentClient = {
 };
 
 /** The client's `from`, narrowed back to the shape this file actually uses. */
-const table = (name: string): TableBuilder => (db as ContentClient).from(name) as TableBuilder;
+const table = (name: string, client: ContentClient): TableBuilder => client.from(name) as TableBuilder;
 
 /**
  * `from()` is not thenable, `select()` is. That distinction is the whole reason
@@ -132,8 +132,13 @@ const isDev = (): boolean =>
  * the bundled one. The failure is logged once and never surfaced, because there
  * is nothing the student could do about it.
  */
-async function read<T>(key: string, query: () => Promise<{ data: T | null; error: unknown }>, fallback: () => T): Promise<T> {
-  if (!db) return fallback();
+async function read<T>(
+  client: ContentClient | null,
+  key: string,
+  query: () => Promise<{ data: T | null; error: unknown }>,
+  fallback: () => T,
+): Promise<T> {
+  if (!client) return fallback();
   try {
     const { data, error } = await query();
     if (error || data == null || (Array.isArray(data) && data.length === 0)) throw error ?? new Error('empty');
@@ -199,14 +204,16 @@ const toChapter = (r: ChapterRow, counts?: { mcqs: number; cards: number; sectio
 
 /* --------------------------------------------------------------- queries */
 
-export async function fetchSubjects(ids?: string[]): Promise<Subject[]> {
+export async function fetchSubjects(ids?: string[], client?: ContentClient): Promise<Subject[]> {
+  const at = client ?? db;
   const key = `subjects:${ids?.join(',') ?? 'all'}`;
   const fallback = () => (ids?.length ? SUBJECTS.filter((s) => ids.includes(s.id)) : SUBJECTS);
 
   return read<Subject[]>(
+    at,
     key,
     async () => {
-      let q = table('subjects').select('id,name,urdu_name,icon,compulsory,study_group,chapters(count)').order('sort_order');
+      let q = table('subjects', at!).select('id,name,urdu_name,icon,compulsory,study_group,chapters(count)').order('sort_order');
       if (ids?.length) q = q.in('id', ids);
       const { data, error } = await q;
       return {
@@ -220,15 +227,17 @@ export async function fetchSubjects(ids?: string[]): Promise<Subject[]> {
   );
 }
 
-export async function fetchSubject(id: string): Promise<Subject | undefined> {
-  return (await fetchSubjects([id]))[0] ?? subjectById(id);
+export async function fetchSubject(id: string, client?: ContentClient): Promise<Subject | undefined> {
+  return (await fetchSubjects([id], client))[0] ?? subjectById(id);
 }
 
-export async function fetchChapters(subjectId: string): Promise<Chapter[]> {
+export async function fetchChapters(subjectId: string, client?: ContentClient): Promise<Chapter[]> {
+  const at = client ?? db;
   return read<Chapter[]>(
+    at,
     `chapters:${subjectId}:${medium}`,
     async () => {
-      const { data, error } = await table('chapters')
+      const { data, error } = await table('chapters', at!)
         .select('id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes')
         .eq('subject_id', subjectId)
         .order('number');
@@ -238,9 +247,9 @@ export async function fetchChapters(subjectId: string): Promise<Chapter[]> {
   );
 }
 
-export async function fetchChapter(id: string): Promise<Chapter | undefined> {
+export async function fetchChapter(id: string, client?: ContentClient): Promise<Chapter | undefined> {
   const subjectId = id.split('-')[0];
-  return (await fetchChapters(subjectId)).find((c) => c.id === id) ?? chapterById(id);
+  return (await fetchChapters(subjectId, client)).find((c) => c.id === id) ?? chapterById(id);
 }
 
 /**
@@ -252,10 +261,12 @@ export async function fetchChapter(id: string): Promise<Chapter | undefined> {
  * chapter with untranslated flashcards should still show the translated
  * chapter.
  */
-export async function fetchChapterContent(chapterId: string): Promise<ChapterContent> {
+export async function fetchChapterContent(chapterId: string, client?: ContentClient): Promise<ChapterContent> {
+  const at = client ?? db;
   const fallback = () => contentFor(chapterId);
 
   return read<ChapterContent>(
+    at,
     `content:${chapterId}:${medium}`,
     async () => {
       /**
@@ -270,11 +281,11 @@ export async function fetchChapterContent(chapterId: string): Promise<ChapterCon
       };
 
       const [sections, mcqs, cards, shorts, blanks] = await Promise.all([
-        table('chapter_sections').select('id,medium,position,title,blocks').eq('chapter_id', chapterId).order('position'),
-        table('mcqs').select('id,medium,topic,q,options,answer,explanation,difficulty,source').eq('chapter_id', chapterId),
-        table('flashcards').select('id,medium,front,back').eq('chapter_id', chapterId),
-        table('short_questions').select('id,medium,marks,q,answer,points').eq('chapter_id', chapterId),
-        table('blanks').select('id,medium,before_text,after_text,answer,options').eq('chapter_id', chapterId),
+        table('chapter_sections', at!).select('id,medium,position,title,blocks').eq('chapter_id', chapterId).order('position'),
+        table('mcqs', at!).select('id,medium,topic,q,options,answer,explanation,difficulty,source').eq('chapter_id', chapterId),
+        table('flashcards', at!).select('id,medium,front,back').eq('chapter_id', chapterId),
+        table('short_questions', at!).select('id,medium,marks,q,answer,points').eq('chapter_id', chapterId),
+        table('blanks', at!).select('id,medium,before_text,after_text,answer,options').eq('chapter_id', chapterId),
       ]);
 
       const error = sections.error ?? mcqs.error ?? cards.error ?? shorts.error ?? blanks.error;
@@ -343,10 +354,14 @@ export async function fetchChapterContent(chapterId: string): Promise<ChapterCon
  */
 export type Slo = { code: string; text: string; cognitive: string | null; assessment: string | null; domain: string; title: string | null };
 
-export async function fetchSlos(subjectId: string, opts?: { examinableOnly?: boolean }): Promise<Slo[]> {
-  if (!db) return [];
+export async function fetchSlos(
+  subjectId: string,
+  opts?: { examinableOnly?: boolean },
+  client?: ContentClient,
+): Promise<Slo[]> {
+  if (!client && !db) return [];
   try {
-    let q = table('curriculum_slos').select('code,text,cognitive,assessment,domain,title').eq('subject_id', subjectId).order('code');
+    let q = table('curriculum_slos', client ?? db!).select('code,text,cognitive,assessment,domain,title').eq('subject_id', subjectId).order('code');
     // null assessment means the source table merged the column, not that the
     // outcome is unexamined, so it stays in.
     if (opts?.examinableOnly) q = q.or('assessment.eq.summative,assessment.is.null');
@@ -357,7 +372,11 @@ export async function fetchSlos(subjectId: string, opts?: { examinableOnly?: boo
   }
 }
 
-export async function fetchMcqs(opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] }): Promise<Mcq[]> {
+export async function fetchMcqs(
+  opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] },
+  client?: ContentClient,
+): Promise<Mcq[]> {
+  const at = client ?? db;
   const fallbackPool = (): Mcq[] => {
     const chapters = opts.chapterIds?.length
       ? (opts.chapterIds.map(chapterById).filter(Boolean) as Chapter[])
@@ -368,9 +387,10 @@ export async function fetchMcqs(opts: { chapterIds?: string[]; subjectId?: strin
   };
 
   return read<Mcq[]>(
+    at,
     `mcqs:${opts.subjectId ?? ''}:${opts.chapterIds?.join(',') ?? ''}:${opts.topics?.join(',') ?? ''}:${opts.count}:${medium}`,
     async () => {
-      let q = table('mcqs').select('id,chapter_id,medium,topic,q,options,answer,explanation,difficulty,source');
+      let q = table('mcqs', at!).select('id,chapter_id,medium,topic,q,options,answer,explanation,difficulty,source');
       if (opts.chapterIds?.length) q = q.in('chapter_id', opts.chapterIds);
       else if (opts.subjectId) q = q.eq('subject_id', opts.subjectId);
       if (opts.topics?.length) q = q.in('topic', opts.topics);
@@ -401,8 +421,8 @@ export async function fetchMcqs(opts: { chapterIds?: string[]; subjectId?: strin
   );
 }
 
-export async function fetchFlashcards(chapterId: string): Promise<Flashcard[]> {
-  return (await fetchChapterContent(chapterId)).flashcards;
+export async function fetchFlashcards(chapterId: string, client?: ContentClient): Promise<Flashcard[]> {
+  return (await fetchChapterContent(chapterId, client)).flashcards;
 }
 
 export async function fetchPastPapers(subjectId?: string): Promise<PastPaper[]> {

@@ -21,27 +21,41 @@ import {
   fetchSubjects,
 } from './db';
 import { ALL_CHAPTERS, contentFor } from './content';
+import type { ContentClient } from './db';
 import { Chapter, ChapterContent, Flashcard, Mcq, PastPaper, Subject } from './types';
 
 /** Still needed by the two mocks below, which fake their own latency. */
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+/**
+ * Every content read takes an optional client, and this is not decoration.
+ *
+ * The browser and the mobile app connect one long-lived client with
+ * `connectContent` and never pass one here. A Next.js server cannot do that:
+ * module state is shared across requests, so a client built from one student's
+ * cookies would end up serving another student's page. Server code therefore
+ * builds a client per request and hands it in. Getting this wrong is not a
+ * rendering bug, it is one student seeing another's session.
+ */
 export const api = {
-  getSubjects: (ids?: string[]): Promise<Subject[]> => fetchSubjects(ids),
+  getSubjects: (ids?: string[], client?: ContentClient): Promise<Subject[]> => fetchSubjects(ids, client),
 
-  getSubject: (id: string): Promise<Subject | undefined> => fetchSubject(id),
+  getSubject: (id: string, client?: ContentClient): Promise<Subject | undefined> => fetchSubject(id, client),
 
-  getChapters: (subjectId: string): Promise<Chapter[]> => fetchChapters(subjectId),
+  getChapters: (subjectId: string, client?: ContentClient): Promise<Chapter[]> => fetchChapters(subjectId, client),
 
-  getChapter: (id: string): Promise<Chapter | undefined> => fetchChapter(id),
+  getChapter: (id: string, client?: ContentClient): Promise<Chapter | undefined> => fetchChapter(id, client),
 
-  getChapterContent: (chapterId: string): Promise<ChapterContent> => fetchChapterContent(chapterId),
+  getChapterContent: (chapterId: string, client?: ContentClient): Promise<ChapterContent> =>
+    fetchChapterContent(chapterId, client),
 
   /** Question set for a practice session or exam. */
-  getMcqs: (opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] }): Promise<Mcq[]> =>
-    fetchMcqs(opts),
+  getMcqs: (
+    opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] },
+    client?: ContentClient,
+  ): Promise<Mcq[]> => fetchMcqs(opts, client),
 
-  getFlashcards: (chapterId: string): Promise<Flashcard[]> => fetchFlashcards(chapterId),
+  getFlashcards: (chapterId: string, client?: ContentClient): Promise<Flashcard[]> => fetchFlashcards(chapterId, client),
 
   getPastPapers: (subjectId?: string): Promise<PastPaper[]> => fetchPastPapers(subjectId),
 
