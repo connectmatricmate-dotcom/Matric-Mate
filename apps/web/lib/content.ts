@@ -8,14 +8,24 @@
  * chapter list that shows bundled sample content for one frame and then swaps
  * to the real rows reads as a bug rather than as a load.
  *
- * Browser only. Server components render on Vercel where there is no student
- * session, and content reads there would come back as the anon role seeing
- * nothing. Anything server-rendered keeps using the bundled content, which is
- * the same structure, so the two never disagree about what a chapter is called.
+ * Browser only, and this file is only half the story. Server components cannot
+ * share this client: module state in Next is shared across requests, so a
+ * client built from one student's cookies would still be sitting there when the
+ * next student's page renders. Server reads therefore build their own client
+ * per request in lib/content-readers.ts. Both halves are needed. When only this
+ * one existed, every server-rendered page served placeholder text while the
+ * real content sat in the database.
  */
-import { connectContent } from '@matricmate/core';
+import { connectContent, primeAllContent } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/client';
 
-if (typeof window !== 'undefined') connectContent(createClient());
+if (typeof window !== 'undefined') {
+  const client = createClient();
+  connectContent(client);
+  // Warm the synchronous lookups in core. Without this the browser answers
+  // chapterById from the bundle, so a heading shows the old chapter name beside
+  // a body full of new content. Not awaited: it is a warm-up, not a dependency.
+  void primeAllContent(client);
+}
 
 export {};

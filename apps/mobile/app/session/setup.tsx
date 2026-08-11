@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Small, Spacer, useToast } from '../../src/components/ui';
-import { api , CHAPTERS, chapterById, subjectById } from '@matricmate/core';
+import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { api , chapterById, subjectById } from '@matricmate/core';
+import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
-import { S } from '../../src/theme';
+import { C, S } from '../../src/theme';
 
 export default function SessionSetup() {
   const { chapter: chapterParam } = useLocalSearchParams<{ chapter?: string }>();
@@ -20,9 +21,10 @@ export default function SessionSetup() {
   const [count, setCount] = useState<'10' | '20' | '50'>('10');
   const [busy, setBusy] = useState(false);
 
+  const { data: chapterList, loading: chaptersLoading } = useAsync(() => api.getChapters(subjectId), [subjectId]);
   const chapters = useMemo(
-    () => (CHAPTERS[subjectId] ?? []).filter((c) => !c.premium || state.premium.active),
-    [subjectId, state.premium.active]
+    () => (chapterList ?? []).filter((c) => !c.premium || state.premium.active),
+    [chapterList, state.premium.active]
   );
 
   /**
@@ -97,7 +99,30 @@ export default function SessionSetup() {
           onPress={() => setChapterIds([])}
           right={<Check on={chapterIds.length === 0} round />}
         />
-        {chapters.map((c, i) => {
+        {chaptersLoading
+          ? [0, 1, 2].map((i) => (
+              <View
+                key={i}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: S.md,
+                  paddingVertical: 14,
+                  minHeight: 62,
+                  borderBottomWidth: i === 2 ? 0 : 1,
+                  borderBottomColor: C.line,
+                }}
+              >
+                <Skeleton w={42} h={42} style={{ borderRadius: 13 }} />
+                <View style={{ flex: 1, gap: 7 }}>
+                  <Skeleton w="55%" h={13} />
+                  <Skeleton w="35%" h={10} />
+                </View>
+              </View>
+            ))
+          : null}
+        {!chaptersLoading &&
+          chapters.map((c, i) => {
           const on = chapterIds.includes(c.id);
           return (
             <Item

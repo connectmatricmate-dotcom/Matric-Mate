@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
 import { Card, Empty, Ring, Row, Screen, Skeleton, Small, Ur } from '../../src/components/ui';
-import { api , CHAPTERS , subjectPct } from '@matricmate/core';
+import { api , subjectPct } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -14,14 +14,21 @@ export default function Study() {
   const { state, derived } = useApp();
   const t = useT();
   const [q, setQ] = useState('');
-  const { data: subjects, loading } = useAsync(() => api.getSubjects(derived.subjects), [derived.subjects.join()]);
+  // One fetch for both: a subject list without its chapters can't render a
+  // chapter count or a "continue" chapter, so there's nothing useful to show
+  // until both have arrived. Keeping them on one `loading` flag is what stops
+  // the list flashing empty between "subjects in" and "chapters in".
+  const { data: subjects, loading } = useAsync(async () => {
+    const list = await api.getSubjects(derived.subjects);
+    const chapters = await Promise.all(list.map((s) => api.getChapters(s.id)));
+    return list.map((s, i) => ({ s, chapters: chapters[i] }));
+  }, [derived.subjects.join()]);
 
   const rows = useMemo(() => {
     if (!subjects) return [];
     const needle = q.trim().toLowerCase();
     return subjects
-      .map((s) => {
-        const chapters = CHAPTERS[s.id] ?? [];
+      .map(({ s, chapters }) => {
         const pct = subjectPct(s.id, state.readSections, state.attempts);
         const next = chapters.find((c) => c.id === state.lastChapterId) ?? chapters[0];
         return { s, pct, next, chapters };

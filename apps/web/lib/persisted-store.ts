@@ -11,7 +11,7 @@
  * The state shape matches the Android app's store deliberately, see
  * apps/mobile/src/store/app.tsx.
  */
-import { AI_QUOTA, Attempt, ChatThread, Language, Medium, Group, Notification, TestResult, XP, todayKey } from '@matricmate/core';
+import { AI_QUOTA, Attempt, ChatThread, Language, Medium, Group, Notification, SyncOp, TestResult, XP, enqueueOp, todayKey } from '@matricmate/core';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
@@ -191,3 +191,54 @@ export function touchToday(s: State): State {
 
 export const aiLimitFor = (premium: boolean) => (premium ? AI_QUOTA.premium : AI_QUOTA.free);
 export const xpFor = XP.forAnswer;
+
+/* --------------------------------------------------------------- sync queue */
+
+/**
+ * Study-state writes waiting to reach Postgres, mirroring `state` itself: an
+ * in-memory copy the store reads and writes synchronously, backed by
+ * localStorage so a closed tab does not lose them. store.tsx owns the
+ * Supabase calls that drain this; this file only owns where it lives, the
+ * same split as the state above.
+ *
+ * Keyed per user id, not one shared key, so a still-queued write from
+ * whoever last used this browser is never sent under a different student's
+ * session if someone else signs in on the same machine before it flushes.
+ */
+let syncQueue: SyncOp[] = [];
+
+const queueStorageKey = (userId: string) => `mm.web.syncQueue.${userId}`;
+
+export const getQueue = (): SyncOp[] => syncQueue;
+
+/** Reads a user's queued writes off localStorage into memory. Call once, right after identifying who is signed in. */
+export function loadQueue(userId: string): SyncOp[] {
+  syncQueue = [];
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = window.localStorage.getItem(queueStorageKey(userId));
+      if (raw) syncQueue = JSON.parse(raw) as SyncOp[];
+    } catch {
+      // corrupt queue, start empty rather than throw on a browser reload
+    }
+  }
+  return syncQueue;
+}
+
+/** Replaces the in-memory queue and mirrors it to localStorage. Used both to append a write and to drop flushed/dead ones. */
+export function saveQueue(userId: string, queue: SyncOp[]): void {
+  syncQueue = queue;
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(queueStorageKey(userId), JSON.stringify(queue));
+  } catch {
+    // storage blocked or full; the queue still lives in memory for this tab
+  }
+}
+
+/** Appends one write, deduplicating against anything already queued for the same fact. */
+export function pushToQueue(userId: string, op: SyncOp): SyncOp[] {
+  const next = enqueueOp(syncQueue, op);
+  saveQueue(userId, next);
+  return next;
+}

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { api } from '@matricmate/core';
+import type { Chapter } from '@matricmate/core';
 import { StudyList, StudyListSkeleton } from '@/components/screens/StudyList';
+import { getChapters, getSubjects } from '@/lib/content-readers';
 
 export const metadata: Metadata = {
   title: 'Study',
@@ -9,8 +10,12 @@ export const metadata: Metadata = {
 };
 
 async function Subjects() {
-  const subjects = await api.getSubjects();
-  return <StudyList subjects={subjects} />;
+  const subjects = await getSubjects();
+  const chapterLists = await Promise.all(subjects.map((s) => getChapters(s.id)));
+  const chaptersBySubject: Record<string, Chapter[]> = Object.fromEntries(
+    subjects.map((s, i) => [s.id, chapterLists[i]])
+  );
+  return <StudyList subjects={subjects} chaptersBySubject={chaptersBySubject} />;
 }
 
 export default function StudyPage() {

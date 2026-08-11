@@ -30,4 +30,5 @@ const client = cache(() => createClient());
 export const getChapter = cache(async (id: string) => api.getChapter(id, await client()));
 export const getChapterContent = cache(async (id: string) => api.getChapterContent(id, await client()));
 export const getSubject = cache(async (id: string) => api.getSubject(id, await client()));
+export const getSubjects = cache(async (ids?: string[]) => api.getSubjects(ids, await client()));
 export const getChapters = cache(async (subjectId: string) => api.getChapters(subjectId, await client()));

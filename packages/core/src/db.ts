@@ -28,7 +28,7 @@
  * React Native storage adapter), and this file only needs the query builder
  * shape, so it takes it structurally.
  */
-import { CHAPTERS, PAST_PAPERS, SUBJECTS, chapterById, contentFor, subjectById } from './content';
+import { CHAPTERS, PAST_PAPERS, SUBJECTS, chapterById, contentFor, primeContent, subjectById } from './content';
 import { Blank, Chapter, ChapterContent, Flashcard, Mcq, Medium, PastPaper, Section, ShortQ, Subject } from './types';
 
 /**
@@ -216,15 +216,42 @@ export async function fetchSubjects(ids?: string[], client?: ContentClient): Pro
       let q = table('subjects', at!).select('id,name,urdu_name,icon,compulsory,study_group,chapters(count)').order('sort_order');
       if (ids?.length) q = q.in('id', ids);
       const { data, error } = await q;
-      return {
-        error,
-        data: (data as (SubjectRow & { chapters: { count: number }[] })[] | null)?.map((r) =>
+      const mapped =
+        (data as (SubjectRow & { chapters: { count: number }[] })[] | null)?.map((r) =>
           toSubject(r, r.chapters?.[0]?.count ?? 0),
-        ) ?? null,
-      };
+        ) ?? null;
+      if (mapped?.length) primeContent({ subjects: mapped });
+      return { error, data: mapped };
     },
     fallback,
   );
+}
+
+/**
+ * Load every subject and chapter once, and prime the synchronous lookups.
+ *
+ * The live index in content.ts only helps in a runtime where something actually
+ * fetched. Server rendering primes the server; the browser and the mobile app
+ * then still answer `chapterById` from the bundle, so a heading shows the old
+ * chapter name while the page body shows the new content. One query at startup
+ * closes that, and one is enough: the whole curriculum is 84 rows.
+ *
+ * Deliberately not awaited by callers. It is a warm-up, and a screen must never
+ * wait on it. Failure is silent because the bundle is already a working answer.
+ */
+export async function primeAllContent(client?: ContentClient): Promise<void> {
+  const at = client ?? db;
+  if (!at) return;
+  try {
+    const { data, error } = await table('chapters', at)
+      .select('id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes')
+      .order('number');
+    if (error || !data) return;
+    const chapters = (data as ChapterRow[]).map((r) => toChapter(r));
+    if (chapters.length) primeContent({ chapters });
+  } catch {
+    /* the bundle stays in place, which is a working answer */
+  }
 }
 
 export async function fetchSubject(id: string, client?: ContentClient): Promise<Subject | undefined> {
@@ -261,17 +288,20 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
         chapter_sections: { count: number }[];
       };
 
-      return {
-        error,
-        data:
-          (data as Counted[] | null)?.map((r) =>
-            toChapter(r, {
-              mcqs: r.mcqs?.[0]?.count ?? 0,
-              cards: r.flashcards?.[0]?.count ?? 0,
-              sections: r.chapter_sections?.[0]?.count ?? 0,
-            }),
-          ) ?? null,
-      };
+      const mapped =
+        (data as Counted[] | null)?.map((r) =>
+          toChapter(r, {
+            mcqs: r.mcqs?.[0]?.count ?? 0,
+            cards: r.flashcards?.[0]?.count ?? 0,
+            sections: r.chapter_sections?.[0]?.count ?? 0,
+          }),
+        ) ?? null;
+
+      // Feed the synchronous lookups in content.ts, so every screen that reads
+      // chapterById or chaptersFor gets the real chapter without becoming async.
+      if (mapped?.length) primeContent({ chapters: mapped });
+
+      return { error, data: mapped };
     },
     () => CHAPTERS[subjectId] ?? [],
   );

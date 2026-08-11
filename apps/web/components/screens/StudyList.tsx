@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { CHAPTERS, SUBJECT_ICON, type Subject, subjectPct } from '@matricmate/core';
+import { SUBJECT_ICON, type Chapter, type Subject, subjectPct } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Empty, Icon, Skeleton, Ur } from '@/components/ui/primitives';
@@ -39,7 +39,13 @@ export function StudyListSkeleton() {
   );
 }
 
-export function StudyList({ subjects }: { subjects: Subject[] }) {
+export function StudyList({
+  subjects,
+  chaptersBySubject,
+}: {
+  subjects: Subject[];
+  chaptersBySubject: Record<string, Chapter[]>;
+}) {
   const { state, derived } = useApp();
   const t = useT();
   const [q, setQ] = useState('');
@@ -62,7 +68,7 @@ export function StudyList({ subjects }: { subjects: Subject[] }) {
       subjects
         .filter((s) => derived.subjects.includes(s.id))
         .map((s) => {
-          const chapters = CHAPTERS[s.id] ?? [];
+          const chapters = chaptersBySubject[s.id] ?? [];
           return {
             s,
             chapters,
@@ -70,7 +76,7 @@ export function StudyList({ subjects }: { subjects: Subject[] }) {
             next: chapters.find((c) => c.id === state.lastChapterId) ?? chapters[0],
           };
         }),
-    [subjects, derived.subjects, state.readSections, state.attempts, state.lastChapterId]
+    [subjects, chaptersBySubject, derived.subjects, state.readSections, state.attempts, state.lastChapterId]
   );
 
   const rows = useMemo(() => {

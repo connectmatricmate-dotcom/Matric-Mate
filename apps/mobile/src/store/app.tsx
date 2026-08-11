@@ -1,28 +1,72 @@
 /**
  * App state, session, onboarding choices, progress, attempts, AI usage, settings.
  *
- * Persisted to AsyncStorage (localStorage on web) so real progress survives reloads
- * and app restarts. When Supabase lands this becomes a thin cache over server state;
- * the shape of `state` and the action names stay the same.
+ * Persisted to AsyncStorage so real progress survives reloads and app restarts.
+ * Study-state (attempts, results, read sections, known cards, active days) is
+ * also written through to Postgres, following the same shape as the
+ * entitlement cache in store/auth.tsx: local state updates immediately, a
+ * queued write follows in the background, and a bad connection only delays
+ * the sync, never the screen. See @matricmate/core's sync.ts for the shared
+ * queue/merge logic and the reasoning behind it.
  */
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey ,
+import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey, totalXp,
   Attempt,
   ChatThread,
   Group,
   Medium,
   Notification,
   PlanTask,
+  SyncOp,
   TestResult,
+  enqueueOp,
+  flushQueue,
+  hydrateStudyState,
+  mergeHydratedState,
+  syncActiveDay,
+  syncAttempt,
+  syncCardKnown,
+  syncCardUnknown,
+  syncReadSection,
+  syncResult,
 } from '@matricmate/core';
 import { useAuth } from './auth';
+import { supabase } from '../lib/supabase';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
 // device already had stored under v1, so nobody's dashboard still shows the
 // fabricated history. Do not revert this to v1.
 const KEY = 'mm.state.v2';
+
+/**
+ * Where a signed-in student's unsent writes wait. Keyed per user, not one
+ * shared key, so a still-queued answer from whoever last used this phone can
+ * never be attributed to the next person who signs in on it (a shared family
+ * or classroom phone is not a hypothetical here).
+ */
+const queueKey = (userId: string) => `mm.syncQueue.${userId}`;
+
+async function loadQueue(userId: string): Promise<SyncOp[]> {
+  try {
+    const raw = await AsyncStorage.getItem(queueKey(userId));
+    return raw ? (JSON.parse(raw) as SyncOp[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Fire-and-forget on purpose. The queue that matters for correctness is the
+ * in-memory `queueRef`; this write only protects against the app being killed
+ * before the next flush. Nothing awaits it, and nothing should: an action
+ * that answered a question must return the moment local state is updated.
+ */
+function saveQueue(userId: string, queue: SyncOp[]): void {
+  AsyncStorage.setItem(queueKey(userId), JSON.stringify(queue)).catch(() => {});
+}
 
 export type Onboarding = {
   classLevel: 9 | 10;
@@ -133,14 +177,35 @@ const AppCtx = createContext<Ctx | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   /**
-   * Study progress is still local. Identity and entitlement are not, and are
-   * merged in below so every screen keeps reading `state.user` and
-   * `state.premium` without knowing where they came from.
+   * Study progress is local-first, but not local-only any more. Identity and
+   * entitlement are merged in below so every screen keeps reading `state.user`
+   * and `state.premium` without knowing where they came from; the same is now
+   * true of progress, which starts from AsyncStorage and is corrected by the
+   * server the moment a session and a connection both exist.
    */
-  const { user: authUser, entitlement } = useAuth();
+  const { user: authUser, entitlement, loading: authLoading } = useAuth();
   const [state, setState] = useState<State>(EMPTY);
+  const [localLoaded, setLocalLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Read by actions so they can decide what to queue without `state` in their deps (see `actions` below, memoised once). */
+  const stateRef = useRef<State>(EMPTY);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  /** Unsent study-state writes for the signed-in user, mirrored to AsyncStorage on every change. */
+  const queueRef = useRef<SyncOp[]>([]);
+  const flushingRef = useRef(false);
+  /**
+   * Which user id the server hydration (and queue load) has already run for
+   * this cold start, or null for signed-out. Guards against re-running on
+   * every token refresh, the same problem `refresh` guards against for
+   * entitlement, and lets actions know who a write belongs to without a
+   * second copy of `authUser` threaded through `useMemo` deps.
+   */
+  const syncedForRef = useRef<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -153,7 +218,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       } catch {
         // corrupt cache, start clean rather than crash
       } finally {
-        setHydrated(true);
+        setLocalLoaded(true);
       }
     })();
   }, []);
@@ -165,6 +230,98 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.setItem(KEY, JSON.stringify(state)).catch(() => {});
     }, 250);
   }, [state, hydrated]);
+
+  const flush = useCallback(async (userId: string) => {
+    if (flushingRef.current) return;
+    flushingRef.current = true;
+    try {
+      const { remaining, flushed, dropped } = await flushQueue(supabase, userId, queueRef.current);
+      queueRef.current = remaining;
+      if (flushed || dropped) saveQueue(userId, remaining);
+    } finally {
+      flushingRef.current = false;
+    }
+  }, []);
+
+  /**
+   * Queues a write and immediately tries to send it. Never awaited by a
+   * caller: the point of the queue is that a student answering questions on a
+   * train does not wait on a network that is not there. If `flush` fails, the
+   * op is still in `queueRef` (and on disk), and the AppState listener below
+   * retries it the next time the app comes to the foreground.
+   */
+  const queueAndFlush = useCallback(
+    (op: SyncOp) => {
+      const userId = syncedForRef.current;
+      if (!userId) return; // signed out: nothing to attach this write to yet
+      queueRef.current = enqueueOp(queueRef.current, op);
+      saveQueue(userId, queueRef.current);
+      void flush(userId);
+    },
+    [flush],
+  );
+
+  /**
+   * On sign-in (including the app's very first launch already signed in),
+   * pull server study-state before this device shows any of it. Skipped
+   * entirely for a signed-out student. Guarded by `syncedForRef` so a token
+   * refresh, which fires the same auth events as a sign-in, does not re-pull
+   * and re-merge on every one.
+   */
+  useEffect(() => {
+    if (!localLoaded || authLoading) return;
+    const uid = authUser?.id ?? null;
+    let cancelled = false;
+
+    // Everything that can call setState runs inside this async body, even the
+    // two branches with no real async work, so nothing here sets state
+    // synchronously while the effect itself is still running.
+    (async () => {
+      if (syncedForRef.current === uid) {
+        setHydrated(true);
+        return;
+      }
+      syncedForRef.current = uid;
+
+      if (!uid) {
+        queueRef.current = [];
+        setHydrated(true);
+        return;
+      }
+
+      queueRef.current = await loadQueue(uid);
+      const server = await hydrateStudyState(supabase, uid);
+      if (cancelled || syncedForRef.current !== uid) return;
+      if (server) {
+        setState((s) => {
+          const merged = mergeHydratedState(s, server);
+          return { ...merged, xp: totalXp(merged.attempts, merged.cardsKnown) };
+        });
+      }
+      setHydrated(true);
+      void flush(uid);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [localLoaded, authLoading, authUser?.id, flush]);
+
+  /**
+   * Retries whatever is still queued whenever the student picks the phone
+   * back up. There is no native network-reachability listener wired into this
+   * app (adding one is a native dependency and a rebuild, see BUILD-PLAN's
+   * standing risks on Expo Go drift), so "the app came back to the
+   * foreground" stands in for "we might have a connection again", the same
+   * proxy store/auth.tsx already uses to re-check entitlement on resume.
+   */
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (status) => {
+      const uid = syncedForRef.current;
+      if (status === 'active' && uid) void flush(uid);
+    });
+    return () => sub.remove();
+  }, [flush]);
 
   const touchToday = (s: State): State => {
     const t = todayKey();
@@ -188,6 +345,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         })),
       recordAttempt: (a) => {
         const full: Attempt = { ...a, id: `a-${Date.now()}-${Math.round(Math.random() * 1e4)}`, at: Date.now() };
+        const isNewDay = !stateRef.current.activeDays.includes(todayKey());
         setState((s) =>
           touchToday({
             ...s,
@@ -195,14 +353,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             xp: s.xp + XP.forAnswer(a.correct, a.confidence),
           })
         );
+        // Queued, not awaited: the answer is already on screen and in state.
+        // Whether it reaches Postgres now, in ten minutes on reconnect, or
+        // never (see applySyncOp's drop path) cannot be allowed to hold up
+        // the next question.
+        queueAndFlush(syncAttempt(full));
+        if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
         return full;
       },
       addResult: (r) => {
         const full: TestResult = { ...r, id: `r-${Date.now()}`, at: Date.now() };
+        const isNewDay = !stateRef.current.activeDays.includes(todayKey());
         setState((s) => touchToday({ ...s, results: [full, ...s.results] }));
+        queueAndFlush(syncResult(full));
+        if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
         return full;
       },
-      markSectionRead: (sectionId, chapterId, index) =>
+      markSectionRead: (sectionId, chapterId, index) => {
+        const isNewSection = !stateRef.current.readSections.includes(sectionId);
+        const isNewDay = !stateRef.current.activeDays.includes(todayKey());
         setState((s) =>
           touchToday({
             ...s,
@@ -210,7 +379,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             lastChapterId: chapterId,
             lastSectionIndex: index,
           })
-        ),
+        );
+        // Only the first time a section is read is synced (read_sections'
+        // own comment in 0001_init.sql: re-reading is not a new fact), which
+        // also means "resume reading" restores to the newest section a
+        // student reached, not wherever they last happened to be re-reading.
+        if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
+        if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
+      },
       togglePlanTask: (id) =>
         setState((s) => ({
           ...s,
@@ -223,7 +399,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             ? s.downloads.filter((x) => x !== chapterId)
             : [...s.downloads, chapterId],
         })),
-      markCard: (cardId, known) =>
+      markCard: (cardId, known) => {
+        const wasKnown = stateRef.current.cardsKnown.includes(cardId);
         setState((s) => ({
           ...s,
           cardsKnown: known
@@ -232,7 +409,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               : [...s.cardsKnown, cardId]
             : s.cardsKnown.filter((x) => x !== cardId),
           xp: known && !s.cardsKnown.includes(cardId) ? s.xp + XP.card : s.xp,
-        })),
+        }));
+        if (known && !wasKnown) queueAndFlush(syncCardKnown(cardId));
+        else if (!known && wasKnown) queueAndFlush(syncCardUnknown(cardId));
+      },
       consumeAi: () => {
         let allowed = false;
         setState((s) => {
@@ -258,7 +438,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
       resetDemo: () => setState((s) => ({ ...EMPTY, user: s.user, onboarding: s.onboarding, settings: s.settings })),
     }),
-    []
+    [queueAndFlush]
   );
 
   /**

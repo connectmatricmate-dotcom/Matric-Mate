@@ -3,7 +3,7 @@
  * Pure functions so the same rules run on device, on web and (later) on the server.
  */
 import { Attempt, Confidence, PlanTask, TestResult } from './types';
-import { CHAPTERS, chapterById, contentFor } from './content';
+import { chapterById, chaptersFor, contentFor } from './content';
 
 export const XP = {
   /** Correct answer. Honest confidence is rewarded: a lucky guess earns less than a sure answer. */
@@ -23,6 +23,24 @@ export const XP = {
 export const level = (xp: number) => Math.floor(xp / XP.perLevel) + 1;
 export const levelProgress = (xp: number) => ((xp % XP.perLevel) / XP.perLevel) * 100;
 export const xpToNextLevel = (xp: number) => XP.perLevel - (xp % XP.perLevel);
+
+/**
+ * Total XP implied by a set of attempts and known cards, recomputed rather
+ * than read off a running counter.
+ *
+ * Every screen that awards XP does it incrementally, `xp + XP.forAnswer(...)`
+ * on the moment of the answer, which is right for a device that saw every
+ * answer happen. It is wrong the moment a sync hydration merges in attempts a
+ * server had and this device did not: the counter never saw those, so it
+ * would stay short by exactly their XP. This recomputes the total from
+ * history instead, so it is correct regardless of which device recorded what.
+ * Only used right after a hydration merge; every other update stays
+ * incremental, because walking the full attempt list on every answer would
+ * cost more than it is worth.
+ */
+export function totalXp(attempts: Attempt[], cardsKnown: string[]): number {
+  return attempts.reduce((sum, a) => sum + XP.forAnswer(a.correct, a.confidence), 0) + cardsKnown.length * XP.card;
+}
 
 const dayKey = (ms: number) => new Date(ms).toISOString().slice(0, 10);
 
@@ -102,20 +120,29 @@ export function weakTopics(attempts: Attempt[], minAttempts = 3) {
     .sort((a, b) => a.accuracy - b.accuracy);
 }
 
-/** Per-chapter progress = read sections + practised questions. */
+/**
+ * Per-chapter progress = read sections + practised questions.
+ *
+ * Counts against the chapter's own totals, not against the bundled sample.
+ * Real sections are ids like `phy-1-en-s1` and the bundle's are not, so
+ * matching read markers against bundled section ids found nothing and progress
+ * sat at zero however much a student read. Ownership is by id prefix, which is
+ * unambiguous because `chem-1-` cannot match `chem-10-en-s1`.
+ */
 export function chapterPct(chapterId: string, readSections: string[], attempts: Attempt[]): number {
+  const chapter = chapterById(chapterId);
   const content = contentFor(chapterId);
-  const totalSections = content.sections.length || 1;
-  const readCount = content.sections.filter((s) => readSections.includes(s.id)).length;
+  const totalSections = chapter?.sectionCount || content.sections.length || 1;
+  const readCount = readSections.filter((id) => id === chapterId || id.startsWith(`${chapterId}-`)).length;
   const answered = new Set(attempts.filter((a) => a.chapterId === chapterId).map((a) => a.mcqId)).size;
-  const qTarget = Math.min(content.mcqs.length || 1, 10);
+  const qTarget = Math.min(chapter?.mcqCount || content.mcqs.length || 1, 10);
   const readPart = (readCount / totalSections) * 70;
   const practicePart = (Math.min(answered, qTarget) / qTarget) * 30;
   return Math.round(readPart + practicePart);
 }
 
 export function subjectPct(subjectId: string, readSections: string[], attempts: Attempt[]): number {
-  const chapters = CHAPTERS[subjectId] ?? [];
+  const chapters = chaptersFor(subjectId);
   if (!chapters.length) return 0;
   const sum = chapters.reduce((n, c) => n + chapterPct(c.id, readSections, attempts), 0);
   return Math.round(sum / chapters.length);

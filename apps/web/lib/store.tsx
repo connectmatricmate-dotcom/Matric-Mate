@@ -15,11 +15,22 @@ import {
   Language,
   PlanTask,
   StringKey,
+  SyncOp,
   TestResult,
   buildPlan,
+  flushQueue,
+  hydrateStudyState,
   level,
+  mergeHydratedState,
   streakFrom,
+  syncActiveDay,
+  syncAttempt,
+  syncCardKnown,
+  syncCardUnknown,
+  syncReadSection,
+  syncResult,
   todayKey,
+  totalXp,
   translate,
 } from '@matricmate/core';
 import {
@@ -28,9 +39,13 @@ import {
   Settings,
   State,
   aiLimitFor,
+  getQueue,
   getServerSnapshot,
   getSnapshot,
   hydrate,
+  loadQueue,
+  pushToQueue,
+  saveQueue,
   subscribe,
   touchToday,
   update,
@@ -89,30 +104,49 @@ const actions: Actions = {
         ...o,
       },
     })),
-  recordAttempt: (a) =>
+  recordAttempt: (a) => {
+    const day = todayKey();
+    const isNewDay = !getSnapshot().activeDays.includes(day);
+    const full: Attempt = { ...a, id: `a-${Date.now()}-${getSnapshot().attempts.length}`, at: Date.now() };
+    update((s) => touchToday({ ...s, attempts: [...s.attempts, full], xp: s.xp + xpFor(a.correct, a.confidence) }));
+    // Queued, not awaited: the store already updated and the screen already
+    // moved on. See queueAndFlush below for what happens to this in the
+    // background.
+    queueAndFlush(syncAttempt(full));
+    if (isNewDay) queueAndFlush(syncActiveDay(day));
+  },
+  recordAttempts: (list) => {
+    if (!list.length) return;
+    const day = todayKey();
+    const isNewDay = !getSnapshot().activeDays.includes(day);
+    const at = Date.now();
+    const base = getSnapshot().attempts.length;
+    const full = list.map((a, n) => ({ ...a, id: `a-${at}-${base + n}`, at }));
     update((s) =>
       touchToday({
         ...s,
-        attempts: [...s.attempts, { ...a, id: `a-${Date.now()}-${s.attempts.length}`, at: Date.now() }],
-        xp: s.xp + xpFor(a.correct, a.confidence),
-      })
-    ),
-  recordAttempts: (list) =>
-    update((s) => {
-      if (!list.length) return s;
-      const at = Date.now();
-      return touchToday({
-        ...s,
-        attempts: [...s.attempts, ...list.map((a, n) => ({ ...a, id: `a-${at}-${s.attempts.length + n}`, at }))],
+        attempts: [...s.attempts, ...full],
         xp: s.xp + list.reduce((sum, a) => sum + xpFor(a.correct, a.confidence), 0),
-      });
-    }),
+      })
+    );
+    // Each answer in the paper is still its own row server-side (attempts is
+    // an append-only log); only the store notification was batched.
+    full.forEach((a) => queueAndFlush(syncAttempt(a)));
+    if (isNewDay) queueAndFlush(syncActiveDay(day));
+  },
   addResult: (r) => {
     const full: TestResult = { ...r, id: `r-${Date.now()}`, at: Date.now() };
+    const day = todayKey();
+    const isNewDay = !getSnapshot().activeDays.includes(day);
     update((s) => touchToday({ ...s, results: [full, ...s.results] }));
+    queueAndFlush(syncResult(full));
+    if (isNewDay) queueAndFlush(syncActiveDay(day));
     return full;
   },
-  markSectionRead: (sectionId, chapterId, index) =>
+  markSectionRead: (sectionId, chapterId, index) => {
+    const isNewSection = !getSnapshot().readSections.includes(sectionId);
+    const day = todayKey();
+    const isNewDay = !getSnapshot().activeDays.includes(day);
     update((s) =>
       touchToday({
         ...s,
@@ -120,7 +154,14 @@ const actions: Actions = {
         lastChapterId: chapterId,
         lastSectionIndex: index,
       })
-    ),
+    );
+    // Only the first time a section is read is synced (read_sections' own
+    // comment in 0001_init.sql: re-reading is not a new fact), so "resume
+    // reading" restores to the newest section reached, not wherever a
+    // student last happened to be re-reading.
+    if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
+    if (isNewDay) queueAndFlush(syncActiveDay(day));
+  },
   togglePlanTask: (id) =>
     update((s) => ({
       ...s,
@@ -131,7 +172,8 @@ const actions: Actions = {
       ...s,
       downloads: s.downloads.includes(chapterId) ? s.downloads.filter((x) => x !== chapterId) : [...s.downloads, chapterId],
     })),
-  markCard: (cardId, known) =>
+  markCard: (cardId, known) => {
+    const wasKnown = getSnapshot().cardsKnown.includes(cardId);
     update((s) => ({
       ...s,
       cardsKnown: known
@@ -140,7 +182,10 @@ const actions: Actions = {
           : [...s.cardsKnown, cardId]
         : s.cardsKnown.filter((x) => x !== cardId),
       xp: known && !s.cardsKnown.includes(cardId) ? s.xp + 2 : s.xp,
-    })),
+    }));
+    if (known && !wasKnown) queueAndFlush(syncCardKnown(cardId));
+    else if (!known && wasKnown) queueAndFlush(syncCardUnknown(cardId));
+  },
   consumeAi: () => {
     let allowed = false;
     update((s) => {
@@ -181,6 +226,70 @@ async function refreshPremium(): Promise<boolean> {
   return active;
 }
 
+/* ------------------------------------------------------------- study sync */
+
+/**
+ * Which user id has already had its offline queue loaded and its server
+ * study-state pulled in this tab, or null while signed out. Set synchronously
+ * so `queueAndFlush` always knows who a write belongs to, and checked before
+ * acting on it so a SIGNED_IN/USER_UPDATED pair (the same events
+ * refreshPremium reacts to) does not re-pull and re-merge twice.
+ */
+let syncedFor: string | null = null;
+let flushing = false;
+
+/**
+ * Sends whatever is queued for `userId`. Called after every enqueue and on
+ * an online/visibility signal, never on a timer: there is nothing to poll for,
+ * only a queue to drain the moment a connection plausibly exists.
+ */
+async function flush(userId: string): Promise<void> {
+  if (flushing) return;
+  flushing = true;
+  try {
+    const supabase = createClient();
+    const { remaining } = await flushQueue(supabase, userId, getQueue());
+    saveQueue(userId, remaining);
+  } finally {
+    flushing = false;
+  }
+}
+
+/**
+ * Queues a write and kicks a flush in the background. Never awaited by an
+ * action: recordAttempt etc. must return the instant local state is updated,
+ * with the network write following behind it rather than gating it.
+ */
+function queueAndFlush(op: SyncOp): void {
+  const userId = syncedFor;
+  if (!userId) return; // signed out: nothing to attach this write to
+  pushToQueue(userId, op);
+  void flush(userId);
+}
+
+/**
+ * Pulls server study-state into the store and loads that user's offline
+ * queue, once per identity per tab. A fresh sign-in on a new browser has an
+ * empty local store, so this is what turns a blank dashboard into the real
+ * one; on a browser that already has local state, it is a cross-device merge
+ * (see mergeHydratedState), which is what keeps two devices converging.
+ */
+async function syncStudyState(userId: string): Promise<void> {
+  if (syncedFor === userId) return;
+  syncedFor = userId;
+  loadQueue(userId);
+  const supabase = createClient();
+  const server = await hydrateStudyState(supabase, userId);
+  if (syncedFor !== userId) return; // a different user signed in while this was in flight
+  if (server) {
+    update((s) => {
+      const merged = mergeHydratedState(s, server);
+      return { ...merged, xp: totalXp(merged.attempts, merged.cardsKnown) };
+    });
+  }
+  void flush(userId);
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
@@ -213,24 +322,58 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     void supabase.auth.getUser().then(({ data }) => {
       apply(data.user);
-      if (data.user) void refreshPremium();
+      if (data.user) {
+        void refreshPremium();
+        void syncStudyState(data.user.id);
+      }
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       apply(session?.user ?? null);
-      // Entitlement re-checks only when the PERSON might have changed, not on
-      // every TOKEN_REFRESHED. Token rotation happens constantly in the
-      // background, and each re-check is a network query plus a full-store
-      // update for an answer that cannot have changed.
+      // Entitlement and study-state re-pull only when the PERSON might have
+      // changed, not on every TOKEN_REFRESHED. Token rotation happens
+      // constantly in the background, and each re-check is a network round
+      // trip for an answer that cannot have changed; syncStudyState also
+      // short-circuits on its own via `syncedFor`, so this gate is belt and
+      // braces against firing it on every refresh.
       if (session?.user) {
-        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') void refreshPremium();
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+          void refreshPremium();
+          void syncStudyState(session.user.id);
+        }
+      } else {
+        // Signing out must also drop what the last account was entitled to,
+        // or the next person on a shared computer inherits the crown until
+        // their first sync answers. The offline queue is left on disk under
+        // the outgoing user's own key rather than cleared: a write that has
+        // not synced yet is real work a student did, and it is still there
+        // to send if they sign back in on this browser.
+        update((s) => ({ ...s, premium: { active: false, validTill: null } }));
+        syncedFor = null;
       }
-      // Signing out must also drop what the last account was entitled to, or
-      // the next person on a shared computer inherits the crown until their
-      // first sync answers.
-      else update((s) => ({ ...s, premium: { active: false, validTill: null } }));
     });
     return () => sub.subscription.unsubscribe();
+  }, []);
+
+  /**
+   * Retries whatever is still queued on the two browser signals that
+   * plausibly mean "we might be online again": the connection coming back,
+   * and the tab regaining focus after being backgrounded (mobile Safari and
+   * Chrome both suspend timers and sometimes connections in a hidden tab).
+   */
+  useEffect(() => {
+    const onOnline = () => {
+      if (syncedFor) void flush(syncedFor);
+    };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && syncedFor) void flush(syncedFor);
+    };
+    window.addEventListener('online', onOnline);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, []);
 
   const derived = useMemo(() => {

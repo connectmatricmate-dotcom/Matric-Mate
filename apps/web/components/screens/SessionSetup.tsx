@@ -2,15 +2,58 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { CHAPTERS, api, chapterById, subjectById } from '@matricmate/core';
+import { type Chapter, api, chapterById, subjectById } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, Seg } from '@/components/ui/controls';
-import { Card, Check, Item, SectionTitle } from '@/components/ui/primitives';
+import { Card, Check, Item, SectionTitle, Skeleton } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 
-export function SessionSetup({ initialChapterId }: { initialChapterId?: string }) {
+export function SessionSetupSkeleton() {
+  return (
+    <Page width="focus">
+      <div className="mb-5">
+        <Skeleton className="mb-3 h-3.5 w-24" />
+        <Skeleton className="mb-2 h-7 w-48" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+
+      <Skeleton className="mb-2 h-3 w-16" />
+      <div className="flex flex-wrap gap-2">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-10 w-20 rounded-full" />
+        ))}
+      </div>
+
+      <Skeleton className="mt-6 mb-2 h-3 w-20" />
+      <Card flat className="py-0">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className={`flex items-center gap-3 py-3.5 ${i < 3 ? 'border-b border-line' : ''}`}>
+            <Skeleton className="h-10 w-10 shrink-0 rounded-[13px]" />
+            <div className="flex-1">
+              <Skeleton className="mb-1.5 h-3.5 w-2/5" />
+              <Skeleton className="h-2.5 w-1/4" />
+            </div>
+          </div>
+        ))}
+      </Card>
+
+      <Skeleton className="mt-6 mb-2 h-3 w-24" />
+      <Skeleton className="h-10 w-full max-w-[280px] rounded-full" />
+
+      <Skeleton className="mt-6 h-11 w-full max-w-[220px] rounded-full" />
+    </Page>
+  );
+}
+
+export function SessionSetup({
+  initialChapterId,
+  chaptersBySubject,
+}: {
+  initialChapterId?: string;
+  chaptersBySubject: Record<string, Chapter[]>;
+}) {
   const router = useRouter();
   const { derived, state } = useApp();
   const t = useT();
@@ -24,8 +67,8 @@ export function SessionSetup({ initialChapterId }: { initialChapterId?: string }
   const [pickedSubject, setPickedSubject] = useState(subjectId);
 
   const chapters = useMemo(
-    () => (CHAPTERS[subjectId] ?? []).filter((c) => !c.premium || state.premium.active),
-    [subjectId, state.premium.active]
+    () => (chaptersBySubject[subjectId] ?? []).filter((c) => !c.premium || state.premium.active),
+    [chaptersBySubject, subjectId, state.premium.active]
   );
 
   // The default subject is picked before the store hydrates, when the subject

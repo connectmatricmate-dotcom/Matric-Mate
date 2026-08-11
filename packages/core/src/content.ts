@@ -202,8 +202,54 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
 );
 
 export const ALL_CHAPTERS: Chapter[] = Object.values(CHAPTERS).flat();
-export const chapterById = (id: string) => ALL_CHAPTERS.find((c) => c.id === id);
-export const subjectById = (id: string) => SUBJECTS.find((s) => s.id === id);
+
+/* ------------------------------------------------------------ live index */
+
+/**
+ * Real chapters and subjects, once anything has fetched them.
+ *
+ * WHY THIS EXISTS. Dozens of call sites across both apps ask `chapterById` for
+ * a title, or read `CHAPTERS[subjectId]` for a list. They are synchronous by
+ * nature: a heading cannot await. When content moved to Postgres those call
+ * sites kept returning the bundled sample, so screens showed old chapter names
+ * and placeholder counts long after the database was correct. Converting every
+ * one of them to an async read would be a large refactor and would make every
+ * title flicker.
+ *
+ * So the lookups stay synchronous and the data underneath them gets replaced.
+ * `db.ts` calls `primeContent` whenever it successfully reads from the server,
+ * and from then on every existing call site returns real data with no change at
+ * the call site at all. Before that first fetch, and offline, they fall back to
+ * the bundle exactly as before.
+ */
+let liveChapters: Record<string, Chapter> | null = null;
+let liveBySubject: Record<string, Chapter[]> | null = null;
+let liveSubjects: Subject[] | null = null;
+
+/** Called by the fetch layer after a successful read. Not for app code. */
+export function primeContent(next: { subjects?: Subject[]; chapters?: Chapter[] }): void {
+  if (next.subjects?.length) liveSubjects = next.subjects;
+  if (next.chapters?.length) {
+    liveChapters = { ...(liveChapters ?? {}) };
+    const bySubject: Record<string, Chapter[]> = { ...(liveBySubject ?? {}) };
+    for (const c of next.chapters) liveChapters[c.id] = c;
+    // Group only the subjects in this batch, so priming one subject does not
+    // wipe another that was primed earlier.
+    for (const subjectId of new Set(next.chapters.map((c) => c.subjectId))) {
+      bySubject[subjectId] = next.chapters.filter((c) => c.subjectId === subjectId).sort((a, b) => a.number - b.number);
+    }
+    liveBySubject = bySubject;
+  }
+}
+
+/** Live chapters for a subject, or the bundled ones if nothing has loaded. */
+export const chaptersFor = (subjectId: string): Chapter[] => liveBySubject?.[subjectId] ?? CHAPTERS[subjectId] ?? [];
+
+export const chapterById = (id: string): Chapter | undefined =>
+  liveChapters?.[id] ?? ALL_CHAPTERS.find((c) => c.id === id);
+
+export const subjectById = (id: string): Subject | undefined =>
+  liveSubjects?.find((s) => s.id === id) ?? SUBJECTS.find((s) => s.id === id);
 
 /* ------------------------------------------------------- authored content */
 

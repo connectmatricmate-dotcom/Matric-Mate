@@ -13,7 +13,7 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { connectContent } from '@matricmate/core';
+import { connectContent, primeAllContent } from '@matricmate/core';
 
 /**
  * The Supabase client for the app. Same project, same tables, same rules as the
@@ -113,6 +113,8 @@ export const supabase: SupabaseClient =
  * that throws on every call.
  */
 connectContent(client);
+// Warm the synchronous lookups so chapter titles are real from the first render.
+void primeAllContent(client ?? undefined);
 
 /**
  * Refresh tokens only while the app is in front of someone.
