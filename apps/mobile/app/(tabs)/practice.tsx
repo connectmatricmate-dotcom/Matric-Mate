@@ -68,7 +68,7 @@ export default function Practice() {
               icon={r.mode === 'exam' ? 'clock' : 'target'}
               tone={r.mode === 'exam' ? 'orange' : 'teal'}
               last={i === recent.length - 1}
-              right={<Pill tone={r.score / r.total >= 0.7 ? 'green' : 'red'}>{`${Math.round((r.score / r.total) * 100)}%`}</Pill>}
+              right={<Pill tone={(r.total ? r.score / r.total : 0) >= 0.7 ? 'green' : 'red'}>{`${Math.round((r.total ? r.score / r.total : 0) * 100)}%`}</Pill>}
             />
           ))}
         </Card>

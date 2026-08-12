@@ -147,10 +147,20 @@ function RealPlayer({ id }: { id: string }) {
 
   const medium = state.settings.contentMedium;
   const { data: tracks, loading: tracksLoading, error: tracksError } = useAsync(() => api.getAudioTracks(id), [id]);
-  const picked = pickAudioTrack(tracks ?? [], medium) ?? localAudioTrack(id, medium);
+  // Membership, not the array: this is what actually decides whether files
+  // exist on disk, and it changes exactly when a download lands or is removed.
+  const isDownloaded = state.downloads.includes(id);
+  // Disk is only touched when the inputs change, not on every render: the
+  // status hook re-renders this component twice a second during playback, and
+  // each of these used to stat and parse files on the JS thread every time.
+  const localTrack = useMemo(() => (isDownloaded ? localAudioTrack(id, medium) : null), [id, medium, isDownloaded]);
+  const picked = pickAudioTrack(tracks ?? [], medium) ?? localTrack;
   // The downloaded copy wins over the stream, so a saved chapter plays with no
   // signal and a replay costs the student no data.
-  const offlineUri = picked ? localAudioUri(id, picked.medium) : null;
+  const offlineUri = useMemo(
+    () => (picked && isDownloaded ? localAudioUri(id, picked.medium) : null),
+    [id, picked, isDownloaded],
+  );
   /**
    * The hook owns source changes, nothing here calls player.replace().
    *
@@ -246,10 +256,11 @@ function PreviewPlayer({ id }: { id: string }) {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
-  const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
-  const duration = (chapter?.audioMinutes ?? 14) * 60;
+  // This boundary only exists for binaries that predate expo-audio, and it
+  // cannot play anything. A made-up "14 minutes" was worse than saying so.
+  const duration = 0;
   const [position, setPosition] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(0);

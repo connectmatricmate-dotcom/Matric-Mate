@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { View } from 'react-native';
 import { BILLING_SITE } from '@matricmate/core';
 import { useT } from '../i18n';
 import { C, S } from '../theme';
-import { Btn, Card, Row, Small, useToast } from './ui';
+import { Card, Row, Small } from './ui';
 import { Icon } from './Icon';
 
 /**
@@ -15,15 +14,16 @@ import { Icon } from './Icon';
  * core/billing.ts.
  *
  * What is allowed is naming, as plain text, where the account is managed, and
- * contacting the student outside the app. So the one action here opens nothing:
- * it asks the server to email them the link. The message leaves Play's surface
- * entirely, which is the same route Netflix and Spotify take. The difference is
- * that we do the typing for them instead of leaving them at a dead end.
+ * contacting the student outside the app.
+ *
+ * There used to be an "Email me the link" button here that only flipped its
+ * own label to "Saved": no server call existed, so it told a student their
+ * email was on the way and sent nothing. A control that lies is worse than no
+ * control. It comes back when the server can actually send that mail, see
+ * docs/CLIENT-ACTIONS.md.
  */
 export function LockedNotice({ variant = 'locked' }: { variant?: 'locked' | 'expired' | 'free' }) {
   const t = useT();
-  const toast = useToast();
-  const [sent, setSent] = useState(false);
 
   const body =
     variant === 'expired' ? t('billing.expiredBody') : variant === 'free' ? t('billing.freeBody') : t('billing.lockedBody');
@@ -37,22 +37,6 @@ export function LockedNotice({ variant = 'locked' }: { variant?: 'locked' | 'exp
           {/* Plain text on purpose, must never be tappable. */}
           <Small style={{ marginTop: 4 }}>{t('billing.manageNote', { site: BILLING_SITE })}</Small>
           <Small style={{ marginTop: 4 }}>{t('billing.howToUpgrade')}</Small>
-
-          <View style={{ marginTop: S.md, alignSelf: 'flex-start' }}>
-            <Btn
-              title={sent ? t('common.saved') : t('billing.emailLink')}
-              variant="line"
-              sm
-              icon="mail"
-              disabled={sent}
-              onPress={() => {
-                // Deliberately no navigation and no Linking.openURL: the server
-                // sends the mail, so nothing in the app points at a checkout.
-                setSent(true);
-                toast(t('billing.emailLinkSent'));
-              }}
-            />
-          </View>
         </View>
       </Row>
     </Card>

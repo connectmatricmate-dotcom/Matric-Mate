@@ -50,13 +50,16 @@ export default function Dashboard() {
   const week = useMemo(() => {
     const since = now - 7 * 864e5;
     const recent = state.attempts.filter((a) => a.at >= since);
-    const minutes = Math.round(recent.length * 1.6 + state.readSections.length * 4);
+    // Days actually studied, counted from real activity. The old value here
+    // was minutes invented by a formula over counts, which told a student
+    // they had studied for hours they never spent.
+    const days = state.activeDays.filter((d) => Date.parse(d) >= since).length;
     return {
       accuracy: accuracy(recent),
       questions: recent.length,
-      time: minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes}m`,
+      days: `${Math.min(7, days)}/7`,
     };
-  }, [state.attempts, state.readSections, now]);
+  }, [state.attempts, state.activeDays, now]);
 
   const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
@@ -151,7 +154,7 @@ export default function Dashboard() {
               >
                 {planLabel(task)}
               </Text>
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: 'rgba(255,255,255,0.92)' }}>
                 {subjectById(task.subjectId)?.name}
               </Text>
             </Tap>
@@ -220,7 +223,7 @@ export default function Dashboard() {
       <Row gap={S.sm}>
         <Kpi value={`${week.accuracy}%`} label={t('dash.accuracy')} small />
         <Kpi value={`${week.questions}`} label={t('dash.questions')} small />
-        <Kpi value={week.time} label={t('dash.studyTime')} small />
+        <Kpi value={week.days} label={t('dash.activeDays')} small />
       </Row>
 
       {!state.premium.active ? (

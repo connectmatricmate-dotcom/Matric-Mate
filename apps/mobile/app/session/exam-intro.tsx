@@ -2,32 +2,37 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Btn, Card, H2, Header, Pill, Row, Screen, Small, Spacer } from '../../src/components/ui';
-import { api , chapterById, subjectById } from '@matricmate/core';
+import { Btn, Card, H2, Header, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
+import { api , chapterById, subjectById, weakTopics } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
 
 export default function ExamIntro() {
-  const { subject, chapter, paper, ai } = useLocalSearchParams<{
+  const { subject, chapter, paper, ai, topics, count: countParam } = useLocalSearchParams<{
     subject?: string;
     chapter?: string;
     paper?: string;
     ai?: string;
+    topics?: string;
+    count?: string;
   }>();
   const { state, derived } = useApp();
   const t = useT();
   const [busy, setBusy] = useState(false);
+  const toast = useToast();
 
   const subjectId = subject ?? (chapter ? chapterById(chapter)?.subjectId : undefined) ?? derived.subjects[0] ?? 'phy';
   const isAi = ai === '1';
-  const count = 20;
-  const minutes = 30;
+  // The AI screen's choices arrive as params; everything else stays a board
+  // exam: 20 questions, 30 minutes.
+  const count = isAi && countParam ? Math.min(25, Math.max(5, Number(countParam) || 15)) : 20;
+  const minutes = Math.round(count * 1.5);
 
   const best = state.results
     .filter((r) => r.subjectId === subjectId && r.mode === 'exam')
-    .sort((a, b) => b.score / b.total - a.score / a.total)[0];
+    .sort((a, b) => (b.total ? b.score / b.total : 0) - (a.total ? a.score / a.total : 0))[0];
 
   const label = isAi
     ? t('tutor.aiTestTitle')
@@ -39,14 +44,31 @@ export default function ExamIntro() {
 
   async function start() {
     setBusy(true);
-    const mcqs = isAi
-      ? await api.generateTest(['Circular motion', 'Turning Effect of Forces', 'Transport'], count)
-      : await api.getMcqs({
-          chapterIds: chapter ? [chapter] : undefined,
-          subjectId: chapter ? undefined : subjectId,
-          count,
-        });
+    let mcqs;
+    try {
+      // The topic list comes from the AI screen's picker, falling back to the
+      // student's actual weak topics. Three Physics topics were hardcoded
+      // here, so every AI test was a Physics test whatever the student chose.
+      const aiTopics = topics
+        ? topics.split('|').filter(Boolean)
+        : weakTopics(state.attempts).slice(0, 3).map((w) => w.topic);
+      mcqs = isAi
+        ? await api.generateTest(aiTopics, count)
+        : await api.getMcqs({
+            chapterIds: chapter ? [chapter] : undefined,
+            subjectId: chapter ? undefined : subjectId,
+            count,
+          });
+    } catch {
+      setBusy(false);
+      toast(t('states.errorTitle'));
+      return;
+    }
     setBusy(false);
+    if (!mcqs.length) {
+      toast(t('session.noQuestions'));
+      return;
+    }
     session.start({
       mode: 'exam',
       label: `${label} · ${t('session.examTitle')}`,
@@ -73,7 +95,8 @@ export default function ExamIntro() {
           ) : (
             <Pill tone="grey">{t('session.firstAttempt')}</Pill>
           )}
-          <Pill tone="orange">{t('session.pauseOnce')}</Pill>
+          {/* No pause pill: the exam has no pause mechanism, and promising
+              one here cost students who believed it their timer. */}
           {isAi ? <Pill tone="teal">{t('session.aiGenerated')}</Pill> : null}
         </Row>
       </Card>
@@ -84,7 +107,6 @@ export default function ExamIntro() {
         <View style={{ gap: 8, marginTop: 10 }}>
           <Small>• {t('session.beforeStart1', { min: minutes })}</Small>
           <Small>• {t('session.beforeStart2')}</Small>
-          <Small>• {t('session.beforeStart3')}</Small>
         </View>
       </Card>
     </Screen>

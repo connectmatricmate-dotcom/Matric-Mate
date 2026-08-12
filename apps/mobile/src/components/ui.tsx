@@ -217,7 +217,16 @@ export function Card({
       {children}
     </View>
   );
-  return onPress ? <Tap onPress={onPress}>{body}</Tap> : body;
+  // A pill is label-sized (about 22px tall), and several screens use one as
+  // a control: playback speed, review filters, chat feedback. `hit` pads the
+  // touchable area out to something a thumb can actually land on.
+  return onPress ? (
+    <Tap onPress={onPress} hit>
+      {body}
+    </Tap>
+  ) : (
+    body
+  );
 }
 
 /** Pressable with feedback that feels native on each platform. */
@@ -376,10 +385,16 @@ export function Btn({
     ghost: 'transparent',
     line: C.card,
   };
-  // Ink on orange, not white: white sits at 2.3:1 on this orange and washes
-  // out in daylight. Ink reads at 5:1. Same rule as the web button recipe.
+  // Ink on the light fills, not white: white sits at 2.3:1 on this orange,
+  // about 2:1 on WhatsApp green and 3.4:1 on brand green, all short of the
+  // 4.5:1 floor and washed out in daylight. Ink reads at 5:1 or better on
+  // each. Same rule as the web button recipe.
   const fg =
-    variant === 'ghost' || variant === 'line' ? C.teal : variant === 'orange' ? C.ink : '#fff';
+    variant === 'ghost' || variant === 'line'
+      ? C.teal
+      : variant === 'orange' || variant === 'green' || variant === 'whatsapp'
+        ? C.ink
+        : '#fff';
   return (
     <Tap onPress={onPress} disabled={disabled || loading} style={[{ opacity: disabled ? 0.45 : 1 }, style]}>
       <View
@@ -438,7 +453,16 @@ export function Pill({
       )}
     </View>
   );
-  return onPress ? <Tap onPress={onPress}>{body}</Tap> : body;
+  // A pill is label-sized (about 22px tall), and several screens use one as
+  // a control: playback speed, review filters, chat feedback. `hit` pads the
+  // touchable area out to something a thumb can actually land on.
+  return onPress ? (
+    <Tap onPress={onPress} hit>
+      {body}
+    </Tap>
+  ) : (
+    body
+  );
 }
 
 export function Seg<Tv extends string>({
@@ -548,8 +572,9 @@ export function Field({
 }
 
 export function Toggle({ on, onPress }: { on: boolean; onPress?: () => void }) {
+  // The track is 26px tall; `hit` pads the touchable to a real target.
   return (
-    <Tap onPress={onPress}>
+    <Tap onPress={onPress} hit>
       <View style={[st.toggle, { backgroundColor: on ? C.teal : '#D7E0DB' }]}>
         <View style={[st.knob, on ? { right: 3 } : { left: 3 }]} />
       </View>
@@ -708,6 +733,22 @@ export function Skeleton({ w = '100%', h = 14, style }: { w?: number | `${number
   return <Animated.View style={[{ width: w, height: h, borderRadius: R.md, backgroundColor: '#EAF0EC', opacity: a }, style]} />;
 }
 
+/**
+ * A fetch failed and the screen would otherwise render its empty state, which
+ * lies: "no results" and "the network is down" call for opposite reactions.
+ * Every consumer of useAsync that can fail user-visibly should branch to this
+ * with the hook's own reload.
+ */
+export function ErrorState({ title, sub, retry, onRetry }: { title: string; sub: string; retry: string; onRetry: () => void }) {
+  return (
+    <Card flat tint={C.redTint} style={{ alignItems: 'center', gap: S.sm, paddingVertical: 22 }}>
+      <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{title}</Text>
+      <Small style={{ textAlign: 'center' }}>{sub}</Small>
+      <Btn title={retry} variant="line" sm onPress={onRetry} />
+    </Card>
+  );
+}
+
 export function Empty({
   emoji = '📭',
   title,
@@ -729,16 +770,6 @@ export function Empty({
   );
 }
 
-export function OfflineBanner() {
-  return (
-    <Card flat tint={C.orangeTint} border={C.orange} style={{ flexDirection: 'row', alignItems: 'center', gap: S.sm, marginBottom: S.md }}>
-      <Icon name="wifiOff" size={18} color={C.orangeDark} />
-      <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink, flex: 1 }}>
-        You’re offline, downloaded content still works.
-      </Text>
-    </Card>
-  );
-}
 
 /* --------------------------------------------------------------- toast */
 

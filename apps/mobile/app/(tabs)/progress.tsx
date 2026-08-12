@@ -19,7 +19,6 @@ export default function Progress() {
   const days = useMemo(() => last14(state.activeDays), [state.activeDays]);
   const weak = useMemo(() => weakTopics(state.attempts).slice(0, 3), [state.attempts]);
   const acc = accuracy(state.attempts);
-  const minutes = state.attempts.length * 1.6 + state.readSections.length * 4;
   const month = new Date().toLocaleDateString('en-GB', { month: 'long' });
 
   const link = (label: string, href: string) => (
@@ -65,7 +64,7 @@ export default function Progress() {
       <Row gap={S.sm}>
         <Kpi value={`${state.attempts.length}`} label={t('dash.questions')} small />
         <Kpi value={`${acc}%`} label={t('dash.accuracy')} small />
-        <Kpi value={`${Math.round(minutes / 60)}h`} label={t('dash.studyTime')} small />
+        <Kpi value={String(state.activeDays.length)} label={t('dash.activeDays')} small />
         <Kpi value={`${state.results.length}`} label={t('progress.tests')} small />
       </Row>
 

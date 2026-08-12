@@ -17,7 +17,7 @@ const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: strin
 export default function Tutor() {
   const { state, derived } = useApp();
   const t = useT();
-  const usedPct = ((derived.aiLimit - derived.aiLeft) / derived.aiLimit) * 100;
+  const usedPct = (derived.aiLimit ? (derived.aiLimit - derived.aiLeft) / derived.aiLimit : 0) * 100;
   const low = derived.aiLeft <= Math.max(1, Math.floor(derived.aiLimit * 0.2));
 
   return (
@@ -65,11 +65,14 @@ export default function Tutor() {
       {derived.aiLeft === 0 ? (
         <>
           <Spacer h={S.md} />
+          {/* A free account has no quota to exhaust, so "your 0 questions
+              reset at midnight" was nonsense. Say what it actually is. */}
           <Card flat tint={C.redTint} border={C.red}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.red }}>{t('tutor.limitTitle')}</Text>
             <Small style={{ marginTop: 2 }}>
-              {t('tutor.limitBody', { n: derived.aiLimit })}
-              {state.premium.active ? '' : ` ${t('tutor.limitPremium')}`}
+              {derived.aiLimit === 0
+                ? t('tutor.limitPremium')
+                : `${t('tutor.limitBody', { n: derived.aiLimit })}${state.premium.active ? '' : ` ${t('tutor.limitPremium')}`}`}
             </Small>
           </Card>
         </>

@@ -16,7 +16,7 @@ import { C } from '../src/theme';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Baloo2_600SemiBold,
     Baloo2_700Bold,
     Nunito_400Regular,
@@ -26,11 +26,15 @@ export default function RootLayout() {
     NotoNastaliqUrdu_600SemiBold,
   });
 
+  // A face that fails to load must not hold the app hostage: without the
+  // error branch, fontsLoaded stayed false forever and the splash never hid.
+  // System fonts are a downgrade; a frozen splash is an outage.
+  const ready = fontsLoaded || !!fontError;
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync().catch(() => {});
-  }, [fontsLoaded]);
+    if (ready) SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
 
-  if (!fontsLoaded) return null;
+  if (!ready) return null;
 
   return (
     <SafeAreaProvider>

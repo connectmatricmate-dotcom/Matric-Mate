@@ -33,14 +33,24 @@ export default function Chat() {
       toast(t('tutor.limitToast'));
       return;
     }
-    if (!actions.consumeAi()) return;
-
     const mine: ChatMessage = { id: `m-${Date.now()}`, role: 'user', text: clean, at: Date.now() };
     setMessages((m) => [...m, mine]);
     setInput('');
     setThinking(true);
 
-    const res = await api.askTutor(clean, contextLabel);
+    let res;
+    try {
+      res = await api.askTutor(clean, contextLabel);
+    } catch {
+      // Without this catch a failed request left `thinking` true forever,
+      // which blocks the input, after already charging a quota unit.
+      setThinking(false);
+      toast(t('states.errorTitle'));
+      return;
+    }
+    // Charged only for a delivered answer. It was charged up front, so a
+    // network failure cost the student a question they never got to ask.
+    actions.consumeAi();
     const reply: ChatMessage = { id: `m-${Date.now()}-ai`, role: 'ai', text: res.text, steps: res.steps, at: Date.now() };
     setThinking(false);
     const next = [...messages, mine, reply];
@@ -178,7 +188,8 @@ export default function Chat() {
           }}
           gap={S.sm}
         >
-          <IconButton icon="camera" onPress={() => toast(t('tutor.photoSoon'))} />
+          {/* Camera control parked until photo questions exist; a button
+              whose only job is to explain why it does nothing is noise. */}
           <View
             style={{
               flex: 1,

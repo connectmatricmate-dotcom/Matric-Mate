@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../../src/components/Icon';
-import { Bar, Btn, Card, Header, Pill, Row, Screen, Sheet, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
+import { Bar, Btn, Card, ErrorState, Header, Pill, Row, Screen, Sheet, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
 import { LockedNotice } from '../../../src/components/LockedNotice';
 import { api , chapterPct, hasStudyMaterial, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
@@ -15,7 +15,7 @@ export default function Chapters() {
   const { state } = useApp();
   const t = useT();
   const { data: subject } = useAsync(() => api.getSubject(id), [id]);
-  const { data: chapters, loading } = useAsync(() => api.getChapters(id), [id]);
+  const { data: chapters, loading, error, reload } = useAsync(() => api.getChapters(id), [id]);
   const [showLocked, setShowLocked] = useState(false);
 
   const pct = subjectPct(id, state.readSections, state.attempts);
@@ -55,6 +55,8 @@ export default function Chapters() {
             </Card>
           ))}
         </View>
+      ) : error && !(chapters ?? []).length ? (
+        <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
       ) : (
         <View style={{ gap: S.sm }}>
           {(chapters ?? []).map((c) => {
@@ -95,7 +97,10 @@ export default function Chapters() {
                       <Small>{c.blurb}</Small>
                     ) : (
                       <Small numberOfLines={1}>
-                        {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
+                        {/* Only what the row actually knows. audioMinutes is
+                            always zero here; the real length lives on the
+                            audio_tracks row and belongs to the chapter hub. */}
+                        {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.sectionsSub', { n: c.sectionCount })}
                       </Small>
                     )}
                     {!empty && p > 0 && p < 100 ? (

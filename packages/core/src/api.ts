@@ -20,7 +20,6 @@ import {
   fetchSubject,
   fetchSubjects,
 } from './db';
-import { ALL_CHAPTERS, contentFor } from './content';
 import type { ContentClient } from './db';
 import { AudioTrack, Chapter, ChapterContent, Flashcard, Mcq, Subject } from './types';
 
@@ -130,13 +129,17 @@ export const api = {
     };
   },
 
-  /** Mock AI question generation, used by the AI test screen. */
+  /**
+   * Builds an "AI" test from the real published bank, focused on the given
+   * topics and padded with a mixed pool when the focus runs thin. It used to
+   * draw from the bundled sample, which after the fabricated content was
+   * removed meant a nearly empty pool and a test that could not start.
+   */
   async generateTest(topics: string[], count: number): Promise<Mcq[]> {
-    await wait(1600);
-    const pool: Mcq[] = [];
-    ALL_CHAPTERS.forEach((c) => pool.push(...contentFor(c.id).mcqs.map((m) => ({ ...m, source: 'ai' as const }))));
-    const focused = pool.filter((m) => topics.includes(m.topic));
-    const chosen = (focused.length >= count ? focused : [...focused, ...pool]).slice(0, count);
-    return chosen;
+    const focused = topics.length ? await fetchMcqs({ count, topics }) : [];
+    if (focused.length >= count) return focused;
+    const mixed = await fetchMcqs({ count });
+    const seen = new Set(focused.map((m) => m.id));
+    return [...focused, ...mixed.filter((m) => !seen.has(m.id))].slice(0, count);
   },
 };

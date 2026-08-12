@@ -131,19 +131,6 @@ export function confidenceBreakdown(attempts: Attempt[]) {
   });
 }
 
-/** Coaching line derived from the breakdown, plain, specific, never preachy. */
-export function confidenceInsight(rows: ReturnType<typeof confidenceBreakdown>): string | null {
-  const pakka = rows.find((r) => r.confidence === 2);
-  const tukka = rows.find((r) => r.confidence === 0);
-  if (!pakka?.said && !tukka?.said) return null;
-  if (pakka && pakka.said >= 5 && pakka.accuracy >= 85)
-    return `Jab aap Pakka kehte hain, ${pakka.accuracy}% sahi hota hai. Khud par bharosa rakhein.`;
-  if (pakka && pakka.said >= 5 && pakka.accuracy < 65)
-    return `Pakka wale jawab sirf ${pakka.accuracy}% sahi hain. Un topics ko dobara dekh lein, confidence dhoka de raha hai.`;
-  if (tukka && tukka.said > 0 && pakka)
-    return `Tukka answers ${tukka.accuracy}% sahi hain vs Pakka ${pakka.accuracy}%. Tukkay kam karne ke liye practice barhayein.`;
-  return 'Thori aur practice karein, phir confidence ka pattern saaf nazar aaye ga.';
-}
 
 /** Topics ranked worst-first, from at least 3 attempts each. */
 export function weakTopics(attempts: Attempt[], minAttempts = 3) {
@@ -238,10 +225,6 @@ export const AI_QUOTA = { premium: 20, free: 0 };
 export const grade = (pct: number) =>
   pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B+' : pct >= 60 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';
 
-export function resultXp(score: number, total: number, mode: 'practice' | 'exam', attempts: Attempt[]) {
-  const base = attempts.reduce((n, a) => n + XP.forAnswer(a.correct, a.confidence), 0);
-  return mode === 'exam' ? base * XP.examMultiplier : base;
-}
 
 export const todayKey = () => dayKey(Date.now());
 

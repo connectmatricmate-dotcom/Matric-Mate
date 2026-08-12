@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
+import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Skeleton, Small, Spacer, useToast } from '../../../src/components/ui';
 import { api , chapterPct, hasStudyMaterial , pickAudioTrack, subjectById } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
@@ -15,7 +15,7 @@ export default function ChapterHub() {
   const t = useT();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
-  const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
+  const { data: chapter, loading: chapterLoading } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
   const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
   // No row, no row in the grid: a chapter offers an audio lesson only once one
@@ -26,6 +26,25 @@ export default function ChapterHub() {
     pickAudioTrack(tracks ?? [], state.settings.contentMedium) ??
     localAudioTrack(id, state.settings.contentMedium);
 
+  // While the chapter row is still on its way, the screen used to paint the
+  // full layout with every text slot blank: a teal card with nothing in it,
+  // which on a slow connection read as a broken chapter rather than a loading
+  // one. Skeletons, like the subject list already shows.
+  if (!chapter && chapterLoading) {
+    return (
+      <Screen>
+        <Header title=" " back />
+        <View style={{ gap: S.md }}>
+          <Skeleton h={120} />
+          <Skeleton w="40%" h={14} />
+          <Skeleton h={64} />
+          <Skeleton h={64} />
+          <Skeleton h={64} />
+        </View>
+      </Screen>
+    );
+  }
+
   // Guards a direct link or an old bookmark to a chapter the board doesn't
   // examine: no notes, audio, flashcards, MCQs, short questions or blanks
   // exist for it, so there is nothing the usual grid could open.
@@ -35,7 +54,7 @@ export default function ChapterHub() {
         <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
         <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
           <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
-          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
+          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
             {chapter.blurb}
           </Text>
         </Card>
@@ -57,7 +76,7 @@ export default function ChapterHub() {
     else toast(t('downloads.saveFailed'));
   }
   const readCount = content ? content.sections.filter((s) => state.readSections.includes(s.id)).length : 0;
-  const best = state.results.filter((r) => r.chapterId === id).sort((a, b) => b.score / b.total - a.score / a.total)[0];
+  const best = state.results.filter((r) => r.chapterId === id).sort((a, b) => (b.total ? b.score / b.total : 0) - (a.total ? a.score / a.total : 0))[0];
   const knownCards = content ? content.flashcards.filter((f) => state.cardsKnown.includes(f.id)).length : 0;
 
   return (
@@ -86,7 +105,7 @@ export default function ChapterHub() {
 
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         <H2 style={{ color: '#fff' }}>{chapter?.title ?? ''}</H2>
-        <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
+        <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
           {chapter?.blurb}
         </Text>
         <Row gap={S.md} style={{ marginTop: S.md }}>

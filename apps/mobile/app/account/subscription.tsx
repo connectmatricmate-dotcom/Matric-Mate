@@ -89,8 +89,15 @@ export default function Subscription() {
         }}
       />
 
-      <Spacer h={S.lg} />
-      <LockedNotice variant={active ? 'locked' : 'free'} />
+      {/* Someone with an active plan needs no upgrade guidance at all. The
+          old ternary showed them the "locked chapter" notice, which told a
+          paying subscriber their chapter was not in their plan. */}
+      {active ? null : (
+        <>
+          <Spacer h={S.lg} />
+          <LockedNotice variant="free" />
+        </>
+      )}
 
       <Spacer h={S.md} />
       <Card flat style={{ paddingVertical: 0 }}>

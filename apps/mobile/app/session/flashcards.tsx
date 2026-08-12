@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bar, Btn, Card, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
-import { api } from '@matricmate/core';
+import { Bar, Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
+import { api, chaptersFor } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -10,15 +10,21 @@ import { C, F, S, isWeb } from '../../src/theme';
 
 export default function Flashcards() {
   const { chapter } = useLocalSearchParams<{ chapter?: string }>();
-  const chapterId = chapter ?? 'phy-3';
-  const { actions } = useApp();
+  const { state, actions } = useApp();
+  // Arriving with no chapter param used to mean Physics chapter 3 for
+  // everyone. Follow the student instead: the chapter they last studied,
+  // else the first chapter of their first subject.
+  const chapterId = chapter ?? state.lastChapterId ?? chaptersFor(state.onboarding?.subjects?.[0] ?? 'phy')[0]?.id ?? 'phy-1';
   const t = useT();
-  const { data: cards, loading } = useAsync(() => api.getFlashcards(chapterId), [chapterId]);
+  const { data: cards, loading, error, reload } = useAsync(() => api.getFlashcards(chapterId), [chapterId]);
 
   const [i, setI] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [repeats, setRepeats] = useState<string[]>([]);
   const [known, setKnown] = useState<string[]>([]);
+  // Null means the full deck. Set to the repeat ids when the student asks to
+  // review them: the button used to reset the whole deck from card one.
+  const [round, setRound] = useState<string[] | null>(null);
   // Lazy initialiser, so the value is built once. See the note in ui.tsx/Skeleton.
   const [spin] = useState(() => new Animated.Value(0));
 
@@ -26,9 +32,35 @@ export default function Flashcards() {
     Animated.timing(spin, { toValue: flipped ? 1 : 0, duration: 260, useNativeDriver: !isWeb }).start();
   }, [flipped, spin]);
 
-  const card = cards?.[i];
-  const done = !!cards && i >= cards.length;
-  const total = cards?.length ?? 0;
+  const deck = round ? (cards ?? []).filter((c) => round.includes(c.id)) : (cards ?? []);
+  const card = deck[i];
+  const done = !!cards && i >= deck.length;
+
+
+  // A failed fetch is not an empty chapter, and an empty chapter is not a
+  // finished session. Without these two branches, a network error rendered a
+  // blank card, and a chapter with none of this practice type opened straight
+  // onto the confetti screen claiming "0 of 0, well done".
+  if (error && !(cards ?? []).length) {
+    return (
+      <Screen>
+        <Header title={t('study.flashcards')} back />
+        <Spacer h={S.lg} />
+        <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
+      </Screen>
+    );
+  }
+  if (!loading && cards && (cards ?? []).length === 0) {
+    return (
+      <Screen>
+        <Header title={t('study.flashcards')} back />
+        <Spacer h={S.lg} />
+        <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+      </Screen>
+    );
+  }
+
+  const total = deck.length;
 
   const frontRotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
   const backRotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['180deg', '360deg'] });
@@ -68,9 +100,9 @@ export default function Flashcards() {
           <Btn
             title={t('session.reviewRepeats', { n: repeats.length })}
             onPress={() => {
+              setRound(repeats);
               setI(0);
               setRepeats([]);
-              setKnown([]);
             }}
           />
         ) : null}

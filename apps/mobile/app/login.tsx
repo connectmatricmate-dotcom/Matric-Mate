@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Image } from 'react-native';
 import { router } from 'expo-router';
 import { useT } from '../src/i18n';
-import { useApp } from '../src/store/app';
 import { useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
 import { C, S } from '../src/theme';
@@ -16,7 +15,6 @@ import { C, S } from '../src/theme';
  */
 export default function Login() {
   const { signIn } = useAuth();
-  const { state } = useApp();
   const t = useT();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +29,11 @@ export default function Login() {
     setError(null);
     try {
       await signIn(email, password);
-      router.replace(state.onboarding?.subjects?.length ? '/(tabs)' : '/onboarding/class');
+      // The splash gate decides where to land, AFTER this account's state has
+      // hydrated. Deciding here read the previous user's cached onboarding,
+      // so on a shared phone the new student inherited someone else's
+      // subjects, and a restored account was marched through onboarding.
+      router.replace('/');
     } catch (e) {
       setError(e instanceof Error ? e.message : t('states.errorBody'));
       setBusy(false);

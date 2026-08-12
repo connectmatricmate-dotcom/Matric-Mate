@@ -199,8 +199,12 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       // needs a subscription. Was `i >= 6`, which quietly gave away six
       // chapters per subject and contradicted the pricing page.
       premium: i >= 1,
-      mcqCount: 24 + ((i * 7) % 19),
-      flashcardCount: 12 + ((i * 5) % 14),
+      // Zero, like audioMinutes below and for the same reason: these were
+      // formulas that invented plausible counts, so offline or before the
+      // live index primed, screens advertised "31 MCQs" for chapters that
+      // might have none. Real counts come from the chapters table.
+      mcqCount: 0,
+      flashcardCount: 0,
       // Zero, and it stays zero here.
       //
       // This was `11 + ((i * 3) % 9)`, a formula that invented a plausible
@@ -209,7 +213,7 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       // Real durations come from the audio_tracks row when one exists, set by
       // the ingest, so a chapter shows audio only once audio is really there.
       audioMinutes: 0,
-      sectionCount: 4 + (i % 3),
+      sectionCount: 0,
     })),
   ])
 );

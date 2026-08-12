@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { BackHandler, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, H3, IconButton, Pill, Row, Screen, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
@@ -18,10 +18,25 @@ export default function Exam() {
   const [flags, setFlags] = useState<string[]>([]);
   const [left, setLeft] = useState(s?.durationSec ?? 1800);
   const [confirm, setConfirm] = useState(false);
+  const submitted = useRef(false);
 
   useEffect(() => {
     const timer = setInterval(() => setLeft((l) => Math.max(0, l - 1)), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  /**
+   * Hardware back held every answer in local state and simply popped the
+   * screen: twenty answered questions gone with one reflex tap. It now raises
+   * the same submit sheet the button does, so leaving is always a decision.
+   */
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (submitted.current) return false;
+      setConfirm(true);
+      return true;
+    });
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {
@@ -34,6 +49,10 @@ export default function Exam() {
 
   function submit() {
     if (!s) return;
+    // The timeout path and the button can fire together, and a second pass
+    // would record every attempt twice: double XP, double history.
+    if (submitted.current) return;
+    submitted.current = true;
     s.mcqs.forEach((m) => {
       const chosen = answers[m.id] ?? null;
       const correct = chosen === m.answer;
@@ -160,8 +179,8 @@ export default function Exam() {
             const bg = current ? C.orange : answered ? C.teal : isFlagged ? C.orangeTint : C.grey;
             const fg = current || answered ? '#fff' : isFlagged ? C.orangeDark : C.ink2;
             return (
-              <Tap key={m.id} onPress={() => setI(n)}>
-                <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
+              <Tap key={m.id} onPress={() => setI(n)} hit>
+                <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ fontFamily: F.bodyBold, fontSize: 12, color: fg }}>{n + 1}</Text>
                 </View>
               </Tap>

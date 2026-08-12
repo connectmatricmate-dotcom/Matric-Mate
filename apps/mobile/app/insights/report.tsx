@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Image, Text, View } from 'react-native';
 import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
-import { subjectById , accuracy, grade, subjectPct } from '@matricmate/core';
+import { subjectById , accuracy, grade } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
@@ -18,7 +18,10 @@ export default function Report() {
     () =>
       derived.subjects.map((sid) => {
         const set = state.attempts.filter((a) => a.subjectId === sid);
-        const acc = set.length ? accuracy(set) : subjectPct(sid, state.readSections, state.attempts);
+        // Zero when unattempted. The old fallback graded syllabus coverage
+        // as if it were accuracy, and the row hides unattempted subjects
+        // anyway, so it could only ever have misled.
+        const acc = set.length ? accuracy(set) : 0;
         const half = Math.floor(set.length / 2);
         const older = set.slice(0, half);
         const recent = set.slice(half);
@@ -26,7 +29,7 @@ export default function Report() {
         const trend = delta > 4 ? '↑' : delta < -4 ? '↓' : '→';
         return { sid, acc, trend, attempted: set.length };
       }),
-    [derived.subjects, state.attempts, state.readSections]
+    [derived.subjects, state.attempts]
   );
 
   const activeDays = state.activeDays.filter((d) => d.slice(0, 7) === new Date().toISOString().slice(0, 7)).length;

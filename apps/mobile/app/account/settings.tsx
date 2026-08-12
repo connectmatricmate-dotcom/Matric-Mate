@@ -1,7 +1,9 @@
+import Constants from 'expo-constants';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../../src/components/LanguageToggle';
-import { Card, Header, Item, Screen, SectionTitle, Seg, Small, Spacer, Toggle, useToast } from '../../src/components/ui';
+import { Btn, Card, Header, Item, Row, Screen, SectionTitle, Seg, Sheet, Small, Spacer, Toggle, useToast } from '../../src/components/ui';
 import { Medium } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -9,6 +11,7 @@ import { S } from '../../src/theme';
 
 export default function Settings() {
   const { state, actions } = useApp();
+  const [confirmReset, setConfirmReset] = useState(false);
   const t = useT();
   const toast = useToast();
   const s = state.settings;
@@ -35,13 +38,10 @@ export default function Settings() {
           icon="moon"
           last
           right={
-            <Toggle
-              on={s.dark}
-              onPress={() => {
-                actions.setSettings({ dark: !s.dark });
-                toast(t('account.darkToast'));
-              }}
-            />
+            // Never latches on: no dark theme exists yet, and a switch that
+            // visibly turns on and does nothing trains people to distrust
+            // every other switch on the page.
+            <Toggle on={false} onPress={() => toast(t('account.darkToast'))} />
           }
         />
       </Card>
@@ -81,7 +81,7 @@ export default function Settings() {
           title={t('account.studyReminder')}
           sub={t('account.studyReminderSub', { time: s.reminderTime })}
           icon="bell"
-          right={<Toggle on={s.reminders} onPress={() => actions.setSettings({ reminders: !s.reminders })} />}
+          right={<Toggle on={false} onPress={() => toast(t('onboarding.comingSoon'))} />}
         />
         <Item
           title={t('account.streakAlerts')}
@@ -89,7 +89,7 @@ export default function Settings() {
           icon="flame"
           tone="orange"
           last
-          right={<Toggle on={s.streakAlerts} onPress={() => actions.setSettings({ streakAlerts: !s.streakAlerts })} />}
+          right={<Toggle on={false} onPress={() => toast(t('onboarding.comingSoon'))} />}
         />
       </Card>
 
@@ -126,16 +126,34 @@ export default function Settings() {
           icon="trash"
           tone="red"
           last
-          onPress={() => {
-            actions.resetDemo();
-            toast(t('account.resetDone'));
-          }}
+          onPress={() => setConfirmReset(true)}
         />
       </Card>
 
+      {/* One tap used to do it, no questions asked: local state, downloaded
+          files AND server history, gone. That is the most destructive action
+          in the app and the only one that had no confirm. */}
+      <Sheet visible={confirmReset} onClose={() => setConfirmReset(false)} title={t('account.resetDemo')}>
+        <Small>{t('account.resetDemoSub')}</Small>
+        <Spacer h={S.md} />
+        <Row gap={S.sm}>
+          <Btn title={t('common.cancel')} variant="line" sm onPress={() => setConfirmReset(false)} />
+          <Btn
+            title={t('account.resetDemo')}
+            variant="danger"
+            sm
+            onPress={() => {
+              setConfirmReset(false);
+              actions.resetDemo();
+              toast(t('account.resetDone'));
+            }}
+          />
+        </Row>
+      </Sheet>
+
       <SectionTitle>{t('account.about')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>
-        <Item title={t('account.version', { v: '0.2.1' })} icon="help" />
+        <Item title={t('account.version', { v: Constants.expoConfig?.version ?? '' })} icon="help" />
         <Item title={t('account.terms')} icon="doc" last onPress={() => toast(t('account.termsToast'))} />
       </Card>
       <Spacer h={S.md} />

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import { router } from 'expo-router';
 import Svg, { Circle, Polyline, Rect } from 'react-native-svg';
 import { Bar, Card, Header, Item, Label, Row, Screen, SectionTitle, Seg, Small, Spacer } from '../../src/components/ui';
 import { accuracy, confidenceBreakdown } from '@matricmate/core';
@@ -9,6 +8,14 @@ import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 type Range = 'week' | 'month' | 'all';
+
+/**
+ * One y-mapping for the accuracy chart, shared by the gridlines and the
+ * polyline. They used to use two slightly different formulas, so the 50%
+ * gridline sat five pixels away from a 50% data point.
+ */
+const CHART_W = 300;
+const yFor = (pct: number) => 80 - (pct / 100) * 70; // 0% -> y=80, 100% -> y=10
 
 export default function Performance() {
   const { state } = useApp();
@@ -45,11 +52,9 @@ export default function Performance() {
   }, [attempts, range, now]);
 
   const points = useMemo(() => {
-    const w = 300;
-    const h = 80;
     const valid = trend.map((x, i) => ({ ...x, i })).filter((x) => x.acc != null);
     if (valid.length < 2) return '';
-    return valid.map((x) => `${(x.i / (trend.length - 1)) * w},${h - ((x.acc as number) / 100) * (h - 10) - 5}`).join(' ');
+    return valid.map((x) => `${(x.i / (trend.length - 1)) * CHART_W},${yFor(x.acc as number)}`).join(' ');
   }, [trend]);
 
   const conf = useMemo(() => confidenceBreakdown(attempts), [attempts]);
@@ -76,7 +81,7 @@ export default function Performance() {
         <View style={{ marginTop: S.sm }}>
           <Svg width="100%" height={90} viewBox="0 0 300 90">
             {[25, 50, 75].map((g) => (
-              <Rect key={g} x={0} y={85 - (g / 100) * 80} width={300} height={1} fill="#EFF3F0" />
+              <Rect key={g} x={0} y={yFor(g)} width={CHART_W} height={1} fill="#EFF3F0" />
             ))}
             {points ? <Polyline points={points} fill="none" stroke={C.teal} strokeWidth={3} strokeLinecap="round" /> : null}
             {points ? (
@@ -157,7 +162,6 @@ export default function Performance() {
               icon={r.mode === 'exam' ? 'clock' : 'target'}
               tone={r.mode === 'exam' ? 'orange' : 'teal'}
               last={i === Math.min(5, state.results.length - 1)}
-              onPress={() => router.push('/session/review')}
             />
           ))}
         </Card>

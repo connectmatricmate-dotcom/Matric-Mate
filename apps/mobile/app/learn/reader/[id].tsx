@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +8,7 @@ import {
   Body,
   Btn,
   Card,
+  ErrorState,
   H2,
   IconButton,
   Label,
@@ -130,11 +131,20 @@ export default function Reader() {
   const toast = useToast();
   const insets = useSafeAreaInsets();
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
-  const { data: content, loading } = useAsync(() => api.getChapterContent(id), [id]);
+  const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(id), [id]);
   const [idx, setIdx] = useState(0);
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
+  // True while this screen is mounted; ask() checks it before setState after
+  // its await, because the student may have left mid-request.
+  const aliveRef = useRef(true);
+  useEffect(() => {
+    aliveRef.current = true;
+    return () => {
+      aliveRef.current = false;
+    };
+  }, []);
 
   // Urdu-medium students get the Urdu sections where the client has supplied them.
   const urduMedium = state.settings.contentMedium === 'ur';
@@ -147,7 +157,10 @@ export default function Reader() {
   function advance(dir: 1 | -1) {
     const next = idx + dir;
     if (next < 0 || next >= sections.length) return;
-    if (section) actions.markSectionRead(section.id, id, next);
+    // Only forward movement records progress. Recording on the way back
+    // rewound the dashboard's "continue from" pointer to wherever the student
+    // happened to re-read, losing their real position.
+    if (section && dir === 1) actions.markSectionRead(section.id, id, next);
     setIdx(next);
   }
 
@@ -159,9 +172,16 @@ export default function Reader() {
     if (!actions.consumeAi()) return;
     setAsking(true);
     setAnswer(null);
-    const res = await api.askTutor(prompt, chapter ? chapter.title : undefined);
-    setAnswer(res);
-    setAsking(false);
+    try {
+      const res = await api.askTutor(prompt, chapter ? chapter.title : undefined);
+      if (aliveRef.current) setAnswer(res);
+    } catch {
+      // The quota unit is spent and the answer is not coming. Say so instead
+      // of leaving the skeleton up forever.
+      if (aliveRef.current) toast(t('states.errorTitle'));
+    } finally {
+      if (aliveRef.current) setAsking(false);
+    }
   }
 
   return (
@@ -205,6 +225,13 @@ export default function Reader() {
                 <Skeleton key={i} h={14} />
               ))}
             </View>
+          ) : error && !section ? (
+            <ErrorState
+              title={t('states.errorTitle')}
+              sub={t('states.errorBody')}
+              retry={t('common.retry')}
+              onRetry={reload}
+            />
           ) : section ? (
             <>
               <Label>{t('reader.section', { a: idx + 1, b: total })}</Label>

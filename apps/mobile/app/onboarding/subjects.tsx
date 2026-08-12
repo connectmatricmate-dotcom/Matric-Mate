@@ -21,7 +21,9 @@ export default function ChooseSubjects() {
   const [picked, setPicked] = useState<string[]>(['phy', 'chem', 'bio']);
 
   const total = compulsory.length + picked.length;
-  const enough = picked.length >= 2;
+  // "Pick two" assumed the science list. Arts currently offers one elective,
+  // so demanding two locked every arts student on this step forever.
+  const enough = picked.length >= Math.min(2, electives.length);
 
   return (
     <Screen

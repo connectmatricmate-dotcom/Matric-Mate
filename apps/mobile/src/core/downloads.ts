@@ -122,14 +122,24 @@ export function localAudioUri(chapterId: string, medium: Medium): string | null 
  * actually sitting on the device right now.
  */
 export function chapterDownloadBytes(chapterId: string): number {
-  const dir = chapterDir(chapterId);
-  return dir?.exists ? (dir.size ?? 0) : 0;
+  try {
+    const dir = chapterDir(chapterId);
+    return dir?.exists ? (dir.size ?? 0) : 0;
+  } catch {
+    // Same policy as every other accessor here: a broken filesystem costs
+    // a size label, never the screen that asked for it.
+    return 0;
+  }
 }
 
 /** True on-disk size of every downloaded chapter combined, in bytes. */
 export function totalDownloadBytes(): number {
-  const r = root();
-  return r?.exists ? (r.size ?? 0) : 0;
+  try {
+    const r = root();
+    return r?.exists ? (r.size ?? 0) : 0;
+  } catch {
+    return 0;
+  }
 }
 
 /**

@@ -39,16 +39,26 @@ export default function SessionSetup() {
   const [lastSubject, setLastSubject] = useState(subjectId);
   if (lastSubject !== subjectId) {
     setLastSubject(subjectId);
-    if (!initialChapter) setChapterIds([]);
+    // Always. The old guard kept the deep-linked chapter ticked across a
+    // subject switch, so a "Chemistry" session could quietly fetch the
+    // Physics chapter it arrived with.
+    setChapterIds([]);
   }
 
   async function start() {
     setBusy(true);
-    const mcqs = await api.getMcqs({
-      chapterIds: chapterIds.length ? chapterIds : undefined,
-      subjectId: chapterIds.length ? undefined : subjectId,
-      count: Number(count),
-    });
+    let mcqs;
+    try {
+      mcqs = await api.getMcqs({
+        chapterIds: chapterIds.length ? chapterIds : undefined,
+        subjectId: chapterIds.length ? undefined : subjectId,
+        count: Number(count),
+      });
+    } catch {
+      setBusy(false);
+      toast(t('states.errorTitle'));
+      return;
+    }
     setBusy(false);
     if (!mcqs.length) {
       toast(t('session.noQuestions'));

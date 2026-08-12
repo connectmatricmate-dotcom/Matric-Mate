@@ -43,8 +43,10 @@ export function ChoiceCard({
   onPress?: () => void;
   round?: boolean;
 }) {
+  // The handler stays when disabled: the Class 10 card uses it to explain
+  // WHY it cannot be picked, and suppressing it made the tap dead air.
   return (
-    <Tap onPress={disabled ? undefined : onPress}>
+    <Tap onPress={onPress}>
       <Card
         flat={!selected}
         tint={selected ? C.tealTint : undefined}

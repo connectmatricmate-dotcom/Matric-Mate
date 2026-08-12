@@ -3,7 +3,7 @@ import { Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
-import { Card, Empty, Ring, Row, Screen, Skeleton, Small, Ur } from '../../src/components/ui';
+import { Card, Empty, ErrorState, Ring, Row, Screen, Skeleton, Small, Ur } from '../../src/components/ui';
 import { api , hasStudyMaterial, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
@@ -18,7 +18,7 @@ export default function Study() {
   // chapter count or a "continue" chapter, so there's nothing useful to show
   // until both have arrived. Keeping them on one `loading` flag is what stops
   // the list flashing empty between "subjects in" and "chapters in".
-  const { data: subjects, loading } = useAsync(async () => {
+  const { data: subjects, loading, error, reload } = useAsync(async () => {
     const list = await api.getSubjects(derived.subjects);
     const chapters = await Promise.all(list.map((s) => api.getChapters(s.id)));
     return list.map((s, i) => ({ s, chapters: chapters[i] }));
@@ -96,6 +96,10 @@ export default function Study() {
             </Card>
           ))}
         </View>
+      ) : error && rows.length === 0 ? (
+        // A network failure used to fall through to "no search results",
+        // which tells a student to retype instead of to reconnect.
+        <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
       ) : rows.length === 0 ? (
         <Empty emoji="🔍" title={t('study.noMatchTitle')} sub={t('study.noMatchBody', { q })} />
       ) : (

@@ -3,19 +3,22 @@ import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, Field, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
-import { useApp } from '../../src/store/app';
+import { AVATARS, useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { C, S } from '../../src/theme';
 
-const AVATARS = ['🧑🏽‍🎓', '👩🏽‍🎓', '🧕🏽', '👨🏽‍💻', '🦸🏽'];
+
 
 export default function EditProfile() {
-  const { state } = useApp();
+  const { state, actions } = useApp();
   const { updateName } = useAuth();
   const t = useT();
   const toast = useToast();
   const [name, setName] = useState(state.user?.name ?? '');
-  const [avatar, setAvatar] = useState(0);
+  // Persisted, not local: the picker used to keep its choice in component
+  // state, so the selection silently vanished on the way out of the screen.
+  const avatar = state.settings.avatar ?? 0;
+  const setAvatar = (i: number) => actions.setSettings({ avatar: i });
   const setup = state.onboarding;
 
   return (

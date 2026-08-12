@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Bar, Btn, Card, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
-import { api, blankHalves } from '@matricmate/core';
+import { Bar, Btn, Card, Empty, ErrorState, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import { api, blankHalves, chaptersFor } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -11,10 +11,13 @@ import { C, F, S } from '../../src/theme';
 
 export default function Blanks() {
   const { chapter } = useLocalSearchParams<{ chapter?: string }>();
-  const chapterId = chapter ?? 'phy-3';
-  const { actions } = useApp();
+  const { state, actions } = useApp();
+  // Arriving with no chapter param used to mean Physics chapter 3 for
+  // everyone. Follow the student instead: the chapter they last studied,
+  // else the first chapter of their first subject.
+  const chapterId = chapter ?? state.lastChapterId ?? chaptersFor(state.onboarding?.subjects?.[0] ?? 'phy')[0]?.id ?? 'phy-1';
   const t = useT();
-  const { data: content, loading } = useAsync(() => api.getChapterContent(chapterId), [chapterId]);
+  const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(chapterId), [chapterId]);
 
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
@@ -25,7 +28,30 @@ export default function Blanks() {
   const item = items[i];
   const halves = item ? blankHalves(item.sentence[0], item.sentence[1]) : ['', ''];
   const done = !!content && i >= items.length;
-  const correct = checked && pick === item?.answer;
+
+
+  // A failed fetch is not an empty chapter, and an empty chapter is not a
+  // finished session. Without these two branches, a network error rendered a
+  // blank card, and a chapter with none of this practice type opened straight
+  // onto the confetti screen claiming "0 of 0, well done".
+  if (error && !items.length) {
+    return (
+      <Screen>
+        <Header title={t('practice.blanks')} back />
+        <Spacer h={S.lg} />
+        <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
+      </Screen>
+    );
+  }
+  if (!loading && content && items.length === 0) {
+    return (
+      <Screen>
+        <Header title={t('practice.blanks')} back />
+        <Spacer h={S.lg} />
+        <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+      </Screen>
+    );
+  }  const correct = checked && pick === item?.answer;
 
   function check() {
     if (!item || !pick) return;

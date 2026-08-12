@@ -1,10 +1,11 @@
+import Constants from 'expo-constants';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Bar, Btn, Card, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Sheet, Small, Spacer } from '../../src/components/ui';
 import { levelProgress, xpToNextLevel } from '@matricmate/core';
 import { useT } from '../../src/i18n';
-import { useApp } from '../../src/store/app';
+import { AVATARS, useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { C, F, S } from '../../src/theme';
 
@@ -32,7 +33,7 @@ export default function Account() {
                 justifyContent: 'center',
               }}
             >
-              <Text style={{ fontSize: 28 }}>🧑🏽‍🎓</Text>
+              <Text style={{ fontSize: 28 }}>{AVATARS[state.settings.avatar ?? 0] ?? AVATARS[0]}</Text>
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={{ fontFamily: F.bodyBold, fontSize: 16, color: C.ink }}>{state.user?.name ?? 'Student'}</Text>
@@ -110,7 +111,7 @@ export default function Account() {
         </Card>
 
         <Spacer h={S.lg} />
-        <Small style={{ textAlign: 'center' }}>{t('account.version', { v: '0.1.0' })}</Small>
+        <Small style={{ textAlign: 'center' }}>{t('account.version', { v: Constants.expoConfig?.version ?? '' })}</Small>
       </Screen>
 
       <Sheet visible={confirmOut} onClose={() => setConfirmOut(false)} title={t('auth.logOutConfirm')}>

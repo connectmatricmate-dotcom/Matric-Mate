@@ -69,6 +69,13 @@ function saveQueue(userId: string, queue: SyncOp[]): void {
   AsyncStorage.setItem(queueKey(userId), JSON.stringify(queue)).catch(() => {});
 }
 
+/**
+ * Module constant, not an inline literal: as a literal it took a new identity
+ * on every derive, which defeated every useMemo keyed on derived.subjects and
+ * re-walked all chapters per state change on the progress and report screens.
+ */
+const DEFAULT_SUBJECTS = ['phy', 'chem', 'bio', 'math', 'eng', 'urd', 'isl'];
+
 export type Onboarding = {
   classLevel: 9 | 10;
   board: 'fbise' | 'punjab';
@@ -77,9 +84,14 @@ export type Onboarding = {
   subjects: string[];
 };
 
+/** The avatar choices, indexed by Settings.avatar. */
+export const AVATARS = ['🧑🏽‍🎓', '👩🏽‍🎓', '🧕🏽', '👨🏽‍💻', '🦸🏽'];
+
 export type Settings = {
   /** Language of the interface. Separate from `contentMedium`, which is the syllabus language. */
   language: 'en' | 'ur';
+  /** Index into AVATARS, chosen on the edit-profile screen. */
+  avatar: number;
   dark: boolean;
   reminders: boolean;
   reminderTime: string;
@@ -110,6 +122,7 @@ export type State = {
 
 const DEFAULT_SETTINGS: Settings = {
   language: 'en',
+  avatar: 0,
   dark: false,
   reminders: true,
   reminderTime: '7:00 PM',
@@ -426,7 +439,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           touchToday({
             ...s,
             attempts: [...s.attempts, full],
-            xp: s.xp + XP.forAnswer(a.correct, a.confidence),
+            // Exam answers really earn the doubled XP the result screen
+            // advertises. It used to be shown there and credited nowhere.
+            xp: s.xp + XP.forAnswer(a.correct, a.confidence) * (a.mode === 'exam' ? XP.examMultiplier : 1),
           })
         );
         // Queued, not awaited: the answer is already on screen and in state.
@@ -546,21 +561,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * source of truth moved to the server. No screen had to change, and none of
    * them can write to either any more.
    */
+  /**
+   * Memoised on the scalar fields, not the objects. authUser and entitlement
+   * arrive as fresh objects even when nothing changed (every foreground
+   * entitlement refresh built a new one), and rebuilding `user`/`premium`
+   * churned every effect keyed on them, including the splash redirect timer.
+   */
+  const user = useMemo(
+    () => (authUser ? { id: authUser.id, name: authUser.name, contact: authUser.email } : null),
+    [authUser?.id, authUser?.name, authUser?.email], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const premium = useMemo(
+    () => ({ active: entitlement.active, validTill: entitlement.validTill }),
+    [entitlement.active, entitlement.validTill],
+  );
   const view = useMemo<State>(
     () => ({
       ...state,
-      user: authUser ? { id: authUser.id, name: authUser.name, contact: authUser.email } : null,
-      premium: { active: entitlement.active, validTill: entitlement.validTill },
+      user,
+      premium,
     }),
-    [state, authUser, entitlement]
+    [state, user, premium]
   );
 
   const derived = useMemo(() => {
     const aiLimit = view.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
     const usedToday = view.ai.day === todayKey() ? view.ai.used : 0;
-    const subjects = view.onboarding?.subjects?.length
-      ? view.onboarding.subjects
-      : ['phy', 'chem', 'bio', 'math', 'eng', 'urd', 'isl'];
+    const subjects = view.onboarding?.subjects?.length ? view.onboarding.subjects : DEFAULT_SUBJECTS;
     return {
       streak: streakFrom(view.activeDays),
       level: level(view.xp),

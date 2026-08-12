@@ -10,7 +10,13 @@ export default function AiTest() {
   const { state } = useApp();
   const t = useT();
   const weak = useMemo(() => weakTopics(state.attempts).slice(0, 6), [state.attempts]);
-  const [picked, setPicked] = useState<string[]>(weak.slice(0, 3).map((w) => w.topic));
+  /**
+   * Derived until the student touches it. Seeding useState from `weak` froze
+   * whatever the list was on first render, and on a cold start that is empty:
+   * the topics then filled in unchecked and Generate stayed disabled forever.
+   */
+  const [touched, setTouched] = useState<string[] | null>(null);
+  const picked = touched ?? weak.slice(0, 3).map((w) => w.topic);
   const [count, setCount] = useState<'10' | '15' | '20'>('15');
   const [difficulty, setDifficulty] = useState<'easy' | 'board' | 'hard'>('board');
 
@@ -23,7 +29,14 @@ export default function AiTest() {
             variant="orange"
             icon="spark"
             disabled={picked.length === 0}
-            onPress={() => router.replace('/session/exam-intro?ai=1')}
+            onPress={() =>
+              // The three controls above were decorative: none of these
+              // values survived the navigation, and every AI test came out
+              // as 20 board-level questions on three hardcoded topics.
+              router.replace(
+                `/session/exam-intro?ai=1&topics=${encodeURIComponent(picked.join('|'))}&count=${count}&difficulty=${difficulty}`,
+              )
+            }
           />
         ) : undefined
       }
@@ -53,7 +66,7 @@ export default function AiTest() {
                   icon="alert"
                   tone={w.accuracy < 50 ? 'red' : 'orange'}
                   last={i === weak.length - 1}
-                  onPress={() => setPicked((p) => (on ? p.filter((x) => x !== w.topic) : [...p, w.topic]))}
+                  onPress={() => setTouched(on ? picked.filter((x) => x !== w.topic) : [...picked, w.topic])}
                   right={<Check on={on} />}
                 />
               );
