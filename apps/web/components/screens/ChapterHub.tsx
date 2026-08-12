@@ -3,9 +3,7 @@
 import type { Chapter, ChapterContent, PlayableTrack } from '@matricmate/core';
 import { chapterPct, hasStudyMaterial, pickAudioTrack } from '@matricmate/core';
 import { Actions, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
-import { IconButton } from '@/components/ui/controls';
-import { Card, Empty, Item, Label, LinkBtn, Pill, Ring, Ur } from '@/components/ui/primitives';
-import { useToast } from '@/components/ui/toast';
+import { Card, Empty, Item, Label, LinkBtn, Ring, Ur } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 export function ChapterHub({
@@ -20,9 +18,8 @@ export function ChapterHub({
   /** Empty until this chapter has really been recorded, and then the row hides. */
   tracks: PlayableTrack[];
 }) {
-  const { state, actions } = useApp();
+  const { state } = useApp();
   const t = useT();
-  const toast = useToast();
 
   const id = chapter.id;
 
@@ -52,7 +49,6 @@ export function ChapterHub({
   }
   const track = pickAudioTrack(tracks, state.settings.contentMedium);
   const pct = chapterPct(id, state.readSections, state.attempts);
-  const downloaded = state.downloads.includes(id);
   const readCount = content.sections.filter((s) => state.readSections.includes(s.id)).length;
   const knownCards = content.flashcards.filter((f) => state.cardsKnown.includes(f.id)).length;
   const best = state.results
@@ -70,15 +66,6 @@ export function ChapterHub({
         sub={chapter.blurb}
         actions={
           <>
-            <IconButton
-              icon={downloaded ? 'check' : 'download'}
-              tone={downloaded ? 'active' : 'card'}
-              label={downloaded ? t('study.removeOffline') : t('study.saveOffline')}
-              onClick={() => {
-                actions.toggleDownload(id);
-                toast(downloaded ? t('study.removedOffline') : t('study.savedOffline'));
-              }}
-            />
             <LinkBtn
               title={readCount ? t('study.continueReading') : t('study.startReading')}
               href={`/learn/reader/${id}`}
@@ -140,13 +127,6 @@ export function ChapterHub({
           last
         />
       </Card>
-
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
-              {downloaded ? t('study.savedOffline') : t('study.notDownloaded')}
-            </Pill>
-            <Pill tone="grey">{t('study.sizeApprox')}</Pill>
-          </div>
 
           <Actions>
             <LinkBtn

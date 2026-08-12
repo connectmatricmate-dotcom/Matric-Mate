@@ -70,7 +70,6 @@ type Actions = {
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
   markSectionRead: (sectionId: string, chapterId: string, index: number) => void;
   togglePlanTask: (id: string) => void;
-  toggleDownload: (chapterId: string) => void;
   markCard: (cardId: string, known: boolean) => void;
   consumeAi: () => boolean;
   saveThread: (t: ChatThread) => void;
@@ -168,11 +167,6 @@ const actions: Actions = {
     update((s) => ({
       ...s,
       planDone: s.planDone.includes(id) ? s.planDone.filter((x) => x !== id) : [...s.planDone, id],
-    })),
-  toggleDownload: (chapterId) =>
-    update((s) => ({
-      ...s,
-      downloads: s.downloads.includes(chapterId) ? s.downloads.filter((x) => x !== chapterId) : [...s.downloads, chapterId],
     })),
   markCard: (cardId, known) => {
     const wasKnown = getSnapshot().cardsKnown.includes(cardId);

@@ -47,7 +47,6 @@ export type State = {
   attempts: Attempt[];
   results: TestResult[];
   planDone: string[];
-  downloads: string[];
   ai: { day: string; used: number };
   threads: ChatThread[];
   notifications: Notification[];
@@ -80,7 +79,6 @@ export const EMPTY: State = {
   attempts: [],
   results: [],
   planDone: [],
-  downloads: [],
   ai: { day: todayKey(), used: 0 },
   threads: [],
   notifications: [],

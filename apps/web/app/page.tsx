@@ -47,7 +47,7 @@ const STEPS = [
 /** Chip tones rotate so the feature grid carries colour, not just copy. */
 const INSIDE: { icon: IconName; tone: string; title: string; body: string }[] = [
   { icon: 'book', tone: 'bg-tealtint text-teal', title: 'Chapter-wise notes', body: 'Every chapter split into short sections with definitions, formulas and worked examples, in your medium.' },
-  { icon: 'headphones', tone: 'bg-orangetint text-orangedark', title: 'Audio lessons', body: 'Listen to the whole chapter in English or Urdu. Works offline, so it costs no data on the second listen.' },
+  { icon: 'headphones', tone: 'bg-orangetint text-orangedark', title: 'Audio lessons', body: 'Listen to the whole chapter in English or Urdu. Download it in the Android app and it costs no data on the second listen.' },
   { icon: 'cards', tone: 'bg-greentint text-green', title: 'Flashcards', body: 'Active recall for the definitions that show up in Section A. Cards you miss come back first.' },
   { icon: 'target', tone: 'bg-greentint text-green', title: 'MCQs with explanations', body: 'Every question tells you why the right answer is right, which is the part that actually teaches.' },
   { icon: 'edit', tone: 'bg-tealtint text-teal', title: 'Blanks and short questions', body: 'Model answers with the marking points, so you know what earns each mark.' },
@@ -61,7 +61,7 @@ const FAQ = [
   },
   {
     q: 'Does it work without internet?',
-    a: 'Download a chapter and its notes, audio and MCQs work offline. Answers you give offline sync when you reconnect. The AI tutor and timed tests need a connection.',
+    a: 'Downloads are an Android app feature. Save a chapter there and its notes, audio and MCQs work with no signal, and answers sync when you reconnect. The website needs a connection. The AI tutor and timed tests need one on both.',
   },
   {
     q: 'My child studies in Urdu medium. Is the content really in Urdu?',
@@ -329,7 +329,7 @@ export default function LandingPage() {
                 examiner actually uses. Read a paper, or sit it under a timer with a question palette and flagging.
               </p>
               <ul className="mt-6 flex flex-col gap-3">
-                {['FBISE papers from 2019 onwards', 'Attempt as a timed test with double XP', 'Answers reviewed question by question', 'Download to read offline'].map((li) => (
+                {['FBISE papers from 2019 onwards', 'Attempt as a timed test with double XP', 'Answers reviewed question by question', 'Download to read offline in the Android app'].map((li) => (
                   <li key={li} className="flex items-center gap-2.5 text-[15.5px] text-ink">
                     <Icon name="check" size={18} className="text-green" strokeWidth={2.6} />
                     {li}
@@ -467,7 +467,7 @@ export default function LandingPage() {
                     'Unlimited MCQs, tests and past papers',
                     'AI tutor: 20 questions a day',
                     'Weak topics and monthly report card',
-                    'Offline downloads',
+                    'Offline downloads in the Android app',
                     'Android app and website, one account',
                   ].map((li) => (
                     <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink">

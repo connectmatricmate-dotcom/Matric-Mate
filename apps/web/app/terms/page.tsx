@@ -26,7 +26,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     heading: 'Paying, renewing and cancelling',
     paragraphs: [
       'Premium is sold on this website only. Nothing renews automatically: two days before your plan ends we send a reminder, and you choose whether to pay again.',
-      'You can cancel any time from Profile, then Subscription. Access continues to the date you have already paid for, and chapters you downloaded stay on your device.',
+      'You can cancel any time from Profile, then Subscription. Access continues to the date you have already paid for, and chapters you downloaded in the Android app stay on your phone.',
       'Payments are processed by Safepay. Card and mobile-wallet details go to them, not to us, and we store only the reference number shown on your receipt.',
     ],
   },

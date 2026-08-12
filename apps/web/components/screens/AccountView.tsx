@@ -96,12 +96,6 @@ export function AccountView() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card flat className="py-0">
               <Item href="/account/payments" title={t('account.paymentHistory')} icon="card" />
-              <Item
-                href="/learn/downloads"
-                title={t('account.downloads')}
-                sub={t('account.downloadsSub', { n: state.downloads.length })}
-                icon="download"
-              />
               <Item href="/notifications" title={t('account.notifications')} icon="bell" last />
             </Card>
 

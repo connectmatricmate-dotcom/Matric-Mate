@@ -84,7 +84,7 @@ export const INCLUDED = [
   'Unlimited MCQs, tests and past papers',
   'AI tutor: 20 questions a day',
   'Weak topics and monthly report card',
-  'Offline downloads',
+  'Offline downloads in the Android app',
   'Android app and website, one account',
 ];
 

@@ -155,7 +155,7 @@ export const en = {
     perk2: 'Unlimited MCQs, tests and past papers',
     perk3: 'AI tutor: 20 questions a day',
     perk4: 'Weak topics and monthly report card',
-    perk5: 'Offline downloads',
+    perk5: 'Offline downloads in the Android app',
     emailLink: 'Email me the link',
     emailLinkSent: 'Sent. Check your email for the link.',
     howToUpgrade:
@@ -888,7 +888,7 @@ export const ur: typeof en = {
     perk2: 'Unlimited MCQs, tests aur past papers',
     perk3: 'AI tutor: roz 20 sawal',
     perk4: 'Weak topics aur mahana report card',
-    perk5: 'Offline downloads',
+    perk5: 'Android app mein offline downloads',
     emailLink: 'Link email karein',
     emailLinkSent: 'Bhej diya. Email mein link mil jaye ga.',
     howToUpgrade:

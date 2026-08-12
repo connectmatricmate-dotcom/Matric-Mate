@@ -11,9 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Chapter, PlayableTrack } from '@matricmate/core';
 import { pickAudioTrack } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { IconButton } from '@/components/ui/controls';
-import { Bar, Card, Icon, Pill } from '@/components/ui/primitives';
-import { useToast } from '@/components/ui/toast';
+import { Bar, Card, Icon } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 const SPEEDS = [1, 1.25, 1.5] as const;
@@ -29,9 +27,8 @@ export function AudioLesson({
   /** Published recordings for this chapter, straight from Supabase Storage. */
   tracks: PlayableTrack[];
 }) {
-  const { state, actions } = useApp();
+  const { state } = useApp();
   const t = useT();
-  const toast = useToast();
   const audio = useRef<HTMLAudioElement>(null);
 
   const id = chapter.id;
@@ -46,7 +43,6 @@ export function AudioLesson({
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(0);
   const [loadedSrc, setLoadedSrc] = useState(src);
-  const downloaded = state.downloads.includes(id);
 
   // Switching study medium loads a different recording, start it from the top
   // rather than mid-sentence. Adjusted during render, not in an effect, so the
@@ -80,19 +76,6 @@ export function AudioLesson({
         back={`/learn/chapter/${id}`}
         backLabel={chapter.title}
         title={t('audio.title')}
-        actions={
-          <IconButton
-            icon={downloaded ? 'check' : 'download'}
-            tone={downloaded ? 'active' : 'card'}
-            // The label names the ACTION a press performs; the toast reports
-            // the RESULT. They used to be the same string in the wrong tense.
-            label={downloaded ? t('study.removeOffline') : t('study.saveOffline')}
-            onClick={() => {
-              actions.toggleDownload(id);
-              toast(downloaded ? t('study.removedOffline') : t('study.savedOffline'));
-            }}
-          />
-        }
       />
 
       {src ? (
@@ -165,9 +148,7 @@ export function AudioLesson({
         >
           {t('audio.speed', { n: SPEEDS[speed] })}
         </button>
-        <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
-          {downloaded ? t('audio.offline') : t('audio.stream')}
-        </Pill>
+
       </div>
 
       <Card

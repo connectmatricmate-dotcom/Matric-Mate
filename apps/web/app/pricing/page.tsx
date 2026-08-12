@@ -22,7 +22,7 @@ const COMPARE: { feature: string; free: string; premium: string }[] = [
   { feature: 'AI tutor questions a day', free: '5', premium: '20' },
   { feature: 'Weak topics', free: 'No', premium: 'Yes' },
   { feature: 'Monthly report card', free: 'No', premium: 'Yes' },
-  { feature: 'Offline downloads', free: 'No', premium: 'Yes' },
+  { feature: 'Offline downloads (Android app)', free: 'No', premium: 'Yes' },
   { feature: 'Android app and website', free: 'Yes', premium: 'Yes, one account' },
 ];
 
@@ -41,7 +41,7 @@ const QUESTIONS = [
   },
   {
     q: 'Can I cancel?',
-    a: 'Any time, from Profile, then Subscription. You keep access until the date you’ve already paid for, and downloads stay on your device.',
+    a: 'Any time, from Profile, then Subscription. You keep access until the date you’ve already paid for, and chapters downloaded in the Android app stay on your phone.',
   },
   {
     q: 'Is there a discount for a whole class or school?',

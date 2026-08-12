@@ -132,12 +132,6 @@ export function SettingsView() {
         </Group>
 
         <Group title={t('account.storage')}>
-          <Item
-            href="/learn/downloads"
-            title={t('account.manageDownloads')}
-            sub={t('account.chaptersCount', { n: state.downloads.length })}
-            icon="download"
-          />
           <ItemButton
             title={t('account.resetDemo')}
             sub={t('account.resetDemoSub')}
