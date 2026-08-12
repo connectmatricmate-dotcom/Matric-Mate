@@ -245,6 +245,25 @@ if there is none it says so. Install one with `nvm install 22`.
 If you hit the dtrace error after a failed run on a newer Node, the broken
 native build is cached: `rm -rf ~/.npm/_npx` and run again.
 
+### Gradle memory
+
+The generated Android project caps Gradle's Metaspace at 512 MB, which this
+build blows through: the symptom is a failure deep into the build with
+"Metaspace" under a Kotlin or lint task. The fix lives in
+`~/.gradle/gradle.properties` (already written on this machine), which
+outranks the per-project file that EAS regenerates on every run:
+
+```
+org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1536m -Dfile.encoding=UTF-8
+kotlin.daemon.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g
+```
+
+Two more first-run facts: Gradle installs its own NDK and SDK platform
+versions regardless of what sdkmanager preinstalled, and a build interrupted
+mid-download can leave a stub NDK directory that fails later runs with "did
+not have a source.properties file". Delete the offending
+`~/Android/Sdk/ndk/<version>` directory and run again.
+
 ## In the cloud
 
 ```bash
