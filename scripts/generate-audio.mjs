@@ -212,9 +212,29 @@ async function main() {
       continue;
     }
 
-    // 24kbps mono, which is what edge-tts returns, so bytes to seconds is close
-    // enough for a duration label and costs no extra tooling.
-    const seconds = Math.round(bytes / 3000);
+    // Read the real duration out of the file rather than inferring it.
+    //
+    // This was `bytes / 3000`, assuming 24kbps. edge-tts actually returns
+    // 48kbps, so every duration was double the truth and a nine minute lesson
+    // was advertised as eighteen. Guessing a number and showing it to a student
+    // is how the fake "11 min Urdu narration" got there in the first place.
+    let seconds = 0;
+    try {
+      const { stdout } = await run('python3', [
+        '-c',
+        'import sys;from mutagen.mp3 import MP3;print(int(MP3(sys.argv[1]).info.length))',
+        mp3,
+      ]);
+      seconds = Number(stdout.trim()) || 0;
+    } catch {
+      seconds = 0;
+    }
+    if (!seconds) {
+      console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim('could not read duration, refusing to guess')}`);
+      await unlink(mp3).catch(() => {});
+      skipped++;
+      continue;
+    }
 
     const { error: rowErr } = await db.from('audio_tracks').upsert(
       {
