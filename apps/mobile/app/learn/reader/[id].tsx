@@ -104,8 +104,13 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
         </View>
       );
     case 'example':
+      // The border is load-bearing, not decoration. On some Android devices
+      // a rounded, tinted, borderless card intermittently painted no children
+      // at all (blank peach boxes over real content); bordered cards next to
+      // them never did, because a border forces the non-clipping draw path.
+      // It also matches the MCQ explanation card, which already wears one.
       return (
-        <Card flat tint={C.orangeTint} style={{ marginBottom: S.md }}>
+        <Card flat tint={C.orangeTint} border={C.orange} style={{ marginBottom: S.md }}>
           <Label style={{ color: C.orangeDark }}>{labels.example}</Label>
           <View style={{ marginTop: 4 }}>
             <Prose text={b.text} size={14.5 * scale} />
