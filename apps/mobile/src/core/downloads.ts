@@ -28,6 +28,7 @@
  */
 import { Directory, File, Paths } from 'expo-file-system';
 import {
+  AudioTrack,
   ChapterContent,
   Medium,
   api,
@@ -77,6 +78,28 @@ const audioFile = (chapterId: string, medium: Medium): File | null => {
   const dir = chapterDir(chapterId);
   return dir ? new File(dir, `${medium}.mp3`) : null;
 };
+const audioMetaFile = (chapterId: string, medium: Medium): File | null => {
+  const dir = chapterDir(chapterId);
+  return dir ? new File(dir, `${medium}.audio.json`) : null;
+};
+
+/**
+ * The saved track row for a downloaded lesson.
+ *
+ * Kept next to the MP3 because the row itself lives on the server, and a
+ * student with no signal cannot fetch it. Without this the chapter hub would
+ * hide the audio option for a chapter whose lesson is sitting on the phone,
+ * and the player would have no duration to show.
+ */
+export function localAudioTrack(chapterId: string, medium: Medium): AudioTrack | null {
+  try {
+    const file = audioMetaFile(chapterId, medium);
+    if (!file?.exists) return null;
+    return JSON.parse(file.textSync()) as AudioTrack;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * The on-disk lesson for a chapter, or null when it was never downloaded.
@@ -199,9 +222,13 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
 
   try {
     let audioTemp: File | null = null;
-    if (url) {
+    let metaTemp: File | null = null;
+    if (url && track) {
       audioTemp = await File.downloadFileAsync(url, new File(dir, `.${medium}.audio.tmp-${stamp}`));
       scratch.push(audioTemp);
+      metaTemp = new File(dir, `.${medium}.meta.tmp-${stamp}`);
+      scratch.push(metaTemp);
+      metaTemp.write(JSON.stringify(track));
     }
 
     const temp = new File(dir, `.${medium}.tmp-${stamp}`);
@@ -211,7 +238,9 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
     // Both files move into place only once both exist, so a chapter is never
     // half-downloaded from a reader's point of view.
     const audioDest = audioFile(chapterId, medium);
+    const metaDest = audioMetaFile(chapterId, medium);
     if (audioTemp && audioDest) audioTemp.moveSync(audioDest, { overwrite: true });
+    if (metaTemp && metaDest) metaTemp.moveSync(metaDest, { overwrite: true });
     temp.moveSync(dest, { overwrite: true });
   } catch (e) {
     sweep();

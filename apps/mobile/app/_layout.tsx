@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font';
 import { Baloo2_600SemiBold, Baloo2_700Bold } from '@expo-google-fonts/baloo-2';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import { NotoNastaliqUrdu_400Regular, NotoNastaliqUrdu_600SemiBold } from '@expo-google-fonts/noto-nastaliq-urdu';
+import { ConnectivityProvider } from '../src/core/connectivity';
 import { AuthProvider } from '../src/store/auth';
 import { AppProvider } from '../src/store/app';
 import { ToastHost } from '../src/components/ui';
@@ -34,23 +35,25 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       {/* Auth sits outside the study store, which reads identity and entitlement from it. */}
-      <AuthProvider>
-        <AppProvider>
-          <ToastHost>
-            <StatusBar style="dark" />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: C.paper },
-                animation: 'slide_from_right',
-              }}
-            >
-              <Stack.Screen name="index" options={{ animation: 'none' }} />
-              <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
-            </Stack>
-          </ToastHost>
-        </AppProvider>
-      </AuthProvider>
+      <ConnectivityProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ToastHost>
+              <StatusBar style="dark" />
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: C.paper },
+                  animation: 'slide_from_right',
+                }}
+              >
+                <Stack.Screen name="index" options={{ animation: 'none' }} />
+                <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+              </Stack>
+            </ToastHost>
+          </AppProvider>
+        </AuthProvider>
+      </ConnectivityProvider>
     </SafeAreaProvider>
   );
 }

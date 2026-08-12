@@ -7,7 +7,7 @@ import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
 import { api, pickAudioTrack } from '@matricmate/core';
 import { audioSource } from '../../../src/core/audio';
-import { localAudioUri } from '../../../src/core/downloads';
+import { localAudioTrack, localAudioUri } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -148,7 +148,7 @@ function RealPlayer({ id }: { id: string }) {
 
   const medium = state.settings.contentMedium;
   const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
-  const picked = pickAudioTrack(tracks ?? [], medium);
+  const picked = pickAudioTrack(tracks ?? [], medium) ?? localAudioTrack(id, medium);
   // The downloaded copy wins over the stream, so a saved chapter plays with no
   // signal and a replay costs the student no data.
   const offlineUri = picked ? localAudioUri(id, picked.medium) : null;

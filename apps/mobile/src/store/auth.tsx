@@ -25,6 +25,38 @@ export type Entitlement = {
 
 const NONE: Entitlement = { active: false, validTill: null, plan: null };
 
+/**
+ * How long a plan we cannot re-check stays trusted.
+ *
+ * A student with no data for a week should not lose chapters they paid for and
+ * already downloaded, so the last known entitlement is honoured offline. It
+ * cannot be honoured forever, or one signed-in phone becomes a permanent
+ * subscription passed around a classroom. Thirty days is the same window
+ * Spotify allows, and it comfortably covers a month of no connection.
+ */
+const OFFLINE_GRACE_MS = 30 * 24 * 60 * 60 * 1000;
+
+type CachedEntitlement = Entitlement & { cachedAt?: number };
+
+/**
+ * The last entitlement seen, if it is still inside the grace window.
+ *
+ * Returns null for a cache older than that, and for one written before this
+ * function existed, which carries no timestamp: an unknown age is treated as
+ * too old rather than as fresh.
+ */
+async function readCachedEntitlement(userId: string): Promise<Entitlement | null> {
+  const raw = await AsyncStorage.getItem(cacheKey(userId));
+  if (!raw) return null;
+  try {
+    const { cachedAt, ...rest } = JSON.parse(raw) as CachedEntitlement;
+    if (!cachedAt || Date.now() - cachedAt > OFFLINE_GRACE_MS) return null;
+    return rest;
+  } catch {
+    return null;
+  }
+}
+
 export type AuthUser = { id: string; name: string; email: string };
 
 /**
@@ -113,8 +145,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         // Offline or the server is unhappy. Fall back to what we saw last time
         // rather than telling a paying student their plan has gone.
-        const cached = await AsyncStorage.getItem(cacheKey(userId));
-        if (cached && currentUserId.current === userId) setEntitlement(JSON.parse(cached) as Entitlement);
+        const cached = await readCachedEntitlement(userId);
+        if (cached && currentUserId.current === userId) setEntitlement(cached);
         return;
       }
 
@@ -130,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         plan: data?.plan ?? null,
       };
       setEntitlement(next);
-      await AsyncStorage.setItem(cacheKey(userId), JSON.stringify(next));
+      await AsyncStorage.setItem(cacheKey(userId), JSON.stringify({ ...next, cachedAt: Date.now() }));
     } finally {
       setChecking(false);
     }
@@ -153,9 +185,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfileName(null);
         return;
       }
-      // Cached value first so the UI is right immediately, server second.
-      AsyncStorage.getItem(cacheKey(id)).then((cached) => {
-        if (cached && currentUserId.current === id) setEntitlement(JSON.parse(cached) as Entitlement);
+      // Cached value first so the UI is right immediately, server second. Goes
+      // through the same grace check, so a stale cache cannot outlive the
+      // window just because this path reads it before loadEntitlement does.
+      readCachedEntitlement(id).then((cached) => {
+        if (cached && currentUserId.current === id) setEntitlement(cached);
       });
       loadEntitlement(id);
       loadProfile(id);

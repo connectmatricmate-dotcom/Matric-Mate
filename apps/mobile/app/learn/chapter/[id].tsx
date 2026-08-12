@@ -3,7 +3,7 @@ import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
 import { api , chapterPct, hasStudyMaterial , pickAudioTrack, subjectById } from '@matricmate/core';
-import { chapterDownloadBytes, formatBytes } from '../../../src/core/downloads';
+import { chapterDownloadBytes, formatBytes, localAudioTrack } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -19,8 +19,12 @@ export default function ChapterHub() {
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
   const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
   // No row, no row in the grid: a chapter offers an audio lesson only once one
-  // has really been recorded and published.
-  const audio = pickAudioTrack(tracks ?? [], state.settings.contentMedium);
+  // has really been recorded and published. Offline the fetch returns nothing,
+  // so the copy saved with the download answers instead and a downloaded
+  // chapter keeps offering the lesson that is sitting on the phone.
+  const audio =
+    pickAudioTrack(tracks ?? [], state.settings.contentMedium) ??
+    localAudioTrack(id, state.settings.contentMedium);
 
   // Guards a direct link or an old bookmark to a chapter the board doesn't
   // examine: no notes, audio, flashcards, MCQs, short questions or blanks

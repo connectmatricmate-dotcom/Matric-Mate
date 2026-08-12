@@ -365,9 +365,16 @@ export const en = {
     emptyTitle: 'No downloads yet',
     emptyBody: 'Save a chapter and study without internet. Useful when data runs out.',
     browse: 'Browse subjects',
-    perChapter: '{n} · notes, flashcards, MCQs',
+    perChapter: '{n} · notes, audio, flashcards, MCQs',
     footnote: 'Downloads use Wi-Fi by default. Answers given offline sync when you reconnect.',
     saveFailed: 'Could not save this chapter. Try again.',
+  },
+  offline: {
+    title: 'No internet',
+    sub: 'You can still study anything you downloaded.',
+    emptyTitle: 'Nothing saved yet',
+    emptyBody: 'Download a chapter while you have signal, and it will be waiting here the next time you do not.',
+    footnote: 'Tests, the AI tutor and anything new come back on their own when you reconnect.',
   },
 
   practice: {
@@ -1098,9 +1105,16 @@ export const ur: typeof en = {
     emptyTitle: 'Abhi koi download nahi',
     emptyBody: 'Chapter save karein aur bina internet parhein. Jab data khatam ho, tab kaam aata hai.',
     browse: 'Subjects dekhein',
-    perChapter: '{n} · notes, flashcards, MCQs',
+    perChapter: '{n} · notes, audio, flashcards, MCQs',
     footnote: 'Downloads Wi-Fi par hote hain. Offline diye gaye jawab internet aate hi sync ho jate hain.',
     saveFailed: 'Chapter save nahi ho saka. Dobara koshish karein.',
+  },
+  offline: {
+    title: 'Internet nahi hai',
+    sub: 'Jo kuch download kiya hai woh ab bhi parh sakte hain.',
+    emptyTitle: 'Abhi kuch save nahi hai',
+    emptyBody: 'Signal hote hue chapter download karein, phir jab signal na ho to wo yahan mil jaye ga.',
+    footnote: 'Tests, AI tutor aur baqi sab dobara connect hote hi khud wapas aa jate hain.',
   },
 
   practice: {

@@ -24,6 +24,7 @@ import {
 } from '../../../src/components/ui';
 import { api , Block } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
+import { useOnline } from '../../../src/core/connectivity';
 import { useT } from '../../../src/i18n';
 import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -120,6 +121,7 @@ export default function Reader() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, actions, derived } = useApp();
   const t = useT();
+  const online = useOnline();
   const toast = useToast();
   const insets = useSafeAreaInsets();
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
@@ -224,9 +226,12 @@ export default function Reader() {
           ) : null}
         </ScrollView>
 
-        <View style={{ position: 'absolute', right: S.lg, bottom: 92 + insets.bottom }}>
-          <Btn title={t('reader.askAi')} icon="spark" sm onPress={() => setAskOpen(true)} style={{ borderRadius: 99 }} />
-        </View>
+        {/* The tutor is the one thing on this screen that cannot work from disk. */}
+        {online ? (
+          <View style={{ position: 'absolute', right: S.lg, bottom: 92 + insets.bottom }}>
+            <Btn title={t('reader.askAi')} icon="spark" sm onPress={() => setAskOpen(true)} style={{ borderRadius: 99 }} />
+          </View>
+        ) : null}
 
         <Row
           style={{
