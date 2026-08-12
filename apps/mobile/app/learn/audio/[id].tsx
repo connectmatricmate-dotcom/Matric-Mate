@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
@@ -147,13 +147,25 @@ function RealPlayer({ id }: { id: string }) {
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
   const medium = state.settings.contentMedium;
-  const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
+  const { data: tracks, loading: tracksLoading, error: tracksError } = useAsync(() => api.getAudioTracks(id), [id]);
   const picked = pickAudioTrack(tracks ?? [], medium) ?? localAudioTrack(id, medium);
   // The downloaded copy wins over the stream, so a saved chapter plays with no
   // signal and a replay costs the student no data.
   const offlineUri = picked ? localAudioUri(id, picked.medium) : null;
-  const track = offlineUri ? { uri: offlineUri } : audioSource(picked);
+  /**
+   * Memoised on the identity of the recording, not rebuilt every render.
+   *
+   * Without this, `track` is a fresh object literal on each render, so the
+   * effect below fires every render and calls player.replace() forever: the
+   * player restarts loading before it can finish, and nothing ever plays. The
+   * bundled-asset version returned a stable module constant, so the bug only
+   * appeared when this started resolving remote URLs.
+   */
+  const remoteUri = audioSource(picked)?.uri ?? null;
+  const uri = offlineUri ?? remoteUri;
+  const track = useMemo(() => (uri ? { uri } : null), [uri]);
   const player = useAudioPlayer(track);
+
   const status = useAudioPlayerStatus(player);
   const [speed, setSpeed] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -193,7 +205,23 @@ function RealPlayer({ id }: { id: string }) {
         setSpeed(next);
         player.setPlaybackRate(SPEEDS[next]);
       }}
-      note={track ? t('audio.sampleNote') : t('audio.noTrackNote')}
+      /**
+       * Three different states, and they used to render as one.
+       *
+       * While the track list is still being fetched there is no URL yet, so the
+       * screen showed "no recording for this chapter" over dead controls, for a
+       * chapter that has one. A slow request looked exactly like a missing
+       * lesson. A failed request looked like one too, silently.
+       */
+      note={
+        track
+          ? t('audio.sampleNote')
+          : tracksLoading
+            ? t('common.loading')
+            : tracksError
+              ? t('audio.loadFailed')
+              : t('audio.noTrackNote')
+      }
       downloaded={downloaded}
       offlineAudio={!!offlineUri}
       busy={busy}

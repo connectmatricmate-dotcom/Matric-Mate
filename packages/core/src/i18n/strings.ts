@@ -350,6 +350,7 @@ export const en = {
     sampleNote:
       'This chapter has a full recording in both mediums. Switch Study medium in Settings to hear the other one. More chapters are being recorded.',
     noTrackNote: 'No recording for this chapter yet. It is on the way.',
+    loadFailed: 'Could not load the lesson. Check your connection and try again.',
     needsNewBuild:
       'This copy of the app was built before audio support was added, so the transport below is a preview. Install the latest build to hear the recording.',
     demoNote: 'Playback is simulated for chapters whose recording is still on the way.',
@@ -1090,6 +1091,7 @@ export const ur: typeof en = {
     sampleNote:
       'Is chapter ki mukammal recording dono mediums mein maujood hai. Settings se Study medium badal kar doosri sunein. Baqi chapters record ho rahe hain.',
     noTrackNote: 'Is chapter ki recording abhi nahi aayi. Jald aa rahi hai.',
+    loadFailed: 'Lesson load nahi ho saka. Connection check karke dobara koshish karein.',
     needsNewBuild:
       'Yeh app audio support se pehle bani thi, is liye neeche sirf preview chal raha hai. Asli recording ke liye nayi build install karein.',
     demoNote: 'Jin chapters ki recording abhi aani hai un ki playback simulate hoti hai.',

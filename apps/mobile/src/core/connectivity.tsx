@@ -7,14 +7,22 @@
  * so the only missing piece was knowing when to stop offering things that need
  * a server.
  *
- * `isInternetReachable` is the honest signal rather than `isConnected`: a phone
- * joined to a wifi router with no working uplink is "connected" and can fetch
- * nothing. It is undefined for a moment at launch while the probe runs, and we
- * assume online then, because flashing the offline library at every cold start
- * would be worse than a request that fails once.
+ * WHY NOT useNetworkState()
+ *
+ * expo-network exposes a hook, and it was used here first. It sits at the root
+ * of the tree, above every error boundary, so anything it throws takes the
+ * whole app down before a screen renders rather than degrading. That is the
+ * same failure the downloads helper had when it built a Directory at module
+ * scope. Reading the state inside an effect means a module that is missing,
+ * broken or unavailable on this platform costs us the offline shell and
+ * nothing else: the app assumes it is online, which is what it did before any
+ * of this existed.
+ *
+ * Reachability is the honest signal rather than "connected": a phone joined to
+ * a router with no working uplink is connected and can fetch nothing.
  */
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { useNetworkState } from 'expo-network';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { AppState } from 'react-native';
 
 const OnlineContext = createContext(true);
 
@@ -27,28 +35,68 @@ const OnlineContext = createContext(true);
  */
 const SETTLE_MS = 3000;
 
-export function ConnectivityProvider({ children }: { children: ReactNode }) {
-  const net = useNetworkState();
-  const reachable = net.isInternetReachable ?? net.isConnected ?? true;
-  const [settledOffline, setSettledOffline] = useState(false);
-  const [seen, setSeen] = useState(reachable);
+/** How often to re-read, when the OS gives us no change events. */
+const POLL_MS = 8000;
 
-  // Adjusted during render rather than in an effect, so the settle timer starts
-  // fresh on each new outage instead of the second drop being instant.
-  if (seen !== reachable) {
-    setSeen(reachable);
-    if (reachable) setSettledOffline(false);
+/**
+ * Reads expo-network lazily and defensively.
+ *
+ * Returns null when the module cannot answer, which the caller treats as
+ * online. require() rather than a static import so a missing native module is
+ * a caught throw here instead of a failed module evaluation at startup.
+ */
+async function reachable(): Promise<boolean | null> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Network = require('expo-network');
+    const state = await Network.getNetworkStateAsync();
+    return state?.isInternetReachable ?? state?.isConnected ?? null;
+  } catch {
+    return null;
   }
+}
+
+export function ConnectivityProvider({ children }: { children: ReactNode }) {
+  const [online, setOnline] = useState(true);
+  const offlineSince = useRef<number | null>(null);
 
   useEffect(() => {
-    if (reachable) return;
-    const timer = setTimeout(() => setSettledOffline(true), SETTLE_MS);
-    return () => clearTimeout(timer);
-  }, [reachable]);
+    let alive = true;
 
-  const online = reachable || !settledOffline;
+    async function check() {
+      const up = await reachable();
+      if (!alive) return;
+
+      // Unknown counts as online. Better a request that fails than an app that
+      // hides itself because one module would not answer.
+      if (up !== false) {
+        offlineSince.current = null;
+        setOnline(true);
+        return;
+      }
+
+      const since = offlineSince.current ?? Date.now();
+      offlineSince.current = since;
+      if (Date.now() - since >= SETTLE_MS) setOnline(false);
+    }
+
+    void check();
+    const timer = setInterval(check, POLL_MS);
+    // Coming back to the app is the moment the answer matters most, and the
+    // one time a student will not wait out the poll interval.
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s === 'active') void check();
+    });
+
+    return () => {
+      alive = false;
+      clearInterval(timer);
+      sub.remove();
+    };
+  }, []);
+
   return <OnlineContext.Provider value={online}>{children}</OnlineContext.Provider>;
 }
 
-/** True when the app can reach the server. Default true, see the note above. */
+/** True when the app can reach the server. Defaults to true, see the note above. */
 export const useOnline = (): boolean => useContext(OnlineContext);
