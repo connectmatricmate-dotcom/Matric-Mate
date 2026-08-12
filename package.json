@@ -15,6 +15,7 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "check": "node scripts/check.mjs",
     "content:fetch": "node scripts/fetch-fbise.mjs",
+    "content:toppers": "node scripts/fetch-toppers.mjs",
     "content:build": "node scripts/build-curriculum.mjs",
     "content:ingest": "node scripts/ingest-content.mjs",
     "content:verify": "node scripts/verify-content.mjs",
