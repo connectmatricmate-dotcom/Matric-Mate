@@ -339,6 +339,12 @@ const fromResultRow = (r: ResultRow): TestResult => ({
 });
 
 export type HydratedStudyState = {
+  /**
+   * The student's saved class/board/subjects choices, opaque to core. The app
+   * owns the shape; this layer only ferries it, which is also why it is not
+   * merged by mergeHydratedState below.
+   */
+  onboarding: Record<string, unknown> | null;
   readSections: string[];
   attempts: Attempt[];
   results: TestResult[];
@@ -352,15 +358,16 @@ export type HydratedStudyState = {
 const HYDRATE_TIMEOUT_MS = 8000;
 
 async function fetchStudyState(client: SyncClient, userId: string): Promise<HydratedStudyState> {
-  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes] = await Promise.all([
+  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, profileRes] = await Promise.all([
     client.from('attempts').select('id,mcq_id,chapter_id,subject_id,topic,correct,confidence,mode,at').eq('user_id', userId).order('at', { ascending: true }).limit(1000),
     client.from('results').select('id,subject_id,chapter_id,label,score,total,xp,mode,at').eq('user_id', userId).order('at', { ascending: false }).limit(100),
     client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: true }),
     client.from('cards_known').select('card_id').eq('user_id', userId),
     client.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: true }).limit(400),
+    client.from('profiles').select('onboarding').eq('id', userId).maybeSingle(),
   ]);
 
-  const error = attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error;
+  const error = attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error ?? profileRes.error;
   if (error) throw error;
 
   // Ordered ascending by `at`, so the last row is the most recently read
@@ -370,6 +377,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
   const last = sections[sections.length - 1];
 
   return {
+    onboarding: ((profileRes.data as { onboarding?: Record<string, unknown> | null } | null)?.onboarding) ?? null,
     attempts: ((attemptsRes.data ?? []) as AttemptRow[]).map(fromAttemptRow),
     results: ((resultsRes.data ?? []) as ResultRow[]).map(fromResultRow),
     readSections: sections.map((s) => s.section_id),

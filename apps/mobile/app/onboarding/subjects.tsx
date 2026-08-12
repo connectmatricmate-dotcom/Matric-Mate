@@ -9,7 +9,7 @@ import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
 
 export default function ChooseSubjects() {
-  const { actions } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
   const [group, setGroup] = useState<Group>('science');
@@ -31,7 +31,10 @@ export default function ChooseSubjects() {
           disabled={!enough}
           onPress={() => {
             actions.setOnboarding({ group, subjects: [...compulsory.map((s) => s.id), ...picked] });
-            router.push('/signup');
+            // A student who signed in first and was sent here to pick their
+            // subjects already has the account this flow used to demand next.
+            // Routing them to signup told them to create one again.
+            router.replace(state.user ? '/(tabs)' : '/signup');
           }}
         />
       }
