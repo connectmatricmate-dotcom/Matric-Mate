@@ -17,6 +17,7 @@
     "content:fetch": "node scripts/fetch-fbise.mjs",
     "content:toppers": "node scripts/fetch-toppers.mjs",
     "content:papers": "node scripts/build-papers-catalogue.mjs",
+    "content:host-papers": "node scripts/host-zip-papers.mjs",
     "content:build": "node scripts/build-curriculum.mjs",
     "content:ingest": "node scripts/ingest-content.mjs",
     "content:verify": "node scripts/verify-content.mjs",

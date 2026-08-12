@@ -47,6 +47,40 @@ const PAST_PAPER_PAGES = [
 
 const TOPPERS_PAGE = 'https://fbise.edu.pk/topper_copies.php';
 
+/**
+ * The one session FBISE publishes only as a ZIP, extracted and served by us.
+ *
+ * A browser cannot open one page of a ZIP, so linking to the board's copy would
+ * hand a student a 16 MB download containing four papers, two of them Class 10.
+ * `SSC-I Normal.pdf` and its hearing-impaired variant are pulled out and put in
+ * the public `papers` bucket. Everything else in this catalogue still points at
+ * fbise.edu.pk, because copying what the board already serves would be storage
+ * spent for nothing.
+ *
+ * Re-upload with scripts/host-zip-papers.mjs if the bucket is ever rebuilt.
+ */
+const SELF_HOSTED = [
+  {
+    year: 2025,
+    file: 'SSC-I Normal.pdf',
+    label: 'SSC Part 1 First Annual 2025',
+    url: 'https://aueallnkfhipyneqtllp.supabase.co/storage/v1/object/public/papers/2025/ssc-i-first-annual-2025.pdf',
+    classLevel: 9,
+    selfHosted: true,
+    extractedFrom: 'https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip',
+  },
+  {
+    year: 2025,
+    file: 'SSC-I HIC.pdf',
+    label: 'SSC Part 1 First Annual 2025, hearing impaired candidates',
+    url: 'https://aueallnkfhipyneqtllp.supabase.co/storage/v1/object/public/papers/2025/ssc-i-first-annual-2025-hic.pdf',
+    classLevel: 9,
+    selfHosted: true,
+    accessibility: true,
+    extractedFrom: 'https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip',
+  },
+];
+
 /** Subject from a topper filename. The board names them inconsistently. */
 const SUBJECT_OF = (file) => {
   const n = file.toLowerCase();
@@ -109,9 +143,10 @@ async function main() {
     }
     for (const href of hrefs) {
       const file = decodeURIComponent(href.split('/').pop());
+      // The ZIP is replaced by the two PDFs pulled out of it, added below.
+      if (/\.zip$/i.test(file)) continue;
       // SSC-II is Class 10. Keep it out: this app is Class 9.
       const isPartTwo = /SSC[-_ ]?II/i.test(file);
-      const isZip = /\.zip$/i.test(file);
       pastPapers.push({
         year,
         file,
@@ -120,12 +155,13 @@ async function main() {
         classLevel: isPartTwo ? 10 : 9,
         // A browser cannot open one page of a ZIP, so these are the only files
         // we ever have to host ourselves.
-        needsHosting: isZip,
-        note: isZip ? 'ZIP: extract SSC-I Normal.pdf and host it, the rest is Class 10 or accessibility variants' : null,
+        selfHosted: false,
       });
     }
     console.log(`${C.green('  ok')} past papers ${year} ${C.dim(`${hrefs.length} files`)}`);
   }
+
+  pastPapers.push(...SELF_HOSTED);
 
   /* topper answer scripts ------------------------------------------------ */
 
@@ -170,11 +206,11 @@ async function main() {
   await writeFile(resolve(OUT, 'papers.json'), `${JSON.stringify(doc, null, 2)}\n`);
 
   const cls9 = pastPapers.filter((p) => p.classLevel === 9);
-  const hosting = pastPapers.filter((p) => p.needsHosting);
+  const hosting = pastPapers.filter((p) => p.selfHosted);
   console.log(
     C.dim(
       `\n  ${cls9.length} Class 9 past papers, ${toppers.length} topper scripts -> data/fbise/papers.json` +
-        `${hosting.length ? `\n  ${hosting.length} need extracting and hosting: ${hosting.map((h) => h.file).join(', ')}` : ''}`,
+        `${hosting.length ? `\n  ${hosting.length} served from our own storage, extracted from the board's ZIP` : ''}`,
     ),
   );
 }

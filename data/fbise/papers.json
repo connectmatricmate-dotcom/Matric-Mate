@@ -17,17 +17,7 @@
       "label": "SSC I Second Annual 2025",
       "url": "https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC-I_2A25.pdf",
       "classLevel": 9,
-      "needsHosting": false,
-      "note": null
-    },
-    {
-      "year": 2025,
-      "file": "SSC_1A25_QP.zip",
-      "label": "SSC First Annual 2025 question papers",
-      "url": "https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip",
-      "classLevel": 9,
-      "needsHosting": true,
-      "note": "ZIP: extract SSC-I Normal.pdf and host it, the rest is Class 10 or accessibility variants"
+      "selfHosted": false
     },
     {
       "year": 2024,
@@ -35,8 +25,7 @@
       "label": "SSC I Compulsory+Science+General",
       "url": "https://fbise.edu.pk/Old%20Question%20Paper/2024/SSC_I_1ST_2024/SSC-I%20Compulsory%2BScience%2BGeneral.pdf",
       "classLevel": 9,
-      "needsHosting": false,
-      "note": null
+      "selfHosted": false
     },
     {
       "year": 2024,
@@ -44,8 +33,7 @@
       "label": "SSC I Hearing impaired candidates",
       "url": "https://fbise.edu.pk/Old%20Question%20Paper/2024/SSC_I_1ST_2024/SSC-I%20HIC.pdf",
       "classLevel": 9,
-      "needsHosting": false,
-      "note": null
+      "selfHosted": false
     },
     {
       "year": 2024,
@@ -53,8 +41,7 @@
       "label": "SSC I Tech",
       "url": "https://fbise.edu.pk/Old%20Question%20Paper/2024/SSC12A/SSC-I%20Tech.pdf",
       "classLevel": 9,
-      "needsHosting": false,
-      "note": null
+      "selfHosted": false
     },
     {
       "year": 2023,
@@ -62,8 +49,7 @@
       "label": "SSC I Compulsory+Science+General",
       "url": "https://fbise.edu.pk/Old%20Question%20Paper/2023/SSC12A/SSC-I%20Compulsory%2BScience%2BGeneral.pdf",
       "classLevel": 9,
-      "needsHosting": false,
-      "note": null
+      "selfHosted": false
     },
     {
       "year": 2023,
@@ -71,8 +57,7 @@
       "label": "SSC I Hearing impaired candidates",
       "url": "https://fbise.edu.pk/Old%20Question%20Paper/2023/SSC12A/SSC-I%20HIC.pdf",
       "classLevel": 9,
-      "needsHosting": false,
-      "note": null
+      "selfHosted": false
     },
     {
       "year": 2023,
@@ -80,8 +65,26 @@
       "label": "SSC I Tech",
       "url": "https://fbise.edu.pk/Old%20Question%20Paper/2023/SSC12A/SSC-I%20Tech.pdf",
       "classLevel": 9,
-      "needsHosting": false,
-      "note": null
+      "selfHosted": false
+    },
+    {
+      "year": 2025,
+      "file": "SSC-I Normal.pdf",
+      "label": "SSC Part 1 First Annual 2025",
+      "url": "https://aueallnkfhipyneqtllp.supabase.co/storage/v1/object/public/papers/2025/ssc-i-first-annual-2025.pdf",
+      "classLevel": 9,
+      "selfHosted": true,
+      "extractedFrom": "https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip"
+    },
+    {
+      "year": 2025,
+      "file": "SSC-I HIC.pdf",
+      "label": "SSC Part 1 First Annual 2025, hearing impaired candidates",
+      "url": "https://aueallnkfhipyneqtllp.supabase.co/storage/v1/object/public/papers/2025/ssc-i-first-annual-2025-hic.pdf",
+      "classLevel": 9,
+      "selfHosted": true,
+      "accessibility": true,
+      "extractedFrom": "https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip"
     }
   ],
   "toppers": [
