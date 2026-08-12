@@ -173,6 +173,25 @@ async function main() {
   // Mark weights from the board's Table of Specification, where we have read it.
   const spec = JSON.parse(await readFile(resolve(DATA, 'chapters.json'), 'utf8')).subjects ?? {};
 
+  // Real audio durations, so a chapter advertises a lesson only when one exists.
+  // packages/core reports zero for every chapter on purpose; the truth is in
+  // audio_tracks, written by scripts/generate-audio.mjs.
+  const audioMinutes = {};
+  if (!DRY) {
+    const env0 = await loadEnv();
+    if (env0.NEXT_PUBLIC_SUPABASE_URL && (env0.SUPABASE_SECRET_KEY || env0.SUPABASE_SERVICE_ROLE_KEY)) {
+      const { createClient } = await import('@supabase/supabase-js');
+      const probe = createClient(env0.NEXT_PUBLIC_SUPABASE_URL, env0.SUPABASE_SECRET_KEY || env0.SUPABASE_SERVICE_ROLE_KEY, {
+        auth: { persistSession: false },
+      });
+      const { data: tracks } = await probe.from('audio_tracks').select('chapter_id,duration_secs').eq('review_status', 'published');
+      for (const t of tracks ?? []) {
+        // The longest medium wins, so the label never promises less than exists.
+        audioMinutes[t.chapter_id] = Math.max(audioMinutes[t.chapter_id] ?? 0, Math.round((t.duration_secs ?? 0) / 60));
+      }
+    }
+  }
+
   const chapters = ALL_CHAPTERS.map((c) => {
     const units = curriculum[c.subjectId]?.examUnits?.units;
     const weight = spec[c.subjectId]?.chapters?.find((x) => x.number === c.number);
@@ -187,7 +206,7 @@ async function main() {
       urdu_title: c.urduTitle ?? null,
       blurb: c.blurb,
       premium: c.premium,
-      audio_minutes: c.audioMinutes,
+      audio_minutes: audioMinutes[c.id] ?? 0,
       review_status: PUBLISH ? 'published' : 'draft',
     };
   });

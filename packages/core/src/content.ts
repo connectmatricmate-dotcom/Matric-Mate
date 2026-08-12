@@ -7,15 +7,11 @@
  * ALL of this is replaced by client-supplied content via the admin CMS (M7).
  */
 import {
-  Blank,
-  Block,
   Chapter,
   ChapterContent,
-  Flashcard,
   Mcq,
   PaperSection,
   Section,
-  ShortQ,
   Subject,
 } from './types';
 
@@ -205,7 +201,14 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       premium: i >= 1,
       mcqCount: 24 + ((i * 7) % 19),
       flashcardCount: 12 + ((i * 5) % 14),
-      audioMinutes: 11 + ((i * 3) % 9),
+      // Zero, and it stays zero here.
+      //
+      // This was `11 + ((i * 3) % 9)`, a formula that invented a plausible
+      // number of minutes per chapter, so all 94 chapters advertised an audio
+      // lesson while `audio_tracks` held nothing at all. A student could tap it.
+      // Real durations come from the audio_tracks row when one exists, set by
+      // the ingest, so a chapter shows audio only once audio is really there.
+      audioMinutes: 0,
       sectionCount: 4 + (i % 3),
     })),
   ])
@@ -590,111 +593,8 @@ const AUTHORED: Record<string, ChapterContent> = {
 
 export const isAuthored = (chapterId: string) => !!AUTHORED[chapterId];
 
-/** The topics a chapter covers, taken from its blurb. */
-const termsOf = (ch: Chapter) =>
-  ch.blurb
-    .replace(/\.$/, '')
-    .split(/,|;| and /)
-    .map((t) => t.trim().replace(/^[a-z]/, (m) => m))
-    .filter((t) => t.length > 3);
 
-/** Terms from other chapters of the same subject, used as plausible distractors. */
-function otherTerms(ch: Chapter, n: number): string[] {
-  const pool = (CHAPTERS[ch.subjectId] ?? [])
-    .filter((c) => c.id !== ch.id)
-    .flatMap(termsOf)
-    .filter(Boolean);
-  const out: string[] = [];
-  for (let i = 0; i < pool.length && out.length < n; i++) {
-    const pick = pool[(i * 7 + ch.number * 3) % pool.length];
-    if (!out.includes(pick)) out.push(pick);
-  }
-  while (out.length < n) out.push('none of these');
-  return out;
-}
 
-/**
- * Readable placeholder content for chapters the client hasn't supplied yet.
- * Questions are built from the real chapter/topic names so the app never shows
- * "option A / option B" filler, while staying obviously provisional.
- */
-function generate(ch: Chapter): ChapterContent {
-  const topic = ch.title;
-  const terms = termsOf(ch);
-  const sections: Section[] = Array.from({ length: Math.min(4, ch.sectionCount) }, (_, i) => ({
-    id: `${ch.id}-gs${i + 1}`,
-    title: i === 0 ? `What this chapter covers` : terms[i - 1] ? `${terms[i - 1]}` : `${topic}, part ${i}`,
-    blocks: [
-      { kind: 'h', text: i === 0 ? `${topic} at a glance` : terms[i - 1] ?? `${topic}, part ${i}` },
-      { kind: 'p', text: ch.blurb },
-      ...(i === 0 && terms.length
-        ? ([{ kind: 'list', items: terms }] as Block[])
-        : ([
-            {
-              kind: 'p',
-              text: `Detailed notes, worked examples and figures for ${terms[i - 1] ?? topic} come from the client’s own material and are loaded through the admin panel.`,
-            },
-          ] as Block[])),
-      { kind: 'def', term: terms[i] ?? topic, text: `Part of ${topic} in the FBISE Class 9 scheme of study.` },
-    ],
-  }));
-
-  const mcqs: Mcq[] = terms.slice(0, 6).flatMap((term, i) => {
-    const distractors = otherTerms(ch, 3);
-    const options = [distractors[0], term, distractors[1], distractors[2]];
-    const q1: Mcq = {
-      id: `${ch.id}-gm${i + 1}`,
-      chapterId: ch.id,
-      topic,
-      q: `Which of these is studied in “${topic}”?`,
-      options,
-      answer: 1,
-      explanation: `“${term}” is part of ${topic}. The others belong to different chapters of ${subjectById(ch.subjectId)?.name}.`,
-      difficulty: i % 3 === 0 ? 'easy' : i % 3 === 1 ? 'medium' : 'hard',
-    };
-    const chapterOptions = (CHAPTERS[ch.subjectId] ?? [])
-      .filter((c) => c.id !== ch.id)
-      .slice(0, 3)
-      .map((c) => c.title);
-    const q2: Mcq = {
-      id: `${ch.id}-gm${i + 1}b`,
-      chapterId: ch.id,
-      topic,
-      q: `“${term}” belongs to which chapter?`,
-      options: [chapterOptions[0] ?? 'Another chapter', topic, chapterOptions[1] ?? 'Another chapter', chapterOptions[2] ?? 'Another chapter'],
-      answer: 1,
-      explanation: `${term} is covered in Chapter ${ch.number}, ${topic}.`,
-      difficulty: 'easy',
-    };
-    return [q1, q2];
-  });
-
-  const flashcards: Flashcard[] = terms.slice(0, 6).map((term, i) => ({
-    id: `${ch.id}-gf${i + 1}`,
-    chapterId: ch.id,
-    front: term,
-    back: `Studied in Chapter ${ch.number}, ${topic}. The full definition comes with the client’s notes.`,
-  }));
-
-  const shortQs: ShortQ[] = terms.slice(0, 3).map((term, i) => ({
-    id: `${ch.id}-gq${i + 1}`,
-    chapterId: ch.id,
-    marks: 2,
-    q: `Briefly explain ${term}.`,
-    answer: `${term} is part of ${topic} (Chapter ${ch.number}). The marked model answer is supplied with the client’s content.`,
-    points: [`defines ${term} (1 mark)`, 'gives an example or application (1 mark)'],
-  }));
-
-  const blanks: Blank[] = terms.slice(0, 3).map((term, i) => ({
-    id: `${ch.id}-gb${i + 1}`,
-    chapterId: ch.id,
-    sentence: [`In Chapter ${ch.number}, `, ` is one of the main topics.`],
-    answer: term,
-    options: [term, ...otherTerms(ch, 3)],
-  }));
-
-  return { sections, mcqs, flashcards, shortQs, blanks, audioTitle: `${topic}, full chapter` };
-}
 
 /**
  * Generated content is deterministic per chapter, so it is built once and kept.
@@ -702,18 +602,31 @@ function generate(ch: Chapter): ChapterContent {
  * re-ran generate() per unauthored chapter, ~0.2ms a call, which added up to
  * 40-90ms per render on a phone once a screen swept all seven subjects.
  */
-const GENERATED = new Map<string, ChapterContent>();
 const EMPTY_CONTENT: ChapterContent = { sections: [], mcqs: [], flashcards: [], shortQs: [], blanks: [], audioTitle: '' };
 
+/**
+ * Bundled content for a chapter, or nothing.
+ *
+ * THIS NO LONGER INVENTS ANYTHING, AND THAT IS THE POINT.
+ *
+ * It used to call `generate(ch)` for any chapter it did not have, producing
+ * cards that read "Studied in Chapter 5, Speaking. The full definition comes
+ * with the client's notes." That was reasonable when the app was a demo with no
+ * real content behind it. It is now actively harmful, because the fetch layer
+ * falls back here whenever the database returns nothing, and a chapter can
+ * legitimately have nothing: the board does not examine Urdu speaking or
+ * listening, and it dropped three Maths chapters from Class 9 entirely. Those
+ * chapters have an honest blurb saying so, and then this function undid it by
+ * fabricating a flashcard.
+ *
+ * Real content lives in Postgres, downloads keep a copy on the device, and the
+ * fetch layer caches the last good answer. If all three miss, an empty state is
+ * the truth and a screen can say so. Filler that claims content is coming is
+ * worse than a blank page, because a student cannot tell it apart from the real
+ * thing.
+ */
 export function contentFor(chapterId: string): ChapterContent {
-  if (AUTHORED[chapterId]) return AUTHORED[chapterId];
-  const hit = GENERATED.get(chapterId);
-  if (hit) return hit;
-  const ch = chapterById(chapterId);
-  if (!ch) return EMPTY_CONTENT;
-  const built = generate(ch);
-  GENERATED.set(chapterId, built);
-  return built;
+  return AUTHORED[chapterId] ?? EMPTY_CONTENT;
 }
 
 // The board's own past papers and topper scripts (as listed to students in
