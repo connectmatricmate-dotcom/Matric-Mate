@@ -2,11 +2,15 @@
  * Offline chapter downloads.
  *
  * A JSON snapshot per chapter and medium (sections, mcqs, flashcards, short
- * questions and blanks), written to the document directory so it survives
- * app restarts, unlike the cache directory, which the OS is free to clear
- * under storage pressure. Audio is not part of this: the only tracks that
- * exist today ship as bundled assets (see core/audio.ts), so there is
- * nothing to fetch and cache for them yet.
+ * questions and blanks) plus the chapter's audio lesson, written to the
+ * document directory so it survives app restarts, unlike the cache directory,
+ * which the OS is free to clear under storage pressure.
+ *
+ * Audio used to be excluded, because the only tracks that existed shipped as
+ * bundled assets and were therefore offline by definition. They stream from
+ * Supabase Storage now, so a download that skipped them would leave a student
+ * in a plane with notes and questions and a dead player, while the screen
+ * still called the chapter "Offline".
  *
  * Registered with @matricmate/core's fetch layer through connectLocalContent,
  * so the reader, flashcards and practice screens pick up a download
@@ -23,7 +27,16 @@
  * filesystem call is here.
  */
 import { Directory, File, Paths } from 'expo-file-system';
-import { ChapterContent, Medium, connectLocalContent, fetchChapterContentLive, setContentMedium } from '@matricmate/core';
+import {
+  ChapterContent,
+  Medium,
+  api,
+  connectLocalContent,
+  fetchChapterContentLive,
+  pickAudioTrack,
+  setContentMedium,
+} from '@matricmate/core';
+import { audioUrl } from './audio';
 import { supabase } from '../lib/supabase';
 
 /**
@@ -60,6 +73,25 @@ const snapshotFile = (chapterId: string, medium: Medium): File | null => {
   const dir = chapterDir(chapterId);
   return dir ? new File(dir, `${medium}.json`) : null;
 };
+const audioFile = (chapterId: string, medium: Medium): File | null => {
+  const dir = chapterDir(chapterId);
+  return dir ? new File(dir, `${medium}.mp3`) : null;
+};
+
+/**
+ * The on-disk lesson for a chapter, or null when it was never downloaded.
+ *
+ * The player prefers this over the streaming URL, so a downloaded chapter
+ * plays with no signal and costs the student no data on a replay.
+ */
+export function localAudioUri(chapterId: string, medium: Medium): string | null {
+  try {
+    const file = audioFile(chapterId, medium);
+    return file?.exists ? file.uri : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * True on-disk size of one chapter's offline copy, across every medium saved
@@ -79,10 +111,10 @@ export function totalDownloadBytes(): number {
 
 /**
  * A human-sized rendering of a byte count for the downloads screen: KB below
- * 1 MB, MB above it. These snapshots are plain JSON text with no audio in
- * them, so most chapters land in the tens of KB, not the tens of MB an audio
- * bundle would need. Showing that honestly, rather than rounding up to a
- * reassuring "1 MB", is the point of measuring real size on disk at all.
+ * 1 MB, MB above it. A chapter is a few tens of KB of text plus a couple of MB
+ * of audio when it has a lesson, so the figure moves a lot between chapters.
+ * Showing that honestly, rather than rounding to a reassuring constant, is the
+ * point of measuring real size on disk at all.
  */
 export function formatBytes(bytes: number): string {
   if (bytes <= 0) return '0 KB';
@@ -136,20 +168,53 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
   if (!dir || !dest) throw new Error('no filesystem available for downloads');
   if (!dir.exists) dir.create({ intermediates: true, idempotent: true });
 
-  const temp = new File(dir, `.${medium}.tmp-${Date.now()}`);
-  try {
-    temp.write(JSON.stringify(content));
-    temp.moveSync(dest, { overwrite: true });
-  } catch (e) {
-    if (temp.exists) {
+  const stamp = Date.now();
+
+  /**
+   * The audio comes down before the snapshot lands, and a failure here fails
+   * the whole download.
+   *
+   * It is the big, slow, likely-to-drop part, and the caller only records the
+   * chapter as downloaded when this function resolves. Saving the text anyway
+   * would leave a chapter marked "Offline" whose lesson is missing, which is
+   * the exact lie this file exists to avoid. The student is told it failed and
+   * can retry on better signal.
+   */
+  const tracks = await api.getAudioTracks(chapterId, supabase);
+  const track = pickAudioTrack(tracks, medium);
+  const url = audioUrl(track);
+
+  const scratch: File[] = [];
+  const sweep = () => {
+    for (const f of scratch) {
       try {
-        temp.delete();
+        if (f.exists) f.delete();
       } catch {
         // Best effort. A leftover .tmp file is a few stray KB, not a chapter
         // that looks downloaded when it is not: readLocal never looks for it
         // and it is swept up the next time this chapter downloads or deletes.
       }
     }
+  };
+
+  try {
+    let audioTemp: File | null = null;
+    if (url) {
+      audioTemp = await File.downloadFileAsync(url, new File(dir, `.${medium}.audio.tmp-${stamp}`));
+      scratch.push(audioTemp);
+    }
+
+    const temp = new File(dir, `.${medium}.tmp-${stamp}`);
+    scratch.push(temp);
+    temp.write(JSON.stringify(content));
+
+    // Both files move into place only once both exist, so a chapter is never
+    // half-downloaded from a reader's point of view.
+    const audioDest = audioFile(chapterId, medium);
+    if (audioTemp && audioDest) audioTemp.moveSync(audioDest, { overwrite: true });
+    temp.moveSync(dest, { overwrite: true });
+  } catch (e) {
+    sweep();
     throw e;
   }
 }

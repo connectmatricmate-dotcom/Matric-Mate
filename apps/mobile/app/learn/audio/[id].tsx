@@ -7,6 +7,7 @@ import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
 import { api, pickAudioTrack } from '@matricmate/core';
 import { audioSource } from '../../../src/core/audio';
+import { localAudioUri } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -29,6 +30,7 @@ function PlayerChrome({
   disabled,
   note,
   downloaded,
+  offlineAudio,
   busy,
   onToggleDownload,
 }: {
@@ -44,6 +46,13 @@ function PlayerChrome({
   disabled?: boolean;
   note: string;
   downloaded: boolean;
+  /**
+   * Whether the lesson file is really on disk, which is not the same thing as
+   * the chapter being downloaded. The pill used to read `downloaded`, so it
+   * claimed "Offline" for a chapter whose text was saved and whose audio was
+   * still streaming.
+   */
+  offlineAudio: boolean;
   busy?: boolean;
   onToggleDownload: () => void;
 }) {
@@ -117,8 +126,8 @@ function PlayerChrome({
         <Pill tone="grey" onPress={disabled ? undefined : onSpeed}>
           {t('audio.speed', { n: SPEEDS[speed] })}
         </Pill>
-        <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
-          {downloaded ? t('audio.offline') : t('audio.stream')}
+        <Pill tone={offlineAudio ? 'green' : 'grey'} icon={offlineAudio ? 'check' : 'download'}>
+          {offlineAudio ? t('audio.offline') : t('audio.stream')}
         </Pill>
       </Row>
 
@@ -139,7 +148,11 @@ function RealPlayer({ id }: { id: string }) {
 
   const medium = state.settings.contentMedium;
   const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
-  const track = audioSource(pickAudioTrack(tracks ?? [], medium));
+  const picked = pickAudioTrack(tracks ?? [], medium);
+  // The downloaded copy wins over the stream, so a saved chapter plays with no
+  // signal and a replay costs the student no data.
+  const offlineUri = picked ? localAudioUri(id, picked.medium) : null;
+  const track = offlineUri ? { uri: offlineUri } : audioSource(picked);
   const player = useAudioPlayer(track);
   const status = useAudioPlayerStatus(player);
   const [speed, setSpeed] = useState(0);
@@ -182,6 +195,7 @@ function RealPlayer({ id }: { id: string }) {
       }}
       note={track ? t('audio.sampleNote') : t('audio.noTrackNote')}
       downloaded={downloaded}
+      offlineAudio={!!offlineUri}
       busy={busy}
       onToggleDownload={async () => {
         setBusy(true);
@@ -236,6 +250,7 @@ function PreviewPlayer({ id }: { id: string }) {
       onSpeed={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
       note={t('audio.needsNewBuild')}
       downloaded={downloaded}
+      offlineAudio={!!localAudioUri(id, state.settings.contentMedium)}
       busy={busy}
       onToggleDownload={async () => {
         setBusy(true);
