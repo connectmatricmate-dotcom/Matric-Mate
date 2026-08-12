@@ -19,6 +19,7 @@ export const en = {
     save: 'Save changes',
     saved: 'Saved',
     retry: 'Try again',
+    openLinkError: 'Couldn’t open that link.',
     close: 'Close',
     search: 'Search',
     loading: 'Loading…',
@@ -520,14 +521,6 @@ export const en = {
     papersFootnote: 'These open on the board’s own site in a new tab. More years are added as FBISE publishes them.',
     papersEmptyTitle: 'No papers available yet',
     papersEmptyBody: 'More past papers are added as the board publishes them.',
-    // Kept for the Android app's still-bundled sample paper reader, which this
-    // web rework no longer uses (see /session/papers, now real FBISE papers).
-    paperMeta: '{marks} marks · {h}h {m}m',
-    practiceAsExam: 'Practise as test',
-    practiceThisPaper: 'Practise this paper',
-    fullPaper: 'Full paper',
-    realPaperNote: 'A complete sample paper, laid out the way the board prints it.',
-    paperViewerNote: 'Zoom and offline download arrive with the full paper library.',
 
     toppersTitle: 'Topper papers',
     toppersSub: 'Marked scripts from the board’s own toppers',
@@ -756,6 +749,7 @@ export const ur: typeof en = {
     save: 'Save karein',
     saved: 'Save ho gaya',
     retry: 'Dobara koshish karein',
+    openLinkError: 'Yeh link khul nahi saka.',
     close: 'Band karein',
     search: 'Dhoondein',
     loading: 'Load ho raha hai…',
@@ -1257,12 +1251,6 @@ export const ur: typeof en = {
     papersFootnote: 'Yeh board ki apni website par naye tab mein khulte hain. FBISE jab naya saal publish karta hai, hum shamil kar dete hain.',
     papersEmptyTitle: 'Abhi koi paper dastyab nahi',
     papersEmptyBody: 'Board jab papers publish karta hai, hum unhein yahan shamil kar dete hain.',
-    paperMeta: '{marks} marks · {h} ghante {m} min',
-    practiceAsExam: 'Test ki tarah karein',
-    practiceThisPaper: 'Yeh paper karein',
-    fullPaper: 'Poora paper',
-    realPaperNote: 'Yeh mukammal sample paper hai, bilkul waise jaise board chhapta hai.',
-    paperViewerNote: 'Zoom aur offline download poori paper library ke saath aayein ge.',
 
     toppersTitle: 'Topper papers',
     toppersSub: 'Board ke apne toppers ki checked scripts',

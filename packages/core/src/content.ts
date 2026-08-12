@@ -14,7 +14,6 @@ import {
   Flashcard,
   Mcq,
   PaperSection,
-  PastPaper,
   Section,
   ShortQ,
   Subject,
@@ -717,23 +716,13 @@ export function contentFor(chapterId: string): ChapterContent {
   return built;
 }
 
-export const PAST_PAPERS: PastPaper[] = [
-  { id: 'pp1', subjectId: 'phy', year: 2025, session: 'Annual', marks: 65, minutes: 150, downloaded: true },
-  { id: 'pp-urd', subjectId: 'urd', year: 2025, session: 'Annual', marks: 75, minutes: 180, downloaded: false },
-  { id: 'pp2', subjectId: 'phy', year: 2024, session: 'Annual', marks: 65, minutes: 150, downloaded: true },
-  { id: 'pp3', subjectId: 'phy', year: 2024, session: 'Supplementary', marks: 65, minutes: 150, downloaded: false },
-  { id: 'pp4', subjectId: 'phy', year: 2023, session: 'Annual', marks: 65, minutes: 150, downloaded: false },
-  { id: 'pp5', subjectId: 'chem', year: 2025, session: 'Annual', marks: 65, minutes: 150, downloaded: false },
-  { id: 'pp6', subjectId: 'chem', year: 2024, session: 'Annual', marks: 65, minutes: 150, downloaded: false },
-  { id: 'pp7', subjectId: 'bio', year: 2025, session: 'Annual', marks: 65, minutes: 150, downloaded: false },
-  { id: 'pp8', subjectId: 'math', year: 2025, session: 'Annual', marks: 75, minutes: 180, downloaded: false },
-];
-
-/**
- * Two papers written out in full, one English-medium Physics paper and one Urdu
- * paper, so the client can see a complete paper in the viewer. The rest are
- * listed but carry the shared sample body until the real papers arrive.
- */
+// The board's own past papers and topper scripts (as listed to students in
+// both apps) live in ./papers, backed by data/fbise/papers.json. See
+// fbisePastPapers() / fbiseToppersFor() there.
+//
+// PAPER_CONTENT below is different: two papers transcribed in full, kept only
+// so the marketing site's hero demo (apps/web/app/page.tsx) can show what a
+// full paper looks like inline. Nothing in either app's session flow reads it.
 export const PAPER_CONTENT: Record<string, PaperSection[]> = {
   pp1: [
     {
@@ -824,24 +813,3 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
     },
   ],
 };
-
-/** Fallback body for papers the client hasn't supplied yet. */
-export const PAPER_BODY: PaperSection[] = [
-  {
-    heading: 'SECTION A · Objective',
-    marks: '12 marks',
-    lines: ['Q1. Circle the correct option.', 'The full paper for this year loads here once the client supplies it.'],
-  },
-  {
-    heading: 'SECTION B · Short answer questions',
-    marks: '33 marks',
-    lines: ['Q2. Attempt any eleven parts.'],
-  },
-  {
-    heading: 'SECTION C · Detailed answer questions',
-    marks: '20 marks',
-    lines: ['Q3. Attempt all questions.'],
-  },
-];
-
-export const paperContent = (id: string): PaperSection[] => PAPER_CONTENT[id] ?? PAPER_BODY;

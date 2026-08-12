@@ -28,6 +28,7 @@ const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
   { label: 'dash.quickCards', icon: 'cards', href: '/session/flashcards' },
   { label: 'dash.quickAi', icon: 'spark', href: '/(tabs)/tutor' },
   { label: 'dash.quickPapers', icon: 'doc', href: '/session/papers' },
+  { label: 'dash.quickToppers', icon: 'award', href: '/session/topper-papers' },
 ];
 
 export default function Dashboard() {

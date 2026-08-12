@@ -80,17 +80,9 @@ export type ChapterContent = {
   audioTitle: string;
 };
 
+/** A fully written-out sample paper section, used by the marketing site's demo. */
 export type PaperSection = { heading: string; marks?: string; lines: string[]; urdu?: boolean };
 
-export type PastPaper = {
-  id: string;
-  subjectId: string;
-  year: number;
-  session: 'Annual' | 'Supplementary';
-  marks: number;
-  minutes: number;
-  downloaded: boolean;
-};
 
 /** One answered question, the row that powers every analytic in the app. */
 export type Attempt = {

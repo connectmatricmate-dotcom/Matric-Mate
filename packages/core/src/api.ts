@@ -16,13 +16,12 @@ import {
   fetchChapters,
   fetchFlashcards,
   fetchMcqs,
-  fetchPastPapers,
   fetchSubject,
   fetchSubjects,
 } from './db';
 import { ALL_CHAPTERS, contentFor } from './content';
 import type { ContentClient } from './db';
-import { Chapter, ChapterContent, Flashcard, Mcq, PastPaper, Subject } from './types';
+import { Chapter, ChapterContent, Flashcard, Mcq, Subject } from './types';
 
 /** Still needed by the two mocks below, which fake their own latency. */
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -56,8 +55,6 @@ export const api = {
   ): Promise<Mcq[]> => fetchMcqs(opts, client),
 
   getFlashcards: (chapterId: string, client?: ContentClient): Promise<Flashcard[]> => fetchFlashcards(chapterId, client),
-
-  getPastPapers: (subjectId?: string): Promise<PastPaper[]> => fetchPastPapers(subjectId),
 
   /* ----------------------------------------------------------------- auth */
 

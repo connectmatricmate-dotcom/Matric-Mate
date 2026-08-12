@@ -26,10 +26,40 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { ChapterContent, Medium, connectLocalContent, fetchChapterContentLive, setContentMedium } from '@matricmate/core';
 import { supabase } from '../lib/supabase';
 
-const ROOT = new Directory(Paths.document, 'downloads');
+/**
+ * Built on first use, never at import.
+ *
+ * This was `const ROOT = new Directory(...)` at module scope, which runs the
+ * moment anything imports this file. expo-file-system's web shim has no working
+ * Directory, so the constructor threw during module evaluation and took the
+ * whole app down before a single screen rendered, on any platform where the
+ * API is not what we expect. A downloads helper failing should cost you
+ * downloads, not the app.
+ *
+ * Cached after the first successful construction, so this stays one object.
+ */
+let rootDir: Directory | null = null;
 
-const chapterDir = (chapterId: string): Directory => new Directory(ROOT, chapterId);
-const snapshotFile = (chapterId: string, medium: Medium): File => new File(chapterDir(chapterId), `${medium}.json`);
+function root(): Directory | null {
+  if (rootDir) return rootDir;
+  try {
+    rootDir = new Directory(Paths.document, 'downloads');
+    return rootDir;
+  } catch {
+    // No usable filesystem here. Every caller below treats null as "nothing is
+    // downloaded", which is exactly true.
+    return null;
+  }
+}
+
+const chapterDir = (chapterId: string): Directory | null => {
+  const r = root();
+  return r ? new Directory(r, chapterId) : null;
+};
+const snapshotFile = (chapterId: string, medium: Medium): File | null => {
+  const dir = chapterDir(chapterId);
+  return dir ? new File(dir, `${medium}.json`) : null;
+};
 
 /**
  * True on-disk size of one chapter's offline copy, across every medium saved
@@ -38,12 +68,13 @@ const snapshotFile = (chapterId: string, medium: Medium): File => new File(chapt
  */
 export function chapterDownloadBytes(chapterId: string): number {
   const dir = chapterDir(chapterId);
-  return dir.exists ? (dir.size ?? 0) : 0;
+  return dir?.exists ? (dir.size ?? 0) : 0;
 }
 
 /** True on-disk size of every downloaded chapter combined, in bytes. */
 export function totalDownloadBytes(): number {
-  return ROOT.exists ? (ROOT.size ?? 0) : 0;
+  const r = root();
+  return r?.exists ? (r.size ?? 0) : 0;
 }
 
 /**
@@ -64,7 +95,7 @@ export function formatBytes(bytes: number): string {
 function readLocal(chapterId: string, medium: Medium): ChapterContent | null {
   try {
     const file = snapshotFile(chapterId, medium);
-    if (!file.exists) return null;
+    if (!file?.exists) return null;
     return JSON.parse(file.textSync()) as ChapterContent;
   } catch {
     // A half-written or corrupted snapshot must not crash a screen. Treat it
@@ -97,12 +128,18 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
   const content = await fetchChapterContentLive(chapterId, supabase);
 
   const dir = chapterDir(chapterId);
+  const dest = snapshotFile(chapterId, medium);
+  // No filesystem on this platform, so there is nowhere to put it. Throwing is
+  // right: the caller already treats a rejection as a failed download and tells
+  // the student, which beats silently reporting success for a file that is not
+  // there.
+  if (!dir || !dest) throw new Error('no filesystem available for downloads');
   if (!dir.exists) dir.create({ intermediates: true, idempotent: true });
 
   const temp = new File(dir, `.${medium}.tmp-${Date.now()}`);
   try {
     temp.write(JSON.stringify(content));
-    temp.moveSync(snapshotFile(chapterId, medium), { overwrite: true });
+    temp.moveSync(dest, { overwrite: true });
   } catch (e) {
     if (temp.exists) {
       try {
@@ -120,7 +157,7 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
 /** Removes every file this chapter has on disk, in any medium. */
 export function deleteChapterDownload(chapterId: string): void {
   const dir = chapterDir(chapterId);
-  if (dir.exists) dir.delete();
+  if (dir?.exists) dir.delete();
 }
 
 /**
@@ -133,7 +170,8 @@ export function deleteChapterDownload(chapterId: string): void {
  * delete them from the downloads screen again.
  */
 export function deleteAllDownloads(): void {
-  if (ROOT.exists) ROOT.delete();
+  const r = root();
+  if (r?.exists) r.delete();
 }
 
 connectLocalContent(async (chapterId, medium) => readLocal(chapterId, medium));

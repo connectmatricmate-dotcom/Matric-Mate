@@ -14,6 +14,7 @@ const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; a
   { label: 'practice.blanks', sub: 'practice.blanksSub', icon: 'edit', href: '/session/blanks' },
   { label: 'practice.shortQ', sub: 'practice.shortQSub', icon: 'quill', href: '/session/shortq' },
   { label: 'practice.papers', sub: 'practice.papersSub', icon: 'doc', href: '/session/papers' },
+  { label: 'practice.toppers', sub: 'practice.toppersSub', icon: 'award', href: '/session/topper-papers' },
   { label: 'practice.exam', sub: 'practice.examSub', icon: 'clock', href: '/session/exam-intro', accent: true },
 ];
 

@@ -28,8 +28,8 @@
  * React Native storage adapter), and this file only needs the query builder
  * shape, so it takes it structurally.
  */
-import { CHAPTERS, PAST_PAPERS, SUBJECTS, chapterById, contentFor, primeContent, subjectById } from './content';
-import { Blank, Chapter, ChapterContent, Flashcard, Mcq, Medium, PastPaper, Section, ShortQ, Subject } from './types';
+import { CHAPTERS, SUBJECTS, chapterById, contentFor, primeContent, subjectById } from './content';
+import { Blank, Chapter, ChapterContent, Flashcard, Mcq, Medium, Section, ShortQ, Subject } from './types';
 
 /**
  * The slice of a Supabase client this file uses. Typed loosely on purpose: the
@@ -564,10 +564,4 @@ export async function fetchMcqs(
 
 export async function fetchFlashcards(chapterId: string, client?: ContentClient): Promise<Flashcard[]> {
   return (await fetchChapterContent(chapterId, client)).flashcards;
-}
-
-export async function fetchPastPapers(subjectId?: string): Promise<PastPaper[]> {
-  // Papers are still bundled: the client has not supplied real ones yet, and
-  // there is no table for them until he does.
-  return subjectId ? PAST_PAPERS.filter((p) => p.subjectId === subjectId) : PAST_PAPERS;
 }
