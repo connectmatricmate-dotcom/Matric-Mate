@@ -143,7 +143,6 @@ function RealPlayer({ id }: { id: string }) {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
-  const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
   const medium = state.settings.contentMedium;
@@ -153,13 +152,14 @@ function RealPlayer({ id }: { id: string }) {
   // signal and a replay costs the student no data.
   const offlineUri = picked ? localAudioUri(id, picked.medium) : null;
   /**
-   * Memoised on the identity of the recording, not rebuilt every render.
+   * The hook owns source changes, nothing here calls player.replace().
    *
-   * Without this, `track` is a fresh object literal on each render, so the
-   * effect below fires every render and calls player.replace() forever: the
-   * player restarts loading before it can finish, and nothing ever plays. The
-   * bundled-asset version returned a stable module constant, so the bug only
-   * appeared when this started resolving remote URLs.
+   * useAudioPlayer keys the underlying player on the stringified source, so
+   * when the URI changes it builds a new player already loaded with it and
+   * releases the old one. The first version of this screen did not know that
+   * and replaced the source from an effect keyed on a track object rebuilt
+   * every render; the status hook re-renders twice a second, so the player
+   * restarted its load twice a second and nothing ever played.
    */
   const remoteUri = audioSource(picked)?.uri ?? null;
   const uri = offlineUri ?? remoteUri;
@@ -175,11 +175,15 @@ function RealPlayer({ id }: { id: string }) {
     setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(() => {});
   }, []);
 
+  // A new player starts at 1x, but the speed pill keeps its state across a
+  // source switch. Re-applied whenever either changes, so they cannot drift.
   useEffect(() => {
-    if (track) player.replace(track);
-  }, [track]); // eslint-disable-line react-hooks/exhaustive-deps
+    player.setPlaybackRate(SPEEDS[speed]);
+  }, [player, speed]);
 
-  const duration = status.duration || (chapter?.audioMinutes ?? 14) * 60;
+  // Until the file's own metadata arrives, the row's measured duration is the
+  // truth. audioMinutes is the bundled chapter constant and is always zero.
+  const duration = status.duration || picked?.durationSecs || 0;
   const position = status.currentTime || 0;
 
   return (
@@ -200,11 +204,7 @@ function RealPlayer({ id }: { id: string }) {
         }
       }}
       onSeek={(d) => player.seekTo(Math.max(0, Math.min(duration, position + d)))}
-      onSpeed={() => {
-        const next = (speed + 1) % SPEEDS.length;
-        setSpeed(next);
-        player.setPlaybackRate(SPEEDS[next]);
-      }}
+      onSpeed={() => setSpeed((n) => (n + 1) % SPEEDS.length)}
       /**
        * Three different states, and they used to render as one.
        *
