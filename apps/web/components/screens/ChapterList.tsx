@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { Chapter, Subject } from '@matricmate/core';
-import { chapterPct, subjectPct } from '@matricmate/core';
+import { chapterPct, hasStudyMaterial, subjectPct } from '@matricmate/core';
 import { LockedNotice } from '@/components/app/LockedNotice';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { UpgradeRail, WeakRail } from '@/components/app/rails';
@@ -51,7 +51,8 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
       <Split>
         <Work className="flex flex-col gap-2.5">
         {chapters.map((c) => {
-          const p = perChapter.get(c.id) ?? 0;
+          const empty = !hasStudyMaterial(c);
+          const p = empty ? 0 : (perChapter.get(c.id) ?? 0);
           const isLocked = c.premium && !state.premium.active;
           const current = c.id === state.lastChapterId;
           const done = p >= 100;
@@ -61,12 +62,12 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
               flat={!current}
               border={current ? 'border-teal' : undefined}
               className={`flex items-center gap-3 transition-colors duration-200 ${
-                isLocked ? 'opacity-60' : 'hover:border-teal'
+                empty || isLocked ? 'opacity-60' : 'hover:border-teal'
               }`}
             >
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] font-display text-[16px] ${
-                  done ? 'bg-greentint text-green' : 'bg-tealtint text-teal'
+                  empty ? 'bg-grey text-ink3' : done ? 'bg-greentint text-green' : 'bg-tealtint text-teal'
                 }`}
               >
                 {done ? <Icon name="check" size={19} strokeWidth={2.6} /> : c.number}
@@ -74,16 +75,22 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
               <span className="min-w-0 flex-1">
                 {c.urduTitle ? <Ur className="text-ink2">{c.urduTitle}</Ur> : null}
                 <span className="block text-[14px] font-extrabold text-ink">{c.title}</span>
-                <span className="block truncate text-[13px] text-ink2">
-                  {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
-                </span>
-                {p > 0 && p < 100 ? (
+                {empty ? (
+                  <span className="block text-[13px] text-ink2">{c.blurb}</span>
+                ) : (
+                  <span className="block truncate text-[13px] text-ink2">
+                    {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
+                  </span>
+                )}
+                {!empty && p > 0 && p < 100 ? (
                   <span className="mt-2 block">
                     <Bar pct={p} tone="teal" />
                   </span>
                 ) : null}
               </span>
-              {isLocked ? (
+              {empty ? (
+                <Pill tone="grey">{t('study.notOnPaper')}</Pill>
+              ) : isLocked ? (
                 <Pill tone="grey" icon="lock">
                   {t('study.premiumChapter')}
                 </Pill>
@@ -94,6 +101,10 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
               )}
             </Card>
           );
+
+          if (empty) {
+            return <div key={c.id}>{body}</div>;
+          }
 
           return isLocked ? (
             <button key={c.id} type="button" onClick={() => setLocked(c)} className="text-left">

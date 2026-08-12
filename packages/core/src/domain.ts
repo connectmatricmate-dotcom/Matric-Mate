@@ -2,8 +2,22 @@
  * Domain logic. XP, streaks, progress, weak topics, quotas.
  * Pure functions so the same rules run on device, on web and (later) on the server.
  */
-import { Attempt, Confidence, PlanTask, TestResult } from './types';
+import { Attempt, Chapter, Confidence, PlanTask, TestResult } from './types';
 import { chapterById, chaptersFor, contentFor } from './content';
+
+/**
+ * Whether a chapter has anything to actually study.
+ *
+ * Five chapters correctly carry zero sections, zero MCQs and zero flashcards:
+ * three Maths chapters NCP 2022-23 dropped from Class 9 (Matrices, Congruent
+ * Triangles, Sides and Angles of a Triangle), and Urdu listening and speaking,
+ * which the board assesses in class and never on the annual paper. Both apps
+ * read this off the chapter's own counts, populated from the database, rather
+ * than a hardcoded id, so a chapter earns its "nothing to revise" treatment by
+ * actually having nothing, not by matching a list that has to be kept in sync.
+ */
+export const hasStudyMaterial = (chapter: Pick<Chapter, 'sectionCount' | 'mcqCount' | 'flashcardCount'>): boolean =>
+  chapter.sectionCount > 0 || chapter.mcqCount > 0 || chapter.flashcardCount > 0;
 
 export const XP = {
   /** Correct answer. Honest confidence is rewarded: a lucky guess earns less than a sure answer. */

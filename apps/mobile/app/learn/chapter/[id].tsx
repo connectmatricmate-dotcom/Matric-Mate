@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
-import { api , chapterPct , subjectById } from '@matricmate/core';
+import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
+import { api , chapterPct, hasStudyMaterial , subjectById } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
@@ -17,6 +17,25 @@ export default function ChapterHub() {
   const [busy, setBusy] = useState(false);
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
+
+  // Guards a direct link or an old bookmark to a chapter the board doesn't
+  // examine: no notes, audio, flashcards, MCQs, short questions or blanks
+  // exist for it, so there is nothing the usual grid could open.
+  if (chapter && !hasStudyMaterial(chapter)) {
+    return (
+      <Screen>
+        <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
+        <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
+          <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
+          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
+            {chapter.blurb}
+          </Text>
+        </Card>
+        <Spacer h={S.lg} />
+        <Empty title={t('study.emptyChapterTitle')} sub={t('study.emptyChapterBody')} />
+      </Screen>
+    );
+  }
 
   const pct = chapterPct(id, state.readSections, state.attempts);
   const downloaded = state.downloads.includes(id);

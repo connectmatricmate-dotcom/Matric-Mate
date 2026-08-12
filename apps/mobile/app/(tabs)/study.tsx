@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
 import { Card, Empty, Ring, Row, Screen, Skeleton, Small, Ur } from '../../src/components/ui';
-import { api , subjectPct } from '@matricmate/core';
+import { api , hasStudyMaterial, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -30,7 +30,9 @@ export default function Study() {
     return subjects
       .map(({ s, chapters }) => {
         const pct = subjectPct(s.id, state.readSections, state.attempts);
-        const next = chapters.find((c) => c.id === state.lastChapterId) ?? chapters[0];
+        // Skip chapters with nothing to study: pointing "Continue" at an
+        // empty chapter would send a student straight to a dead end.
+        const next = chapters.find((c) => c.id === state.lastChapterId) ?? chapters.find(hasStudyMaterial);
         return { s, pct, next, chapters };
       })
       .filter(({ s, chapters }) =>

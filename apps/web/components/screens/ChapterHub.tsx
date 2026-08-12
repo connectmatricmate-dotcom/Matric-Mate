@@ -1,10 +1,10 @@
 'use client';
 
 import type { Chapter, ChapterContent } from '@matricmate/core';
-import { chapterPct } from '@matricmate/core';
+import { chapterPct, hasStudyMaterial } from '@matricmate/core';
 import { Actions, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { IconButton } from '@/components/ui/controls';
-import { Card, Item, Label, LinkBtn, Pill, Ring, Ur } from '@/components/ui/primitives';
+import { Card, Empty, Item, Label, LinkBtn, Pill, Ring, Ur } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
 
@@ -22,6 +22,31 @@ export function ChapterHub({
   const toast = useToast();
 
   const id = chapter.id;
+
+  // Guards a direct link or an old bookmark to a chapter the board doesn't
+  // examine: no notes, audio, flashcards, MCQs, short questions or blanks
+  // exist for it, so there is nothing the usual grid could open.
+  if (!hasStudyMaterial(chapter)) {
+    return (
+      <Page width="focus">
+        <PageHead
+          back={`/learn/subject/${chapter.subjectId}`}
+          backLabel={subjectName}
+          eyebrow={`${subjectName} · Chapter ${chapter.number}`}
+          title={chapter.title}
+          urduTitle={
+            chapter.urduTitle ? (
+              <p className="mt-1">
+                <Ur className="text-[15px] text-ink2">{chapter.urduTitle}</Ur>
+              </p>
+            ) : undefined
+          }
+          sub={chapter.blurb}
+        />
+        <Empty title={t('study.emptyChapterTitle')} sub={t('study.emptyChapterBody')} />
+      </Page>
+    );
+  }
   const pct = chapterPct(id, state.readSections, state.attempts);
   const downloaded = state.downloads.includes(id);
   const readCount = content.sections.filter((s) => state.readSections.includes(s.id)).length;

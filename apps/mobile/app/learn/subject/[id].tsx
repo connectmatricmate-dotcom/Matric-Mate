@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Btn, Card, Header, Pill, Row, Screen, Sheet, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
 import { LockedNotice } from '../../../src/components/LockedNotice';
-import { api , chapterPct, subjectPct } from '@matricmate/core';
+import { api , chapterPct, hasStudyMaterial, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -58,7 +58,8 @@ export default function Chapters() {
       ) : (
         <View style={{ gap: S.sm }}>
           {(chapters ?? []).map((c) => {
-            const p = chapterPct(c.id, state.readSections, state.attempts);
+            const empty = !hasStudyMaterial(c);
+            const p = empty ? 0 : chapterPct(c.id, state.readSections, state.attempts);
             const locked = c.premium && !state.premium.active;
             const current = c.id === state.lastChapterId;
             const done = p >= 100;
@@ -67,8 +68,8 @@ export default function Chapters() {
                 key={c.id}
                 flat={!current}
                 border={current ? C.teal : undefined}
-                style={{ opacity: locked ? 0.62 : 1 }}
-                onPress={() => (locked ? setShowLocked(true) : router.push(`/learn/chapter/${c.id}`))}
+                style={{ opacity: empty || locked ? 0.62 : 1 }}
+                onPress={empty ? undefined : () => (locked ? setShowLocked(true) : router.push(`/learn/chapter/${c.id}`))}
               >
                 <Row gap={S.md}>
                   <View
@@ -76,7 +77,7 @@ export default function Chapters() {
                       width: 40,
                       height: 40,
                       borderRadius: 12,
-                      backgroundColor: done ? C.greenTint : C.tealTint,
+                      backgroundColor: empty ? C.grey : done ? C.greenTint : C.tealTint,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
@@ -84,22 +85,28 @@ export default function Chapters() {
                     {done ? (
                       <Icon name="check" size={19} color={C.green} strokeWidth={2.6} />
                     ) : (
-                      <Text style={{ fontFamily: F.display, fontSize: 16, color: C.teal }}>{c.number}</Text>
+                      <Text style={{ fontFamily: F.display, fontSize: 16, color: empty ? C.ink3 : C.teal }}>{c.number}</Text>
                     )}
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
                     {c.urduTitle ? <Ur size={15}>{c.urduTitle}</Ur> : null}
                     <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{c.title}</Text>
-                    <Small numberOfLines={1}>
-                      {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
-                    </Small>
-                    {p > 0 && p < 100 ? (
+                    {empty ? (
+                      <Small>{c.blurb}</Small>
+                    ) : (
+                      <Small numberOfLines={1}>
+                        {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
+                      </Small>
+                    )}
+                    {!empty && p > 0 && p < 100 ? (
                       <View style={{ marginTop: 7 }}>
                         <Bar pct={p} tone="teal" />
                       </View>
                     ) : null}
                   </View>
-                  {locked ? (
+                  {empty ? (
+                    <Pill tone="grey">{t('study.notOnPaper')}</Pill>
+                  ) : locked ? (
                     <Pill tone="grey" icon="lock">
                       {t('study.premiumChapter')}
                     </Pill>

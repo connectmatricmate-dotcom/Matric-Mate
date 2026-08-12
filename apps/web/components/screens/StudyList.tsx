@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { SUBJECT_ICON, type Chapter, type Subject, subjectPct } from '@matricmate/core';
+import { SUBJECT_ICON, type Chapter, type Subject, hasStudyMaterial, subjectPct } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Empty, Icon, Skeleton, Ur } from '@/components/ui/primitives';
@@ -73,7 +73,9 @@ export function StudyList({
             s,
             chapters,
             pct: subjectPct(s.id, state.readSections, state.attempts),
-            next: chapters.find((c) => c.id === state.lastChapterId) ?? chapters[0],
+            // Skip chapters with nothing to study: pointing "Continue" at an
+            // empty chapter would send a student straight to a dead end.
+            next: chapters.find((c) => c.id === state.lastChapterId) ?? chapters.find(hasStudyMaterial),
           };
         }),
     [subjects, chaptersBySubject, derived.subjects, state.readSections, state.attempts, state.lastChapterId]
