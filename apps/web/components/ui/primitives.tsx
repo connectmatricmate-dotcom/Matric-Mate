@@ -324,6 +324,47 @@ export function LinkBtn({
   );
 }
 
+/**
+ * A button-styled link to somewhere outside the app: FBISE's own site, for a
+ * past paper or a topper script. Always a new tab, so a student never loses
+ * their place in the app, and always `rel="noopener noreferrer"` since the
+ * destination is a third party. Server-safe, same disabled treatment as LinkBtn.
+ */
+export function ExternalLinkBtn({
+  title,
+  href,
+  variant = 'primary',
+  icon,
+  sm,
+  lg,
+  disabled,
+  className = '',
+}: {
+  title: string;
+  href: string;
+  variant?: BtnVariant;
+  icon?: IconName;
+  sm?: boolean;
+  lg?: boolean;
+  disabled?: boolean;
+  className?: string;
+}) {
+  if (disabled) {
+    return (
+      <span aria-disabled className={buttonClasses({ variant, sm, lg, disabled: true, className })}>
+        {icon ? <Icon name={icon} size={sm ? 16 : 18} /> : null}
+        {title}
+      </span>
+    );
+  }
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={buttonClasses({ variant, sm, lg, className })}>
+      {icon ? <Icon name={icon} size={sm ? 16 : 18} /> : null}
+      {title}
+    </a>
+  );
+}
+
 export function Check({ on, round, size = 26 }: { on: boolean; round?: boolean; size?: number }) {
   return (
     <span

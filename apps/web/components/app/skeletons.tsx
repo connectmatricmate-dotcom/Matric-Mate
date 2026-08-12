@@ -163,22 +163,51 @@ export function AudioSkeleton() {
   );
 }
 
-/** /session/papers: filter chips over a card grid. */
+/** /session/papers: a year heading over a card of rows, twice. */
 export function PapersSkeleton() {
   return (
     <Page>
       <PageHeadSkeleton />
-      <div className="flex flex-wrap gap-2">
-        <Skeleton className="h-10 w-24 rounded-full" />
-        <Skeleton className="h-10 w-20 rounded-full" />
-        <Skeleton className="h-10 w-28 rounded-full" />
-      </div>
+      {[0, 1].map((g) => (
+        <div key={g} className="mt-6 first:mt-0">
+          <Skeleton className="mb-2 h-4 w-28" />
+          <Card flat className="py-0">
+            <RowSkeleton />
+            <RowSkeleton />
+            <RowSkeleton last />
+          </Card>
+        </div>
+      ))}
+    </Page>
+  );
+}
+
+/** /session/topper-papers: an intro card over a grid of subject cards. */
+export function TopperPapersSkeleton() {
+  return (
+    <Page>
+      <PageHeadSkeleton />
+      <Card flat className="flex items-start gap-3">
+        <Skeleton className="h-9 w-9 shrink-0 rounded-[12px]" />
+        <div className="min-w-0 flex-1">
+          <Skeleton className="h-3.5 w-full max-w-md" />
+          <Skeleton className="mt-2 h-3.5 w-3/4 max-w-md" />
+        </div>
+      </Card>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {Array.from({ length: 4 }, (_, i) => (
-          <Card flat key={i}>
-            <Skeleton className="h-4 w-40 max-w-full" />
-            <Skeleton className="mt-2 h-3 w-56 max-w-full" />
-            <Skeleton className="mt-4 h-9 w-28 rounded-[16px]" />
+        {Array.from({ length: 6 }, (_, i) => (
+          <Card flat key={i} className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-[46px] w-[46px] shrink-0 rounded-[14px]" />
+              <div className="min-w-0 flex-1">
+                <Skeleton className="h-4 w-28 max-w-full" />
+                <Skeleton className="mt-1.5 h-3 w-16 max-w-full" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-20 rounded-[16px]" />
+              <Skeleton className="h-9 w-20 rounded-[16px]" />
+            </div>
           </Card>
         ))}
       </div>

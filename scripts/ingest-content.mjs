@@ -82,6 +82,7 @@ async function loadCore() {
         '--moduleResolution', 'nodenext',
         '--target', 'es2022',
         '--skipLibCheck',
+        '--resolveJsonModule',
         '--noEmitOnError', 'false',
         resolve(ROOT, 'packages/core/src/index.ts'),
       ],
@@ -92,12 +93,40 @@ async function loadCore() {
   });
   // tsc reports type errors on a package it is not configured for; the emit is
   // what matters, so only a missing output is fatal.
-  const entry = resolve(BUILD, 'content.js');
+  //
+  // The output path is not fixed. tsc infers rootDir from the widest common
+  // ancestor of everything it compiles, so the day core started importing
+  // data/fbise/papers.json from outside the package, the emit moved from
+  // <build>/content.js to <build>/packages/core/src/content.js and this script
+  // broke with a module-not-found. Find the file instead of assuming where it
+  // landed.
+  const entry = await findEmitted(BUILD, 'content.js');
+  if (!entry) throw new Error(`tsc emitted no content.js under ${BUILD} (exit ${code})`);
   try {
     return await import(pathToFileURL(entry).href);
   } catch (e) {
     throw new Error(`could not load compiled core from ${entry} (tsc exit ${code}): ${e.message}`);
   }
+}
+
+/** Depth-first search for a compiled file, wherever tsc decided to put it. */
+async function findEmitted(dir, name) {
+  const { readdir } = await import('node:fs/promises');
+  let entries;
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch {
+    return null;
+  }
+  for (const e of entries) {
+    const full = resolve(dir, e.name);
+    if (e.isFile() && e.name === name) return full;
+    if (e.isDirectory()) {
+      const hit = await findEmitted(full, name);
+      if (hit) return hit;
+    }
+  }
+  return null;
 }
 
 /** Read apps/web/.env.local without adding a dotenv dependency. */

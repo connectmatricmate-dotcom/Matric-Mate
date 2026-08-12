@@ -11,6 +11,7 @@ export * from './domain';
 export * from './billing';
 export * from './tokens';
 export * from './icons';
+export * from './papers';
 export { api } from './api';
 export {
   connectContent,

@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import { api } from '@matricmate/core';
+import { fbisePastPapersByYear } from '@matricmate/core';
 import { PapersScreen } from '@/components/screens/PapersScreen';
 
 export const metadata: Metadata = {
   title: 'Past papers',
-  description: 'FBISE Class 9 past papers. Read them, or sit one as a timed test.',
+  description: 'FBISE Class 9 past papers, straight from the board.',
 };
 
-export default async function PapersPage() {
-  const papers = await api.getPastPapers();
-  return <PapersScreen papers={papers} />;
+export default function PapersPage() {
+  const groups = fbisePastPapersByYear();
+  return <PapersScreen groups={groups} />;
 }
