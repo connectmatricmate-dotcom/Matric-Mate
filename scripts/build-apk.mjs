@@ -24,6 +24,7 @@
 
 import { execFile, spawn } from 'node:child_process';
 import { access, mkdir, readdir, rename } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
@@ -78,8 +79,20 @@ async function checkJdk() {
   ok('jdk', `java ${major}`);
 }
 
+/**
+ * Where the SDK is, without needing a shell profile edit.
+ *
+ * `sdkmanager` installs to ~/Android/Sdk unless told otherwise, so falling back
+ * to it means a fresh terminal builds without exporting anything. An explicit
+ * ANDROID_HOME still wins, for anyone who put the SDK somewhere else.
+ */
+function androidHome() {
+  const set = process.env.ANDROID_HOME ?? process.env.ANDROID_SDK_ROOT;
+  return set || resolve(homedir(), 'Android/Sdk');
+}
+
 async function checkAndroidSdk() {
-  const home = process.env.ANDROID_HOME ?? process.env.ANDROID_SDK_ROOT;
+  const home = androidHome();
   if (!home) {
     fail(
       'android sdk',
@@ -156,10 +169,21 @@ async function main() {
   console.log(C.dim('\n  building. First run downloads Gradle and takes a while; later ones are faster.\n'));
 
   const code = await new Promise((done) => {
+    const home = androidHome();
     const child = spawn(
       'npx',
       ['eas-cli', 'build', '--profile', PROFILE, '--platform', 'android', '--local', '--non-interactive'],
-      { cwd: MOBILE, stdio: 'inherit' },
+      {
+        cwd: MOBILE,
+        stdio: 'inherit',
+        // Gradle reads these, and they are not in the shell profile.
+        env: {
+          ...process.env,
+          ANDROID_HOME: home,
+          ANDROID_SDK_ROOT: home,
+          PATH: `${process.env.PATH}:${resolve(home, 'platform-tools')}:${resolve(home, 'cmdline-tools/latest/bin')}`,
+        },
+      },
     );
     child.on('close', done);
   });
