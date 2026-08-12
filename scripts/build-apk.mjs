@@ -23,6 +23,7 @@
  */
 
 import { execFile, spawn } from 'node:child_process';
+import { readdirSync } from 'node:fs';
 import { access, mkdir, readdir, rename } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
@@ -39,6 +40,18 @@ const PROFILE = PRODUCTION ? 'production' : 'preview';
 
 /** Android Gradle Plugin 8, which Expo 57 uses, needs 17 or newer. */
 const MIN_JDK = 17;
+
+/**
+ * The newest Node the local build plugin actually runs on.
+ *
+ * eas-cli-local-build-plugin logs through bunyan, which loads dtrace-provider,
+ * whose native binding does not build on Node 23 or newer. It fails as
+ * `dtrace.createDTraceProvider is not a function` before any build work starts,
+ * and eas reports it as an empty non-zero exit with no stdout at all, which
+ * tells you nothing. The rest of the repo is happy on a newer Node, so rather
+ * than hold the whole project back, the build alone is run on an older one.
+ */
+const MAX_BUILD_NODE = 22;
 
 const C = {
   dim: (s) => `\x1b[2m${s}\x1b[0m`,
@@ -125,6 +138,46 @@ async function checkAndroidSdk() {
   ok('android sdk', home);
 }
 
+/**
+ * A Node the build plugin can run on: this one if it is old enough, otherwise
+ * the newest suitable version nvm has. Returns the bin directory to put at the
+ * front of the child's PATH, or null to use the current Node.
+ */
+function buildNodeBin() {
+  if (Number(process.versions.node.split('.')[0]) <= MAX_BUILD_NODE) return null;
+  const versions = resolve(homedir(), '.nvm/versions/node');
+  let best = null;
+  try {
+    for (const dir of readdirSync(versions)) {
+      const major = Number(dir.replace(/^v/, '').split('.')[0]);
+      if (major > MAX_BUILD_NODE || major < 20) continue;
+      if (!best || major > best.major) best = { major, dir };
+    }
+  } catch {
+    return null;
+  }
+  return best ? resolve(versions, best.dir, 'bin') : null;
+}
+
+async function checkBuildNode() {
+  const current = Number(process.versions.node.split('.')[0]);
+  if (current <= MAX_BUILD_NODE) {
+    ok('node', `node ${current}`);
+    return null;
+  }
+  const bin = buildNodeBin();
+  if (!bin) {
+    fail(
+      'node',
+      `node ${current}, and the build plugin cannot run above ${MAX_BUILD_NODE}`,
+      `Install a supported Node once. Nothing else in the repo changes, the build alone uses it:\n\n  nvm install ${MAX_BUILD_NODE}`,
+    );
+  }
+  const { stdout } = await run(resolve(bin, 'node'), ['-v']);
+  ok('node', `${stdout.trim()} for the build, ${process.version} everywhere else`);
+  return bin;
+}
+
 async function checkEasLogin() {
   try {
     const { stdout } = await run('npx', ['eas-cli', 'whoami'], { cwd: MOBILE });
@@ -164,6 +217,7 @@ async function main() {
 
   await checkJdk();
   await checkAndroidSdk();
+  const nodeBin = await checkBuildNode();
   await checkEasLogin();
 
   console.log(C.dim('\n  building. First run downloads Gradle and takes a while; later ones are faster.\n'));
@@ -181,7 +235,13 @@ async function main() {
           ...process.env,
           ANDROID_HOME: home,
           ANDROID_SDK_ROOT: home,
-          PATH: `${process.env.PATH}:${resolve(home, 'platform-tools')}:${resolve(home, 'cmdline-tools/latest/bin')}`,
+          // The build Node goes at the FRONT, the Android tools at the back.
+          PATH: [
+            ...(nodeBin ? [nodeBin] : []),
+            process.env.PATH,
+            resolve(home, 'platform-tools'),
+            resolve(home, 'cmdline-tools/latest/bin'),
+          ].join(':'),
         },
       },
     );

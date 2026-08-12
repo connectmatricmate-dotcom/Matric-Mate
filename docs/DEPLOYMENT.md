@@ -226,8 +226,24 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/lates
 sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 ```
 
-Put those two exports in `~/.bashrc` so a new terminal keeps them. Budget about
-10 GB and half an hour once. `npm run apk` names anything still missing.
+Nothing needs exporting: the script looks in `~/Android/Sdk`, which is where
+`sdkmanager` installs by default, and passes the paths to Gradle itself. Budget
+about 500 MB and twenty minutes once. `npm run apk` names anything still
+missing.
+
+### Node
+
+Expo's local build plugin logs through bunyan, which loads `dtrace-provider`,
+whose native binding does not build on Node 23 or newer. It fails before any
+build work starts, and eas reports it as an empty non-zero exit with no output,
+which tells you nothing about the cause.
+
+The build therefore runs on Node 22 while everything else in the repo stays on
+whatever you have. `npm run apk` picks a suitable version out of nvm on its own;
+if there is none it says so. Install one with `nvm install 22`.
+
+If you hit the dtrace error after a failed run on a newer Node, the broken
+native build is cached: `rm -rf ~/.npm/_npx` and run again.
 
 ## In the cloud
 
