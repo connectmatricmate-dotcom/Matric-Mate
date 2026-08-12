@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Blank } from '@matricmate/core';
+import { blankHalves } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
@@ -78,7 +79,7 @@ export function BlanksScreen({
       <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
       <Card className="md:border-0 md:bg-transparent md:p-0 md:shadow-none">
         <p className="font-display text-[18px] leading-[1.9] text-ink md:text-[20px]">
-          {item.sentence[0]}
+          {blankHalves(item.sentence[0], item.sentence[1])[0]}
           <span
             className={`font-body font-extrabold underline ${
               checked ? (correct ? 'text-green' : 'text-red') : pick ? 'text-teal' : 'text-ink3'
@@ -86,7 +87,7 @@ export function BlanksScreen({
           >
             {pick ?? '_______'}
           </span>
-          {item.sentence[1]}
+          {blankHalves(item.sentence[0], item.sentence[1])[1]}
         </p>
       </Card>
 

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Bar, Btn, Card, Header, Pill, Row, Screen, Skeleton, Small, Spacer } from '../../src/components/ui';
-import { api } from '@matricmate/core';
+import { Bar, Btn, Card, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import { api, blankHalves } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -23,6 +23,7 @@ export default function Blanks() {
 
   const items = content?.blanks ?? [];
   const item = items[i];
+  const halves = item ? blankHalves(item.sentence[0], item.sentence[1]) : ['', ''];
   const done = !!content && i >= items.length;
   const correct = checked && pick === item?.answer;
 
@@ -91,7 +92,7 @@ export default function Blanks() {
 
       <Card>
         <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 34, color: C.ink }}>
-          {item?.sentence[0]}
+          {halves[0]}
           <Text
             style={{
               fontFamily: F.bodyBold,
@@ -101,20 +102,47 @@ export default function Blanks() {
           >
             {pick ?? '_______'}
           </Text>
-          {item?.sentence[1]}
+          {halves[1]}
         </Text>
       </Card>
 
       <Spacer h={S.md} />
+      {/* Real answer buttons, two per row. These were Pills, which are made
+          for labels: at label size the four choices read as tags, not as
+          things a student is supposed to press. */}
       <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
         {item?.options.map((o) => {
           const selected = pick === o;
           const isAnswer = o === item.answer;
-          const tone = checked ? (isAnswer ? 'green' : selected ? 'red' : 'grey') : selected ? 'teal' : 'grey';
+          const look = checked
+            ? isAnswer
+              ? { bg: C.greenTint, line: C.green, text: C.green }
+              : selected
+                ? { bg: C.redTint, line: C.red, text: C.red }
+                : { bg: C.card, line: C.line, text: C.ink3 }
+            : selected
+              ? { bg: C.tealTint, line: C.teal, text: C.teal }
+              : { bg: C.card, line: C.line, text: C.ink };
           return (
-            <Pill key={o} tone={tone} onPress={checked ? undefined : () => setPick(o)} style={{ paddingVertical: 11, paddingHorizontal: 16 }}>
-              {o}
-            </Pill>
+            <Tap
+              key={o}
+              onPress={checked ? undefined : () => setPick(o)}
+              style={{
+                flexGrow: 1,
+                flexBasis: '47%',
+                minHeight: 52,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: 12,
+                paddingHorizontal: 14,
+                borderRadius: 14,
+                borderWidth: 1.5,
+                backgroundColor: look.bg,
+                borderColor: look.line,
+              }}
+            >
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 15.5, color: look.text }}>{o}</Text>
+            </Tap>
           );
         })}
       </Row>

@@ -26,6 +26,24 @@ import { chapterById, chaptersFor, contentFor } from './content';
 export const pickAudioTrack = <T extends { medium: Medium }>(tracks: T[], medium: Medium): T | null =>
   tracks.find((t) => t.medium === medium) ?? tracks.find((t) => t.medium === 'en') ?? tracks[0] ?? null;
 
+/**
+ * Spacing around the chosen word in a fill-in-the-blank sentence.
+ *
+ * The sentence halves in the data are inconsistent about surrounding
+ * whitespace, and both apps concatenated them raw, so the picked word fused
+ * with its neighbours: "an example ofneutralequilibrium, because". Normalised
+ * here once for both apps: the word gets a space on each side, except after an
+ * opening bracket or quote and before closing punctuation.
+ */
+export const blankHalves = (before: string, after: string): [string, string] => {
+  const b = before.replace(/\s+$/u, '');
+  const a = after.replace(/^\s+/u, '');
+  return [
+    b ? (/[([{\u2018\u201C"']$/u.test(b) ? b : `${b} `) : '',
+    a ? (/^[,.;:!?%)\]}\u2019\u201D]/u.test(a) ? a : ` ${a}`) : '',
+  ];
+};
+
 export const hasStudyMaterial = (chapter: Pick<Chapter, 'sectionCount' | 'mcqCount' | 'flashcardCount'>): boolean =>
   chapter.sectionCount > 0 || chapter.mcqCount > 0 || chapter.flashcardCount > 0;
 
