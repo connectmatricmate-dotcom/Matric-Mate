@@ -1,0 +1,227 @@
+{
+  "_note": [
+    "Links to FBISE, not copies. The board serves these free from a public site and they are",
+    "hundreds of megabytes of scanned paper, so the apps link out rather than host them.",
+    "",
+    "Everything here is a scan with no text layer. Do not parse it. Toppers exist so a student",
+    "can see how a real marked answer was written, which is what no generated content teaches.",
+    "",
+    "needsHosting means the board only publishes it inside a ZIP, which a browser cannot open",
+    "a page of. Those are the only files that belong in our own storage."
+  ],
+  "retrieved": "2026-08-12",
+  "pastPapers": [
+    {
+      "year": 2025,
+      "file": "SSC-I_2A25.pdf",
+      "label": "SSC I Second Annual 2025",
+      "url": "https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC-I_2A25.pdf",
+      "classLevel": 9,
+      "needsHosting": false,
+      "note": null
+    },
+    {
+      "year": 2025,
+      "file": "SSC_1A25_QP.zip",
+      "label": "SSC First Annual 2025 question papers",
+      "url": "https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip",
+      "classLevel": 9,
+      "needsHosting": true,
+      "note": "ZIP: extract SSC-I Normal.pdf and host it, the rest is Class 10 or accessibility variants"
+    },
+    {
+      "year": 2024,
+      "file": "SSC-I Compulsory+Science+General.pdf",
+      "label": "SSC I Compulsory+Science+General",
+      "url": "https://fbise.edu.pk/Old%20Question%20Paper/2024/SSC_I_1ST_2024/SSC-I%20Compulsory%2BScience%2BGeneral.pdf",
+      "classLevel": 9,
+      "needsHosting": false,
+      "note": null
+    },
+    {
+      "year": 2024,
+      "file": "SSC-I HIC.pdf",
+      "label": "SSC I Hearing impaired candidates",
+      "url": "https://fbise.edu.pk/Old%20Question%20Paper/2024/SSC_I_1ST_2024/SSC-I%20HIC.pdf",
+      "classLevel": 9,
+      "needsHosting": false,
+      "note": null
+    },
+    {
+      "year": 2024,
+      "file": "SSC-I Tech.pdf",
+      "label": "SSC I Tech",
+      "url": "https://fbise.edu.pk/Old%20Question%20Paper/2024/SSC12A/SSC-I%20Tech.pdf",
+      "classLevel": 9,
+      "needsHosting": false,
+      "note": null
+    },
+    {
+      "year": 2023,
+      "file": "SSC-I Compulsory+Science+General.pdf",
+      "label": "SSC I Compulsory+Science+General",
+      "url": "https://fbise.edu.pk/Old%20Question%20Paper/2023/SSC12A/SSC-I%20Compulsory%2BScience%2BGeneral.pdf",
+      "classLevel": 9,
+      "needsHosting": false,
+      "note": null
+    },
+    {
+      "year": 2023,
+      "file": "SSC-I HIC.pdf",
+      "label": "SSC I Hearing impaired candidates",
+      "url": "https://fbise.edu.pk/Old%20Question%20Paper/2023/SSC12A/SSC-I%20HIC.pdf",
+      "classLevel": 9,
+      "needsHosting": false,
+      "note": null
+    },
+    {
+      "year": 2023,
+      "file": "SSC-I Tech.pdf",
+      "label": "SSC I Tech",
+      "url": "https://fbise.edu.pk/Old%20Question%20Paper/2023/SSC12A/SSC-I%20Tech.pdf",
+      "classLevel": 9,
+      "needsHosting": false,
+      "note": null
+    }
+  ],
+  "toppers": [
+    {
+      "subject": "bio",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/bio1025%20(2).pdf",
+      "n": 1
+    },
+    {
+      "subject": "bio",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/bio1025%20(1).pdf",
+      "n": 2
+    },
+    {
+      "subject": "chem",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/che10%20(3).pdf",
+      "n": 1
+    },
+    {
+      "subject": "chem",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/che10%20(2).pdf",
+      "n": 2
+    },
+    {
+      "subject": "chem",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/che10%20(1).pdf",
+      "n": 3
+    },
+    {
+      "subject": "cs",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/CSC.pdf",
+      "n": 1
+    },
+    {
+      "subject": "eng",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/eng1%20(2).pdf",
+      "n": 1
+    },
+    {
+      "subject": "eng",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/eng1%20(3).pdf",
+      "n": 2
+    },
+    {
+      "subject": "eng",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/eng1%20(1).pdf",
+      "n": 3
+    },
+    {
+      "subject": "isl",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/IST3.pdf",
+      "n": 1
+    },
+    {
+      "subject": "isl",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/IST2.pdf",
+      "n": 2
+    },
+    {
+      "subject": "isl",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/IST1.pdf",
+      "n": 3
+    },
+    {
+      "subject": "math",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/MAT%20(1).pdf",
+      "n": 1
+    },
+    {
+      "subject": "math",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/MAT%20(3).pdf",
+      "n": 2
+    },
+    {
+      "subject": "math",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/MAT%20(2).pdf",
+      "n": 3
+    },
+    {
+      "subject": "pst",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/pst%20(2).pdf",
+      "n": 1
+    },
+    {
+      "subject": "pst",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/pst%20(3).pdf",
+      "n": 2
+    },
+    {
+      "subject": "pst",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/pst%20(1).pdf",
+      "n": 3
+    },
+    {
+      "subject": "phy",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/phy%20(1).pdf",
+      "n": 1
+    },
+    {
+      "subject": "phy",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/phy%20(2).pdf",
+      "n": 2
+    },
+    {
+      "subject": "urd",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/URD%20(3).pdf",
+      "n": 1
+    },
+    {
+      "subject": "urd",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/URD%20(2).pdf",
+      "n": 2
+    },
+    {
+      "subject": "urd",
+      "year": 2025,
+      "url": "https://fbise.edu.pk/Topper_Copies/SSC_2025/URD%20(1).pdf",
+      "n": 3
+    }
+  ]
+}
