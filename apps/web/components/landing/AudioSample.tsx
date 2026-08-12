@@ -7,9 +7,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Bar, Card, Icon, pillClasses } from '@/components/ui';
 
+/**
+ * The same Dynamics lesson a subscriber hears, streamed from the same public
+ * bucket. These were two copies committed into `public/`, which meant the
+ * marketing page could drift from what the app actually plays.
+ */
+const BUCKET = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio`;
+
 const TRACKS = {
-  en: { src: '/audio/dynamics-en.mp3', label: 'English narration', name: 'English' },
-  ur: { src: '/audio/dynamics-ur.mp3', label: 'Urdu narration', name: 'Urdu' },
+  en: { src: `${BUCKET}/phy-3/en.mp3`, label: 'English narration', name: 'English' },
+  ur: { src: `${BUCKET}/phy-3/ur.mp3`, label: 'Urdu narration', name: 'Urdu' },
 };
 
 export function AudioSample() {

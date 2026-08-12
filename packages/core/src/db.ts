@@ -29,7 +29,7 @@
  * shape, so it takes it structurally.
  */
 import { CHAPTERS, SUBJECTS, chapterById, contentFor, primeContent, subjectById } from './content';
-import { Blank, Chapter, ChapterContent, Flashcard, Mcq, Medium, Section, ShortQ, Subject } from './types';
+import { AudioTrack, Blank, Chapter, ChapterContent, Flashcard, Mcq, Medium, Section, ShortQ, Subject } from './types';
 
 /**
  * The slice of a Supabase client this file uses. Typed loosely on purpose: the
@@ -560,6 +560,36 @@ export async function fetchMcqs(
     },
     fallbackPool,
   );
+}
+
+/**
+ * The recordings a chapter really has, both mediums.
+ *
+ * Returns an empty list when there is no row, and the caller is expected to
+ * show no audio at all rather than a player pointed at nothing. This used to be
+ * a hardcoded map in content.ts naming two demo files bundled into each app, so
+ * a chapter had audio only if it was one specific physics chapter, no matter
+ * what had actually been recorded and published.
+ */
+export async function fetchAudioTracks(chapterId: string, client?: ContentClient): Promise<AudioTrack[]> {
+  if (!client && !db) return [];
+  try {
+    const { data, error } = await table('audio_tracks', client ?? db!)
+      .select('id,chapter_id,medium,title,storage_path,duration_secs,bytes')
+      .eq('chapter_id', chapterId);
+    if (error || !data) return [];
+    return (data as Record<string, unknown>[]).map((r) => ({
+      id: String(r.id),
+      chapterId: String(r.chapter_id),
+      medium: r.medium as Medium,
+      title: String(r.title),
+      storagePath: String(r.storage_path),
+      durationSecs: Number(r.duration_secs) || 0,
+      bytes: Number(r.bytes) || 0,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchFlashcards(chapterId: string, client?: ContentClient): Promise<Flashcard[]> {

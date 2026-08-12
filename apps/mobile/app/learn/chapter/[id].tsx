@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
-import { api , chapterPct, hasStudyMaterial , subjectById } from '@matricmate/core';
+import { api , chapterPct, hasStudyMaterial , pickAudioTrack, subjectById } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
@@ -17,6 +17,10 @@ export default function ChapterHub() {
   const [busy, setBusy] = useState(false);
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
+  const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
+  // No row, no row in the grid: a chapter offers an audio lesson only once one
+  // has really been recorded and published.
+  const audio = pickAudioTrack(tracks ?? [], state.settings.contentMedium);
 
   // Guards a direct link or an old bookmark to a chapter the board doesn't
   // examine: no notes, audio, flashcards, MCQs, short questions or blanks
@@ -99,12 +103,14 @@ export default function ChapterHub() {
           pct={content?.sections.length ? (readCount / content.sections.length) * 100 : 0}
           onPress={() => router.push(`/learn/reader/${id}`)}
         />
-        <Item
-          title={t('study.audio')}
-          sub={chapter ? t('study.audioSub', { n: chapter.audioMinutes }) : ''}
-          icon="headphones"
-          onPress={() => router.push(`/learn/audio/${id}`)}
-        />
+        {audio ? (
+          <Item
+            title={t('study.audio')}
+            sub={t('study.audioSub', { n: Math.max(1, Math.round(audio.durationSecs / 60)) })}
+            icon="headphones"
+            onPress={() => router.push(`/learn/audio/${id}`)}
+          />
+        ) : null}
         <Item
           title={t('study.flashcards')}
           sub={content ? t('study.flashcardsSub', { n: content.flashcards.length, known: knownCards }) : ''}

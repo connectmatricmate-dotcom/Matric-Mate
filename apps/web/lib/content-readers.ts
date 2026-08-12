@@ -1,6 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { api } from '@matricmate/core';
+import type { PlayableTrack } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -47,3 +48,16 @@ export const getFlashcards = cache(async (chapterId: string) => api.getFlashcard
  * If you need a new read on the server, add a reader here rather than reaching
  * for `api` in the page.
  */
+
+/**
+ * A chapter's recordings with playable URLs.
+ *
+ * The bucket is public, so a plain public URL is enough and the player needs no
+ * expiry handling. Resolved here, on the server, because the storage path in
+ * the row is deliberately relative to whichever Supabase project is current.
+ */
+export const getAudioTracks = cache(async (id: string): Promise<PlayableTrack[]> => {
+  const c = await client();
+  const tracks = await api.getAudioTracks(id, c);
+  return tracks.map((t) => ({ ...t, url: c.storage.from('audio').getPublicUrl(t.storagePath).data.publicUrl }));
+});

@@ -266,19 +266,12 @@ export const subjectById = (id: string): Subject | undefined =>
 
 /* ------------------------------------------------------- authored content */
 
-/**
- * Which chapters have a real recording, and under what name.
- *
- * Only the identifier lives here, each app resolves it to an actual file,
- * because the platforms load media differently (Metro `require` on Android, a
- * public URL on the web). One chapter is recorded in both mediums so the client
- * can hear how an audio lesson behaves; the rest wait on their own recordings.
+/*
+ * The AUDIO_TRACKS map and hasAudio() used to live here, naming two demo files
+ * bundled into each app. Audio now comes from the audio_tracks table via
+ * api.getAudioTracks(), so a chapter has a lesson when one has really been
+ * recorded and published, not when it appears in a list in this file.
  */
-export const AUDIO_TRACKS: Record<string, { en?: string; ur?: string }> = {
-  'phy-3': { en: 'dynamics-en', ur: 'dynamics-ur' },
-};
-
-export const hasAudio = (chapterId: string) => !!AUDIO_TRACKS[chapterId];
 
 const dynamicsSections: Section[] = [
   {

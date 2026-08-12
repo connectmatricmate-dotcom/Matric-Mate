@@ -20,6 +20,7 @@ export {
   contentMedium,
   isLive,
   fetchSlos,
+  fetchAudioTracks,
   fetchChapterContentLive,
   primeAllContent,
 } from './db';

@@ -66,6 +66,26 @@ export type Mcq = {
 };
 
 export type Flashcard = { id: string; chapterId: string; front: string; back: string; urduBack?: string };
+
+/**
+ * A recorded lesson that actually exists.
+ *
+ * `storagePath` is a path inside the public `audio` bucket, not a URL, because
+ * the project URL differs between environments and a stored absolute URL would
+ * pin every row to whichever one was current when it was written. Each app
+ * resolves it with its own Supabase client, which already knows the project.
+ */
+export type PlayableTrack = AudioTrack & { url: string };
+
+export type AudioTrack = {
+  id: string;
+  chapterId: string;
+  medium: Medium;
+  title: string;
+  storagePath: string;
+  durationSecs: number;
+  bytes: number;
+};
 export type ShortQ = { id: string; chapterId: string; marks: number; q: string; answer: string; points: string[] };
 export type Blank = { id: string; chapterId: string; sentence: [string, string]; answer: string; options: string[] };
 

@@ -8,7 +8,8 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
-import type { Chapter } from '@matricmate/core';
+import type { Chapter, PlayableTrack } from '@matricmate/core';
+import { pickAudioTrack } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { IconButton } from '@/components/ui/controls';
 import { Bar, Card, Icon, Pill } from '@/components/ui/primitives';
@@ -25,7 +26,8 @@ export function AudioLesson({
 }: {
   chapter: Chapter;
   audioTitle: string;
-  tracks: { en?: string; ur?: string } | null;
+  /** Published recordings for this chapter, straight from Supabase Storage. */
+  tracks: PlayableTrack[];
 }) {
   const { state, actions } = useApp();
   const t = useT();
@@ -34,11 +36,13 @@ export function AudioLesson({
 
   const id = chapter.id;
   const medium = state.settings.contentMedium;
-  const trackId = tracks ? (tracks[medium] ?? tracks.en) : null;
-  const src = trackId ? `/audio/${trackId}.mp3` : null;
+  // Was a bundled file path built from a hardcoded id, so only the one demo
+  // chapter ever played. The URL now comes from the row that publishing wrote.
+  const track = pickAudioTrack(tracks, medium);
+  const src = track?.url ?? null;
 
   const [position, setPosition] = useState(0);
-  const [duration, setDuration] = useState(chapter.audioMinutes * 60);
+  const [duration, setDuration] = useState(track?.durationSecs ?? 0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(0);
   const [loadedSrc, setLoadedSrc] = useState(src);
@@ -99,7 +103,7 @@ export function AudioLesson({
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onTimeUpdate={(e) => setPosition(e.currentTarget.currentTime)}
-          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || chapter.audioMinutes * 60)}
+          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || (track?.durationSecs ?? 0))}
           onEnded={() => setPlaying(false)}
         />
       ) : null}

@@ -11,6 +11,7 @@
  * generator below are still mocks and are labelled as such.
  */
 import {
+  fetchAudioTracks,
   fetchChapter,
   fetchChapterContent,
   fetchChapters,
@@ -21,7 +22,7 @@ import {
 } from './db';
 import { ALL_CHAPTERS, contentFor } from './content';
 import type { ContentClient } from './db';
-import { Chapter, ChapterContent, Flashcard, Mcq, Subject } from './types';
+import { AudioTrack, Chapter, ChapterContent, Flashcard, Mcq, Subject } from './types';
 
 /** Still needed by the two mocks below, which fake their own latency. */
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -55,6 +56,7 @@ export const api = {
   ): Promise<Mcq[]> => fetchMcqs(opts, client),
 
   getFlashcards: (chapterId: string, client?: ContentClient): Promise<Flashcard[]> => fetchFlashcards(chapterId, client),
+  getAudioTracks: (chapterId: string, client?: ContentClient): Promise<AudioTrack[]> => fetchAudioTracks(chapterId, client),
 
   /* ----------------------------------------------------------------- auth */
 

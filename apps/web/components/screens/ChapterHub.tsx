@@ -1,7 +1,7 @@
 'use client';
 
-import type { Chapter, ChapterContent } from '@matricmate/core';
-import { chapterPct, hasStudyMaterial } from '@matricmate/core';
+import type { Chapter, ChapterContent, PlayableTrack } from '@matricmate/core';
+import { chapterPct, hasStudyMaterial, pickAudioTrack } from '@matricmate/core';
 import { Actions, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { IconButton } from '@/components/ui/controls';
 import { Card, Empty, Item, Label, LinkBtn, Pill, Ring, Ur } from '@/components/ui/primitives';
@@ -12,10 +12,13 @@ export function ChapterHub({
   chapter,
   content,
   subjectName,
+  tracks,
 }: {
   chapter: Chapter;
   content: ChapterContent;
   subjectName: string;
+  /** Empty until this chapter has really been recorded, and then the row hides. */
+  tracks: PlayableTrack[];
 }) {
   const { state, actions } = useApp();
   const t = useT();
@@ -47,6 +50,7 @@ export function ChapterHub({
       </Page>
     );
   }
+  const track = pickAudioTrack(tracks, state.settings.contentMedium);
   const pct = chapterPct(id, state.readSections, state.attempts);
   const downloaded = state.downloads.includes(id);
   const readCount = content.sections.filter((s) => state.readSections.includes(s.id)).length;
@@ -98,12 +102,14 @@ export function ChapterHub({
           icon="book"
           pct={content.sections.length ? (readCount / content.sections.length) * 100 : 0}
         />
-        <Item
-          href={`/learn/audio/${id}`}
-          title={t('study.audio')}
-          sub={t('study.audioSub', { n: chapter.audioMinutes })}
-          icon="headphones"
-        />
+        {track ? (
+          <Item
+            href={`/learn/audio/${id}`}
+            title={t('study.audio')}
+            sub={t('study.audioSub', { n: Math.max(1, Math.round(track.durationSecs / 60)) })}
+            icon="headphones"
+          />
+        ) : null}
         <Item
           href={`/session/flashcards?chapter=${id}`}
           title={t('study.flashcards')}

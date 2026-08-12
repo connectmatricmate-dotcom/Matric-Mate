@@ -2,7 +2,7 @@
  * Domain logic. XP, streaks, progress, weak topics, quotas.
  * Pure functions so the same rules run on device, on web and (later) on the server.
  */
-import { Attempt, Chapter, Confidence, PlanTask, TestResult } from './types';
+import { Attempt, Chapter, Confidence, Medium, PlanTask, TestResult } from './types';
 import { chapterById, chaptersFor, contentFor } from './content';
 
 /**
@@ -16,6 +16,16 @@ import { chapterById, chaptersFor, contentFor } from './content';
  * than a hardcoded id, so a chapter earns its "nothing to revise" treatment by
  * actually having nothing, not by matching a list that has to be kept in sync.
  */
+/**
+ * The recording to play for a student, given what was actually published.
+ *
+ * Falls back to English when their medium has not been recorded yet, because a
+ * lesson in the other language beats no lesson at all. Returns null when the
+ * chapter has nothing, and the caller must then show no audio option at all.
+ */
+export const pickAudioTrack = <T extends { medium: Medium }>(tracks: T[], medium: Medium): T | null =>
+  tracks.find((t) => t.medium === medium) ?? tracks.find((t) => t.medium === 'en') ?? tracks[0] ?? null;
+
 export const hasStudyMaterial = (chapter: Pick<Chapter, 'sectionCount' | 'mcqCount' | 'flashcardCount'>): boolean =>
   chapter.sectionCount > 0 || chapter.mcqCount > 0 || chapter.flashcardCount > 0;
 

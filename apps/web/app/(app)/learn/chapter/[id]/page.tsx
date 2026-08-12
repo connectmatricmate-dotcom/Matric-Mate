@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { subjectById } from '@matricmate/core';
 import { ChapterHub } from '@/components/screens/ChapterHub';
-import { getChapter, getChapterContent } from '@/lib/content-readers';
+import { getAudioTracks, getChapter, getChapterContent } from '@/lib/content-readers';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -16,8 +16,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ChapterPage({ params }: Props) {
   const { id } = await params;
-  const [chapter, content] = await Promise.all([getChapter(id), getChapterContent(id)]);
+  const [chapter, content, tracks] = await Promise.all([getChapter(id), getChapterContent(id), getAudioTracks(id)]);
   if (!chapter) notFound();
 
-  return <ChapterHub chapter={chapter} content={content} subjectName={subjectById(chapter.subjectId)?.name ?? ''} />;
+  return (
+    <ChapterHub
+      chapter={chapter}
+      content={content}
+      subjectName={subjectById(chapter.subjectId)?.name ?? ''}
+      tracks={tracks}
+    />
+  );
 }
