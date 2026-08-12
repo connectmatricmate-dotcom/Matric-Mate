@@ -23,6 +23,7 @@
  * the thing no amount of generated content teaches.
  */
 
+import { readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -58,13 +59,46 @@ const TOPPERS_PAGE = 'https://fbise.edu.pk/topper_copies.php';
  * spent for nothing.
  *
  * Re-upload with scripts/host-zip-papers.mjs if the bucket is ever rebuilt.
+ *
+ * The project URL is read from the environment, never written here. It used to
+ * be typed into both entries, which pinned the catalogue, and therefore the
+ * rows the app reads, to whichever Supabase project was current the day this
+ * ran. Restoring into a new project would have left two dead links that nothing
+ * in the build would notice.
  */
+const PAPERS_BUCKET = 'papers';
+
+/**
+ * Reads apps/web/.env.local, synchronously, because the catalogue below is
+ * built at module load. Same file every other content script reads, so there is
+ * one place the project URL lives and it is gitignored.
+ */
+function readEnvFile() {
+  try {
+    const text = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../apps/web/.env.local'), 'utf8');
+    const env = {};
+    for (const line of text.split('\n')) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)$/);
+      if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
+    }
+    return env;
+  } catch {
+    return {};
+  }
+}
+
+function publicUrl(path) {
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? readEnvFile().NEXT_PUBLIC_SUPABASE_URL;
+  if (!base) throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set, cannot build self-hosted paper URLs');
+  return `${base.replace(/\/$/, '')}/storage/v1/object/public/${PAPERS_BUCKET}/${path}`;
+}
+
 const SELF_HOSTED = [
   {
     year: 2025,
     file: 'SSC-I Normal.pdf',
     label: 'SSC Part 1 First Annual 2025',
-    url: 'https://aueallnkfhipyneqtllp.supabase.co/storage/v1/object/public/papers/2025/ssc-i-first-annual-2025.pdf',
+    url: publicUrl('2025/ssc-i-first-annual-2025.pdf'),
     classLevel: 9,
     selfHosted: true,
     extractedFrom: 'https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip',
@@ -73,7 +107,7 @@ const SELF_HOSTED = [
     year: 2025,
     file: 'SSC-I HIC.pdf',
     label: 'SSC Part 1 First Annual 2025, hearing impaired candidates',
-    url: 'https://aueallnkfhipyneqtllp.supabase.co/storage/v1/object/public/papers/2025/ssc-i-first-annual-2025-hic.pdf',
+    url: publicUrl('2025/ssc-i-first-annual-2025-hic.pdf'),
     classLevel: 9,
     selfHosted: true,
     accessibility: true,
