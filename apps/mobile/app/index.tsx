@@ -26,7 +26,9 @@ export default function Splash() {
       : !state.onboarding?.subjects?.length
         ? '/onboarding/class'
         : '/(tabs)';
-    const t = setTimeout(() => router.replace(to), 550);
+    // Long enough to register the brand, short enough not to read as delay.
+    // Was 550ms on top of hydration, and the whole cold start read as slow.
+    const t = setTimeout(() => router.replace(to), 300);
     return () => clearTimeout(t);
   }, [hydrated, loading, state.user, state.onboarding]);
 

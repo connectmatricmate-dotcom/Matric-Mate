@@ -150,13 +150,40 @@ const isDev = (): boolean =>
   (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env?.NODE_ENV !== 'production';
 
 /**
+ * Whether the app believes it can reach the server right now.
+ *
+ * Set by the platform, which is the only layer that can know (mobile watches
+ * the OS network state; the web is online by definition or nothing loads).
+ * While false, read() skips the live query entirely: a student in airplane
+ * mode was paying a full network timeout per screen before their own
+ * downloaded chapter appeared, which read as the app being slow when it was
+ * actually waiting politely for a network it had been told about.
+ */
+let contentOnline = true;
+
+export function setContentOnline(next: boolean): void {
+  contentOnline = next;
+}
+
+/**
+ * How long a live query may hold up a screen.
+ *
+ * Long enough for a slow 3G answer, short enough that a student on flaky
+ * signal gets their cached or downloaded copy instead of a spinner. The live
+ * request is not cancelled at the deadline: if it lands late, its answer still
+ * goes into the session cache, so the next screen gets fresh data for free.
+ */
+const LIVE_DEADLINE_MS = 4000;
+
+/**
  * Run a query, and if anything at all goes wrong fall back.
  *
  * "Anything at all" is deliberate. A thrown error, a Supabase error object, a
- * null result and an empty array all mean the same thing to a student staring
- * at a screen, so they are all treated the same: serve the last good answer, or
- * the bundled one. The failure is logged once and never surfaced, because there
- * is nothing the student could do about it.
+ * null result, an empty array and a request slower than the deadline all mean
+ * the same thing to a student staring at a screen, so they are all treated the
+ * same: serve the last good answer, or the bundled one. The failure is logged
+ * once and never surfaced, because there is nothing the student could do
+ * about it.
  */
 async function read<T>(
   client: ContentClient | null,
@@ -165,14 +192,27 @@ async function read<T>(
   fallback: () => T | Promise<T>,
 ): Promise<T> {
   if (!client) return fallback();
+  if (!contentOnline) return (cache.get(key) as T) ?? fallback();
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    const { data, error } = await query();
-    if (error || data == null || (Array.isArray(data) && data.length === 0)) throw error ?? new Error('empty');
-    cache.set(key, data);
-    return data;
+    const live = (async () => {
+      const { data, error } = await query();
+      if (error || data == null || (Array.isArray(data) && data.length === 0)) throw error ?? new Error('empty');
+      cache.set(key, data);
+      return data;
+    })();
+    // A late success still fills the cache above; this stops a late failure
+    // from surfacing as an unhandled rejection after the race is over.
+    live.catch(() => {});
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error('deadline')), LIVE_DEADLINE_MS);
+    });
+    return await Promise.race([live, deadline]);
   } catch (e) {
     if (isDev()) console.warn(`[content] ${key} fell back:`, e);
     return (cache.get(key) as T) ?? (await fallback());
+  } finally {
+    clearTimeout(timer);
   }
 }
 

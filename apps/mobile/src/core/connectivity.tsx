@@ -23,6 +23,7 @@
  */
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
+import { setContentOnline } from '@matricmate/core';
 
 const OnlineContext = createContext(true);
 
@@ -94,6 +95,13 @@ export function ConnectivityProvider({ children }: { children: ReactNode }) {
       sub.remove();
     };
   }, []);
+
+  // Tell the content layer, so a fetch that cannot succeed is skipped rather
+  // than timed out. This is why airplane mode opens a downloaded chapter
+  // instantly instead of after a spinner.
+  useEffect(() => {
+    setContentOnline(online);
+  }, [online]);
 
   return <OnlineContext.Provider value={online}>{children}</OnlineContext.Provider>;
 }

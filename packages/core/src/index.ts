@@ -17,6 +17,7 @@ export {
   connectContent,
   connectLocalContent,
   setContentMedium,
+  setContentOnline,
   contentMedium,
   isLive,
   fetchSlos,

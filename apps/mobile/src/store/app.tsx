@@ -300,14 +300,62 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
 
       queueRef.current = await loadQueue(uid);
-      const server = await hydrateStudyState(supabase, uid);
-      if (cancelled || syncedForRef.current !== uid) return;
-      if (server) {
-        setState((s) => {
-          const merged = mergeHydratedState(s, server);
-          return { ...merged, xp: totalXp(merged.attempts, merged.cardsKnown) };
+
+      /**
+       * A device that already carries study state renders now and merges the
+       * server's answer whenever it lands. Blocking the splash on this fetch
+       * made every cold start pay a full network round trip to show data that
+       * was already sitting on the phone, which is most of why opening the
+       * app felt slow, and on a dead network it held the splash indefinitely.
+       *
+       * A fresh device still waits, because rendering before the server
+       * answers would seed demo data over a real account's history. It waits
+       * six seconds at most: a student installing on a dead network gets an
+       * empty but working app now and their history on the next good signal.
+       */
+      const apply = (server: Awaited<ReturnType<typeof hydrateStudyState>>) => {
+        if (cancelled || syncedForRef.current !== uid) return;
+        if (server) {
+          setState((s) => {
+            const merged = mergeHydratedState(s, server);
+            // Choices already made on this device win; the server's copy is
+            // for the phone that has none, which is what a reinstall is.
+            const onboarding = s.onboarding?.subjects?.length
+              ? s.onboarding
+              : ((server.onboarding as Onboarding | null) ?? s.onboarding);
+            return { ...merged, onboarding, xp: totalXp(merged.attempts, merged.cardsKnown) };
+          });
+        }
+        // The account had no saved choices but this device does: an account
+        // created before choices synced. Send them up so the next reinstall
+        // lands in the app, not back in the class picker.
+        const onb = stateRef.current.onboarding;
+        if (onb?.subjects?.length && !server?.onboarding) {
+          void supabase.from('profiles').update({ onboarding: onb }).eq('id', uid);
+        }
+      };
+
+      const local = stateRef.current;
+      const deviceHasState =
+        local.attempts.length > 0 ||
+        local.readSections.length > 0 ||
+        (local.onboarding?.subjects?.length ?? 0) > 0;
+
+      if (deviceHasState) {
+        setHydrated(true);
+        void hydrateStudyState(supabase, uid).then((server) => {
+          apply(server);
+          void flush(uid);
         });
+        return;
       }
+
+      const server = await Promise.race([
+        hydrateStudyState(supabase, uid),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000)),
+      ]);
+      apply(server);
+      if (cancelled || syncedForRef.current !== uid) return;
       setHydrated(true);
       void flush(uid);
     })();
@@ -353,19 +401,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const actions = useMemo<Actions>(
     () => ({
-      setOnboarding: (o) =>
-        setState((s) => ({
-          ...s,
-          onboarding: {
-            classLevel: 9,
-            board: 'fbise',
-            medium: 'en',
-            group: 'science',
-            subjects: [],
-            ...(s.onboarding ?? {}),
-            ...o,
-          },
-        })),
+      setOnboarding: (o) => {
+        const onboarding: Onboarding = {
+          classLevel: 9,
+          board: 'fbise',
+          medium: 'en',
+          group: 'science',
+          subjects: [],
+          ...(stateRef.current.onboarding ?? {}),
+          ...o,
+        };
+        setState((s) => ({ ...s, onboarding }));
+        // Fire and forget: choices follow the account so a reinstall skips
+        // this flow. Signed out (the very first run) there is no account row
+        // yet; the hydration reconciliation above pushes them up after
+        // sign-in instead.
+        const uid = syncedForRef.current;
+        if (uid) void supabase.from('profiles').update({ onboarding }).eq('id', uid);
+      },
       recordAttempt: (a) => {
         const full: Attempt = { ...a, id: `a-${Date.now()}-${Math.round(Math.random() * 1e4)}`, at: Date.now() };
         const isNewDay = !stateRef.current.activeDays.includes(todayKey());
