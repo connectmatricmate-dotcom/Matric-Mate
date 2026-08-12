@@ -188,6 +188,77 @@ payment end to end before telling anyone it works.
 
 ---
 
+# Part 5 · Building the Android APK
+
+Two ways to build. Both produce the same artifact from the same `eas.json`
+profile and the same environment variables; only the machine differs.
+
+Use the **preview** profile for anything you send to a person: it produces an
+installable `.apk`. The **production** profile produces an `.aab`, which is the
+Play Store upload format and cannot be sideloaded onto a phone.
+
+## Locally, with no queue
+
+```bash
+npm run apk                  # preview .apk, into builds/
+npm run apk -- --production  # production .aab
+```
+
+The script checks the toolchain before it starts, because a missing JDK
+otherwise surfaces as a Gradle error several minutes in. First run downloads
+Gradle and is slow; later runs are much faster. The artifact lands in `builds/`
+named after the profile and the commit, so two builds are never confused. That
+folder is gitignored: a 100 MB binary must not reach the repo.
+
+### One-time setup
+
+```bash
+sudo apt install -y openjdk-17-jdk
+```
+
+Then the Android SDK, either through Android Studio or the command line tools
+alone (https://developer.android.com/studio#command-line-tools-only, unzipped
+into `~/Android/Sdk/cmdline-tools/latest`):
+
+```bash
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin
+sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+```
+
+Put those two exports in `~/.bashrc` so a new terminal keeps them. Budget about
+10 GB and half an hour once. `npm run apk` names anything still missing.
+
+## In the cloud
+
+```bash
+cd apps/mobile
+npx eas-cli build --profile preview --platform android
+```
+
+Same result, no local toolchain, but the free tier queues and the wait is not
+predictable. Worth it for a one-off; not worth it when iterating.
+
+## Environment variables
+
+These live on the Expo account, not in this repo, and both build routes read
+them from there. Set for `development`, `preview` and `production`:
+
+| Name | Visibility |
+| :-- | :-- |
+| `EXPO_PUBLIC_SUPABASE_URL` | Plain text |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Plain text |
+| `EXPO_PUBLIC_SITE_URL` | Plain text |
+
+Plain text, not Secret. Anything prefixed `EXPO_PUBLIC_` is compiled into the
+APK and can be read out of it by anyone, so marking it Secret protects nothing
+and only risks the build not seeing it. A service-role key or an AI provider key
+must never be set here for the same reason.
+
+With these unset the build still succeeds, and the app then shows "Supabase keys
+are missing from this build" and no real content. That failure looks like a code
+bug and is not one, so check here first.
+
 # Running costs
 
 | | Free tier | Paid | Needed by |
