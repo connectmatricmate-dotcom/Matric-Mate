@@ -355,13 +355,14 @@ export const en = {
   downloads: {
     title: 'Downloads',
     sub: 'Available without internet',
-    used: '{n} MB used',
+    used: '{n} used',
     cap: 'of {n} MB',
     emptyTitle: 'No downloads yet',
     emptyBody: 'Save a chapter and study without internet. Useful when data runs out.',
     browse: 'Browse subjects',
-    perChapter: '{n} MB · notes, audio, MCQs',
+    perChapter: '{n} · notes, flashcards, MCQs',
     footnote: 'Downloads use Wi-Fi by default. Answers given offline sync when you reconnect.',
+    saveFailed: 'Could not save this chapter. Try again.',
   },
 
   practice: {
@@ -1076,13 +1077,14 @@ export const ur: typeof en = {
   downloads: {
     title: 'Downloads',
     sub: 'Bina internet ke bhi chalte hain',
-    used: '{n} MB istemal',
+    used: '{n} istemal',
     cap: '{n} MB mein se',
     emptyTitle: 'Abhi koi download nahi',
     emptyBody: 'Chapter save karein aur bina internet parhein. Jab data khatam ho, tab kaam aata hai.',
     browse: 'Subjects dekhein',
-    perChapter: '{n} MB · notes, audio, MCQs',
+    perChapter: '{n} · notes, flashcards, MCQs',
     footnote: 'Downloads Wi-Fi par hote hain. Offline diye gaye jawab internet aate hi sync ho jate hain.',
+    saveFailed: 'Chapter save nahi ho saka. Dobara koshish karein.',
   },
 
   practice: {

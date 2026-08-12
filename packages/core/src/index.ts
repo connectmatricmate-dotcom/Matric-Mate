@@ -12,7 +12,16 @@ export * from './billing';
 export * from './tokens';
 export * from './icons';
 export { api } from './api';
-export { connectContent, setContentMedium, contentMedium, isLive, fetchSlos, primeAllContent } from './db';
-export type { ContentClient, Slo } from './db';
+export {
+  connectContent,
+  connectLocalContent,
+  setContentMedium,
+  contentMedium,
+  isLive,
+  fetchSlos,
+  fetchChapterContentLive,
+  primeAllContent,
+} from './db';
+export type { ContentClient, LocalContentProvider, Slo } from './db';
 export * from './i18n';
 export * from './sync';

@@ -5,6 +5,8 @@
   "chapters": [
     { "number": 1, "title": "پڑھنا", "slos": ["C"], "marks": 15, "share": 20 },
     { "number": 2, "title": "لکھنا", "slos": ["D"], "marks": 43, "share": 46.7 },
-    { "number": 3, "title": "قواعد / زبان شناسی", "slos": ["E"], "marks": 29, "share": 33.3 }
+    { "number": 3, "title": "قواعد / زبان شناسی", "slos": ["E"], "marks": 29, "share": 33.3 },
+    { "number": 4, "title": "سننا", "slos": ["A"], "marks": null, "share": null },
+    { "number": 5, "title": "بولنا", "slos": ["B"], "marks": null, "share": null }
   ]
 }

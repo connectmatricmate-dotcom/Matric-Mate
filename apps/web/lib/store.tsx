@@ -22,7 +22,9 @@ import {
   hydrateStudyState,
   level,
   mergeHydratedState,
+  setContentMedium,
   streakFrom,
+  wipeStudyHistory,
   syncActiveDay,
   syncAttempt,
   syncCardKnown,
@@ -201,7 +203,17 @@ const actions: Actions = {
   saveThread: (t) => update((s) => ({ ...s, threads: [t, ...s.threads.filter((x) => x.id !== t.id)].slice(0, 20) })),
   readNotifications: () => update((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
   setSettings: (patch) => update((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
-  resetDemo: () => update((s) => ({ ...EMPTY, hydrated: true, user: s.user, onboarding: s.onboarding, settings: s.settings })),
+  resetDemo: () =>
+    update((s) => {
+      // The server too, not just localStorage. Progress syncs now, so clearing
+      // only this browser is undone by the next hydration, and a button that
+      // appears to do nothing is worse than no button. Fired from inside the
+      // updater because that is where the signed-in user is readable, and not
+      // awaited because the screen should respond at once.
+      const uid = s.user?.id;
+      if (uid) void wipeStudyHistory(createClient(), uid);
+      return { ...EMPTY, hydrated: true, user: s.user, onboarding: s.onboarding, settings: s.settings };
+    }),
   refreshPremium: () => refreshPremium(),
 };
 
@@ -411,6 +423,20 @@ export function useApp(): Ctx {
 /** Same call signature as the Android app's hook. */
 export function useT() {
   const { state } = useApp();
+  /**
+   * Keep the content layer on the student's medium.
+   *
+   * db.ts queries by medium, and nothing ever told it which one. Every live
+   * read came back English no matter what the student picked at onboarding, so
+   * an Urdu-medium student got English notes and English questions while a full
+   * Urdu translation sat unread in the database. The medium chosen at
+   * onboarding is the syllabus language, which is what content is keyed on.
+   */
+  const contentMedium = state.onboarding?.medium ?? 'en';
+  useEffect(() => {
+    setContentMedium(contentMedium);
+  }, [contentMedium]);
+
   const lang = state.settings.language;
   return useCallback(
     (key: StringKey, params?: Record<string, string | number>) => translate(lang, key, params),

@@ -1,13 +1,14 @@
 {
   "subject": "cs",
   "totalMarks": 108,
-  "sourcePage": "Table of Specification, Model Paper Computer Science - Grade IX (SSC-I), content/fbise/text/framework-cs.txt lines 1168-1199 (PDF page 30 of framework-cs.pdf). The ToS also lists Domain G: Digital Literacy (0 marks) and Domain H: Entrepreneurship in the digital age (5 marks), but data/fbise/cs.json has no SLOs recorded for either domain, so they are not represented as chapters here.",
+  "sourcePage": "Table of Specification, Model Paper Computer Science - Grade IX (SSC-I), content/fbise/text/framework-cs.txt lines 1168-1199 (PDF page 30 of framework-cs.pdf). The ToS also lists Domain G: Digital Literacy (0 marks), explicitly \"Not applicable for grade 9\" in the framework text, so it stays out. Domain H: Entrepreneurship in the digital age (5 marks) is chapter 7 below; see data/fbise/cs.json for why the automated parse missed it.",
   "chapters": [
     { "number": 1, "title": "Computer Systems", "slos": ["A"], "marks": 22, "share": 20.4 },
     { "number": 2, "title": "Computational Thinking and Algorithms", "slos": ["B"], "marks": 17, "share": 15.7 },
     { "number": 3, "title": "Programming Fundamentals", "slos": ["C"], "marks": 21, "share": 19.4 },
     { "number": 4, "title": "Data and Analysis", "slos": ["D"], "marks": 16, "share": 14.8 },
     { "number": 5, "title": "Applications of Computer Science", "slos": ["E"], "marks": 13, "share": 12 },
-    { "number": 6, "title": "Impacts of Computing", "slos": ["F"], "marks": 14, "share": 13 }
+    { "number": 6, "title": "Impacts of Computing", "slos": ["F"], "marks": 14, "share": 13 },
+    { "number": 7, "title": "Entrepreneurship in the Digital Age", "slos": ["H"], "marks": 5, "share": 4.6 }
   ]
 }

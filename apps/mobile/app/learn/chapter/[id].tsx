@@ -1,7 +1,9 @@
-import { Text , View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, H2, Header, IconButton, Item, Pill, Row, Screen, Small, Spacer, useToast } from '../../../src/components/ui';
 import { api , chapterPct , subjectById } from '@matricmate/core';
+import { chapterDownloadBytes, formatBytes } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -12,11 +14,21 @@ export default function ChapterHub() {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
+  const [busy, setBusy] = useState(false);
   const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
   const pct = chapterPct(id, state.readSections, state.attempts);
   const downloaded = state.downloads.includes(id);
+
+  async function toggleDownload() {
+    setBusy(true);
+    const result = await actions.toggleDownload(id);
+    setBusy(false);
+    if (result === 'downloaded') toast(t('study.saveOffline'));
+    else if (result === 'removed') toast(t('study.removedOffline'));
+    else toast(t('downloads.saveFailed'));
+  }
   const readCount = content ? content.sections.filter((s) => state.readSections.includes(s.id)).length : 0;
   const best = state.results.filter((r) => r.chapterId === id).sort((a, b) => b.score / b.total - a.score / a.total)[0];
   const knownCards = content ? content.flashcards.filter((f) => state.cardsKnown.includes(f.id)).length : 0;
@@ -35,14 +47,13 @@ export default function ChapterHub() {
         sub={chapter ? subjectById(chapter.subjectId)?.name : ' '}
         back
         right={
-          <IconButton
-            icon={downloaded ? 'check' : 'download'}
-            tone={downloaded ? 'active' : 'card'}
-            onPress={() => {
-              actions.toggleDownload(id);
-              toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
-            }}
-          />
+          busy ? (
+            <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <ActivityIndicator size="small" color={C.teal} />
+            </View>
+          ) : (
+            <IconButton icon={downloaded ? 'check' : 'download'} tone={downloaded ? 'active' : 'card'} onPress={toggleDownload} />
+          )
         }
       />
 
@@ -113,7 +124,7 @@ export default function ChapterHub() {
         <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
           {downloaded ? t('study.savedOffline') : t('study.notDownloaded')}
         </Pill>
-        <Pill tone="grey">≈ 2 MB</Pill>
+        {downloaded ? <Pill tone="grey">{formatBytes(chapterDownloadBytes(id))}</Pill> : null}
       </Row>
     </Screen>
   );

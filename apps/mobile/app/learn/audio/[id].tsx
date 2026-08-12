@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
@@ -29,6 +29,7 @@ function PlayerChrome({
   disabled,
   note,
   downloaded,
+  busy,
   onToggleDownload,
 }: {
   title: string;
@@ -43,6 +44,7 @@ function PlayerChrome({
   disabled?: boolean;
   note: string;
   downloaded: boolean;
+  busy?: boolean;
   onToggleDownload: () => void;
 }) {
   const t = useT();
@@ -52,11 +54,17 @@ function PlayerChrome({
         title={t('audio.title')}
         back
         right={
-          <IconButton
-            icon={downloaded ? 'check' : 'download'}
-            tone={downloaded ? 'active' : 'card'}
-            onPress={onToggleDownload}
-          />
+          busy ? (
+            <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <ActivityIndicator size="small" color={C.teal} />
+            </View>
+          ) : (
+            <IconButton
+              icon={downloaded ? 'check' : 'download'}
+              tone={downloaded ? 'active' : 'card'}
+              onPress={onToggleDownload}
+            />
+          )
         }
       />
 
@@ -134,6 +142,7 @@ function RealPlayer({ id }: { id: string }) {
   const player = useAudioPlayer(track);
   const status = useAudioPlayerStatus(player);
   const [speed, setSpeed] = useState(0);
+  const [busy, setBusy] = useState(false);
   const downloaded = state.downloads.includes(id);
 
   useEffect(() => {
@@ -172,9 +181,14 @@ function RealPlayer({ id }: { id: string }) {
       }}
       note={track ? t('audio.sampleNote') : t('audio.noTrackNote')}
       downloaded={downloaded}
-      onToggleDownload={() => {
-        actions.toggleDownload(id);
-        toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
+      busy={busy}
+      onToggleDownload={async () => {
+        setBusy(true);
+        const result = await actions.toggleDownload(id);
+        setBusy(false);
+        if (result === 'downloaded') toast(t('study.saveOffline'));
+        else if (result === 'removed') toast(t('study.removedOffline'));
+        else toast(t('downloads.saveFailed'));
       }}
     />
   );
@@ -197,6 +211,7 @@ function PreviewPlayer({ id }: { id: string }) {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [busy, setBusy] = useState(false);
   const downloaded = state.downloads.includes(id);
 
   useEffect(() => {
@@ -220,9 +235,14 @@ function PreviewPlayer({ id }: { id: string }) {
       onSpeed={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
       note={t('audio.needsNewBuild')}
       downloaded={downloaded}
-      onToggleDownload={() => {
-        actions.toggleDownload(id);
-        toast(downloaded ? t('study.removedOffline') : t('study.saveOffline'));
+      busy={busy}
+      onToggleDownload={async () => {
+        setBusy(true);
+        const result = await actions.toggleDownload(id);
+        setBusy(false);
+        if (result === 'downloaded') toast(t('study.saveOffline'));
+        else if (result === 'removed') toast(t('study.removedOffline'));
+        else toast(t('downloads.saveFailed'));
       }}
     />
   );

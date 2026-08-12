@@ -10,9 +10,9 @@
     "retrieved": "2026-08-11"
   },
   "stats": {
-    "domains": 6,
-    "slos": 18,
-    "summative": 17,
+    "domains": 7,
+    "slos": 20,
+    "summative": 19,
     "formative": 0,
     "unclassified": 1,
     "untitledDomains": 6,
@@ -20,7 +20,9 @@
     "examUnits": 6
   },
   "notes": [
-    "6 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+    "6 domains are unnamed in the source. Name them from the Table of Specifications before publishing.",
+    "Domain H (Entrepreneurship in the digital age, 5 marks / 4.6% per the ToS) was missing entirely until this was added by hand. scripts/build-curriculum.mjs matches SLO codes only against the subject's own prefix ('CS-09-...'), and the board's own PDF prints domain H's two outcomes as [SLO EN-09-H-01] and [SLO EN-09-H-02], the English framework's prefix, not CS, apparently copy-pasted from that document's template. So the automated parse silently dropped both. Verified against the rendered pages: PDF page 21 of framework-cs.pdf for the SLO table (content/fbise/text/framework-cs.txt lines 708-778) and PDF page 30 for the Table of Specification confirming the 5-mark, all-Knowledge-row total. Codes below are renumbered CS-09-H-01/02 to match this file's own convention; the source's literal EN- labels are left as this note so a future re-run of build-curriculum.mjs is not surprised to see them differ. Domain G, Digital Literacy, genuinely carries 0 marks and is marked 'Not applicable for grade 9' in the source itself, so it is correctly absent.",
+    "Domain H's title, 'Entrepreneurship in the digital age', is stated directly in both the SLO table's domain column and the Table of Specification header, unlike domains A-F where the parser could not recover a clean title, so it is recorded here rather than left null."
   ],
   "examUnits": {
     "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
@@ -193,6 +195,24 @@
           "code": "CS-09-F-03",
           "text": "Evaluate the ways computing impacts personal, ethical, social, economic, and cultural practices. Students will understand… • Environmental impacts of computing • Computing has changed the way we live and conduct business • Impact of computing on globalization and e-commerce Students will know… • The key terms: patents, trademarks, copyrights Students will be able to… • Strategize on how to minimize the environmental impacts of computing • Search and identify patents, trademarks, and copyright information for computing applications • Determine if technology design maybe infringing on intellectual property • Evaluate designs of computing technologies in terms of personal, environmental, ethical, legal, social, economic, and cultural impacts G: Digital - Literacy Content (Knowledge, Area",
           "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "H",
+      "title": "Entrepreneurship in the digital age",
+      "slos": [
+        {
+          "code": "CS-09-H-01",
+          "text": "Students identify a problem and create a business using design thinking. Students will understand: the skills needed for problem solving, the 4Cs of the 21st century (collaboration, critical thinking, creativity, communication); design thinking as a process: empathising to discover the problem, defining or interpreting the problem, ideating on how to solve it, experimenting or prototyping the solution, and evolving the solution as insights redefine the problem; how to define and articulate an entrepreneurial solution to a local or global problem; the Sustainable Development Goals (SDGs) as the world's development goals, and linking them to potential problems worth solving; and growth mindset versus fixed mindset. Students will be able to: define a problem in their local context, categorise it according to the SDGs, use design thinking to create a solution, and identify the advantages of a growth mindset in entrepreneurship.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-09-H-02",
+          "text": "Students will use digital tools to create and present a business plan for an entrepreneurial solution. Students will understand the key elements of a business plan: market size (TAM, total addressable market; SAM, serviceable available market; SOM, serviceable obtainable market), the solution's product or service and its unique selling proposition, financial feasibility, and a go-to-market strategy; how to collect and synthesise information to create a business plan; and how to evaluate one. Students will be able to: create a business plan using digital tools such as MS Word or Google Docs to communicate their business problem, suggested solution and financial feasibility, and evaluate a business plan using criteria such as communication, feasibility and market potential. Assessed in the annual theory paper as well as lab work in the Practical Based Assessment.",
+          "cognitive": "application",
           "assessment": "summative"
         }
       ]

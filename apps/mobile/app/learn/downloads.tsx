@@ -3,11 +3,11 @@ import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Bar, Btn, Card, Empty, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { chapterById, subjectById } from '@matricmate/core';
+import { chapterDownloadBytes, formatBytes, totalDownloadBytes } from '../../src/core/downloads';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
 
-const MB_PER_CHAPTER = 41;
 const CAP_MB = 512;
 
 export default function Downloads() {
@@ -15,13 +15,23 @@ export default function Downloads() {
   const t = useT();
   const toast = useToast();
   const chapters = state.downloads.map(chapterById).filter(Boolean);
-  const used = chapters.length * MB_PER_CHAPTER;
+  // Read straight off the filesystem, not from an estimate: this is what a
+  // "true size on disk" figure means. Both calls are fast, synchronous local
+  // reads, so doing them at render time (recomputed whenever state.downloads
+  // changes) needs no separate loading state.
+  const usedBytes = totalDownloadBytes();
+  const usedPct = (usedBytes / (1024 * 1024) / CAP_MB) * 100;
 
   const bySubject = chapters.reduce<Record<string, typeof chapters>>((acc, c) => {
     if (!c) return acc;
     (acc[c.subjectId] ||= []).push(c);
     return acc;
   }, {});
+
+  async function remove(chapterId: string) {
+    const result = await actions.toggleDownload(chapterId);
+    if (result === 'removed') toast(t('study.removedOffline'));
+  }
 
   return (
     <Screen>
@@ -31,9 +41,9 @@ export default function Downloads() {
         <Row gap={S.md}>
           <Icon name="download" color={C.teal} />
           <View style={{ flex: 1 }}>
-            <Small style={{ color: C.ink }}>{t('downloads.used', { n: used })}</Small>
+            <Small style={{ color: C.ink }}>{t('downloads.used', { n: formatBytes(usedBytes) })}</Small>
             <View style={{ marginTop: 8 }}>
-              <Bar pct={(used / CAP_MB) * 100} tone="teal" />
+              <Bar pct={usedPct} tone="teal" />
             </View>
           </View>
           <Small>{t('downloads.cap', { n: CAP_MB })}</Small>
@@ -59,19 +69,13 @@ export default function Downloads() {
                 <Item
                   key={c!.id}
                   title={c!.title}
-                  sub={t('downloads.perChapter', { n: MB_PER_CHAPTER })}
+                  sub={t('downloads.perChapter', { n: formatBytes(chapterDownloadBytes(c!.id)) })}
                   icon="check"
                   tone="green"
                   last={i === list.length - 1}
                   onPress={() => router.push(`/learn/chapter/${c!.id}`)}
                   right={
-                    <Tap
-                      onPress={() => {
-                        actions.toggleDownload(c!.id);
-                        toast(t('study.removedOffline'));
-                      }}
-                      hit
-                    >
+                    <Tap onPress={() => remove(c!.id)} hit>
                       <Icon name="trash" size={19} color={C.red} />
                     </Tap>
                   }

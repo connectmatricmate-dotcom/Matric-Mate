@@ -30,7 +30,7 @@ export function DownloadsView() {
       <Card className="flex items-center gap-3">
         <Icon name="download" className="shrink-0 text-teal" />
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-extrabold text-ink">{t('downloads.used', { n: used })}</p>
+          <p className="text-[13px] font-extrabold text-ink">{t('downloads.used', { n: `${used} MB` })}</p>
           <div className="mt-2">
             <Bar pct={(used / CAP_MB) * 100} tone="teal" />
           </div>
@@ -56,7 +56,7 @@ export function DownloadsView() {
                   key={c.id}
                   href={`/learn/chapter/${c.id}`}
                   title={c.title}
-                  sub={t('downloads.perChapter', { n: MB_PER_CHAPTER })}
+                  sub={t('downloads.perChapter', { n: `${MB_PER_CHAPTER} MB` })}
                   icon="check"
                   tone="green"
                   last={i === list.length - 1}

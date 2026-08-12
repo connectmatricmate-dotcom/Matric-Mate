@@ -397,7 +397,7 @@
     },
     "cs": {
       "totalMarks": 108,
-      "sourcePage": "Table of Specification, Model Paper Computer Science - Grade IX (SSC-I), content/fbise/text/framework-cs.txt lines 1168-1199 (PDF page 30 of framework-cs.pdf). The ToS also lists Domain G: Digital Literacy (0 marks) and Domain H: Entrepreneurship in the digital age (5 marks), but data/fbise/cs.json has no SLOs recorded for either domain, so they are not represented as chapters here.",
+      "sourcePage": "Table of Specification, Model Paper Computer Science - Grade IX (SSC-I), content/fbise/text/framework-cs.txt lines 1168-1199 (PDF page 30 of framework-cs.pdf). The ToS also lists Domain G: Digital Literacy (0 marks), explicitly \"Not applicable for grade 9\" in the framework text (line 708), so it stays out. Domain H: Entrepreneurship in the digital age (5 marks) is now chapter 7 below: its two outcomes exist in the source (PDF pages 21 and 27 of framework-cs.pdf) but were missed by scripts/build-curriculum.mjs because the board's own PDF labels them with the English framework's SLO prefix (SLO EN-09-H-01/02) instead of CS-09-H, see data/fbise/cs.json.",
       "chapters": [
         {
           "number": 1,
@@ -452,6 +452,15 @@
           ],
           "marks": 14,
           "share": 13
+        },
+        {
+          "number": 7,
+          "title": "Entrepreneurship in the Digital Age",
+          "slos": [
+            "H"
+          ],
+          "marks": 5,
+          "share": 4.6
         }
       ]
     },
@@ -679,7 +688,7 @@
     },
     "urd": {
       "totalMarks": 75,
-      "sourcePage": "Table of Specification, Model Paper Urdu (Compulsory) Grade IX (SSC-I), PDF page 26 of 27 of content/fbise/pdf/framework-urd.pdf (rendered to PNG and read by hand; the PDF's text layer reports the wrong code points for Urdu script, so pdftotext/the .txt extract cannot be used). totalMarks (75) is the paper's own scored total, read off the part headers on PDF pages 18, 21 and 24 (حصہ اول 15 + حصہ دوم 34 + حصہ سوم 26 = 75; the Part 1 cover states 'کل نمبر 15', the Parts 2-3 cover states 'کل نمبر 60'). The ToS table's own row and column totals foot to 87, not 75: its own key explains why, it lists both branches of every OR-choice question ('Q2(i/f) 2' and 'Q2(i/s) 2'), so alternative questions are double-counted by design, to show the full range of content the paper draws from, even though a student answers only one branch and is scored out of 75. marks/share on each chapter below are the ToS table's own per-domain figures (columns قواعد/زبان شناسی, لکھنا, پڑھنا) and intentionally do not sum to totalMarks.",
+      "sourcePage": "Table of Specification, Model Paper Urdu (Compulsory) Grade IX (SSC-I), PDF page 26 of 27 of content/fbise/pdf/framework-urd.pdf (rendered to PNG and read by hand; the PDF's text layer reports the wrong code points for Urdu script, so pdftotext/the .txt extract cannot be used). totalMarks (75) is the paper's own scored total, read off the part headers on PDF pages 18, 21 and 24 (حصہ اول 15 + حصہ دوم 34 + حصہ سوم 26 = 75; the Part 1 cover states 'کل نمبر 15', the Parts 2-3 cover states 'کل نمبر 60'). The ToS table's own row and column totals foot to 87, not 75: its own key explains why, it lists both branches of every OR-choice question ('Q2(i/f) 2' and 'Q2(i/s) 2'), so alternative questions are double-counted by design, to show the full range of content the paper draws from, even though a student answers only one branch and is scored out of 75. marks/share on each chapter below are the ToS table's own per-domain figures (columns قواعد/زبان شناسی, لکھنا, پڑھنا) and intentionally do not sum to totalMarks. Chapters 4 and 5 (سننا, بولنا) are appended for parity with English's eng-1 (Oral Communication Skills): domains A and B in data/fbise/urd.json, marked wholly formative there, so they carry no marks or share here either.",
       "chapters": [
         {
           "number": 1,
@@ -707,6 +716,24 @@
           ],
           "marks": 29,
           "share": 33.3
+        },
+        {
+          "number": 4,
+          "title": "سننا",
+          "slos": [
+            "A"
+          ],
+          "marks": null,
+          "share": null
+        },
+        {
+          "number": 5,
+          "title": "بولنا",
+          "slos": [
+            "B"
+          ],
+          "marks": null,
+          "share": null
         }
       ]
     }

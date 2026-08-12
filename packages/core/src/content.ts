@@ -26,10 +26,10 @@ export const SUBJECTS: Subject[] = [
   { id: 'bio', name: 'Biology', icon: 'leaf', compulsory: false, group: 'science', chapterCount: 10 },
   { id: 'math', name: 'Mathematics', icon: 'calc', compulsory: true, chapterCount: 17 },
   { id: 'eng', name: 'English', icon: 'book', compulsory: true, chapterCount: 4 },
-  { id: 'urd', name: 'Urdu', urduName: 'اردو', icon: 'quill', compulsory: true, chapterCount: 3 },
+  { id: 'urd', name: 'Urdu', urduName: 'اردو', icon: 'quill', compulsory: true, chapterCount: 5 },
   { id: 'isl', name: 'Islamiyat', urduName: 'اسلامیات', icon: 'star', compulsory: true, chapterCount: 7 },
   { id: 'pst', name: 'Pakistan Studies', icon: 'globe', compulsory: true, chapterCount: 8 },
-  { id: 'cs', name: 'Computer Science', icon: 'book2', compulsory: false, group: 'science', chapterCount: 6 },
+  { id: 'cs', name: 'Computer Science', icon: 'book2', compulsory: false, group: 'science', chapterCount: 7 },
 ];
 
 const CH: Record<string, [string, string, string?][]> = {
@@ -104,7 +104,7 @@ const CH: Record<string, [string, string, string?][]> = {
   // examines in Class 9 under NCP 2022-23; their titles stay so a student
   // with an older textbook can still find them, but the blurb says so.
   math: [
-    ['Matrices and Determinants', 'Matrix types, operations and determinants: the board does not examine this in Class 9 under NCP 2022-23.'],
+    ['Matrices and Determinants', 'Matrix types, operations and determinants. Older FBISE textbooks include this chapter, but the current Class 9 syllabus does not test it, so there is nothing here to revise for your paper.'],
     ['Sets and Rational Numbers', 'Three-set Venn diagrams and set laws, plus real-life problems using rational numbers.'],
     ['Logarithms', 'Scientific notation, common and natural logs, laws of logarithms.'],
     ['Algebraic Expressions and Formulas', 'Rational expressions, surds, useful algebraic identities.'],
@@ -113,10 +113,10 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Linear Equations and Inequalities', 'Solving equations, absolute value, inequality solution sets.'],
     ['Relations', 'Binary relations and their domain and range, shown as tables, ordered pairs or graphs.'],
     ['Introduction to Coordinate Geometry', 'Distance formula, collinear points, midpoint.'],
-    ['Congruent Triangles', 'Congruence postulates and proofs for triangles: the board does not examine this in Class 9 under NCP 2022-23.'],
+    ['Congruent Triangles', 'Congruence postulates and proofs for triangles. Older FBISE textbooks include this chapter, but the current Class 9 syllabus does not test it, so there is nothing here to revise for your paper.'],
     ['Parallelograms and Triangles', 'Properties of parallelograms, midpoint theorem and its converse.'],
     ['Line Bisectors and Angle Bisectors', 'Perpendicular bisectors, angle bisectors and their concurrency.'],
-    ['Sides and Angles of a Triangle', 'Angle-side inequalities and the triangle inequality: the board does not examine this in Class 9 under NCP 2022-23.'],
+    ['Sides and Angles of a Triangle', 'Angle-side inequalities and the triangle inequality. Older FBISE textbooks include this chapter, but the current Class 9 syllabus does not test it, so there is nothing here to revise for your paper.'],
     ['Statistics and Probability', 'Mean, median, mode and modal class, plus probability and relative frequency.'],
     ['Trigonometry', 'Angles, trig ratios and identities, plus bearings and angles of elevation and depression.'],
     ['Areas and Volumes of Similar Figures', 'How the areas and volumes of similar figures and solids compare by scale factor.'],
@@ -132,13 +132,18 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Vocabulary and Grammar', 'Vocabulary in context, idioms, parts of speech, punctuation, tenses, and direct and indirect speech.'],
     ['Writing', 'Editing and proofreading, and writing narrative, descriptive and argumentative essays, letters and book reviews.'],
   ],
-  // Three chapters, not eight. Now follows the board's Table of Specification:
-  // پڑھنا، لکھنا اور قواعد, the three domains the SSC-I paper actually examines,
-  // not a set of prescribed lessons. See data/fbise/chapters.json for weights.
+  // Five chapters, not eight. The first three follow the board's Table of
+  // Specification: پڑھنا، لکھنا اور قواعد, the three domains the SSC-I paper
+  // actually examines. سننا and بولنا are appended as chapters 4 and 5, the same
+  // way English keeps Oral Communication Skills (eng-1): taught and judged in
+  // class, never on the annual paper. Appended, not inserted, so urd-1..3 keep
+  // their ids. See data/fbise/chapters.json for weights.
   urd: [
     ['پڑھنا', 'نظم و نثر کو سمجھ کر پڑھنا، اشعار کی تشریح اور رائے دینا، غزل میں مطلع و مقطع کی شناخت، اور متن پر تبصرہ۔', 'Reading.'],
     ['لکھنا', 'املا کی درستی، خط و درخواست، تلخیص و ترجمہ، مضمون و تقریر نویسی، اور نادیدہ اقتباس کا تجزیہ۔', 'Writing.'],
     ['قواعد / زبان شناسی', 'تذکیر و تانیث، اسم و فعل، تراکیب اور محاورات، جملوں کی درستی، اور اصنافِ سخن و علمِ بیان کی بنیادی اصطلاحات۔', 'Grammar and linguistics.'],
+    ['سننا', 'واقعات، کہانی، تقریر اور شاعری کو توجہ سے سن کر سمجھنا، اور نشریات پر رائے دینا۔ یہ مہارت صرف جماعت میں جانچی جاتی ہے، سالانہ امتحانی پرچے میں شامل نہیں۔', 'Listening.'],
+    ['بولنا', 'روزمرہ گفتگو میں مدلل بات چیت، کسی موضوع پر تقریر، اور اپنے موقف کا واضح اظہار۔ یہ مہارت صرف جماعت میں جانچی جاتی ہے، سالانہ امتحانی پرچے میں شامل نہیں۔', 'Speaking.'],
   ],
   // The board's seven دائرہ ہائے کار (strands), not the six approximations that
   // were here. Note strand 1 covers only the introduction to the Quran and the
@@ -167,8 +172,13 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Transport, Trade and Telecommunication', 'Pakistan’s transport networks, and how routes like Gwadar Port and CPEC connect it to global trade.'],
   ],
   // The previous list here was a different board's syllabus. Now follows the
-  // board's Table of Specification: six content areas from the SSC-I Assessment
-  // Framework. See data/fbise/chapters.json for the mark weights.
+  // board's Table of Specification: seven content areas from the SSC-I
+  // Assessment Framework. Domain G, Digital Literacy, carries 0 marks and is
+  // marked "Not applicable for grade 9" directly in the framework, so it stays
+  // out. Domain H, Entrepreneurship in the digital age, is worth 5 marks and
+  // was missing here only because its two outcomes are mislabelled in the
+  // board's own PDF (see data/fbise/cs.json); appended as chapter 7 so that mark
+  // share stops going unrevised. See data/fbise/chapters.json for the weights.
   cs: [
     ['Computer Systems', 'Computer hardware and architecture, system versus application software, and data communication basics.'],
     ['Computational Thinking and Algorithms', 'Breaking problems down and solving them computationally using logical and algorithmic thinking.'],
@@ -176,6 +186,7 @@ const CH: Record<string, [string, string, string?][]> = {
     ['Data and Analysis', 'What data science covers, how data is collected and stored, and how businesses use big data.'],
     ['Applications of Computer Science', 'Where AI and machine learning are used, and the social questions raised by AI making decisions about people.'],
     ['Impacts of Computing', 'Safe and responsible computer use, and the beneficial and harmful effects of computing on society.'],
+    ['Entrepreneurship in the Digital Age', 'Using design thinking to turn a real problem into a business idea, and building and evaluating a business plan with digital tools.'],
   ],
 };
 

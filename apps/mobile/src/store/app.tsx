@@ -12,7 +12,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey, totalXp,
+import { AI_QUOTA, XP, buildPlan, level, setContentMedium, streakFrom, todayKey, totalXp, wipeStudyHistory,
   Attempt,
   ChatThread,
   Group,
@@ -34,6 +34,7 @@ import { AI_QUOTA, XP, buildPlan, level, streakFrom, todayKey, totalXp,
 } from '@matricmate/core';
 import { useAuth } from './auth';
 import { supabase } from '../lib/supabase';
+import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
@@ -150,7 +151,16 @@ type Actions = {
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
   markSectionRead: (sectionId: string, chapterId: string, index: number) => void;
   togglePlanTask: (id: string) => void;
-  toggleDownload: (chapterId: string) => void;
+  /**
+   * Downloads a chapter for offline use, or removes it. Async, and reports
+   * which of the three actually happened: a download is a real network fetch
+   * plus a disk write, not a state flip, so a failed fetch or a failed write
+   * must not add the chapter to state.downloads. That would leave the
+   * downloads screen claiming offline access to a chapter with nothing
+   * actually on disk, which is exactly what a plane-mode student would
+   * discover at the worst possible time.
+   */
+  toggleDownload: (chapterId: string) => Promise<'downloaded' | 'removed' | 'failed'>;
   markCard: (cardId: string, known: boolean) => void;
   consumeAi: () => boolean;
   saveThread: (t: ChatThread) => void;
@@ -328,6 +338,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return s.activeDays.includes(t) ? s : { ...s, activeDays: [...s.activeDays, t] };
   };
 
+  /**
+   * Keep the content layer on the student's medium.
+   *
+   * db.ts queries by medium and nothing ever set it, so every live read came
+   * back English however the student had it configured. A full Urdu
+   * translation of all nine subjects sat in the database that no Urdu-medium
+   * student could reach.
+   */
+  const contentMedium = state.settings.contentMedium;
+  useEffect(() => {
+    setContentMedium(contentMedium);
+  }, [contentMedium]);
+
   const actions = useMemo<Actions>(
     () => ({
       setOnboarding: (o) =>
@@ -392,13 +415,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           ...s,
           planDone: s.planDone.includes(id) ? s.planDone.filter((x) => x !== id) : [...s.planDone, id],
         })),
-      toggleDownload: (chapterId) =>
-        setState((s) => ({
-          ...s,
-          downloads: s.downloads.includes(chapterId)
-            ? s.downloads.filter((x) => x !== chapterId)
-            : [...s.downloads, chapterId],
-        })),
+      toggleDownload: async (chapterId) => {
+        const isDownloaded = stateRef.current.downloads.includes(chapterId);
+        if (isDownloaded) {
+          deleteChapterDownload(chapterId);
+          setState((s) => ({ ...s, downloads: s.downloads.filter((x) => x !== chapterId) }));
+          return 'removed';
+        }
+        try {
+          await downloadChapter(chapterId, stateRef.current.settings.contentMedium);
+        } catch {
+          return 'failed';
+        }
+        setState((s) => (s.downloads.includes(chapterId) ? s : { ...s, downloads: [...s.downloads, chapterId] }));
+        return 'downloaded';
+      },
       markCard: (cardId, known) => {
         const wasKnown = stateRef.current.cardsKnown.includes(cardId);
         setState((s) => ({
@@ -436,9 +467,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       readNotifications: () =>
         setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
       setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
-      resetDemo: () => setState((s) => ({ ...EMPTY, user: s.user, onboarding: s.onboarding, settings: s.settings })),
+      resetDemo: () => {
+        // Files on disk, not just the state pointing at them: otherwise every
+        // download from before the reset keeps its space on the phone with no
+        // entry left in state.downloads to delete it from again.
+        deleteAllDownloads();
+        // And the server, not just this device. Progress syncs now, so a local
+        // clear is undone by the next hydration: the student presses reset,
+        // sees zero, reopens the app and their history is back. Not awaited,
+        // because the screen should respond at once, and a failed delete leaves
+        // rows that the next reset will catch rather than anything broken.
+        const uid = authUser?.id;
+        if (uid) void wipeStudyHistory(supabase, uid);
+        setState((s) => ({ ...EMPTY, user: s.user, onboarding: s.onboarding, settings: s.settings }));
+      },
     }),
-    [queueAndFlush]
+    [queueAndFlush, authUser?.id],
   );
 
   /**

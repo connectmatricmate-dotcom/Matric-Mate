@@ -441,3 +441,41 @@ export function mergeHydratedState<S extends SyncableState>(local: S, server: Hy
     lastSectionIndex: local.lastChapterId ? local.lastSectionIndex : server.lastSectionIndex,
   };
 }
+
+
+/* ------------------------------------------------------------ hard reset */
+
+/**
+ * Delete this student's entire study history from the server.
+ *
+ * "Reset app data" used to clear device storage only, which was coherent when
+ * nothing synced. Now that progress is on the server, a local clear is undone
+ * by the next hydration: the student presses reset, sees zero, reopens the app
+ * and their old history is back. A button that appears to do nothing is worse
+ * than no button.
+ *
+ * Attempts and results are append-only everywhere else in this file, and that
+ * rule holds for the app. It was never a promise to the student. This is their
+ * own data, RLS scopes every one of these tables to them, and a person asking
+ * to start over is entitled to actually start over.
+ *
+ * This is NOT account deletion. The account, the subscription and the payment
+ * history all survive, because a content reset is not a refund. Removing the
+ * account is a separate flow at /delete-account, which Play requires.
+ *
+ * Returns false if any table failed, so the caller can keep the local state
+ * rather than show a success it cannot back up.
+ */
+export async function wipeStudyHistory(client: SyncClient, userId: string): Promise<boolean> {
+  const tables = ['attempts', 'results', 'read_sections', 'cards_known', 'active_days', 'plan_done'];
+  let ok = true;
+  for (const t of tables) {
+    try {
+      const { error } = await client.from(t).delete().eq('user_id', userId);
+      if (error) ok = false;
+    } catch {
+      ok = false;
+    }
+  }
+  return ok;
+}

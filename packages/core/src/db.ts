@@ -99,6 +99,32 @@ export function connectContent(client: ContentClient | null): void {
   cache.clear();
 }
 
+/**
+ * A chapter a student downloaded for offline use, read back off whatever this
+ * app persists it to. Returns null when nothing was saved for that chapter
+ * and medium, which this file treats exactly like a cache miss.
+ */
+export type LocalContentProvider = (chapterId: string, medium: Medium) => Promise<ChapterContent | null>;
+
+let localContent: LocalContentProvider | null = null;
+
+/**
+ * Wires the fetch layer to a store of chapters downloaded for offline use.
+ *
+ * core does not read the filesystem itself, on purpose: this file is shared
+ * with the web app, which has no expo-file-system, and that package's own web
+ * shim is a no-op that just warns (see its ExpoFileSystem.web.ts). Importing
+ * it here would either break the web build or silently do nothing there. So
+ * core only defines the extension point; the mobile app is the only caller
+ * that ever provides one (see apps/mobile/src/core/downloads.ts), backed by
+ * JSON snapshots under expo-file-system's document directory. Passing null
+ * (the default) means "no offline copies exist", which is exactly true on
+ * the web and in tests.
+ */
+export function connectLocalContent(provider: LocalContentProvider | null): void {
+  localContent = provider;
+}
+
 /** Follow the student's chosen medium. Set from the profile after sign-in. */
 export function setContentMedium(next: Medium): void {
   if (next === medium) return;
@@ -136,7 +162,7 @@ async function read<T>(
   client: ContentClient | null,
   key: string,
   query: () => Promise<{ data: T | null; error: unknown }>,
-  fallback: () => T,
+  fallback: () => T | Promise<T>,
 ): Promise<T> {
   if (!client) return fallback();
   try {
@@ -146,7 +172,7 @@ async function read<T>(
     return data;
   } catch (e) {
     if (isDev()) console.warn(`[content] ${key} fell back:`, e);
-    return (cache.get(key) as T) ?? fallback();
+    return (cache.get(key) as T) ?? (await fallback());
   }
 }
 
@@ -321,87 +347,116 @@ export async function fetchChapter(id: string, client?: ContentClient): Promise<
  * chapter with untranslated flashcards should still show the translated
  * chapter.
  */
+/**
+ * The live round trip for one chapter's full content: sections, mcqs,
+ * flashcards, short questions and blanks, in the student's current medium.
+ * Split out of fetchChapterContent so the download path below can run
+ * exactly this query without going anywhere near the fallback chain.
+ */
+async function queryChapterContent(
+  chapterId: string,
+  at: ContentClient,
+): Promise<{ data: ChapterContent | null; error: unknown }> {
+  /**
+   * Rows in the student's medium, or the English ones when that medium has
+   * nothing yet. Per resource, not per chapter: a translated chapter whose
+   * flashcards are not translated yet should still read in Urdu.
+   */
+  const pick = (rows: unknown): Row[] => {
+    const all = (rows as Row[] | null) ?? [];
+    const wanted = all.filter((r) => r.medium === medium);
+    return wanted.length ? wanted : all.filter((r) => r.medium === 'en');
+  };
+
+  const [sections, mcqs, cards, shorts, blanks] = await Promise.all([
+    table('chapter_sections', at).select('id,medium,position,title,blocks').eq('chapter_id', chapterId).order('position'),
+    table('mcqs', at).select('id,medium,topic,q,options,answer,explanation,difficulty,source').eq('chapter_id', chapterId),
+    table('flashcards', at).select('id,medium,front,back').eq('chapter_id', chapterId),
+    table('short_questions', at).select('id,medium,marks,q,answer,points').eq('chapter_id', chapterId),
+    table('blanks', at).select('id,medium,before_text,after_text,answer,options').eq('chapter_id', chapterId),
+  ]);
+
+  const error = sections.error ?? mcqs.error ?? cards.error ?? shorts.error ?? blanks.error;
+  if (error) return { error, data: null };
+
+  const s = pick(sections.data);
+  // A chapter with no readable text is not a chapter yet. Fall back whole
+  // rather than render an empty reader with working flashcards under it.
+  if (!s.length) return { error: new Error('no sections'), data: null };
+
+  return {
+    error: null,
+    data: {
+      sections: s.map((r) => ({
+        id: r.id,
+        title: r.title,
+        blocks: r.blocks,
+      })) as Section[],
+      mcqs: pick(mcqs.data).map((r) => ({
+        id: r.id,
+        chapterId,
+        topic: r.topic,
+        q: r.q,
+        options: r.options,
+        answer: r.answer,
+        explanation: r.explanation,
+        difficulty: r.difficulty,
+        source: r.source === 'human' ? 'human' : 'ai',
+      })) as Mcq[],
+      flashcards: pick(cards.data).map((r) => ({
+        id: r.id,
+        chapterId,
+        front: r.front,
+        back: r.back,
+      })) as Flashcard[],
+      shortQs: pick(shorts.data).map((r) => ({
+        id: r.id,
+        chapterId,
+        marks: r.marks,
+        q: r.q,
+        answer: r.answer,
+        points: r.points,
+      })) as ShortQ[],
+      blanks: pick(blanks.data).map((r) => ({
+        id: r.id,
+        chapterId,
+        sentence: [r.before_text, r.after_text],
+        answer: r.answer,
+        options: r.options,
+      })) as Blank[],
+      audioTitle: contentFor(chapterId).audioTitle,
+    },
+  };
+}
+
 export async function fetchChapterContent(chapterId: string, client?: ContentClient): Promise<ChapterContent> {
   const at = client ?? db;
-  const fallback = () => contentFor(chapterId);
 
   return read<ChapterContent>(
     at,
     `content:${chapterId}:${medium}`,
-    async () => {
-      /**
-       * Rows in the student's medium, or the English ones when that medium has
-       * nothing yet. Per resource, not per chapter: a translated chapter whose
-       * flashcards are not translated yet should still read in Urdu.
-       */
-      const pick = (rows: unknown): Row[] => {
-        const all = (rows as Row[] | null) ?? [];
-        const wanted = all.filter((r) => r.medium === medium);
-        return wanted.length ? wanted : all.filter((r) => r.medium === 'en');
-      };
-
-      const [sections, mcqs, cards, shorts, blanks] = await Promise.all([
-        table('chapter_sections', at!).select('id,medium,position,title,blocks').eq('chapter_id', chapterId).order('position'),
-        table('mcqs', at!).select('id,medium,topic,q,options,answer,explanation,difficulty,source').eq('chapter_id', chapterId),
-        table('flashcards', at!).select('id,medium,front,back').eq('chapter_id', chapterId),
-        table('short_questions', at!).select('id,medium,marks,q,answer,points').eq('chapter_id', chapterId),
-        table('blanks', at!).select('id,medium,before_text,after_text,answer,options').eq('chapter_id', chapterId),
-      ]);
-
-      const error = sections.error ?? mcqs.error ?? cards.error ?? shorts.error ?? blanks.error;
-      if (error) return { error, data: null };
-
-      const s = pick(sections.data);
-      // A chapter with no readable text is not a chapter yet. Fall back whole
-      // rather than render an empty reader with working flashcards under it.
-      if (!s.length) return { error: new Error('no sections'), data: null };
-
-      return {
-        error: null,
-        data: {
-          sections: s.map((r) => ({
-            id: r.id,
-            title: r.title,
-            blocks: r.blocks,
-          })) as Section[],
-          mcqs: pick(mcqs.data).map((r) => ({
-            id: r.id,
-            chapterId,
-            topic: r.topic,
-            q: r.q,
-            options: r.options,
-            answer: r.answer,
-            explanation: r.explanation,
-            difficulty: r.difficulty,
-            source: r.source === 'human' ? 'human' : 'ai',
-          })) as Mcq[],
-          flashcards: pick(cards.data).map((r) => ({
-            id: r.id,
-            chapterId,
-            front: r.front,
-            back: r.back,
-          })) as Flashcard[],
-          shortQs: pick(shorts.data).map((r) => ({
-            id: r.id,
-            chapterId,
-            marks: r.marks,
-            q: r.q,
-            answer: r.answer,
-            points: r.points,
-          })) as ShortQ[],
-          blanks: pick(blanks.data).map((r) => ({
-            id: r.id,
-            chapterId,
-            sentence: [r.before_text, r.after_text],
-            answer: r.answer,
-            options: r.options,
-          })) as Blank[],
-          audioTitle: fallback().audioTitle,
-        },
-      };
-    },
-    fallback,
+    () => queryChapterContent(chapterId, at!),
+    // Cache (above, inside read) is this session's last good answer. Below
+    // that: a chapter the student downloaded on purpose, real content even if
+    // it may be a little stale, which is still a better answer than the
+    // bundled sample. The bundle is the last resort, not the first fallback.
+    async () => (await localContent?.(chapterId, medium)) ?? contentFor(chapterId),
   );
+}
+
+/**
+ * The live query only, no fallback chain at all. What the download button
+ * calls, deliberately not fetchChapterContent: that function's whole job is
+ * to always hand back *something*, cache or bundle included, and a download
+ * that "succeeds" by writing the bundled sample to disk under a chapter's
+ * name would be a silent lie the next time the student opens it offline.
+ * Throws on anything short of a genuine live answer, so the caller can tell
+ * the student the download failed instead of quietly saving a placeholder.
+ */
+export async function fetchChapterContentLive(chapterId: string, client: ContentClient): Promise<ChapterContent> {
+  const { data, error } = await queryChapterContent(chapterId, client);
+  if (error || !data) throw error ?? new Error(`no live content for ${chapterId}`);
+  return data;
 }
 
 /**
@@ -437,7 +492,26 @@ export async function fetchMcqs(
   client?: ContentClient,
 ): Promise<Mcq[]> {
   const at = client ?? db;
-  const fallbackPool = (): Mcq[] => {
+
+  /**
+   * Downloaded chapters' own MCQs, when the caller asked for specific
+   * chapters (a single chapter's practice, or a hand-picked few) rather than
+   * "mixed practice" across a whole subject. There is no local record of
+   * which chapters exist for a subject the student never opened, so a
+   * subject-wide pool with no chapterIds still falls through to the bundle
+   * below, same as before this file knew about downloads.
+   */
+  const localPool = async (): Promise<Mcq[] | null> => {
+    if (!localContent || !opts.chapterIds?.length) return null;
+    const perChapter = await Promise.all(opts.chapterIds.map((id) => localContent!(id, medium)));
+    let mcqs = perChapter.flatMap((c) => c?.mcqs ?? []);
+    if (opts.topics?.length) mcqs = mcqs.filter((m) => opts.topics!.includes(m.topic));
+    return mcqs.length ? mcqs : null;
+  };
+
+  const fallbackPool = async (): Promise<Mcq[]> => {
+    const local = await localPool();
+    if (local) return local.slice(0, opts.count);
     const chapters = opts.chapterIds?.length
       ? (opts.chapterIds.map(chapterById).filter(Boolean) as Chapter[])
       : Object.values(CHAPTERS)
