@@ -32,3 +32,18 @@ export const getChapterContent = cache(async (id: string) => api.getChapterConte
 export const getSubject = cache(async (id: string) => api.getSubject(id, await client()));
 export const getSubjects = cache(async (ids?: string[]) => api.getSubjects(ids, await client()));
 export const getChapters = cache(async (subjectId: string) => api.getChapters(subjectId, await client()));
+export const getFlashcards = cache(async (chapterId: string) => api.getFlashcards(chapterId, await client()));
+
+/*
+ * EVERY server-side content read goes through this file. No exceptions.
+ *
+ * `api.getFlashcards(id)` called straight from a page compiles, runs, returns
+ * plausible data and is wrong: with no client the fetch layer falls through to
+ * the bundled sample, so the page renders placeholder text next to a correct
+ * chapter title. Three session pages did exactly that and shipped, and the only
+ * reason it was caught is that a student noticed the flashcards said "the full
+ * definition comes with the client's notes".
+ *
+ * If you need a new read on the server, add a reader here rather than reaching
+ * for `api` in the page.
+ */

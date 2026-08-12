@@ -264,6 +264,13 @@ export async function fetchSubjects(ids?: string[], client?: ContentClient): Pro
  *
  * Deliberately not awaited by callers. It is a warm-up, and a screen must never
  * wait on it. Failure is silent because the bundle is already a working answer.
+ *
+ * THE ROW CAP. PostgREST returns at most 1000 rows unless you page, and it does
+ * not tell you it truncated. Class 9 is 94 chapters so this is safe, and every
+ * other query in this file is scoped to one subject or one chapter and bounded.
+ * Adding Class 10 roughly doubles the chapter count, still under the cap, but
+ * anything that starts selecting mcqs or sections unscoped will silently get
+ * the first thousand and look fine. Page it, or scope it.
  */
 export async function primeAllContent(client?: ContentClient): Promise<void> {
   const at = client ?? db;

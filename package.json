@@ -18,6 +18,7 @@
     "content:build": "node scripts/build-curriculum.mjs",
     "content:ingest": "node scripts/ingest-content.mjs",
     "content:verify": "node scripts/verify-content.mjs",
+    "content:audit": "node scripts/audit-content.mjs",
     "db:migrate": "node scripts/db-migrate.mjs",
     "mobile:go": "npm run start --workspace apps/mobile -- --go",
     "mobile:tunnel": "npm run start --workspace apps/mobile -- --go --tunnel",

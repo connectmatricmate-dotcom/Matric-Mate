@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { api, chapterById } from '@matricmate/core';
+import { chapterById } from '@matricmate/core';
+import { getFlashcards } from '@/lib/content-readers';
 import { FlashcardsScreen } from '@/components/screens/FlashcardsScreen';
 
 export const metadata: Metadata = {
@@ -10,6 +11,6 @@ export const metadata: Metadata = {
 export default async function FlashcardsPage({ searchParams }: { searchParams: Promise<{ chapter?: string }> }) {
   const { chapter } = await searchParams;
   const chapterId = chapter ?? 'phy-3';
-  const cards = await api.getFlashcards(chapterId);
+  const cards = await getFlashcards(chapterId);
   return <FlashcardsScreen chapterId={chapterId} chapterTitle={chapterById(chapterId)?.title ?? ''} cards={cards} />;
 }
