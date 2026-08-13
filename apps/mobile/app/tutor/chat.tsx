@@ -4,10 +4,16 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
 import { Body, Card, IconButton, Pill, Row, Screen, Small, Tap, useToast } from '../../src/components/ui';
-import { api , chapterById , ChatMessage } from '@matricmate/core';
+import { api, chapterById, ChatMessage, fetchTutorQuota, weakTopics } from '@matricmate/core';
+import type { TutorQuota } from '@matricmate/core';
+import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb } from '../../src/theme';
+
+/** "21:00" style local clock time out of the server's reset instant. */
+const clock = (iso: string) =>
+  new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
 export default function Chat() {
   const { q, chapter, thread } = useLocalSearchParams<{ q?: string; chapter?: string; thread?: string }>();
@@ -17,19 +23,65 @@ export default function Chat() {
   const insets = useSafeAreaInsets();
   const scroller = useRef<ScrollView | null>(null);
 
-  const existing = thread ? state.threads.find((x) => x.id === thread) : undefined;
-  const [messages, setMessages] = useState<ChatMessage[]>(existing?.messages ?? []);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
-  // Minted once, when the screen opens. `useRef(…)` would rebuild the id string
-  // on every render and read it back during render; a lazy initialiser does not.
-  const [threadId] = useState(() => existing?.id ?? `t-${Date.now()}`);
-  const contextLabel = chapter ? chapterById(chapter)?.title : existing?.contextLabel;
+  /**
+   * The server owns the conversation now. threadId is minted by the tutor
+   * route on the first answer and echoed back; opening a saved chat passes
+   * the id in and the history is read from Postgres under the student's own
+   * row-level security, so the same chat shows up on the website too.
+   */
+  const [threadId, setThreadId] = useState<string | null>(thread ?? null);
+  const [contextLabel, setContextLabel] = useState<string | undefined>(
+    chapter ? chapterById(chapter)?.title : undefined
+  );
+  /** The server's count, not a local guess. Null until the first fetch lands. */
+  const [quota, setQuota] = useState<TutorQuota | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetchTutorQuota().then((qta) => alive && qta && setQuota(qta));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  /** A saved thread's history, loaded once. New chats skip this entirely. */
+  useEffect(() => {
+    if (!thread) return;
+    let alive = true;
+    (async () => {
+      try {
+        const [{ data: rows }, { data: meta }] = await Promise.all([
+          supabase.from('chat_messages').select('id,role,content,at').eq('thread_id', thread).order('at'),
+          supabase.from('chat_threads').select('context_label').eq('id', thread).maybeSingle(),
+        ]);
+        if (!alive || !rows) return;
+        setMessages(
+          rows.map((r) => ({
+            id: r.id as string,
+            role: r.role === 'assistant' ? ('ai' as const) : ('user' as const),
+            text: r.content as string,
+            at: Date.parse(r.at as string),
+          }))
+        );
+        if (meta?.context_label) setContextLabel((c) => c ?? (meta.context_label as string));
+      } catch {
+        // History is a nicety; the chat still works as a fresh thread.
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [thread]);
+
+  const outOfQuestions = quota !== null && quota.remaining <= 0;
 
   async function send(text: string) {
     const clean = text.trim();
     if (!clean || thinking) return;
-    if (!derived.aiLeft) {
+    if (outOfQuestions) {
       toast(t('tutor.limitToast'));
       return;
     }
@@ -38,30 +90,46 @@ export default function Chat() {
     setInput('');
     setThinking(true);
 
-    let res;
-    try {
-      res = await api.askTutor(clean, contextLabel);
-    } catch {
-      // Without this catch a failed request left `thinking` true forever,
-      // which blocks the input, after already charging a quota unit.
-      setThinking(false);
-      toast(t('states.errorTitle'));
+    const res = await api.askTutor(clean, {
+      threadId,
+      context: contextLabel,
+      profile: {
+        name: state.user?.name,
+        medium: state.settings.contentMedium,
+        language: state.settings.language,
+        subjects: derived.subjects,
+        weakTopics: weakTopics(state.attempts)
+          .slice(0, 3)
+          .map((w) => w.topic),
+      },
+    });
+    setThinking(false);
+
+    if (res.reason) {
+      // The question never reached an answer, so it must not sit in the chat
+      // looking answered. Put it back in the box and say what happened.
+      setMessages((m) => m.filter((x) => x.id !== mine.id));
+      setInput(clean);
+      if (res.quota) setQuota(res.quota);
+      const note = {
+        offline: t('tutor.offline'),
+        quota: t('tutor.limitToast'),
+        rate: t('tutor.slowDown'),
+        plan: t('tutor.planNeeded'),
+        refused: t('tutor.refused'),
+        error: t('tutor.errorReply'),
+      }[res.reason];
+      toast(note);
       return;
     }
-    // Charged only for a delivered answer. It was charged up front, so a
-    // network failure cost the student a question they never got to ask.
-    actions.consumeAi();
+
     const reply: ChatMessage = { id: `m-${Date.now()}-ai`, role: 'ai', text: res.text, steps: res.steps, at: Date.now() };
-    setThinking(false);
-    const next = [...messages, mine, reply];
-    setMessages(next);
-    actions.saveThread({
-      id: threadId,
-      title: clean.length > 42 ? `${clean.slice(0, 42)}…` : clean,
-      contextLabel,
-      messages: next,
-      at: Date.now(),
-    });
+    setMessages((m) => [...m, reply]);
+    if (res.threadId) setThreadId(res.threadId);
+    if (res.quota) setQuota(res.quota);
+    // Mirror into the local counter so the tutor tab's ring stays roughly
+    // right between server fetches. The server remains the authority.
+    actions.consumeAi();
   }
 
   /**
@@ -69,11 +137,10 @@ export default function Chat() {
    * question is sent on their behalf.
    *
    * Started after the first paint rather than inside the effect body. `send`
-   * writes three pieces of state before it ever awaits, and doing that while
-   * the effect is still running makes the screen re-render before it has shown
-   * anything, so the student watches an empty chat resolve into their own
-   * question. This way the shell paints, then the message appears. The timer is
-   * cleared on unmount so a question is not sent from a screen already left.
+   * writes state before it ever awaits, and doing that while the effect is
+   * still running makes the screen re-render before it has shown anything.
+   * The timer is cleared on unmount so a question is not sent from a screen
+   * already left.
    */
   useEffect(() => {
     if (!q || messages.length) return;
@@ -98,7 +165,18 @@ export default function Chat() {
             <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{t('tutor.title')}</Text>
             {contextLabel ? <Small numberOfLines={1}>{t('tutor.context', { label: contextLabel })}</Small> : null}
           </View>
-          <Pill tone={derived.aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: derived.aiLeft })}</Pill>
+          {quota ? (
+            <View style={{ alignItems: 'flex-end' }}>
+              <Pill tone={outOfQuestions ? 'red' : 'grey'}>
+                {t('tutor.quotaPill', { n: quota.remaining, limit: quota.limit })}
+              </Pill>
+              {outOfQuestions ? (
+                <Text style={{ fontFamily: F.body, fontSize: 10.5, color: C.ink3, marginTop: 3 }}>
+                  {t('tutor.resetsAt', { time: clock(quota.resetAt) })}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
         </Row>
 
         <ScrollView
@@ -146,7 +224,18 @@ export default function Chat() {
                   borderBottomLeftRadius: 6,
                 }}
               >
-                <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, lineHeight: 20, color: C.ink }}>{m.text}</Text>
+                {/* A real answer is paragraphs, not a headline: body weight.
+                    The bold treatment stays for the stepped mock shape. */}
+                <Text
+                  style={{
+                    fontFamily: m.steps?.length ? F.bodyBold : F.body,
+                    fontSize: 13.5,
+                    lineHeight: 21,
+                    color: C.ink,
+                  }}
+                >
+                  {m.text}
+                </Text>
                 {m.steps?.map((step, i) => (
                   <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                     <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
@@ -188,12 +277,10 @@ export default function Chat() {
           }}
           gap={S.sm}
         >
-          {/* Camera control parked until photo questions exist; a button
-              whose only job is to explain why it does nothing is noise. */}
           <View
             style={{
               flex: 1,
-              backgroundColor: C.paper,
+              backgroundColor: outOfQuestions ? C.line : C.paper,
               borderWidth: 1.5,
               borderColor: C.line,
               borderRadius: 99,
@@ -204,7 +291,12 @@ export default function Chat() {
             <TextInput
               value={input}
               onChangeText={setInput}
-              placeholder={t('tutor.placeholder')}
+              editable={!outOfQuestions}
+              placeholder={
+                outOfQuestions && quota
+                  ? t('tutor.limitInputHint', { time: clock(quota.resetAt) })
+                  : t('tutor.placeholder')
+              }
               placeholderTextColor={C.ink3}
               onSubmitEditing={() => send(input)}
               returnKeyType="send"
@@ -220,7 +312,7 @@ export default function Chat() {
                 width: 44,
                 height: 44,
                 borderRadius: 99,
-                backgroundColor: input.trim() ? C.teal : C.ink3,
+                backgroundColor: input.trim() && !outOfQuestions ? C.teal : C.ink3,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}

@@ -191,6 +191,23 @@ export default function Blanks() {
               {correct ? t('session.blanksCorrect') : t('session.blanksWrong', { a: item?.answer ?? '' })}
             </Text>
           </Row>
+          {!correct && item ? (
+            <>
+              <Spacer h={S.sm} />
+              <Btn
+                title={t('session.askAi')}
+                variant="line"
+                sm
+                onPress={() =>
+                  router.push(
+                    `/tutor/chat?q=${encodeURIComponent(
+                      `Why does "${item.answer}" fit here: "${item.sentence[0]} ____ ${item.sentence[1]}"?`
+                    )}`
+                  )
+                }
+              />
+            </>
+          ) : null}
         </Card>
       ) : null}
     </Screen>

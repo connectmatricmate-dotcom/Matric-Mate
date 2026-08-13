@@ -11,6 +11,7 @@
     "dev:https": "next dev --experimental-https"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.116.0",
     "@matricmate/core": "*",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.111.0",

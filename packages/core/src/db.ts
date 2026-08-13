@@ -603,6 +603,41 @@ export async function fetchMcqs(
 }
 
 /**
+ * Approved AI-drafted questions, for the test generator.
+ *
+ * These live in generated_mcqs, a separate table from the curated bank, and
+ * RLS only serves rows a human has flipped to published. No cache and no
+ * bundled fallback on purpose: an empty answer just means the generator draws
+ * everything from the bank, which is never wrong, only less varied.
+ */
+export async function fetchGeneratedMcqs(
+  opts: { count: number; topics?: string[] },
+  client?: ContentClient,
+): Promise<Mcq[]> {
+  const at = client ?? db;
+  if (!at) return [];
+  try {
+    let q = table('generated_mcqs', at).select('id,topic,medium,q,options,answer,explanation,difficulty');
+    if (opts.topics?.length) q = q.in('topic', opts.topics);
+    const { data, error } = await q.eq('medium', medium).limit(opts.count);
+    if (error) return [];
+    return ((data as Row[]) ?? []).map((r) => ({
+      id: r.id,
+      chapterId: '',
+      topic: r.topic,
+      q: r.q,
+      options: r.options,
+      answer: r.answer,
+      explanation: r.explanation ?? '',
+      difficulty: r.difficulty ?? 'medium',
+      source: 'ai',
+    })) as Mcq[];
+  } catch {
+    return [];
+  }
+}
+
+/**
  * The recordings a chapter really has, both mediums.
  *
  * Returns an empty list when there is no row, and the caller is expected to

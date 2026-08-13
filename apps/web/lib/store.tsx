@@ -18,6 +18,7 @@ import {
   SyncOp,
   TestResult,
   buildPlan,
+  configureTutor,
   flushQueue,
   hydrateStudyState,
   level,
@@ -54,6 +55,13 @@ import {
   xpFor,
 } from './persisted-store';
 import { createClient } from './supabase/client';
+
+/**
+ * The tutor rides same-origin: /api/ai/* on this very deployment, with the
+ * session cookie carrying who is asking. No token function needed, and module
+ * scope on purpose so it is configured before any screen can send a question.
+ */
+configureTutor({ siteUrl: '', getToken: async () => null });
 
 export type { Onboarding, Settings, State };
 

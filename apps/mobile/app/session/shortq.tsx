@@ -135,6 +135,14 @@ export default function ShortQuestions() {
             </View>
           </Card>
 
+          <Spacer h={S.sm} />
+          <Btn
+            title={t('session.askAi')}
+            variant="line"
+            sm
+            onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item?.q ?? ''}`)}`)}
+          />
+
           <Spacer h={S.lg} />
           <Label>{t('session.howDidYouDo')}</Label>
           <Spacer h={S.sm} />

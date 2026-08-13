@@ -109,6 +109,15 @@ export function ShortQScreen({
             </div>
           </Card>
 
+          <div className="mt-3">
+            <LinkBtn
+              title={t('session.askAi')}
+              variant="line"
+              sm
+              href={`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item.q}`)}`}
+            />
+          </div>
+
           <div className="mt-6">
             <Label>{t('session.howDidYouDo')}</Label>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row">

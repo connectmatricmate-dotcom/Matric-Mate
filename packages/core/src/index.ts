@@ -7,6 +7,7 @@
  */
 export * from './types';
 export * from './avatars';
+export * from './tutor';
 export * from './content';
 export * from './domain';
 export * from './billing';

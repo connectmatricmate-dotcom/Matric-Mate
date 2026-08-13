@@ -134,7 +134,7 @@ export default function Reader() {
   const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(id), [id]);
   const [idx, setIdx] = useState(0);
   const [askOpen, setAskOpen] = useState(false);
-  const [answer, setAnswer] = useState<{ text: string; steps: string[] } | null>(null);
+  const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
   // True while this screen is mounted; ask() checks it before setState after
   // its await, because the student may have left mid-request.
@@ -165,19 +165,28 @@ export default function Reader() {
   }
 
   async function ask(prompt: string) {
-    if (!derived.aiLeft) {
-      toast(t('tutor.limitToast'));
-      return;
-    }
-    if (!actions.consumeAi()) return;
     setAsking(true);
     setAnswer(null);
     try {
-      const res = await api.askTutor(prompt, chapter ? chapter.title : undefined);
-      if (aliveRef.current) setAnswer(res);
+      // The server enforces quota and plan; the answer says why if it can't.
+      const res = await api.askTutor(prompt, { context: chapter?.title });
+      if (!aliveRef.current) return;
+      if (res.reason) {
+        const note = {
+          offline: t('tutor.offline'),
+          quota: t('tutor.limitToast'),
+          rate: t('tutor.slowDown'),
+          plan: t('tutor.planNeeded'),
+          refused: t('tutor.refused'),
+          error: t('tutor.errorReply'),
+        }[res.reason];
+        toast(note);
+        return;
+      }
+      setAnswer({ text: res.text, steps: res.steps });
+      // Keep the local counter roughly in step with the server's.
+      actions.consumeAi();
     } catch {
-      // The quota unit is spent and the answer is not coming. Say so instead
-      // of leaving the skeleton up forever.
       if (aliveRef.current) toast(t('states.errorTitle'));
     } finally {
       if (aliveRef.current) setAsking(false);
@@ -324,8 +333,8 @@ export default function Reader() {
           </Card>
         ) : answer ? (
           <Card flat style={{ marginTop: S.md }}>
-            <Body style={{ fontFamily: F.bodyBold }}>{answer.text}</Body>
-            {answer.steps.map((step, i) => (
+            <Body style={{ fontFamily: answer.steps?.length ? F.bodyBold : F.body }}>{answer.text}</Body>
+            {answer.steps?.map((step, i) => (
               <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                 <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: C.teal }}>{i + 1}</Text>

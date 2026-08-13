@@ -2,16 +2,18 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { type ChatMessage, api } from '@matricmate/core';
+import { type ChatMessage, api, weakTopics } from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
+import { createClient } from '@/lib/supabase/client';
+import { quotaClock, useTutorQuota } from '@/lib/use-tutor-quota';
 
 export function ChatScreen({
   initialQuestion,
   chapterLabel,
-  threadId,
+  threadId: threadParam,
 }: {
   initialQuestion?: string;
   chapterLabel?: string;
@@ -22,54 +24,103 @@ export function ChatScreen({
   const toast = useToast();
   const bottom = useRef<HTMLDivElement>(null);
 
-  const existing = threadId ? state.threads.find((x) => x.id === threadId) : undefined;
-  const [messages, setMessages] = useState<ChatMessage[]>(existing?.messages ?? []);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
   /** One vote per answer, kept so the buttons latch instead of only toasting. */
   const [feedback, setFeedback] = useState<Record<string, 'up' | 'down'>>({});
-  // Minted on the first message, not during render, a thread that is never
-  // sent shouldn't claim an id, and reading the clock while rendering is impure.
-  const id = useRef(existing?.id ?? '');
-  const contextLabel = chapterLabel ?? existing?.contextLabel;
+  /**
+   * The server owns the conversation. The tutor route mints the thread id on
+   * the first answer; opening a saved chat passes it in and history is read
+   * from Postgres under the student's own row-level security, which is why
+   * the same chat also shows up in the Android app.
+   */
+  const [threadId, setThreadId] = useState<string | null>(threadParam ?? null);
+  const [contextLabel, setContextLabel] = useState<string | undefined>(chapterLabel);
+  const [quota, setQuota] = useTutorQuota();
   const asked = useRef(false);
 
-  // A saved thread opened before the store hydrates finds no messages on the
-  // first render. Backfilled during render once the threads arrive, never over
-  // a live chat. The thread id follows along inside send().
-  if (existing && messages.length === 0 && !thinking && existing.messages.length) {
-    setMessages(existing.messages);
-  }
+  /** A saved thread's history, loaded once. New chats skip this entirely. */
+  useEffect(() => {
+    if (!threadParam) return;
+    let alive = true;
+    const supabase = createClient();
+    (async () => {
+      const [{ data: rows }, { data: meta }] = await Promise.all([
+        supabase.from('chat_messages').select('id,role,content,at').eq('thread_id', threadParam).order('at'),
+        supabase.from('chat_threads').select('context_label').eq('id', threadParam).maybeSingle(),
+      ]);
+      if (!alive || !rows) return;
+      setMessages(
+        rows.map((r) => ({
+          id: r.id as string,
+          role: r.role === 'assistant' ? ('ai' as const) : ('user' as const),
+          text: r.content as string,
+          at: Date.parse(r.at as string),
+        }))
+      );
+      if (meta?.context_label) setContextLabel((c) => c ?? (meta.context_label as string));
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [threadParam]);
+
+  const outOfQuestions = quota !== null && quota.remaining <= 0;
 
   async function send(text: string) {
     const clean = text.trim();
     if (!clean || thinking) return;
-    if (!derived.aiLeft) {
+    if (outOfQuestions) {
       toast(t('tutor.limitToast'));
       return;
     }
-    if (!actions.consumeAi()) return;
-    // The ref seeds before hydration, so a saved thread's id may arrive late.
-    if (!id.current) id.current = existing?.id ?? `t-${Date.now()}`;
 
     const mine: ChatMessage = { id: `m-${Date.now()}`, role: 'user', text: clean, at: Date.now() };
-    const history = [...messages, mine];
-    setMessages(history);
+    setMessages((m) => [...m, mine]);
     setInput('');
     setThinking(true);
 
-    const res = await api.askTutor(clean, contextLabel);
-    const reply: ChatMessage = { id: `m-${Date.now()}-ai`, role: 'ai', text: res.text, steps: res.steps, at: Date.now() };
-    const next = [...history, reply];
-    setThinking(false);
-    setMessages(next);
-    actions.saveThread({
-      id: id.current,
-      title: clean.length > 42 ? `${clean.slice(0, 42)}…` : clean,
-      contextLabel,
-      messages: next,
-      at: Date.now(),
+    const res = await api.askTutor(clean, {
+      threadId,
+      context: contextLabel,
+      profile: {
+        name: state.user?.name,
+        medium: state.settings.contentMedium,
+        language: state.settings.language,
+        subjects: derived.subjects,
+        weakTopics: weakTopics(state.attempts)
+          .slice(0, 3)
+          .map((w) => w.topic),
+      },
     });
+    setThinking(false);
+
+    if (res.reason) {
+      // No answer was delivered, so the question must not sit in the chat
+      // looking answered. Put it back in the box and say what happened.
+      setMessages((m) => m.filter((x) => x.id !== mine.id));
+      setInput(clean);
+      if (res.quota) setQuota(res.quota);
+      const note = {
+        offline: t('tutor.offline'),
+        quota: t('tutor.limitToast'),
+        rate: t('tutor.slowDown'),
+        plan: t('tutor.planNeeded'),
+        refused: t('tutor.refused'),
+        error: t('tutor.errorReply'),
+      }[res.reason];
+      toast(note);
+      return;
+    }
+
+    const reply: ChatMessage = { id: `m-${Date.now()}-ai`, role: 'ai', text: res.text, steps: res.steps, at: Date.now() };
+    setMessages((m) => [...m, reply]);
+    if (res.threadId) setThreadId(res.threadId);
+    if (res.quota) setQuota(res.quota);
+    // Mirror into the local counter so rails stay roughly right between
+    // server fetches. The server remains the authority.
+    actions.consumeAi();
   }
 
   // A question passed in the URL is asked once, on arrival.
@@ -88,10 +139,8 @@ export function ChatScreen({
     /**
      * A chat owns its viewport: a full-height column with the header on top,
      * the messages scrolling in the middle, and the composer pinned to the
-     * bottom. The previous sticky-in-flow layout put the composer wherever the
-     * content happened to end, so a short chat crammed against the top of an
-     * empty page and the type box drifted downward as messages arrived.
-     * Height = viewport minus the 56px shell header, minus the phone tab bar.
+     * bottom. Height = viewport minus the 56px shell header, minus the phone
+     * tab bar.
      */
     <div className="-mx-4 -mt-6 -mb-28 flex h-[calc(100dvh-3.5rem-58px-env(safe-area-inset-bottom))] flex-col md:-mx-8 md:-mb-16 md:h-[calc(100dvh-3.5rem)]">
       <div className="border-b border-line bg-paper px-4 py-2 md:px-8">
@@ -107,7 +156,16 @@ export function ChatScreen({
           <p className="text-[15px] font-extrabold text-ink">{t('tutor.title')}</p>
           {contextLabel ? <p className="truncate text-[13px] text-ink2">{t('tutor.context', { label: contextLabel })}</p> : null}
         </div>
-        <Pill tone={derived.aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: derived.aiLeft })}</Pill>
+        {quota ? (
+          <div className="flex flex-col items-end gap-0.5">
+            <Pill tone={outOfQuestions ? 'red' : 'grey'}>
+              {t('tutor.quotaPill', { n: quota.remaining, limit: quota.limit })}
+            </Pill>
+            {outOfQuestions ? (
+              <span className="text-[11px] text-ink3">{t('tutor.resetsAt', { time: quotaClock(quota.resetAt) })}</span>
+            ) : null}
+          </div>
+        ) : null}
         </div>
       </div>
 
@@ -132,7 +190,13 @@ export function ChatScreen({
               key={m.id}
               className="max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-card p-4"
             >
-              <p className="text-[13.5px] font-extrabold leading-[1.5] text-ink">{m.text}</p>
+              {/* A real answer is paragraphs, not a headline: body weight.
+                  The bold treatment stays for the stepped mock shape. */}
+              <p
+                className={`whitespace-pre-wrap text-[13.5px] leading-[1.65] text-ink ${m.steps?.length ? 'font-extrabold' : ''}`}
+              >
+                {m.text}
+              </p>
               {m.steps?.length ? (
                 <ol className="mt-2 flex flex-col gap-2">
                   {m.steps.map((step, i) => (
@@ -207,22 +271,28 @@ export function ChatScreen({
         className="border-t border-line bg-card px-4 py-3 md:px-8"
       >
         <div className="mx-auto flex w-full max-w-[820px] items-center gap-2.5">
-        {/* No camera button: a control whose only behaviour was announcing its
-            own absence ("photo questions arrive later") is noise, not a feature.
-            It returns with the live tutor in M3. */}
         {/* .field-shell owns the focus ring; a bare outline-none input erased it */}
-        <div className="field-shell flex min-w-0 flex-1 items-center rounded-full border-[1.5px] border-line bg-paper px-4 py-2.5 transition-[border-color,box-shadow] duration-200">
+        <div
+          className={`field-shell flex min-w-0 flex-1 items-center rounded-full border-[1.5px] border-line px-4 py-2.5 transition-[border-color,box-shadow] duration-200 ${
+            outOfQuestions ? 'bg-grey' : 'bg-paper'
+          }`}
+        >
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={t('tutor.placeholder')}
+            disabled={outOfQuestions}
+            placeholder={
+              outOfQuestions && quota
+                ? t('tutor.limitInputHint', { time: quotaClock(quota.resetAt) })
+                : t('tutor.placeholder')
+            }
             aria-label={t('tutor.placeholder')}
-            className="w-full bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3"
+            className="w-full bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3 disabled:cursor-not-allowed"
           />
         </div>
         <button
           type="submit"
-          disabled={!input.trim() || thinking}
+          disabled={!input.trim() || thinking || outOfQuestions}
           aria-label={t('tutor.send')}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-teal text-white transition-colors duration-200 hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
         >

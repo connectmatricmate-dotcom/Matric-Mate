@@ -13,7 +13,7 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { connectContent, primeAllContent } from '@matricmate/core';
+import { configureTutor, connectContent, primeAllContent } from '@matricmate/core';
 
 /**
  * The Supabase client for the app. Same project, same tables, same rules as the
@@ -115,6 +115,24 @@ export const supabase: SupabaseClient =
 connectContent(client);
 // Warm the synchronous lookups so chapter titles are real from the first render.
 void primeAllContent(client ?? undefined);
+
+/**
+ * Point the tutor at the web app's API, which holds the AI key and enforces
+ * the plan check, daily quota and rate limit server-side. The phone proves
+ * who is asking with its Supabase access token; the fallback URL matches the
+ * production deployment so a build without the env var still reaches it.
+ */
+configureTutor({
+  siteUrl: process.env.EXPO_PUBLIC_SITE_URL ?? 'https://matric-mate-web.vercel.app',
+  getToken: async () => {
+    if (!client) return null;
+    try {
+      return (await client.auth.getSession()).data.session?.access_token ?? null;
+    } catch {
+      return null;
+    }
+  },
+});
 
 /**
  * Refresh tokens only while the app is in front of someone.

@@ -23,6 +23,7 @@
     "content:verify": "node scripts/verify-content.mjs",
     "content:audit": "node scripts/audit-content.mjs",
     "db:migrate": "node scripts/db-migrate.mjs",
+    "gen:mcqs": "node scripts/generate-mcqs.mjs",
     "mobile:go": "npm run start --workspace apps/mobile -- --go",
     "mobile:tunnel": "npm run start --workspace apps/mobile -- --go --tunnel",
     "android:log": "bash scripts/android-crashlog.sh",

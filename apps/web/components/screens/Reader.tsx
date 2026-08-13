@@ -108,7 +108,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
   const toast = useToast();
   const [idx, setIdx] = useState(0);
   const [askOpen, setAskOpen] = useState(false);
-  const [answer, setAnswer] = useState<{ text: string; steps: string[] } | null>(null);
+  const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
 
   const id = chapter.id;
@@ -128,15 +128,26 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
   }
 
   async function ask(prompt: string) {
-    if (!derived.aiLeft) {
-      toast(t('tutor.limitToast'));
-      return;
-    }
-    if (!actions.consumeAi()) return;
     setAsking(true);
     setAnswer(null);
-    setAnswer(await api.askTutor(prompt, chapter.title));
+    // The server enforces quota and plan; the answer says why if it can't.
+    const res = await api.askTutor(prompt, { context: chapter.title });
     setAsking(false);
+    if (res.reason) {
+      const note = {
+        offline: t('tutor.offline'),
+        quota: t('tutor.limitToast'),
+        rate: t('tutor.slowDown'),
+        plan: t('tutor.planNeeded'),
+        refused: t('tutor.refused'),
+        error: t('tutor.errorReply'),
+      }[res.reason];
+      toast(note);
+      return;
+    }
+    setAnswer({ text: res.text, steps: res.steps });
+    // Keep the local counter roughly in step with the server's.
+    actions.consumeAi();
   }
 
   return (
@@ -233,9 +244,11 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
           </Card>
         ) : answer ? (
           <Card flat className="mt-4">
-            <p className="text-[14.5px] font-extrabold text-ink">{answer.text}</p>
+            <p className={`whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink ${answer.steps?.length ? 'font-extrabold' : ''}`}>
+              {answer.text}
+            </p>
             <ol className="mt-2 flex flex-col gap-2">
-              {answer.steps.map((step, i) => (
+              {answer.steps?.map((step, i) => (
                 <li key={i} className="flex items-start gap-2.5">
                   <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-tealtint text-[11px] font-extrabold text-teal">
                     {i + 1}

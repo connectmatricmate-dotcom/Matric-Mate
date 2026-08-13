@@ -137,6 +137,14 @@ export function BlanksScreen({
           <p className={`flex-1 text-[13.5px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}>
             {correct ? t('session.blanksCorrect') : t('session.blanksWrong', { a: item.answer })}
           </p>
+          {!correct ? (
+            <LinkBtn
+              title={t('session.askAi')}
+              variant="line"
+              sm
+              href={`/tutor/chat?q=${encodeURIComponent(`Why does "${item.answer}" fit here: "${item.sentence[0]} ____ ${item.sentence[1]}"?`)}`}
+            />
+          ) : null}
         </Card>
       ) : null}
 

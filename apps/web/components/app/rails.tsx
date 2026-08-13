@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import { accuracy, confidenceBreakdown, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
 import { Bar, Card, Icon, Label, Pill, Ring } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
+import { useTutorQuota } from '@/lib/use-tutor-quota';
 
 /**
  * The Pakka-meter, promoted out of a sub-page.
@@ -179,22 +180,26 @@ export function CoverageRail() {
 
 /** AI budget for the day, where a student can see it before they need it. */
 export function TutorBudgetRail() {
-  const { derived, state } = useApp();
+  const { derived } = useApp();
   const t = useT();
-  const usedPct = ((derived.aiLimit - derived.aiLeft) / derived.aiLimit) * 100;
-  const low = derived.aiLeft <= Math.max(1, Math.floor(derived.aiLimit * 0.2));
+  // The server's quota when it has arrived; the local mirror until then.
+  const [quota] = useTutorQuota();
+  const left = quota ? quota.remaining : derived.aiLeft;
+  const limit = quota ? quota.limit : derived.aiLimit;
+  const usedPct = (limit ? (limit - left) / limit : 0) * 100;
+  const low = left <= Math.max(1, Math.floor(limit * 0.2));
 
   return (
     <Card flat className="flex items-center gap-4">
       <Ring pct={usedPct} size={62} stroke={7} color={low ? 'var(--color-orange)' : 'var(--color-teal)'}>
         <span className="text-[12px] font-extrabold text-ink tabular">
-          {derived.aiLeft}/{derived.aiLimit}
+          {left}/{limit}
         </span>
       </Ring>
       <div className="min-w-0 flex-1">
-        <p className="text-[13.5px] font-extrabold text-ink">{t('tutor.leftToday', { n: derived.aiLeft })}</p>
+        <p className="text-[13.5px] font-extrabold text-ink">{t('tutor.leftToday', { n: left })}</p>
         <p className="text-[12.5px] leading-[1.5] text-ink2">
-          {state.premium.active ? t('tutor.limitBody', { n: derived.aiLimit }) : t('tutor.limitPremium')}
+          {limit === 0 ? t('tutor.limitPremium') : t('tutor.limitBody', { n: limit })}
         </p>
       </div>
     </Card>

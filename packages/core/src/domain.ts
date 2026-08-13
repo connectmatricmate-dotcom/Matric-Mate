@@ -220,7 +220,13 @@ export function buildPlan(opts: {
  * question, so it is subscriber-only. A free account can read the sample
  * chapter but cannot spend our money asking questions.
  */
-export const AI_QUOTA = { premium: 20, free: 0 };
+/**
+ * 50, not 20: high enough that an honest student never meets it on an exam
+ * night, so the tutor feels unlimited. The real abuse wall is the server's
+ * per-minute rate limit, not this ceiling. One constant, enforced in the
+ * tutor route; changing it is an edit here and a deploy, no app update.
+ */
+export const AI_QUOTA = { premium: 50, free: 0 };
 
 export const grade = (pct: number) =>
   pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B+' : pct >= 60 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';

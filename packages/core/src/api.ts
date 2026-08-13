@@ -16,11 +16,14 @@ import {
   fetchChapterContent,
   fetchChapters,
   fetchFlashcards,
+  fetchGeneratedMcqs,
   fetchMcqs,
   fetchSubject,
   fetchSubjects,
 } from './db';
 import type { ContentClient } from './db';
+import { askTutorLive, tutorConfigured } from './tutor';
+import type { TutorProfile, TutorQuota } from './tutor';
 import { AudioTrack, Chapter, ChapterContent, Flashcard, Mcq, Subject } from './types';
 
 /** Still needed by the two mocks below, which fake their own latency. */
@@ -84,11 +87,60 @@ export const api = {
   /* ------------------------------------------------------------------- AI */
 
   /**
-   * Mock AI tutor. Returns a canned step-by-step answer with a small delay so the
-   * streaming/typing UI is real. M3 replaces this with a Claude call through a
-   * Supabase Edge Function that also enforces the per-user daily quota.
+   * The tutor. Live when the app has called `configureTutor` at startup, which
+   * both shipped apps do, so students always reach the real teacher behind the
+   * server route: Claude, the student's own context, the quota, the works.
+   *
+   * When live and something goes wrong the answer says so through `reason`,
+   * never through a fake reply: quota spent, rate limited, no plan, offline.
+   * The canned fallback below survives only for an unconfigured build (core
+   * tests, a bare dev checkout) and marks itself with live:false.
    */
-  async askTutor(question: string, context?: string): Promise<{ text: string; steps: string[] }> {
+  async askTutor(
+    question: string,
+    opts?: { context?: string; threadId?: string | null; profile?: TutorProfile },
+  ): Promise<{
+    live: boolean;
+    text: string;
+    steps?: string[];
+    threadId?: string;
+    quota?: TutorQuota;
+    reason?: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error';
+  }> {
+    if (tutorConfigured()) {
+      const res = await askTutorLive({
+        message: question,
+        threadId: opts?.threadId,
+        context: opts?.context,
+        profile: opts?.profile,
+      });
+      if (res.ok) return { live: true, text: res.text, threadId: res.threadId, quota: res.quota };
+      return { live: true, text: '', reason: res.reason, quota: res.quota };
+    }
+    const mock = await mockTutor(question, opts?.context);
+    return { live: false, ...mock };
+  },
+
+  /**
+   * Builds an "AI" test: approved AI-drafted questions first (generated_mcqs
+   * rows a human has published), then the curated bank, focused on the given
+   * topics and padded with a mixed pool when the focus runs thin.
+   */
+  async generateTest(topics: string[], count: number): Promise<Mcq[]> {
+    const generated = await fetchGeneratedMcqs({ count, topics });
+    const focused = topics.length ? await fetchMcqs({ count, topics }) : [];
+    const seen = new Set(generated.map((m) => m.id));
+    const pool = [...generated, ...focused.filter((m) => !seen.has(m.id))];
+    if (pool.length >= count) return pool.slice(0, count);
+    const mixed = await fetchMcqs({ count });
+    for (const m of pool) seen.add(m.id);
+    return [...pool, ...mixed.filter((m) => !seen.has(m.id))].slice(0, count);
+  },
+};
+
+/** The unconfigured-build stand-in, kept out of the api object on purpose. */
+async function mockTutor(question: string, context?: string): Promise<{ text: string; steps: string[] }> {
+  {
     await wait(1200);
     const q = question.toLowerCase();
     if (q.includes('velocity') || q.includes('speed'))
@@ -127,19 +179,5 @@ export const api = {
         'Note: yeh preview ka sample jawab hai. Live tutor aap ke asal sawal ka jawab de ga.',
       ],
     };
-  },
-
-  /**
-   * Builds an "AI" test from the real published bank, focused on the given
-   * topics and padded with a mixed pool when the focus runs thin. It used to
-   * draw from the bundled sample, which after the fabricated content was
-   * removed meant a nearly empty pool and a test that could not start.
-   */
-  async generateTest(topics: string[], count: number): Promise<Mcq[]> {
-    const focused = topics.length ? await fetchMcqs({ count, topics }) : [];
-    if (focused.length >= count) return focused;
-    const mixed = await fetchMcqs({ count });
-    const seen = new Set(focused.map((m) => m.id));
-    return [...focused, ...mixed.filter((m) => !seen.has(m.id))].slice(0, count);
-  },
-};
+  }
+}

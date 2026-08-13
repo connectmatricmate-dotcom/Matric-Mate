@@ -1,11 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { TutorBudgetRail, WeakRail } from '@/components/app/rails';
 import { Card, Empty, Icon, Item } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
+import { createClient } from '@/lib/supabase/client';
+import { useTutorQuota } from '@/lib/use-tutor-quota';
+
+type ThreadRow = { id: string; title: string; context_label: string | null; updated_at: string };
 
 const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: string }[] = [
   { label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark', prompt: '' },
@@ -20,12 +25,38 @@ const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: strin
 ];
 
 export function TutorView() {
-  const { state, derived } = useApp();
+  const { derived } = useApp();
   const t = useT();
+
+  // The server's numbers, with the local mirror as the pre-fetch fallback.
+  const [quota] = useTutorQuota();
+  const left = quota ? quota.remaining : derived.aiLeft;
+  const limit = quota ? quota.limit : derived.aiLimit;
+
+  /**
+   * Recent chats come from Postgres, where the tutor route saves every
+   * conversation, so a chat started on the phone shows up here too. RLS only
+   * returns the signed-in student's own threads.
+   */
+  const [threads, setThreads] = useState<ThreadRow[]>([]);
+  useEffect(() => {
+    let alive = true;
+    createClient()
+      .from('chat_threads')
+      .select('id,title,context_label,updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(8)
+      .then(({ data }) => {
+        if (alive && data) setThreads(data as ThreadRow[]);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <Page>
-      <PageHead title={t('tutor.title')} sub={t('tutor.sub')} eyebrow={t('tutor.leftToday', { n: derived.aiLeft })} />
+      <PageHead title={t('tutor.title')} sub={t('tutor.sub')} eyebrow={t('tutor.leftToday', { n: left })} />
 
       <Split>
         <Work className="flex flex-col gap-6">
@@ -56,30 +87,29 @@ export function TutorView() {
             </Card>
           </Link>
 
-          {derived.aiLeft === 0 ? (
+          {left === 0 ? (
             <Card flat tint="bg-redtint" border="border-red">
               <p className="text-[13.5px] font-extrabold text-red">{t('tutor.limitTitle')}</p>
               <p className="mt-0.5 text-[13px] text-ink2">
-                {t('tutor.limitBody', { n: derived.aiLimit })}
-                {state.premium.active ? '' : ` ${t('tutor.limitPremium')}`}
+                {limit === 0 ? t('tutor.limitPremium') : t('tutor.limitBody', { n: limit })}
               </p>
             </Card>
           ) : null}
 
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('tutor.recentChats')}</h2>
-            {state.threads.length === 0 ? (
+            {threads.length === 0 ? (
               <Empty icon="whatsapp" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />
             ) : (
               <Card flat className="py-0">
-                {state.threads.slice(0, 8).map((thread, i) => (
+                {threads.map((thread, i) => (
                   <Item
                     key={thread.id}
                     href={`/tutor/chat?thread=${thread.id}`}
                     title={thread.title}
-                    sub={`${thread.contextLabel ?? ''} ${new Date(thread.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`.trim()}
+                    sub={`${thread.context_label ?? ''} ${new Date(thread.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`.trim()}
                     icon="spark"
-                    last={i === Math.min(7, state.threads.length - 1)}
+                    last={i === threads.length - 1}
                   />
                 ))}
               </Card>
