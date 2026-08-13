@@ -98,6 +98,12 @@ export function ChapterHub({
           />
         ) : null}
         <Item
+          href={`/learn/sheet/${id}`}
+          title={t('tutor.sheetMake')}
+          sub={t('tutor.aiMade')}
+          icon="spark"
+        />
+        <Item
           href={`/session/flashcards?chapter=${id}`}
           title={t('study.flashcards')}
           sub={t('study.flashcardsSub', { n: content.flashcards.length, known: knownCards })}

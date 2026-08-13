@@ -208,7 +208,17 @@ export function McqScreen() {
               icon="spark"
               className="flex-1"
               loading={leaving}
-              onClick={() => startLeaving(() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`))}
+              onClick={() =>
+                startLeaving(() => {
+                  // Tell the tutor what was picked, so the answer addresses
+                  // THIS student's confusion instead of re-teaching the topic.
+                  const wrong = chosen != null && chosen !== mcq.answer;
+                  const prompt = wrong
+                    ? `I answered "${mcq.options[chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
+                    : mcq.q;
+                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}`);
+                })
+              }
             />
             <Btn
               title={i + 1 >= s.mcqs.length ? t('session.seeResult') : t('session.nextQuestion')}

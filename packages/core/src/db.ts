@@ -80,8 +80,9 @@ type Filterable = PromiseLike<{ data: unknown; error: unknown }> & {
   eq(column: string, value: string): Filterable;
   in(column: string, values: readonly string[]): Filterable;
   or(filter: string): Filterable;
-  order(column: string): Filterable;
+  order(column: string, opts?: { ascending?: boolean }): Filterable;
   limit(count: number): Filterable;
+  maybeSingle(): PromiseLike<{ data: unknown; error: unknown }>;
 };
 
 type Row = { medium: Medium; [column: string]: unknown };
@@ -632,6 +633,77 @@ export async function fetchGeneratedMcqs(
       difficulty: r.difficulty ?? 'medium',
       source: 'ai',
     })) as Mcq[];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * One AI-generated practice set, read back under the student's own RLS.
+ *
+ * No cache and no bundled fallback: these sets are personal, created online
+ * moments before they are opened, and an id that fails to load should say
+ * so rather than show someone else's practice.
+ */
+export type AiSessionRow = {
+  id: string;
+  kind: 'mcq' | 'flashcards' | 'blanks' | 'shortq' | 'paper';
+  title: string;
+  subjectId: string | null;
+  chapterId: string | null;
+  topic: string | null;
+  medium: string;
+  items: unknown;
+  createdAt: string;
+};
+
+export async function fetchAiSession(id: string, client?: ContentClient): Promise<AiSessionRow | null> {
+  const at = client ?? db;
+  if (!at) return null;
+  try {
+    const { data, error } = await table('ai_sessions', at)
+      .select('id,kind,title,subject_id,chapter_id,topic,medium,items,created_at')
+      .eq('id', id)
+      .maybeSingle();
+    if (error || !data) return null;
+    const r = data as Row;
+    return {
+      id: r.id,
+      kind: r.kind,
+      title: r.title,
+      subjectId: r.subject_id,
+      chapterId: r.chapter_id,
+      topic: r.topic,
+      medium: r.medium,
+      items: r.items,
+      createdAt: r.created_at,
+    } as AiSessionRow;
+  } catch {
+    return null;
+  }
+}
+
+/** The student's saved AI sets, newest first, for the builder's shelf. */
+export async function fetchAiSessions(client?: ContentClient): Promise<AiSessionRow[]> {
+  const at = client ?? db;
+  if (!at) return [];
+  try {
+    const { data, error } = await table('ai_sessions', at)
+      .select('id,kind,title,subject_id,chapter_id,topic,medium,items,created_at')
+      .order('created_at', { ascending: false })
+      .limit(12);
+    if (error) return [];
+    return ((data as Row[]) ?? []).map((r) => ({
+      id: r.id,
+      kind: r.kind,
+      title: r.title,
+      subjectId: r.subject_id,
+      chapterId: r.chapter_id,
+      topic: r.topic,
+      medium: r.medium,
+      items: r.items,
+      createdAt: r.created_at,
+    })) as AiSessionRow[];
   } catch {
     return [];
   }

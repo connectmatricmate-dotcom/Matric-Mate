@@ -100,6 +100,20 @@ export default function Tutor() {
         <Icon name="chevron" size={18} color={C.ink3} />
       </Card>
 
+      <Spacer h={S.sm} />
+      <Card
+        onPress={() => router.push('/tutor/paper')}
+        border={C.teal}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: S.md }}
+      >
+        <Icon name="doc" color={C.teal} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('tutor.paperTitle')}</Text>
+          <Small>{t('tutor.paperSub')}</Small>
+        </View>
+        <Icon name="chevron" size={18} color={C.ink3} />
+      </Card>
+
       {left === 0 ? (
         <>
           <Spacer h={S.md} />

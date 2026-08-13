@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { ShortQ } from '@matricmate/core';
+import { checkAnswerLive } from '@matricmate/core';
+import type { AiCheckVerdict, ShortQ } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Label, LinkBtn, Pill } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 
@@ -20,11 +22,16 @@ export function ShortQScreen({
   chapterTitle: string;
   items: ShortQ[];
 }) {
-  const { actions } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
+  const toast = useToast();
   const [i, setI] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [marks, setMarks] = useState<Mark[]>([]);
+  /** The student's own written answer and the examiner's verdict on it. */
+  const [written, setWritten] = useState('');
+  const [checking, setChecking] = useState(false);
+  const [verdict, setVerdict] = useState<AiCheckVerdict | null>(null);
 
   const item = items[i];
   const done = i >= items.length;
@@ -33,6 +40,35 @@ export function ShortQScreen({
   useEffect(() => {
     if (done) fireConfetti(70);
   }, [done]);
+
+  /** Send the written answer to the AI examiner; reveal comes with marks. */
+  async function checkMine() {
+    if (!item || !written.trim() || checking) return;
+    setChecking(true);
+    const res = await checkAnswerLive({
+      question: item.q,
+      modelAnswer: item.answer,
+      points: item.points,
+      marks: item.marks,
+      answer: written.trim(),
+      medium: state.settings.contentMedium,
+    });
+    setChecking(false);
+    if (!res.ok) {
+      const note = {
+        offline: t('tutor.offline'),
+        quota: t('tutor.limitToast'),
+        rate: t('tutor.slowDown'),
+        plan: t('tutor.planNeeded'),
+        refused: t('tutor.refused'),
+        error: t('tutor.errorReply'),
+      }[res.reason];
+      toast(note);
+      return;
+    }
+    setVerdict(res.verdict);
+    setRevealed(true);
+  }
 
   function mark(m: Mark) {
     if (!item) return;
@@ -47,6 +83,8 @@ export function ShortQScreen({
       mode: 'shortq',
     });
     setRevealed(false);
+    setWritten('');
+    setVerdict(null);
     setI(i + 1);
   }
 
@@ -88,12 +126,54 @@ export function ShortQScreen({
           <Card flat tint="bg-tealtint" border="border-tealtint2">
             <p className="text-[13px] text-ink2">{t('session.thinkFirst')}</p>
           </Card>
-          <div className="mt-6">
-            <Btn title={t('session.revealAnswer')} onClick={() => setRevealed(true)} className="w-full" />
+          {/* Write it like the paper, get it marked like the paper. */}
+          <div className="field-shell mt-4 rounded-[16px] border-[1.5px] border-line bg-card transition-[border-color,box-shadow] duration-200">
+            <textarea
+              value={written}
+              onChange={(e) => setWritten(e.target.value)}
+              placeholder={t('tutor.checkPlaceholder')}
+              aria-label={t('tutor.checkPlaceholder')}
+              rows={4}
+              className="w-full resize-y bg-transparent p-4 text-[14px] leading-[1.6] text-ink outline-none placeholder:text-ink3"
+            />
+          </div>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <Btn
+              title={checking ? t('tutor.checkBusy') : t('tutor.checkTitle')}
+              variant="orange"
+              className="flex-1"
+              loading={checking}
+              disabled={!written.trim()}
+              onClick={() => void checkMine()}
+            />
+            <Btn title={t('session.revealAnswer')} variant="line" className="flex-1" onClick={() => setRevealed(true)} />
           </div>
         </div>
       ) : (
         <div className="mt-4">
+          {verdict ? (
+            <Card
+              flat
+              tint={verdict.score >= verdict.maxMarks ? 'bg-greentint' : 'bg-orangetint'}
+              border={verdict.score >= verdict.maxMarks ? 'border-green' : 'border-orange'}
+              className="mb-4"
+            >
+              <p className="font-display text-[19px] text-ink">{t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}</p>
+              <p className="mt-1.5 text-[14px] leading-[1.6] text-ink">{verdict.feedback}</p>
+              {verdict.missed.length ? (
+                <div className="mt-3">
+                  <Label className="text-orangedark">{t('tutor.checkMissed')}</Label>
+                  <ul className="mt-1 flex flex-col gap-1">
+                    {verdict.missed.map((p, n) => (
+                      <li key={n} className="text-[13px] text-ink2">
+                        • {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </Card>
+          ) : null}
           <Card flat tint="bg-greentint" border="border-green">
             <Label className="text-green">{t('session.modelAnswer')}</Label>
             <p className="mt-1 text-[14.5px] leading-[1.6] text-ink">{item.answer}</p>

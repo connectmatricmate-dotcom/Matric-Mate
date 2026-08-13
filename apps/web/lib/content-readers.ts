@@ -1,6 +1,6 @@
 import 'server-only';
 import { cache } from 'react';
-import { api } from '@matricmate/core';
+import { api, fetchAiSession } from '@matricmate/core';
 import type { PlayableTrack } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/server';
 
@@ -34,6 +34,8 @@ export const getSubject = cache(async (id: string) => api.getSubject(id, await c
 export const getSubjects = cache(async (ids?: string[]) => api.getSubjects(ids, await client()));
 export const getChapters = cache(async (subjectId: string) => api.getChapters(subjectId, await client()));
 export const getFlashcards = cache(async (chapterId: string) => api.getFlashcards(chapterId, await client()));
+/** An AI-generated set, read under the student's own cookie session (RLS). */
+export const getAiSession = cache(async (id: string) => fetchAiSession(id, await client()));
 
 /*
  * EVERY server-side content read goes through this file. No exceptions.

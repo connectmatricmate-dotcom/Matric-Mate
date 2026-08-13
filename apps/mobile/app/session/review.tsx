@@ -98,7 +98,13 @@ export default function Review() {
                         title={t('session.askAi')}
                         variant="line"
                         sm
-                        onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(mcq.q)}`)}
+                        onPress={() => {
+                          const prompt =
+                            a?.chosen != null && a.chosen !== mcq.answer
+                              ? `I answered "${mcq.options[a.chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
+                              : mcq.q;
+                          router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}`);
+                        }}
                       />
                       <Btn
                         title={t('session.readInChapter')}

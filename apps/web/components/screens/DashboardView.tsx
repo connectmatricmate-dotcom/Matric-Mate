@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { type IconName, SUBJECT_ICON, type StringKey, accuracy, chapterById, chapterPct, subjectById } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
-import { ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
+import { CoachRail, ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, Label } from '@/components/ui/primitives';
 import { useNow } from '@/lib/now';
 import { useApp, useT } from '@/lib/store';
@@ -160,6 +160,7 @@ export function DashboardView() {
         </Work>
 
         <Rail>
+          <CoachRail />
           <StreakRail />
           <WeakRail />
           <ConfidenceRail />

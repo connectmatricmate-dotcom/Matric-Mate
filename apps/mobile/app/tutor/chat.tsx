@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
 import { Body, Card, IconButton, Pill, Row, Screen, Small, Tap, useToast } from '../../src/components/ui';
 import { api, chapterById, ChatMessage, fetchTutorQuota, weakTopics } from '@matricmate/core';
-import type { TutorQuota } from '@matricmate/core';
+import type { TutorImage, TutorQuota } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -26,6 +27,12 @@ export default function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
+  /** The answer growing live while the tutor writes. Cleared on completion. */
+  const [liveText, setLiveText] = useState('');
+  /** A photo waiting in the composer, plus its uri for the preview chip. */
+  const [photo, setPhoto] = useState<(TutorImage & { uri: string }) | null>(null);
+  /** Thumbnails for photo questions sent this visit; history shows a marker. */
+  const [sentPhotos, setSentPhotos] = useState<Record<string, string>>({});
   /**
    * The server owns the conversation now. threadId is minted by the tutor
    * route on the first answer and echoed back; opening a saved chat passes
@@ -80,36 +87,53 @@ export default function Chat() {
 
   async function send(text: string) {
     const clean = text.trim();
-    if (!clean || thinking) return;
+    if ((!clean && !photo) || thinking) return;
     if (outOfQuestions) {
       toast(t('tutor.limitToast'));
       return;
     }
-    const mine: ChatMessage = { id: `m-${Date.now()}`, role: 'user', text: clean, at: Date.now() };
+    const image = photo;
+    const mine: ChatMessage = {
+      id: `m-${Date.now()}`,
+      role: 'user',
+      text: clean || t('tutor.photoQuestion'),
+      at: Date.now(),
+    };
     setMessages((m) => [...m, mine]);
+    if (image) setSentPhotos((p) => ({ ...p, [mine.id]: image.uri }));
     setInput('');
+    setPhoto(null);
     setThinking(true);
+    setLiveText('');
 
-    const res = await api.askTutor(clean, {
-      threadId,
-      context: contextLabel,
-      profile: {
-        name: state.user?.name,
-        medium: state.settings.contentMedium,
-        language: state.settings.language,
-        subjects: derived.subjects,
-        weakTopics: weakTopics(state.attempts)
-          .slice(0, 3)
-          .map((w) => w.topic),
+    const res = await api.askTutor(
+      clean,
+      {
+        threadId,
+        context: contextLabel,
+        image: image ? { data: image.data, mediaType: image.mediaType } : undefined,
+        profile: {
+          name: state.user?.name,
+          medium: state.settings.contentMedium,
+          language: state.settings.language,
+          subjects: derived.subjects,
+          weakTopics: weakTopics(state.attempts)
+            .slice(0, 3)
+            .map((w) => w.topic),
+        },
       },
-    });
+      // The answer streams in; the growing text renders as a live bubble.
+      (textSoFar) => setLiveText(textSoFar),
+    );
     setThinking(false);
+    setLiveText('');
 
     if (res.reason) {
       // The question never reached an answer, so it must not sit in the chat
       // looking answered. Put it back in the box and say what happened.
       setMessages((m) => m.filter((x) => x.id !== mine.id));
       setInput(clean);
+      if (image) setPhoto(image);
       if (res.quota) setQuota(res.quota);
       const note = {
         offline: t('tutor.offline'),
@@ -130,6 +154,34 @@ export default function Chat() {
     // Mirror into the local counter so the tutor tab's ring stays roughly
     // right between server fetches. The server remains the authority.
     actions.consumeAi();
+  }
+
+  /** Snap or pick a photo of a question. Compressed by the picker; the
+   *  server enforces the hard size wall. */
+  async function attachPhoto(fromCamera: boolean) {
+    try {
+      if (fromCamera) {
+        const perm = await ImagePicker.requestCameraPermissionsAsync();
+        if (!perm.granted) return;
+      }
+      const result = fromCamera
+        ? await ImagePicker.launchCameraAsync({ quality: 0.6, base64: true })
+        : await ImagePicker.launchImageLibraryAsync({ quality: 0.6, base64: true, mediaTypes: 'images' });
+      const asset = result.assets?.[0];
+      if (result.canceled || !asset?.base64) return;
+      const mediaType = asset.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
+      setPhoto({ data: asset.base64, mediaType, uri: asset.uri });
+    } catch {
+      toast(t('states.errorTitle'));
+    }
+  }
+
+  function pickPhotoSource() {
+    Alert.alert(t('tutor.photoTitle'), undefined, [
+      { text: t('tutor.photoCamera'), onPress: () => void attachPhoto(true) },
+      { text: t('tutor.photoGallery'), onPress: () => void attachPhoto(false) },
+      { text: t('common.cancel'), style: 'cancel' },
+    ]);
   }
 
   /**
@@ -208,6 +260,13 @@ export default function Chat() {
                   borderBottomRightRadius: 6,
                 }}
               >
+                {sentPhotos[m.id] ? (
+                  <Image
+                    source={{ uri: sentPhotos[m.id] }}
+                    style={{ width: 180, height: 135, borderRadius: 10, marginBottom: 8 }}
+                    resizeMode="cover"
+                  />
+                ) : null}
                 <Text style={{ fontFamily: F.body, fontSize: 14, lineHeight: 22, color: '#fff' }}>{m.text}</Text>
               </View>
             ) : (
@@ -259,13 +318,35 @@ export default function Chat() {
             )
           )}
 
-          {thinking ? (
+          {thinking && liveText ? (
+            <View
+              style={{
+                alignSelf: 'flex-start',
+                maxWidth: '92%',
+                backgroundColor: C.card,
+                borderWidth: 1,
+                borderColor: C.line,
+                padding: 15,
+                borderRadius: 18,
+                borderBottomLeftRadius: 6,
+              }}
+            >
+              <Text style={{ fontFamily: F.body, fontSize: 13.5, lineHeight: 21, color: C.ink }}>{liveText}</Text>
+            </View>
+          ) : thinking ? (
             <View style={{ alignSelf: 'flex-start', backgroundColor: C.card, borderWidth: 1, borderColor: C.line, padding: 14, borderRadius: 18 }}>
               <Small>{t('tutor.thinking')}</Small>
             </View>
           ) : null}
         </ScrollView>
 
+        {photo ? (
+          <Row style={{ paddingHorizontal: S.md, paddingVertical: 6, backgroundColor: C.card }} gap={S.sm}>
+            <Image source={{ uri: photo.uri }} style={{ width: 44, height: 44, borderRadius: 8 }} resizeMode="cover" />
+            <Small style={{ flex: 1 }}>{t('tutor.photoAttached')}</Small>
+            <IconButton icon="close" onPress={() => setPhoto(null)} />
+          </Row>
+        ) : null}
         <Row
           style={{
             paddingHorizontal: S.md,
@@ -277,6 +358,7 @@ export default function Chat() {
           }}
           gap={S.sm}
         >
+          <IconButton icon="camera" onPress={pickPhotoSource} />
           <View
             style={{
               flex: 1,
@@ -312,7 +394,7 @@ export default function Chat() {
                 width: 44,
                 height: 44,
                 borderRadius: 99,
-                backgroundColor: input.trim() && !outOfQuestions ? C.teal : C.ink3,
+                backgroundColor: (input.trim() || photo) && !outOfQuestions ? C.teal : C.ink3,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}

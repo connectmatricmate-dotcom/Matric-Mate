@@ -5,8 +5,9 @@
  * itself. Deliberately small, quiet and never the primary action.
  */
 import Link from 'next/link';
-import { useMemo } from 'react';
-import { accuracy, confidenceBreakdown, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import { useEffect, useMemo, useState } from 'react';
+import { accuracy, buildCoachDigest, confidenceBreakdown, fetchCoachReport, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import type { CoachReport } from '@matricmate/core';
 import { Bar, Card, Icon, Label, Pill, Ring } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
@@ -225,6 +226,60 @@ export function UpgradeRail() {
       >
         {t('account.upgrade')}
       </Link>
+    </Card>
+  );
+}
+
+/**
+ * The weekly AI coach: two sentences about the week, the two weakest topics
+ * with why they matter, three things to do. One model call per week, cached
+ * server-side in coach_reports; quiet until there is practice to coach.
+ */
+export function CoachRail() {
+  const { state, derived } = useApp();
+  const t = useT();
+  const [report, setReport] = useState<CoachReport | null>(null);
+  const hasAttempts = state.attempts.length > 0;
+  useEffect(() => {
+    if (!hasAttempts) return;
+    let alive = true;
+    fetchCoachReport(
+      buildCoachDigest({
+        attempts: state.attempts,
+        streak: derived.streak,
+        xp: state.xp,
+        subjects: derived.subjects,
+        language: state.settings.language,
+      }),
+    ).then((res) => {
+      if (alive && res.ok) setReport(res.report);
+    });
+    return () => {
+      alive = false;
+    };
+    // One fetch per mount is right: the report is cached per week server-side.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasAttempts]);
+
+  if (!report) return null;
+  return (
+    <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
+      <Label className="text-teal">{t('tutor.coachTitle')}</Label>
+      <p className="text-[13px] leading-[1.6] text-ink">{report.summary}</p>
+      {report.weak.slice(0, 2).map((w) => (
+        <div key={w.topic}>
+          <p className="text-[13px] font-extrabold text-ink">{w.topic}</p>
+          <p className="text-[12px] leading-[1.5] text-ink2">{w.why}</p>
+        </div>
+      ))}
+      <Label>{t('tutor.coachActions')}</Label>
+      <ol className="flex flex-col gap-1">
+        {report.actions.slice(0, 3).map((a, i) => (
+          <li key={i} className="text-[12.5px] leading-[1.5] text-ink2">
+            {i + 1}. {a}
+          </li>
+        ))}
+      </ol>
     </Card>
   );
 }

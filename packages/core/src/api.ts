@@ -23,7 +23,7 @@ import {
 } from './db';
 import type { ContentClient } from './db';
 import { askTutorLive, tutorConfigured } from './tutor';
-import type { TutorProfile, TutorQuota } from './tutor';
+import type { TutorImage, TutorProfile, TutorQuota } from './tutor';
 import { AudioTrack, Chapter, ChapterContent, Flashcard, Mcq, Subject } from './types';
 
 /** Still needed by the two mocks below, which fake their own latency. */
@@ -98,7 +98,9 @@ export const api = {
    */
   async askTutor(
     question: string,
-    opts?: { context?: string; threadId?: string | null; profile?: TutorProfile },
+    opts?: { context?: string; threadId?: string | null; profile?: TutorProfile; image?: TutorImage },
+    /** Streaming: called with the answer-so-far while the tutor writes. */
+    onDelta?: (textSoFar: string) => void,
   ): Promise<{
     live: boolean;
     text: string;
@@ -108,12 +110,16 @@ export const api = {
     reason?: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error';
   }> {
     if (tutorConfigured()) {
-      const res = await askTutorLive({
-        message: question,
-        threadId: opts?.threadId,
-        context: opts?.context,
-        profile: opts?.profile,
-      });
+      const res = await askTutorLive(
+        {
+          message: question,
+          threadId: opts?.threadId,
+          context: opts?.context,
+          profile: opts?.profile,
+          image: opts?.image,
+        },
+        onDelta,
+      );
       if (res.ok) return { live: true, text: res.text, threadId: res.threadId, quota: res.quota };
       return { live: true, text: '', reason: res.reason, quota: res.quota };
     }

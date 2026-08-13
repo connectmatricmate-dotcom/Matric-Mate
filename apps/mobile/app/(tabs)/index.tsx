@@ -16,6 +16,7 @@ import {
   Tap,
   Tiny,
 } from '../../src/components/ui';
+import { CoachCard } from '../../src/components/CoachCard';
 import { LockedNotice } from '../../src/components/LockedNotice';
 import { SUBJECT_COLORS, chapterById, subjectById , accuracy, chapterPct, todayKey } from '@matricmate/core';
 import { Confetti, Pop, Pulse } from '../../src/components/celebration';
@@ -278,6 +279,10 @@ export default function Dashboard() {
           </Card>
         </>
       ) : null}
+
+      {/* The weekly AI coach, cached server-side per week. */}
+      <Spacer h={S.md} />
+      <CoachCard />
 
       {/* Quick actions */}
       <SectionTitle>{t('dash.quickActions')}</SectionTitle>

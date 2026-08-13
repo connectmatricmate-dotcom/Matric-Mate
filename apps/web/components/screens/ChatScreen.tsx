@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { type ChatMessage, api, weakTopics } from '@matricmate/core';
+import { type ChatMessage, type TutorImage, api, weakTopics } from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
@@ -27,6 +27,13 @@ export function ChatScreen({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
+  /** The answer growing live while the tutor writes. Cleared on completion. */
+  const [liveText, setLiveText] = useState('');
+  /** A photo waiting in the composer, with a data URL for the preview chip. */
+  const [photo, setPhoto] = useState<(TutorImage & { preview: string }) | null>(null);
+  /** Thumbnails for photo questions sent this visit; history shows a marker. */
+  const [sentPhotos, setSentPhotos] = useState<Record<string, string>>({});
+  const fileInput = useRef<HTMLInputElement>(null);
   /** One vote per answer, kept so the buttons latch instead of only toasting. */
   const [feedback, setFeedback] = useState<Record<string, 'up' | 'down'>>({});
   /**
@@ -70,37 +77,54 @@ export function ChatScreen({
 
   async function send(text: string) {
     const clean = text.trim();
-    if (!clean || thinking) return;
+    if ((!clean && !photo) || thinking) return;
     if (outOfQuestions) {
       toast(t('tutor.limitToast'));
       return;
     }
 
-    const mine: ChatMessage = { id: `m-${Date.now()}`, role: 'user', text: clean, at: Date.now() };
+    const image = photo;
+    const mine: ChatMessage = {
+      id: `m-${Date.now()}`,
+      role: 'user',
+      text: clean || t('tutor.photoQuestion'),
+      at: Date.now(),
+    };
     setMessages((m) => [...m, mine]);
+    if (image) setSentPhotos((p) => ({ ...p, [mine.id]: image.preview }));
     setInput('');
+    setPhoto(null);
     setThinking(true);
+    setLiveText('');
 
-    const res = await api.askTutor(clean, {
-      threadId,
-      context: contextLabel,
-      profile: {
-        name: state.user?.name,
-        medium: state.settings.contentMedium,
-        language: state.settings.language,
-        subjects: derived.subjects,
-        weakTopics: weakTopics(state.attempts)
-          .slice(0, 3)
-          .map((w) => w.topic),
+    const res = await api.askTutor(
+      clean,
+      {
+        threadId,
+        context: contextLabel,
+        image: image ? { data: image.data, mediaType: image.mediaType } : undefined,
+        profile: {
+          name: state.user?.name,
+          medium: state.settings.contentMedium,
+          language: state.settings.language,
+          subjects: derived.subjects,
+          weakTopics: weakTopics(state.attempts)
+            .slice(0, 3)
+            .map((w) => w.topic),
+        },
       },
-    });
+      // The answer streams in; the growing text renders as a live bubble.
+      (textSoFar) => setLiveText(textSoFar),
+    );
     setThinking(false);
+    setLiveText('');
 
     if (res.reason) {
       // No answer was delivered, so the question must not sit in the chat
       // looking answered. Put it back in the box and say what happened.
       setMessages((m) => m.filter((x) => x.id !== mine.id));
       setInput(clean);
+      if (image) setPhoto(image);
       if (res.quota) setQuota(res.quota);
       const note = {
         offline: t('tutor.offline'),
@@ -121,6 +145,26 @@ export function ChatScreen({
     // Mirror into the local counter so rails stay roughly right between
     // server fetches. The server remains the authority.
     actions.consumeAi();
+  }
+
+  /**
+   * A picked file, downscaled on a canvas so a 12 MP photo does not ride up
+   * as ten megabytes of base64. JPEG at 0.8 keeps printed and written text
+   * perfectly readable for the model.
+   */
+  async function attachPhoto(file: File) {
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      canvas.getContext('2d')?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      setPhoto({ data: dataUrl.split(',')[1], mediaType: 'image/jpeg', preview: dataUrl });
+    } catch {
+      toast(t('states.errorTitle'));
+    }
   }
 
   // A question passed in the URL is asked once, on arrival.
@@ -183,6 +227,10 @@ export function ChatScreen({
               key={m.id}
               className="max-w-[84%] self-end rounded-[18px] rounded-br-[6px] bg-teal px-4 py-3 text-[14px] leading-[1.6] text-white"
             >
+              {sentPhotos[m.id] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={sentPhotos[m.id]} alt="" className="mb-2 max-h-44 rounded-[10px]" />
+              ) : null}
               {m.text}
             </div>
           ) : (
@@ -246,7 +294,11 @@ export function ChatScreen({
           )
         )}
 
-        {thinking ? (
+        {thinking && liveText ? (
+          <div className="max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-card p-4">
+            <p className="whitespace-pre-wrap text-[13.5px] leading-[1.65] text-ink">{liveText}</p>
+          </div>
+        ) : thinking ? (
           <div
             role="status"
             aria-label={t('tutor.thinking')}
@@ -271,6 +323,38 @@ export function ChatScreen({
         className="border-t border-line bg-card px-4 py-3 md:px-8"
       >
         <div className="mx-auto flex w-full max-w-[820px] items-center gap-2.5">
+        <input
+          ref={fileInput}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void attachPhoto(f);
+            e.target.value = '';
+          }}
+        />
+        {photo ? (
+          <button
+            type="button"
+            aria-label={t('common.cancel')}
+            title={t('tutor.photoAttached')}
+            onClick={() => setPhoto(null)}
+            className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[12px] border border-line"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={photo.preview} alt="" className="h-full w-full object-cover" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            aria-label={t('tutor.photoTitle')}
+            onClick={() => fileInput.current?.click()}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-grey text-ink2 transition-colors duration-200 hover:text-ink"
+          >
+            <Icon name="camera" size={19} />
+          </button>
+        )}
         {/* .field-shell owns the focus ring; a bare outline-none input erased it */}
         <div
           className={`field-shell flex min-w-0 flex-1 items-center rounded-full border-[1.5px] border-line px-4 py-2.5 transition-[border-color,box-shadow] duration-200 ${
@@ -292,7 +376,7 @@ export function ChatScreen({
         </div>
         <button
           type="submit"
-          disabled={!input.trim() || thinking || outOfQuestions}
+          disabled={(!input.trim() && !photo) || thinking || outOfQuestions}
           aria-label={t('tutor.send')}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-teal text-white transition-colors duration-200 hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
         >

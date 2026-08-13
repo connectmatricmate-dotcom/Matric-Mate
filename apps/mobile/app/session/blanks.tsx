@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Bar, Btn, Card, Empty, ErrorState, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
-import { api, blankHalves, chaptersFor } from '@matricmate/core';
+import { api, blankHalves, chaptersFor, fetchAiSession, normalizeAiBlanks } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer, thud, tick } from '../../src/core/haptics';
@@ -12,14 +12,22 @@ import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function Blanks() {
-  const { chapter } = useLocalSearchParams<{ chapter?: string }>();
+  const { chapter, ai } = useLocalSearchParams<{ chapter?: string; ai?: string }>();
   const { state, actions } = useApp();
   // Arriving with no chapter param used to mean Physics chapter 3 for
   // everyone. Follow the student instead: the chapter they last studied,
   // else the first chapter of their first subject.
   const chapterId = chapter ?? state.lastChapterId ?? chaptersFor(state.onboarding?.subjects?.[0] ?? 'phy')[0]?.id ?? 'phy-1';
   const t = useT();
-  const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(chapterId), [chapterId]);
+  // An ?ai= id swaps the bank for a set the student asked the AI to build.
+  const { data: content, loading, error, reload } = useAsync(async () => {
+    if (ai) {
+      const s = await fetchAiSession(ai);
+      if (!s) throw new Error('missing session');
+      return { blanks: normalizeAiBlanks(s.items as Parameters<typeof normalizeAiBlanks>[0], s.chapterId ?? chapterId) };
+    }
+    return api.getChapterContent(chapterId);
+  }, [chapterId, ai ?? '']);
 
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);

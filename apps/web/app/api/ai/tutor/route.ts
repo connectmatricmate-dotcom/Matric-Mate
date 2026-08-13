@@ -17,6 +17,16 @@ import { createClient } from '@/lib/supabase/server';
  *    student lives): 429 with the reset time
  *  - 5 questions per minute, the actual abuse wall: 429 with retry hint
  *
+ * Those walls answer as plain JSON before any model call. Once the model
+ * starts, the answer streams back as NDJSON lines so the student watches it
+ * being written instead of staring at a spinner:
+ *   {"t":"delta","text":"..."}   repeated, then exactly one of
+ *   {"t":"done","threadId":...,"quota":{...}} | {"t":"err","reason":...}
+ *
+ * A question can also carry a photo (base64) and the model reads it: snap
+ * the homework, get the steps. Images are answered but not persisted; the
+ * thread keeps a text marker instead, because chat history is text.
+ *
  * The model choice is one constant. claude-sonnet-5 because a tutor for
  * fourteen-year-olds must be genuinely good in both English and Urdu and
  * still answer in a few seconds; at roughly two rupees an answer against a
@@ -31,6 +41,9 @@ const MAX_ANSWER_TOKENS = 6000;
 const HISTORY_TURNS = 12;
 const RATE_LIMIT_PER_MINUTE = 5;
 const TIMEZONE = 'Asia/Karachi';
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+/** ~5 MB of base64: generous for a downscaled phone photo, a wall for abuse. */
+const IMAGE_MAX_CHARS = 7_000_000;
 
 export const maxDuration = 60;
 
@@ -118,6 +131,7 @@ How you teach:
 - Exam craft counts: point out what examiners award marks for, common mistakes, and how many marks a question of this kind usually carries.
 - Keep answers tight. A focused answer a student finishes beats a lecture they abandon. No filler, no repeated caveats.
 - If a question is outside Class 9 study (other classes are fine to touch briefly when they help), gently steer back to the syllabus. You are a study tutor, not a general assistant: politely decline requests unrelated to studying.
+- When a photo is attached, read it carefully first. If it shows a question, solve it step by step; if it shows notes or a diagram, explain it. If the photo is unreadable, say so and ask for a clearer one.
 - Use web search only when the question genuinely needs current information (board dates, notifications, recent changes); the syllabus itself you already know.
 - Never invent board policies, dates or marks distributions. If unsure, say so and suggest checking fbise.edu.pk.
 - Write in plain text: short paragraphs and numbered lists only. No markdown headings, no asterisks or bold markers, no tables, no LaTeX. Write fractions with / and powers with ^, the way they are typed in class notes.
@@ -164,6 +178,7 @@ export async function POST(req: NextRequest) {
     message?: string;
     threadId?: string;
     context?: string;
+    image?: { data?: string; mediaType?: string };
     profile?: { name?: string; medium?: string; language?: string; subjects?: string[]; weakTopics?: string[] };
   };
   try {
@@ -172,7 +187,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'bad_request' }, { status: 400 });
   }
   const message = (body.message ?? '').trim().slice(0, 4000);
-  if (!message) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+
+  let image: { data: string; media_type: (typeof IMAGE_TYPES)[number] } | null = null;
+  if (body.image?.data) {
+    const mediaType = IMAGE_TYPES.find((m) => m === body.image?.mediaType);
+    if (!mediaType || body.image.data.length > IMAGE_MAX_CHARS) {
+      return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+    }
+    image = { data: body.image.data, media_type: mediaType };
+  }
+  if (!message && !image) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+
+  // What the thread remembers about this turn. Photos are answered live but
+  // not stored, so the saved history marks that one was here.
+  const persistedQuestion = message || 'Photo question';
+  const savedUserText = image ? `[photo] ${persistedQuestion}` : persistedQuestion;
 
   // Thread: reuse if owned, else start one named after the question.
   let threadId = body.threadId ?? null;
@@ -181,7 +210,7 @@ export async function POST(req: NextRequest) {
     if (!owned) threadId = null;
   }
   if (!threadId) {
-    const title = message.length > 42 ? `${message.slice(0, 42)}…` : message;
+    const title = persistedQuestion.length > 42 ? `${persistedQuestion.slice(0, 42)}…` : persistedQuestion;
     const { data: created, error: tErr } = await admin
       .from('chat_threads')
       .insert({ user_id: userId, title, context_label: body.context?.slice(0, 120) ?? null })
@@ -190,12 +219,13 @@ export async function POST(req: NextRequest) {
     if (tErr || !created) return NextResponse.json({ error: 'server_error' }, { status: 500 });
     threadId = created.id;
   }
+  const thread = threadId;
 
   // History, oldest first, trimmed to keep the request lean.
   const { data: historyRows } = await admin
     .from('chat_messages')
     .select('role,content')
-    .eq('thread_id', threadId)
+    .eq('thread_id', thread)
     .order('at', { ascending: true })
     .limit(HISTORY_TURNS);
 
@@ -214,65 +244,99 @@ export async function POST(req: NextRequest) {
 
   const standing = await buildStandingContext(admin);
 
-  try {
-    const turns: Anthropic.MessageParam[] = [
-      ...(historyRows ?? []).map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
-      { role: 'user' as const, content: message },
-    ];
-    const ask = () =>
-      anthropic.messages.create({
-        model: TUTOR_MODEL,
-        max_tokens: MAX_ANSWER_TOKENS,
-        output_config: { effort: 'low' },
-        system: [
-          // Stable bytes first with the cache breakpoint, volatile student
-          // block after it, so the big block caches across every student.
-          { type: 'text', text: PERSONA + standing, cache_control: { type: 'ephemeral' } },
-          { type: 'text', text: studentBlock },
-        ],
-        tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }],
-        messages: turns,
-      });
+  const userContent: Anthropic.ContentBlockParam[] = [];
+  if (image) userContent.push({ type: 'image', source: { type: 'base64', ...image } });
+  userContent.push({ type: 'text', text: message || 'Solve or explain what is in this photo, step by step.' });
 
-    let response = await ask();
-    // A server-side web search can pause the turn; resend the conversation
-    // with the paused assistant content and the API resumes where it left
-    // off. Bounded, so a stuck search cannot spin the route forever.
-    for (let i = 0; i < 2 && response.stop_reason === 'pause_turn'; i++) {
-      turns.push({ role: 'assistant', content: response.content });
-      response = await ask();
-    }
+  const turns: Anthropic.MessageParam[] = [
+    ...(historyRows ?? []).map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+    { role: 'user' as const, content: userContent },
+  ];
 
-    if (response.stop_reason === 'refusal') {
-      return NextResponse.json({ error: 'refused', quota }, { status: 200 });
-    }
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const emit = (line: object) => controller.enqueue(encoder.encode(`${JSON.stringify(line)}\n`));
+      try {
+        let text = '';
+        // A server-side web search can pause the turn; resending with the
+        // paused assistant content resumes it. Bounded, so a stuck search
+        // cannot spin the route forever.
+        let stopReason: string | null = null;
+        for (let round = 0; round < 3; round++) {
+          const s = anthropic.messages.stream({
+            model: TUTOR_MODEL,
+            max_tokens: MAX_ANSWER_TOKENS,
+            output_config: { effort: 'low' },
+            system: [
+              // Stable bytes first with the cache breakpoint, volatile
+              // student block after it, so the big block caches across
+              // every student.
+              { type: 'text', text: PERSONA + standing, cache_control: { type: 'ephemeral' } },
+              { type: 'text', text: studentBlock },
+            ],
+            tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }],
+            messages: turns,
+          });
+          s.on('text', (delta) => {
+            text += delta;
+            emit({ t: 'delta', text: delta });
+          });
+          const final = await s.finalMessage();
+          stopReason = final.stop_reason;
+          if (stopReason !== 'pause_turn') break;
+          turns.push({ role: 'assistant', content: final.content });
+        }
 
-    const text = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n')
-      .trim();
-    if (!text) return NextResponse.json({ error: 'server_error' }, { status: 500 });
+        if (stopReason === 'refusal') {
+          emit({ t: 'err', reason: 'refused', quota });
+          controller.close();
+          return;
+        }
+        const answer = text.trim();
+        if (!answer) {
+          emit({ t: 'err', reason: 'error', quota });
+          controller.close();
+          return;
+        }
 
-    // Persist both sides, bump the thread, charge the quota. Charged only
-    // after a delivered answer: a failed request must not cost a question.
-    await admin.from('chat_messages').insert([
-      { thread_id: threadId, user_id: userId, role: 'user', content: message },
-      { thread_id: threadId, user_id: userId, role: 'assistant', content: text },
-    ]);
-    await admin.from('chat_threads').update({ updated_at: new Date().toISOString() }).eq('id', threadId);
-    await admin.from('ai_usage').upsert(
-      { user_id: userId, day: dayKey(), used: quota.used + 1 },
-      { onConflict: 'user_id,day' },
-    );
+        // Persist both sides, bump the thread, charge the quota. Charged
+        // only after a delivered answer: a failed request must not cost a
+        // question.
+        await admin.from('chat_messages').insert([
+          { thread_id: thread, user_id: userId, role: 'user', content: savedUserText },
+          { thread_id: thread, user_id: userId, role: 'assistant', content: answer },
+        ]);
+        await admin.from('chat_threads').update({ updated_at: new Date().toISOString() }).eq('id', thread);
+        await admin.from('ai_usage').upsert(
+          { user_id: userId, day: dayKey(), used: quota.used + 1 },
+          { onConflict: 'user_id,day' },
+        );
 
-    return NextResponse.json({
-      threadId,
-      text,
-      quota: { ...quota, used: quota.used + 1, remaining: quota.remaining - 1 },
-    });
-  } catch (e) {
-    console.error('[tutor]', e instanceof Error ? e.message : e);
-    return NextResponse.json({ error: 'server_error', quota }, { status: 502 });
-  }
+        emit({
+          t: 'done',
+          threadId: thread,
+          quota: { ...quota, used: quota.used + 1, remaining: quota.remaining - 1 },
+        });
+        controller.close();
+      } catch (e) {
+        console.error('[tutor]', e instanceof Error ? e.message : e);
+        try {
+          emit({ t: 'err', reason: 'error', quota });
+          controller.close();
+        } catch {
+          controller.error(e);
+        }
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'content-type': 'application/x-ndjson; charset=utf-8',
+      'cache-control': 'no-store',
+      // Vercel and some proxies buffer unless told not to.
+      'x-accel-buffering': 'no',
+    },
+  });
 }

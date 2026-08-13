@@ -8,6 +8,7 @@
 export * from './types';
 export * from './avatars';
 export * from './tutor';
+export * from './ai';
 export * from './content';
 export * from './domain';
 export * from './billing';
@@ -23,10 +24,12 @@ export {
   contentMedium,
   isLive,
   fetchSlos,
+  fetchAiSession,
+  fetchAiSessions,
   fetchAudioTracks,
   fetchChapterContentLive,
   primeAllContent,
 } from './db';
-export type { ContentClient, LocalContentProvider, Slo } from './db';
+export type { AiSessionRow, ContentClient, LocalContentProvider, Slo } from './db';
 export * from './i18n';
 export * from './sync';

@@ -1,30 +1,44 @@
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Body, Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, Skeleton, Small, Spacer } from '../../src/components/ui';
-import { api, chaptersFor } from '@matricmate/core';
+import { Body, Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { api, chaptersFor, checkAnswerLive, fetchAiSession, normalizeAiShortQs } from '@matricmate/core';
+import type { AiCheckVerdict } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, isWeb } from '../../src/theme';
 
 type Mark = 'got' | 'partial' | 'missed';
 
 export default function ShortQuestions() {
-  const { chapter } = useLocalSearchParams<{ chapter?: string }>();
+  const { chapter, ai } = useLocalSearchParams<{ chapter?: string; ai?: string }>();
   const { state, actions } = useApp();
   // Arriving with no chapter param used to mean Physics chapter 3 for
   // everyone. Follow the student instead: the chapter they last studied,
   // else the first chapter of their first subject.
   const chapterId = chapter ?? state.lastChapterId ?? chaptersFor(state.onboarding?.subjects?.[0] ?? 'phy')[0]?.id ?? 'phy-1';
   const t = useT();
-  const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(chapterId), [chapterId]);
+  // An ?ai= id swaps the bank for a set the student asked the AI to build.
+  const { data: content, loading, error, reload } = useAsync(async () => {
+    if (ai) {
+      const s = await fetchAiSession(ai);
+      if (!s) throw new Error('missing session');
+      return { shortQs: normalizeAiShortQs(s.items as Parameters<typeof normalizeAiShortQs>[0], s.chapterId ?? chapterId) };
+    }
+    return api.getChapterContent(chapterId);
+  }, [chapterId, ai ?? '']);
 
   const [i, setI] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [marks, setMarks] = useState<Mark[]>([]);
+  /** The student's own written answer and the examiner's verdict on it. */
+  const [written, setWritten] = useState('');
+  const [checking, setChecking] = useState(false);
+  const [verdict, setVerdict] = useState<AiCheckVerdict | null>(null);
+  const toast = useToast();
 
   const items = content?.shortQs ?? [];
   const item = items[i];
@@ -57,6 +71,35 @@ export default function ShortQuestions() {
       </Screen>
     );
   }
+  /** Send the written answer to the AI examiner; reveal comes with marks. */
+  async function checkMine() {
+    if (!item || !written.trim() || checking) return;
+    setChecking(true);
+    const res = await checkAnswerLive({
+      question: item.q,
+      modelAnswer: item.answer,
+      points: item.points,
+      marks: item.marks,
+      answer: written.trim(),
+      medium: state.settings.contentMedium,
+    });
+    setChecking(false);
+    if (!res.ok) {
+      const note = {
+        offline: t('tutor.offline'),
+        quota: t('tutor.limitToast'),
+        rate: t('tutor.slowDown'),
+        plan: t('tutor.planNeeded'),
+        refused: t('tutor.refused'),
+        error: t('tutor.errorReply'),
+      }[res.reason];
+      toast(note);
+      return;
+    }
+    setVerdict(res.verdict);
+    setRevealed(true);
+  }
+
   function mark(m: Mark) {
     if (!item) return;
     setMarks((prev) => [...prev, m]);
@@ -70,6 +113,8 @@ export default function ShortQuestions() {
       mode: 'shortq',
     });
     setRevealed(false);
+    setWritten('');
+    setVerdict(null);
     setI(i + 1);
   }
 
@@ -119,10 +164,59 @@ export default function ShortQuestions() {
             <Small>{t('session.thinkFirst')}</Small>
           </Card>
           <Spacer h={S.md} />
-          <Btn title={t('session.revealAnswer')} onPress={() => setRevealed(true)} />
+          {/* Write it like the paper, get it marked like the paper. */}
+          <Card flat>
+            <TextInput
+              value={written}
+              onChangeText={setWritten}
+              placeholder={t('tutor.checkPlaceholder')}
+              placeholderTextColor={C.ink3}
+              multiline
+              style={[
+                { fontFamily: F.body, fontSize: 14, lineHeight: 22, color: C.ink, minHeight: 96, textAlignVertical: 'top' },
+                isWeb && ({ outlineStyle: 'none' } as object),
+              ]}
+            />
+          </Card>
+          <Spacer h={S.sm} />
+          <Btn
+            title={checking ? t('tutor.checkBusy') : t('tutor.checkTitle')}
+            variant="orange"
+            loading={checking}
+            disabled={!written.trim()}
+            onPress={checkMine}
+          />
+          <Spacer h={S.sm} />
+          <Btn title={t('session.revealAnswer')} variant="line" onPress={() => setRevealed(true)} />
         </>
       ) : (
         <>
+          {verdict ? (
+            <>
+              <Card
+                flat
+                tint={verdict.score >= verdict.maxMarks ? C.greenTint : C.orangeTint}
+                border={verdict.score >= verdict.maxMarks ? C.green : C.orange}
+              >
+                <Text style={{ fontFamily: F.display, fontSize: 19, color: C.ink }}>
+                  {t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}
+                </Text>
+                <Body style={{ marginTop: 6 }}>{verdict.feedback}</Body>
+                {verdict.missed.length ? (
+                  <>
+                    <Spacer h={S.sm} />
+                    <Label style={{ color: C.orangeDark }}>{t('tutor.checkMissed')}</Label>
+                    <View style={{ gap: 4, marginTop: 4 }}>
+                      {verdict.missed.map((p, n) => (
+                        <Small key={n}>• {p}</Small>
+                      ))}
+                    </View>
+                  </>
+                ) : null}
+              </Card>
+              <Spacer h={S.md} />
+            </>
+          ) : null}
           <Card flat tint={C.greenTint} border={C.green}>
             <Label style={{ color: C.green }}>{t('session.modelAnswer')}</Label>
             <Body style={{ marginTop: 4 }}>{item?.answer}</Body>

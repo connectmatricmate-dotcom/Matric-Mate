@@ -195,6 +195,12 @@ export default function ChapterHub() {
           />
         ) : null}
         <Item
+          title={t('tutor.sheetMake')}
+          sub={t('tutor.aiMade')}
+          icon="spark"
+          onPress={() => router.push(`/learn/sheet/${id}`)}
+        />
+        <Item
           title={t('study.flashcards')}
           sub={content ? t('study.flashcardsSub', { n: content.flashcards.length, known: knownCards }) : ''}
           icon="cards"

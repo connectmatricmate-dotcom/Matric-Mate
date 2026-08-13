@@ -11,6 +11,7 @@
  */
 import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetch as expoFetch } from 'expo/fetch';
 import { AppState } from 'react-native';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { configureTutor, connectContent, primeAllContent } from '@matricmate/core';
@@ -132,6 +133,12 @@ configureTutor({
       return null;
     }
   },
+  /**
+   * expo/fetch, not React Native's built-in fetch, and only here: it exposes
+   * a readable response body, which is what lets tutor answers stream in
+   * word by word instead of landing all at once.
+   */
+  fetchImpl: (url, init) => expoFetch(url, init as Parameters<typeof expoFetch>[1]) as unknown as Promise<Response>,
 });
 
 /**
