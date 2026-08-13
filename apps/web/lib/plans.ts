@@ -88,8 +88,7 @@ export const INCLUDED = [
   'Android app and website, one account',
 ];
 
-export const FREE_INCLUDED = [
-  'Browse every subject and chapter',
-  'One full chapter per subject',
-  'A sample of the practice questions',
-];
+/*
+ * There is no free tier. The client's call: every account needs a plan, so
+ * the only list that exists is what the plan includes.
+ */

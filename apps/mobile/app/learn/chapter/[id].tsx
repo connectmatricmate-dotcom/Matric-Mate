@@ -5,6 +5,7 @@ import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Skel
 import { api , chapterPct, hasStudyMaterial , pickAudioTrack, subjectById } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack } from '../../../src/core/downloads';
 import { Confetti, Pop } from '../../../src/components/celebration';
+import { LockedNotice } from '../../../src/components/LockedNotice';
 import { cheer } from '../../../src/core/haptics';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
@@ -57,6 +58,36 @@ export default function ChapterHub() {
           <Skeleton h={64} />
           <Skeleton h={64} />
         </View>
+      </Screen>
+    );
+  }
+
+  /**
+   * Paid-only gate, before any content fetch. Without a plan the RLS wall
+   * returns empty content anyway; fetching and rendering that would read as
+   * "broken chapter". What an unpaid student should meet is the shelf card,
+   * what is inside, and the plain-text route to a plan, which is exactly
+   * what LockedNotice is allowed to say on Play.
+   */
+  const locked = !!chapter && chapter.premium && !state.premium.active;
+  if (locked) {
+    return (
+      <Screen>
+        <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
+        <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
+          <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
+          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+            {chapter.blurb}
+          </Text>
+        </Card>
+        <Spacer h={S.md} />
+        <Card flat style={{ paddingVertical: 0 }}>
+          <Item title={t('study.notes')} sub={t('study.sectionsSub', { n: chapter.sectionCount })} icon="book" />
+          <Item title={t('study.mcqs')} sub={t('study.mcqsSub', { n: chapter.mcqCount })} icon="target" />
+          <Item title={t('study.flashcards')} sub={t('study.flashcardsSub', { n: chapter.flashcardCount, known: 0 })} icon="cards" last />
+        </Card>
+        <Spacer h={S.md} />
+        <LockedNotice variant="locked" />
       </Screen>
     );
   }

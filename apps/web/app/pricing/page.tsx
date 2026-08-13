@@ -5,25 +5,23 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { PayMark } from '@/components/commerce/PayMark';
 import { PlanPicker } from '@/components/commerce/PlanPicker';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
-import { FREE_INCLUDED, PAYMENT_METHODS } from '@/lib/plans';
+import { PAYMENT_METHODS } from '@/lib/plans';
 
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'Rs 1,000 a month for everything in MatricMate: every chapter, unlimited practice, past papers and the AI tutor. Three days free, cancel any time.',
+    'Rs 1,000 a month for everything in MatricMate: every chapter, unlimited practice, past papers and the AI tutor. Cancel any time.',
 };
 
 /** Row-by-row, so a parent can see exactly where the money goes. */
-const COMPARE: { feature: string; free: string; premium: string }[] = [
-  { feature: 'Chapters and notes', free: 'One per subject', premium: 'All of them' },
-  { feature: 'Audio lessons', free: 'Sample chapter', premium: 'Every chapter' },
-  { feature: 'MCQs a day', free: '5', premium: 'Unlimited' },
-  { feature: 'Timed tests and past papers', free: 'No', premium: 'Unlimited' },
-  { feature: 'AI tutor questions a day', free: '5', premium: '20' },
-  { feature: 'Weak topics', free: 'No', premium: 'Yes' },
-  { feature: 'Monthly report card', free: 'No', premium: 'Yes' },
-  { feature: 'Offline downloads (Android app)', free: 'No', premium: 'Yes' },
-  { feature: 'Android app and website', free: 'Yes', premium: 'Yes, one account' },
+const COMPARE: { feature: string; premium: string }[] = [
+  { feature: 'Chapters, notes and audio lessons', premium: 'All of them, English and Urdu' },
+  { feature: 'MCQs, blanks and short questions', premium: 'Unlimited' },
+  { feature: 'Timed tests and past papers', premium: 'Unlimited' },
+  { feature: 'AI tutor questions a day', premium: '20' },
+  { feature: 'Weak topics and monthly report card', premium: 'Included' },
+  { feature: 'Offline downloads (Android app)', premium: 'Included' },
+  { feature: 'Android app and website', premium: 'One account, both' },
 ];
 
 const QUESTIONS = [
@@ -67,26 +65,24 @@ export default function PricingPage() {
 
         <PlanPicker />
 
-        {/* ------------------------------------------------------- comparison */}
+        {/* ---------------------------------------------------- what's inside */}
         <section className="border-t border-tealtint2 bg-tealtint">
           <div className="mx-auto max-w-[860px] px-5 py-16">
-            <h2 className="font-display text-mk-h2 text-ink">Free and Premium, side by side</h2>
+            <h2 className="font-display text-mk-h2 text-ink">Everything opens with the plan</h2>
             <p className="mt-3 text-mk-lead text-ink2">
-              The free plan is a real plan, not a countdown. It stays free for as long as you want it.
+              There is one plan and it holds the whole product. No tiers to compare, no feature held back for a
+              bigger one.
             </p>
 
             <div className="mt-7 overflow-x-auto">
-              <table className="w-full min-w-[520px] border-collapse text-left">
+              <table className="w-full min-w-[420px] border-collapse text-left">
                 <thead>
                   <tr className="border-b-2 border-line">
                     <th scope="col" className="py-3 text-[12px] font-extrabold uppercase tracking-[0.07em] text-ink3">
                       What you get
                     </th>
-                    <th scope="col" className="w-[130px] py-3 text-[12px] font-extrabold uppercase tracking-[0.07em] text-ink3">
-                      Free
-                    </th>
-                    <th scope="col" className="w-[150px] py-3 text-[12px] font-extrabold uppercase tracking-[0.07em] text-orangedark">
-                      Premium
+                    <th scope="col" className="w-[190px] py-3 text-[12px] font-extrabold uppercase tracking-[0.07em] text-orangedark">
+                      With your plan
                     </th>
                   </tr>
                 </thead>
@@ -96,25 +92,12 @@ export default function PricingPage() {
                       <th scope="row" className="py-3 text-[15px] font-normal text-ink">
                         {row.feature}
                       </th>
-                      <td className="py-3 text-[15px] text-ink2">{row.free}</td>
                       <td className="py-3 text-[15px] font-extrabold text-ink">{row.premium}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-
-            <Card flat className="mt-7">
-              <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">Staying on free</p>
-              <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
-                {FREE_INCLUDED.map((li) => (
-                  <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink2">
-                    <Icon name="check" size={16} strokeWidth={2.6} className="mt-0.5 shrink-0 text-ink3" />
-                    {li}
-                  </li>
-                ))}
-              </ul>
-            </Card>
           </div>
         </section>
 
@@ -154,11 +137,11 @@ export default function PricingPage() {
               ))}
             </div>
             <p className="mt-6 text-[14.5px] text-ink2">
-              Still unsure?{' '}
+              Ready?{' '}
               <Link href="/signup" className="font-extrabold text-teal hover:underline">
-                Start on the free plan
+                Make the account
               </Link>{' '}
-              and upgrade when it earns it.
+              and you are two minutes from the first chapter.
             </p>
           </div>
         </section>

@@ -100,6 +100,15 @@ export default function Dashboard() {
       <AppHeader eyebrow={today} title={t('dash.greeting', { name: firstName })} />
       {milestoneToday ? <Confetti /> : null}
 
+      {!state.premium.active ? (
+        <>
+          {/* Leading with the pitch, not burying it: for an unpaid account
+              this screen's job is to show what a plan opens. */}
+          <LockedNotice variant="free" />
+          <Spacer h={S.md} />
+        </>
+      ) : null}
+
       {derived.streak > 0 ? (
         <Pop>
           <Row
@@ -293,12 +302,6 @@ export default function Dashboard() {
         <Kpi value={week.days} label={t('dash.activeDays')} small />
       </Row>
 
-      {!state.premium.active ? (
-        <>
-          <Spacer h={S.lg} />
-          <LockedNotice variant="free" />
-        </>
-      ) : null}
 
       <Spacer h={S.lg} />
       <Tiny style={{ textAlign: 'center' }}>{t('common.demoNote')}</Tiny>

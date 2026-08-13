@@ -487,8 +487,8 @@ export default function LandingPage() {
             </Tilt>
 
             <p className="mt-6 text-center text-mk-small text-ink2">
-              Making an account is free, and lets you see the syllabus and a sample chapter. Studying the full course
-              needs a subscription.
+              Making an account shows you the full syllabus and what every chapter contains. Studying needs the
+              plan, which opens all of it at once.
             </p>
           </Reveal>
         </section>

@@ -195,10 +195,10 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       title: subjectId === 'urd' || subjectId === 'isl' ? (r[2] as string) : r[0],
       urduTitle: subjectId === 'urd' || subjectId === 'isl' ? r[0] : undefined,
       blurb: subjectId === 'urd' || subjectId === 'isl' ? r[1] : r[1],
-      // Chapter one of every subject is the free sample; everything after it
-      // needs a subscription. Was `i >= 6`, which quietly gave away six
-      // chapters per subject and contradicted the pricing page.
-      premium: i >= 1,
+      // Paid-only, the client's call after M2: there is no free chapter any
+      // more, so the flag no longer varies. It stays because the apps and the
+      // chapters table still carry it.
+      premium: true,
       // Zero, like audioMinutes below and for the same reason: these were
       // formulas that invented plausible counts, so offline or before the
       // live index primed, screens advertised "31 MCQs" for chapters that

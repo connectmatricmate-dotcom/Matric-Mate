@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName } from '../../src/components/Icon';
 import { Card, Empty, Item, Pill, Screen, SectionTitle, Small, Spacer } from '../../src/components/ui';
+import { LockedNotice } from '../../src/components/LockedNotice';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -22,24 +23,42 @@ export default function Practice() {
   const { state } = useApp();
   const t = useT();
   const recent = state.results.slice(0, 4);
+  /**
+   * Paid-only: the practice grid is the shop window for unpaid accounts.
+   * Everything stays visible so they can see what they would get, nothing
+   * navigates, because every session behind these tiles fetches content the
+   * server will not serve them. Topper papers stay open: board URLs, not
+   * our content.
+   */
+  const paid = state.premium.active;
 
   return (
     <Screen tabbed>
       <AppHeader title={t('practice.title')} eyebrow={t('practice.sub')} showStreak={false} />
 
+      {!paid ? (
+        <>
+          <LockedNotice variant="free" />
+          <Spacer h={S.sm} />
+        </>
+      ) : null}
+
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: S.sm }}>
-        {MODES.map((m) => (
+        {MODES.map((m) => {
+          const open = paid || m.href === '/session/topper-papers';
+          return (
           <Card
             key={m.label}
-            onPress={() => router.push(m.href as never)}
+            onPress={open ? () => router.push(m.href as never) : undefined}
             border={m.accent ? C.orange : undefined}
-            style={{ flexGrow: 1, flexBasis: '46%', gap: 6 }}
+            style={{ flexGrow: 1, flexBasis: '46%', gap: 6, opacity: open ? 1 : 0.62 }}
           >
-            <Icon name={m.icon} color={m.accent ? C.orangeDark : C.teal} />
+            <Icon name={open ? m.icon : 'lock'} color={m.accent ? C.orangeDark : C.teal} />
             <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t(m.label)}</Text>
             <Small style={{ fontSize: 11.5 }}>{t(m.sub)}</Small>
           </Card>
-        ))}
+          );
+        })}
       </View>
 
       <Spacer h={S.md} />
