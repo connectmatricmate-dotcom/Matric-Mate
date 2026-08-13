@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Body, Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, Skeleton, Small, Spacer } from '../../src/components/ui';
 import { api, chaptersFor } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
+import { Confetti, Pop } from '../../src/components/celebration';
+import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
@@ -27,6 +29,10 @@ export default function ShortQuestions() {
   const items = content?.shortQs ?? [];
   const item = items[i];
   const done = !!content && i >= items.length;
+
+  useEffect(() => {
+    if (done) cheer();
+  }, [done]);
 
 
   // A failed fetch is not an empty chapter, and an empty chapter is not a
@@ -80,12 +86,14 @@ export default function ShortQuestions() {
     const got = marks.filter((m) => m === 'got').length;
     return (
       <Screen>
+        <Confetti />
         <Header title={t('practice.shortQ')} back />
+        <Pop>
         <Card style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
-          <Text style={{ fontSize: 38 }}>📝</Text>
           <H2 style={{ textAlign: 'center' }}>{t('session.shortQDone', { n: got, total: items.length })}</H2>
           <Small style={{ textAlign: 'center' }}>{t('session.shortQDoneSub')}</Small>
         </Card>
+        </Pop>
         <Spacer h={S.lg} />
         <Btn title={t('session.backToChapter')} onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
       </Screen>

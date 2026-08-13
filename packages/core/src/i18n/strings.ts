@@ -261,6 +261,8 @@ export const en = {
     questions: 'questions',
     studyTime: 'study time',
     activeDays: 'Active days',
+    streakChip: '{n} day streak',
+    streakMilestone: '{n} days in a row. Keep it going!',
   },
 
   notifications: {
@@ -293,6 +295,7 @@ export const en = {
     premiumChapter: 'Premium',
     premiumNote: 'Chapters 7 and up are part of Premium.',
     notOnPaper: 'Not on the Class 9 paper',
+    chapterCleared: 'Chapter cleared!',
     emptyChapterTitle: 'Nothing to revise here',
     emptyChapterBody: 'No notes, audio, flashcards or questions for this chapter.',
     sections: 'What’s inside',
@@ -438,6 +441,8 @@ export const en = {
     askAi: 'Ask AI',
     nextQuestion: 'Next question',
     seeResult: 'See result',
+    levelUp: 'Level {n} unlocked!',
+    combo: '{n} in a row!',
     noItemsTitle: 'Nothing here yet',
     noItemsBody: 'This chapter does not have this practice type yet.',
     noSession: 'No active session',
@@ -1006,6 +1011,8 @@ export const ur: typeof en = {
     questions: 'sawal',
     studyTime: 'parhai ka waqt',
     activeDays: 'Active din',
+    streakChip: 'Lagatar {n} din',
+    streakMilestone: 'Lagatar {n} din. Aise hi chalte raho!',
   },
 
   notifications: {
@@ -1038,6 +1045,7 @@ export const ur: typeof en = {
     premiumChapter: 'Premium',
     premiumNote: 'Chapter 7 se aagey Premium ka hissa hain.',
     notOnPaper: 'Class 9 paper mein shamil nahi',
+    chapterCleared: 'Chapter mukammal!',
     emptyChapterTitle: 'Yahan dohrane ke liye kuch nahi',
     emptyChapterBody: 'Is chapter ke liye koi notes, audio, flashcards ya sawal nahi hain.',
     sections: 'Is chapter mein kya hai',
@@ -1183,6 +1191,8 @@ export const ur: typeof en = {
     askAi: 'AI se poochein',
     nextQuestion: 'Agla sawal',
     seeResult: 'Result dekhein',
+    levelUp: 'Level {n} khul gaya!',
+    combo: 'Lagatar {n} sahi!',
     noItemsTitle: 'Abhi yahan kuch nahi',
     noItemsBody: 'Is chapter mein ye practice type abhi nahi hai.',
     noSession: 'Koi session nahi chal rahi',

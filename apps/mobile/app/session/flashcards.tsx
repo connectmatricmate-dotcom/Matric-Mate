@@ -4,6 +4,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Bar, Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
 import { api, chaptersFor } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
+import { Confetti, Pop } from '../../src/components/celebration';
+import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb } from '../../src/theme';
@@ -35,6 +37,10 @@ export default function Flashcards() {
   const deck = round ? (cards ?? []).filter((c) => round.includes(c.id)) : (cards ?? []);
   const card = deck[i];
   const done = !!cards && i >= deck.length;
+
+  useEffect(() => {
+    if (done) cheer();
+  }, [done]);
 
 
   // A failed fetch is not an empty chapter, and an empty chapter is not a
@@ -89,12 +95,14 @@ export default function Flashcards() {
   if (done) {
     return (
       <Screen>
+        <Confetti />
         <Header title={t('study.flashcards')} back />
+        <Pop>
         <Card style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
-          <Text style={{ fontSize: 40 }}>🎉</Text>
           <H2 style={{ textAlign: 'center' }}>{t('session.cardsDone', { known: known.length, repeat: repeats.length })}</H2>
           <Small style={{ textAlign: 'center' }}>{t('session.cardsDoneSub')}</Small>
         </Card>
+        </Pop>
         <Spacer h={S.lg} />
         {repeats.length ? (
           <Btn

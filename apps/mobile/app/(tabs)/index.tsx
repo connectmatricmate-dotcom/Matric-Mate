@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
@@ -17,7 +17,9 @@ import {
   Tiny,
 } from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { chapterById, subjectById , accuracy, chapterPct } from '@matricmate/core';
+import { chapterById, subjectById , accuracy, chapterPct, todayKey } from '@matricmate/core';
+import { Confetti, Pop, Pulse } from '../../src/components/celebration';
+import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -61,6 +63,23 @@ export default function Dashboard() {
     };
   }, [state.attempts, state.activeDays, now]);
 
+  /**
+   * Milestone streaks get one celebration on the day they land. The flame
+   * chip itself pulses any day the streak is alive, a small ember of "do not
+   * break it now" that costs nothing to keep lit.
+   */
+  const MILESTONES = [3, 7, 14, 30, 50, 100];
+  const streakActiveToday = state.activeDays.includes(todayKey());
+  const milestoneToday =
+    streakActiveToday && MILESTONES.includes(derived.streak) && state.lastStreakCelebrated !== todayKey();
+  useEffect(() => {
+    if (milestoneToday) {
+      cheer();
+      actions.markStreakCelebrated();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [milestoneToday]);
+
   const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
   const planDone = derived.plan.filter((task) => task.done).length;
@@ -79,6 +98,35 @@ export default function Dashboard() {
   return (
     <Screen tabbed>
       <AppHeader eyebrow={today} title={t('dash.greeting', { name: firstName })} />
+      {milestoneToday ? <Confetti /> : null}
+
+      {derived.streak > 0 ? (
+        <Pop>
+          <Row
+            gap={6}
+            style={{
+              alignSelf: 'flex-start',
+              alignItems: 'center',
+              backgroundColor: C.orangeTint,
+              borderColor: C.orange,
+              borderWidth: 1.5,
+              borderRadius: 99,
+              paddingVertical: 5,
+              paddingHorizontal: 12,
+              marginBottom: S.md,
+            }}
+          >
+            <Pulse on={streakActiveToday}>
+              <Icon name="flame" size={15} color={C.orangeDark} fill={C.orange} />
+            </Pulse>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.orangeDark }}>
+              {milestoneToday
+                ? t('dash.streakMilestone', { n: derived.streak })
+                : t('dash.streakChip', { n: derived.streak })}
+            </Text>
+          </Row>
+        </Pop>
+      ) : null}
 
       {/* Today's plan */}
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>

@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Skeleton, Small, Spacer, useToast } from '../../../src/components/ui';
 import { api , chapterPct, hasStudyMaterial , pickAudioTrack, subjectById } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack } from '../../../src/core/downloads';
+import { Confetti, Pop } from '../../../src/components/celebration';
+import { cheer } from '../../../src/core/haptics';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -25,6 +27,20 @@ export default function ChapterHub() {
   const audio =
     pickAudioTrack(tracks ?? [], state.settings.contentMedium) ??
     localAudioTrack(id, state.settings.contentMedium);
+  /**
+   * The 100% moment, once per chapter, ever. A student who clears a chapter
+   * deserves a bigger beat than a full progress ring; a student re-visiting
+   * a cleared chapter deserves not to be confettied every time.
+   */
+  const justCleared = chapterPct(id, state.readSections, state.attempts) >= 100 && !state.celebratedChapters.includes(id);
+  useEffect(() => {
+    if (justCleared) {
+      cheer();
+      actions.markChapterCelebrated(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [justCleared, id]);
+
 
   // While the chapter row is still on its way, the screen used to paint the
   // full layout with every text slot blank: a teal card with nothing in it,
@@ -67,6 +83,7 @@ export default function ChapterHub() {
   const pct = chapterPct(id, state.readSections, state.attempts);
   const downloaded = state.downloads.includes(id);
 
+
   async function toggleDownload() {
     setBusy(true);
     const result = await actions.toggleDownload(id);
@@ -88,6 +105,14 @@ export default function ChapterHub() {
         />
       }
     >
+      {justCleared ? <Confetti /> : null}
+      {justCleared ? (
+        <Pop>
+          <Card flat tint={C.greenTint} border={C.green} style={{ alignItems: 'center', paddingVertical: 12, marginBottom: S.sm }}>
+            <Text style={{ fontFamily: F.display, fontSize: 17, color: C.green }}>{t('study.chapterCleared')}</Text>
+          </Card>
+        </Pop>
+      ) : null}
       <Header
         title={`Chapter ${chapter?.number ?? ''}`}
         sub={chapter ? subjectById(chapter.subjectId)?.name : ' '}

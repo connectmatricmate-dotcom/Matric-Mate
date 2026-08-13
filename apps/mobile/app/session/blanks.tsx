@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Bar, Btn, Card, Empty, ErrorState, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
 import { api, blankHalves, chaptersFor } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
+import { Confetti, Pop } from '../../src/components/celebration';
+import { cheer, thud, tick } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
@@ -28,6 +30,10 @@ export default function Blanks() {
   const item = items[i];
   const halves = item ? blankHalves(item.sentence[0], item.sentence[1]) : ['', ''];
   const done = !!content && i >= items.length;
+
+  useEffect(() => {
+    if (done) cheer();
+  }, [done]);
 
 
   // A failed fetch is not an empty chapter, and an empty chapter is not a
@@ -57,6 +63,8 @@ export default function Blanks() {
     if (!item || !pick) return;
     const ok = pick === item.answer;
     setChecked(true);
+    if (ok) tick();
+    else thud();
     if (ok) setRight((r) => r + 1);
     actions.recordAttempt({
       mcqId: item.id,
@@ -81,14 +89,16 @@ export default function Blanks() {
   if (done) {
     return (
       <Screen>
+        <Confetti />
         <Header title={t('practice.blanks')} back />
+        <Pop>
         <Card style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>
-          <Text style={{ fontSize: 38 }}>{right === items.length ? '🎉' : '👍'}</Text>
           <Text style={{ fontFamily: F.display, fontSize: 21, color: C.ink }}>
             {t('session.blanksDone', { a: right, b: items.length })}
           </Text>
           <Small style={{ textAlign: 'center' }}>{t('session.blanksDoneSub')}</Small>
         </Card>
+        </Pop>
         <Spacer h={S.lg} />
         <Btn title={t('session.backToChapter')} onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
       </Screen>

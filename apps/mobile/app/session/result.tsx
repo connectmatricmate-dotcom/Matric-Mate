@@ -2,7 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, H2, Pill, Ring, Row, Screen, Small, Spacer } from '../../src/components/ui';
-import { XP, accuracy, grade , chapterById } from '@matricmate/core';
+import { Confetti, Pop } from '../../src/components/celebration';
+import { cheer } from '../../src/core/haptics';
+import { Icon } from '../../src/components/Icon';
+import { XP, accuracy, grade , chapterById, level } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -39,6 +42,11 @@ export default function Result() {
       attemptIds: [],
     });
   }, [s]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (pct >= 70) cheer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let n = 0;
@@ -78,9 +86,18 @@ export default function Result() {
 
   const good = pct >= 70;
   const diff = pct - myAverage;
+  /**
+   * 1 to 3 stars, the scale a nine-year-old already understands: one for
+   * finishing, two for a pass, three for excellent. Zero would just be mean.
+   */
+  const stars = pct >= 90 ? 3 : pct >= 70 ? 2 : 1;
+  // The XP for this session is already in state.xp by the time this screen
+  // renders, so the level before it is the level at (xp - earned).
+  const levelledUp = level(state.xp) > level(Math.max(0, state.xp - xp));
 
   return (
     <Screen>
+      {good ? <Confetti /> : null}
       <Spacer h={S.xl} />
       <View style={{ alignItems: 'center' }}>
         <Ring pct={shown} size={150} stroke={12} color={good ? C.orange : C.red}>
@@ -89,7 +106,17 @@ export default function Result() {
             {score} / {total}
           </Small>
         </Ring>
-        <H2 style={{ marginTop: S.md, textAlign: 'center' }}>
+
+        {/* The reveal beat: stars land one at a time, after the ring fills. */}
+        <Row gap={6} style={{ marginTop: S.md }}>
+          {[0, 1, 2].map((i) => (
+            <Pop key={i} delay={500 + i * 220}>
+              <Icon name="star" size={30} color={i < stars ? '#F7C948' : C.grey} fill={i < stars ? '#F7C948' : C.grey} />
+            </Pop>
+          ))}
+        </Row>
+
+        <H2 style={{ marginTop: S.sm, textAlign: 'center' }}>
           {good
             ? t('session.resultGood', { name: (state.user?.name ?? 'Student').split(' ')[0] })
             : t('session.resultTry')}
@@ -97,13 +124,30 @@ export default function Result() {
         <Small style={{ textAlign: 'center' }}>{s.label}</Small>
       </View>
 
+      {levelledUp ? (
+        <Pop delay={1000}>
+          <Spacer h={S.md} />
+          <Card flat tint={C.orangeTint} border={C.orange} style={{ alignItems: 'center', paddingVertical: 12 }}>
+            <Text style={{ fontFamily: F.display, fontSize: 17, color: C.orangeDark }}>
+              {t('session.levelUp', { n: level(state.xp) })}
+            </Text>
+          </Card>
+        </Pop>
+      ) : null}
+
       <Spacer h={S.md} />
       <Row gap={S.sm} style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Pill tone={good ? 'green' : 'red'}>{t('session.grade', { g: grade(pct) })}</Pill>
-        <Pill tone="orange">
-          {s.mode === 'exam' ? t('session.xpDoubled', { n: xp }) : t('session.xpEarned', { n: xp })}
-        </Pill>
-        <Pill tone="grey">{t('session.vsAverage', { n: `${diff >= 0 ? '+' : ''}${diff}` })}</Pill>
+        <Pop delay={300}>
+          <Pill tone={good ? 'green' : 'red'}>{t('session.grade', { g: grade(pct) })}</Pill>
+        </Pop>
+        <Pop delay={450}>
+          <Pill tone="orange">
+            {s.mode === 'exam' ? t('session.xpDoubled', { n: xp }) : t('session.xpEarned', { n: xp })}
+          </Pill>
+        </Pop>
+        <Pop delay={600}>
+          <Pill tone="grey">{t('session.vsAverage', { n: `${diff >= 0 ? '+' : ''}${diff}` })}</Pill>
+        </Pop>
       </Row>
 
       {weakest ? (

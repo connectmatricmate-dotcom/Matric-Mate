@@ -162,12 +162,15 @@ export function Icon({
   size = 20,
   color = C.ink,
   strokeWidth = 1.9,
+  fill = 'none',
 }: {
   name: IconName;
   size?: number;
   color?: string;
+  /** Solid fill for celebratory icons like the result stars. */
+  fill?: string;
   strokeWidth?: number;
 }) {
   const Glyph = GLYPHS[name];
-  return <Glyph size={size} color={color} strokeWidth={strokeWidth} />;
+  return <Glyph size={size} color={color} strokeWidth={strokeWidth} fill={fill} />;
 }

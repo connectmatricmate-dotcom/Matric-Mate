@@ -114,6 +114,10 @@ export type State = {
   notifications: Notification[];
   settings: Settings;
   lastChapterId?: string;
+  /** Chapters whose 100% moment has already been celebrated on this device. */
+  celebratedChapters: string[];
+  /** Day key of the last streak-milestone celebration, so it fires once a day. */
+  lastStreakCelebrated: string | null;
   lastSectionIndex: number;
   activeDays: string[];
   xp: number;
@@ -144,6 +148,8 @@ const EMPTY: State = {
   threads: [],
   notifications: [],
   settings: DEFAULT_SETTINGS,
+  celebratedChapters: [],
+  lastStreakCelebrated: null,
   lastSectionIndex: 0,
   activeDays: [],
   xp: 0,
@@ -159,6 +165,9 @@ const EMPTY: State = {
  * itself premium, which is both a bug and the thing Play policy exists to stop.
  */
 type Actions = {
+  /** Records that a chapter's 100% moment has been shown, so it never repeats. */
+  markChapterCelebrated: (chapterId: string) => void;
+  markStreakCelebrated: () => void;
   setOnboarding: (o: Partial<Onboarding>) => void;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => Attempt;
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
@@ -414,6 +423,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const actions = useMemo<Actions>(
     () => ({
+      markChapterCelebrated: (chapterId) =>
+        setState((s) =>
+          s.celebratedChapters.includes(chapterId)
+            ? s
+            : { ...s, celebratedChapters: [...s.celebratedChapters, chapterId] },
+        ),
+      markStreakCelebrated: () => setState((s) => ({ ...s, lastStreakCelebrated: todayKey() })),
       setOnboarding: (o) => {
         const onboarding: Onboarding = {
           classLevel: 9,

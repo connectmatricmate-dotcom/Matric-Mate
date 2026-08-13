@@ -18,6 +18,9 @@ import {
   Tap,
 } from '../../src/components/ui';
 import { XP , Confidence } from '@matricmate/core';
+import Animated from 'react-native-reanimated';
+import { Pop, useShake } from '../../src/components/celebration';
+import { thud, tick } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -42,6 +45,12 @@ export default function McqScreen() {
   const [chosen, setChosen] = useState<number | null>(null);
   const [confidence, setConfidence] = useState<Confidence | null>(null);
   const [checked, setChecked] = useState(false);
+  /**
+   * Consecutive correct answers in this sitting. The pill only appears from
+   * three, because "1 in a row" is not a streak, it is an answer.
+   */
+  const [combo, setCombo] = useState(0);
+  const [optionsStyle, shakeOptions] = useShake();
 
   const mcq = s?.mcqs[i];
   /**
@@ -74,6 +83,14 @@ export default function McqScreen() {
     if (chosen == null || confidence == null) return;
     const isRight = chosen === mcq!.answer;
     setChecked(true);
+    if (isRight) {
+      tick();
+      setCombo((c) => c + 1);
+    } else {
+      thud();
+      shakeOptions();
+      setCombo(0);
+    }
     session.answer({ mcqId: mcq!.id, chosen, confidence, correct: isRight });
     actions.recordAttempt({
       mcqId: mcq!.id,
@@ -138,6 +155,29 @@ export default function McqScreen() {
       <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 27, color: C.ink }}>{mcq.q}</Text>
       <Spacer h={S.md} />
 
+      {combo >= 3 ? (
+        <Pop style={{ alignSelf: 'flex-start', marginBottom: S.sm }}>
+          <Row
+            gap={5}
+            style={{
+              backgroundColor: C.orangeTint,
+              borderColor: C.orange,
+              borderWidth: 1.5,
+              borderRadius: 99,
+              paddingVertical: 5,
+              paddingHorizontal: 12,
+              alignItems: 'center',
+            }}
+          >
+            <Icon name="flame" size={14} color={C.orangeDark} fill={C.orange} />
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.orangeDark }}>
+              {t('session.combo', { n: combo })}
+            </Text>
+          </Row>
+        </Pop>
+      ) : null}
+
+      <Animated.View style={optionsStyle}>
       {mcq.options.map((opt, n) => {
         const isChosen = chosen === n;
         const isAnswer = n === mcq.answer;
@@ -172,6 +212,7 @@ export default function McqScreen() {
           </Tap>
         );
       })}
+      </Animated.View>
 
       {/* confidence */}
       {chosen != null && !checked ? (
