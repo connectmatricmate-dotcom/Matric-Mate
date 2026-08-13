@@ -762,8 +762,21 @@ export function Empty({
 }) {
   return (
     <Card flat style={{ alignItems: 'center', paddingVertical: 26 }}>
-      <Text style={{ fontSize: 34 }}>{emoji}</Text>
-      <H3 style={{ marginTop: 6, textAlign: 'center' }}>{title}</H3>
+      {/* The emoji sits on a soft tinted disc so an empty screen still looks
+          designed rather than abandoned. */}
+      <View
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: 99,
+          backgroundColor: C.tealTint,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 34 }}>{emoji}</Text>
+      </View>
+      <H3 style={{ marginTop: 10, textAlign: 'center' }}>{title}</H3>
       {sub ? <Small style={{ textAlign: 'center', marginTop: 3 }}>{sub}</Small> : null}
       {cta ? <View style={{ marginTop: S.md }}>{cta}</View> : null}
     </Card>

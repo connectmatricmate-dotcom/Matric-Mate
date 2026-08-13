@@ -17,7 +17,7 @@ import {
   Tiny,
 } from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { chapterById, subjectById , accuracy, chapterPct, todayKey } from '@matricmate/core';
+import { SUBJECT_COLORS, chapterById, subjectById , accuracy, chapterPct, todayKey } from '@matricmate/core';
 import { Confetti, Pop, Pulse } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
@@ -228,7 +228,22 @@ export default function Dashboard() {
                   justifyContent: 'center',
                 }}
               >
-                <Icon name={SUBJECT_ICON[lastChapter.subjectId] ?? 'book'} color={C.teal} />
+                <View
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 13,
+                    backgroundColor: SUBJECT_COLORS[lastChapter.subjectId]?.tint ?? C.tealTint,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Icon
+                    name={SUBJECT_ICON[lastChapter.subjectId] ?? 'book'}
+                    color={SUBJECT_COLORS[lastChapter.subjectId]?.main ?? C.teal}
+                    strokeWidth={2.3}
+                  />
+                </View>
               </View>
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }} numberOfLines={1}>

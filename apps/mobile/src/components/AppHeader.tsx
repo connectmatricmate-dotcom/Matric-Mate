@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { AVATARS, useApp } from '../store/app';
+import { AvatarBadge } from './AvatarBadge';
+import { useApp } from '../store/app';
 import { C, F, S } from '../theme';
 import { H2, IconButton, Pill, Small, Tap } from './ui';
 
@@ -32,7 +33,7 @@ export function AppHeader({
             justifyContent: 'center',
           }}
         >
-          <Text style={{ fontSize: 21 }}>{AVATARS[state.settings.avatar ?? 0] ?? AVATARS[0]}</Text>
+          <AvatarBadge index={state.settings.avatar ?? 0} size={38} />
         </View>
       </Tap>
 

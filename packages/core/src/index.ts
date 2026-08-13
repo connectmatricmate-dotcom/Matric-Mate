@@ -6,6 +6,7 @@
  * navigation, storage, asset loading) stays in the app that needs it.
  */
 export * from './types';
+export * from './avatars';
 export * from './content';
 export * from './domain';
 export * from './billing';

@@ -84,13 +84,10 @@ export type Onboarding = {
   subjects: string[];
 };
 
-/** The avatar choices, indexed by Settings.avatar. */
-export const AVATARS = ['🧑🏽‍🎓', '👩🏽‍🎓', '🧕🏽', '👨🏽‍💻', '🦸🏽'];
-
 export type Settings = {
   /** Language of the interface. Separate from `contentMedium`, which is the syllabus language. */
   language: 'en' | 'ur';
-  /** Index into AVATARS, chosen on the edit-profile screen. */
+  /** Index into core's AVATARS cast, chosen on the edit-profile screen. */
   avatar: number;
   dark: boolean;
   reminders: boolean;

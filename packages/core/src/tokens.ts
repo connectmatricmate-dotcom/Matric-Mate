@@ -90,3 +90,21 @@ export const CONTENT_MAX = 1040;
 export const READING_MAX = 720;
 
 export type ColorToken = keyof typeof colors;
+
+/**
+ * Each subject's colour identity, used to tint its icon, ring and chip in
+ * both apps. Chosen to stay legible on white and on their own tints, and to
+ * make the study list read as a friendly shelf of different books rather
+ * than nine copies of the same teal one.
+ */
+export const SUBJECT_COLORS: Record<string, { main: string; tint: string }> = {
+  phy: { main: '#7C4DDB', tint: '#EFE8FB' },
+  chem: { main: '#0E8FB5', tint: '#E2F4FA' },
+  bio: { main: '#2E9E5B', tint: '#E7F5EC' },
+  math: { main: '#E8590C', tint: '#FDEEE3' },
+  eng: { main: '#C2255C', tint: '#FBE9F0' },
+  urd: { main: '#0B7285', tint: '#E1F1F4' },
+  isl: { main: '#5F3DC4', tint: '#ECE7FA' },
+  pst: { main: '#087F5B', tint: '#E3F4EE' },
+  cs: { main: '#364FC7', tint: '#E8ECFA' },
+};

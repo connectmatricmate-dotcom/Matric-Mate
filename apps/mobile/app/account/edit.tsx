@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, Field, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
-import { AVATARS, useApp } from '../../src/store/app';
+import { AVATARS } from '@matricmate/core';
+import { AvatarBadge } from '../../src/components/AvatarBadge';
+import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { C, S } from '../../src/theme';
 
@@ -41,22 +43,18 @@ export default function EditProfile() {
     >
       <Header title={t('account.editTitle')} back />
 
-      <Row gap={S.sm} style={{ justifyContent: 'center', marginVertical: S.md }}>
+      <Row gap={S.sm} style={{ justifyContent: 'center', flexWrap: 'wrap', marginVertical: S.md }}>
         {AVATARS.map((a, i) => (
-          <Tap key={a} onPress={() => setAvatar(i)}>
+          <Tap key={a.id} onPress={() => setAvatar(i)}>
             <View
               style={{
-                width: 54,
-                height: 54,
-                borderRadius: 17,
-                backgroundColor: C.orangeTint,
-                borderWidth: i === avatar ? 2 : 1,
+                borderRadius: 99,
+                borderWidth: i === avatar ? 2.5 : 1.5,
                 borderColor: i === avatar ? C.teal : C.line,
-                alignItems: 'center',
-                justifyContent: 'center',
+                padding: 2,
               }}
             >
-              <Text style={{ fontSize: 26 }}>{a}</Text>
+              <AvatarBadge index={i} size={52} />
             </View>
           </Tap>
         ))}

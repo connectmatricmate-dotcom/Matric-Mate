@@ -5,7 +5,8 @@ import { router } from 'expo-router';
 import { Bar, Btn, Card, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Sheet, Small, Spacer } from '../../src/components/ui';
 import { levelProgress, xpToNextLevel } from '@matricmate/core';
 import { useT } from '../../src/i18n';
-import { AVATARS, useApp } from '../../src/store/app';
+import { AvatarBadge } from '../../src/components/AvatarBadge';
+import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { C, F, S } from '../../src/theme';
 
@@ -33,7 +34,7 @@ export default function Account() {
                 justifyContent: 'center',
               }}
             >
-              <Text style={{ fontSize: 28 }}>{AVATARS[state.settings.avatar ?? 0] ?? AVATARS[0]}</Text>
+              <AvatarBadge index={state.settings.avatar ?? 0} size={52} />
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={{ fontFamily: F.bodyBold, fontSize: 16, color: C.ink }}>{state.user?.name ?? 'Student'}</Text>

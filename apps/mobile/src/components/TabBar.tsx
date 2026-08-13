@@ -1,6 +1,7 @@
 import { Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon, IconName } from './Icon';
+import { IconName } from './Icon';
+import { TabGlyph } from './TabGlyph';
 import { Tap } from './ui';
 import { C, F, R, isWeb } from '../theme';
 
@@ -68,7 +69,7 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
                 backgroundColor: it.focused ? C.tealTint : 'transparent',
               }}
             >
-              <Icon name={it.icon} size={20} color={it.focused ? C.teal : C.ink3} />
+              <TabGlyph name={it.icon} focused={it.focused} />
               <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: it.focused ? C.teal : C.ink2 }}>
                 {it.label}
               </Text>
@@ -96,9 +97,20 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
             accessibilityRole="tab"
             accessibilityState={{ selected: it.focused }}
             accessibilityLabel={it.label}
-            style={{ alignItems: 'center', justifyContent: 'center', gap: 3, minHeight: 46, borderRadius: R.md }}
+            style={{ alignItems: 'center', justifyContent: 'center', gap: 2, minHeight: 48, borderRadius: R.md }}
           >
-            <Icon name={it.icon} size={22} color={it.focused ? C.teal : C.ink3} />
+            {/* The active tab sits in a soft pill, the toy-box treatment the
+                client asked for, and the glyph bounces as it lands. */}
+            <View
+              style={{
+                paddingHorizontal: 14,
+                paddingVertical: 2,
+                borderRadius: 99,
+                backgroundColor: it.focused ? C.tealTint : 'transparent',
+              }}
+            >
+              <TabGlyph name={it.icon} focused={it.focused} />
+            </View>
             <Text
               numberOfLines={1}
               style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: it.focused ? C.teal : C.ink3 }}

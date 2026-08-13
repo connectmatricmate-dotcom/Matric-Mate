@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
 import { Card, Empty, ErrorState, Ring, Row, Screen, Skeleton, Small, Ur } from '../../src/components/ui';
-import { api , hasStudyMaterial, subjectPct } from '@matricmate/core';
+import { api , hasStudyMaterial, subjectPct , SUBJECT_COLORS } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -107,8 +107,19 @@ export default function Study() {
           {rows.map(({ s, pct, next, chapters }) => (
             <Card key={s.id} onPress={() => router.push(`/learn/subject/${s.id}`)}>
               <Row gap={S.md}>
-                <Ring pct={pct}>
-                  <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={18} color={C.teal} />
+                <Ring pct={pct} color={SUBJECT_COLORS[s.id]?.main ?? C.teal}>
+                  <View
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 12,
+                      backgroundColor: SUBJECT_COLORS[s.id]?.tint ?? C.tealTint,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={18} color={SUBJECT_COLORS[s.id]?.main ?? C.teal} strokeWidth={2.3} />
+                  </View>
                 </Ring>
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Row gap={6}>
