@@ -219,3 +219,40 @@ export function useCountUp(target: number, duration = 900): number {
 
   return value;
 }
+
+/* ------------------------------------------------------------ equalizer */
+
+/** One dancing bar. Staggered phase per index, honest stillness when idle. */
+function EqBar({ index, playing, color }: { index: number; playing: boolean; color: string }) {
+  const reduced = useReducedMotion();
+  const h = useSharedValue(6);
+
+  useEffect(() => {
+    if (playing && !reduced) {
+      h.value = withDelay(
+        index * 130,
+        withRepeat(withSequence(withTiming(18, { duration: 320 }), withTiming(7, { duration: 300 })), -1),
+      );
+    } else {
+      h.value = withTiming(6, { duration: 180 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, reduced]);
+
+  const a = useAnimatedStyle(() => ({ height: h.value }));
+  return <Animated.View style={[a, { width: 4, borderRadius: 2, backgroundColor: color }]} />;
+}
+
+/**
+ * The little dancing bars that say "sound is coming out of your phone".
+ * Sits next to the lesson title while audio plays and rests flat when paused.
+ */
+export function Equalizer({ playing, color }: { playing: boolean; color: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 3, height: 20 }}>
+      {[0, 1, 2, 3].map((i) => (
+        <EqBar key={i} index={i} playing={playing} color={color} />
+      ))}
+    </View>
+  );
+}

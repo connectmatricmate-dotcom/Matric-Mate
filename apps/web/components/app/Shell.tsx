@@ -12,6 +12,7 @@ import { usePathname } from 'next/navigation';
 import type { IconName, StringKey } from '@matricmate/core';
 import { levelProgress } from '@matricmate/core';
 import { Bar, Icon } from '@/components/ui/primitives';
+import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { useApp, useT } from '@/lib/store';
 
 /**
@@ -85,9 +86,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           className="mt-2 rounded-[16px] border border-line px-3 py-3 transition-colors duration-200 hover:border-tealtint2 hover:bg-paper"
         >
           <span className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-orangetint text-orangedark">
-              <Icon name="gradCap" size={17} strokeWidth={2.1} />
-            </span>
+            <AvatarBadge index={state.settings.avatar ?? 0} size={32} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-extrabold text-ink">{state.user?.name ?? 'Account'}</span>
               <span className="block text-[11.5px] text-ink2">
@@ -117,7 +116,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 title={t('progress.streakAlive', { n: derived.streak })}
                 className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-orangetint px-3 text-[13px] font-extrabold text-orangedark transition-colors duration-200 hover:brightness-95"
               >
-                <Icon name="flame" size={14} strokeWidth={2.4} />
+                <span className="fx-pulse inline-flex">
+                  <Icon name="flame" size={14} strokeWidth={2.4} />
+                </span>
                 {derived.streak}
               </Link>
             ) : null}

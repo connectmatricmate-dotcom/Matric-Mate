@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { XP, accuracy, chapterById, grade } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
 import { Card, Pill, Ring } from '@/components/ui/primitives';
+import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 import { NoSession } from './NoSession';
@@ -48,6 +49,13 @@ export function ResultScreen() {
   // The ring counts up rather than snapping, the one flourish on this screen.
   // The CSS reduced-motion guard cannot reach a JS interval, so under reduced
   // motion the first (and only) tick jumps straight to the final value.
+  // One burst when a good score lands. fireConfetti no-ops under reduced
+  // motion, so this needs no separate guard.
+  useEffect(() => {
+    if (total && Math.round((score / total) * 100) >= 70) fireConfetti();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let n = 0;
@@ -91,7 +99,21 @@ export function ResultScreen() {
             {score} / {total}
           </span>
         </Ring>
-        <h1 className="mt-4 text-center font-display text-[23px] text-ink">
+        {/* Stars land one at a time after the ring settles, the same beat as
+            the Android result screen. */}
+        <div className="mt-4 flex gap-1.5" aria-label={`${pct >= 90 ? 3 : pct >= 70 ? 2 : 1} of 3 stars`}>
+          {[0, 1, 2].map((i) => {
+            const earned = i < (pct >= 90 ? 3 : pct >= 70 ? 2 : 1);
+            return (
+              <span key={i} className={`fx-pop ${i === 0 ? 'fx-pop-d1' : i === 1 ? 'fx-pop-d2' : 'fx-pop-d3'}`}>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill={earned ? '#F7C948' : 'var(--color-grey)'}>
+                  <path d="M12 2.6 15 9l7 .9-5.2 4.8 1.4 7-6.2-3.5L5.8 21.7l1.4-7L2 9.9 9 9l3-6.4Z" />
+                </svg>
+              </span>
+            );
+          })}
+        </div>
+        <h1 className="mt-2 text-center font-display text-[23px] text-ink">
           {good ? t('session.resultGood', { name: (state.user?.name ?? 'Student').split(' ')[0] }) : t('session.resultTry')}
         </h1>
         <p className="text-center text-[13px] text-ink2">{s.label}</p>

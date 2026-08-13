@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Flashcard } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui/primitives';
+import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 
 export function FlashcardsScreen({
@@ -26,6 +27,11 @@ export function FlashcardsScreen({
 
   const card = cards[i];
   const done = i >= cards.length;
+
+  // The finish deserves a bang. No-op under reduced motion.
+  useEffect(() => {
+    if (done) fireConfetti(70);
+  }, [done]);
 
   function mark(isKnown: boolean) {
     if (!card) return;

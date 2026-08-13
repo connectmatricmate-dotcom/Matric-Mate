@@ -123,7 +123,11 @@ export default function ChapterHub() {
               <ActivityIndicator size="small" color={C.teal} />
             </View>
           ) : (
-            <IconButton icon={downloaded ? 'check' : 'download'} tone={downloaded ? 'active' : 'card'} onPress={toggleDownload} />
+            // Keyed on the state, so the icon swap replays the pop: saving a
+            // chapter visibly lands instead of just recolouring.
+            <Pop key={downloaded ? 'saved' : 'unsaved'}>
+              <IconButton icon={downloaded ? 'check' : 'download'} tone={downloaded ? 'active' : 'card'} onPress={toggleDownload} />
+            </Pop>
           )
         }
       />

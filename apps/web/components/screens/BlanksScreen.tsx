@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Blank } from '@matricmate/core';
 import { blankHalves } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
+import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 
 export function BlanksScreen({
@@ -27,6 +28,11 @@ export function BlanksScreen({
 
   const item = items[i];
   const done = i >= items.length;
+
+  // The finish deserves a bang. No-op under reduced motion.
+  useEffect(() => {
+    if (done) fireConfetti(70);
+  }, [done]);
   const correct = checked && pick === item?.answer;
 
   function check() {

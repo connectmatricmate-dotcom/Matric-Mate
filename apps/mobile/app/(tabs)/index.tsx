@@ -175,7 +175,11 @@ export default function Dashboard() {
                   justifyContent: 'center',
                 }}
               >
-                {task.done ? <Icon name="check" size={14} color="#fff" strokeWidth={3} /> : null}
+                {task.done ? (
+                  <Pop>
+                    <Icon name="check" size={14} color="#fff" strokeWidth={3} />
+                  </Pop>
+                ) : null}
               </View>
             </Tap>
 

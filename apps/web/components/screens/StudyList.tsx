@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { SUBJECT_ICON, type Chapter, type Subject, hasStudyMaterial, subjectPct } from '@matricmate/core';
+import { SUBJECT_COLORS, SUBJECT_ICON, type Chapter, type Subject, hasStudyMaterial, subjectPct } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Empty, Icon, Skeleton, Ur } from '@/components/ui/primitives';
@@ -112,11 +112,17 @@ export function StudyList({
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
               {rows.map(({ s, pct, next, chapters }) => (
-                <Link key={s.id} href={`/learn/subject/${s.id}`} className="min-w-0">
+                <Link key={s.id} href={`/learn/subject/${s.id}`} className="group min-w-0">
                   <Card className="flex h-full flex-col gap-3 transition-colors duration-200 hover:border-teal">
                     <span className="flex items-center gap-3">
-                      <span className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[14px] bg-tealtint text-teal">
-                        <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={22} />
+                      <span
+                        className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-[14px] transition-transform duration-200 group-hover:scale-110"
+                        style={{
+                          background: SUBJECT_COLORS[s.id]?.tint ?? 'var(--color-tealtint)',
+                          color: SUBJECT_COLORS[s.id]?.main ?? 'var(--color-teal)',
+                        }}
+                      >
+                        <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={22} strokeWidth={2.3} />
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-baseline gap-x-2">

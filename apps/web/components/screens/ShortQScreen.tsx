@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ShortQ } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Label, LinkBtn, Pill } from '@/components/ui/primitives';
+import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 
 type Mark = 'got' | 'partial' | 'missed';
@@ -27,6 +28,11 @@ export function ShortQScreen({
 
   const item = items[i];
   const done = i >= items.length;
+
+  // The finish deserves a bang. No-op under reduced motion.
+  useEffect(() => {
+    if (done) fireConfetti(70);
+  }, [done]);
 
   function mark(m: Mark) {
     if (!item) return;

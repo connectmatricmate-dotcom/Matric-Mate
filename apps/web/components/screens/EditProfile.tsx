@@ -7,10 +7,11 @@ import { Btn, ErrorBanner, Field } from '@/components/ui/controls';
 import { Card, Item, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { createClient } from '@/lib/supabase/client';
+import { AVATARS } from '@matricmate/core';
+import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { useApp, useT } from '@/lib/store';
 import { validateName } from '@/lib/validation';
 
-const AVATARS = ['🧑🏽‍🎓', '👩🏽‍🎓', '🧕🏽', '👨🏽‍💻', '🦸🏽'];
 
 export function EditProfile() {
   const { state, actions } = useApp();
@@ -19,7 +20,10 @@ export function EditProfile() {
   const toast = useToast();
   const [name, setName] = useState(state.user?.name ?? '');
   const [edited, setEdited] = useState(false);
-  const [avatar, setAvatar] = useState(0);
+  // Persisted in settings, not local state: the old picker forgot the choice
+  // the moment you left the page.
+  const avatar = state.settings.avatar ?? 0;
+  const setAvatar = (i: number) => actions.setSettings({ avatar: i });
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,16 +69,16 @@ export function EditProfile() {
           <div className="flex flex-wrap justify-center gap-2.5">
             {AVATARS.map((a, i) => (
               <button
-                key={a}
+                key={a.id}
                 type="button"
                 aria-pressed={i === avatar}
-                aria-label={`Avatar ${i + 1}`}
+                aria-label={a.name}
                 onClick={() => setAvatar(i)}
-                className={`flex h-[54px] w-[54px] items-center justify-center rounded-[16px] border-2 bg-orangetint text-[26px] transition-colors duration-200 ${
+                className={`rounded-full border-2 p-0.5 transition-transform duration-200 hover:scale-110 ${
                   i === avatar ? 'border-teal' : 'border-line hover:border-teal'
                 }`}
               >
-                {a}
+                <AvatarBadge index={i} size={52} />
               </button>
             ))}
           </div>

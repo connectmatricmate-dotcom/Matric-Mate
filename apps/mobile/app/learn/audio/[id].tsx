@@ -6,6 +6,7 @@ import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
 import { api, pickAudioTrack } from '@matricmate/core';
+import { Equalizer } from '../../../src/components/celebration';
 import { audioSource } from '../../../src/core/audio';
 import { localAudioTrack, localAudioUri } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
@@ -81,7 +82,11 @@ function PlayerChrome({
         <View style={{ width: 210, height: 210, borderRadius: 24, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
           <Image source={require('../../../assets/monogram.png')} style={{ width: 130, height: 100 }} resizeMode="contain" />
         </View>
-        <H2 style={{ marginTop: S.md, textAlign: 'center' }}>{title}</H2>
+        <Row gap={8} style={{ marginTop: S.md, alignItems: 'center' }}>
+          <Equalizer playing={playing} color={C.teal} />
+          <H2 style={{ textAlign: 'center' }}>{title}</H2>
+          <Equalizer playing={playing} color={C.teal} />
+        </Row>
         <Small style={{ textAlign: 'center' }}>{subtitle}</Small>
       </View>
 

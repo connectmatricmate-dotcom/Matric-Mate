@@ -29,6 +29,8 @@ export type Onboarding = {
 
 export type Settings = {
   language: Language;
+  /** Index into core's AVATARS cast, chosen on the edit-profile screen. */
+  avatar: number;
   dark: boolean;
   reminders: boolean;
   reminderTime: string;
@@ -62,6 +64,7 @@ export type State = {
 
 export const DEFAULT_SETTINGS: Settings = {
   language: 'en',
+  avatar: 0,
   dark: false,
   reminders: true,
   reminderTime: '7:00 PM',
