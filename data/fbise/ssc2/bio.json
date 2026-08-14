@@ -1,0 +1,531 @@
+{
+  "subject": "bio",
+  "name": "Biology",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Biology SSC-I.pdf",
+    "sha256": "b03be5a1fd46c2434428db0bdb0c9c3897b93cd2537183a2e06de0da51f74fb2",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 6,
+    "slos": 71,
+    "summative": 67,
+    "formative": 0,
+    "unclassified": 4,
+    "untitledDomains": 6,
+    "shortText": 0,
+    "examUnits": 9
+  },
+  "notes": [
+    "6 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Biology IX-X along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Introduction to Biology"
+      },
+      {
+        "number": 2,
+        "title": "Solving a Biological Problem"
+      },
+      {
+        "number": 3,
+        "title": "Biodiversity"
+      },
+      {
+        "number": 4,
+        "title": "Cells and Tissues"
+      },
+      {
+        "number": 5,
+        "title": "Cell Cycle"
+      },
+      {
+        "number": 6,
+        "title": "Enzymes"
+      },
+      {
+        "number": 7,
+        "title": "Bioenergetics"
+      },
+      {
+        "number": 8,
+        "title": "Nutrition"
+      },
+      {
+        "number": 9,
+        "title": "Transport"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "G",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-10-G-01",
+          "text": "Describe the nervous system and its role.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-02",
+          "text": "Discuss the central nervous system and the peripheral nervous system.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-03",
+          "text": "Outline the types of neurons with diagrams.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-04",
+          "text": "Define a stimulus with examples.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-05",
+          "text": "State that nerve impulses are electrical signals that travel across neurons. G: Nervous",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-06",
+          "text": "Define and sketch synapses. system",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-07",
+          "text": "Introduce neurotransmitters. for theory",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "B-10-G-08",
+          "text": "Explain through sketching a diagram the involvement of the nervous system when a person accidentally touches something for theory painfully hot and withdraws their hands as a reflex.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-09",
+          "text": "Explain the Endocrine system.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-G-10",
+          "text": "Identify the major endocrine glands and hormones with their functions.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "H",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-10-H-01",
+          "text": "Describe the role of Reproduction for theory and Inheritance",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-H-02",
+          "text": "Describe the process of gametogenesis and fertilization. [SLO: reproduction for theory mechanisms with examples (plants and animals). discussed in grade IX.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-H-03",
+          "text": "Describe asexual reproduction and sexual reproduction mechanisms with examples (plants and animals).",
+          "cognitive": "knowledge",
+          "assessment": null
+        },
+        {
+          "code": "B-10-H-04",
+          "text": "Describe sex determination in humans.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-H-05",
+          "text": "Sketch the structure of chromosomes.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-H-06",
+          "text": "Define genotype and phenotype, allele, homozygous, heterozygous, for theory dominant, and recessive.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-H-07",
+          "text": "Illustrate Mendelian inheritance laws through monohybrid and for theory dihybrid cross.",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "I",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-10-I-01",
+          "text": "Define disease, illness and infection and pathogen.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-02",
+          "text": "List the 4 different types of pathogens (Viruses, Bacteria, Plasmodium, for theory Fungi), and list their common diseases.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-03",
+          "text": "Discuss antibiotics. for theory",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "B-10-I-04",
+          "text": "Discuss the development of I: Disease and",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-05",
+          "text": "Define immunity and list the roles of the immune system. Immunity",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-06",
+          "text": "Describe the components of the immune system (Lymphatic system (lymph nodes), Types of immune cells and their roles, for theory Innate immunity, adaptive immunity, and the three lines of defence)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-07",
+          "text": "Describe the process of blood clotting.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-08",
+          "text": "State the function of adaptive immunity.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-09",
+          "text": "Discuss that vaccines help boost immunity with examples.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-10",
+          "text": "Describe the discovery of penicillin.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-11",
+          "text": "Define Diabetes and its subtypes and explain the effects on the human for theory body.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-12",
+          "text": "Discuss cancer and its effects on the human body.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-13",
+          "text": "Narrate Covid 19 and list the harmful effects on the human body. Diseases compromises the immune system and over times leads to development of Acquired Immune Deficiency Syndrome (AIDS).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-I-15",
+          "text": "Explain plant diseases commonly present in Pakistan, in terms of their effect on plant health and yield and their treatment. (Rust, smut, red rot of sugar cane)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "J",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-10-J-01",
+          "text": "Introduce biotechnology. for theory",
+          "cognitive": "understanding",
+          "assessment": null
+        },
+        {
+          "code": "B-10-J-02",
+          "text": "Explain with examples that food biotechnology has advanced agriculture for theory especially inside Pakistan.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-J-03",
+          "text": "Explain with examples that J:Biotechnology Biotechnology medical biotechnology has advanced healthcare in annual examination. in diabetes and cancer.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-J-04",
+          "text": "Stated the potential advantages that genetic editing provides with examples in the context of medicine and agriculture.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-J-05",
+          "text": "Describe with examples the benefits of marine biotechnology.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-J-06",
+          "text": "Describe that bioremediation can help us in taking better care of our for theory environment with an example.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-J-07",
+          "text": "Explain the concept and for theory examples.",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "K",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-10-K-01",
+          "text": "Define biostatistics and its use.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-K-02",
+          "text": "Define and calculate mean, Handling",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-K-03",
+          "text": "Sketch a bar chart for a given set of biological data.",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "R",
+      "title": null,
+      "slos": [
+        {
+          "code": "B-10-R-01",
+          "text": "Describe the needs of ingestion, digestion, absorption, assimilation and for theory egestion.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-02",
+          "text": "Identify and describe the structures of the main regions of the alimentary for theory canal and the associated organs.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-03",
+          "text": "Describe swallowing and peristalsis.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-04",
+          "text": "Sort out the action of enzymes Digestion for theory respect to their substrates and products. R: Human Physiology for theory",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-06",
+          "text": "Describe the structure of a villus, including the roles of capillaries and for theory lacteals.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-07",
+          "text": "State the signs and symptoms, causes, treatments and preventions of the disorders of gut i.e. diarrhea, constipation, and ulcer.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-08",
+          "text": "Describe how the blood is circulated inside the human body. Circulation",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-09",
+          "text": "Explain how blood is used to transport materials throughout the human body. for theory",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-10",
+          "text": "Identify the different types of organs connected to the blood system and their for theory roles.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-11",
+          "text": "Identify the different components that make up the blood",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-12",
+          "text": "Name the cell types found in blood and their roles.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-13",
+          "text": "Explain the structure of the heart with a diagram.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-14",
+          "text": "Explain common heart diseases. (Coronary Heart Disease, Myocardial for theory Infarction, Angina)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-15",
+          "text": "Explain the harmful effects of smoking related to heart diseases",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-16",
+          "text": "Identify the different organs of urinary system.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-17",
+          "text": "Relate the structure of the kidney with its function.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-18",
+          "text": "State that nephron is the excretory unit of kidney.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-19",
+          "text": "Locate the different parts of nephrons and relate them with their function.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-20",
+          "text": "State that main role of the system",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-21",
+          "text": "Describe that urine formation involves three processes i.e. filtration, for theory reabsorption and secretion.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-22",
+          "text": "Explain that the kidney plays an important role in osmoregulation. Identify the for theory causes and treatment of kidney stones.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-23",
+          "text": "Outline the causes of kidney failure and treatments.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-24",
+          "text": "Describe the roles of the parts of the air passageway and lungs. Respiratory",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-25",
+          "text": "Describe the mechanism of system breathing in terms of movements ribs and diaphragm.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-26",
+          "text": "Differentiate between the composition of inspired and expired air.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-27",
+          "text": "Discuss briefly diseases related to respiratory system like bronchitis, emphysema, pneumonia, asthma, and lung cancer.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-28",
+          "text": "Describe infectious and non- infectious diseases and their types with examples.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-29",
+          "text": "Define zoonotic diseases and give their types.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-30",
+          "text": "Describe vector borne diseases with examples.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "B-10-R-31",
+          "text": "Enlist allergies with some Immunity common types. Federal Board SSC-II Examination Biology Model Question Paper (Curriculum 2022-2023— Scheme of Studies 2006) ROLL NUMBER Section - A (Marks 12) ⓪ ① Section – A is compulsory. All parts of this section are to be answered on this ③ page and handed over to the Centre Superintendent. Deleting/overwriting is not allowed. Do not use lead pencil. ⑦ ⑧ ⑨ Candidate Sign. Q. 1 S.No The part of the neuron which Node of (i) Ranvier transmits them toward the cell body is: (ii) modified form of sexual Parthenogenesis reproduction? A hospital observes that a common bacterial infection is no longer responding combination of (iii) previously different antibiotic. What would antibiotics be the best strategy to address this issue? Which of the labelled part in diagram controls conscious thoughts and intelligence? (iv) A C Which one is the most Developing suitable new drugs (v) from marine medicine? organisms Urine flows from the (vi) Renal pelvis by: (vii)  related to nasal cavity? During a long-distance (viii) needs a continuous supply of energy. Which part of the digestive system plays the most significant role in ensuring glucose is absorbed bloodstream to meet this energy demand? (ix) is zoonotic? (x) of biostatistics is: effects of a new medical book medicine (xi)  healthy (xii) emergency hormone? Federal Board SSC-II Examination Model Question Paper Biology (Curriculum 2022-23) Scheme of Studies 2006 Write your answers on the allotted /given spaces. SECTION – B (Marks 33) Q. 2 (i) during swallowing of food. (ii) How myocardial infarction is life threatening? (iii) Compare the composition of inspired air and expired air in tabular manner. (iv) List the components of reflex arc. least one response in each box Endocrine gland Thyroid Ovary Parathyroid (v) While focusing on the labeled parts of the 1.5 following diagram of heart, answer the questions relevant to it. A. Identify the type of neuron in the diagram. B. Why are “Y” important for neuron communication? C. If the “Z” is damaged, how would this affect nerve function? A. What is the physiological significance of the fact that “Y” is thicker than “X”? B. What would you expect to happen if there was a pore left in “Z”? (vi) What are the benefits of internal fertilization in land animals? different materials. (vii) List any three traits of pea plant with their 1x3 OR contrasting phenotypes studied by Mendel. Salmonella typhi Ringworm Protozoa (viii) Why do some vaccines require booster shots after some time? (ix) How does biostatistics help in management of public health? cells involved. (x) What is adaptive immunity? How it helps to defend body against infections? exchange? (xi) Why do veins have valves but arteries do not? SECTION – C (Marks 20) Q. 3 cells highlighting the role of each type. Q. 4 How they are involved in absorption of food in small intestine? seed shape and colour in pea plant. Q. 5 improvement of food crops and dairy livestock in Pakistan? Q. 6 impulse through neuron with the help of diagram. Name of student A B C D E F G Federal Board SSC-II Examination Biology Model Question Paper (Curriculum 2022-23) Alignment of Questions with Student Learning Outcomes Sr No (Part no.) Paper",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

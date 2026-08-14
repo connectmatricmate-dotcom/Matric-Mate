@@ -1,0 +1,450 @@
+{
+ "subject": "isl",
+ "name": "Islamiyat",
+ "urduName": "اسلامیات (لازمی)",
+ "grade": 10,
+ "board": "fbise",
+ "curriculum": "NCP 2022-23",
+ "medium": "ur",
+ "source": {
+  "document": "ModelPaper/2024New/islamiyat/Final Assessemnt Framework + Model Question Paper SSC-I.pdf",
+  "pages": "8-14",
+  "method": "read from the rendered pages by hand",
+  "retrieved": "2026-08-11"
+ },
+ "_note": [
+  "Grade 10 derivation of the hand-transcribed IX-X outcomes. The NCP 2022-23 curriculum",
+  "documents state these competencies for the Grades IX-X band as one list; the SSC-II paper",
+  "examines the same domains at Class 10 depth. Codes re-stamped to grade 10; depth comes",
+  "from the generation prompt, which asks for Class 10 material."
+ ],
+ "codeSource": "assigned",
+ "paper": {
+  "totalMarks": 100,
+  "minutes": 180,
+  "sectionA": {
+   "marks": 20,
+   "minutes": 25,
+   "type": "MCQ",
+   "compulsory": true
+  },
+  "rules": [
+   "Strand 1 (ب) تعارفِ قرآن مجید اور حفاظت و تدوینِ حدیث: MCQs and SRQs only, never ERQs.",
+   "Strand 1 (ج) احادیثِ مبارکہ: questions appear only in Part 4 (حصہ چہارم) of the paper.",
+   "Strand 1 (ج) اسمائے حسنیٰ: exactly two MCQs, on the meanings of the selected names.",
+   "Strands 2, 3, 4, 5 and 7: MCQs, SRQs and ERQs are all permitted.",
+   "Strand 6: no MCQs at all. SRQs and ERQs only.",
+   "Tarjuma Quran Majeed is a separate 50 mark paper and is NOT part of this one."
+  ]
+ },
+ "stats": {
+  "domains": 7,
+  "slos": 48,
+  "summative": 48,
+  "formative": 0,
+  "unclassified": 0,
+  "untitledDomains": 0
+ },
+ "examUnits": {
+  "scheme": "دائرہ ہائے کار (strands) of the NCP 2022-23 Islamiyat compulsory syllabus",
+  "document": "ModelPaper/2024New/islamiyat/Final Assessemnt Framework + Model Question Paper SSC-I.pdf",
+  "units": [
+   {
+    "number": 1,
+    "title": "قرآن مجید و حدیثِ نبوی ﷺ"
+   },
+   {
+    "number": 2,
+    "title": "ایمانیات و عبادات"
+   },
+   {
+    "number": 3,
+    "title": "سیرتِ رسول خاتم النبیین ﷺ"
+   },
+   {
+    "number": 4,
+    "title": "اخلاق و آداب"
+   },
+   {
+    "number": 5,
+    "title": "حسنِ معاملات و معاشرت"
+   },
+   {
+    "number": 6,
+    "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام"
+   },
+   {
+    "number": 7,
+    "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے"
+   }
+  ]
+ },
+ "domains": [
+  {
+   "code": "A",
+   "title": "قرآن مجید و حدیثِ نبوی ﷺ",
+   "slos": [
+    {
+     "code": "IS-10-A-01",
+     "text": "تعارفِ قرآن مجید: قرآن مجید کی تدوین اور اس کی حفاظت",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-A-02",
+     "text": "حفاظت و تدوینِ حدیث: تعریف، اہمیت، فضیلت، حفاظت اور تدوین",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-A-03",
+     "text": "احادیثِ مبارکہ: نصاب میں شامل بیس (20) احادیث کا ترجمہ، ان کا فہم، اور ان میں موجود تعلیمات کی سمجھ اور عملی زندگی میں اطلاق",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-A-04",
+     "text": "اسمائے حسنیٰ: نصاب میں شامل سینتیس (37) اسمائے حسنیٰ اور ان کے معانی",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    }
+   ]
+  },
+  {
+   "code": "B",
+   "title": "ایمانیات و عبادات",
+   "slos": [
+    {
+     "code": "IS-10-B-01",
+     "text": "عقیدۂ توحید",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-02",
+     "text": "عقیدۂ رسالت",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-03",
+     "text": "ملائکہ (قرآنی آیات و احادیثِ نبوی ﷺ کی روشنی میں)",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-04",
+     "text": "کتبِ سماویہ (قرآنی آیات و احادیثِ نبوی ﷺ کی روشنی میں)",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-05",
+     "text": "عقیدۂ آخرت (قرآنی آیات و احادیثِ نبوی ﷺ کی روشنی میں)",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-06",
+     "text": "نماز",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-07",
+     "text": "روزہ",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-08",
+     "text": "زکوٰۃ (قرآنی آیات و احادیثِ نبوی خاتم النبیین ﷺ کی روشنی میں)",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-B-09",
+     "text": "حج اور قربانی (قرآنی آیات و احادیثِ نبوی خاتم النبیین ﷺ کی روشنی میں)",
+     "cognitive": "application",
+     "assessment": "summative"
+    }
+   ]
+  },
+  {
+   "code": "C",
+   "title": "سیرتِ رسول خاتم النبیین ﷺ",
+   "slos": [
+    {
+     "code": "IS-10-C-01",
+     "text": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور): فتحِ مکہ",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-02",
+     "text": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور): غزوۂ حنین",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-03",
+     "text": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور): عام الوفود",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-04",
+     "text": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور): غزوۂ تبوک",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-05",
+     "text": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور): حجۃ الوداع",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-06",
+     "text": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور): وصالِ نبوی ﷺ",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-07",
+     "text": "اُسوۂ رسول ﷺ: حضرت محمد خاتم النبیین ﷺ کا بچپن اور جوانی",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-08",
+     "text": "اُسوۂ رسول ﷺ: حضرت محمد خاتم النبیین ﷺ کا ذوقِ عبادت",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-09",
+     "text": "اُسوۂ رسول ﷺ: حضرت محمد خاتم النبیین ﷺ کی سخاوت و ایثار",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-10",
+     "text": "اُسوۂ رسول ﷺ: صلہ رحمی",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-11",
+     "text": "اُسوۂ رسول ﷺ: خواتین کے ساتھ حسنِ سلوک",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-C-12",
+     "text": "اُسوۂ رسول ﷺ: اندازِ تربیت",
+     "cognitive": "application",
+     "assessment": "summative"
+    }
+   ]
+  },
+  {
+   "code": "D",
+   "title": "اخلاق و آداب",
+   "slos": [
+    {
+     "code": "IS-10-D-01",
+     "text": "شکر و قناعت",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-02",
+     "text": "امانت و دیانت",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-03",
+     "text": "اخلاص و تقویٰ",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-04",
+     "text": "پردہ پوشی",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-05",
+     "text": "بری عادات سے اجتناب: تکبر",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-06",
+     "text": "بری عادات سے اجتناب: حسد",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-07",
+     "text": "بری عادات سے اجتناب: جھوٹ",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-08",
+     "text": "بری عادات سے اجتناب: غیبت و بہتان",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-D-09",
+     "text": "بری عادات سے اجتناب: جادو، فال اور توہم پرستی",
+     "cognitive": "application",
+     "assessment": "summative"
+    }
+   ]
+  },
+  {
+   "code": "E",
+   "title": "حسنِ معاملات و معاشرت",
+   "slos": [
+    {
+     "code": "IS-10-E-01",
+     "text": "قسم کے احکام و مسائل",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-E-02",
+     "text": "گواہی کے احکام و مسائل",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-E-03",
+     "text": "ہمسایوں کے حقوق",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-E-04",
+     "text": "سود کی حرمت",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-E-05",
+     "text": "اسلامی ریاست",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-E-06",
+     "text": "جہاد فی سبیل اللہ",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    }
+   ]
+  },
+  {
+   "code": "F",
+   "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
+   "slos": [
+    {
+     "code": "IS-10-F-01",
+     "text": "اہلِ بیتِ عظام: حضرت امام زین العابدین رضی اللہ تعالیٰ عنہ",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-02",
+     "text": "اہلِ بیتِ عظام: حضرت امام زید بن علی رضی اللہ تعالیٰ عنہ",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-03",
+     "text": "صحابہ کرام رضی اللہ تعالیٰ عنہم: حضرت ابو موسیٰ اشعری، حضرت عبداللہ بن عمرو بن العاص، حضرت عمرو بن امیہ رضی اللہ تعالیٰ عنہم",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-04",
+     "text": "صحابہ کرام رضی اللہ تعالیٰ عنہم: حضرت عمرو بن العاص، حضرت جابر بن عبداللہ، حضرت انس بن مالک رضی اللہ تعالیٰ عنہم",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-05",
+     "text": "صحابیاتِ کرام رضی اللہ تعالیٰ عنہن: حضرت شفا، حضرت ام سُلیم، حضرت ام عطیہ رضی اللہ تعالیٰ عنہن",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-06",
+     "text": "صحابیاتِ کرام رضی اللہ تعالیٰ عنہن: حضرت ام ایمن، حضرت ام عمارہ، حضرت اسماء بنتِ ابی بکر رضی اللہ تعالیٰ عنہن",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-07",
+     "text": "صوفیائے کرام رحمۃ اللہ تعالیٰ علیہم: حضرت ابو القاسم قشیری، حضرت شیخ فرید الدین عطار، حضرت خواجہ نظام الدین دہلوی رحمۃ اللہ تعالیٰ علیہم",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-08",
+     "text": "صوفیائے کرام رحمۃ اللہ تعالیٰ علیہم: حضرت سید عبداللطیف کاظمی المعروف امام بری، حضرت عبدالرحمن جامی، حضرت عثمان مروندی المعروف شہباز قلندر رحمۃ اللہ تعالیٰ علیہم",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-09",
+     "text": "علما و مفکرین رحمۃ اللہ تعالیٰ علیہم: امام شاطبی، امام جلال الدین سیوطی، ابنِ خلدون رحمۃ اللہ تعالیٰ علیہم",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-F-10",
+     "text": "علما و مفکرین رحمۃ اللہ تعالیٰ علیہم: شیخ ابنِ عربی، شاہ عبدالعزیز محدث دہلوی، ابنِ رشد رحمۃ اللہ تعالیٰ علیہم",
+     "cognitive": "knowledge",
+     "assessment": "summative"
+    }
+   ]
+  },
+  {
+   "code": "G",
+   "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
+   "slos": [
+    {
+     "code": "IS-10-G-01",
+     "text": "خود اعتمادی و خود انحصاری",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-G-02",
+     "text": "جسمانی و ذہنی صحت اور جسمانی ریاضت",
+     "cognitive": "application",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-G-03",
+     "text": "اسلام میں مستقبل کی منصوبہ بندی کی اہمیت",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    },
+    {
+     "code": "IS-10-G-04",
+     "text": "اسلامی تہذیب کے امتیازات",
+     "cognitive": "understanding",
+     "assessment": "summative"
+    }
+   ]
+  }
+ ]
+}

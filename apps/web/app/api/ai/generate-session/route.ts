@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
   const medium = body.medium === 'ur' ? 'ur' : 'en';
   const topic = (body.topic ?? '').slice(0, 120);
 
-  const grounding = await chapterGrounding(g.admin, chapterId, medium);
+  const grounding = await chapterGrounding(g.admin, chapterId, medium, 24_000, g.grade);
   if (!grounding) return NextResponse.json({ error: 'no_content' }, { status: 404 });
 
   try {

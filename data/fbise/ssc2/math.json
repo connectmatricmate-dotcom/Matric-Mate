@@ -1,0 +1,773 @@
+{
+  "subject": "math",
+  "name": "Mathematics",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2024New/maths/Final_Assessment_Framework_Model_Question_Paper_Mathematics_SSC-I.pdf",
+    "sha256": "b3d43c2b893dbcffec9394448f20e8cb8f040aa8825a245dc366175a4cc99729",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 3,
+    "slos": 109,
+    "summative": 97,
+    "formative": 12,
+    "unclassified": 0,
+    "untitledDomains": 2,
+    "shortText": 0,
+    "examUnits": 17
+  },
+  "notes": [
+    "2 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Mathematics I-XII along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Matrices and Determinants"
+      },
+      {
+        "number": 2,
+        "title": "Real and Complex Numbers"
+      },
+      {
+        "number": 3,
+        "title": "Logarithms"
+      },
+      {
+        "number": 4,
+        "title": "Algebraic Expressions and Algebraic Formulas"
+      },
+      {
+        "number": 5,
+        "title": "Factorization"
+      },
+      {
+        "number": 6,
+        "title": "Algebraic Manipulation"
+      },
+      {
+        "number": 7,
+        "title": "Linear Equations and Inequalities"
+      },
+      {
+        "number": 14,
+        "title": "Linear Graphs and Their Application"
+      },
+      {
+        "number": 15,
+        "title": "Introduction to Coordinate Geometry"
+      },
+      {
+        "number": 17,
+        "title": "Congruent Triangles"
+      },
+      {
+        "number": 18,
+        "title": "Parallelograms and Triangles"
+      },
+      {
+        "number": 19,
+        "title": "Line Bisectors and Angle Bisectors"
+      },
+      {
+        "number": 20,
+        "title": "Sides and Angles of a Triangle"
+      },
+      {
+        "number": 21,
+        "title": "Ratio and Proportion"
+      },
+      {
+        "number": 22,
+        "title": "Pythagoras’ Theorem"
+      },
+      {
+        "number": 23,
+        "title": "Theorems Related with Area"
+      },
+      {
+        "number": 29,
+        "title": "Practical Geometry – Triangles"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": "Numbers",
+      "slos": [
+        {
+          "code": "M-10-A-01",
+          "text": "Identify complex numbers, complex conjugate, Numbers absolute value or modulus of a complex number. examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-02",
+          "text": "Apply algebraic properties and perform basic operations on complex numbers. in the annual examination A: Numbers and Algebra",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-03",
+          "text": "Demonstrate additive identity and multiplicative identity for the set of complex numbers asked in the annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-04",
+          "text": "Find additive inverse and multiplicative inverse of a complex number z. in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-05",
+          "text": "Demonstrate the following properties of a complex number z. in the annual examination Content (Knowledge, Area 40 minutes) z  z  z  z , z  z, zz  z , z1  z2  z1  z2 , z1z2  z1 z2 ,  z1  z1    2 2 z",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-06",
+          "text": "Find real and imaginary parts of complex numbers of the type (i)  x  iy  n  Z n n  x1  iy1  (ii)   x2  iy2 ",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-07",
+          "text": "Explain, with examples, how mathematical models and equations are often used to make predictions and test hypotheses in science. [e.g., In physics, mathematical equations are used to describe the motion of objects and the behavior of energy and matter. In chemistry, mathematical models are used to predict the behavior of chemical reactions and the properties of molecules. In biology, mathematical models are used to predict the growth and spread of populations and the spread of disease.]",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-08",
+          "text": "Solve the simultaneous linear equations with complex coefficients. in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-09",
+          "text": "Apply the Geometric interpretation of a complex number. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-10",
+          "text": "Apply the geometric interpretation of the modulus of a complex number. annual examination; Content (Knowledge, Area 40 minutes) however, it will be part of regular teaching practice.",
+          "cognitive": "application",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-11",
+          "text": "Apply the geometric interpretation of algebraic operations. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-12",
+          "text": "Solve quadratic equations of the form pz 2  qz  r  0, p, q, r  R and z  C by factorization, quadratic in the annual formula, completing square and graphs.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-13",
+          "text": "Draw the graphs of the quadratic function. c Equation s-I",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-14",
+          "text": "Establish relationship between roots and coefficients of quadratic equations. in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-15",
+          "text": "Form a quadratic equation when roots are given. in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-16",
+          "text": "Find discriminant of a given quadratic equation. in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-17",
+          "text": "Identify the nature of roots of a quadratic equation through discriminant. Content (Knowledge, Area 40 minutes) in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-18",
+          "text": "Solve a pair of linear and quadratic equations simultaneously. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-19",
+          "text": "Solve word problems involving quadratic equations. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-20",
+          "text": "Solve quadratic inequalities in one unknown. will be asked in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-21",
+          "text": "Apply the concept of quadratic equations, and quadratic inequalities, to real world problems (such as in physics, engineering, and finance, i.e., calculating max and min heights in projectile motion, determining the max price on a company’s budget, stability of population, growth of business, the relationship between hours worked and amount earned etc.).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-22",
+          "text": "Display information in the form of matrix of and Determin ants examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-23",
+          "text": "Solve situations involving sum, difference, and product of two matrices. Content (Knowledge, Area 40 minutes) in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-24",
+          "text": "Calculate the product of the scalar quantity and a matrix. asked in the annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-25",
+          "text": "Evaluate the determinant and inverse of a matrix of order 2  2. will be asked in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-26",
+          "text": "Solve the simultaneous linear equations in two variables using matrix inversion method and Cramer’s rule. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-27",
+          "text": "Explain, with examples, how mathematics plays a key role in the development of new scientific theories and technologies. [e.g., Mathematical models and simulations are used to design and optimize new materials and drugs, and to understand the behavior of complex systems such as the human brain.] however, it will be part of regular teaching practice. Content (Knowledge, Area 40 minutes)",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-28",
+          "text": "Apply concepts of matrices to real world problems (such as engineering, economics, computer graphics, and physics). examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-29",
+          "text": "Recognize notation and determine the value of s and Graphs annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-30",
+          "text": "Identify types of functions (into, onto, one-to- one, injective, surjective and bijective) by using Venn diagrams. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-31",
+          "text": "Explain operations on, and compositions of, functions. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-32",
+          "text": "Find the inverse of a given function. will be asked in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-33",
+          "text": "Formulate composite functions as defined by  gf  x   f g  x  . will be asked in the annual examination Content (Knowledge, Area 40 minutes)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-34",
+          "text": "Apply concepts from functions to real world problems (such as finance, transportation, and sales). in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-35",
+          "text": "Plot graphs of constant function, identity of basic Function s",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-36",
+          "text": "Solve absolute value equations and inequalities in one variable and express the solution as a range of values on a number line. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-37",
+          "text": "Apply concepts of absolute valued functions to real-world problems (such as to calculate energy wave, magnitude and distance). examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-38",
+          "text": "Apply concepts from functions to real world problems (such as finance, transportation, and sales). in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-39",
+          "text": "Describe rational expressions. c Fractions annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-40",
+          "text": "Factorize and simplify rational expressions. will be asked Content (Knowledge, Area 40 minutes) in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-41",
+          "text": "Demonstrate manipulation of algebraic fractions. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-42",
+          "text": "Perform operations on rational expressions (limited to numerators and denominators that are monomials, binomials, or trinomials). examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-43",
+          "text": "Apply the concept of rational equations (limited to numerators and denominators that are monomials, binomials, or trinomials) to real world problems (such as the amount of work a person can do in certain amount of time, rates, and work).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-44",
+          "text": "Solve two linear inequalities with two Inequalit ies in Two",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-45",
+          "text": "Interpret and Identify regions in plane bounded by two linear inequalities in two unknowns. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-46",
+          "text": "Solve quadratic equations by using the methods c Equation s-II",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-47",
+          "text": "Solve problems of “changing the subject of formula”. annual examination; Content (Knowledge, Area 40 minutes) however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-48",
+          "text": "Solve fractional equations that can be reduced to quadratic equations. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-49",
+          "text": "Solve real world situations by formulating a quadratic equation. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-50",
+          "text": "Draw graphs of functions of the form y  ax n and (Including the sums of few of these taking n as a rational number). Interpret ing",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-51",
+          "text": "Solve a system of one linear and one quadratic equation graphically and interpret the solution. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-52",
+          "text": "Discover exponential growth/decay of a practical phenomenon through its graph. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-53",
+          "text": "Determine the gradients of curves through tangents. asked in the examination; however, it will be part of Content (Knowledge, Area 40 minutes) regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-A-54",
+          "text": "Identify, sketch and interpret graphs of the Sketchin g examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-55",
+          "text": "Identify, sketch and interpret graphs of the non-linear functions such as quadratic, cubic, reciprocal, and exponential functions. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-56",
+          "text": "Sketch graph of the function y  x where 𝑛 is n will be asked a +𝑣𝑒 integer, −𝑣𝑒 integer, rational number for x  0 in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-A-57",
+          "text": "Apply concepts of sketching and interpreting graph to real life problems (such as in tax payment, income and salary problems and cost and profit analysis). examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": null,
+      "slos": [
+        {
+          "code": "M-10-B-01",
+          "text": "Introduce rectangular coordinate system in in Plane asked in the annual B: Geometry examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-B-02",
+          "text": "Represent vectors as directed line segment. asked in the Content (Knowledge, Area 40 minutes) annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-B-03",
+          "text": "Express a vector in terms of two non-zero and non-parallel coplanar vectors. asked in the annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-04",
+          "text": "Express a vector in terms of position vector. will not be asked in the annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-05",
+          "text": "Express translation by a vector. will be asked in the annual examination Content (Knowledge, Area 40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-06",
+          "text": "Find the magnitude of a vector. will be asked in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-07",
+          "text": "Add and subtract vectors. will be asked in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-08",
+          "text": "Multiply a vector by a scalar. will not be asked in the annual examination; however, it will be part of regular teaching practice.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "M-10-B-09",
+          "text": "Solve geometrical problems involving the use of vectors. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-10",
+          "text": "Apply concepts from geometrical problems involving the use of vectors (such as parallel and perpendicular lines in geometrical shapes, vector projectile motion, crosswinds aviation, military usage, designing roller coasters).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-11",
+          "text": "Extend sine and cosine functions to angles ons of Trigono metry",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-12",
+          "text": "Solve problems using the laws of sine, cosine and the area formulas for any triangle. Content (Knowledge, Area 40 minutes) in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-13",
+          "text": "Solve simple trigonometric problems in three dimensions. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-14",
+          "text": "Apply concepts of trigonometry to real life world problems (such as video games, flight engineering, navigation, sound waves). examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-15",
+          "text": "Solve problems by using the property of circle: and Arcs of a Circle",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-16",
+          "text": "Solve problems by using the property of circle: A straight line, drawn from the centre of a circle to bisect a chord (which is not a diameter) is perpendicular to the chord. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-17",
+          "text": "Solve problems by using the property of circle: Perpendicular from the centre of a circle on a chord bisects it. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-18",
+          "text": "Solve problems by using the property of circle: If two chords of a circle are congruent then they will be equidistant from the centre. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-19",
+          "text": "Solve problems by using the property of circle: Two chords of a circle which are equidistant from the centre are congruent. examination Content (Knowledge, Area 40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-20",
+          "text": "Solve problems by using the property of circle: If two arcs of a circle (or of congruent circles) are congruent then the corresponding chords are equal. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-21",
+          "text": "Solve problems by using the property of circle: If two chords of a circle (or of congruent circles) are equal, then their corresponding arcs (minor, major or semi-circular) are congruent.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-22",
+          "text": "Solve problems by using the property of circle: Equal chords of a circle (or of congruent circles) subtend equal angles at the centre (at the corresponding centres). examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-23",
+          "text": "Solve problems by using the property of circle: If the angles subtended by two chords of a circle (or congruent circles) at the centre (corresponding centres) are equal, the chords are equal.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-24",
+          "text": "Apply concepts of chords and arcs of a circle to real life world problems (such as decorative features, rainbow, bridges, roller coaster track). examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-25",
+          "text": "Solve problems by using the property of circle: and Angles of outer end point, it is tangent to the circle at that point. a Circle",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-26",
+          "text": "Solve problems by using the property of circle: The tangent a circle and the radial segment joining the point of contact and the centre are perpendicular to each other. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-27",
+          "text": "Solve problems by using the property of circle: The two tangents drawn to a circle from a point outside it, are equal in length. examination Content (Knowledge, Area 40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-28",
+          "text": "Solve problems by using the property of circle: If two circles touch externally or internally, the distance between their centres is respectively equal to the sum or difference of their radii.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-29",
+          "text": "Solve problems by using the property of circle: The measure of a is central angle of a minor arc of a circle double that of the angle subtended by the corresponding major arc. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-30",
+          "text": "Solve problems by using the property of circle: Any two angles in the same segment of a circle are equal. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-31",
+          "text": "Solve problems by using the property of circle: The angle in a semi-circle is a right angle, in a segment greater than a semi-circle is less than a right angle, in a segment less than semi- circle is greater than a right angle.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-32",
+          "text": "Solve problems by using the property of circle: The opposite angles of any quadrilateral inscribed in a circle are supplementary. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-33",
+          "text": "Apply concepts of tangents and angles of a circle to real life world problems (such as architecture, monuments, pyramids). examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-34",
+          "text": "Locate the centre of a given circle. Geometr y of Circles",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-35",
+          "text": "Draw a circle passing through three given noncollinear points. in the annual examination Content (Knowledge, Area 40 minutes)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-36",
+          "text": "Complete the circle:  by finding the center,  without finding the center, when a part of its circumference is given.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-37",
+          "text": "Draw a tangent to a given arc, without using to the Circle  at the end of the arc,  outside the arc.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-38",
+          "text": "Draw a tangent to a given circle from a point P when P lies  on the circumference  outside the circle",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-39",
+          "text": "Draw two tangents to a circle meeting each other at a given angle. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-B-40",
+          "text": "Apply concepts of practical geometry of a circle to real life world problems (such as athletic tracks, recreational parks, Ferris wheels, mechanical machines). examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": null,
+      "slos": [
+        {
+          "code": "M-10-C-01",
+          "text": "Construct cumulative frequency table, ve C: Information Frequenc Handling y",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-02",
+          "text": "Interpret the median, quartiles, deciles, ion curve. examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-03",
+          "text": "Interpret and analyze box and whisker plots Correlation. Content (Knowledge, Area 40 minutes) in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-04",
+          "text": "Construct and interpret data from scatter diagrams and also draw lines of best fit. in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-05",
+          "text": "Measure correlation using scatter diagram. will be asked in the annual examination",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-06",
+          "text": "Calculate the range, standard deviation and of Dispersio n",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-07",
+          "text": "Use the mean and standard deviation to compare two sets of data. in the annual examination",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-08",
+          "text": "Solve real-life situations involving variance, and standard deviation for grouped data. in the annual examination",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-09",
+          "text": "Apply concepts from measures of dispersion to solve real life situations (such as determining the consistency of data, checking variability in forecasting, manufacturing, finance, economics).",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-10",
+          "text": "Calculate the probability of combined events ty of Combine diagram, tree diagrams, Venn diagrams. d Events",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-11",
+          "text": "Apply addition law of probability to solve problems involving mutually exclusive events (such as left and right Content (Knowledge, Area 40 minutes) hand turns, tossing a coin, even and odd numbers on a die, winning and losing a game)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "M-10-C-12",
+          "text": "Apply the Multiplication law of probability to solve problems involving independent and dependent events (trading, flipping a coin, such as 2 cards being drawn 1 by 1 with replacement and without replacement etc.) Total Federal Board SSC-II Examination Model Question Paper Mathematics (Curriculum 2022-23) ROLL NUMBER Section - A (Marks 15) ⓪ ② Section – A is compulsory. All parts of this section are to be answered on this page and handed over to the Centre Superintendent. Deleting/overwriting allowed. Do not use lead pencil. Candidate Sign. ________ Q1. Fill the relevant bubble against each question. Each part carries one mark. Sr Question no. If 3  3i  (m  2)i  3 , then i. the value of 𝑚 is: If  ,  are the roots of ii. of the product   is: What is the value of y, if iii. 8  If f  x   iv. the value of f ( x ) ? If x  5  3 , then the value v. of 𝑥 is: The discriminant of vi. x2  3x  4  0 is: A projectile is launched at an angle of 30 with an initial vii. horizontal component of its velocity? In triangle ABC if a  10 , viii. value of  is: To create a realistic rainbow effect, which type of the ix. curves is the most appropriate for arcs? Two circles having radii 4cm and 5cm respectively, touch x. between the centers of the circles is: The probability of getting two tails when two coins are xi. tossed is: Line of best fit is given by the xii. If a line is tangent to a circle at point P, what is the angle xiii. line and the radius drawn to point P? The simplified form of the expression xiv. 2 x2  2 x 2 x2  2 x  x 1 If 2 x  3 y  2 , then xv. Federal Board SSC-II Examination Model Question Paper Mathematics (Curriculum 2022-23) answers on the allotted/given spaces. SECTION – B (Marks 36) (9 × 4 = 36) Q.2 (2  3i ) Express i. ii. If T   3 3  a. Find T 1 b. Show that TT 1  I For an absolute function f  x  | x  2 | clean a large warehouse. Saqib can clean a. Construct table of values b. Plot the graph iii. Saqib leaves, and Aqib continuous cleaning alone. How long will it take Aqib to finish cleaning the warehouse after Saqib leaves? 2  5x 2  exponential function f  x   4x iv. Shade the solution region bounded by a pair of linear inequalities: x  y  50 ; x  y  10 ; x  0 ; y  0 v. after the translation. b. Verify if the same vector v can also translate point B to the point D (10,13). Justify your answer. Three points A, B and C in the plane are given by the position vectors:  OA   2, 1 , OB  5,  2 , OC  1,  3 vi. with O (0, 0) as reference point. a. Find AB and AC . b. Determine if A, B and C are collinear A balloon is floating at a height of 60 meters. From two points on the ground, 80 vii. of elevation to the balloon are 30 and 45 , respectively. Calculate the horizontal distance from the balloon to the closer point, when points lie on the opposite side of balloon. A magician takes out two cards from a deck of cards, one after the other, without viii. replacement. What is the probability of getting an ace of spade, and a card of heart, as the first and second card, respectively? In the adjoining figure, ABCD is a cyclic quadrilateral inscribed in a circle having ix. a  30, d  45 then find the values of 𝑏, 𝑐, 𝑒 and 𝑓. SECTION – C (Marks 24) (3 × 8 = 24) Q. No. Area of a rectangular park is 1500 square metres and perimeter is 160 Q.3 metres. Find the length and width of the park. Q.4 velocity of 150 m/s at an angle of 60 above the horizontal when it releases a package. Due to a wind blowing from east at 40 m/s, the trajectory of the package changes. a. Represent the drone’s initial velocity vector and the wind velocity vector in component OR form. b. Calculate the resultant velocity vector of the package at the moment of release. c. If the package is dropped from a height of 500 m, determine the horizontal displacement of the package before it hits the ground. Ignore air resistance. Solve f  x   2x  5 , and Q.5 g  x   2x2  1 graphically. Federal Board SSC-II Examination Mathematics Model Question Paper (Curriculum 2022-23) Alignment of Questions with Curriculum Student Learning Outcomes OBJECTIVE PART SECTION A Section: Q. No. Area (Part no.)",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

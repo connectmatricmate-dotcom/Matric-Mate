@@ -144,7 +144,7 @@ async function writeLesson(chapter, medium, subjectName) {
     const response = await anthropic.messages.create({
       model: MODEL,
       max_tokens: 8000,
-      system: `You write spoken audio lesson scripts for MatricMate, an FBISE Class 9 (SSC-I, Pakistan) exam-prep app.\n\n${RULES}\n\n${writeUrdu ? UR_RULES : EN_RULES}`,
+      system: `You write spoken audio lesson scripts for MatricMate, an FBISE Class ${chapter.grade ?? 9} (SSC-${chapter.grade === 10 ? 'II' : 'I'}, Pakistan) exam-prep app.\n\n${RULES}\n\n${writeUrdu ? UR_RULES : EN_RULES}`,
       messages: [
         {
           role: 'user',
@@ -176,7 +176,7 @@ async function main() {
 
   let q = db
     .from('chapters')
-    .select('id,subject_id,number,title,urdu_title,exam_share,exam_marks')
+    .select('id,subject_id,number,title,urdu_title,exam_share,exam_marks,grade')
     .eq('review_status', 'published')
     .order('subject_id')
     .order('number');

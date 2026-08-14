@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
   if (cached) return NextResponse.json({ sheet: cached.body, cached: true, quota: g.quota });
 
-  const grounding = await chapterGrounding(g.admin, chapterId, medium);
+  const grounding = await chapterGrounding(g.admin, chapterId, medium, 24_000, g.grade);
   if (!grounding) return NextResponse.json({ error: 'no_content' }, { status: 404 });
 
   try {

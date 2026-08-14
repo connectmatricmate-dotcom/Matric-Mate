@@ -42,7 +42,19 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TXT = resolve(ROOT, 'content/fbise/text');
-const OUT = resolve(ROOT, 'data/fbise');
+
+/**
+ * Which class's framework to parse. The SLO codes carry the grade (P-09-...,
+ * P-10-...), so the same parser serves both; only the inputs and the output
+ * directory move. Grade 10 inputs are framework-<subject>-ssc2.txt and land
+ * in data/fbise/ssc2/, keeping every grade-9 artifact byte-identical.
+ */
+const GRADE = process.argv.includes('--grade')
+  ? process.argv[process.argv.indexOf('--grade') + 1]
+  : '9';
+const GRADE_CODE = GRADE === '10' ? '10' : '09';
+const FILE_SUFFIX = GRADE === '10' ? '-ssc2' : '';
+const OUT = resolve(ROOT, GRADE === '10' ? 'data/fbise/ssc2' : 'data/fbise');
 
 const C = {
   dim: (s) => `\x1b[2m${s}\x1b[0m`,
@@ -209,7 +221,7 @@ function parseFramework(text, subject) {
       // Wrong subject or wrong class. Both really occur: the English framework
       // interleaves Class 9 and Class 10, and the Computer Science one quotes a
       // handful of English outcomes.
-      if (prefix !== subject.prefix || grade !== '09') {
+      if (prefix !== subject.prefix || grade !== GRADE_CODE) {
         current = null;
         continue;
       }
@@ -228,7 +240,7 @@ function parseFramework(text, subject) {
       const glued = splitTrailingColumns(text0);
 
       current = {
-        code: `${prefix}-09-${domain}${sub}-${num.padStart(2, '0')}`,
+        code: `${prefix}-${GRADE_CODE}-${domain}${sub}-${num.padStart(2, '0')}`,
         domain,
         subDomain: sub || null,
         number: Number(num),
@@ -417,7 +429,9 @@ function coverageNotes(stats) {
 }
 
 async function main() {
-  const only = process.argv[2];
+  // The optional positional is the subject id; skip the --grade pair.
+  const positional = process.argv.slice(2).filter((a, i, all) => a !== '--grade' && all[i - 1] !== '--grade');
+  const only = positional[0];
   await mkdir(OUT, { recursive: true });
 
   const manifest = JSON.parse(await readFile(resolve(ROOT, 'content/fbise/manifest.json'), 'utf8')).files;
@@ -456,7 +470,7 @@ async function main() {
       continue;
     }
 
-    const file = resolve(TXT, `framework-${subject.id}.txt`);
+    const file = resolve(TXT, `framework-${subject.id}${FILE_SUFFIX}.txt`);
     let text;
     try {
       text = await readFile(file, 'utf8');

@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
     .from('chapters')
     .select('id,title,exam_share')
     .eq('subject_id', subjectId)
+    .eq('grade', g.grade)
     .eq('review_status', 'published')
     .order('number');
   if (!subject || !chapterRows?.length) return NextResponse.json({ error: 'no_content' }, { status: 404 });
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
   // Section C: the model writes long questions from the two heaviest chapters.
   const heavy = [...chapters].sort((a, b) => b.share - a.share).slice(0, 2);
   const groundings = (
-    await Promise.all(heavy.map((c) => chapterGrounding(g.admin, c.id, medium, 9000)))
+    await Promise.all(heavy.map((c) => chapterGrounding(g.admin, c.id, medium, 9000, g.grade)))
   ).filter(Boolean) as { title: string; text: string }[];
 
   try {
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 6000,
       output_config: { format: { type: 'json_schema', schema: LONG_SCHEMA } },
       system:
-        'You write Section C long questions for an FBISE Class 9 (SSC-I) board paper. Work ONLY from the chapter text provided. Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ' +
+        `You write Section C long questions for an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) board paper. Work ONLY from the chapter text provided. Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ` +
         (medium === 'ur'
           ? 'Write in Urdu, keeping technical terms in English the way Pakistani textbooks do.'
           : 'Write in clear English at board register.'),

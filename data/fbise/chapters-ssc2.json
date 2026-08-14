@@ -1,0 +1,759 @@
+{
+ "_note": [
+  "Grade 10 (SSC-II) chapter structure, from the board's own Tables of Specification in the",
+  "2025 SSC-II Assessment Frameworks (content/fbise/pdf/ssc2/, gitignored). Same philosophy as",
+  "chapters.json for grade 9: a chapter is a ToS content area, mapped to SLO domains or",
+  "CODE-RANGE strings so every outcome lands in exactly one chapter deterministically.",
+  "",
+  "share IS THE BOARD'S NUMBER where the ToS states it per content area (phy, bio, cs, pst,",
+  "math domains). Where a ToS column scan was ambiguous (chem) or domains had to be split into",
+  "study-sized chapters (math, pst sub-domains), the share is the ToS group total distributed",
+  "by outcome count, rounded; the method is honest weighting, not board gospel per chapter.",
+  "eng/urd/isl shares are null pending a readable SSC-II ToS for them (Urdu-typeset PDFs).",
+  "",
+  "MARKS ARE NOT PAPER MARKS: ToS tables count both branches of either/or questions, so they",
+  "foot above the real paper total. Treat marks as relative weight, trust share.",
+  "",
+  "This file is also the grade-10 chapter CATALOG: titles, urduTitle and blurbs live here",
+  "(grade 9's live in packages/core content.ts; grade 10 is database-first by design, the",
+  "bundled catalog stays grade 9). Chapter ids become <subject>-10-<number>."
+ ],
+ "source": "ModelPaper/2025/Assessment Frameworks/SSC-II/*, Table of Specification pages",
+ "retrieved": "2026-08-15",
+ "grade": 10,
+ "subjects": {
+  "phy": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "Heat and Thermodynamics",
+     "slos": [
+      "C"
+     ],
+     "marks": 21,
+     "share": 18,
+     "blurb": "Heat capacity, modes of heat transfer, thermal expansion and changes of state. Almost one mark in five on your paper starts here."
+    },
+    {
+     "number": 2,
+     "title": "Waves and Sound",
+     "slos": [
+      "D:1-32"
+     ],
+     "marks": 16,
+     "share": 13,
+     "blurb": "Wave behaviour, reflection, refraction and diffraction, then sound: how it travels, its speed, loudness and quality."
+    },
+    {
+     "number": 3,
+     "title": "Optics",
+     "slos": [
+      "D:33-58"
+     ],
+     "marks": 15,
+     "share": 13,
+     "blurb": "Mirrors, lenses, refraction and total internal reflection, image formation and the optical instruments built on them."
+    },
+    {
+     "number": 4,
+     "title": "Electrostatics",
+     "slos": [
+      "E:1-17"
+     ],
+     "marks": 7,
+     "share": 6,
+     "blurb": "Charge, electric fields, capacitors and lightning: electricity at rest and what it does."
+    },
+    {
+     "number": 5,
+     "title": "Current Electricity and Circuits",
+     "slos": [
+      "E:18-62"
+     ],
+     "marks": 21,
+     "share": 18,
+     "blurb": "Current, voltage, resistance, Ohm's law, series and parallel circuits, electrical power and safe use of electricity."
+    },
+    {
+     "number": 6,
+     "title": "Basic Electronics",
+     "slos": [
+      "E:63-73"
+     ],
+     "marks": 10,
+     "share": 9,
+     "blurb": "Digital and analogue electronics, Boolean logic and the logic gates every year's paper asks about."
+    },
+    {
+     "number": 7,
+     "title": "Electromagnetism",
+     "slos": [
+      "E:74-98"
+     ],
+     "marks": 16,
+     "share": 13,
+     "blurb": "Electromagnetic induction, generators, motors, transformers and electromagnetic waves."
+    },
+    {
+     "number": 8,
+     "title": "Nuclear Physics",
+     "slos": [
+      "F"
+     ],
+     "marks": 12,
+     "share": 10,
+     "blurb": "The atom's nucleus, radioactivity, half-life, fission and fusion, and the uses and dangers of radiation."
+    }
+   ]
+  },
+  "chem": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "States of Matter",
+     "slos": [
+      "B:1-10"
+     ],
+     "marks": 10,
+     "share": 8,
+     "blurb": "Changes of state, heating and cooling curves, and the kinetic particle theory behind them."
+    },
+    {
+     "number": 2,
+     "title": "Solutions and Concentration",
+     "slos": [
+      "B:11-16"
+     ],
+     "marks": 9,
+     "share": 8,
+     "blurb": "Concentration in grams and moles per cubic decimetre, composition by mass and percentage purity."
+    },
+    {
+     "number": 3,
+     "title": "Electrochemistry",
+     "slos": [
+      "B:17-27"
+     ],
+     "marks": 16,
+     "share": 14,
+     "blurb": "Electrolytic and voltaic cells, electrode reactions and ionic half-equations. One of the heaviest chapters on the paper."
+    },
+    {
+     "number": 4,
+     "title": "Rates of Reaction",
+     "slos": [
+      "B:28-33"
+     ],
+     "marks": 8,
+     "share": 7,
+     "blurb": "Collision theory and everything that speeds a reaction up or slows it down."
+    },
+    {
+     "number": 5,
+     "title": "Salts",
+     "slos": [
+      "B:34-38"
+     ],
+     "marks": 6,
+     "share": 5,
+     "blurb": "How salts form, their solubility rules and how to prepare them."
+    },
+    {
+     "number": 6,
+     "title": "Chemistry of Nitrogen and Sulphur",
+     "slos": [
+      "C:1-8"
+     ],
+     "marks": 12,
+     "share": 10,
+     "blurb": "Oxides of nitrogen, the Haber process, sulfur dioxide and sulfuric acid."
+    },
+    {
+     "number": 7,
+     "title": "Metals",
+     "slos": [
+      "C:9-12"
+     ],
+     "marks": 6,
+     "share": 5,
+     "blurb": "General properties of metals, amphoteric oxides and the reactivity behind extraction."
+    },
+    {
+     "number": 8,
+     "title": "Hydrocarbons and Fuels",
+     "slos": [
+      "E:1-13",
+      "F"
+     ],
+     "marks": 17,
+     "share": 14,
+     "blurb": "Alkanes, alkenes and alkynes, fossil fuels and the fractions of petroleum."
+    },
+    {
+     "number": 9,
+     "title": "Alcohols and Carboxylic Acids",
+     "slos": [
+      "E:14-25"
+     ],
+     "marks": 13,
+     "share": 11,
+     "blurb": "The two organic families the board examines hardest: their preparation, reactions and everyday roles."
+    },
+    {
+     "number": 10,
+     "title": "Polymers and Biochemistry",
+     "slos": [
+      "E:26-40"
+     ],
+     "marks": 21,
+     "share": 18,
+     "blurb": "Plastics and their environmental cost, then the molecules of life: carbohydrates, proteins, fats and vitamins."
+    }
+   ]
+  },
+  "bio": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "Digestive System",
+     "slos": [
+      "R:1-7"
+     ],
+     "marks": 12,
+     "share": 10,
+     "blurb": "Ingestion to assimilation: the alimentary canal, enzymes, the villus and the diseases of digestion."
+    },
+    {
+     "number": 2,
+     "title": "Circulatory System",
+     "slos": [
+      "R:8-15"
+     ],
+     "marks": 14,
+     "share": 12,
+     "blurb": "Blood, its cells, the heart's structure and the heart diseases examiners return to every year."
+    },
+    {
+     "number": 3,
+     "title": "Urinary System",
+     "slos": [
+      "R:16-23"
+     ],
+     "marks": 9,
+     "share": 8,
+     "blurb": "Kidneys, nephrons, urine formation, osmoregulation and kidney failure."
+    },
+    {
+     "number": 4,
+     "title": "Respiratory System",
+     "slos": [
+      "R:24-27"
+     ],
+     "marks": 12,
+     "share": 10,
+     "blurb": "The air passageway, the mechanism of breathing and the diseases that attack it."
+    },
+    {
+     "number": 5,
+     "title": "Coordination and Control",
+     "slos": [
+      "G"
+     ],
+     "marks": 17,
+     "share": 14,
+     "blurb": "Nervous system, neurons, synapses, reflexes and the endocrine glands. The heaviest chapter of your year."
+    },
+    {
+     "number": 6,
+     "title": "Reproduction",
+     "slos": [
+      "H:1-3"
+     ],
+     "marks": 7,
+     "share": 6,
+     "blurb": "Asexual and sexual reproduction, gametogenesis and fertilization."
+    },
+    {
+     "number": 7,
+     "title": "Inheritance",
+     "slos": [
+      "H:4-7"
+     ],
+     "marks": 11,
+     "share": 9,
+     "blurb": "Chromosomes, genotype and phenotype, and Mendel's laws through monohybrid and dihybrid crosses."
+    },
+    {
+     "number": 8,
+     "title": "Diseases",
+     "slos": [
+      "I:1-4",
+      "I:11-15",
+      "R:28-30"
+     ],
+     "marks": 8,
+     "share": 7,
+     "blurb": "Pathogens, infectious and non-infectious disease, diabetes, cancer and the lessons of Covid-19."
+    },
+    {
+     "number": 9,
+     "title": "Immunity",
+     "slos": [
+      "I:5-10",
+      "R:31"
+     ],
+     "marks": 7,
+     "share": 6,
+     "blurb": "The immune system, blood clotting, vaccines and allergies."
+    },
+    {
+     "number": 10,
+     "title": "Biotechnology",
+     "slos": [
+      "J"
+     ],
+     "marks": 12,
+     "share": 10,
+     "blurb": "Food, medical and marine biotechnology, genetic editing and bioremediation."
+    },
+    {
+     "number": 11,
+     "title": "Biostatistics and Data Handling",
+     "slos": [
+      "K"
+     ],
+     "marks": 9,
+     "share": 8,
+     "blurb": "Mean, median and mode for biological data, and the charts that present them."
+    }
+   ]
+  },
+  "math": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "Complex Numbers",
+     "slos": [
+      "A:1-11"
+     ],
+     "share": 11,
+     "blurb": "The number i, operations on complex numbers, conjugates, modulus and their geometric meaning."
+    },
+    {
+     "number": 2,
+     "title": "Quadratic Equations and Inequalities",
+     "slos": [
+      "A:12-21"
+     ],
+     "share": 10,
+     "blurb": "Solving quadratics, the discriminant, roots and coefficients, and quadratic inequalities."
+    },
+    {
+     "number": 3,
+     "title": "Matrices and Determinants",
+     "slos": [
+      "A:22-28"
+     ],
+     "share": 7,
+     "blurb": "Matrix operations, determinants, inverses and solving simultaneous equations with them."
+    },
+    {
+     "number": 4,
+     "title": "Functions and Graphs",
+     "slos": [
+      "A:29-38"
+     ],
+     "share": 10,
+     "blurb": "Types of functions, composition, inverses, absolute value and their graphs."
+    },
+    {
+     "number": 5,
+     "title": "Algebraic Fractions and Inequalities",
+     "slos": [
+      "A:39-45"
+     ],
+     "share": 7,
+     "blurb": "Rational expressions, algebraic fractions and regions bounded by linear inequalities."
+    },
+    {
+     "number": 6,
+     "title": "Equations and Graph Sketching",
+     "slos": [
+      "A:46-57"
+     ],
+     "share": 11,
+     "blurb": "Equations reducible to quadratics, exponential growth and decay, gradients and sketching non-linear graphs."
+    },
+    {
+     "number": 7,
+     "title": "Vectors in a Plane",
+     "slos": [
+      "B:1-10"
+     ],
+     "share": 8,
+     "blurb": "Vectors as directed segments, position vectors, magnitude, addition and geometric problems."
+    },
+    {
+     "number": 8,
+     "title": "Further Trigonometry",
+     "slos": [
+      "B:11-14"
+     ],
+     "share": 3,
+     "blurb": "Sine and cosine beyond acute angles, the laws of sines and cosines, and 3D problems."
+    },
+    {
+     "number": 9,
+     "title": "Chords and Arcs of a Circle",
+     "slos": [
+      "B:15-24"
+     ],
+     "share": 8,
+     "blurb": "The circle theorems on chords and arcs, and the problems the board builds on them."
+    },
+    {
+     "number": 10,
+     "title": "Tangents and Angles of a Circle",
+     "slos": [
+      "B:25-33"
+     ],
+     "share": 7,
+     "blurb": "Tangent properties and angle theorems in circles."
+    },
+    {
+     "number": 11,
+     "title": "Practical Geometry of Circles",
+     "slos": [
+      "B:34-40"
+     ],
+     "share": 6,
+     "blurb": "Constructing circles and tangents with ruler and compasses, the way the paper asks for them."
+    },
+    {
+     "number": 12,
+     "title": "Statistics",
+     "slos": [
+      "C:1-9"
+     ],
+     "share": 8,
+     "blurb": "Cumulative frequency, quartiles, box plots, scatter diagrams, correlation and standard deviation."
+    },
+    {
+     "number": 13,
+     "title": "Probability of Combined Events",
+     "slos": [
+      "C:10-12"
+     ],
+     "share": 3,
+     "blurb": "The addition and multiplication laws of probability for combined events."
+    }
+   ]
+  },
+  "cs": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "Computer Systems",
+     "slos": [
+      "A"
+     ],
+     "marks": 20,
+     "share": 21,
+     "blurb": "System software, hardware and the tools that hold a computer together. The heaviest chapter of your paper."
+    },
+    {
+     "number": 2,
+     "title": "Computational Thinking and Algorithms",
+     "slos": [
+      "B"
+     ],
+     "marks": 11,
+     "share": 11,
+     "blurb": "Common algorithms, abstraction and building modular solutions."
+    },
+    {
+     "number": 3,
+     "title": "Programming Fundamentals",
+     "slos": [
+      "C"
+     ],
+     "marks": 9,
+     "share": 9,
+     "blurb": "Front-end and back-end, advanced programming techniques and implementing real algorithms."
+    },
+    {
+     "number": 4,
+     "title": "Data and Analysis",
+     "slos": [
+      "D"
+     ],
+     "marks": 17,
+     "share": 18,
+     "blurb": "The scope, types and stages of data analysis: the second-heaviest chapter on the paper."
+    },
+    {
+     "number": 5,
+     "title": "Applications of Computer Science",
+     "slos": [
+      "E"
+     ],
+     "marks": 13,
+     "share": 14,
+     "blurb": "Where computing meets the world, including AI and its social effects."
+    },
+    {
+     "number": 6,
+     "title": "Impacts of Computing",
+     "slos": [
+      "F:1-2"
+     ],
+     "marks": 11,
+     "share": 11,
+     "blurb": "Safe and responsible use of technology and strategies against its harms."
+    },
+    {
+     "number": 7,
+     "title": "Digital Literacy",
+     "slos": [
+      "F:3"
+     ],
+     "marks": 8,
+     "share": 8,
+     "blurb": "The digital divide and what digital citizenship demands."
+    },
+    {
+     "number": 8,
+     "title": "Entrepreneurship in Computing",
+     "slos": [
+      "G"
+     ],
+     "marks": 8,
+     "share": 8,
+     "blurb": "Communicating and publishing ideas: turning computing skills into ventures."
+    }
+   ]
+  },
+  "pst": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "Cultural Diversity of Pakistan",
+     "slos": [
+      "D1"
+     ],
+     "marks": 19,
+     "share": 21,
+     "blurb": "Languages, folklore, mystical orders and the cultural elements that shape Pakistani society."
+    },
+    {
+     "number": 2,
+     "title": "Sports and Leisure in Society",
+     "slos": [
+      "D2"
+     ],
+     "marks": 9,
+     "share": 10,
+     "blurb": "Why leisure and sports matter to a society, in the board's own framing."
+    },
+    {
+     "number": 3,
+     "title": "Constitutional Development",
+     "slos": [
+      "E1"
+     ],
+     "marks": 21,
+     "share": 23,
+     "blurb": "From the Objectives Resolution through the constitutions of 1956, 1962 and 1973. The heaviest chapter of the paper."
+    },
+    {
+     "number": 4,
+     "title": "Citizenship and Rule of Law",
+     "slos": [
+      "E2"
+     ],
+     "marks": 17,
+     "share": 19,
+     "blurb": "Rule of law, citizenship, free press and what it means to be a digital citizen."
+    },
+    {
+     "number": 5,
+     "title": "Pakistan's Foreign Policy",
+     "slos": [
+      "F1"
+     ],
+     "marks": 12,
+     "share": 14,
+     "blurb": "The aims of foreign policy and Pakistan's geo-political position."
+    },
+    {
+     "number": 6,
+     "title": "Pakistan and International Affairs",
+     "slos": [
+      "F2"
+     ],
+     "marks": 12,
+     "share": 13,
+     "blurb": "The United Nations, Pakistan's relations with its neighbours and the wider world."
+    }
+   ]
+  },
+  "eng": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "Oral Communication Skills",
+     "slos": [
+      "A"
+     ],
+     "share": null,
+     "blurb": "Listening and speaking for different purposes. Judged in class, not on the annual paper, but the base of every other skill."
+    },
+    {
+     "number": 2,
+     "title": "Reading and Critical Thinking",
+     "slos": [
+      "B"
+     ],
+     "share": null,
+     "blurb": "Reading strategies, informational texts, poetry and precis: the comprehension half of your paper."
+    },
+    {
+     "number": 3,
+     "title": "Vocabulary and Grammar",
+     "slos": [
+      "C"
+     ],
+     "share": null,
+     "blurb": "Tenses, conjunctions and the grammar and vocabulary questions of Section A."
+    },
+    {
+     "number": 4,
+     "title": "Writing",
+     "slos": [
+      "D"
+     ],
+     "share": null,
+     "blurb": "Narrative and informative writing, and the precis skills the paper rewards."
+    }
+   ]
+  },
+  "urd": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "پڑھنا",
+     "urduTitle": "پڑھنا",
+     "titleEn": "Reading.",
+     "slos": [
+      "C"
+     ],
+     "share": null,
+     "blurb": "نظم و نثر کی تفہیم، اشعار کی تشریح اور متن پر رائے۔ سالانہ پرچے کا بنیادی حصہ۔"
+    },
+    {
+     "number": 2,
+     "title": "لکھنا",
+     "urduTitle": "لکھنا",
+     "titleEn": "Writing.",
+     "slos": [
+      "D"
+     ],
+     "share": null,
+     "blurb": "مضمون نویسی، خط و درخواست، تلخیص اور ترجمہ: پرچے کا سب سے وزنی حصہ۔"
+    },
+    {
+     "number": 3,
+     "title": "قواعد / زبان شناسی",
+     "urduTitle": "قواعد / زبان شناسی",
+     "titleEn": "Grammar and linguistics.",
+     "slos": [
+      "E"
+     ],
+     "share": null,
+     "blurb": "قواعد، تراکیب، محاورات اور اصنافِ سخن کی بنیادی اصطلاحات۔"
+    }
+   ]
+  },
+  "isl": {
+   "chapters": [
+    {
+     "number": 1,
+     "title": "قرآن مجید و حدیثِ نبوی ﷺ",
+     "urduTitle": "قرآن مجید و حدیثِ نبوی ﷺ",
+     "titleEn": "Quran and Hadith.",
+     "slos": [
+      "A"
+     ],
+     "share": null,
+     "blurb": "منتخب آیات و احادیث کا مطالعہ، ترجمہ اور تشریح۔"
+    },
+    {
+     "number": 2,
+     "title": "ایمانیات و عبادات",
+     "urduTitle": "ایمانیات و عبادات",
+     "titleEn": "Beliefs and worship.",
+     "slos": [
+      "B"
+     ],
+     "share": null,
+     "blurb": "ایمانیات کی بنیادیں اور عبادات کے احکام و حکمتیں۔"
+    },
+    {
+     "number": 3,
+     "title": "سیرتِ رسول ﷺ",
+     "urduTitle": "سیرتِ رسول ﷺ",
+     "titleEn": "Seerah.",
+     "slos": [
+      "C"
+     ],
+     "share": null,
+     "blurb": "رسول اکرم ﷺ کی حیاتِ طیبہ کے اہم پہلو اور ان سے ملنے والے اسباق۔"
+    },
+    {
+     "number": 4,
+     "title": "اخلاق و آداب",
+     "urduTitle": "اخلاق و آداب",
+     "titleEn": "Ethics and manners.",
+     "slos": [
+      "D"
+     ],
+     "share": null,
+     "blurb": "اسلامی اخلاق، آداب اور کردار سازی۔"
+    },
+    {
+     "number": 5,
+     "title": "حسنِ معاملات و معاشرت",
+     "urduTitle": "حسنِ معاملات و معاشرت",
+     "titleEn": "Social conduct.",
+     "slos": [
+      "E"
+     ],
+     "share": null,
+     "blurb": "معاملات، حقوق العباد اور معاشرتی زندگی کے اسلامی اصول۔"
+    },
+    {
+     "number": 6,
+     "title": "ہدایت کے سرچشمے",
+     "urduTitle": "ہدایت کے سرچشمے",
+     "titleEn": "Sources of guidance.",
+     "slos": [
+      "F"
+     ],
+     "share": null,
+     "blurb": "قرآن، سنت اور اجماع: ہدایت کے بنیادی ماخذ اور مشاہیرِ اسلام۔"
+    },
+    {
+     "number": 7,
+     "title": "اسلامی تعلیمات اور عصرِ حاضر",
+     "urduTitle": "اسلامی تعلیمات اور عصرِ حاضر",
+     "titleEn": "Islam and the modern age.",
+     "slos": [
+      "G"
+     ],
+     "share": null,
+     "blurb": "عصرِ حاضر کے مسائل پر اسلامی تعلیمات کا اطلاق۔"
+    }
+   ]
+  }
+ }
+}

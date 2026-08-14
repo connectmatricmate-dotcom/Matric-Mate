@@ -1,0 +1,677 @@
+{
+  "subject": "chem",
+  "name": "Chemistry",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Chemistry SSC-I.pdf",
+    "sha256": "4decc4a565712eb271127fc5a5098d1c581ed6932ed7463ff3a86e8113d9a36e",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 5,
+    "slos": 97,
+    "summative": 82,
+    "formative": 15,
+    "unclassified": 0,
+    "untitledDomains": 5,
+    "shortText": 0,
+    "examUnits": 8
+  },
+  "notes": [
+    "5 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Chemistry IX-X along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Fundamentals of Chemistry"
+      },
+      {
+        "number": 2,
+        "title": "Structure of Atoms"
+      },
+      {
+        "number": 3,
+        "title": "Periodic Table and Periodicity of Properties"
+      },
+      {
+        "number": 4,
+        "title": "Structure of Molecules"
+      },
+      {
+        "number": 5,
+        "title": "Physical States of Matter"
+      },
+      {
+        "number": 6,
+        "title": "Solutions"
+      },
+      {
+        "number": 7,
+        "title": "Electrochemistry"
+      },
+      {
+        "number": 8,
+        "title": "Chemical Reactivity"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-10-A-01",
+          "text": "Justify, with examples, that to do science is to be ‘A’ Chemistry Nature of Science in Chemistry theories. For example, chemists based their research on the assumptions of conservation of mass and energy and use this to verify whether their calculations and findings are sensible. - Scientists in different fields often share similar methodologies, such as the use of controlled experiments and the peer review process. The scientific community also values objectivity and skepticism, which are essential for ensuring the accuracy and validity of scientific findings).",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-A-02",
+          "text": "Explain, with examples, that a 'scientific paradigm' is a theoretical model of how nature works (Some examples include: - The belief that materials that burn do so because a material called ‘phlogiston’ was the paradigm in chemistry in the 18th century - Historical models of the atom are paradigms, such as the ‘plum pudding' and the Rutherford models of the atom - The periodic table of elements, and belief in the ‘periodicity’ of atoms based on the arrangements of their electrons is a paradigm Scientific paradigms in chemistry provide a framework for understanding the properties of materials and developing new materials with specific properties. Overall, scientific paradigms in chemistry guide research and development in the field, and help scientists to better understand the behavior of chemicals and their interactions.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-A-03",
+          "text": "Explain, with examples, how scientists speak of “levels of confidence” (or uncertainty) when discussing experimental outcomes. teaching.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-A-04",
+          "text": "Explain the difference between repeatability and reproducibility in chemistry. (For context: - repeatability as the idea that scientific results from experiments should be possible to verify by conducting the experiment again under the same physical conditions. - reproducibility as the idea that the same or similar result is obtained when the measurement is made under either different conditions or by a different method or in different experiment).",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-10-B-01",
+          "text": "Explain changes of state and internal energy without change in temperature (melting, boiling, Physical Chemistry",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-02",
+          "text": "Distinguish between evaporation and boiling. for theory examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-03",
+          "text": "Interpret heating and cooling curves in terms of kinetic theory. examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-04",
+          "text": "Interpret in terms of kinetic particle theory the effects of changing pressure, temperature and volume of a gas on the other two with regards to Boyle's law, Charles' Law, and Avogadro's Law.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-05",
+          "text": "Explain qualitatively the effect of external pressure on rate of boiling and evaporation. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-06",
+          "text": "Explain diffusion of gases in terms of kinetic particle theory. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-07",
+          "text": "Examine qualitatively the effect of molecular mass and temperature on the rate of diffusion. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-08",
+          "text": "Discuss applications of sublimation around us. (Examples may include: solid air fresheners and 3D printing)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-09",
+          "text": "Explain, with the help of kinetic particle theory, the importance of rates of diffusion of medicines in the body.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-10",
+          "text": "Use the molar gas volume, 24 dm3 at room ry involving gases. teaching.",
+          "cognitive": "application",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-B-11",
+          "text": "Define concentration, use both g/dm3 and mol/dm3 and convert them. examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-12",
+          "text": "Calculate stoichiometric relationships between substances relationships (specifically: ● reacting masses, limiting reactants, ● volume of gasses at r.t.p., ● volumes of solution and concentrations of solutions in g/dm3 or mol/dm3, including conversion between cm and dm3)",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-13",
+          "text": "Calculate concentration of a solution in a titration using empirical data. PBA.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-14",
+          "text": "Calculate empirical formula and molecular formula from appropriate data. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-15",
+          "text": "Calculate composition by mass and percentage purity from appropriate data. teaching.",
+          "cognitive": "application",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-B-16",
+          "text": "Define electrolysis as decomposition of ionic istry passage of electric current.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-17",
+          "text": "Identify and label in simple electrolytic cells, the anode (+), cathode (-), electrolyte and direction of flow of electrons in external circuit.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-18",
+          "text": "Describe the transfer of charge in external circuit, Understanding movement of ions in the electrolyte and transfer of electrons at electrodes. [SLO: C-10-8-19] describe the observations made during the electrolysis of molten lead (lI) chloride, concentrated aqueous sodium chloride, dilute sulfuric acid using inert electrodes (platinum or carbon/graphite).",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-20",
+          "text": ") hydrogen and oxygen to produce electricity with water as the only chemical product.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-21",
+          "text": "Describe the advantages and disadvantages of Understanding using hydrogen-oxygen fuel cells in comparison with gasoline /petrol engines in vehicles.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-22",
+          "text": "Identify the products formed at electrodes and Understanding describe the observations made during the electrolysis of dilute copper sulphate using inert electrode or copper electrode.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-23",
+          "text": "Predict the identity of products of electrolysis of Understanding a halide compound in dilute or concentrated solution.",
+          "cognitive": null,
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-24",
+          "text": "Construct ionic half-equations for reaction at either electrode. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-25",
+          "text": "Describe the electroplating and its applications. for theory examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-26",
+          "text": "Sketch a schematic diagram for a Voltaic cell e.g. Daniel cell. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-27",
+          "text": "Use the voltage data given for voltaic cells to determine order of reactivity of any two metals. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-28",
+          "text": "Describe collision theory in terms of number of particles per unit volume, frequency of collisions of particles, kinetic energy of particles and activation energy. teaching.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-B-29",
+          "text": "State that catalyst increases the rate of reaction, provides alternate pathway with lower activation energy, and remains unchanged at the end of a reaction. teaching.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-B-30",
+          "text": "Describe the physical parameters that may be affected by the rate of, reaction including change in mass, temperature, and formation of gas.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-31",
+          "text": "Interpret data, including graphs, for investigating rate of reaction. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-32",
+          "text": "Explain the effect on rate of reaction of changing concentration of a reactant, pressure of gases, surface area of solids, temperature, presence of catalyst (including enzymes) using collision theory. teaching.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-B-33",
+          "text": "Justify the importance of chemical kinetics in the food industry to determine ideal harvesting and transportation times for produce.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-34",
+          "text": "Explain that salts are ionic compounds formed due to electrostatic attraction between oppositely charged ions (in which the positive ions come from bases and negative ions come from acids).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-35",
+          "text": "Explain why at STP salts are solids with high melting points. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-36",
+          "text": "Describe that under normal conditions, ionic compounds are usually solids with lattice structures.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-37",
+          "text": "Explain why the molten and aqueous solutions of salts are good conductors of electricity by making reference to the idea of mobile ions.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-38",
+          "text": "Describe the general solubility rules for salts. (These are: a. sodium, nitrate, potassium and ammonium salts are soluble b. chlorides are soluble except lead and silver. c. carbonates are insoluble except sodium, potassium and ammonium d. hydroxides are insoluble except sodium, potassium, ammonium and calcium (partially).",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-B-39",
+          "text": "Describe the preparation, separation and purification of soluble salts by reactions of acids with alkali (titration), excess metal, excess insoluble base, excess insoluble carbonate.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-10-C-01",
+          "text": "Recognize that atmospheric oxides of nitrogen ‘C’ hydrocarbons to form peroxyacetyl nitrate, PAN, Inorganic",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-02",
+          "text": "Describe the role of NO and NO2, in the formation of acid rain both directly and in their catalytic role in the oxidation of atmospheric sulfur dioxide. teaching.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-C-03",
+          "text": "State the symbol equation for the production of ammonia in the Haber process: N2 (g)+ 3H2 (g)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-04",
+          "text": "State the sources of the hydrogen (methane) and nitrogen (air) in the Haber process. examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-05",
+          "text": "State the typical conditions in the Haber process as 450°C, 20000 kPa /200 atm and an iron catalyst.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-06",
+          "text": "State the symbol equation for the conversion of sulfur dioxide to sulfur trioxide in the Contact process: 2SO2 + O2",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-07",
+          "text": "State the sources of the sulfur dioxide (burning sulfur or roasting sulfide ores) and oxygen (air) in the Contact process.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-08",
+          "text": "State the typical conditions for the conversion of sulfur dioxide to sulfur trioxide in the Contact process as 450°C, 200kPa /atm and a Vanadium(V) oxide catalyst.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-09",
+          "text": "Oxides Describe amphoteric oxides as oxides that react with acids and bases to produce a salt and water.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-10",
+          "text": "Classify oxides as acidic, including SO2, and CO2, basic, including CuO and CaO, or amphoteric, limited to Al2O3 and ZnO, related to metallic and non-metallic character.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-11",
+          "text": "Properties of metals Identify the general chemical properties of metals, limited to their reactions with dilute acids, cold water, steam and oxygen.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-C-12",
+          "text": "Arrange metals in order of reactivity given relevant information. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "E",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-10-E-01",
+          "text": "Name and draw the structural and displayed ‘E’ Chemistry Organic Chemistry",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-02",
+          "text": "State the type of compound present given the chemical name ending in - ane, -ene, -yne, -ol, or -oic acid or from a molecular, structural or displayed formula.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-03",
+          "text": "Name and draw the displayed formulae of the unbranched esters which can be made from unbranched alcohols and carboxylic acids, each containing up to four carbon atoms.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-04",
+          "text": "Alkenes carbons double carbon-carbon covalent bond and that alkenes are unsaturated hydrocarbons.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-05",
+          "text": "Describe the manufacture of alkenes by the cracking of large alkane molecules using a high temperature and a catalyst.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-06",
+          "text": "Describe the reasons for the cracking of large alkane molecules. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-07",
+          "text": "Describe the test to distinguish between saturated and unsaturated hydrocarbons by their reaction with aqueous bromine and KMnO4.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-08",
+          "text": "Describe the properties of alkenes in terms of addition reactions with: a. bromine or aqueous bromine b. hydrogen in the presence of a nickel catalyst c. steam in the presence of an acid catalyst and draw the structural or displayed formulae of the products",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-09",
+          "text": "Describe, using symbol equations, preparation of alkenes halogenoalkanes and alcohols.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-10",
+          "text": "Alkynes Identify alkynes as hydrocarbons containing triple carbon-carbon covalent bond and that alkynes are unsaturated hydrocarbons.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-11",
+          "text": "Describe the use of ethyne as fuel for welding and in artificially ripening fruits. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-12",
+          "text": "Describe how the properties of fractions obtained from petroleum change from the bottom to the top of the fractionating column, limited to: a. decreasing chain length b. higher volatility c. lower boiling points d. lower viscosity",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-14",
+          "text": "Name the uses of the fractions as: a. refinery gas fraction for gas used in heating and cooking b. gasoline /petrol fraction for fuel used in cars c. naphtha fraction as a chemical feedstock d. kerosene /paraffin fraction for jet fuel e. diesel oil/ gas oil fraction for fuel used in diesel engines f. fuel oil fraction for fuel used in ships and home heating systems. g. lubricating oil fraction for lubricants, waxes and polishes h. bitumen fraction for making roads",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-15",
+          "text": "Describe the manufacture of ethanol. Compounds  Fermentation of aqueous glucose at 25-35 O C in the presence of yeast and in the absence of oxygen.  catalytic addition of steam to ethane at 300 OC and 6000kPa / 6atm in the presence of an acid catalyst including a comparison of the advantages disadvantages of the two methods)",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-16",
+          "text": "Describe the combustion of alcohols. for theory examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-17",
+          "text": "Discuss the applications of alcohols as fuels, including their advantages and disadvantages over fossil fuels.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-18",
+          "text": "Explain the role of alcohols in various industries such as pharmaceuticals, cosmetics, and fuel production.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-19",
+          "text": "Discuss the impact of alcohols on daily life, including their use as solvents and disinfectants. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-20",
+          "text": "Describe the reactions of carboxylic acids with Compounds formulae of the salts produced.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-21",
+          "text": "Describe the formation of ethanoic acid by the oxidation of ethanol: with acidified aqueous potassium manganate (VII) & by bacterial oxidation during vinegar production.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-22",
+          "text": "Describe the reaction of a carboxylic acid with an alcohol using an acid catalyst to form an ester. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-23",
+          "text": "Describe the industrial applications of carboxylic acids and esters, including their use as solvents, flavors, fragrances, and plastics.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-24",
+          "text": "Explain the role of carboxylic acids and esters in daily life, including their use in food preservation, cosmetics, and pharmaceuticals.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-25",
+          "text": "Define polymers as large molecules built up from many smaller molecules called monomers. examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-26",
+          "text": "Identify the repeating units and / or linkages in addition polymers and in condensation polymers. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-27",
+          "text": "Deduce the structure or repeat unit of an addition polymer from a given alkene and vice versa. examination, teaching.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-28",
+          "text": "Deduce the structure or repeating unit of a condensation polymer from given monomers and vice versa, limited to: a. polyamides from a dicarboxylic acid and a diamine b. polyesters from a dicarboxylic acid and a diol",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-29",
+          "text": "Describe the differences between addition and condensation polymerization.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-30",
+          "text": "State that plastics are made from polymers. for theory examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-31",
+          "text": "Describe how the properties of plastics have implications for their disposal. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-32",
+          "text": "Describe the environmental challenges. caused by plastics, limited to: a. disposal in landfill sites b. accumulation in oceans c. formation of toxic gases from burning",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-33",
+          "text": "Describe the structure of: a. nylon, a polyamide b. PET, a polyester The full name for PET, polyethylene terephthalate, is not required teaching.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-E-34",
+          "text": "State that PET can be converted back into monomers and re-polymerized. examination, teaching.",
+          "cognitive": "knowledge",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-E-35",
+          "text": "Outline the importance of polymers in the textile industry. (Examples for polymers being used may be given along with their specific properties)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-36",
+          "text": "Describe proteins as natural polyamides and that chemistry the general structure.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-37",
+          "text": "Draw the general structure of proteins. for theory examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-38",
+          "text": "Explain the sources, use and structure of proteins, lipids and carbohydrates. examination, teaching.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-E-39",
+          "text": "Describe the importance of nucleic acids. be asked in annual examination, teaching.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        },
+        {
+          "code": "C-10-E-40",
+          "text": "Explain vitamins, their sources and their importance to health. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-E-41",
+          "text": "Identify applications of biochemistry in testing (blood test, pregnancy test, cancer screening, parental genetic testing), genetic engineering, gene therapy and cloning. teaching.",
+          "cognitive": "understanding",
+          "assessment": "formative"
+        }
+      ]
+    },
+    {
+      "code": "F",
+      "title": null,
+      "slos": [
+        {
+          "code": "C-10-F-01",
+          "text": "Name fossil fuels; coal, natural gas and ‘F’ examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-F-02",
+          "text": "Name methane as main constituent of natural gas. Data Collection",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "C-10-F-03",
+          "text": "State that petroleum is a mixture of hydrocarbons, compounds containing hydrogen and carbon only. [SLO: C-09-10-G-01] Explain, with examples, the types of chemical ‘G’ Lab and Practical Skills hazards and asphyxiation hazards). [SLO: C-09-10-G-02] Recognize the meaning of different chemical hazard signs in the lab and on chemicals. examination, part of Lab work [SLO: C-09-10-G-03] Recognize the importance of personal protective equipment (PPE) by correctly lab activities identifying the types of PPE needed for different lab activities. part of Lab work [SLO: C-09-10-G-04] Locate the nearest emergency shower. examination, part of Lab work [SLO: C-09-10-G-05] Show awareness of emergency procedures in the event of an emergency in the lab. examination, part of Lab work. [SLO: C-09-10-G-06] Identify apparatus from diagrams or descriptions. for PBA asked in PBA. [SLO: C-09-10-G-07] Draw, complete or label diagrams of apparatus. for PBA asked in PBA [SLO: C-09-10-G-08] Explain the use of, common techniques, apparatus and materials. asked in PBA. [SLO: C-09-10-G-09] Select the most appropriate apparatus or method for the task and justify the choice made asked in PBA [SLO: C-09-10-G-10] Describe tests (qualitative, gas tests, other tests). for PBA asked in PBA. [SLO: C-09-10-G-11] Describe and explain techniques used to ensure the accuracy of observations and data. examination, part of Lab work. [SLO: C-09-10-G-12] Carry out the following tests under supervision.  Identification of metal ions.  Non-metal ions and gases.  Chemical test for water.  Test-tube reactions of dilute acids, including ethanoic acid.  Tests for oxidizing and reducing agents.  Melting points and boiling points.  Displacement reactions of metals and halogens.  Temperature changes during reactions. [SLO: C-09-10-G-13] Carry out separation and purification techniques. (This may include:  Filtration.  Crystallization.  Simple distillation, fractional distillation.  Chromatography.  Electrolysis). [SLO: C-09-10-G-14] Suggest the most appropriate apparatus or technique and justify the choice made. asked in PBA. [SLO: C-09-10-G-15] Describe experimental procedures. for PBA asked in PBA. [SLO: C-09-10-G-16] Take readings from apparatus (analogue and digital) or from diagrams of apparatus with appropriate precision. [SLO: C-09-10-G-17] Take sufficient observations or measurements, including repeats where appropriate. asked in PBA. [SLO: C-09-10-G-18] Record qualitative observations from chemical tests and other tests. asked in PBA. [SLO: C-09-10-G-19] Record systematically (in a suitable table, to an appropriate degree of precision and using appropriate units). [SLO: C-09-10-G-20] Record the results of an experiment. for PBA asked in PBA. [SLO: C-09-10-G-21] Process the results of an experiment to form a conclusion or to evaluate a prediction. examination, part of Lab work. [SLO: C-09-10-G-22] Predict expected results. for PBA examination, part of Lab work. [SLO: C-09-10-G-23] Interpret and evaluate experimental observations and data. examination, part of Lab work. [SLO: C-09-10-G-24] Process data, including for use in further calculations or for graph plotting. examination, part of Lab work. [SLO: C-09-10-G-25] Present data graphically, including the use of best-fit lines where appropriate. examination, part of Lab work. [SLO: C-09-10-G-26] Analyze and interpret observations and data, including data presented graphically. examination, part of Lab work. [SLO: C-09-10-G-27] Form conclusions justified by reference to observations and data and with appropriate explanation. part of Lab work. [SLO: C-09-10-G-28] Evaluate the quality of observations and data, identifying any anomalous results. examination, part of Lab work. [SLO: C-09-10-G-29] Identify potential sources of error in an experimental design. examination, part of Lab work. [SLO: C-09-10-G-30] Assess the limitations of an experimental design. for PBA examination, part of Lab work. [SLO: C-09-10-G-31] Evaluate experimental arrangements, methods and techniques, including the control of variables. examination, part of Lab work. [SLO: C-09-10-G-32] Suggest possible improvements to the apparatus, experimental techniques. part of Lab work. Total no. of = 110 Federal Board SSC-II Examination Model Question Paper Chemistry (Curriculum 2022-23) Scheme of Studies 2006 ROLL NUMBER Section - A (Marks 12) ⓪ ② Section-A is compulsory. All parts of this section are to be answered on this page and handed over to the Centre Superintendent. Deleting/ overwriting is not allowed. Do not use lead pencil. ⑨ Invigilator Sign. __________________ Q1. Fill the relevant bubble against each question according to the curriculum. Each part carries one mark. Question A student places a piece of dry ice (solid CO₂) in a melted and sealed container. After a turned into i while, the container expands form new and may even burst. What is compounds the best explanation for this? What is the direction of flow ii electrolytic cell? In the following reaction, N2(g)+3H2(g) ⇌ 2NH3(g) Which physical factor has iii the greatest impact on the reaction rate as the reaction progresses? Sodium Silver (Na⁺), (Ag⁺), Lead Which cations generally iv form soluble salts in water? Mercury Ammonium (Hg²⁺) (NH₄⁺) The products of the reaction v base are? What 450°C, 2 atm conditions used in the vi manufacture of ammonia in catalyst Haber process? A student plotted a graph of A decrease reactant A slower vii reaction rate reaction. What does a energy steeper slope indicate? To To dissolve What is the purpose of the salt viii evaporation completely purification? in water form crystals How many grams of NaCl are present in 2 moles of sodium ix (Molar mass of NaCl = 58.5 g/mol) Which one of the following x oxidation of ethanol? Gas & xi Alcohol Which of the following equations will take place at 4OH⁻−4e⁻→H2O SO42⁻ →SO2 + xii +O2 electrolysis of an aqueous CuSO₄ solution? Federal Board SSC-II Examination Chemistry Model Question Paper (Curriculum 2022-2023) Scheme of Studies 2006 answers on the allotted /given spaces. SECTION – B (Marks 33) Q. 2 Based on the given standard electrode potential (E°) values, arrange the following metals in order of increasing reactivity. Explain how electrode (i) potential relates to metal reactivity. Mg²⁺ + 2e⁻ → Mg Cu²⁺ + 2e⁻ → Cu Ni²⁺ + 2e⁻ → Ni The Contact Process is an industrial method for sulfuric acid production. a. Write the balanced symbol equation for conversion of sulfur dioxide to sulfur trioxide in the 1+1 (ii) +1 b. Identify the sources of sulfur dioxide and oxygen in this process. c. What are the typical conditions for the conversion of sulfur dioxide to sulfur trioxide? A sample of calcium carbonate (CaCO3) contains 20 grams of calcium. What is the (iii) when the calcium carbonate is heated? a. What is a polymer? b. Name the basic building blocks of 1+1 (iv) +1 c. Which polymer is commonly used to make plastic bottles? Write the chemical equations for the reactions of: a. Zinc with steam. (v) +1 c. Sodium with cold water. a hydrogen-oxygen fuel cell. a. What is esterification? Provide a general reaction equation to (vi) b. Why is esterification considered a condensation reaction? Complete the following reactions: a. CH₃-CH₂-Br + alcoholic KOH → Y (vii) b. Y + Br2 → Z a. Why is petroleum considered a mixture? (viii) + 1.5 found in petroleum. Give reactions to illustrate how unburned hydrocarbons contribute to the formation of peroxyacetyl nitrates (PANs) ? . 1+1 (ix) +1 Among coal, petroleum, and natural gas, which is considered the cleanest- burning fuel Vitamins are important for our health. Summarize their sources and importance 1.5 (x) + 1.5 fuels? Zinc plating is carried out to prevent iron from corrosion. Describe its complete 1.5 (xi) + 1.5 place at anode and cathode. balanced chemical equations. Section – C (Marks 20) Identify the functional groups in the following compounds: a. HCOOCH3 b. CH3-C ≡ C-CH3 Q.3 R iii. Steam d. C4H11OH Provide balanced chemical equations to illustrate each type of reaction. Carbon dioxide (CO2) is produced by the reaction of carbon monoxide (CO) with oxygen gas (O2) according to the balanced equation: 2CO(g) + O2(g) → 2CO2(g) If 28 g of carbon monoxide (CO) reacts with an excess of oxygen gas, answer the following: a. Calculate the number of moles of Q.4 carbon monoxide (CO) used. b. Determine the number of moles of carbon dioxide (CO2) produced. c. Find the mass of carbon dioxide (CO2) formed. Calculate the volume of carbon dioxide (CO2) produced at room temperature and pressure (RTP), where 1 mole of gas = 24 dm³. a. What does the rate of reaction mean, and how can it be measured? b. How can a graph of \"time vs. reactant concentration\" be used to determine the rate of reaction? c. Interpret the given graph and explain how the reaction rate changes over 2+2 O Metal Q.5 +2 R arrange these metals in order of reactivity and explain how the observations support your answer. a) Draw a schematic diagram for the electrolysis of dilute copper(II) sulphate using inert or copper electrodes. b) Label the anode, cathode, electrolyte, Q.6 +2 R Describe the observations and products formed at each electrode Name a well-known synthetic polyamide and mention one of its applications. FBISE SSC-II Examination Chemistry Model Question Paper (Curriculum 2022-23) Scheme of Studies 2006 Alignment of Questions with Curriculum Student Learning Outcomes Q 1: Parts No",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

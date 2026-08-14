@@ -51,6 +51,10 @@ export type Guarded = {
   userId: string;
   admin: ReturnType<typeof createAdminClient>;
   quota: QuotaState;
+  /** The caller's class from profiles.grade. Admin queries bypass RLS, so
+   *  every AI route must filter by this itself or it would happily serve a
+   *  grade-9 student class-10 material and defeat the one-class wall. */
+  grade: 9 | 10;
 };
 
 /**
@@ -73,13 +77,13 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
   }
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
 
-  const { data: ent } = await admin
-    .from('entitlements')
-    .select('active,valid_till')
-    .eq('user_id', userId)
-    .maybeSingle();
+  const [{ data: ent }, { data: prof }] = await Promise.all([
+    admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
+    admin.from('profiles').select('grade').eq('id', userId).maybeSingle(),
+  ]);
   const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
   if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
+  const grade: 9 | 10 = prof?.grade === 10 ? 10 : 9;
 
   const { data: usage } = await admin
     .from('ai_usage')
@@ -94,7 +98,7 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
     return NextResponse.json({ error: 'quota_exhausted', quota }, { status: 429 });
   }
 
-  return { userId, admin, quota };
+  return { userId, admin, quota, grade };
 }
 
 /** Charge after delivery, never before: a failed request costs nothing. */
@@ -120,13 +124,16 @@ export async function chapterGrounding(
   chapterId: string,
   medium: string,
   maxChars = 24_000,
+  /** When given, a chapter from another class reads as not-found. */
+  grade?: 9 | 10,
 ): Promise<{ title: string; text: string } | null> {
   const { data: chapter } = await admin
     .from('chapters')
-    .select('id,title,subject_id')
+    .select('id,title,subject_id,grade')
     .eq('id', chapterId)
     .maybeSingle();
   if (!chapter) return null;
+  if (grade && chapter.grade !== grade) return null;
 
   let { data: sections } = await admin
     .from('chapter_sections')

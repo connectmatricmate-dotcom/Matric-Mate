@@ -1,0 +1,221 @@
+{
+  "subject": "pst",
+  "name": "Pakistan Studies",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2024New/pst/Final_Assessment_Framework_Model_Question_Paper_PakistanStudies_SSC-I.pdf",
+    "sha256": "014cb4a97687e286ab3c0234b62bed41be30fb2e04a4e9dec3c6bc2c4fa8d6e4",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 3,
+    "slos": 26,
+    "summative": 26,
+    "formative": 0,
+    "unclassified": 0,
+    "untitledDomains": 0,
+    "shortText": 0,
+    "examUnits": 4
+  },
+  "notes": [],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Pakistan Studies IX-X along with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Ideological Basis of Pakistan"
+      },
+      {
+        "number": 2,
+        "title": "Making of Pakistan"
+      },
+      {
+        "number": 3,
+        "title": "Land and Environment"
+      },
+      {
+        "number": 4,
+        "title": "History of Pakistan"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "D",
+      "title": "Cultural",
+      "slos": [
+        {
+          "code": "PS-10-D1-01",
+          "text": "Investigate how various cultural elements / components influence the promotion or variation of cultural diversity within a society. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D1-02",
+          "text": "Examine the influence of various languages and dialects spoken within a country on national unity and integration. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D1-03",
+          "text": "Analyze the origin and development of folklore and drama in literary history of Pakistan. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D1-04",
+          "text": "Examine the concept of unity with reference to regional cultures leading to national integration and analyze the effects of globalization on Pakistani society and culture. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D1-05",
+          "text": "Analyze the development of Pakistani society in relation to Diversity in Pakistan",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D1-06",
+          "text": "Provide an analysis of the characteristics and key concept of social stratification, and the way it leads to social inequality that affects both individuals and society as a whole. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D1-07",
+          "text": "Analyze the influence of noteworthy mystical orders in Pakistan across diverse regions to highlight the shared principles in their teachings and the way they have become a cohesive spiritual entity in Pakistani society and culture.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D2-01",
+          "text": "Recognize the significance of leisure activities within a community and explore some notable leisure activities that are popular in Pakistani society. examination. No. of Required",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-D2-02",
+          "text": "Recognize the significance of sports as a vital recreational pursuit, and examine the prevalence of popular traditional, non-traditional, national and international sports in Pakistan.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "E",
+      "title": "Constitution",
+      "slos": [
+        {
+          "code": "PS-10-E1-01",
+          "text": "Examine the historical context of the constitution to trace the origins of constitutional evolution in Pakistan. examination.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E1-02",
+          "text": "Identify Salient features of Objectives Resolution in order to signify its impact on constitutional development in Pakistan. examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E1-03",
+          "text": "Outline the salient features of the Constitution of 1956, 1962, and 1973. examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E1-04",
+          "text": "Compare and contrast the constitutions of 1956 and 1962, particularly with reference to the Islamic features included in both constitutions. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E1-05",
+          "text": "Evaluate the reasons for the failure of the constitution of 1956 and 1962. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E2-01",
+          "text": "-Discuss the significance of the rule of law as a fundamental principle of a democratic state and propose methods to enhance the law-and-order situation in Pakistan.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E2-02",
+          "text": "Explore the concepts and importance of participation of citizens in community services or volunteer works. examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E2-03",
+          "text": "Determine the modes of acquiring and losing citizenship. (Immigration, emigration, marriages) examination.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E2-04",
+          "text": "Understand the importance of free press, justice and equality for a prosperous country. examination. No. of Required",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E2-05",
+          "text": "Highlight the importance of being knowledgeable digital citizen in today's world of social media and technology, emphasizing that media messages are influenced by various contexts, including economic, social, political, examination. historical and aesthetic factors.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-E2-06",
+          "text": "Explore the concepts and importance of participation of citizens in community services or volunteer works. examination.",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "F",
+      "title": "Pakistan and",
+      "slos": [
+        {
+          "code": "PS-10-F1-01",
+          "text": "Appreciate the importance of foreign policy for any country and evaluate the foreign policy of Pakistan with reference to its need and adherence to the guiding principles and objectives.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-F1-02",
+          "text": "Analyze the geo-political importance of Pakistan with reference to its neighboring states. examination. Domin F:",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-F1-03",
+          "text": "Critically assess the diplomatic ties of Pakistan with International examination. Affairs",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-F2-01",
+          "text": "Examine the significance of the United Nations, its primary organs and their goals, its involvement in global peacekeeping efforts, and the contributions of Pakistan to the UN in different global examination. peacekeeping activities particularly on occasions of natural calamities and disasters.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-F2-02",
+          "text": "Evaluate Pakistan’s foreign relations with other countries focusing on SAARC countries and OIC countries, and relate its efforts in highlighting issues of Muslim World on all platforms examination. including OIC.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "PS-10-F2-03",
+          "text": "Analyze the difficulties faced by the UN in resolving the crisis in Kashmir, Afghanistan, and Palestine. examination. Federal Board SSC-II Examination Pakistan Studies Model Paper (Curriculum 2022-23) Scheme of Studies 2006 ROLL NUMBER Section - A (Marks 10) ⓪ ② Section – A is compulsory. All parts of this section are to be answered on this page and handed over to the Centre Superintendent. Deleting/overwriting allowed. Do not use lead pencil. Candidate Sign. ________ Q1. Fill the relevant bubble against each question. Each part carries one mark. Sr Question No Which is a fundamental cultural component that i. influences cultural diversity? Foster a common Urdu was chosen as the ii. Pakistan to: linguistic groups What relationship encompasses citizenship iii. between individual and state? Who was the first President of Pakistan iv. under 1956 Constitution? Which system of government was v. established by the constitution of 1973? Which region of Pakistan Balochista vi. n of Heer Ranjha? In which of the following By ways globalization has a preserving positive effect on Pakistani all vii. traditional Pakistan’s art forms culture unchanged world wide Which regional issue has been a major point of viii. tension in Pakistan’s relationship with India? Protect The Women’s protection ix. introduced to: violence What is the most important outcome of digital x. citizenship? Rights Federal Board SSC-I Examination Pakistan Studies Model Question Paper (Curriculum 2022-23) Scheme of Studies 2006 Write your answers on the allotted/given spaces. SECTION – B (Marks 24) Q.2 What has been the overall What is the role of Urdu as a i. Write any three points. players. What is meant by the rule of Write any two steps taken to ii. reduce feudalism in Pakistan. democratic society? Define citizenship and why is it iii. important? Define social stratification and iv. society? How does Pakistan’s geography Mention any two Presidential v. powers in 1973 constitution. Write any three points. Write down the names of vi. in Pakistan. What are the contributions of Write the legal grounds for losing Pakistan in global peacekeeping vii. efforts under the United Nations? (Any three) Highlight any two reasons for Mention any two categories of viii. Rule of law. resolve the Palestine conflict? SECTION – C (Marks 16) Q. No. Why was SAARC established? Discuss three contributions of Evaluate four Islamic provisions of Q.3 the 1973 constitution of Pakistan. relations countries. Explain the print media laws in How has Pakistani folklore evolved, Pakistan Q.4 importance of a free press in the the cultural heritage? country. Federal Board SSC-II Examination Pakistan Studies Model Question Paper (Curriculum 2022-23) Alignment of Questions with Student Learning Outcomes Allocated Section: Sr Q. No. No (Part no.) Paper",
+          "cognitive": "application",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}

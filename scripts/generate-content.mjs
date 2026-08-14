@@ -46,9 +46,24 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const DATA = resolve(ROOT, 'data/fbise');
+
+/**
+ * Which class to generate for. Grade 10 reads its curriculum from
+ * data/fbise/ssc2/, its chapter spec from chapters-ssc2.json, keeps its
+ * mapping cache and generated copies in grade-suffixed folders, and asks the
+ * model for Class 10 material. Every grade-9 path and prompt stays
+ * byte-identical when the flag is absent. When more boards arrive, this
+ * pair of knobs (board dir, grade) is the whole extension surface.
+ */
+const GRADE = (() => {
+  const i = process.argv.indexOf('--grade');
+  return i === -1 ? 9 : Number(process.argv[i + 1]) || 9;
+})();
+const GRADE_LABEL = `Class ${GRADE}`;
+const DATA = resolve(ROOT, GRADE === 10 ? 'data/fbise/ssc2' : 'data/fbise');
 const MAPDIR = resolve(DATA, 'mapping');
-const GENDIR = resolve(ROOT, 'content/generated');
+const GENDIR = resolve(ROOT, GRADE === 10 ? 'content/generated/ssc2' : 'content/generated');
+const SPEC_FILE = GRADE === 10 ? resolve(ROOT, 'data/fbise/chapters-ssc2.json') : null;
 
 const args = process.argv.slice(2);
 const flag = (name, fallback = null) => {
@@ -64,6 +79,10 @@ const FROM_DISK = args.includes('--from-disk');
 const REMAP = args.includes('--remap');
 const ONLY_SUBJECT = flag('subject');
 const LIMIT = Number(flag('limit', 0)) || 0;
+/** Parallel chapter-media generations. Serial (1) unless asked. */
+const CONCURRENCY = Number(flag('concurrency', 1)) || 1;
+/** Skip chapter-media that already have live sections: resume, don't redo. */
+const MISSING_ONLY = args.includes('--missing');
 const MEDIA = flag('medium') ? [flag('medium')] : ['en', 'ur'];
 
 const MODEL = 'claude-sonnet-5';
@@ -227,10 +246,10 @@ function mapByCode(spec, slos) {
 
 
 
-const MAP_SYSTEM = `You map FBISE Class 9 learning outcomes onto textbook chapters.
+const MAP_SYSTEM = `You map FBISE ${GRADE_LABEL} learning outcomes onto textbook chapters.
 
 You are given a subject's chapter list and its learning outcomes. Assign every
-outcome to exactly one chapter: the chapter a Pakistani Class 9 student would
+outcome to exactly one chapter: the chapter a Pakistani ${GRADE_LABEL} student would
 turn to if they wanted to learn that outcome.
 
 Rules:
@@ -247,7 +266,7 @@ async function mapSlosToChapters(env, subject, chapters, slos) {
 
   const out = await ask(env, {
     system: MAP_SYSTEM,
-    prompt: `Subject: ${subject.name}, FBISE Class 9.\n\nCHAPTERS:\n${chapterList}\n\nOUTCOMES:\n${sloList}`,
+    prompt: `Subject: ${subject.name}, FBISE ${GRADE_LABEL}.\n\nCHAPTERS:\n${chapterList}\n\nOUTCOMES:\n${sloList}`,
     maxTokens: 16000,
   });
 
@@ -265,7 +284,7 @@ async function mapSlosToChapters(env, subject, chapters, slos) {
 
 /* ---------------------------------------------------- phase 2: generation */
 
-const GEN_SYSTEM = `You write exam-preparation material for FBISE Class 9 students in Pakistan.
+const GEN_SYSTEM = `You write exam-preparation material for FBISE ${GRADE_LABEL} students in Pakistan.
 
 You are given one chapter and the exact learning outcomes the Federal Board
 examines on it. Everything you write must serve those outcomes.
@@ -323,7 +342,7 @@ first time a technical word appears, because that is what the exam paper does.`
  */
 async function generateChapter(env, { subject, chapter, slos, medium }) {
   const sloText = slos.map((s) => `${s.code} [${s.cognitive ?? 'unspecified'}]: ${s.text}`).join('\n');
-  const head = `Subject: ${subject.name}, FBISE Class 9.
+  const head = `Subject: ${subject.name}, FBISE ${GRADE_LABEL}.
 Chapter ${chapter.number}: ${chapter.title}
 ${chapter.blurb ? `Scope: ${chapter.blurb}` : ''}
 
@@ -627,7 +646,7 @@ async function main() {
 
   await mkdir(MAPDIR, { recursive: true });
 
-  const SPEC = JSON.parse(await readFile(resolve(DATA, 'chapters.json'), 'utf8'));
+  const SPEC = JSON.parse(await readFile(SPEC_FILE ?? resolve(DATA, 'chapters.json'), 'utf8'));
 
   const files = (await readdir(DATA)).filter((f) => f.endsWith('.json') && f !== 'index.json' && !f.includes('-'));
   const subjects = [];
@@ -639,12 +658,15 @@ async function main() {
 
   let written = 0;
   let dropped = 0;
+  /** Every (chapter, medium) to generate, pooled after mapping resolves. */
+  const jobs = [];
 
   for (const doc of subjects) {
     const { data: chapters } = await db
       .from('chapters')
       .select('id,number,title,blurb')
       .eq('subject_id', doc.subject)
+      .eq('grade', GRADE)
       .order('number');
     if (!chapters?.length) {
       console.log(`${C.yellow('skip')} ${doc.subject}: no chapters`);
@@ -704,7 +726,7 @@ async function main() {
       continue;
     }
 
-    // Phase 2: generation, chapter by chapter.
+    // Phase 2: queue this subject's generation jobs for the pool below.
     let targets = chapters;
     if (LIMIT) targets = targets.slice(0, LIMIT);
 
@@ -714,52 +736,87 @@ async function main() {
         console.log(`${C.dim('  --  ')} ${chapter.id.padEnd(10)} ${C.dim('no outcomes mapped here')}`);
         continue;
       }
-
-      for (const medium of MEDIA) {
-        const label = `${chapter.id}/${medium}`;
-        try {
-          const raw = await generateChapter(env, { subject: doc, chapter, slos: mine, medium });
-          const { clean, dropped: bad, fatal } = sift(raw, mine);
-
-          if (fatal) {
-            dropped++;
-            console.log(`${C.red(' drop')} ${label.padEnd(14)} ${C.dim(fatal)}`);
-            continue;
-          }
-
-          const tables = rows(clean, { chapter, subject: doc, medium, status: STATUS });
-          const counts = Object.entries(tables).map(([t, r]) => `${r.length} ${t.replace('chapter_', '')}`);
-
-          if (!DRY) {
-            // Replace, do not merge. The chapter already holds placeholder rows
-            // from packages/core occupying the same (chapter_id, medium,
-            // position) slots, so an upsert keyed on id collides with a
-            // different row that owns the slot. Clearing first also makes a
-            // regeneration a clean replacement rather than two overlapping
-            // sets of questions for the same chapter.
-            for (const table of Object.keys(tables)) {
-              const { error } = await db.from(table).delete().eq('chapter_id', chapter.id).eq('medium', medium);
-              if (error) throw new Error(`${table} clear: ${error.message}`);
-            }
-            for (const [table, batch] of Object.entries(tables)) {
-              if (!batch.length) continue;
-              const { error } = await db.from(table).insert(batch);
-              if (error) throw new Error(`${table}: ${error.message}`);
-            }
-          }
-          written++;
-          console.log(
-            `${C.green('   ok')} ${label.padEnd(14)} ${C.dim(
-              `${mine.length} SLOs -> ${counts.join(', ')}${bad.length ? ` · ${bad.length} rejected` : ''}`,
-            )}`,
-          );
-        } catch (e) {
-          dropped++;
-          console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim(String(e.message).slice(0, 120))}`);
-        }
-      }
+      for (const medium of MEDIA) jobs.push({ doc, chapter, mine, medium });
     }
   }
+
+  // Already-generated chapter-media are skipped when asked, so an
+  // interrupted overnight run resumes instead of respending.
+  if (MISSING_ONLY && jobs.length) {
+    const have = new Set();
+    for (const doc of subjects) {
+      const { data } = await db
+        .from('chapter_sections')
+        .select('chapter_id,medium')
+        .like('chapter_id', `${doc.subject}-%`);
+      for (const r of data ?? []) have.add(`${r.chapter_id}|${r.medium}`);
+    }
+    const before = jobs.length;
+    for (let i = jobs.length - 1; i >= 0; i--) {
+      if (have.has(`${jobs[i].chapter.id}|${jobs[i].medium}`)) jobs.splice(i, 1);
+    }
+    if (before !== jobs.length) console.log(C.dim(`  ${before - jobs.length} already generated, skipped`));
+  }
+
+  console.log(C.bold(`\n  ${jobs.length} chapter-media to generate\n`));
+
+  const runJob = async ({ doc, chapter, mine, medium }) => {
+    const label = `${chapter.id}/${medium}`;
+    try {
+      const raw = await generateChapter(env, { subject: doc, chapter, slos: mine, medium });
+      const { clean, dropped: bad, fatal } = sift(raw, mine);
+
+      if (fatal) {
+        dropped++;
+        console.log(`${C.red(' drop')} ${label.padEnd(14)} ${C.dim(fatal)}`);
+        return;
+      }
+
+      const tables = rows(clean, { chapter, subject: doc, medium, status: STATUS });
+      const counts = Object.entries(tables).map(([t, r]) => `${r.length} ${t.replace('chapter_', '')}`);
+
+      if (!DRY) {
+        // Keep a disk copy beside the database rows: the audit trail, and
+        // what a regeneration or a later review reads.
+        await mkdir(GENDIR, { recursive: true });
+        await writeFile(resolve(GENDIR, `${chapter.id}-${medium}.json`), `${JSON.stringify(clean, null, 1)}\n`);
+        // Replace, do not merge. The chapter already holds placeholder rows
+        // from packages/core occupying the same (chapter_id, medium,
+        // position) slots, so an upsert keyed on id collides with a
+        // different row that owns the slot. Clearing first also makes a
+        // regeneration a clean replacement rather than two overlapping
+        // sets of questions for the same chapter.
+        for (const table of Object.keys(tables)) {
+          const { error } = await db.from(table).delete().eq('chapter_id', chapter.id).eq('medium', medium);
+          if (error) throw new Error(`${table} clear: ${error.message}`);
+        }
+        for (const [table, batch] of Object.entries(tables)) {
+          if (!batch.length) continue;
+          const { error } = await db.from(table).insert(batch);
+          if (error) throw new Error(`${table}: ${error.message}`);
+        }
+      }
+      written++;
+      console.log(
+        `${C.green('   ok')} ${label.padEnd(14)} ${C.dim(
+          `${mine.length} SLOs -> ${counts.join(', ')}${bad.length ? ` · ${bad.length} rejected` : ''}`,
+        )}`,
+      );
+    } catch (e) {
+      dropped++;
+      console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim(String(e.message).slice(0, 120))}`);
+    }
+  };
+
+  let cursor = 0;
+  const worker = async () => {
+    for (;;) {
+      const job = jobs[cursor++];
+      if (!job) return;
+      await runJob(job);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.max(1, CONCURRENCY) }, worker));
 
   console.log(C.bold(`\n  ${written} chapter-media written, ${dropped} dropped${DRY ? ' (dry run, nothing saved)' : ''}\n`));
 }

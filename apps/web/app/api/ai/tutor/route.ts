@@ -96,14 +96,16 @@ async function readQuota(admin: ReturnType<typeof createAdminClient>, userId: st
  * breakpoint: Anthropic then serves it from prompt cache at a tenth of the
  * price. The per-student block goes AFTER this, never inside it.
  */
-let weightageDigest: string | null = null;
+const weightageDigest = new Map<number, string>();
 
-async function buildStandingContext(admin: ReturnType<typeof createAdminClient>): Promise<string> {
-  if (weightageDigest) return weightageDigest;
+async function buildStandingContext(admin: ReturnType<typeof createAdminClient>, grade: number): Promise<string> {
+  const cached = weightageDigest.get(grade);
+  if (cached) return cached;
   const { data } = await admin
     .from('chapters')
     .select('id,subject_id,number,title,exam_share,exam_marks')
     .eq('review_status', 'published')
+    .eq('grade', grade)
     .order('subject_id')
     .order('number');
   const bySubject = new Map<string, string[]>();
@@ -118,11 +120,12 @@ async function buildStandingContext(admin: ReturnType<typeof createAdminClient>)
     const lines = bySubject.get(s.id);
     if (lines?.length) parts.push(`${s.name}:\n${lines.join('\n')}`);
   }
-  weightageDigest = parts.join('\n\n');
-  return weightageDigest;
+  const digest = parts.join('\n\n');
+  weightageDigest.set(grade, digest);
+  return digest;
 }
 
-const PERSONA = `You are the MatricMate tutor: a warm, patient teacher for FBISE Class 9 students in Pakistan (SSC Part 1, the 2022-23 National Curriculum assessment framework).
+const personaFor = (grade: number) => `You are the MatricMate tutor: a warm, patient teacher for FBISE Class ${grade} students in Pakistan (SSC Part ${grade === 10 ? 'Two' : 'One'}, the 2022-23 National Curriculum assessment framework).
 
 How you teach:
 - Answer like a good teacher at a whiteboard: short direct answer first, then the steps that get there. Numbered steps for numericals and derivations.
@@ -130,7 +133,7 @@ How you teach:
 - Ground answers in the FBISE syllabus and the chapter weightings provided below. When a student asks what matters for the exam, use the board's real percentages.
 - Exam craft counts: point out what examiners award marks for, common mistakes, and how many marks a question of this kind usually carries.
 - Keep answers tight. A focused answer a student finishes beats a lecture they abandon. No filler, no repeated caveats.
-- If a question is outside Class 9 study (other classes are fine to touch briefly when they help), gently steer back to the syllabus. You are a study tutor, not a general assistant: politely decline requests unrelated to studying.
+- If a question is outside Class ${grade} study (other classes are fine to touch briefly when they help), gently steer back to the syllabus. You are a study tutor, not a general assistant: politely decline requests unrelated to studying.
 - When a photo is attached, read it carefully first. If it shows a question, solve it step by step; if it shows notes or a diagram, explain it. If the photo is unreadable, say so and ask for a clearer one.
 - Use web search only when the question genuinely needs current information (board dates, notifications, recent changes); the syllabus itself you already know.
 - Never invent board policies, dates or marks distributions. If unsure, say so and suggest checking fbise.edu.pk.
@@ -148,13 +151,14 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
 
   // Paid-only: the same wall RLS enforces on content, applied to the tutor.
-  const { data: ent } = await admin
-    .from('entitlements')
-    .select('active,valid_till')
-    .eq('user_id', userId)
-    .maybeSingle();
+  const [{ data: ent }, { data: prof }] = await Promise.all([
+    admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
+    admin.from('profiles').select('grade').eq('id', userId).maybeSingle(),
+  ]);
   const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
   if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
+  // The tutor teaches the student's own class: persona, weightage and all.
+  const grade = prof?.grade === 10 ? 10 : 9;
 
   const quota = await readQuota(admin, userId);
   if (quota.remaining <= 0) {
@@ -242,7 +246,7 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n');
 
-  const standing = await buildStandingContext(admin);
+  const standing = await buildStandingContext(admin, grade);
 
   const userContent: Anthropic.ContentBlockParam[] = [];
   if (image) userContent.push({ type: 'image', source: { type: 'base64', ...image } });
@@ -272,7 +276,7 @@ export async function POST(req: NextRequest) {
               // Stable bytes first with the cache breakpoint, volatile
               // student block after it, so the big block caches across
               // every student.
-              { type: 'text', text: PERSONA + standing, cache_control: { type: 'ephemeral' } },
+              { type: 'text', text: personaFor(grade) + standing, cache_control: { type: 'ephemeral' } },
               { type: 'text', text: studentBlock },
             ],
             tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }],

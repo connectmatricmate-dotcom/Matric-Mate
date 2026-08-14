@@ -1,0 +1,219 @@
+{
+  "subject": "cs",
+  "name": "Computer Science",
+  "grade": 9,
+  "board": "fbise",
+  "curriculum": "NCP 2022-23",
+  "source": {
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Computer Science SSC-I.pdf",
+    "sha256": "d68610990a4fd1332d547b5cb281e1238659515a9f0e622d0080d48502265728",
+    "retrieved": "2026-08-11"
+  },
+  "stats": {
+    "domains": 7,
+    "slos": 20,
+    "summative": 20,
+    "formative": 0,
+    "unclassified": 0,
+    "untitledDomains": 6,
+    "shortText": 0,
+    "examUnits": 6
+  },
+  "notes": [
+    "6 domains are unnamed in the source. Name them from the Table of Specifications before publishing."
+  ],
+  "examUnits": {
+    "scheme": "Examinable unit list from the FBISE cover page of the curriculum document",
+    "document": "notifications/ssc/Curriculum of Computer Science IX-X-XI-XIIalong with SLOs.pdf",
+    "units": [
+      {
+        "number": 1,
+        "title": "Fundamentals of Computer"
+      },
+      {
+        "number": 2,
+        "title": "Fundamentals of Operating System"
+      },
+      {
+        "number": 3,
+        "title": "Office Automation"
+      },
+      {
+        "number": 4,
+        "title": "Data Communication"
+      },
+      {
+        "number": 5,
+        "title": "Computer Networks"
+      },
+      {
+        "number": 6,
+        "title": "Computer Security and Ethics"
+      }
+    ]
+  },
+  "domains": [
+    {
+      "code": "A",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-10-A-01",
+          "text": "Students will be able to understand and describe number systems and encoding schemes for data representation in computer systems Students will understand… ● What is Machine level representation of data ● What are the different numbering systems (decimal, binary, hexadecimal, octal) ● How text is represented digitally using common text encoding (ASCII, Unicode) Students will know ● Key terms: ASCII, Unicode, binary, signed, and unsigned numbers, bit, byte, negatives in binary, 1’s complement, 2’s complement, binary A: Computing Systems Students will be able to ● Understand and explain data representation, instruction sets and addressing modes. ● Demonstrate how data is encoded using ASCII and Unicode",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-A-02",
+          "text": "Students will be able to explain how system software controls the flow of information between hardware components used for input, output, storage, and processing Students will understand that ● What is an operating system ● What main tasks an operating system performs ● How application programs run on top of operating systems ● What are the different types of operating systems Content 40 minutes) Students will know ● Key terms: System calls, Processes, threads, synchronization, interrupts, system calls scheduling, deadlock, File system interface, Memory system and virtual memory. ● The primary resources managed by an operating system ● What a process is and the sequence of events executed for a process to complete Students will be able to explain ● How programming languages, operating systems, and architectures interact and how to use each effectively. ● The services provided by and the design of an operating system. ● The structure and organization of the file system. ● What a process is and how processes are synchronized and scheduled. ● Different approaches to memory management.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-A-03",
+          "text": "Students will identify and learn common software tools such as translators, integrated development environments, online and offline computing platforms, code repositories, etc. Students will understand that  The types of software and how they are different  Where software is hosted and pros and cons of on-premise vs. in cloud  How programming software helps programmers write code that for Theory can then get compiled. paper  Explain the difference between system software, programming software, application software and driver software.  Identify common examples of the different types of applications  Describe uses of common productivity application software  Describe uses of programming software such as language editors, debuggers, compilers, IDEs, source code repositories and build Content 40 minutes) systems (e.g. Eclipse for Java, Coda for Mac, Visual Studio for multiple languages, GitHub for source code) Students will know  Understand uses of different software and tools  Apply common software tools such as translators, integrated development platforms, code repositories etc.  Definitions of key software tools such as translators, integrated development platforms, code repositories etc.  Difference between on premise and hosted application software  What applications can be used without internet (offline) and which require internet to",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "B",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-10-B-01",
+          "text": "Students will identify common algorithms used to develop software, store, search, or sort information Students will understand 1) How to solve the counting problems a) Basics of a counting problem b) Basic counting principles i) B: Computational Thinking Algorithms vi) Inclusion and exclusion principle 2) Properties of Algorithm a) Input b) Output c) Definiteness d) Finiteness e) Effectiveness Content 40 minutes) v) Generality 3) Logical reasoning and will be able to solve a) Boolean logic b) Verbal logical reasoning c) Non-verbal logical reasoning 4) Understand data search and sort, and briefly describe standard algorithms on linear insertion sort, bubble sort etc. Students will be able to 1) Apply logical reasoning to refine and solve problems 2) Apply algorithmic thinking to refine and solve problems 3) Identify when & where to use key search & sort algorithms 4) Discuss an algorithm to solve a specific problem.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-B-02",
+          "text": "Develop and apply abstractions to create generalized, modular solutions Students will understand ● Steps in an algorithm to solve computational problems ● Dry running or Trace Table to run algorithm ● Identify logical and syntax errors ● Abstractions to create generalized, modular solutions for Theory Students will be able to ● Use algorithmic approach to solve the computational simple problems ● Apply abstractions to create generalized, modular solutions ● Create and use dry runs/trace tables to follow an algorithm ● Identify syntax/logic errors in code and solve logical errors",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "C",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-10-C-01",
+          "text": "Students should be able to differentiate between front- end development, and back-end development of a website C: Programming Students will understand… Fundamentals ● Back-end development allows writing code that emits paper HTML/CSS/JavaScript Content 40 minutes) ● browser Students will be able to… ● Differentiate between back-end and front-end development",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-C-02",
+          "text": "Students should be able to use more advanced HTML/CSS features in an appropriate environment Students will understand… ● How HTML tags can be used to show tabular date ● How HTML can be used to retrieve inputs from users ● How to apply animation movements to HTML components for Practical Students will be able to… Based ● Create forms in HTML using an IDE like Visual Studio, Netbeans etc. ● Create tables in HTML using an IDE like Visual Studio, Netbeans etc. ● Create animations in CSS using an IDE like Visual Studio, Netbeans etc.",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-C-03",
+          "text": "Students should be able to use more advanced programming constructs (lists, etc.) to create dynamic websites using JavaScript as backend scripting Students will understand… for Practical ● How to create and use arrays in JavaScript Based ● How to create and use bullet points in HTML Students will be able to… ● Create bullet points in HTML that are generated from an array in JavaScript",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-C-04",
+          "text": "Students should be able to implement complex algorithms that use more complex data structures (lists, etc.) in JavaScript for Practical Students will understand… Based ● The array data structure is similar to a list ● Finding an element in a list requires iterating through entire list till Content 40 minutes) the element is found Students will be able to… ● Write an algorithm that finds an element in a list ● Implement an algorithm that finds an element in a list using JavaScript",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-C-05",
+          "text": "Students will determine more advanced techniques (unit tests, breakpoints, watches) for testing and debugging their code in JavaScript Lab work will be Students will understand… assessed in the ● The purpose of a unit test Practical Based ● Debugging allows them to analyze code as it runs Students will be able to… ● Write simple unit tests for the functions in their code ● Set a breakpoint and use it to analyze intermediate values of variables in JavaScript",
+          "cognitive": "understanding",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "D",
+      "title": "Data",
+      "slos": [
+        {
+          "code": "CS-10-D-01",
+          "text": "Students will understand and explain the scope of data science, Artificial Intelligence (AI), and Machine Learning (ML), including types of supervised and unsupervised learning models, and their Students will know 1) Definitions of data science, artificial intelligence and machine learning. They will also learn to differentiate between the three fields and and Analysis a. Technique used by AI b. Enables systems / machines to learn from large data c. Uses supervised and unsupervised learning d. Automation and scalability e. Uses in fraud detection. ii. Artificial intelligence skills include: Teach machines to emulate human behavior e.g. natural language Content 40 minutes) processing, chatbots, image recognition 2) Data science lifecycle: Collecting, processing, analyzing, visualizing and understanding model outcomes (predictions / descriptive). Students will know i. Recognize different types of supervised learning vs unsupervised learning models including algorithms. ii. How to interpret the results from churn prediction and behavioral segmentation models Students will ● Differentiate between the three fields of data science, AI, and ML and overlapping areas. ● Interpret the results from Churn Prediction and behavioral segmentation through simple examples. ● Decide if a problem and its solution is using supervised, unsupervised, or reinforcement learning.",
+          "cognitive": "application",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-D-02",
+          "text": "Students will understand and explain the types, uses, and methods of data visualizations and understand the benefits of visualizing data. Students will understand that data and data products (charts, graphs, and statistics) can be analyzed and evaluated, similar to analyzing arguments. Students will ● Understand the benefits of visualizing data and appropriate methods to create visualizations. for Theory ● Know visualization techniques such as measures of center and paper spread, boxplots, bar plots , histograms, scatterplots, graphical summaries of multivariate data, side-by-side bar plots and association, scatterplots ● Understand the connection of databases to machine learning. ● Explain sorting, visualizing, and using data. ● Read plots (identify the name of the plot, interpret the axes, look Content 40 minutes) for trends, identify confounding factors). ● Understand relational databases (entities, attributes, and keys) Students will be able to…  Develop relational schema representing simple Entity-Relationship diagrams  Create tables, forms, reports, and queries using common operations like SELECT, CREATE, JOIN etc. in any database tool (MS Excel, MS Access, MySQL etc.)  Analyze tables in any database tool and develop simple insights (i.e. sales are increasing/decreasing over time etc.)  Develop E-R data models, physical and logical design.  Represent data with plots on the real number line (dotplots, histograms, bar plots, and boxplots).  Interpret differences in shape, center, and spread in the context of the data sets, accounting for possible effects of extreme data points (outliers).",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-D-03",
+          "text": "Students will be able to apply stages of the data science life cycle e.g. understanding a real-world business problem, data gathering, building model, and interpreting results). Students will understand…  Define data science life cycle  Explain different steps of data gathering including the source of data, query the data on a database tool (e.g. MS Access, SQL etc.), collect & store the data, format the data to make it ready for modeling.  Different types of real-world business problems and how to formulate them into a data science problem e.g. define a problem e.g. can you help calculate sales for next year. This becomes a sales predictive model.  The data gathering step e.g. from retail stores asking for the last Content 40 minutes) three years of sales data.  What kind of algorithms are possible for example simple linear regression or decision tree?  Key performance metrics (for example mean squared error)  Students will be able to formulate a business problem into a data science problem and link to types of problems (e.g. questions “my customers are leaving me” is a churn prediction model)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "E",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-10-E-01",
+          "text": "Students will be able to describe uses and applications that are enabled by technologies like IoT, and Blockchain Students will know…  IoT and it’s foundational components  Applications that are enabled by IoT  Applications that are enabled by blockchain for Theory  The benefits of cloud computing paper Students will be able to…  Analyze different technologies that use blockchains  Evaluate if a scenario fits an application of IoTs E: Applications",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-E-02",
+          "text": "Students will be able to explain that AI can be applied Science etc. Students will understand… ● Specific applications of speech recognition like personal assistants, Quran Memorization applications, Speech-to-text typing recognition for surveillance and national security, etc. Students will be able to… ● Enumerate and explain the use of AI techniques in different real- world applications like personal assistants, Quran Memorization Content 40 minutes) recognition for authentication, ● Specific applications of NLP like email filtering to protect against spam and scams, Language translation, document analysis, predictive text, Sentiment analysis, etc. ● Applications of Robotics in rescue and search operations, industrial robotics for manufacturing, vacuum cleaners like Romba robotic operations, farming, etc. ● Speech recognition for surveillance and national security, etc.",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-E-03",
+          "text": "Students will be able to demonstrate the social implications of AI Students will understand… ● That improper use of AI tools can result in injustice to specific groups of people. ● AI designers have a responsibility towards ensuring that their for Theory algorithms target human benefit paper Students will be able to… ● Show that there are instances where use of AI causes social injustices. ● Identify the ethical norms for creating AI algorithms",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "F",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-10-F-01",
+          "text": "Understand and apply safe & responsible use of the internet to prevent addiction, promote information and data security Students will understand… ● The concerns of technology addiction ● The need for cyber security to protect data F: Impacts of Computing ● The effects of threats to individual privacy and security of data from spam, spyware, cookies, etc. ● Basics of security & privacy of cloud computing Students will be able to… ● Analyze the impact of new technology laws on digital privacy and Content 40 minutes) information security ● Explain safety and security concepts and strategies including peer pressure and cyberbullying in social media impacts lives ● Discuss the need for cyber security in relation to privacy and data security of information ● Compare ways software developers protect devices and information from unauthorized access",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-F-02",
+          "text": "Evaluate the impact of and apply strategies to prevent cyberbullying/harassment Students will understand… ● Basics of data, network and cyber security: backups, access, network monitoring, public and private clouds ● Use of hardware and software methods to protect devices for Theory Students will be able to… paper ● Discuss ways in which to deal with cyberbullying as a victim or someone you know ● Discuss cybercrimes laws, instances of cybercrimes, and common methods of reporting cybercrimes",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        },
+        {
+          "code": "CS-10-F-03",
+          "text": "Analyze the impacts of the digital divide on access to critical information Students will understand… ● Distribution of computing resources affects the way solutions are designed ● Inequitable Access to information impacts human lives Students will know: for Theory ● the meaning of the digital divide paper Students will be able to: ● Design computing applications that can take into consideration accessibility of information ● Strategize to alleviate the impacts of unequal access of information in creating computing solutions Content 40 minutes) ●",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    },
+    {
+      "code": "G",
+      "title": null,
+      "slos": [
+        {
+          "code": "CS-10-G-01",
+          "text": "Communicate and publish key ideas and details to a variety of audiences using appropriate digital tools and media-rich resources Students will understand… ● Understand how to get information on simple topics and extract ● How to identify key ideas and create appropriate copy and graphics to present an idea (e.g. communicating event information in a G: Literacy ideas to various audiences (e.g. using YouTube to communicate an opinion via a podcast or using Instagram to show images related to a place or a product, or Facebook to share information with a community etc.) ● Best practices in reaching audiences on various digital platforms Students will be able to… ● Get information on simple topics, extract key ideas, and create appropriate copy & graphics to present an idea to various audiences Content 40 minutes) in different formats across various social media platforms (e.g. YouTube, Facebook, Instagram, etc.)",
+          "cognitive": "knowledge",
+          "assessment": "summative"
+        }
+      ]
+    }
+  ]
+}
