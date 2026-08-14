@@ -18,7 +18,9 @@ export default async function PaymentsPage() {
   const { data, error } = await supabase
     .from('payments')
     .select('id, plan, amount, status, reference, at')
-    .order('at', { ascending: false });
+    .order('at', { ascending: false })
+    // The last two years of receipts, not a lifetime scroll.
+    .limit(24);
 
   return <PaymentsView rows={(data as PaymentRow[] | null) ?? []} failed={Boolean(error)} />;
 }

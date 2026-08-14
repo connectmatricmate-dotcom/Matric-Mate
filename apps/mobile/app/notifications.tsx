@@ -37,7 +37,8 @@ export default function Notifications() {
     const start = new Date().setHours(0, 0, 0, 0);
     return {
       today: state.notifications.filter((n) => n.at >= start),
-      earlier: state.notifications.filter((n) => n.at < start),
+      // Capped: an inbox that scrolls forever stops being an inbox.
+      earlier: state.notifications.filter((n) => n.at < start).slice(0, 30),
     };
   }, [state.notifications]);
 

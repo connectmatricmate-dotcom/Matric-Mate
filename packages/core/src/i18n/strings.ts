@@ -29,7 +29,6 @@ export const en = {
     questions: 'questions',
     cards: 'cards',
     of: 'of',
-    demoNote: 'Preview build · sample FBISE Class 9 content',
   },
 
   lang: {
@@ -239,6 +238,16 @@ export const en = {
     progress: 'Progress',
   },
 
+  cert: {
+    title: 'Verified by teachers',
+    sub: 'Teachers who reviewed MatricMate study material and certified it',
+    dashCard: 'Verified by teachers',
+    dashCardSub: 'See who checked our study material',
+    issued: 'Issued {date}',
+    viewCertificate: 'Certificate',
+    emptyTitle: 'Verifications on the way',
+    emptyBody: 'Teachers are reviewing the study material. Their certificates will appear here.',
+  },
   dash: {
     greeting: 'Hi, {name}',
     weekLine: '{q} questions this week · {acc}% accuracy · {time}',
@@ -360,7 +369,6 @@ export const en = {
     loadFailed: 'Could not load the lesson. Check your connection and try again.',
     needsNewBuild:
       'This copy of the app was built before audio support was added, so the transport below is a preview. Install the latest build to hear the recording.',
-    demoNote: 'Playback is simulated for chapters whose recording is still on the way.',
     upNext: 'Up next',
     nextChapter: 'Next chapter audio',
   },
@@ -841,7 +849,6 @@ export const ur: typeof en = {
     questions: 'sawalat',
     cards: 'cards',
     of: 'mein se',
-    demoNote: 'Preview build · sample FBISE Class 9 content',
   },
 
   lang: {
@@ -1051,6 +1058,16 @@ export const ur: typeof en = {
     progress: 'Progress',
   },
 
+  cert: {
+    title: 'Ustaadon ki tasdeeq',
+    sub: 'Woh asaatza jinhon ne MatricMate ka mawaad check kar ke certify kiya',
+    dashCard: 'Ustaadon ki tasdeeq',
+    dashCardSub: 'Dekhein hamara mawaad kis kis ne check kiya',
+    issued: 'Jaari hua {date}',
+    viewCertificate: 'Certificate',
+    emptyTitle: 'Tasdeeq jald aa rahi hai',
+    emptyBody: 'Asaatza mawaad ka jaiza le rahe hain. Un ke certificates yahan nazar aayenge.',
+  },
   dash: {
     greeting: 'Salam, {name}',
     weekLine: 'Is hafte {q} sawal · {acc}% accuracy · {time}',
@@ -1172,7 +1189,6 @@ export const ur: typeof en = {
     loadFailed: 'Lesson load nahi ho saka. Connection check karke dobara koshish karein.',
     needsNewBuild:
       'Yeh app audio support se pehle bani thi, is liye neeche sirf preview chal raha hai. Asli recording ke liye nayi build install karein.',
-    demoNote: 'Jin chapters ki recording abhi aani hai un ki playback simulate hoti hai.',
     upNext: 'Aagey',
     nextChapter: 'Agle chapter ka audio',
   },

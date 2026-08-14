@@ -15,7 +15,6 @@ import {
   Spacer,
   Tap,
   TileGrid,
-  Tiny,
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
 import { LockedNotice } from '../../src/components/LockedNotice';
@@ -25,6 +24,8 @@ import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
+import { useAsync } from '../../src/core/useAsync';
+import { supabase } from '../../src/lib/supabase';
 import { C, F, S } from '../../src/theme';
 
 const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
@@ -50,6 +51,14 @@ export default function Dashboard() {
    * numbers while somebody is looking at them.
    */
   const [now] = useState(() => Date.now());
+
+  /** Teacher verifications, the client's trust feature. The card only
+   *  appears once real certificates exist; an empty promise would be
+   *  exactly the "fake data" this dashboard just stopped showing. */
+  const certCount = useAsync<number>(async () => {
+    const { count } = await supabase.from('certificates').select('id', { count: 'exact', head: true });
+    return count ?? 0;
+  }, []);
 
   const week = useMemo(() => {
     const since = now - 7 * 864e5;
@@ -208,6 +217,22 @@ export default function Dashboard() {
         ))}
       </Card>
 
+      {certCount.data ? (
+        <>
+          <Spacer h={S.md} />
+          <Card onPress={() => router.push('/certificates')} tint={C.greenTint} border={C.green}>
+            <Row gap={S.md}>
+              <Text style={{ fontSize: 24 }}>🎓</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('cert.dashCard')}</Text>
+                <Small>{t('cert.dashCardSub')}</Small>
+              </View>
+              <Icon name="chevron" size={18} color={C.ink3} />
+            </Row>
+          </Card>
+        </>
+      ) : null}
+
       {/* Continue learning */}
       {lastChapter ? (
         <>
@@ -290,10 +315,6 @@ export default function Dashboard() {
         <Kpi value={`${week.questions}`} label={t('dash.questions')} small />
         <Kpi value={week.days} label={t('dash.activeDays')} small />
       </Row>
-
-
-      <Spacer h={S.lg} />
-      <Tiny style={{ textAlign: 'center' }}>{t('common.demoNote')}</Tiny>
     </Screen>
   );
 }

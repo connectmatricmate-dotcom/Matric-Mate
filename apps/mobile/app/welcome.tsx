@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../src/components/LanguageToggle';
-import { Body, Btn, H1, Screen, Tap, Tiny } from '../src/components/ui';
+import { Body, Btn, H1, Screen, Tap } from '../src/components/ui';
 import { useT } from '../src/i18n';
 import type { StringKey } from '../src/i18n';
 import { C, S } from '../src/theme';
@@ -65,7 +65,6 @@ export default function Welcome() {
           </View>
         </View>
 
-        <Tiny style={{ textAlign: 'center' }}>{t('common.demoNote')}</Tiny>
       </View>
     </Screen>
   );

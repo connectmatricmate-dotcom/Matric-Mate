@@ -32,7 +32,7 @@ export default function Payments() {
       .eq('user_id', userId)
       .eq('status', 'paid')
       .order('at', { ascending: false })
-      .limit(50);
+      .limit(24);
     if (qErr) throw qErr;
     return (data ?? []) as Receipt[];
   }, [userId]);

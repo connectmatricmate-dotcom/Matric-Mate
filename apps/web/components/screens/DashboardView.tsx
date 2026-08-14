@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { type IconName, SUBJECT_ICON, type StringKey, accuracy, chapterById, chapterPct, subjectById } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoachRail, ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, Label } from '@/components/ui/primitives';
+import { createClient } from '@/lib/supabase/client';
 import { useNow } from '@/lib/now';
 import { useApp, useT } from '@/lib/store';
 
@@ -22,6 +23,23 @@ export function DashboardView() {
   const t = useT();
   const now = useNow();
   const firstName = (state.user?.name ?? 'Student').split(' ')[0];
+
+  /** Teacher verifications, the client's trust feature. The card only
+   *  appears once real certificates exist; an empty promise would be
+   *  exactly the "fake data" this dashboard just stopped showing. */
+  const [certCount, setCertCount] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    createClient()
+      .from('certificates')
+      .select('id', { count: 'exact', head: true })
+      .then(({ count }) => {
+        if (alive) setCertCount(count ?? 0);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const week = useMemo(() => {
     const since = now - 7 * 864e5;
@@ -121,6 +139,23 @@ export function DashboardView() {
             </ul>
           </Card>
 
+          {certCount > 0 ? (
+            <Link href="/certificates" className="block">
+              <Card
+                tint="bg-greentint"
+                border="border-green"
+                className="flex items-center gap-4 transition-colors duration-200 hover:border-teal"
+              >
+                <span className="text-[24px]">🎓</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14.5px] font-extrabold text-ink">{t('cert.dashCard')}</span>
+                  <span className="block text-[13px] text-ink2">{t('cert.dashCardSub')}</span>
+                </span>
+                <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
+              </Card>
+            </Link>
+          ) : null}
+
           {/* Continue where you stopped */}
           {lastChapter ? (
             <Link href={`/learn/chapter/${lastChapter.id}`} className="block">
@@ -172,7 +207,6 @@ export function DashboardView() {
         </Rail>
       </Split>
 
-      <p className="mt-8 text-center text-[12px] text-ink3">{t('common.demoNote')}</p>
     </Page>
   );
 }
