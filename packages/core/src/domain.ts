@@ -228,6 +228,19 @@ export function buildPlan(opts: {
  */
 export const AI_QUOTA = { premium: 50, free: 0 };
 
+/**
+ * Class 10 exists in the schema and the UI, but stays un-pickable until its
+ * content has actually shipped. Switching class wipes progress and starts a
+ * seven day cooldown, so offering an empty class would be a trap, not a
+ * feature. Flip this when the SSC-II catalogue is published.
+ */
+export const GRADE_10_READY = false;
+
+export const GRADES = [
+  { grade: 9 as const, ready: true },
+  { grade: 10 as const, ready: GRADE_10_READY },
+];
+
 export const grade = (pct: number) =>
   pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B+' : pct >= 60 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';
 

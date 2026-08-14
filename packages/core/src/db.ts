@@ -137,6 +137,22 @@ export const contentMedium = (): Medium => medium;
 export const isLive = (): boolean => db !== null;
 
 /**
+ * The student's class. The DATABASE does the real filtering (row level
+ * security serves each account only its own grade's chapters), so this is
+ * not a query parameter: it exists so a class switch can flush every cached
+ * answer from the old class, and so screens can label what they show.
+ */
+let grade: 9 | 10 = 9;
+
+export function setContentGrade(next: 9 | 10): void {
+  if (next === grade) return;
+  grade = next;
+  cache.clear();
+}
+
+export const contentGrade = (): 9 | 10 => grade;
+
+/**
  * Last good answer per query key. Not an optimisation: it is what stands
  * between a flaky connection and an empty chapter list. Cleared whenever the
  * client or the medium changes, because both change what a key means.

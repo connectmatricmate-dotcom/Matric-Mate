@@ -74,6 +74,16 @@ export function ChapterHub({
           </>
         }
       />
+      {/* The board's own weighting, front and centre: the single most useful
+          planning number a student can have. Hidden when the table of
+          specification gave none, never shown as a zero. */}
+      {chapter.examShare ? (
+        <p className="-mt-4 mb-5 text-[13px] font-extrabold text-orangedark">
+          {chapter.examMarks
+            ? t('study.examShareLong', { n: chapter.examShare, m: chapter.examMarks })
+            : t('study.examShare', { n: chapter.examShare })}
+        </p>
+      ) : null}
 
       <Split>
         <Work>

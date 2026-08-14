@@ -20,6 +20,7 @@ import {
   buildPlan,
   configureTutor,
   flushQueue,
+  setContentGrade,
   hydrateStudyState,
   level,
   mergeHydratedState,
@@ -70,6 +71,8 @@ type Actions = {
   setName: (name: string) => void;
   signOut: () => void;
   setOnboarding: (o: Partial<Onboarding>) => void;
+  /** Server-enforced class change; 'cooldown' when the 7-day wall says no. */
+  switchClass: (next: 9 | 10) => Promise<'ok' | 'cooldown' | 'error'>;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => void;
   /** One store update for a whole paper. Submitting a 50-question exam through
    * recordAttempt would notify every subscriber 50 times in a synchronous
@@ -100,7 +103,7 @@ const AppCtx = createContext<Ctx | null>(null);
 const actions: Actions = {
   setName: (name) => update((s) => (s.user ? { ...s, user: { ...s.user, name } } : s)),
   signOut: () => update((s) => ({ ...s, user: null, premium: { active: false, validTill: null } })),
-  setOnboarding: (o) =>
+  setOnboarding: (o) => {
     update((s) => ({
       ...s,
       onboarding: {
@@ -112,7 +115,40 @@ const actions: Actions = {
         ...(s.onboarding ?? {}),
         ...o,
       },
-    })),
+    }));
+    // The class lives on profiles.grade too, because row level security
+    // follows that column. Pushed fire-and-forget whenever it changes.
+    const snap = getSnapshot();
+    if (o.classLevel && snap.user) {
+      void createClient().from('profiles').update({ grade: o.classLevel, onboarding: snap.onboarding }).eq('id', snap.user.id);
+    }
+  },
+  /**
+   * Change class, server first: the trigger there enforces the 7 day
+   * cooldown and RLS follows profiles.grade, so if the server says no,
+   * nothing local has been touched. On yes: server history wiped, local
+   * store restarted, and every other device adopts the new class on its
+   * next hydration.
+   */
+  switchClass: async (next) => {
+    const snap = getSnapshot();
+    if (!snap.user) return 'error';
+    const onboarding: Onboarding = {
+      board: 'fbise',
+      medium: 'en',
+      group: 'science',
+      subjects: [],
+      ...(snap.onboarding ?? {}),
+      classLevel: next,
+    };
+    const supabase = createClient();
+    const { error } = await supabase.from('profiles').update({ grade: next, onboarding }).eq('id', snap.user.id);
+    if (error) return String(error.message).includes('grade_cooldown') ? 'cooldown' : 'error';
+    void wipeStudyHistory(supabase, snap.user.id);
+    setContentGrade(next);
+    update((s) => ({ ...EMPTY, user: s.user, premium: s.premium, settings: s.settings, hydrated: true, onboarding }));
+    return 'ok';
+  },
   recordAttempt: (a) => {
     const day = todayKey();
     const isNewDay = !getSnapshot().activeDays.includes(day);
@@ -295,6 +331,32 @@ async function syncStudyState(userId: string): Promise<void> {
   const supabase = createClient();
   const server = await hydrateStudyState(supabase, userId);
   if (syncedFor !== userId) return; // a different user signed in while this was in flight
+  /**
+   * The class on the SERVER wins, always. A switch made on the phone must
+   * reset this browser too, or one subscription quietly serves two classes.
+   */
+  const serverGrade = server?.grade === 10 ? 10 : server?.grade === 9 ? 9 : null;
+  const localGrade = getSnapshot().onboarding?.classLevel ?? 9;
+  if (serverGrade && serverGrade !== localGrade) {
+    setContentGrade(serverGrade);
+    update((s) => ({
+      ...EMPTY,
+      user: s.user,
+      premium: s.premium,
+      settings: s.settings,
+      hydrated: true,
+      onboarding: {
+        board: 'fbise',
+        medium: 'en',
+        group: 'science',
+        subjects: [],
+        ...(s.onboarding ?? {}),
+        classLevel: serverGrade,
+      },
+    }));
+    void flush(userId);
+    return;
+  }
   if (server) {
     update((s) => {
       const merged = mergeHydratedState(s, server);
@@ -435,6 +497,11 @@ export function useT() {
    * onboarding is the syllabus language, which is what content is keyed on.
    */
   const contentMedium = state.onboarding?.medium ?? 'en';
+  const classLevel = state.onboarding?.classLevel ?? 9;
+  useEffect(() => {
+    setContentGrade(classLevel);
+  }, [classLevel]);
+
   useEffect(() => {
     setContentMedium(contentMedium);
   }, [contentMedium]);

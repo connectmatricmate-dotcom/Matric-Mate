@@ -165,6 +165,16 @@ export default function ChapterHub() {
 
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         <H2 style={{ color: '#fff' }}>{chapter?.title ?? ''}</H2>
+        {/* The board's own weighting, front and centre: it is the single most
+            useful planning number a student can have. Hidden when the table
+            of specification gave none, never shown as a zero. */}
+        {chapter?.examShare ? (
+          <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.orange, marginTop: 6 }}>
+            {chapter.examMarks
+              ? t('study.examShareLong', { n: chapter.examShare, m: chapter.examMarks })
+              : t('study.examShare', { n: chapter.examShare })}
+          </Text>
+        ) : null}
         <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
           {chapter?.blurb}
         </Text>

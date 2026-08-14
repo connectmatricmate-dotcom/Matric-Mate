@@ -61,6 +61,10 @@ export function DashboardView() {
         title={t('dash.greeting', { name: firstName })}
         sub={t('dash.weekLine', { q: week.questions, acc: week.accuracy, time: week.time })}
       />
+      {/* Which class this whole dashboard is showing. One line, always on. */}
+      <p className="-mt-4 mb-5 text-[13px] font-extrabold text-teal">
+        {t('tutor.classBadge', { n: state.onboarding?.classLevel ?? 9 })}
+      </p>
 
       <Split>
         <Work className="flex flex-col gap-4">

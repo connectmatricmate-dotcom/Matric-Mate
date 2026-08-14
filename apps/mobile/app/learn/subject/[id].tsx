@@ -99,7 +99,10 @@ export default function Chapters() {
                       <Small numberOfLines={1}>
                         {/* Only what the row actually knows. audioMinutes is
                             always zero here; the real length lives on the
-                            audio_tracks row and belongs to the chapter hub. */}
+                            audio_tracks row and belongs to the chapter hub.
+                            The share leads: it is the number the board itself
+                            publishes and the one that decides study order. */}
+                        {c.examShare ? `${t('study.examShare', { n: c.examShare })} · ` : ''}
                         {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.sectionsSub', { n: c.sectionCount })}
                       </Small>
                     )}

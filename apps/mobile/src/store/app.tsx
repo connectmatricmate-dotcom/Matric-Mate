@@ -12,7 +12,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, XP, buildPlan, level, setContentMedium, streakFrom, todayKey, totalXp, wipeStudyHistory,
+import { AI_QUOTA, XP, buildPlan, level, setContentGrade, setContentMedium, streakFrom, todayKey, totalXp, wipeStudyHistory,
   Attempt,
   ChatThread,
   Group,
@@ -185,6 +185,8 @@ type Actions = {
   saveThread: (t: ChatThread) => void;
   readNotifications: () => void;
   setSettings: (s: Partial<Settings>) => void;
+  /** Server-enforced class change; 'cooldown' when the 7-day wall says no. */
+  switchClass: (next: 9 | 10) => Promise<'ok' | 'cooldown' | 'error'>;
   resetDemo: () => void;
 };
 
@@ -334,6 +336,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
        */
       const apply = (server: Awaited<ReturnType<typeof hydrateStudyState>>) => {
         if (cancelled || syncedForRef.current !== uid) return;
+        /**
+         * The class on the SERVER wins, always. A switch made on the website
+         * must reset this phone too, or one subscription quietly serves two
+         * classes, which is the exact thing the client asked us to prevent.
+         * Adopting it is a full local restart: downloads off disk, progress
+         * gone, same as switching here.
+         */
+        const serverGrade = server?.grade === 10 ? 10 : server?.grade === 9 ? 9 : null;
+        const localGrade = stateRef.current.onboarding?.classLevel ?? 9;
+        if (serverGrade && serverGrade !== localGrade) {
+          void deleteAllDownloads();
+          setContentGrade(serverGrade);
+          setState((s) => ({
+            ...EMPTY,
+            user: s.user,
+            settings: s.settings,
+            onboarding: { ...(s.onboarding ?? { board: 'fbise', medium: 'en', group: 'science', subjects: [] }), classLevel: serverGrade },
+          }));
+          setHydrated(true);
+          return;
+        }
         if (server) {
           setState((s) => {
             const merged = mergeHydratedState(s, server);
@@ -418,6 +441,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setContentMedium(contentMedium);
   }, [contentMedium]);
 
+  // And on the student's class. The server filters by it (RLS); this keeps
+  // the local cache and labels honest.
+  const classLevel = state.onboarding?.classLevel ?? 9;
+  useEffect(() => {
+    setContentGrade(classLevel);
+  }, [classLevel]);
+
   const actions = useMemo<Actions>(
     () => ({
       markChapterCelebrated: (chapterId) =>
@@ -443,7 +473,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // yet; the hydration reconciliation above pushes them up after
         // sign-in instead.
         const uid = syncedForRef.current;
-        if (uid) void supabase.from('profiles').update({ onboarding }).eq('id', uid);
+        if (uid) void supabase.from('profiles').update({ onboarding, grade: onboarding.classLevel }).eq('id', uid);
       },
       recordAttempt: (a) => {
         const full: Attempt = { ...a, id: `a-${Date.now()}-${Math.round(Math.random() * 1e4)}`, at: Date.now() };
@@ -548,6 +578,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       readNotifications: () =>
         setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
       setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
+      /**
+       * Change class, the four-step contract: server first (the trigger there
+       * enforces the 7 day cooldown and RLS follows profiles.grade), then
+       * disk, then server history, then local state. Server-first on purpose:
+       * if the cooldown rejects it, nothing local has been touched yet.
+       */
+      switchClass: async (next) => {
+        const uid = authUser?.id;
+        if (!uid) return 'error';
+        const current = stateRef.current.onboarding;
+        const onboarding: Onboarding = {
+          board: 'fbise',
+          medium: 'en',
+          group: 'science',
+          subjects: [],
+          ...(current ?? {}),
+          classLevel: next,
+        };
+        const { error } = await supabase.from('profiles').update({ grade: next, onboarding }).eq('id', uid);
+        if (error) return String(error.message).includes('grade_cooldown') ? 'cooldown' : 'error';
+        deleteAllDownloads();
+        void wipeStudyHistory(supabase, uid);
+        setContentGrade(next);
+        setState((s) => ({ ...EMPTY, user: s.user, settings: s.settings, onboarding }));
+        return 'ok';
+      },
       resetDemo: () => {
         // Files on disk, not just the state pointing at them: otherwise every
         // download from before the reset keeps its space on the phone with no

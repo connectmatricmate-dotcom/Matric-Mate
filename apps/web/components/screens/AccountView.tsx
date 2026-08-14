@@ -8,7 +8,9 @@ import { planById } from '@/lib/plans';
 import { APP_VERSION } from '@/lib/site';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, StreakRail } from '@/components/app/rails';
+import { GRADE_10_READY } from '@matricmate/core';
 import { Btn, ItemButton } from '@/components/ui/controls';
+import { useToast } from '@/components/ui/toast';
 import { Bar, Card, Icon, Item, LinkBtn, Pill } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useApp, useT } from '@/lib/store';
@@ -17,6 +19,10 @@ export function AccountView() {
   const { state, actions, derived } = useApp();
   const t = useT();
   const [confirmOut, setConfirmOut] = useState(false);
+  const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
+  const [switching, setSwitching] = useState(false);
+  const toast = useToast();
+  const classLevel = state.onboarding?.classLevel ?? 9;
   const [signingOut, setSigningOut] = useState(false);
   const setup = state.onboarding;
 
@@ -60,6 +66,30 @@ export function AccountView() {
                 </div>
               </div>
             </div>
+          </Card>
+
+          {/* The class this account studies. One class at a time, by design. */}
+          <Card className="flex items-center gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-tealtint text-teal">
+              <Icon name="award" size={22} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-extrabold text-ink">{t('tutor.classRowValue', { n: classLevel })}</span>
+              <span className="block text-[13px] text-ink2">{t('tutor.classWarnBody').split('.')[0]}.</span>
+            </span>
+            <Btn
+              title={t('tutor.classChange')}
+              variant="line"
+              sm
+              onClick={() => {
+                const next = classLevel === 9 ? 10 : 9;
+                if (next === 10 && !GRADE_10_READY) {
+                  toast(t('onboarding.class10Toast'));
+                  return;
+                }
+                setConfirmClass(next);
+              }}
+            />
           </Card>
 
           <Link href="/account/subscription" className="block">
@@ -121,6 +151,27 @@ export function AccountView() {
           <StreakRail />
         </Rail>
       </Split>
+
+      <Sheet open={confirmClass !== null} onClose={() => setConfirmClass(null)} title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}>
+        <p className="text-[13.5px] leading-[1.6] text-ink2">{t('tutor.classWarnBody')}</p>
+        <Btn
+          title={t('tutor.classWarnCta')}
+          variant="danger"
+          className="mt-5 w-full"
+          loading={switching}
+          onClick={() => {
+            if (confirmClass === null || switching) return;
+            setSwitching(true);
+            void actions.switchClass(confirmClass).then((r) => {
+              setSwitching(false);
+              setConfirmClass(null);
+              if (r === 'ok') toast(t('tutor.classChanged', { n: confirmClass }));
+              else toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+            });
+          }}
+        />
+        <Btn title={t('common.cancel')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmClass(null)} />
+      </Sheet>
 
       <Sheet open={confirmOut} onClose={() => setConfirmOut(false)} title={t('auth.logOutConfirm')}>
         <p className="text-[13.5px] text-ink2">{t('auth.logOutBody')}</p>

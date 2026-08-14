@@ -345,6 +345,8 @@ export type HydratedStudyState = {
    * merged by mergeHydratedState below.
    */
   onboarding: Record<string, unknown> | null;
+  /** The account's class from profiles.grade, the anti-sharing source of truth. */
+  grade: number | null;
   readSections: string[];
   attempts: Attempt[];
   results: TestResult[];
@@ -364,7 +366,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: true }),
     client.from('cards_known').select('card_id').eq('user_id', userId),
     client.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: true }).limit(400),
-    client.from('profiles').select('onboarding').eq('id', userId).maybeSingle(),
+    client.from('profiles').select('onboarding,grade').eq('id', userId).maybeSingle(),
   ]);
 
   const error = attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error ?? profileRes.error;
@@ -378,6 +380,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
 
   return {
     onboarding: ((profileRes.data as { onboarding?: Record<string, unknown> | null } | null)?.onboarding) ?? null,
+    grade: ((profileRes.data as { grade?: number | null } | null)?.grade) ?? null,
     attempts: ((attemptsRes.data ?? []) as AttemptRow[]).map(fromAttemptRow),
     results: ((resultsRes.data ?? []) as ResultRow[]).map(fromResultRow),
     readSections: sections.map((s) => s.section_id),

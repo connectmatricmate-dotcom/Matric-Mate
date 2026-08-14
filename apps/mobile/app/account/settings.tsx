@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../../src/components/LanguageToggle';
 import { Btn, Card, Header, Item, Row, Screen, SectionTitle, Seg, Sheet, Small, Spacer, Toggle, useToast } from '../../src/components/ui';
-import { Medium } from '@matricmate/core';
+import { GRADE_10_READY, Medium } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { S } from '../../src/theme';
@@ -12,6 +12,9 @@ import { S } from '../../src/theme';
 export default function Settings() {
   const { state, actions } = useApp();
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
+  const [switching, setSwitching] = useState(false);
+  const classLevel = state.onboarding?.classLevel ?? 9;
   const t = useT();
   const toast = useToast();
   const s = state.settings;
@@ -49,6 +52,19 @@ export default function Settings() {
       {/* Medium, which version of the syllabus, separate from app language */}
       <SectionTitle>{t('account.content')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>
+        <Item
+          title={t('tutor.classRow')}
+          sub={t('tutor.classRowValue', { n: classLevel })}
+          icon="award"
+          onPress={() => {
+            const next = classLevel === 9 ? 10 : 9;
+            if (next === 10 && !GRADE_10_READY) {
+              toast(t('onboarding.class10Toast'));
+              return;
+            }
+            setConfirmClass(next);
+          }}
+        />
         <Item
           title={t('account.contentMedium')}
           sub={t('account.contentMediumSub')}
@@ -157,6 +173,31 @@ export default function Settings() {
         <Item title={t('account.terms')} icon="doc" last onPress={() => toast(t('account.termsToast'))} />
       </Card>
       <Spacer h={S.md} />
+      <Sheet visible={confirmClass !== null} onClose={() => setConfirmClass(null)} title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}>
+        <Small>{t('tutor.classWarnBody')}</Small>
+        <Spacer h={S.md} />
+        <Btn
+          title={t('tutor.classWarnCta')}
+          variant="danger"
+          loading={switching}
+          onPress={() => {
+            if (confirmClass === null || switching) return;
+            setSwitching(true);
+            void actions.switchClass(confirmClass).then((r) => {
+              setSwitching(false);
+              setConfirmClass(null);
+              if (r === 'ok') {
+                toast(t('tutor.classChanged', { n: confirmClass }));
+                router.replace('/(tabs)');
+              } else {
+                toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+              }
+            });
+          }}
+        />
+        <Spacer h={S.sm} />
+        <Btn title={t('common.cancel')} variant="line" onPress={() => setConfirmClass(null)} />
+      </Sheet>
     </Screen>
   );
 }

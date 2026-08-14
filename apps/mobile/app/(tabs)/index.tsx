@@ -99,6 +99,11 @@ export default function Dashboard() {
   return (
     <Screen tabbed>
       <AppHeader eyebrow={today} title={t('dash.greeting', { name: firstName })} />
+      {/* Which class this whole dashboard is showing. One line, always on. */}
+      <Small style={{ fontFamily: F.bodyBold, color: C.teal, marginTop: -6 }}>
+        {t('tutor.classBadge', { n: state.onboarding?.classLevel ?? 9 })}
+      </Small>
+      <Spacer h={S.sm} />
       {milestoneToday ? <Confetti /> : null}
 
       {!state.premium.active ? (

@@ -79,6 +79,9 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
                   <span className="block text-[13px] text-ink2">{c.blurb}</span>
                 ) : (
                   <span className="block truncate text-[13px] text-ink2">
+                    {/* The share leads: it is the number the board itself
+                        publishes and the one that decides study order. */}
+                    {c.examShare ? `${t('study.examShare', { n: c.examShare })} · ` : ''}
                     {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
                   </span>
                 )}
