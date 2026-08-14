@@ -98,15 +98,7 @@ export default function Chapters() {
                     ) : (
                       <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{c.title}</Text>
                     )}
-                    {empty ? (
-                      // An Urdu blurb must go through the Urdu treatment; in
-                      // the Latin body font it degrades into glyph soup.
-                      isUrduScript(c.blurb) ? (
-                        <Ur size={12.5} style={{ color: C.ink2 }}>{c.blurb}</Ur>
-                      ) : (
-                        <Small>{c.blurb}</Small>
-                      )
-                    ) : (
+                    {empty ? null : (
                       <Small numberOfLines={1}>
                         {/* Only what the row actually knows. audioMinutes is
                             always zero here; the real length lives on the
@@ -135,6 +127,19 @@ export default function Chapters() {
                     <Icon name="chevron" size={18} color={C.ink3} />
                   )}
                 </Row>
+                {empty ? (
+                  // The blurb takes the card's full width below the title
+                  // row; squeezed into the middle column it wrapped into a
+                  // cramped ribbon (client screenshot). Urdu blurbs keep the
+                  // Urdu treatment, Latin ones stay Small.
+                  <View style={{ marginTop: S.sm }}>
+                    {isUrduScript(c.blurb) ? (
+                      <Ur size={13} style={{ color: C.ink2 }}>{c.blurb}</Ur>
+                    ) : (
+                      <Small>{c.blurb}</Small>
+                    )}
+                  </View>
+                ) : null}
               </Card>
             );
           })}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { api } from '@matricmate/core';
+import { api, isUrduScript } from '@matricmate/core';
 import type { Block, Chapter, ChapterContent, StringKey } from '@matricmate/core';
 import { Btn, IconButton } from '@/components/ui/controls';
 import { Card, Label, Pill, Skeleton } from '@/components/ui/primitives';
@@ -79,7 +79,9 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
       return (
         <ul className="mb-4 flex flex-col gap-2">
           {b.items.map((it, i) => (
-            <li key={i} className="flex items-start gap-2.5">
+            // An RTL line carries its bullet on the RIGHT; a left dot next to
+            // right-aligned Urdu read as a layout mistake (client screenshot).
+            <li key={i} className={`flex items-start gap-2.5 ${isUrduScript(it) ? 'flex-row-reverse' : ''}`}>
               <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-teal" />
               <span className="min-w-0 flex-1">
                 <Prose text={it} size={14.5 * scale} />

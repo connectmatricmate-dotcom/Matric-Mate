@@ -61,10 +61,9 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
             <Card
               flat={!current}
               border={current ? 'border-teal' : undefined}
-              className={`flex items-center gap-3 transition-colors duration-200 ${
-                empty || isLocked ? 'opacity-60' : 'hover:border-teal'
-              }`}
+              className={`transition-colors duration-200 ${empty ? 'opacity-60' : isLocked ? 'opacity-60' : 'hover:border-teal'}`}
             >
+              <span className="flex items-center gap-3">
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] font-display text-[16px] ${
                   empty ? 'bg-grey text-ink3' : done ? 'bg-greentint text-green' : 'bg-tealtint text-teal'
@@ -78,13 +77,7 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
                 ) : (
                   <span className="block text-[14px] font-extrabold text-ink">{c.title}</span>
                 )}
-                {empty ? (
-                  isUrduScript(c.blurb) ? (
-                    <Ur block className="text-[13px] text-ink2">{c.blurb}</Ur>
-                  ) : (
-                    <span className="block text-[13px] text-ink2">{c.blurb}</span>
-                  )
-                ) : (
+                {empty ? null : (
                   <span className="block truncate text-[13px] text-ink2">
                     {/* The share leads: it is the number the board itself
                         publishes and the one that decides study order. */}
@@ -109,6 +102,19 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
               ) : (
                 <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
               )}
+                          </span>
+              {empty ? (
+                // The blurb takes the card's full width below the title row;
+                // squeezed into the middle column it wrapped into a cramped
+                // ribbon (client screenshot).
+                <span className="mt-2 block">
+                  {isUrduScript(c.blurb) ? (
+                    <Ur block className="text-[13px] text-ink2">{c.blurb}</Ur>
+                  ) : (
+                    <span className="block text-[13px] text-ink2">{c.blurb}</span>
+                  )}
+                </span>
+              ) : null}
             </Card>
           );
 

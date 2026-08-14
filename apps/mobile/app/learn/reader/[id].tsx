@@ -23,7 +23,7 @@ import {
   Ur,
   useToast,
 } from '../../../src/components/ui';
-import { api , Block } from '@matricmate/core';
+import { api , Block, isUrduScript } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
 import { useOnline } from '../../../src/core/connectivity';
 import { useT } from '../../../src/i18n';
@@ -95,7 +95,13 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
       return (
         <View style={{ gap: 8, marginBottom: S.md }}>
           {b.items.map((it, i) => (
-            <Row key={i} gap={S.sm} style={{ alignItems: 'flex-start' }}>
+            <Row
+              key={i}
+              gap={S.sm}
+              // An RTL line carries its bullet on the RIGHT; a left dot next
+              // to right-aligned Urdu read as a layout mistake.
+              style={{ alignItems: 'flex-start', flexDirection: isUrduScript(it) ? 'row-reverse' : 'row' }}
+            >
               <View style={{ width: 6, height: 6, borderRadius: 99, backgroundColor: C.teal, marginTop: 9 }} />
               <View style={{ flex: 1 }}>
                 <Prose text={it} size={14.5 * scale} />
