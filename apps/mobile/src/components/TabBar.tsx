@@ -1,4 +1,6 @@
-import { Text, View, useWindowDimensions } from 'react-native';
+import { useEffect } from 'react';
+import { Pressable, Text, View, useWindowDimensions } from 'react-native';
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconName } from './Icon';
 import { TabGlyph } from './TabGlyph';
@@ -17,6 +19,71 @@ type TabBarProps = {
     navigate: (name: never) => void;
   };
 };
+
+/**
+ * One tab, one motion. The pill and its glyph land together with a single
+ * spring when the tab becomes active; the press itself adds no ripple and no
+ * flash, because two effects on one tap is exactly what read as cheap. The
+ * cell stays a plain Pressable so the hit area is still the full column.
+ */
+function TabItem({
+  focused,
+  label,
+  icon,
+  onPress,
+}: {
+  focused: boolean;
+  label: string;
+  icon: IconName;
+  onPress: () => void;
+}) {
+  const reduced = useReducedMotion();
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    if (focused && !reduced) {
+      scale.value = withSequence(withSpring(1.14, { damping: 11, stiffness: 320 }), withSpring(1, { damping: 14 }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focused, reduced]);
+
+  const landing = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: focused }}
+      accessibilityLabel={label}
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2,
+        minHeight: 48,
+        borderRadius: R.md,
+        ...(isWeb ? { cursor: 'pointer' as const } : null),
+      }}
+    >
+      <Animated.View
+        style={[
+          {
+            paddingHorizontal: 14,
+            paddingVertical: 2,
+            borderRadius: 99,
+            backgroundColor: focused ? C.tealTint : 'transparent',
+          },
+          landing,
+        ]}
+      >
+        <TabGlyph name={icon} focused={focused} />
+      </Animated.View>
+      <Text numberOfLines={1} style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: focused ? C.teal : C.ink3 }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
 
 /**
  * Custom tab bar. Written by hand because the default one sizes itself
@@ -92,33 +159,7 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
       }}
     >
       {items.map((it) => (
-        <Tap key={it.key} onPress={it.onPress} style={{ flex: 1 }}>
-          <View
-            accessibilityRole="tab"
-            accessibilityState={{ selected: it.focused }}
-            accessibilityLabel={it.label}
-            style={{ alignItems: 'center', justifyContent: 'center', gap: 2, minHeight: 48, borderRadius: R.md }}
-          >
-            {/* The active tab sits in a soft pill, the toy-box treatment the
-                client asked for, and the glyph bounces as it lands. */}
-            <View
-              style={{
-                paddingHorizontal: 14,
-                paddingVertical: 2,
-                borderRadius: 99,
-                backgroundColor: it.focused ? C.tealTint : 'transparent',
-              }}
-            >
-              <TabGlyph name={it.icon} focused={it.focused} />
-            </View>
-            <Text
-              numberOfLines={1}
-              style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: it.focused ? C.teal : C.ink3 }}
-            >
-              {it.label}
-            </Text>
-          </View>
-        </Tap>
+        <TabItem key={it.key} focused={it.focused} label={it.label} icon={it.icon} onPress={it.onPress} />
       ))}
     </View>
   );

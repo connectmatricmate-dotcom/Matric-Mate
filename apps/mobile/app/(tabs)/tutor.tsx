@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
-import { Card, Empty, Item, Ring, Row, Screen, SectionTitle, Small, Spacer, Tiny } from '../../src/components/ui';
+import { Card, Empty, Item, Ring, Row, Screen, SectionTitle, Small, Spacer, TileGrid, Tiny } from '../../src/components/ui';
 import { fetchTutorQuota } from '@matricmate/core';
 import type { TutorQuota } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
@@ -72,19 +72,23 @@ export default function Tutor() {
         </Ring>
       </Row>
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: S.sm }}>
-        {ENTRIES.map((e) => (
-          <Card
-            key={e.label}
-            onPress={() => router.push(e.prompt ? `/tutor/chat?q=${encodeURIComponent(e.prompt)}` : '/tutor/chat')}
-            style={{ flexGrow: 1, flexBasis: '46%', gap: 6 }}
-          >
-            <Icon name={e.icon} color={C.teal} />
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(e.label)}</Text>
-            <Small style={{ fontSize: 11.5 }}>{t(e.sub)}</Small>
-          </Card>
-        ))}
-      </View>
+      <TileGrid
+        tiles={ENTRIES.map((e) => ({
+          key: e.label,
+          node: (
+            <Card
+              onPress={() => router.push(e.prompt ? `/tutor/chat?q=${encodeURIComponent(e.prompt)}` : '/tutor/chat')}
+              style={{ flex: 1, gap: 6, minHeight: 106 }}
+            >
+              <Icon name={e.icon} color={C.teal} />
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(e.label)}</Text>
+              <Small style={{ fontSize: 11.5 }} numberOfLines={2}>
+                {t(e.sub)}
+              </Small>
+            </Card>
+          ),
+        }))}
+      />
 
       <Spacer h={S.md} />
       <Card

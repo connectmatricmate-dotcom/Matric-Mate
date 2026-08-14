@@ -178,6 +178,52 @@ export function Col({ children, gap = S.sm, style }: { children: React.ReactNode
 }
 export const Spacer = ({ h = S.md }: { h?: number }) => <View style={{ height: h }} />;
 
+/**
+ * A two-column grid of equal tiles. React Native's percentage flexBasis
+ * sizes wrapped children by their content, so a grid built that way goes
+ * ragged the moment one caption runs longer than another, which is exactly
+ * how the practice and tutor screens ended up with every card a different
+ * width. Explicit pair rows with flex: 1 children make every tile the same
+ * width and every row the same height. A tile marked `full` takes a row of
+ * its own (the accented "special" tile); an odd leftover keeps half width
+ * against an empty spacer instead of ballooning.
+ */
+export function TileGrid({ tiles }: { tiles: { key: string; full?: boolean; node: React.ReactNode }[] }) {
+  const rows: (typeof tiles)[] = [];
+  let pair: typeof tiles = [];
+  for (const tile of tiles) {
+    if (tile.full) {
+      if (pair.length) {
+        rows.push(pair);
+        pair = [];
+      }
+      rows.push([tile]);
+    } else {
+      pair.push(tile);
+      if (pair.length === 2) {
+        rows.push(pair);
+        pair = [];
+      }
+    }
+  }
+  if (pair.length) rows.push(pair);
+
+  return (
+    <View style={{ gap: S.sm }}>
+      {rows.map((row, i) => (
+        <View key={row[0].key} style={{ flexDirection: 'row', gap: S.sm }}>
+          {row.map((tile) => (
+            <View key={tile.key} style={{ flex: 1 }}>
+              {tile.node}
+            </View>
+          ))}
+          {row.length === 1 && !row[0].full ? <View style={{ flex: 1 }} /> : null}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
     <View style={st.sectionTitle}>
@@ -598,12 +644,17 @@ export function Ring({
   size = 54,
   stroke = 7,
   color = C.teal,
+  fill,
   children,
 }: {
   pct: number;
   size?: number;
   stroke?: number;
   color?: string;
+  /** Paints the ring's whole interior. Drawn inside the same SVG, tucked
+   *  1px under the stroke, so no layout rounding can open a hairline gap
+   *  the way a separately positioned disc did. */
+  fill?: string;
   children?: React.ReactNode;
 }) {
   const r = (size - stroke) / 2;
@@ -612,6 +663,7 @@ export function Ring({
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <View style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}>
         <Svg width={size} height={size}>
+          {fill ? <Circle cx={size / 2} cy={size / 2} r={r - stroke / 2 + 1} fill={fill} /> : null}
           <Circle cx={size / 2} cy={size / 2} r={r} stroke="#EAF0EC" strokeWidth={stroke} fill="none" />
           <Circle
             cx={size / 2}
@@ -626,7 +678,10 @@ export function Ring({
           />
         </Svg>
       </View>
-      {children}
+      {/* zIndex keeps the content above the ring's SVG: on the web an
+          absolutely positioned sibling paints over static children, which
+          swallowed the icon the moment the interior gained an opaque fill. */}
+      <View style={{ zIndex: 1, alignItems: 'center', justifyContent: 'center' }}>{children}</View>
     </View>
   );
 }

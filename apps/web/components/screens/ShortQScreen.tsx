@@ -112,6 +112,10 @@ export function ShortQScreen({
         backLabel={chapterTitle}
         pct={(i / Math.max(1, items.length)) * 100}
         label={`${t('practice.shortQ')} · ${t('session.shortQOf', { a: i + 1, b: items.length })}`}
+        segments={items.map((_, j) =>
+          // 'partial' still earned something, so it reads as done, not wrong.
+          marks[j] ? (marks[j] === 'missed' ? 'bad' : marks[j] === 'got' ? 'ok' : 'done') : j === i && !revealed ? 'current' : 'todo',
+        )}
         right={<Pill tone="grey">{t('session.marks', { n: item.marks })}</Pill>}
       />
 

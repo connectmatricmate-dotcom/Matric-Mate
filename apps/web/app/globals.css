@@ -199,6 +199,15 @@ body {
   }
 }
 
+/* The bottom-nav pill landing under the active tab: one small overshoot,
+   mirroring the Android tab bar's spring. Guarded by motion-safe at the
+   call site and by the global reduced-motion block above. */
+@keyframes tabland {
+  0% { transform: scale(0.92); }
+  55% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 /* -- scroll reveals -------------------------------------------------------
  *
  * CSS never hides anything here. Reveal.tsx adds .rv-wait, but only to

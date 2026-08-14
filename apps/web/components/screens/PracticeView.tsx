@@ -33,24 +33,37 @@ export function PracticeView() {
       <Split>
         <Work className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
-            {MODES.map((m) => (
-              <Link key={m.label} href={m.href}>
-                <Card
-                  border={m.accent ? 'border-orange' : undefined}
-                  className="flex h-full flex-col gap-2 transition-colors duration-200 hover:border-teal"
-                >
-                  <span
-                    className={`flex h-10 w-10 items-center justify-center rounded-[13px] ${
-                      m.accent ? 'bg-orangetint text-orangedark' : 'bg-tealtint text-teal'
-                    }`}
+            {MODES.map((m) =>
+              m.accent ? (
+                // The timed test is the special one, so it gets a whole row,
+                // laid out like the AI banner below rather than a stray tile.
+                <Link key={m.label} href={m.href} className="col-span-full">
+                  <Card
+                    border="border-orange"
+                    className="flex items-center gap-3 transition-colors duration-200 hover:border-orangedark"
                   >
-                    <Icon name={m.icon} size={20} />
-                  </span>
-                  <span className="mt-0.5 text-[14.5px] font-extrabold text-ink">{t(m.label)}</span>
-                  <span className="text-[12.5px] leading-[1.5] text-ink2">{t(m.sub)}</span>
-                </Card>
-              </Link>
-            ))}
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-orangetint text-orangedark">
+                      <Icon name={m.icon} size={20} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[14.5px] font-extrabold text-ink">{t(m.label)}</span>
+                      <span className="block text-[12.5px] leading-[1.5] text-ink2">{t(m.sub)}</span>
+                    </span>
+                    <Icon name="chevron" size={18} className="text-ink3" />
+                  </Card>
+                </Link>
+              ) : (
+                <Link key={m.label} href={m.href}>
+                  <Card className="flex h-full flex-col gap-2 transition-colors duration-200 hover:border-teal">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-[13px] bg-tealtint text-teal">
+                      <Icon name={m.icon} size={20} />
+                    </span>
+                    <span className="mt-0.5 text-[14.5px] font-extrabold text-ink">{t(m.label)}</span>
+                    <span className="text-[12.5px] leading-[1.5] text-ink2">{t(m.sub)}</span>
+                  </Card>
+                </Link>
+              ),
+            )}
           </div>
 
           <Link href="/tutor/ai-test" className="block">

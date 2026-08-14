@@ -2,45 +2,68 @@ import Constants from 'expo-constants';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Bar, Btn, Card, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Sheet, Small, Spacer } from '../../src/components/ui';
-import { levelProgress, xpToNextLevel } from '@matricmate/core';
+import { LanguageToggle } from '../../src/components/LanguageToggle';
+import {
+  Bar,
+  Btn,
+  Card,
+  Header,
+  IconButton,
+  Item,
+  Pill,
+  Row,
+  Screen,
+  SectionTitle,
+  Seg,
+  Sheet,
+  Small,
+  Spacer,
+  Toggle,
+  useToast,
+} from '../../src/components/ui';
+import { GRADE_10_READY, Medium, levelProgress, xpToNextLevel } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { C, F, S } from '../../src/theme';
 
+/**
+ * The ONE settings surface. There used to be two: the avatar opened
+ * "Account" and the gear opened "Settings", and nobody could predict which
+ * of their things lived where (the client's own words). Everything now
+ * lives here, ordered by how often a student actually touches it: who am I,
+ * what plan am I on, the study choices (class, medium, size, language),
+ * then the long tail. /account/settings redirects here so old links hold.
+ */
 export default function Account() {
-  const { state, derived } = useApp();
+  const { state, actions, derived } = useApp();
   const { signOut } = useAuth();
   const t = useT();
+  const toast = useToast();
   const [confirmOut, setConfirmOut] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
+  const [switching, setSwitching] = useState(false);
   const setup = state.onboarding;
+  const classLevel = setup?.classLevel ?? 9;
+  const s = state.settings;
+  const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
 
   return (
     <>
       <Screen>
-        <Header title={t('account.title')} back />
+        <Header title={t('account.settingsTitle')} back />
 
-        <Card>
+        {/* Who am I */}
+        <Card onPress={() => router.push('/account/edit')}>
           <Row gap={S.md}>
-            <View
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 18,
-                backgroundColor: C.orangeTint,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <AvatarBadge index={state.settings.avatar ?? 0} size={52} />
-            </View>
+            <AvatarBadge index={s.avatar ?? 0} size={56} />
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={{ fontFamily: F.bodyBold, fontSize: 16, color: C.ink }}>{state.user?.name ?? 'Student'}</Text>
               <Small>
                 {t('account.classLine', {
-                  class: setup?.classLevel ?? 9,
+                  class: classLevel,
                   board: setup?.board === 'punjab' ? 'Punjab Board' : 'FBISE',
                   medium: setup?.medium === 'ur' ? 'Urdu' : 'English',
                 })}
@@ -51,6 +74,7 @@ export default function Account() {
           </Row>
         </Card>
 
+        {/* What plan am I on */}
         <Spacer h={S.md} />
         <Card
           tint={state.premium.active ? C.orangeTint : undefined}
@@ -96,23 +120,117 @@ export default function Account() {
           </Row>
         </Card>
 
-        <SectionTitle>{t('account.accountSection')}</SectionTitle>
+        {/* The study choices, the settings a student actually changes */}
+        <SectionTitle>{t('account.content')}</SectionTitle>
         <Card flat style={{ paddingVertical: 0 }}>
-          <Item title={t('account.paymentHistory')} icon="card" onPress={() => router.push('/account/payments')} />
           <Item
-            title={t('account.downloads')}
-            sub={t('account.downloadsSub', { n: state.downloads.length })}
+            title={t('tutor.classRow')}
+            sub={t('tutor.classRowValue', { n: classLevel })}
+            icon="award"
+            onPress={() => {
+              const next = classLevel === 9 ? 10 : 9;
+              if (next === 10 && !GRADE_10_READY) {
+                toast(t('onboarding.class10Toast'));
+                return;
+              }
+              setConfirmClass(next);
+            }}
+          />
+          <Item
+            title={t('account.contentMedium')}
+            sub={t('account.contentMediumSub')}
+            icon="book2"
+            right={
+              <View style={{ width: 118 }}>
+                <Seg<Medium>
+                  value={s.contentMedium}
+                  onChange={(m) => actions.setSettings({ contentMedium: m })}
+                  options={[
+                    { value: 'en', label: 'English' },
+                    { value: 'ur', label: 'Urdu' },
+                  ]}
+                />
+              </View>
+            }
+          />
+          <Item
+            title={t('account.readingSize')}
+            sub={sizeLabel}
+            icon="book"
+            last
+            onPress={() => actions.setSettings({ fontScale: ((s.fontScale + 1) % 3) as 0 | 1 | 2 })}
+          />
+        </Card>
+
+        {/* App language, the interface, not the syllabus */}
+        <SectionTitle>{t('lang.label')}</SectionTitle>
+        <Card flat style={{ alignItems: 'center', gap: S.sm }}>
+          <LanguageToggle />
+          <Small style={{ textAlign: 'center' }}>{s.language === 'en' ? t('lang.englishHint') : t('lang.urduHint')}</Small>
+        </Card>
+
+        <SectionTitle>{t('account.appearance')}</SectionTitle>
+        <Card flat style={{ paddingVertical: 0 }}>
+          <Item
+            title={t('account.darkMode')}
+            sub={t('account.darkModeSub')}
+            icon="moon"
+            last
+            right={
+              // Never latches on: no dark theme exists yet, and a switch that
+              // visibly turns on and does nothing trains people to distrust
+              // every other switch on the page.
+              <Toggle on={false} onPress={() => toast(t('account.darkToast'))} />
+            }
+          />
+        </Card>
+
+        <SectionTitle>{t('account.notificationsSection')}</SectionTitle>
+        <Card flat style={{ paddingVertical: 0 }}>
+          <Item
+            title={t('account.studyReminder')}
+            sub={t('account.studyReminderSub', { time: s.reminderTime })}
+            icon="bell"
+            right={<Toggle on={false} onPress={() => toast(t('onboarding.comingSoon'))} />}
+          />
+          <Item
+            title={t('account.streakAlerts')}
+            sub={t('account.streakAlertsSub')}
+            icon="flame"
+            tone="orange"
+            right={<Toggle on={false} onPress={() => toast(t('onboarding.comingSoon'))} />}
+          />
+          <Item title={t('account.notifications')} icon="bell" last onPress={() => router.push('/notifications')} />
+        </Card>
+
+        <SectionTitle>{t('account.storage')}</SectionTitle>
+        <Card flat style={{ paddingVertical: 0 }}>
+          <Item
+            title={t('account.manageDownloads')}
+            sub={t('account.chaptersCount', { n: state.downloads.length })}
             icon="download"
             onPress={() => router.push('/learn/downloads')}
           />
-          <Item title={t('account.notifications')} icon="bell" onPress={() => router.push('/notifications')} />
-          <Item title={t('account.settings')} icon="gear" onPress={() => router.push('/account/settings')} />
+          <Item title={t('account.paymentHistory')} icon="card" onPress={() => router.push('/account/payments')} />
+          <Item
+            title={t('account.resetDemo')}
+            sub={t('account.resetDemoSub')}
+            icon="trash"
+            tone="red"
+            last
+            onPress={() => setConfirmReset(true)}
+          />
+        </Card>
+
+        <SectionTitle>{t('account.about')}</SectionTitle>
+        <Card flat style={{ paddingVertical: 0 }}>
           <Item title={t('account.help')} icon="help" onPress={() => router.push('/account/help')} />
+          <Item title={t('account.terms')} icon="doc" onPress={() => toast(t('account.termsToast'))} />
+          <Item title={t('account.version', { v: Constants.expoConfig?.version ?? '' })} icon="help" />
           <Item title={t('auth.logOut')} icon="logout" tone="red" last onPress={() => setConfirmOut(true)} right={<View />} />
         </Card>
 
         <Spacer h={S.lg} />
-        <Small style={{ textAlign: 'center' }}>{t('account.version', { v: Constants.expoConfig?.version ?? '' })}</Small>
       </Screen>
 
       <Sheet visible={confirmOut} onClose={() => setConfirmOut(false)} title={t('auth.logOutConfirm')}>
@@ -131,6 +249,53 @@ export default function Account() {
         />
         <Spacer h={S.sm} />
         <Btn title={t('auth.stayLoggedIn')} variant="ghost" onPress={() => setConfirmOut(false)} />
+      </Sheet>
+
+      {/* One tap used to do it, no questions asked: local state, downloaded
+          files AND server history, gone. That is the most destructive action
+          in the app and the only one that had no confirm. */}
+      <Sheet visible={confirmReset} onClose={() => setConfirmReset(false)} title={t('account.resetDemo')}>
+        <Small>{t('account.resetDemoSub')}</Small>
+        <Spacer h={S.md} />
+        <Row gap={S.sm}>
+          <Btn title={t('common.cancel')} variant="line" sm onPress={() => setConfirmReset(false)} />
+          <Btn
+            title={t('account.resetDemo')}
+            variant="danger"
+            sm
+            onPress={() => {
+              setConfirmReset(false);
+              actions.resetDemo();
+              toast(t('account.resetDone'));
+            }}
+          />
+        </Row>
+      </Sheet>
+
+      <Sheet visible={confirmClass !== null} onClose={() => setConfirmClass(null)} title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}>
+        <Small>{t('tutor.classWarnBody')}</Small>
+        <Spacer h={S.md} />
+        <Btn
+          title={t('tutor.classWarnCta')}
+          variant="danger"
+          loading={switching}
+          onPress={() => {
+            if (confirmClass === null || switching) return;
+            setSwitching(true);
+            void actions.switchClass(confirmClass).then((r) => {
+              setSwitching(false);
+              setConfirmClass(null);
+              if (r === 'ok') {
+                toast(t('tutor.classChanged', { n: confirmClass }));
+                router.replace('/(tabs)');
+              } else {
+                toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+              }
+            });
+          }}
+        />
+        <Spacer h={S.sm} />
+        <Btn title={t('common.cancel')} variant="line" onPress={() => setConfirmClass(null)} />
       </Sheet>
     </>
   );

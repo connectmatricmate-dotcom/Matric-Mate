@@ -397,12 +397,16 @@ export function Ring({
   size = 54,
   stroke = 7,
   color = 'var(--color-teal)',
+  fill,
   children,
 }: {
   pct: number;
   size?: number;
   stroke?: number;
   color?: string;
+  /** Paints the ring's whole interior, tucked 1px under the stroke so no
+   *  rounding can open a hairline gap (mirrors the Android Ring). */
+  fill?: string;
   children?: React.ReactNode;
 }) {
   const r = (size - stroke) / 2;
@@ -410,6 +414,7 @@ export function Ring({
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="absolute -rotate-90" aria-hidden>
+        {fill ? <circle cx={size / 2} cy={size / 2} r={r - stroke / 2 + 1} fill={fill} /> : null}
         <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--color-track)" strokeWidth={stroke} fill="none" />
         <circle
           cx={size / 2}

@@ -3,6 +3,7 @@ import { BackHandler, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, H3, IconButton, Pill, Row, Screen, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { SegmentTrack } from '../../src/components/SessionHeader';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -128,7 +129,12 @@ export default function Exam() {
         </Row>
 
         <Spacer h={S.sm} />
-        <Small style={{ fontFamily: F.bodyBold }}>{t('session.questionOf', { a: i + 1, b: s.mcqs.length })}</Small>
+        <SegmentTrack
+          segments={s.mcqs.map((m, j) => (j === i ? 'current' : answers[m.id] != null ? 'done' : 'todo'))}
+        />
+        <Small style={{ fontFamily: F.bodyBold, marginTop: 4 }}>
+          {t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
+        </Small>
         <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 27, color: C.ink, marginVertical: S.md }}>{mcq.q}</Text>
 
         {mcq.options.map((opt, n) => {

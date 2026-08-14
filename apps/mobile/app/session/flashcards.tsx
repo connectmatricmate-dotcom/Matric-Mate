@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bar, Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
+import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, chaptersFor, fetchAiSession, normalizeAiCards } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
@@ -142,7 +143,7 @@ export default function Flashcards() {
       }
     >
       <Header title={t('study.flashcards')} sub={t('session.cardOf', { a: i + 1, b: total })} back />
-      <Bar pct={(i / Math.max(1, total)) * 100} tone="teal" />
+      <SegmentTrack segments={Array.from({ length: total }, (_, j) => (j < i ? 'done' : j === i ? 'current' : 'todo'))} />
       <Spacer h={S.lg} />
 
       <Tap onPress={() => setFlipped((f) => !f)}>

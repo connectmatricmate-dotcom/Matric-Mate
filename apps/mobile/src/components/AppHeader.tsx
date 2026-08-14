@@ -5,7 +5,8 @@ import { useApp } from '../store/app';
 import { C, F, S } from '../theme';
 import { H2, IconButton, Pill, Small, Tap } from './ui';
 
-/** Tab-root header: avatar → profile, streak → progress, bell → notifications. */
+/** Tab-root header: streak → progress, gear → settings, bell → notifications.
+ *  The avatar is identity, not a control: settings are behind the gear only. */
 export function AppHeader({
   eyebrow,
   title,
@@ -20,22 +21,9 @@ export function AppHeader({
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: S.sm, paddingTop: S.sm, paddingBottom: S.md }}>
-      <Tap onPress={() => router.push('/account')}>
-        <View
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 15,
-            backgroundColor: C.orangeTint,
-            borderWidth: 1,
-            borderColor: C.line,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <AvatarBadge index={state.settings.avatar ?? 0} size={38} />
-        </View>
-      </Tap>
+      {/* The avatar disc carries its own tint; a second box behind it read
+          as a mistake (the client's words: double background). */}
+      <AvatarBadge index={state.settings.avatar ?? 0} size={42} />
 
       <View style={{ flex: 1, minWidth: 0 }}>
         {eyebrow ? (
@@ -56,7 +44,7 @@ export function AppHeader({
 
       {/* Settings used to live only behind the avatar, which nothing marks as
           tappable. A gear is the one icon every student already knows. */}
-      <IconButton icon="gear" tone="card" onPress={() => router.push('/account/settings')} />
+      <IconButton icon="gear" tone="card" onPress={() => router.push('/account')} />
       <IconButton icon="bell" tone="card" badge={unread} onPress={() => router.push('/notifications')} />
     </View>
   );

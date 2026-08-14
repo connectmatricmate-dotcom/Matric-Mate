@@ -7,6 +7,7 @@
  */
 export * from './types';
 export * from './avatars';
+export * from './glyphs';
 export * from './tutor';
 export * from './ai';
 export * from './content';

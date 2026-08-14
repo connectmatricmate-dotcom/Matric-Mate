@@ -79,6 +79,7 @@ export function FlashcardsScreen({
         backLabel={chapterTitle}
         pct={(i / Math.max(1, cards.length)) * 100}
         label={`${t('study.flashcards')} · ${t('session.cardOf', { a: i + 1, b: cards.length })}`}
+        segments={cards.map((_, j) => (j < i ? 'done' : j === i ? 'current' : 'todo'))}
         right={<Pill tone="grey">{chapterTitle}</Pill>}
       />
 

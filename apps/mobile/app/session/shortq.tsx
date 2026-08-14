@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Body, Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, chaptersFor, checkAnswerLive, fetchAiSession, normalizeAiShortQs } from '@matricmate/core';
 import type { AiCheckVerdict } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
@@ -148,6 +149,13 @@ export default function ShortQuestions() {
   return (
     <Screen>
       <Header title={t('practice.shortQ')} sub={t('session.shortQOf', { a: i + 1, b: items.length })} back />
+      <SegmentTrack
+        segments={items.map((_, j) =>
+          // 'partial' still earned something, so it reads as done, not wrong.
+          marks[j] ? (marks[j] === 'missed' ? 'bad' : marks[j] === 'got' ? 'ok' : 'done') : j === i && !revealed ? 'current' : 'todo',
+        )}
+      />
+      <Spacer h={S.md} />
 
       <Card>
         <Row gap={S.sm}>

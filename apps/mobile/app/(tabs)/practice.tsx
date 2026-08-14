@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName } from '../../src/components/Icon';
-import { Card, Empty, Item, Pill, Screen, SectionTitle, Small, Spacer } from '../../src/components/ui';
+import { Card, Empty, Item, Pill, Screen, SectionTitle, Small, Spacer, TileGrid } from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
@@ -43,23 +43,42 @@ export default function Practice() {
         </>
       ) : null}
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: S.sm }}>
-        {MODES.map((m) => {
+      <TileGrid
+        tiles={MODES.map((m) => {
           const open = paid || m.href === '/session/topper-papers';
-          return (
-          <Card
-            key={m.label}
-            onPress={open ? () => router.push(m.href as never) : undefined}
-            border={m.accent ? C.orange : undefined}
-            style={{ flexGrow: 1, flexBasis: '46%', gap: 6, opacity: open ? 1 : 0.62 }}
-          >
-            <Icon name={open ? m.icon : 'lock'} color={m.accent ? C.orangeDark : C.teal} />
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t(m.label)}</Text>
-            <Small style={{ fontSize: 11.5 }}>{t(m.sub)}</Small>
-          </Card>
-          );
+          return {
+            key: m.label,
+            full: m.accent,
+            node: m.accent ? (
+              // The timed test is the special one, so it gets a whole row,
+              // laid out like the AI banner below it rather than a stray tile.
+              <Card
+                onPress={open ? () => router.push(m.href as never) : undefined}
+                border={C.orange}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: S.md, opacity: open ? 1 : 0.62 }}
+              >
+                <Icon name={open ? m.icon : 'lock'} color={C.orangeDark} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t(m.label)}</Text>
+                  <Small style={{ fontSize: 11.5 }}>{t(m.sub)}</Small>
+                </View>
+                <Icon name="chevron" size={18} color={C.ink3} />
+              </Card>
+            ) : (
+              <Card
+                onPress={open ? () => router.push(m.href as never) : undefined}
+                style={{ flex: 1, gap: 6, minHeight: 106, opacity: open ? 1 : 0.62 }}
+              >
+                <Icon name={open ? m.icon : 'lock'} color={C.teal} />
+                <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t(m.label)}</Text>
+                <Small style={{ fontSize: 11.5 }} numberOfLines={2}>
+                  {t(m.sub)}
+                </Small>
+              </Card>
+            ),
+          };
         })}
-      </View>
+      />
 
       <Spacer h={S.md} />
       <Card

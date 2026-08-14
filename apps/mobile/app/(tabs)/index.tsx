@@ -14,12 +14,13 @@ import {
   Small,
   Spacer,
   Tap,
+  TileGrid,
   Tiny,
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
 import { LockedNotice } from '../../src/components/LockedNotice';
 import { SUBJECT_COLORS, chapterById, subjectById , accuracy, chapterPct, todayKey } from '@matricmate/core';
-import { Confetti, Pop, Pulse } from '../../src/components/celebration';
+import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
@@ -115,33 +116,9 @@ export default function Dashboard() {
         </>
       ) : null}
 
-      {derived.streak > 0 ? (
-        <Pop>
-          <Row
-            gap={6}
-            style={{
-              alignSelf: 'flex-start',
-              alignItems: 'center',
-              backgroundColor: C.orangeTint,
-              borderColor: C.orange,
-              borderWidth: 1.5,
-              borderRadius: 99,
-              paddingVertical: 5,
-              paddingHorizontal: 12,
-              marginBottom: S.md,
-            }}
-          >
-            <Pulse on={streakActiveToday}>
-              <Icon name="flame" size={15} color={C.orangeDark} fill={C.orange} />
-            </Pulse>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.orangeDark }}>
-              {milestoneToday
-                ? t('dash.streakMilestone', { n: derived.streak })
-                : t('dash.streakChip', { n: derived.streak })}
-            </Text>
-          </Row>
-        </Pop>
-      ) : null}
+      {/* The streak lives in the header pill alone. A second chip here said
+          the same thing twice, and its entrance slide dragged the row in
+          from outside the screen, which read as broken. */}
 
       {/* Today's plan */}
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
@@ -291,18 +268,20 @@ export default function Dashboard() {
 
       {/* Quick actions */}
       <SectionTitle>{t('dash.quickActions')}</SectionTitle>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: S.sm }}>
-        {QUICK.map((q) => (
-          <Card
-            key={q.label}
-            onPress={() => router.push(q.href as never)}
-            style={{ flexGrow: 1, flexBasis: '46%', minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: S.sm }}
-          >
-            <Icon name={q.icon} color={C.teal} />
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(q.label)}</Text>
-          </Card>
-        ))}
-      </View>
+      <TileGrid
+        tiles={QUICK.map((q) => ({
+          key: q.label,
+          node: (
+            <Card
+              onPress={() => router.push(q.href as never)}
+              style={{ flex: 1, minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: S.sm }}
+            >
+              <Icon name={q.icon} color={C.teal} />
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(q.label)}</Text>
+            </Card>
+          ),
+        }))}
+      />
 
       {/* This week */}
       <SectionTitle>{t('dash.thisWeek')}</SectionTitle>

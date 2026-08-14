@@ -81,6 +81,12 @@ export function McqScreen() {
         pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100}
         label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
         right={<Pill tone="grey">{mcq.topic}</Pill>}
+        segments={s.mcqs.map((q, j) => {
+          const a = s.answers[q.id];
+          if (j === i && !checked) return 'current';
+          if (a) return a.correct ? 'ok' : 'bad';
+          return j < i ? 'done' : 'todo';
+        })}
       />
 
       {/* On a desktop the question earns a surface of its own; unframed, the

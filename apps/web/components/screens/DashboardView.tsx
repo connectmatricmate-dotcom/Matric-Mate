@@ -150,7 +150,7 @@ export function DashboardView() {
           {/* Quick actions */}
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('dash.quickActions')}</h2>
-            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
               {QUICK.map((q) => (
                 <Link key={q.label} href={q.href} className="h-full">
                   <Card flat className="flex h-full min-h-[88px] flex-col gap-2 transition-colors duration-200 hover:border-teal">

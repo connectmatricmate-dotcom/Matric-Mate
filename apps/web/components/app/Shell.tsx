@@ -13,6 +13,7 @@ import type { IconName, StringKey } from '@matricmate/core';
 import { levelProgress } from '@matricmate/core';
 import { Bar, Icon } from '@/components/ui/primitives';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
+import { TabGlyph } from '@/components/app/TabGlyph';
 import { useApp, useT } from '@/lib/store';
 
 /**
@@ -60,7 +61,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   on ? 'bg-tealtint text-teal' : 'text-ink2 hover:bg-paper hover:text-ink'
                 }`}
               >
-                <Icon name={item.icon} size={20} />
+                <TabGlyph name={item.icon} focused={on} size={20} />
                 {t(item.label)}
               </Link>
             );
@@ -73,7 +74,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           find settings blames the app, not themselves.
         */}
         <Link
-          href="/account/settings"
+          href="/account"
           className="mt-auto flex min-h-11 items-center gap-3 rounded-[12px] px-3 text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-paper hover:text-ink"
         >
           <Icon name="gear" size={20} />
@@ -159,11 +160,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
               key={item.href}
               href={item.href}
               aria-current={on ? 'page' : undefined}
-              className={`flex min-h-[58px] flex-1 flex-col items-center justify-center gap-1 text-[11px] font-extrabold ${
+              className={`group flex min-h-[58px] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-extrabold ${
                 on ? 'text-teal' : 'text-ink2'
               }`}
             >
-              <Icon name={item.icon} size={22} />
+              <span
+                className={`flex items-center justify-center rounded-full px-3.5 py-0.5 transition-all duration-200 ${
+                  on ? 'motion-safe:animate-[tabland_260ms_ease-out] bg-tealtint' : 'bg-transparent'
+                }`}
+              >
+                <TabGlyph name={item.icon} focused={on} size={22} />
+              </span>
               {t(item.label)}
             </Link>
           );

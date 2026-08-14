@@ -107,19 +107,12 @@ export default function Study() {
           {rows.map(({ s, pct, next, chapters }) => (
             <Card key={s.id} onPress={() => router.push(`/learn/subject/${s.id}`)}>
               <Row gap={S.md}>
-                <Ring pct={pct} color={SUBJECT_COLORS[s.id]?.main ?? C.teal}>
-                  <View
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 12,
-                      backgroundColor: SUBJECT_COLORS[s.id]?.tint ?? C.tealTint,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={18} color={SUBJECT_COLORS[s.id]?.main ?? C.teal} strokeWidth={2.3} />
-                  </View>
+                <Ring
+                  pct={pct}
+                  color={SUBJECT_COLORS[s.id]?.main ?? C.teal}
+                  fill={SUBJECT_COLORS[s.id]?.tint ?? C.tealTint}
+                >
+                  <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={19} color={SUBJECT_COLORS[s.id]?.main ?? C.teal} strokeWidth={2.3} />
                 </Ring>
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Row gap={6}>

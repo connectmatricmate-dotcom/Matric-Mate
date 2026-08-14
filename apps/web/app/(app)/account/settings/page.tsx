@@ -1,11 +1,10 @@
-import type { Metadata } from 'next';
-import { SettingsView } from '@/components/screens/SettingsView';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Settings',
-  description: 'Language, study medium, reading size, reminders and storage.',
-};
-
-export default function SettingsPage() {
-  return <SettingsView />;
+/**
+ * Settings and Account merged into one screen (the client found two
+ * destinations confusing). Everything lives at /account now; this route
+ * survives only so old links and habits still land somewhere sensible.
+ */
+export default function SettingsRedirect() {
+  redirect('/account');
 }

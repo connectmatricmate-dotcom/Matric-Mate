@@ -2,45 +2,69 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { levelProgress, xpToNextLevel } from '@matricmate/core';
+import type { Language, Medium } from '@matricmate/core';
+import { GRADE_10_READY, levelProgress, xpToNextLevel } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
 import { planById } from '@/lib/plans';
 import { APP_VERSION } from '@/lib/site';
-import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
+import { CardGrid, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, StreakRail } from '@/components/app/rails';
-import { GRADE_10_READY } from '@matricmate/core';
-import { Btn, ItemButton } from '@/components/ui/controls';
+import { AvatarBadge } from '@/components/ui/AvatarBadge';
+import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
 import { useToast } from '@/components/ui/toast';
-import { Bar, Card, Icon, Item, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Bar, Card, Icon, Item, Label, LinkBtn, Pill } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useApp, useT } from '@/lib/store';
 
+/** A titled group of rows, so a toggle never floats away from its label. */
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <div className="mb-2">
+        <Label>{title}</Label>
+      </div>
+      <Card flat className="py-0">
+        {children}
+      </Card>
+    </section>
+  );
+}
+
+/**
+ * The ONE settings surface. There used to be two: the avatar card opened
+ * "Account" and the sidebar gear opened "Settings", and nobody could
+ * predict which of their things lived where (the client's own words).
+ * Everything lives here now, ordered by how often a student touches it;
+ * /account/settings redirects here so old links hold.
+ */
 export function AccountView() {
   const { state, actions, derived } = useApp();
   const t = useT();
   const [confirmOut, setConfirmOut] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
   const [switching, setSwitching] = useState(false);
   const toast = useToast();
   const classLevel = state.onboarding?.classLevel ?? 9;
   const [signingOut, setSigningOut] = useState(false);
   const setup = state.onboarding;
+  const s = state.settings;
+  const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
 
   return (
     <Page>
       <PageHead
         back="/dashboard"
         backLabel={t('tabs.home')}
-        title={t('account.title')}
+        title={t('account.settingsTitle')}
         actions={<LinkBtn title={t('account.editTitle')} href="/account/edit" variant="line" sm icon="edit" />}
       />
 
       <Split>
         <Work className="flex flex-col gap-4">
+          {/* Who am I */}
           <Card className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[16px] bg-orangetint text-orangedark">
-              <Icon name="gradCap" size={30} />
-            </span>
+            <AvatarBadge index={s.avatar ?? 0} size={64} />
             <div className="min-w-0 flex-1">
               <p className="font-display text-[20px] text-ink">{state.user?.name ?? 'Student'}</p>
               <p className="text-[13.5px] text-ink2">
@@ -92,6 +116,7 @@ export function AccountView() {
             />
           </Card>
 
+          {/* What plan am I on */}
           <Link href="/account/subscription" className="block">
             <Card
               tint={state.premium.active ? 'bg-orangetint' : undefined}
@@ -123,15 +148,107 @@ export function AccountView() {
             </Card>
           </Link>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card flat className="py-0">
-              <Item href="/account/payments" title={t('account.paymentHistory')} icon="card" />
-              <Item href="/notifications" title={t('account.notifications')} icon="bell" last />
-            </Card>
+          {/* App language sits alone: it changes every other word on this page. */}
+          <Card className="flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[14.5px] font-extrabold text-ink">{t('lang.label')}</p>
+              <p className="text-[13px] text-ink2">{s.language === 'en' ? t('lang.englishHint') : t('lang.urduHint')}</p>
+            </div>
+            <Seg
+              value={s.language}
+              onChange={(l: Language) => actions.setSettings({ language: l })}
+              label={t('lang.label')}
+              options={[
+                { value: 'en' as Language, label: t('lang.english') },
+                { value: 'ur' as Language, label: t('lang.urdu') },
+              ]}
+            />
+          </Card>
 
-            <Card flat className="py-0">
-              <Item href="/account/settings" title={t('account.settings')} icon="gear" />
+          <CardGrid>
+            <Group title={t('account.content')}>
+              <Item
+                title={t('account.contentMedium')}
+                sub={t('account.contentMediumSub')}
+                icon="layers"
+                right={
+                  <Seg
+                    value={s.contentMedium}
+                    onChange={(m: Medium) => actions.setSettings({ contentMedium: m })}
+                    label={t('account.contentMedium')}
+                    options={[
+                      { value: 'en' as Medium, label: 'Eng' },
+                      { value: 'ur' as Medium, label: 'Urdu' },
+                    ]}
+                  />
+                }
+              />
+              <ItemButton
+                title={t('account.readingSize')}
+                sub={sizeLabel}
+                icon="book"
+                last
+                onClick={() => actions.setSettings({ fontScale: ((s.fontScale + 1) % 3) as 0 | 1 | 2 })}
+              />
+            </Group>
+
+            <Group title={t('account.notificationsSection')}>
+              <Item
+                title={t('account.studyReminder')}
+                sub={t('account.studyReminderSub', { time: s.reminderTime })}
+                icon="bell"
+                right={
+                  <Toggle
+                    on={s.reminders}
+                    label={t('account.studyReminder')}
+                    onClick={() => actions.setSettings({ reminders: !s.reminders })}
+                  />
+                }
+              />
+              <Item
+                title={t('account.streakAlerts')}
+                sub={t('account.streakAlertsSub')}
+                icon="flame"
+                tone="orange"
+                right={
+                  <Toggle
+                    on={s.streakAlerts}
+                    label={t('account.streakAlerts')}
+                    onClick={() => actions.setSettings({ streakAlerts: !s.streakAlerts })}
+                  />
+                }
+              />
+              <Item href="/notifications" title={t('account.notifications')} icon="bell" last />
+            </Group>
+
+            <Group title={t('account.appearance')}>
+              {/* No toggle until dark mode exists. A switch that visibly flips and
+                  changes nothing is the fastest way to lose a user's trust. */}
+              <Item
+                title={t('account.darkMode')}
+                sub={t('account.darkModeSub')}
+                icon="moon"
+                last
+                right={<Pill tone="grey">{t('onboarding.comingSoon')}</Pill>}
+              />
+            </Group>
+
+            <Group title={t('account.storage')}>
+              <Item href="/account/payments" title={t('account.paymentHistory')} icon="card" />
+              <ItemButton
+                title={t('account.resetDemo')}
+                sub={t('account.resetDemoSub')}
+                icon="trash"
+                tone="red"
+                last
+                onClick={() => setConfirmReset(true)}
+              />
+            </Group>
+
+            <Group title={t('account.about')}>
               <Item href="/account/help" title={t('account.help')} icon="help" />
+              <Item href="/terms" title={t('account.terms')} icon="doc" />
+              <Item title={t('account.version', { v: APP_VERSION })} icon="help" />
               <ItemButton
                 title={t('auth.logOut')}
                 icon="logout"
@@ -140,10 +257,8 @@ export function AccountView() {
                 right={<span />}
                 onClick={() => setConfirmOut(true)}
               />
-            </Card>
-          </div>
-
-          <p className="text-center text-[12.5px] text-ink3">{t('account.version', { v: APP_VERSION })}</p>
+            </Group>
+          </CardGrid>
         </Work>
 
         <Rail>
@@ -171,6 +286,21 @@ export function AccountView() {
           }}
         />
         <Btn title={t('common.cancel')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmClass(null)} />
+      </Sheet>
+
+      <Sheet open={confirmReset} onClose={() => setConfirmReset(false)} title={t('account.resetDemo')}>
+        <p className="text-[13.5px] leading-[1.6] text-ink2">{t('account.resetDemoSub')}</p>
+        <Btn
+          title={t('account.resetDemo')}
+          variant="danger"
+          className="mt-5 w-full"
+          onClick={() => {
+            actions.resetDemo();
+            setConfirmReset(false);
+            toast(t('account.resetDone'));
+          }}
+        />
+        <Btn title={t('common.cancel')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmReset(false)} />
       </Sheet>
 
       <Sheet open={confirmOut} onClose={() => setConfirmOut(false)} title={t('auth.logOutConfirm')}>

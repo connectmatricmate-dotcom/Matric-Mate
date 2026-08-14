@@ -25,6 +25,8 @@ export function BlanksScreen({
   const [pick, setPick] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [right, setRight] = useState(0);
+  // One mark per completed item, feeding the header's segments.
+  const [marks, setMarks] = useState<('ok' | 'bad')[]>([]);
 
   const item = items[i];
   const done = i >= items.length;
@@ -40,6 +42,7 @@ export function BlanksScreen({
     const ok = pick === item.answer;
     setChecked(true);
     if (ok) setRight((r) => r + 1);
+    setMarks((m) => [...m, ok ? 'ok' : 'bad']);
     actions.recordAttempt({
       mcqId: item.id,
       chapterId,
@@ -78,6 +81,7 @@ export function BlanksScreen({
         backLabel={chapterTitle}
         pct={(i / Math.max(1, items.length)) * 100}
         label={`${t('practice.blanks')} · ${t('session.blanksItem', { a: i + 1, b: items.length })}`}
+        segments={items.map((_, j) => marks[j] ?? (j === i && !checked ? 'current' : 'todo'))}
         right={<Pill tone="grey">{chapterTitle}</Pill>}
       />
 

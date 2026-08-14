@@ -110,6 +110,9 @@ export function ExamScreen() {
         closeLabel={t('common.close')}
         pct={((s.mcqs.length - unanswered) / s.mcqs.length) * 100}
         label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
+        segments={s.mcqs.map((m, j) =>
+          j === i ? 'current' : answers[m.id] != null ? 'done' : 'todo',
+        )}
         right={
           <>
             <span

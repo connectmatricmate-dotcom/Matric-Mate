@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Bar, Btn, Card, Empty, ErrorState, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, blankHalves, chaptersFor, fetchAiSession, normalizeAiBlanks } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
@@ -33,6 +34,8 @@ export default function Blanks() {
   const [pick, setPick] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [right, setRight] = useState(0);
+  // One mark per completed item, feeding the header's segments.
+  const [marks, setMarks] = useState<('ok' | 'bad')[]>([]);
 
   const items = content?.blanks ?? [];
   const item = items[i];
@@ -74,6 +77,7 @@ export default function Blanks() {
     if (ok) tick();
     else thud();
     if (ok) setRight((r) => r + 1);
+    setMarks((m) => [...m, ok ? 'ok' : 'bad']);
     actions.recordAttempt({
       mcqId: item.id,
       chapterId,
@@ -131,7 +135,7 @@ export default function Blanks() {
       }
     >
       <Header title={t('practice.blanks')} sub={t('session.blanksItem', { a: i + 1, b: items.length })} back />
-      <Bar pct={(i / Math.max(1, items.length)) * 100} tone="teal" />
+      <SegmentTrack segments={items.map((_, j) => marks[j] ?? (j === i && !checked ? 'current' : 'todo'))} />
       <Spacer h={S.lg} />
 
       <Card>

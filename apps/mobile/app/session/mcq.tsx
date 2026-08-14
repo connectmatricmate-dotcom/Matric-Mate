@@ -2,21 +2,8 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import {
-  Bar,
-  Body,
-  Btn,
-  Card,
-  H3,
-  IconButton,
-  Label,
-  Pill,
-  Row,
-  Screen,
-  Small,
-  Spacer,
-  Tap,
-} from '../../src/components/ui';
+import { Body, Btn, Card, H3, Label, Pill, Row, Screen, Small, Spacer, Tap } from '../../src/components/ui';
+import { SessionHeader } from '../../src/components/SessionHeader';
 import { XP , Confidence } from '@matricmate/core';
 import Animated from 'react-native-reanimated';
 import { Pop, useShake } from '../../src/components/celebration';
@@ -146,18 +133,18 @@ export default function McqScreen() {
         )
       }
     >
-      <Row gap={S.sm} style={{ paddingTop: S.xs }}>
-        <View style={{ marginLeft: -10 }}>
-          <IconButton icon="close" onPress={() => (answeredCount ? router.replace('/session/result') : router.back())} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Bar pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100} tone="teal" h={6} />
-          <Small style={{ fontFamily: F.bodyBold, fontSize: 11, marginTop: 4 }}>
-            {t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
-          </Small>
-        </View>
-        <Pill tone="grey">{mcq.topic}</Pill>
-      </Row>
+      <SessionHeader
+        onClose={() => (answeredCount ? router.replace('/session/result') : router.back())}
+        pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100}
+        label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
+        right={<Pill tone="grey">{mcq.topic}</Pill>}
+        segments={s.mcqs.map((q, j) => {
+          const a = s.answers[q.id];
+          if (j === i && !checked) return 'current';
+          if (a) return a.correct ? 'ok' : 'bad';
+          return j < i ? 'done' : 'todo';
+        })}
+      />
 
       <Spacer h={S.md} />
       <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 27, color: C.ink }}>{mcq.q}</Text>
