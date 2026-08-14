@@ -244,6 +244,25 @@ export const GRADES = [
 export const grade = (pct: number) =>
   pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B+' : pct >= 60 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';
 
+/**
+ * True when a string is written in Arabic script (Urdu titles and blurbs).
+ * Any text this matches must render through the Urdu type treatment
+ * (Nastaliq face, RTL, extra leading); in the Latin body font it degrades
+ * into the broken glyph soup the client screenshotted.
+ */
+export const isUrduScript = (s: string) => /[؀-ۿ]/.test(s);
+
+/**
+ * One language at a time: the app language picks which version of a
+ * bilingual name shows. Showing both at once was the client's complaint,
+ * the UI read as clutter. Falls back to the English name when no Urdu one
+ * exists (and vice versa there is no case: English names always exist).
+ */
+export function localName(language: 'en' | 'ur', en: string, ur?: string | null): { text: string; urdu: boolean } {
+  if (language === 'ur' && ur) return { text: ur, urdu: true };
+  return { text: en, urdu: false };
+}
+
 
 export const todayKey = () => dayKey(Date.now());
 

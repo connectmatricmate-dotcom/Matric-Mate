@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Btn, Card, H3, IconButton, Pill, Row, Screen, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { Btn, Card, H3, IconButton, Pill, Row, Screen, ScriptText, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -135,7 +135,7 @@ export default function Exam() {
         <Small style={{ fontFamily: F.bodyBold, marginTop: 4 }}>
           {t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
         </Small>
-        <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 27, color: C.ink, marginVertical: S.md }}>{mcq.q}</Text>
+        <ScriptText text={mcq.q} face="display" size={18} style={{ marginVertical: S.md }} />
 
         {mcq.options.map((opt, n) => {
           const sel = answers[mcq.id] === n;
@@ -170,7 +170,7 @@ export default function Exam() {
                     {String.fromCharCode(65 + n)}
                   </Text>
                 </View>
-                <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14.5, lineHeight: 21, color: C.ink }}>{opt}</Text>
+                <ScriptText text={opt} size={14.5} style={{ flex: 1 }} />
               </View>
             </Tap>
           );

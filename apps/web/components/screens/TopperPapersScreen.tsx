@@ -4,7 +4,7 @@ import type { FbiseTopperPaper } from '@matricmate/core';
 import { SUBJECT_ICON, subjectById } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Card, Empty, ExternalLinkBtn, Icon, Ur } from '@/components/ui/primitives';
-import { useT } from '@/lib/store';
+import { useApp, useT } from '@/lib/store';
 
 export function TopperPapersScreen({
   groups,
@@ -12,6 +12,7 @@ export function TopperPapersScreen({
   groups: { subjectId: string; scripts: FbiseTopperPaper[] }[];
 }) {
   const t = useT();
+  const { state } = useApp();
 
   return (
     <Page width="page">
@@ -45,10 +46,11 @@ export function TopperPapersScreen({
                     <Icon name={SUBJECT_ICON[subjectId] ?? 'book'} size={22} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-baseline gap-x-2">
-                      <span className="text-[15.5px] font-extrabold text-ink">{subject.name}</span>
-                      {subject.urduName ? <Ur className="text-ink2">{subject.urduName}</Ur> : null}
-                    </span>
+                    {state.settings.language === 'ur' && subject.urduName ? (
+                      <Ur block className="text-[15.5px] text-ink">{subject.urduName}</Ur>
+                    ) : (
+                      <span className="block text-[15.5px] font-extrabold text-ink">{subject.name}</span>
+                    )}
                     <span className="block text-[12.5px] text-ink2">{t('session.toppersCount', { n: scripts.length })}</span>
                   </span>
                 </span>

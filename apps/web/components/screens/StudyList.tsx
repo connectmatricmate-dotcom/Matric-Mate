@@ -125,10 +125,11 @@ export function StudyList({
                         <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={22} strokeWidth={2.3} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="flex flex-wrap items-baseline gap-x-2">
-                          <span className="text-[15.5px] font-extrabold text-ink">{s.name}</span>
-                          {s.urduName ? <Ur className="text-ink2">{s.urduName}</Ur> : null}
-                        </span>
+                        {state.settings.language === 'ur' && s.urduName ? (
+                          <Ur block className="text-[15.5px] text-ink">{s.urduName}</Ur>
+                        ) : (
+                          <span className="block text-[15.5px] font-extrabold text-ink">{s.name}</span>
+                        )}
                         <span className="block text-[12.5px] text-ink2">
                           {t('study.chapterCount', { n: chapters.length })} · {t('study.percentComplete', { n: pct })}
                         </span>

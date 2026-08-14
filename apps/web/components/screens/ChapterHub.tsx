@@ -1,7 +1,7 @@
 'use client';
 
 import type { Chapter, ChapterContent, PlayableTrack } from '@matricmate/core';
-import { chapterPct, hasStudyMaterial, pickAudioTrack } from '@matricmate/core';
+import { chapterPct, hasStudyMaterial, isUrduScript, pickAudioTrack } from '@matricmate/core';
 import { Actions, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { Card, Empty, Item, Label, LinkBtn, Ring, Ur } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
@@ -33,15 +33,10 @@ export function ChapterHub({
           back={`/learn/subject/${chapter.subjectId}`}
           backLabel={subjectName}
           eyebrow={`${subjectName} · Chapter ${chapter.number}`}
-          title={chapter.title}
-          urduTitle={
-            chapter.urduTitle ? (
-              <p className="mt-1">
-                <Ur className="text-[15px] text-ink2">{chapter.urduTitle}</Ur>
-              </p>
-            ) : undefined
-          }
+          title={state.settings.language === 'ur' && chapter.urduTitle ? chapter.urduTitle : chapter.title}
+          titleUrdu={state.settings.language === 'ur' && !!chapter.urduTitle}
           sub={chapter.blurb}
+        subUrdu={isUrduScript(chapter.blurb)}
         />
         <Empty title={t('study.emptyChapterTitle')} sub={t('study.emptyChapterBody')} />
       </Page>
@@ -61,9 +56,10 @@ export function ChapterHub({
         back={`/learn/subject/${chapter.subjectId}`}
         backLabel={subjectName}
         eyebrow={`${subjectName} · Chapter ${chapter.number}`}
-        title={chapter.title}
-        urduTitle={chapter.urduTitle ? <p className="mt-1"><Ur className="text-[15px] text-ink2">{chapter.urduTitle}</Ur></p> : undefined}
+        title={state.settings.language === 'ur' && chapter.urduTitle ? chapter.urduTitle : chapter.title}
+        titleUrdu={state.settings.language === 'ur' && !!chapter.urduTitle}
         sub={chapter.blurb}
+        subUrdu={isUrduScript(chapter.blurb)}
         actions={
           <>
             <LinkBtn

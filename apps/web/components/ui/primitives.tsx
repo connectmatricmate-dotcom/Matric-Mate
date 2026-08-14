@@ -9,7 +9,7 @@
  */
 import Link from 'next/link';
 import React from 'react';
-import { IconName } from '@matricmate/core';
+import { IconName, isUrduScript } from '@matricmate/core';
 import {
   AlertTriangle,
   ArrowRight,
@@ -194,6 +194,31 @@ const GLYPHS: Record<IconName, LucideIcon> = {
 };
 
 /* ------------------------------------------------------------------ text */
+
+/**
+ * Content text that follows its own script. Urdu-medium questions, options
+ * and answers arrive as Urdu strings; rendered in the Latin faces they
+ * degrade into broken glyph soup. Mirrors the Android ScriptText.
+ */
+export function ScriptText({
+  text,
+  className = '',
+  urduClassName,
+}: {
+  text: string;
+  className?: string;
+  /** Classes for the Urdu case; defaults to className. Font family and
+   *  leading come from the .urdu class itself. */
+  urduClassName?: string;
+}) {
+  return isUrduScript(text) ? (
+    <Ur block className={urduClassName ?? className}>
+      {text}
+    </Ur>
+  ) : (
+    <span className={`block ${className}`}>{text}</span>
+  );
+}
 
 /**
  * Urdu text. Inline by default, most Urdu in this app is a subject name or a

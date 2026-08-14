@@ -15,7 +15,7 @@
  * Server-safe: no hooks, no handlers.
  */
 import Link from 'next/link';
-import { Icon } from '@/components/ui/primitives';
+import { Icon, Ur } from '@/components/ui/primitives';
 
 const WIDTH = {
   page: 'max-w-[1180px]',
@@ -46,7 +46,8 @@ export function PageHead({
   actions,
   back,
   backLabel,
-  urduTitle,
+  titleUrdu,
+  subUrdu,
 }: {
   eyebrow?: string;
   title: string;
@@ -54,7 +55,12 @@ export function PageHead({
   actions?: React.ReactNode;
   back?: string;
   backLabel?: string;
-  urduTitle?: React.ReactNode;
+  /** Renders the title through the Urdu treatment (Nastaliq, RTL). Pass it
+   *  when the app language is Urdu and the Urdu name IS the title; the two
+   *  language versions never stack. */
+  titleUrdu?: boolean;
+  /** Same for the sub line, for Urdu-script chapter blurbs. */
+  subUrdu?: boolean;
 }) {
   return (
     <header className="mb-5">
@@ -73,9 +79,22 @@ export function PageHead({
           {eyebrow ? (
             <p className="mb-0.5 text-[11.5px] font-extrabold uppercase tracking-[0.09em] text-ink3">{eyebrow}</p>
           ) : null}
-          <h1 className="font-display text-[26px] leading-[1.15] text-ink md:text-[30px]">{title}</h1>
-          {urduTitle}
-          {sub ? <p className="mt-1 text-[14px] text-ink2">{sub}</p> : null}
+          {titleUrdu ? (
+            <h1>
+              <Ur block className="text-[24px] leading-loose text-ink md:text-[27px]">{title}</Ur>
+            </h1>
+          ) : (
+            <h1 className="font-display text-[26px] leading-[1.15] text-ink md:text-[30px]">{title}</h1>
+          )}
+          {sub ? (
+            subUrdu ? (
+              <p className="mt-1">
+                <Ur block className="text-[14px] text-ink2">{sub}</Ur>
+              </p>
+            ) : (
+              <p className="mt-1 text-[14px] text-ink2">{sub}</p>
+            )
+          ) : null}
         </div>
         {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2.5">{actions}</div> : null}
       </div>

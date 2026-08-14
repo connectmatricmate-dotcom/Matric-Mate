@@ -23,6 +23,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
 import { C, F, R, S, T, WEB_MAX, isWeb, shadow, urdu } from '../theme';
+import { isUrduScript } from '@matricmate/core';
 import { Icon, IconName } from './Icon';
 
 /* ------------------------------------------------------------------ text */
@@ -47,6 +48,52 @@ function Txt({ children, style, numberOfLines }: TextProps) {
 /** Urdu text. Nastaliq, RTL, generous line-height. */
 export function Ur({ children, size = 16, style }: { children: React.ReactNode; size?: number; style?: StyleProp<TextStyle> }) {
   return <Text style={[urdu(size), style]}>{children}</Text>;
+}
+
+/**
+ * Content text that follows its own script. Urdu-medium questions, options
+ * and answers arrive as Urdu strings; rendered in the Latin faces they
+ * degrade into broken glyph soup (the client's screenshots). This detects
+ * the script and applies the Nastaliq treatment automatically, so a screen
+ * never needs to know which medium the content came in.
+ */
+export function ScriptText({
+  text,
+  size = 15,
+  face = 'body',
+  color = C.ink,
+  center,
+  lines,
+  style,
+}: {
+  text: string;
+  size?: number;
+  face?: 'display' | 'body' | 'bodyBold';
+  color?: string;
+  center?: boolean;
+  lines?: number;
+  style?: StyleProp<TextStyle>;
+}) {
+  if (isUrduScript(text)) {
+    return (
+      <Text numberOfLines={lines} style={[urdu(size), { color }, center ? { textAlign: 'center' } : null, style]}>
+        {text}
+      </Text>
+    );
+  }
+  const fontFamily = face === 'display' ? F.display : face === 'bodyBold' ? F.bodyBold : F.body;
+  return (
+    <Text
+      numberOfLines={lines}
+      style={[
+        { fontFamily, fontSize: size, lineHeight: Math.round(size * 1.48), color },
+        center ? { textAlign: 'center' } : null,
+        style,
+      ]}
+    >
+      {text}
+    </Text>
+  );
 }
 
 /* ---------------------------------------------------------------- layout */

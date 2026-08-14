@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, chaptersFor, fetchAiSession, normalizeAiCards } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
@@ -168,7 +168,7 @@ export default function Flashcards() {
             <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: C.ink2 }}>
               {t('session.cardTerm')}
             </Text>
-            <H2 style={{ fontSize: 23, textAlign: 'center' }}>{card?.front}</H2>
+            <ScriptText text={card?.front ?? ''} face="display" size={22} center />
             <Small>{t('session.tapToFlip')}</Small>
           </Animated.View>
 
@@ -190,9 +190,7 @@ export default function Flashcards() {
             <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: 'rgba(255,255,255,0.7)' }}>
               {t('session.cardDefinition')}
             </Text>
-            <Text style={{ fontFamily: F.body, fontSize: 16, lineHeight: 26, color: '#fff', textAlign: 'center' }}>
-              {card?.back}
-            </Text>
+            <ScriptText text={card?.back ?? ''} size={16} color="#fff" center />
             {card?.urduBack ? (
               <Ur size={14} style={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
                 {card.urduBack}

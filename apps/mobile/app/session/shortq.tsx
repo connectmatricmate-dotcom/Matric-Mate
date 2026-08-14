@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Body, Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { Body, Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, chaptersFor, checkAnswerLive, fetchAiSession, normalizeAiShortQs } from '@matricmate/core';
 import type { AiCheckVerdict } from '@matricmate/core';
@@ -162,7 +162,7 @@ export default function ShortQuestions() {
           <Label style={{ color: C.teal }}>{t('session.shortQOf', { a: i + 1, b: items.length })}</Label>
           <Pill tone="grey">{t('session.marks', { n: item?.marks ?? 2 })}</Pill>
         </Row>
-        <Text style={{ fontFamily: F.display, fontSize: 17, lineHeight: 26, color: C.ink, marginTop: 8 }}>{item?.q}</Text>
+        <ScriptText text={item?.q ?? ''} face="display" size={17} style={{ marginTop: 8 }} />
       </Card>
 
       <Spacer h={S.md} />
@@ -209,14 +209,14 @@ export default function ShortQuestions() {
                 <Text style={{ fontFamily: F.display, fontSize: 19, color: C.ink }}>
                   {t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}
                 </Text>
-                <Body style={{ marginTop: 6 }}>{verdict.feedback}</Body>
+                <ScriptText text={verdict.feedback} size={14} style={{ marginTop: 6 }} />
                 {verdict.missed.length ? (
                   <>
                     <Spacer h={S.sm} />
                     <Label style={{ color: C.orangeDark }}>{t('tutor.checkMissed')}</Label>
                     <View style={{ gap: 4, marginTop: 4 }}>
                       {verdict.missed.map((p, n) => (
-                        <Small key={n}>• {p}</Small>
+                        <ScriptText key={n} text={`• ${p}`} size={13} color={C.ink2} />
                       ))}
                     </View>
                   </>
@@ -227,12 +227,12 @@ export default function ShortQuestions() {
           ) : null}
           <Card flat tint={C.greenTint} border={C.green}>
             <Label style={{ color: C.green }}>{t('session.modelAnswer')}</Label>
-            <Body style={{ marginTop: 4 }}>{item?.answer}</Body>
+            <ScriptText text={item?.answer ?? ''} size={14} style={{ marginTop: 4 }} />
             <Spacer h={S.sm} />
             <Label style={{ color: C.ink2 }}>{t('session.markingPoints')}</Label>
             <View style={{ gap: 4, marginTop: 4 }}>
               {item?.points.map((p, n) => (
-                <Small key={n}>• {p}</Small>
+                <ScriptText key={n} text={`• ${p}`} size={13} color={C.ink2} />
               ))}
             </View>
           </Card>

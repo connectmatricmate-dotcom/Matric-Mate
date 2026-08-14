@@ -3,11 +3,13 @@ import { fbiseToppersFor, fbiseTopperSubjectIds, subjectById } from '@matricmate
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
 import { Btn, Card, Empty, Header, Row, Screen, Small, Spacer, Ur, useToast } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
+import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function TopperPapers() {
   const t = useT();
   const toast = useToast();
+  const { state } = useApp();
   const groups = fbiseTopperSubjectIds().map((subjectId) => ({
     subjectId,
     scripts: fbiseToppersFor(subjectId),
@@ -68,10 +70,11 @@ export default function TopperPapers() {
                     <Icon name={SUBJECT_ICON[subjectId] ?? 'book'} size={22} color={C.teal} />
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+                    {state.settings.language === 'ur' && subject.urduName ? (
+                      <Ur size={15.5}>{subject.urduName}</Ur>
+                    ) : (
                       <Text style={{ fontFamily: F.bodyBold, fontSize: 15.5, color: C.ink }}>{subject.name}</Text>
-                      {subject.urduName ? <Ur size={15} style={{ color: C.ink2 }}>{subject.urduName}</Ur> : null}
-                    </Row>
+                    )}
                     <Small>{t('session.toppersCount', { n: scripts.length })}</Small>
                   </View>
                 </Row>

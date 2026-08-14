@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, Label } from '@/components/ui/primitives';
+import { Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
@@ -143,7 +143,7 @@ export function ExamScreen() {
         <Work>
           {/* Same desktop framing as McqScreen: the paper the student writes on. */}
           <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
-          <h1 className="mb-4 font-display text-[19px] leading-[1.5] text-ink md:text-[22px]">{mcq.q}</h1>
+          <h1 className="mb-4"><ScriptText text={mcq.q} className="font-display text-[19px] leading-[1.5] text-ink md:text-[22px]" urduClassName="text-[18px] text-ink" /></h1>
 
           <div className="flex flex-col gap-2.5">
             {mcq.options.map((opt, n) => {
@@ -165,7 +165,7 @@ export function ExamScreen() {
                   >
                     {String.fromCharCode(65 + n)}
                   </span>
-                  <span className="min-w-0 flex-1 text-[14.5px] leading-[1.5] text-ink">{opt}</span>
+                  <span className="min-w-0 flex-1"><ScriptText text={opt} className="text-[14.5px] leading-[1.5] text-ink" urduClassName="text-[14px] text-ink" /></span>
                 </button>
               );
             })}

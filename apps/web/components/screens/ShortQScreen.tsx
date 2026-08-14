@@ -6,7 +6,7 @@ import type { AiCheckVerdict, ShortQ } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, Label, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
@@ -122,7 +122,7 @@ export function ShortQScreen({
       {/* Same task frame as the MCQ and exam screens */}
       <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
       <Card flat className="md:border-0 md:bg-transparent md:p-0">
-        <p className="font-display text-[17px] leading-[1.55] text-ink md:text-[20px]">{item.q}</p>
+        <ScriptText text={item.q} className="font-display text-[17px] leading-[1.55] text-ink md:text-[20px]" urduClassName="text-[16px] text-ink" />
       </Card>
 
       {!revealed ? (
@@ -163,7 +163,7 @@ export function ShortQScreen({
               className="mb-4"
             >
               <p className="font-display text-[19px] text-ink">{t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}</p>
-              <p className="mt-1.5 text-[14px] leading-[1.6] text-ink">{verdict.feedback}</p>
+              <div className="mt-1.5"><ScriptText text={verdict.feedback} className="text-[14px] leading-[1.6] text-ink" urduClassName="text-[13.5px] text-ink" /></div>
               {verdict.missed.length ? (
                 <div className="mt-3">
                   <Label className="text-orangedark">{t('tutor.checkMissed')}</Label>
@@ -180,7 +180,7 @@ export function ShortQScreen({
           ) : null}
           <Card flat tint="bg-greentint" border="border-green">
             <Label className="text-green">{t('session.modelAnswer')}</Label>
-            <p className="mt-1 text-[14.5px] leading-[1.6] text-ink">{item.answer}</p>
+            <div className="mt-1"><ScriptText text={item.answer} className="text-[14.5px] leading-[1.6] text-ink" urduClassName="text-[14px] text-ink" /></div>
             <div className="mt-3">
               <Label>{t('session.markingPoints')}</Label>
               <ul className="mt-1 flex flex-col gap-1">

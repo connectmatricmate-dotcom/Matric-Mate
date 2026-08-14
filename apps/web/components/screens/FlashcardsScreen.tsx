@@ -5,7 +5,7 @@ import type { Flashcard } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui/primitives';
+import { Card, Icon, LinkBtn, Pill, ScriptText, Ur } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 
@@ -97,14 +97,14 @@ export function FlashcardsScreen({
           {/* term */}
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-y-auto rounded-[22px] border-[1.5px] border-line bg-card p-6 [backface-visibility:hidden]">
             <span className="text-[11px] font-extrabold tracking-[0.08em] text-ink2">{t('session.cardTerm')}</span>
-            <span className="text-center font-display text-[23px] text-ink">{card.front}</span>
+            <ScriptText text={card.front} className="text-center font-display text-[23px] text-ink" urduClassName="text-center text-[20px] text-ink" />
             <span className="text-[13px] text-ink2">{t('session.tapToFlip')}</span>
           </span>
 
           {/* definition */}
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-y-auto rounded-[22px] bg-teal p-6 [backface-visibility:hidden] [transform:rotateY(180deg)]">
             <span className="text-[11px] font-extrabold tracking-[0.08em] text-white/70">{t('session.cardDefinition')}</span>
-            <span className="text-center text-[16px] leading-[1.6] text-white">{card.back}</span>
+            <ScriptText text={card.back} className="text-center text-[16px] leading-[1.6] text-white" urduClassName="text-center text-[15px] text-white" />
             {card.urduBack ? <Ur block className="block text-center text-[14px] text-white/85">{card.urduBack}</Ur> : null}
           </span>
         </span>

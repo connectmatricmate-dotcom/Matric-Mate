@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Body, Btn, Card, H3, Label, Pill, Row, Screen, Small, Spacer, Tap } from '../../src/components/ui';
+import { Body, Btn, Card, H3, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Tap } from '../../src/components/ui';
 import { SessionHeader } from '../../src/components/SessionHeader';
 import { XP , Confidence } from '@matricmate/core';
 import Animated from 'react-native-reanimated';
@@ -147,7 +147,7 @@ export default function McqScreen() {
       />
 
       <Spacer h={S.md} />
-      <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 27, color: C.ink }}>{mcq.q}</Text>
+      <ScriptText text={mcq.q} face="display" size={18} />
       <Spacer h={S.md} />
 
       {combo >= 3 ? (
@@ -201,7 +201,7 @@ export default function McqScreen() {
               <View style={{ width: 27, height: 27, borderRadius: 9, backgroundColor: keyBg, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: keyFg }}>{String.fromCharCode(65 + n)}</Text>
               </View>
-              <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14.5, lineHeight: 21, color: C.ink }}>{opt}</Text>
+              <ScriptText text={opt} size={14.5} style={{ flex: 1 }} />
               {checked && isAnswer ? <Icon name="check" size={19} color={C.green} strokeWidth={2.6} /> : null}
             </View>
           </Tap>
@@ -271,7 +271,7 @@ export default function McqScreen() {
 
           <Card style={{ marginTop: S.sm }}>
             <Label style={{ color: C.teal }}>{t('session.why')}</Label>
-            <Body style={{ marginTop: 4 }}>{mcq.explanation}</Body>
+            <ScriptText text={mcq.explanation} size={14} style={{ marginTop: 4 }} />
             <Spacer h={S.sm} />
             <Tap onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)} hit>
               <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.teal }}>{t('session.readInChapter')} →</Text>

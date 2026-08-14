@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react';
 import { type Confidence, type StringKey, XP } from '@matricmate/core';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, Label, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Label, Pill, ScriptText } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 import { NoSession } from './NoSession';
@@ -92,7 +92,7 @@ export function McqScreen() {
       {/* On a desktop the question earns a surface of its own; unframed, the
           same markup read as a phone screen stretched across empty paper. */}
       <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
-      <h1 className="mb-4 font-display text-[19px] leading-[1.5] text-ink md:text-[22px]">{mcq.q}</h1>
+      <h1 className="mb-4"><ScriptText text={mcq.q} className="font-display text-[19px] leading-[1.5] text-ink md:text-[22px]" urduClassName="text-[18px] text-ink" /></h1>
 
       <div className="flex flex-col gap-2.5">
         {mcq.options.map((opt, n) => {
@@ -124,7 +124,7 @@ export function McqScreen() {
               <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12.5px] font-extrabold ${key}`}>
                 {String.fromCharCode(65 + n)}
               </span>
-              <span className="min-w-0 flex-1 text-[14.5px] leading-[1.5] text-ink">{opt}</span>
+              <span className="min-w-0 flex-1"><ScriptText text={opt} className="text-[14.5px] leading-[1.5] text-ink" urduClassName="text-[14px] text-ink" /></span>
               {checked && isAnswer ? <Icon name="check" size={19} strokeWidth={2.6} className="shrink-0 text-green" /> : null}
             </button>
           );
@@ -194,7 +194,7 @@ export function McqScreen() {
 
           <Card>
             <Label className="text-teal">{t('session.why')}</Label>
-            <p className="mt-1 text-[14.5px] leading-[1.6] text-ink">{mcq.explanation}</p>
+            <div className="mt-1"><ScriptText text={mcq.explanation} className="text-[14.5px] leading-[1.6] text-ink" urduClassName="text-[14px] text-ink" /></div>
             <Link
               href={`/learn/reader/${mcq.chapterId}`}
               className="mt-3 inline-block text-[12.5px] font-extrabold text-teal hover:underline"

@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Btn, Card, ErrorState, Header, Pill, Row, Screen, Sheet, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
 import { LockedNotice } from '../../../src/components/LockedNotice';
-import { api , chapterPct, hasStudyMaterial, subjectPct } from '@matricmate/core';
+import { api , chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
@@ -91,10 +91,21 @@ export default function Chapters() {
                     )}
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    {c.urduTitle ? <Ur size={15}>{c.urduTitle}</Ur> : null}
-                    <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{c.title}</Text>
+                    {/* One language at a time: the app language picks the
+                        title, both never stack. */}
+                    {state.settings.language === 'ur' && c.urduTitle ? (
+                      <Ur size={15}>{c.urduTitle}</Ur>
+                    ) : (
+                      <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{c.title}</Text>
+                    )}
                     {empty ? (
-                      <Small>{c.blurb}</Small>
+                      // An Urdu blurb must go through the Urdu treatment; in
+                      // the Latin body font it degrades into glyph soup.
+                      isUrduScript(c.blurb) ? (
+                        <Ur size={12.5} style={{ color: C.ink2 }}>{c.blurb}</Ur>
+                      ) : (
+                        <Small>{c.blurb}</Small>
+                      )
                     ) : (
                       <Small numberOfLines={1}>
                         {/* Only what the row actually knows. audioMinutes is

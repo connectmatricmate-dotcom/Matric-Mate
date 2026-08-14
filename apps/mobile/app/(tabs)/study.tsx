@@ -115,10 +115,12 @@ export default function Study() {
                   <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={19} color={SUBJECT_COLORS[s.id]?.main ?? C.teal} strokeWidth={2.3} />
                 </Ring>
                 <View style={{ flex: 1, minWidth: 0 }}>
-                  <Row gap={6}>
+                  {/* One language at a time: the app language picks the name. */}
+                  {state.settings.language === 'ur' && s.urduName ? (
+                    <Ur size={15}>{s.urduName}</Ur>
+                  ) : (
                     <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{s.name}</Text>
-                    {s.urduName ? <Ur size={13} style={{ color: C.ink2 }}>{s.urduName}</Ur> : null}
-                  </Row>
+                  )}
                   <Small>
                     {t('study.chapterCount', { n: chapters.length })} · {t('study.percentComplete', { n: pct })}
                   </Small>

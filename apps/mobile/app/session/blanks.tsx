@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Btn, Card, Empty, ErrorState, Header, Row, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, Header, Row, Screen, ScriptText, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
-import { api, blankHalves, chaptersFor, fetchAiSession, normalizeAiBlanks } from '@matricmate/core';
+import { api, blankHalves, chaptersFor, fetchAiSession, isUrduScript, normalizeAiBlanks } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer, thud, tick } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, urdu } from '../../src/theme';
 
 export default function Blanks() {
   const { chapter, ai } = useLocalSearchParams<{ chapter?: string; ai?: string }>();
@@ -139,7 +139,15 @@ export default function Blanks() {
       <Spacer h={S.lg} />
 
       <Card>
-        <Text style={{ fontFamily: F.display, fontSize: 18, lineHeight: 34, color: C.ink }}>
+        <Text
+          style={
+            // Urdu sentences take the Urdu treatment; the nested pick Text
+            // inherits the face, so one switch covers the whole line.
+            isUrduScript(item?.sentence.join('') ?? '')
+              ? [urdu(17), { color: C.ink }]
+              : { fontFamily: F.display, fontSize: 18, lineHeight: 34, color: C.ink }
+          }
+        >
           {halves[0]}
           <Text
             style={{
@@ -189,7 +197,7 @@ export default function Blanks() {
                 borderColor: look.line,
               }}
             >
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 15.5, color: look.text }}>{o}</Text>
+              <ScriptText text={o} face="bodyBold" size={15.5} color={look.text} />
             </Tap>
           );
         })}

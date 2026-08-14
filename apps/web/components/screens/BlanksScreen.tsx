@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import type { Blank } from '@matricmate/core';
-import { blankHalves } from '@matricmate/core';
+import { blankHalves, isUrduScript } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Card, Icon, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 
@@ -88,7 +88,15 @@ export function BlanksScreen({
       {/* Same task frame as the MCQ and exam screens */}
       <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
       <Card className="md:border-0 md:bg-transparent md:p-0 md:shadow-none">
-        <p className="font-display text-[18px] leading-[1.9] text-ink md:text-[20px]">
+        <p
+          lang={isUrduScript(item.sentence.join('')) ? 'ur' : undefined}
+          dir={isUrduScript(item.sentence.join('')) ? 'rtl' : undefined}
+          className={
+            isUrduScript(item.sentence.join(''))
+              ? 'urdu text-[17px] text-ink'
+              : 'font-display text-[18px] leading-[1.9] text-ink md:text-[20px]'
+          }
+        >
           {blankHalves(item.sentence[0], item.sentence[1])[0]}
           <span
             className={`font-body font-extrabold underline ${
@@ -123,7 +131,7 @@ export function BlanksScreen({
               onClick={() => setPick(o)}
               className={`min-h-11 rounded-full px-4 py-2.5 text-[13px] font-extrabold transition-colors duration-200 disabled:cursor-default ${tone}`}
             >
-              {o}
+              <ScriptText text={o} className="" urduClassName="text-[13px]" />
             </button>
           );
         })}

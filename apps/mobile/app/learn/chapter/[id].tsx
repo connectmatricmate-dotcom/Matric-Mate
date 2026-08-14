@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Skeleton, Small, Spacer, useToast } from '../../../src/components/ui';
-import { api , chapterPct, hasStudyMaterial , pickAudioTrack, subjectById } from '@matricmate/core';
+import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
+import { api , chapterPct, hasStudyMaterial , isUrduScript, pickAudioTrack, subjectById } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack } from '../../../src/core/downloads';
 import { Confetti, Pop } from '../../../src/components/celebration';
 import { LockedNotice } from '../../../src/components/LockedNotice';
@@ -75,10 +75,18 @@ export default function ChapterHub() {
       <Screen>
         <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
         <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
-          <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
-          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
-            {chapter.blurb}
-          </Text>
+          {state.settings.language === 'ur' && chapter.urduTitle ? (
+            <Ur size={20} style={{ color: '#fff' }}>{chapter.urduTitle}</Ur>
+          ) : (
+            <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
+          )}
+          {isUrduScript(chapter.blurb) ? (
+            <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter.blurb}</Ur>
+          ) : (
+            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+              {chapter.blurb}
+            </Text>
+          )}
         </Card>
         <Spacer h={S.md} />
         <Card flat style={{ paddingVertical: 0 }}>
@@ -100,10 +108,18 @@ export default function ChapterHub() {
       <Screen>
         <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
         <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
-          <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
-          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
-            {chapter.blurb}
-          </Text>
+          {state.settings.language === 'ur' && chapter.urduTitle ? (
+            <Ur size={20} style={{ color: '#fff' }}>{chapter.urduTitle}</Ur>
+          ) : (
+            <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
+          )}
+          {isUrduScript(chapter.blurb) ? (
+            <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter.blurb}</Ur>
+          ) : (
+            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+              {chapter.blurb}
+            </Text>
+          )}
         </Card>
         <Spacer h={S.lg} />
         <Empty title={t('study.emptyChapterTitle')} sub={t('study.emptyChapterBody')} />
@@ -164,7 +180,11 @@ export default function ChapterHub() {
       />
 
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
-        <H2 style={{ color: '#fff' }}>{chapter?.title ?? ''}</H2>
+        {state.settings.language === 'ur' && chapter?.urduTitle ? (
+          <Ur size={20} style={{ color: '#fff' }}>{chapter.urduTitle}</Ur>
+        ) : (
+          <H2 style={{ color: '#fff' }}>{chapter?.title ?? ''}</H2>
+        )}
         {/* The board's own weighting, front and centre: it is the single most
             useful planning number a student can have. Hidden when the table
             of specification gave none, never shown as a zero. */}
@@ -175,9 +195,13 @@ export default function ChapterHub() {
               : t('study.examShare', { n: chapter.examShare })}
           </Text>
         ) : null}
-        <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
-          {chapter?.blurb}
-        </Text>
+        {isUrduScript(chapter?.blurb ?? '') ? (
+          <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter?.blurb}</Ur>
+        ) : (
+          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+            {chapter?.blurb}
+          </Text>
+        )}
         <Row gap={S.md} style={{ marginTop: S.md }}>
           <View style={{ flex: 1, height: 7, backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 99, overflow: 'hidden' }}>
             <View style={{ width: `${pct}%`, height: '100%', backgroundColor: C.orange, borderRadius: 99 }} />

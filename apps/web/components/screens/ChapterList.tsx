@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { Chapter, Subject } from '@matricmate/core';
-import { chapterPct, hasStudyMaterial, subjectPct } from '@matricmate/core';
+import { chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
 import { LockedNotice } from '@/components/app/LockedNotice';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { UpgradeRail, WeakRail } from '@/components/app/rails';
@@ -34,8 +34,8 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
       <PageHead
         back="/study"
         backLabel={t('study.title')}
-        title={subject.name}
-        urduTitle={subject.urduName ? <p className="mt-1"><Ur className="text-[15px] text-ink2">{subject.urduName}</Ur></p> : undefined}
+        title={state.settings.language === 'ur' && subject.urduName ? subject.urduName : subject.name}
+        titleUrdu={state.settings.language === 'ur' && !!subject.urduName}
         sub={`${t('study.chapterCount', { n: chapters.length })} · ${t('study.percentComplete', { n: pct })}`}
         actions={
           <LinkBtn
@@ -73,10 +73,17 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
                 {done ? <Icon name="check" size={19} strokeWidth={2.6} /> : c.number}
               </span>
               <span className="min-w-0 flex-1">
-                {c.urduTitle ? <Ur className="text-ink2">{c.urduTitle}</Ur> : null}
-                <span className="block text-[14px] font-extrabold text-ink">{c.title}</span>
+                {state.settings.language === 'ur' && c.urduTitle ? (
+                  <Ur block className="text-[14.5px] text-ink">{c.urduTitle}</Ur>
+                ) : (
+                  <span className="block text-[14px] font-extrabold text-ink">{c.title}</span>
+                )}
                 {empty ? (
-                  <span className="block text-[13px] text-ink2">{c.blurb}</span>
+                  isUrduScript(c.blurb) ? (
+                    <Ur block className="text-[13px] text-ink2">{c.blurb}</Ur>
+                  ) : (
+                    <span className="block text-[13px] text-ink2">{c.blurb}</span>
+                  )
                 ) : (
                   <span className="block truncate text-[13px] text-ink2">
                     {/* The share leads: it is the number the board itself
