@@ -3,7 +3,7 @@
 import type { Chapter, ChapterContent, PlayableTrack } from '@matricmate/core';
 import { chapterPct, hasStudyMaterial, isUrduScript, pickAudioTrack } from '@matricmate/core';
 import { Actions, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
-import { Card, Empty, Item, Label, LinkBtn, Ring, Ur } from '@/components/ui/primitives';
+import { Card, Empty, Item, Label, LinkBtn, Ring } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 export function ChapterHub({

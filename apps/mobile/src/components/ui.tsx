@@ -478,16 +478,11 @@ export function Btn({
     ghost: 'transparent',
     line: C.card,
   };
-  // Ink on the light fills, not white: white sits at 2.3:1 on this orange,
-  // about 2:1 on WhatsApp green and 3.4:1 on brand green, all short of the
-  // 4.5:1 floor and washed out in daylight. Ink reads at 5:1 or better on
-  // each. Same rule as the web button recipe.
-  const fg =
-    variant === 'ghost' || variant === 'line'
-      ? C.teal
-      : variant === 'orange' || variant === 'green' || variant === 'whatsapp'
-        ? C.ink
-        : '#fff';
+  // Every filled button carries a WHITE label, the client's explicit call
+  // after seeing ink on the orange ("all buttons with dark bg should have
+  // light label"). The extra-bold face is what keeps it legible on the
+  // brighter fills. Same rule as the web button recipe.
+  const fg = variant === 'ghost' || variant === 'line' ? C.teal : '#fff';
   return (
     <Tap onPress={onPress} disabled={disabled || loading} style={[{ opacity: disabled ? 0.45 : 1 }, style]}>
       <View

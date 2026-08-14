@@ -11,9 +11,9 @@ export type Tone = 'teal' | 'orange' | 'green' | 'red' | 'grey';
 
 const VARIANTS: Record<BtnVariant, string> = {
   primary: 'bg-teal text-white hover:bg-tealdark',
-  // Ink on orange, not white: white sat at 2.3:1 and washed out in daylight.
-  // Ink reads at 5:1 and both colours come straight from the logo.
-  orange: 'bg-orange text-ink hover:brightness-95',
+  // White on every filled button, the client's explicit call after seeing
+  // ink on the orange; the extra-bold face keeps it legible on bright fills.
+  orange: 'bg-orange text-white hover:brightness-95',
   green: 'bg-green text-white hover:brightness-95',
   danger: 'bg-red text-white hover:brightness-95',
   whatsapp: 'bg-whatsapp text-white hover:brightness-95',

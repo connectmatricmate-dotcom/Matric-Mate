@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Body, Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, chaptersFor, checkAnswerLive, fetchAiSession, normalizeAiShortQs } from '@matricmate/core';
 import type { AiCheckVerdict } from '@matricmate/core';
