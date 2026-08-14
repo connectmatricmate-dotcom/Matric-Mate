@@ -49,8 +49,12 @@ const flag = (n) => {
   return i === -1 ? null : args[i + 1];
 };
 const DRY = args.includes('--dry-run');
+/** Skip lessons that already have a published audio_tracks row. */
+const MISSING_ONLY = args.includes('--missing');
 const ONLY_CHAPTER = flag('chapter');
 const ONLY_SUBJECT = flag('subject');
+/** Parallel narrations. edge-tts tolerates a few at once; keep it modest. */
+const CONCURRENCY = Number(flag('concurrency')) || 1;
 
 const BUCKET = 'audio';
 
@@ -118,7 +122,7 @@ async function main() {
     process.exit(1);
   }
 
-  const jobs = files
+  let jobs = files
     .map((f) => {
       const m = f.match(/^(.+)-(en|ur)\.txt$/);
       return m ? { file: f, chapterId: m[1], medium: m[2] } : null;
@@ -127,6 +131,15 @@ async function main() {
     .filter((j) => (ONLY_CHAPTER ? j.chapterId === ONLY_CHAPTER : true))
     .filter((j) => (ONLY_SUBJECT ? j.chapterId.startsWith(`${ONLY_SUBJECT}-`) : true))
     .sort((a, b) => a.file.localeCompare(b.file));
+
+  if (MISSING_ONLY) {
+    // Regenerating an already-published lesson wastes an hour and re-uploads
+    // audio the client may have already approved; --missing narrates only
+    // what the app does not have yet.
+    const { data: rows } = await db.from('audio_tracks').select('chapter_id,medium');
+    const have = new Set((rows ?? []).map((r) => `${r.chapter_id}-${r.medium}`));
+    jobs = jobs.filter((j) => !have.has(`${j.chapterId}-${j.medium}`));
+  }
 
   if (!jobs.length) {
     console.error(C.red('nothing matched'));
@@ -152,25 +165,34 @@ async function main() {
   let done = 0;
   let skipped = 0;
 
-  for (const { file, chapterId, medium } of jobs) {
+  const processOne = async ({ file, chapterId, medium }) => {
     const text = (await readFile(resolve(SCRIPTS, file), 'utf8')).trim();
     const label = `${chapterId}/${medium}`;
+
+    /**
+     * The voice must match the language ON THE PAGE, not the app medium.
+     * The Urdu subject is written in Urdu for English-medium students too,
+     * exactly like real schools, and an American voice reading Urdu script
+     * is noise. Any script that is mostly Arabic-script gets the Urdu voice.
+     */
+    const urduChars = (text.match(/[؀-ۿ]/g) ?? []).length;
+    const voiceLang = urduChars > text.length * 0.2 ? 'ur' : 'en';
 
     if (text.length < 400) {
       console.log(`${C.red('  bad')} ${label.padEnd(14)} ${C.dim('script too short to be a lesson')}`);
       skipped++;
-      continue;
+      return;
     }
     const problems = unspeakable(text);
     if (problems.length) {
       console.log(`${C.red('  bad')} ${label.padEnd(14)} ${C.dim(problems.join('; '))}`);
       skipped++;
-      continue;
+      return;
     }
 
     if (DRY) {
-      console.log(`${C.dim('  --  ')} ${label.padEnd(14)} ${C.dim(`${text.length} chars, about ${estimateSeconds(text, medium)}s`)}`);
-      continue;
+      console.log(`${C.dim('  --  ')} ${label.padEnd(14)} ${C.dim(`${text.length} chars, about ${estimateSeconds(text, voiceLang)}s`)}`);
+      return;
     }
 
     const mp3 = resolve(WORK, `${chapterId}-${medium}.mp3`);
@@ -183,14 +205,14 @@ async function main() {
           'asyncio.run(edge_tts.Communicate(txt, sys.argv[2], rate=sys.argv[3]).save(sys.argv[4]))',
         ].join('\n'),
         resolve(SCRIPTS, file),
-        VOICE[medium],
+        VOICE[voiceLang],
         RATE,
         mp3,
       ]);
     } catch (e) {
       console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim(`tts: ${String(e.message).slice(0, 80)}`)}`);
       skipped++;
-      continue;
+      return;
     }
 
     const bytes = (await stat(mp3)).size;
@@ -200,7 +222,7 @@ async function main() {
       console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim(`only ${bytes} bytes, the service likely refused`)}`);
       await unlink(mp3).catch(() => {});
       skipped++;
-      continue;
+      return;
     }
 
     const path = `${chapterId}/${medium}.mp3`;
@@ -209,7 +231,7 @@ async function main() {
     if (upErr) {
       console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim(`upload: ${upErr.message}`)}`);
       skipped++;
-      continue;
+      return;
     }
 
     // Read the real duration out of the file rather than inferring it.
@@ -233,7 +255,7 @@ async function main() {
       console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim('could not read duration, refusing to guess')}`);
       await unlink(mp3).catch(() => {});
       skipped++;
-      continue;
+      return;
     }
 
     const { error: rowErr } = await db.from('audio_tracks').upsert(
@@ -252,7 +274,7 @@ async function main() {
     if (rowErr) {
       console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim(`row: ${rowErr.message}`)}`);
       skipped++;
-      continue;
+      return;
     }
 
     await unlink(mp3).catch(() => {});
@@ -261,7 +283,22 @@ async function main() {
     console.log(
       `${C.green('   ok')} ${label.padEnd(14)} ${C.dim(`${mins}m ${seconds % 60}s · ${(bytes / 1024).toFixed(0)} KB`)}`,
     );
-  }
+  };
+
+  let cursor = 0;
+  const worker = async () => {
+    for (;;) {
+      const job = jobs[cursor++];
+      if (!job) return;
+      try {
+        await processOne(job);
+      } catch (e) {
+        skipped++;
+        console.log(`${C.red(' fail')} ${job.chapterId}/${job.medium} ${C.dim(String(e.message).slice(0, 80))}`);
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: DRY ? 1 : CONCURRENCY }, worker));
 
   const elapsed = (Date.now() - started) / 1000;
   console.log(
