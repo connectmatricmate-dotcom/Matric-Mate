@@ -1,13 +1,13 @@
 {
   "subject": "math",
   "name": "Mathematics",
-  "grade": 9,
+  "grade": 10,
   "board": "fbise",
   "curriculum": "NCP 2022-23",
   "source": {
-    "document": "ModelPaper/2024New/maths/Final_Assessment_Framework_Model_Question_Paper_Mathematics_SSC-I.pdf",
-    "sha256": "b3d43c2b893dbcffec9394448f20e8cb8f040aa8825a245dc366175a4cc99729",
-    "retrieved": "2026-08-11"
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-II/Final Assessment Framework + Model Question Paper Mathematics SSC-II.pdf",
+    "sha256": "533f7804bfd2c3843e0956e98cab6f29e787eeeb1e7720edcc4445503ecb38d4",
+    "retrieved": "2026-08-14"
   },
   "stats": {
     "domains": 3,
@@ -763,7 +763,7 @@
         },
         {
           "code": "M-10-C-12",
-          "text": "Apply the Multiplication law of probability to solve problems involving independent and dependent events (trading, flipping a coin, such as 2 cards being drawn 1 by 1 with replacement and without replacement etc.) Total Federal Board SSC-II Examination Model Question Paper Mathematics (Curriculum 2022-23) ROLL NUMBER Section - A (Marks 15) ⓪ ② Section – A is compulsory. All parts of this section are to be answered on this page and handed over to the Centre Superintendent. Deleting/overwriting allowed. Do not use lead pencil. Candidate Sign. ________ Q1. Fill the relevant bubble against each question. Each part carries one mark. Sr Question no. If 3  3i  (m  2)i  3 , then i. the value of 𝑚 is: If  ,  are the roots of ii. of the product   is: What is the value of y, if iii. 8  If f  x   iv. the value of f ( x ) ? If x  5  3 , then the value v. of 𝑥 is: The discriminant of vi. x2  3x  4  0 is: A projectile is launched at an angle of 30 with an initial vii. horizontal component of its velocity? In triangle ABC if a  10 , viii. value of  is: To create a realistic rainbow effect, which type of the ix. curves is the most appropriate for arcs? Two circles having radii 4cm and 5cm respectively, touch x. between the centers of the circles is: The probability of getting two tails when two coins are xi. tossed is: Line of best fit is given by the xii. If a line is tangent to a circle at point P, what is the angle xiii. line and the radius drawn to point P? The simplified form of the expression xiv. 2 x2  2 x 2 x2  2 x  x 1 If 2 x  3 y  2 , then xv. Federal Board SSC-II Examination Model Question Paper Mathematics (Curriculum 2022-23) answers on the allotted/given spaces. SECTION – B (Marks 36) (9 × 4 = 36) Q.2 (2  3i ) Express i. ii. If T   3 3  a. Find T 1 b. Show that TT 1  I For an absolute function f  x  | x  2 | clean a large warehouse. Saqib can clean a. Construct table of values b. Plot the graph iii. Saqib leaves, and Aqib continuous cleaning alone. How long will it take Aqib to finish cleaning the warehouse after Saqib leaves? 2  5x 2  exponential function f  x   4x iv. Shade the solution region bounded by a pair of linear inequalities: x  y  50 ; x  y  10 ; x  0 ; y  0 v. after the translation. b. Verify if the same vector v can also translate point B to the point D (10,13). Justify your answer. Three points A, B and C in the plane are given by the position vectors:  OA   2, 1 , OB  5,  2 , OC  1,  3 vi. with O (0, 0) as reference point. a. Find AB and AC . b. Determine if A, B and C are collinear A balloon is floating at a height of 60 meters. From two points on the ground, 80 vii. of elevation to the balloon are 30 and 45 , respectively. Calculate the horizontal distance from the balloon to the closer point, when points lie on the opposite side of balloon. A magician takes out two cards from a deck of cards, one after the other, without viii. replacement. What is the probability of getting an ace of spade, and a card of heart, as the first and second card, respectively? In the adjoining figure, ABCD is a cyclic quadrilateral inscribed in a circle having ix. a  30, d  45 then find the values of 𝑏, 𝑐, 𝑒 and 𝑓. SECTION – C (Marks 24) (3 × 8 = 24) Q. No. Area of a rectangular park is 1500 square metres and perimeter is 160 Q.3 metres. Find the length and width of the park. Q.4 velocity of 150 m/s at an angle of 60 above the horizontal when it releases a package. Due to a wind blowing from east at 40 m/s, the trajectory of the package changes. a. Represent the drone’s initial velocity vector and the wind velocity vector in component OR form. b. Calculate the resultant velocity vector of the package at the moment of release. c. If the package is dropped from a height of 500 m, determine the horizontal displacement of the package before it hits the ground. Ignore air resistance. Solve f  x   2x  5 , and Q.5 g  x   2x2  1 graphically. Federal Board SSC-II Examination Mathematics Model Question Paper (Curriculum 2022-23) Alignment of Questions with Curriculum Student Learning Outcomes OBJECTIVE PART SECTION A Section: Q. No. Area (Part no.)",
+          "text": "Apply the Multiplication law of probability to solve problems involving independent and dependent events (trading, flipping a coin, such as 2 cards being drawn 1 by 1 with replacement and without replacement etc.) Total Federal Board SSC-II Examination",
           "cognitive": "application",
           "assessment": "summative"
         }

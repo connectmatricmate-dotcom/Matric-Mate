@@ -124,26 +124,44 @@ async function loadEnv() {
  * overloaded upstream, and a reply that is not valid JSON. Everything else is a
  * real error and is thrown, because retrying a bad request just spends money.
  */
-async function ask(env, { system, prompt, maxTokens = 8000, attempt = 1 }) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-    },
-    // Streamed, and not for the progress bar. A chapter's worth of notes can
-    // take longer than Node's five minute body timeout to produce, and a
-    // non-streamed request simply dies as "fetch failed" with nothing to
-    // diagnose. Streaming keeps bytes moving, so the clock never runs out.
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: maxTokens,
-      system,
-      stream: true,
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
+async function ask(env, { system, prompt, maxTokens = 8000, attempt = 1, netAttempt = 1 }) {
+  // A dropped connection (wifi blip, DNS hiccup) surfaces as a thrown
+  // "fetch failed", at the request or mid-stream. That is the network's
+  // fault, not the prompt's, so it gets its own patient retry: up to eight
+  // more tries with delays growing to a minute (about five minutes in all),
+  // enough to ride out a real outage instead of burning the whole job.
+  const retryNet = async (e) => {
+    if (netAttempt > 8) throw e;
+    await new Promise((r) => setTimeout(r, Math.min(60_000, 5000 * 2 ** (netAttempt - 1))));
+    return ask(env, { system, prompt, maxTokens, attempt, netAttempt: netAttempt + 1 });
+  };
+  const isNetError = (e) => /fetch failed|terminated|network|socket|ECONNRESET|ETIMEDOUT|EAI_AGAIN/i.test(String(e?.message ?? e));
+
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      // Streamed, and not for the progress bar. A chapter's worth of notes can
+      // take longer than Node's five minute body timeout to produce, and a
+      // non-streamed request simply dies as "fetch failed" with nothing to
+      // diagnose. Streaming keeps bytes moving, so the clock never runs out.
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: maxTokens,
+        system,
+        stream: true,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+  } catch (e) {
+    if (isNetError(e)) return retryNet(e);
+    throw e;
+  }
 
   if (res.status === 429 || res.status >= 500) {
     if (attempt > 4) throw new Error(`API ${res.status} after ${attempt} attempts`);
@@ -156,25 +174,32 @@ async function ask(env, { system, prompt, maxTokens = 8000, attempt = 1 }) {
   let stopReason = null;
   let buffer = '';
 
-  for await (const piece of res.body) {
-    buffer += Buffer.from(piece).toString('utf8');
-    // SSE frames are separated by a blank line. Keep the trailing partial
-    // frame in the buffer: a multi-byte character can straddle two chunks.
-    const frames = buffer.split('\n\n');
-    buffer = frames.pop() ?? '';
-    for (const frame of frames) {
-      const line = frame.split('\n').find((l) => l.startsWith('data:'));
-      if (!line) continue;
-      let event;
-      try {
-        event = JSON.parse(line.slice(5).trim());
-      } catch {
-        continue;
+  try {
+    for await (const piece of res.body) {
+      buffer += Buffer.from(piece).toString('utf8');
+      // SSE frames are separated by a blank line. Keep the trailing partial
+      // frame in the buffer: a multi-byte character can straddle two chunks.
+      const frames = buffer.split('\n\n');
+      buffer = frames.pop() ?? '';
+      for (const frame of frames) {
+        const line = frame.split('\n').find((l) => l.startsWith('data:'));
+        if (!line) continue;
+        let event;
+        try {
+          event = JSON.parse(line.slice(5).trim());
+        } catch {
+          continue;
+        }
+        if (event.type === 'content_block_delta' && event.delta?.text) text += event.delta.text;
+        if (event.type === 'message_delta' && event.delta?.stop_reason) stopReason = event.delta.stop_reason;
+        if (event.type === 'error') throw new Error(`stream error: ${event.error?.message ?? 'unknown'}`);
       }
-      if (event.type === 'content_block_delta' && event.delta?.text) text += event.delta.text;
-      if (event.type === 'message_delta' && event.delta?.stop_reason) stopReason = event.delta.stop_reason;
-      if (event.type === 'error') throw new Error(`stream error: ${event.error?.message ?? 'unknown'}`);
     }
+  } catch (e) {
+    // A stream cut off halfway is the same network failure wearing a
+    // different face; the partial text is useless, so start the call over.
+    if (isNetError(e)) return retryNet(e);
+    throw e;
   }
 
   // Truncation is the failure that reads as a parse error: the reply is
@@ -217,8 +242,10 @@ function mapByCode(spec, slos) {
   for (const ch of spec.chapters) {
     for (const rule of ch.slos) {
       const [domain, range] = rule.split(':');
+      // "A" claims the whole domain, "A:5-9" a run, "A:31" a single outcome
+      // (so a missing hi means hi = lo, not an open end).
       const [lo, hi] = range ? range.split('-').map(Number) : [null, null];
-      rules.push({ chapter: ch.number, domain, lo, hi });
+      rules.push({ chapter: ch.number, domain, lo, hi: hi ?? lo });
     }
   }
 
@@ -368,7 +395,7 @@ SCHEMA:
     {"kind":"formula","text":"...","caption":"..."},
     {"kind":"list","items":["..."]}, {"kind":"example","text":"..."}
 ], "slo_codes": ["..."] } ] }${mediumRule(medium)}`,
-    maxTokens: 24000,
+    maxTokens: 32000,
   });
 
   const questions = await ask(env, {
@@ -389,7 +416,9 @@ SCHEMA:
   "shortQs": [ { "marks":3, "q":"...", "answer":"...", "points":["..."], "slo_code":"..." } ],
   "blanks": [ { "before":"...", "after":"...", "answer":"...", "options":["a","b","c","d"], "slo_code":"..." } ]
 }${mediumRule(medium)}`,
-    maxTokens: 32000,
+    // Urdu runs longer per fact than English, and a 12-outcome chapter asks
+    // for the full 20 MCQs; 32k proved too tight for that combination.
+    maxTokens: 48000,
   });
 
   return { ...notes, ...questions };

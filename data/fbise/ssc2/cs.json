@@ -1,13 +1,13 @@
 {
   "subject": "cs",
   "name": "Computer Science",
-  "grade": 9,
+  "grade": 10,
   "board": "fbise",
   "curriculum": "NCP 2022-23",
   "source": {
-    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework Model Question Paper Computer Science SSC-I.pdf",
-    "sha256": "d68610990a4fd1332d547b5cb281e1238659515a9f0e622d0080d48502265728",
-    "retrieved": "2026-08-11"
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-II/Final Assessment Framework + Model Question Paper Computer Science SSC-II.pdf",
+    "sha256": "d94f724feff46dc3c336620d4c2bf7d6d89e2687c6e6c320d75116baeae028cc",
+    "retrieved": "2026-08-14"
   },
   "stats": {
     "domains": 7,

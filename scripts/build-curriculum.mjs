@@ -200,6 +200,23 @@ function dedupe(slos) {
 }
 
 /** Parse one subject's framework text into domains of learning outcomes. */
+/**
+ * Where the SLO table ends and the rest of the document begins: the model
+ * question paper, its Table of Specifications, or the shared IX-X lab-skills
+ * appendix (whose codes read P-09-10-N-01 and never match a single grade).
+ * Without this fence the document's LAST outcome absorbs every page after
+ * the table as "continuation text", thousands of characters of exam paper.
+ */
+const TABLE_END_RE = /Model (?:Question )?Paper|TABLE OF SPECIFICATION|ROLL NUMBER|Centre Superintendent|\[\s*SLO\s*:?\s*[A-Z]{1,2}-09-10-/i;
+
+/**
+ * Hand corrections where the layout defeats any parser, keyed by SLO code
+ * and applied after parsing: so far, a column heading absorbed mid-sentence.
+ */
+const TEXT_FIXES = {
+  'B-10-R-31': 'Enlist allergies with some common types.',
+};
+
 function parseFramework(text, subject) {
   const lines = text.split('\n');
   const titles = readDomainTitles(lines);
@@ -210,6 +227,11 @@ function parseFramework(text, subject) {
   for (const raw of lines) {
     const parts = cells(raw);
     if (!parts.length) continue;
+
+    if (TABLE_END_RE.test(raw)) {
+      current = null;
+      continue;
+    }
 
     // Does this line open a new outcome?
     const codeCell = parts.findIndex((c) => SLO_RE.test(c));
@@ -270,6 +292,8 @@ function parseFramework(text, subject) {
     current.cognitive ??= more.cognitive;
     current.text = clean(`${current.text} ${more.text}`);
   }
+
+  for (const s of slos) if (TEXT_FIXES[s.code]) s.text = TEXT_FIXES[s.code];
 
   // Group into domains, in the order the codes first appear.
   const byDomain = new Map();
@@ -504,13 +528,13 @@ async function main() {
     const doc = {
       subject: subject.id,
       name: subject.name,
-      grade: 9,
+      grade: Number(GRADE),
       board: 'fbise',
       curriculum: 'NCP 2022-23',
       source: {
-        document: byId[`framework-${subject.id}`]?.path ?? null,
-        sha256: byId[`framework-${subject.id}`]?.sha256 ?? null,
-        retrieved: '2026-08-11',
+        document: byId[`framework-${subject.id}${FILE_SUFFIX}`]?.path ?? null,
+        sha256: byId[`framework-${subject.id}${FILE_SUFFIX}`]?.sha256 ?? null,
+        retrieved: GRADE === '10' ? '2026-08-14' : '2026-08-11',
       },
       stats,
       notes: coverageNotes(stats),
@@ -545,7 +569,7 @@ async function main() {
   }
 
   if (!only) {
-    await writeFile(resolve(OUT, 'index.json'), `${JSON.stringify({ grade: 9, board: 'fbise', subjects: index }, null, 2)}\n`);
+    await writeFile(resolve(OUT, 'index.json'), `${JSON.stringify({ grade: Number(GRADE), board: 'fbise', subjects: index }, null, 2)}\n`);
     const total = index.reduce((n, s) => n + (s.slos ?? 0), 0);
     console.log(C.dim(`\n${total} learning outcomes across ${index.filter((s) => s.status === 'ok').length} subjects → data/fbise/`));
   }

@@ -1,13 +1,13 @@
 {
   "subject": "eng",
   "name": "English",
-  "grade": 9,
+  "grade": 10,
   "board": "fbise",
   "curriculum": "NCP 2022-23",
   "source": {
-    "document": "ModelPaper/2025/Assessment Frameworks/SSC-I/Final Assessment Framework + Model Question Paper English SSC-I.pdf",
-    "sha256": "288cd612b7aaaeedc89f47484814f9f1aecf306b0602efae8f5baa389159f7ef",
-    "retrieved": "2026-08-11"
+    "document": "ModelPaper/2025/Assessment Frameworks/SSC-II/Final Assessment Framework + Model Question Paper English SSC-II_compressed.pdf",
+    "sha256": "63ec6585d13e6d13d4a0e9d465266d360a5c1d033f0e9f5b12ec3c501ab608f3",
+    "retrieved": "2026-08-14"
   },
   "stats": {
     "domains": 4,
@@ -157,7 +157,7 @@
         },
         {
           "code": "E-10-D3-03",
-          "text": "Write informative/ explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization and analysis of the content.  Write informative/ explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization and Competency  Introduce a topic; organize complex Writing ideas, concepts, and information so that each new element builds on that which precedes it to create a unified whole; include formatting (e.g., headings), graphics (e.g., figures, tables), and multimedia when useful to aiding comprehension.  Develop the topic thoroughly by selecting the most significant and relevant facts, extended definitions, concrete details, quotations, or other information and examples appropriate  transitions and syntax to link the major sections of the text, create cohesion, and clarify the relationships among complex ideas and concepts.  specific vocabulary, and techniques such as metaphor, simile, and analogy to manage the complexity of the topic.  and objective tone while attending to the norms and conventions of the discipline in which they are writing.  section that follows from and supports explanation articulating implications or significance of the topic). TABLE OF SPECIFICATION OF THE MODEL PAPER ENGLISH (COMPULSORY) SSC-II NATIONAL CURRICULUM OF PAKISTAN (NCP) 2022-23 Thinking Q3. (B) i (2) Q3. (B) ii (2) Q2. i (6) Q3. (B) iii (2) Q4. (B) (4) Q4. (C) (4) Q2 iv (3) Total Marks      111 032 473 For more information, please visit www.fbise.edu.pk / Federal.BISE.Official",
+          "text": "Write informative/ explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization and analysis of the content.  Write informative/ explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization and Competency  Introduce a topic; organize complex Writing ideas, concepts, and information so that each new element builds on that which precedes it to create a unified whole; include formatting (e.g., headings), graphics (e.g., figures, tables), and multimedia when useful to aiding comprehension.  Develop the topic thoroughly by selecting the most significant and relevant facts, extended definitions, concrete details, quotations, or other information and examples appropriate  transitions and syntax to link the major sections of the text, create cohesion, and clarify the relationships among complex ideas and concepts.  specific vocabulary, and techniques such as metaphor, simile, and analogy to manage the complexity of the topic.  and objective tone while attending to the norms and conventions of the discipline in which they are writing.  section that follows from and supports explanation articulating implications or significance of the topic).",
           "cognitive": "knowledge",
           "assessment": null
         },
