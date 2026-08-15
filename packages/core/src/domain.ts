@@ -232,9 +232,13 @@ export const AI_QUOTA = { premium: 50, free: 0 };
  * Class 10 exists in the schema and the UI, but stays un-pickable until its
  * content has actually shipped. Switching class wipes progress and starts a
  * seven day cooldown, so offering an empty class would be a trap, not a
- * feature. Flip this when the SSC-II catalogue is published.
+ * feature.
+ *
+ * Flipped 15 Aug 2026: the full SSC-II catalogue is published, all 70
+ * chapters in both mediums (140 chapter-media, validated against the
+ * board's own outcome codes).
  */
-export const GRADE_10_READY = false;
+export const GRADE_10_READY = true;
 
 export const GRADES = [
   { grade: 9 as const, ready: true },
