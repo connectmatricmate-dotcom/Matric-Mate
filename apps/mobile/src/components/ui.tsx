@@ -22,7 +22,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
-import { C, F, R, S, T, WEB_MAX, isRTL, isWeb, rowDir, shadow, urdu } from '../theme';
+import { C, F, R, S, T, WEB_MAX, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
 import { isUrduScript } from '@matricmate/core';
 import { Icon, IconName } from './Icon';
 
@@ -657,7 +657,10 @@ export function Field({
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
           style={[
-            { flex: 1, fontFamily: F.body, fontSize: 15, color: C.ink, paddingVertical: 0 },
+            // What a student types reads the same way as everything else on
+            // screen, and an Urdu keyboard filling an input from the left is
+            // the first thing that gives away a half-mirrored app.
+            { flex: 1, fontFamily: F.body, fontSize: 15, color: C.ink, paddingVertical: 0, textAlign: textStart() },
             isWeb && ({ outlineStyle: 'none' } as object),
           ]}
         />

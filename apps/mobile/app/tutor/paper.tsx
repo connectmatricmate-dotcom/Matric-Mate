@@ -8,7 +8,7 @@ import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
-import { C, F, S, isWeb } from '../../src/theme';
+import { C, F, S, isWeb, textStart } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 /**
@@ -178,7 +178,8 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
               placeholderTextColor={C.ink3}
               multiline
               style={[
-                { fontFamily: F.body, fontSize: 14, lineHeight: 22, color: C.ink, minHeight: 80, textAlignVertical: 'top' },
+                // A written answer reads the way the rest of the screen reads.
+                { fontFamily: F.body, fontSize: 14, lineHeight: 22, color: C.ink, minHeight: 80, textAlignVertical: 'top', textAlign: textStart() },
                 isWeb && ({ outlineStyle: 'none' } as object),
               ]}
             />

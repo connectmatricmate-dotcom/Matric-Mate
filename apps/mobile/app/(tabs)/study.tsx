@@ -20,7 +20,7 @@ import { SUBJECT_COLORS, api, boardName, hasStudyMaterial, mediumName, subjectPc
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S, isWeb, rowDir } from '../../src/theme';
+import { C, F, S, isWeb, rowDir, textStart } from '../../src/theme';
 
 export default function Study() {
   const { state, derived } = useApp();
@@ -95,7 +95,7 @@ export default function Study() {
           placeholder={t('study.searchPlaceholder')}
           placeholderTextColor={C.ink3}
           style={[
-            { flex: 1, fontFamily: F.body, fontSize: 15, color: C.ink, paddingVertical: 0 },
+            { flex: 1, fontFamily: F.body, fontSize: 15, color: C.ink, paddingVertical: 0, textAlign: textStart() },
             isWeb && ({ outlineStyle: 'none' } as object),
           ]}
         />

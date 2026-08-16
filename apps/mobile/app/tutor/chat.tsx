@@ -11,7 +11,7 @@ import type { TutorImage, TutorQuota } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S, isWeb, urdu } from '../../src/theme';
+import { C, F, S, isWeb, textStart, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 /** "21:00" style local clock time out of the server's reset instant. */
@@ -423,7 +423,8 @@ export default function Chat() {
               onSubmitEditing={() => send(input)}
               returnKeyType="send"
               style={[
-                { fontFamily: F.body, fontSize: 14, color: C.ink, paddingVertical: 0 },
+                // The student's own question, typed in the script they read in.
+                { fontFamily: F.body, fontSize: 14, color: C.ink, paddingVertical: 0, textAlign: textStart() },
                 // Composed in the script being typed: an Urdu question reads
                 // right to left in Nastaliq as it is written, not after send.
                 isUrduScript(input) ? { ...urdu(14), paddingVertical: 0 } : null,
