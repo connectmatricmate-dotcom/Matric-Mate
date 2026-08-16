@@ -133,8 +133,14 @@ Everything else uses `minHeight`, which grows. So the fix is a handful of primit
 ### The website: mostly free, then a mechanical sweep
 
 Setting `dir="rtl"` on the page makes the browser do most of the work. Flexbox rows reverse, grid
-columns reverse, `text-align: start` follows, scrollbars move. The two-column shell in
-`components/app/Page.tsx` is a CSS grid, so the work column and the rail swap sides on their own.
+columns reverse, `text-align: start` follows, scrollbars move.
+
+That covers the thing the client asked about by name. The nav sidebar in
+`components/app/Shell.tsx:45` is a flex row with the `<aside>` first, so under `dir="rtl"` it moves
+to the right edge and the content slides left, with no code change. The two-column page shell in
+`components/app/Page.tsx:107` is a CSS grid, so the work column and the rail swap sides the same way.
+The sidebar's `border-r` and the header's `ml-auto` are the only two lines in that file that need
+touching, and the top bar's fixed `h-14` is a clipping candidate once its labels are Nastaliq.
 
 What does not follow automatically is anything written as a physical direction rather than a logical
 one. A count of the whole web app:
