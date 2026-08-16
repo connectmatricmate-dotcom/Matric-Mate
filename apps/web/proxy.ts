@@ -31,6 +31,8 @@ export const config = {
     '/account/:path*',
     '/notifications/:path*',
     '/checkout/:path*',
+    '/certificates/:path*',
+    '/onboarding/:path*',
     '/login',
     '/signup',
   ],

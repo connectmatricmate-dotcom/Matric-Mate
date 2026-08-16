@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /** Signed-in students only. Everything else is public or handles its own state. */
-const PROTECTED = ['/dashboard', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout'];
+const PROTECTED = ['/dashboard', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout', '/certificates', '/onboarding'];
 
 /** Already signed in? These two have nothing left to offer you. */
 const AUTH_ONLY = ['/login', '/signup'];

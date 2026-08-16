@@ -20,7 +20,14 @@ export default function ChooseSubjects() {
    * Arts subjects do.
    */
   const electives = useMemo(() => SUBJECTS.filter((s) => !s.compulsory), []);
-  const [picked, setPicked] = useState<string[]>(['phy', 'chem', 'bio']);
+  /**
+   * Seeded from what the student already picked. These screens double as the
+   * editors reached from the profile, and starting them at the science
+   * defaults meant opening the step and pressing Continue silently replaced
+   * an Arts student's real subject list.
+   */
+  const chosen = (state.onboarding?.subjects ?? []).filter((id) => !SUBJECTS.find((s) => s.id === id)?.compulsory);
+  const [picked, setPicked] = useState<string[]>(chosen.length ? chosen : ['phy', 'chem', 'bio']);
 
   const total = compulsory.length + picked.length;
   const enough = picked.length >= 2;

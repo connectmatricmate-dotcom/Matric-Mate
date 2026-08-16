@@ -122,6 +122,15 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
   // Urdu-medium students get the Urdu sections where the client has supplied them.
   const urduMedium = state.settings.contentMedium === 'ur';
   const sections = (urduMedium && content.sectionsUr) || content.sections;
+  /**
+   * Whether what we are about to render is actually Urdu.
+   *
+   * The note below used to fire on `!content.sectionsUr`, a field only the
+   * bundled sample chapter carries. Real Urdu notes arrive in `sections`,
+   * already filtered to the student's medium by the query, so the apology
+   * showed on every translated chapter in the database.
+   */
+  const sectionsAreUrdu = sections.some((s) => isUrduScript(s.title));
   const section = sections[idx];
   const scale = [0.92, 1, 1.12][state.settings.fontScale];
   const total = sections.length || 1;
@@ -193,7 +202,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
           <LockedNotice body={t('billing.lockedBody')} cta={t('states.unlock')} />
         ) : section ? (
           <>
-            {urduMedium && !content.sectionsUr ? (
+            {urduMedium && !sectionsAreUrdu ? (
               <Card flat tint="bg-tealtint" border="border-tealtint2" className="mb-4">
                 <p className="text-[13px] text-ink2">{t('reader.urduMediumNote')}</p>
               </Card>

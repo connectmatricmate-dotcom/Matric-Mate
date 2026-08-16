@@ -1,7 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { api, fetchAiSession } from '@matricmate/core';
-import type { PlayableTrack } from '@matricmate/core';
+import type { Medium, PlayableTrack } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -28,12 +28,34 @@ import { createClient } from '@/lib/supabase/server';
  */
 const client = cache(() => createClient());
 
+/**
+ * The signed-in student's study medium, read once per request.
+ *
+ * The content layer keeps the medium in module state, which is correct on a
+ * device where one student owns the process and wrong on a server where every
+ * request shares it. Nothing server-side ever set it, so it stayed 'en' and
+ * every Urdu-medium student was served English notes on the reader, the
+ * chapter hub and all three practice pages.
+ */
+const studentMedium = cache(async (): Promise<Medium> => {
+  const supabase = await client();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return 'en';
+  const { data } = await supabase.from('profiles').select('onboarding').eq('id', auth.user.id).maybeSingle();
+  const onboarding = data?.onboarding as { medium?: Medium } | null;
+  return onboarding?.medium === 'ur' ? 'ur' : 'en';
+});
+
 export const getChapter = cache(async (id: string) => api.getChapter(id, await client()));
-export const getChapterContent = cache(async (id: string) => api.getChapterContent(id, await client()));
+export const getChapterContent = cache(async (id: string) =>
+  api.getChapterContent(id, await client(), await studentMedium()),
+);
 export const getSubject = cache(async (id: string) => api.getSubject(id, await client()));
 export const getSubjects = cache(async (ids?: string[]) => api.getSubjects(ids, await client()));
 export const getChapters = cache(async (subjectId: string) => api.getChapters(subjectId, await client()));
-export const getFlashcards = cache(async (chapterId: string) => api.getFlashcards(chapterId, await client()));
+export const getFlashcards = cache(async (chapterId: string) =>
+  api.getFlashcards(chapterId, await client(), await studentMedium()),
+);
 /** An AI-generated set, read under the student's own cookie session (RLS). */
 export const getAiSession = cache(async (id: string) => fetchAiSession(id, await client()));
 

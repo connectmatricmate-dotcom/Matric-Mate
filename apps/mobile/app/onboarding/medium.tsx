@@ -10,9 +10,10 @@ import { useApp } from '../../src/store/app';
  * the content, not the interface. The app's own language is set separately.
  */
 export default function ChooseMedium() {
-  const { actions } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
-  const [value, setValue] = useState<Medium>('en');
+  // Opens on the medium they already study in, not always English.
+  const [value, setValue] = useState<Medium>(state.onboarding?.medium ?? 'en');
 
   return (
     <StepScreen

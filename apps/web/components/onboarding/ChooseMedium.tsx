@@ -11,10 +11,11 @@ import { useApp, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen } from './StepScreen';
 
 export function ChooseMedium() {
-  const { actions } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
   const router = useRouter();
-  const [value, setValue] = useState<Medium>('en');
+  // Opens on the medium they already study in, not always English.
+  const [value, setValue] = useState<Medium>(state.onboarding?.medium ?? 'en');
 
   return (
     <StepScreen

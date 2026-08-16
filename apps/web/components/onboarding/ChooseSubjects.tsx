@@ -10,11 +10,18 @@ import { useApp, useT } from '@/lib/store';
 import { StepScreen } from './StepScreen';
 
 export function ChooseSubjects() {
-  const { actions } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
   const router = useRouter();
   const toast = useToast();
-  const [picked, setPicked] = useState<string[]>(['phy', 'chem', 'bio']);
+  /**
+   * Seeded from what the student already picked. These screens double as the
+   * editors reached from the profile, and starting them at the science
+   * defaults meant opening the step and pressing Continue silently replaced
+   * an Arts student's real subject list.
+   */
+  const chosen = (state.onboarding?.subjects ?? []).filter((id: string) => !SUBJECTS.find((s) => s.id === id)?.compulsory);
+  const [picked, setPicked] = useState<string[]>(chosen.length ? chosen : ['phy', 'chem', 'bio']);
 
   const compulsory = useMemo(() => SUBJECTS.filter((s) => s.compulsory), []);
   /**

@@ -24,7 +24,7 @@ import {
 import type { ContentClient } from './db';
 import { askTutorLive, tutorConfigured } from './tutor';
 import type { TutorImage, TutorProfile, TutorQuota } from './tutor';
-import { AudioTrack, Chapter, ChapterContent, Flashcard, Mcq, Subject } from './types';
+import { AudioTrack, Chapter, ChapterContent, Flashcard, Mcq, Medium, Subject } from './types';
 
 /** Still needed by the two mocks below, which fake their own latency. */
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -48,8 +48,8 @@ export const api = {
 
   getChapter: (id: string, client?: ContentClient): Promise<Chapter | undefined> => fetchChapter(id, client),
 
-  getChapterContent: (chapterId: string, client?: ContentClient): Promise<ChapterContent> =>
-    fetchChapterContent(chapterId, client),
+  getChapterContent: (chapterId: string, client?: ContentClient, medium?: Medium): Promise<ChapterContent> =>
+    fetchChapterContent(chapterId, client, medium),
 
   /** Question set for a practice session or exam. */
   getMcqs: (
@@ -57,7 +57,8 @@ export const api = {
     client?: ContentClient,
   ): Promise<Mcq[]> => fetchMcqs(opts, client),
 
-  getFlashcards: (chapterId: string, client?: ContentClient): Promise<Flashcard[]> => fetchFlashcards(chapterId, client),
+  getFlashcards: (chapterId: string, client?: ContentClient, medium?: Medium): Promise<Flashcard[]> =>
+    fetchFlashcards(chapterId, client, medium),
   getAudioTracks: (chapterId: string, client?: ContentClient): Promise<AudioTrack[]> => fetchAudioTracks(chapterId, client),
 
   /* ----------------------------------------------------------------- auth */
@@ -75,14 +76,11 @@ export const api = {
 
   /* ------------------------------------------------------------- payments */
 
-  /** Mock Safepay checkout. In M4 this hits the real hosted checkout + webhook. */
-  async pay(input: { method: 'card' | 'jazzcash' | 'easypaisa'; amount: number }) {
-    await wait(1400);
-    return {
-      ref: `SP-${Math.floor(100000 + (input.amount % 7919) * 13 + input.method.length * 977)}`,
-      validTill: Date.now() + 30 * 864e5,
-    };
-  },
+  // A mock checkout used to live here: it invented a Safepay reference and
+  // handed back thirty days of premium after a fake wait. Nothing called it
+  // any more, and a function shaped like "grant this account a month" is not
+  // something to leave lying in a shared module. Real payments go through
+  // apps/web/lib/gateway and the Safepay webhook.
 
   /* ------------------------------------------------------------------- AI */
 

@@ -159,6 +159,12 @@ export default function Reader() {
   // Urdu-medium students get the Urdu sections where the client has supplied them.
   const urduMedium = state.settings.contentMedium === 'ur';
   const sections = (urduMedium && content?.sectionsUr) || content?.sections || [];
+  /**
+   * Whether what we are about to render is actually Urdu. The note below used
+   * to fire on a field only the bundled sample carries, so it apologised on
+   * every translated chapter in the database.
+   */
+  const sectionsAreUrdu = sections.some((s) => isUrduScript(s.title));
   const section = sections[idx];
   const scale = [0.92, 1, 1.12][state.settings.fontScale];
   const total = sections.length || 1;
@@ -256,7 +262,7 @@ export default function Reader() {
             <>
               <Label>{t('reader.section', { a: idx + 1, b: total })}</Label>
               <Spacer h={S.sm} />
-              {urduMedium && !content?.sectionsUr ? (
+              {urduMedium && !sectionsAreUrdu ? (
                 <Card flat tint={C.tealTint} style={{ marginBottom: S.md }}>
                   <Small>{t('reader.urduMediumNote')}</Small>
                 </Card>

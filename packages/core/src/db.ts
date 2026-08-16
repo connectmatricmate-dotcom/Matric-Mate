@@ -333,11 +333,33 @@ export async function primeAllContent(client?: ContentClient): Promise<void> {
   const at = client ?? db;
   if (!at) return;
   try {
+    // The counts come along, exactly as fetchChapters reads them. Without
+    // them toChapter defaults all three to zero, and because this runs
+    // unawaited at startup it could land after a good read and overwrite real
+    // counts with zeros. hasStudyMaterial then reports every chapter empty
+    // and the whole app tells a paying student there is nothing to study.
     const { data, error } = await table('chapters', at)
-      .select('id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes')
+      .select(
+        'id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+          'mcqs(count),flashcards(count),chapter_sections(count)',
+      )
+      .eq('mcqs.medium', medium)
+      .eq('flashcards.medium', medium)
+      .eq('chapter_sections.medium', medium)
       .order('number');
     if (error || !data) return;
-    const chapters = (data as ChapterRow[]).map((r) => toChapter(r));
+    type Counted = ChapterRow & {
+      mcqs: { count: number }[];
+      flashcards: { count: number }[];
+      chapter_sections: { count: number }[];
+    };
+    const chapters = (data as Counted[]).map((r) =>
+      toChapter(r, {
+        mcqs: r.mcqs?.[0]?.count ?? 0,
+        cards: r.flashcards?.[0]?.count ?? 0,
+        sections: r.chapter_sections?.[0]?.count ?? 0,
+      }),
+    );
     if (chapters.length) primeContent({ chapters });
   } catch {
     /* the bundle stays in place, which is a working answer */
@@ -420,6 +442,13 @@ export async function fetchChapter(id: string, client?: ContentClient): Promise<
 async function queryChapterContent(
   chapterId: string,
   at: ContentClient,
+  /**
+   * The medium to read in. Defaults to the module setting, which is right on
+   * a device where one student owns the process. A server must pass it: the
+   * module value is shared by every request there, so it is always 'en' and
+   * every Urdu student was served English notes on server-rendered pages.
+   */
+  want: Medium = medium,
 ): Promise<{ data: ChapterContent | null; error: unknown }> {
   /**
    * Rows in the student's medium, or the English ones when that medium has
@@ -428,7 +457,7 @@ async function queryChapterContent(
    */
   const pick = (rows: unknown): Row[] => {
     const all = (rows as Row[] | null) ?? [];
-    const wanted = all.filter((r) => r.medium === medium);
+    const wanted = all.filter((r) => r.medium === want);
     return wanted.length ? wanted : all.filter((r) => r.medium === 'en');
   };
 
@@ -493,18 +522,23 @@ async function queryChapterContent(
   };
 }
 
-export async function fetchChapterContent(chapterId: string, client?: ContentClient): Promise<ChapterContent> {
+export async function fetchChapterContent(
+  chapterId: string,
+  client?: ContentClient,
+  /** Server callers must pass the student's medium; see queryChapterContent. */
+  want: Medium = medium,
+): Promise<ChapterContent> {
   const at = client ?? db;
 
   return read<ChapterContent>(
     at,
-    `content:${chapterId}:${medium}`,
-    () => queryChapterContent(chapterId, at!),
+    `content:${chapterId}:${want}`,
+    () => queryChapterContent(chapterId, at!, want),
     // Cache (above, inside read) is this session's last good answer. Below
     // that: a chapter the student downloaded on purpose, real content even if
     // it may be a little stale, which is still a better answer than the
     // bundled sample. The bundle is the last resort, not the first fallback.
-    async () => (await localContent?.(chapterId, medium)) ?? contentFor(chapterId),
+    async () => (await localContent?.(chapterId, want)) ?? contentFor(chapterId),
   );
 }
 
@@ -573,15 +607,17 @@ export async function fetchMcqs(
     return mcqs.length ? mcqs : null;
   };
 
+  /**
+   * Offline means the chapters the student actually downloaded, and nothing
+   * else. The bundled sample questions used to backfill this pool, and every
+   * one of them was answered, scored and synced to Postgres as a real attempt
+   * against phy-3, so a slow connection quietly poisoned the student's weak
+   * topics with questions their syllabus never set. An empty pool is honest:
+   * the practice screens already say when a chapter has no questions.
+   */
   const fallbackPool = async (): Promise<Mcq[]> => {
     const local = await localPool();
-    if (local) return local.slice(0, opts.count);
-    const chapters = opts.chapterIds?.length
-      ? (opts.chapterIds.map(chapterById).filter(Boolean) as Chapter[])
-      : Object.values(CHAPTERS)
-          .flat()
-          .filter((c) => (opts.subjectId ? c.subjectId === opts.subjectId : true));
-    return chapters.flatMap((c) => contentFor(c.id).mcqs).slice(0, opts.count);
+    return local ? local.slice(0, opts.count) : [];
   };
 
   return read<Mcq[]>(
@@ -755,6 +791,10 @@ export async function fetchAudioTracks(chapterId: string, client?: ContentClient
   }
 }
 
-export async function fetchFlashcards(chapterId: string, client?: ContentClient): Promise<Flashcard[]> {
-  return (await fetchChapterContent(chapterId, client)).flashcards;
+export async function fetchFlashcards(
+  chapterId: string,
+  client?: ContentClient,
+  want: Medium = medium,
+): Promise<Flashcard[]> {
+  return (await fetchChapterContent(chapterId, client, want)).flashcards;
 }
