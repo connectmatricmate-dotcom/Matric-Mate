@@ -114,7 +114,7 @@ export function ResultScreen() {
           })}
         </div>
         <h1 className="mt-2 text-center font-display text-[23px] text-ink">
-          {good ? t('session.resultGood', { name: (state.user?.name ?? 'Student').split(' ')[0] }) : t('session.resultTry')}
+          {good ? t('session.resultGood', { name: (state.user?.name ?? t('common.student')).split(' ')[0] }) : t('session.resultTry')}
         </h1>
         <p className="text-center text-[13px] text-ink2">{s.label}</p>
       </div>

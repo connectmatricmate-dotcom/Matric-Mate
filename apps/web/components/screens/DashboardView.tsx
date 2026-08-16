@@ -23,7 +23,7 @@ export function DashboardView() {
   const t = useT();
   const { lang } = useLang();
   const now = useNow();
-  const firstName = (state.user?.name ?? 'Student').split(' ')[0];
+  const firstName = (state.user?.name ?? t('common.student')).split(' ')[0];
 
   /** Teacher verifications, the client's trust feature. The card only
    *  appears once real certificates exist; an empty promise would be

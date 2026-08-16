@@ -118,7 +118,7 @@ export default function Result() {
 
         <H2 style={{ marginTop: S.sm, textAlign: 'center' }}>
           {good
-            ? t('session.resultGood', { name: (state.user?.name ?? 'Student').split(' ')[0] })
+            ? t('session.resultGood', { name: (state.user?.name ?? t('common.student')).split(' ')[0] })
             : t('session.resultTry')}
         </H2>
         <Small style={{ textAlign: 'center' }}>{s.label}</Small>

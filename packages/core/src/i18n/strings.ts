@@ -29,6 +29,7 @@ export const en = {
     questions: 'questions',
     cards: 'cards',
     of: 'of',
+    student: 'Student',
   },
 
   lang: {
@@ -151,6 +152,9 @@ export const en = {
     lockedBody: 'This chapter opens with a plan, along with everything else in MatricMate.',
     expiredBody: 'Your plan has ended, so Premium chapters are locked.',
     manageNote: 'Subscriptions are managed on our website, {site}.',
+    planMonthly: 'Monthly',
+    planQuarter: '3 months',
+    planYear: 'Full year',
     statusFree: 'No plan yet',
     statusActive: 'Premium',
     statusExpired: 'Plan ended',
@@ -867,6 +871,7 @@ export const ur: typeof en = {
     questions: 'سوالات',
     cards: 'کارڈز',
     of: 'میں سے',
+    student: 'طالبِ علم',
   },
 
   /* Each language is named in its own script, the way every language picker
@@ -988,6 +993,9 @@ export const ur: typeof en = {
     lockedBody: 'یہ باب پلان کے ساتھ کھلتا ہے، MatricMate کی باقی ہر چیز کی طرح۔',
     expiredBody: 'آپ کا پلان ختم ہو گیا ہے، اس لیے پریمیم ابواب مقفل ہیں۔',
     manageNote: 'سبسکرپشن ہماری ویب سائٹ {site} پر منظم ہوتی ہے۔',
+    planMonthly: 'ماہانہ',
+    planQuarter: '3 مہینے',
+    planYear: 'پورا سال',
     statusFree: 'ابھی کوئی پلان نہیں',
     statusActive: 'پریمیم',
     statusExpired: 'پلان ختم',

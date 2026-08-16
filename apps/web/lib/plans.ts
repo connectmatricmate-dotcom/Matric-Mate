@@ -1,3 +1,4 @@
+import { type Language, translate } from '@matricmate/core';
 /**
  * What Premium costs. One product, three billing lengths, the longer ones exist
  * because Pakistani families budget by exam season, not by month.
@@ -59,6 +60,16 @@ export const PLANS: Plan[] = [
 ];
 
 export const planById = (id: string): Plan => PLANS.find((p) => p.id === id) ?? PLANS[0];
+
+/**
+ * The plan's name in the student's language. `plan.name` above is the English
+ * source; it gets spliced into translated sentences ("پریمیم · Monthly"), so
+ * anywhere a student reads it, it goes through here instead.
+ */
+export function planName(id: string, lang: Language): string {
+  const key = id === 'year' ? 'billing.planYear' : id === 'quarter' ? 'billing.planQuarter' : 'billing.planMonthly';
+  return translate(lang, key);
+}
 
 export const rupees = (n: number) => `Rs ${n.toLocaleString('en-PK')}`;
 

@@ -19,8 +19,8 @@ import { useState } from 'react';
 import { PayMark } from '@/components/commerce/PayMark';
 import { Btn, ErrorBanner } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
-import { useT } from '@/lib/store';
-import { INCLUDED, PAYMENT_METHODS, type Plan, rupees } from '@/lib/plans';
+import { useLang, useT } from '@/lib/store';
+import { INCLUDED, PAYMENT_METHODS, planName, rupees, type Plan } from '@/lib/plans';
 
 
 /**
@@ -46,6 +46,7 @@ export function CheckoutForm({
   accountEmail?: string | null;
 }) {
   const t = useT();
+  const { lang } = useLang();
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(
@@ -116,7 +117,7 @@ export function CheckoutForm({
         <Card flat className="md:sticky md:top-6">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">{t('checkout.yourPlan')}</p>
           <div className="mt-2 flex flex-wrap items-baseline gap-2">
-            <span className="font-display text-[24px] text-ink">{t('checkout.planTitle', { plan: plan.name })}</span>
+            <span className="font-display text-[24px] text-ink">{t('checkout.planTitle', { plan: planName(plan.id, lang) })}</span>
             {plan.saving ? <Pill tone="green">{plan.saving}</Pill> : null}
           </div>
 

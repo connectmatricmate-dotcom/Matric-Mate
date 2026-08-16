@@ -60,7 +60,7 @@ export default function Account() {
           <Row gap={S.md}>
             <AvatarBadge index={s.avatar ?? 0} size={56} />
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 16, color: C.ink }}>{state.user?.name ?? 'Student'}</Text>
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 16, color: C.ink }}>{state.user?.name ?? t('common.student')}</Text>
               <Small>
                 {t('account.classLine', {
                   class: classLevel,

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import type { Language } from '@matricmate/core';
 import { GRADE_10_READY, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
-import { planById } from '@/lib/plans';
+import { planName } from '@/lib/plans';
 import { APP_VERSION } from '@/lib/site';
 import { CardGrid, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, StreakRail } from '@/components/app/rails';
@@ -67,7 +67,7 @@ export function AccountView() {
           <Card className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <AvatarBadge index={s.avatar ?? 0} size={64} />
             <div className="min-w-0 flex-1">
-              <p className="font-display text-[20px] text-ink">{state.user?.name ?? 'Student'}</p>
+              <p className="font-display text-[20px] text-ink">{state.user?.name ?? t('common.student')}</p>
               <p className="text-[13.5px] text-ink2">
                 {t('account.classLine', {
                   class: setup?.classLevel ?? 9,
@@ -134,7 +134,7 @@ export function AccountView() {
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-extrabold text-ink">
                   {state.premium.active
-                    ? `${t('account.premiumActive')} · ${planById(state.premium.plan ?? 'monthly').name}`
+                    ? `${t('account.premiumActive')} · ${planName(state.premium.plan ?? 'monthly', lang)}`
                     : t('account.freeMode')}
                 </span>
                 <span className="block text-[13px] text-ink2">

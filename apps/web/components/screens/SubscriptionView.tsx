@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Item, LinkBtn, Pill, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
-import { planById, rupees } from '@/lib/plans';
+import { planById, planName, rupees } from '@/lib/plans';
 import { useApp, useLang, useT } from '@/lib/store';
 
 const PERKS: [IconName, StringKey][] = [
@@ -46,7 +46,7 @@ export function SubscriptionView() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-extrabold text-ink">
-            {active ? `${t('billing.statusActive')} · ${plan.name}` : t('billing.statusFree')}
+            {active ? `${t('billing.statusActive')} · ${planName(plan.id, lang)}` : t('billing.statusFree')}
           </p>
           <p className="text-[13px] text-ink2">
             {active && state.premium.validTill
@@ -98,7 +98,7 @@ export function SubscriptionView() {
         {active ? (
           <>
             <LinkBtn
-              title={t('billing.renewCta', { plan: plan.name, price: rupees(plan.price) })}
+              title={t('billing.renewCta', { plan: planName(plan.id, lang), price: rupees(plan.price) })}
               href={`/checkout?plan=${plan.id}`}
               variant="orange"
               icon="card"

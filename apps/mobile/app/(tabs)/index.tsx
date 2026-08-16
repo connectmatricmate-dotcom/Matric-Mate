@@ -42,7 +42,7 @@ export default function Dashboard() {
   const { state, derived, actions } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const firstName = (state.user?.name ?? 'Student').split(' ')[0];
+  const firstName = (state.user?.name ?? t('common.student')).split(' ')[0];
 
   /**
    * The clock, read once on mount rather than on every render.

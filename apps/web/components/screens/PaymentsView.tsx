@@ -5,7 +5,7 @@ import { Page, PageHead } from '@/components/app/Page';
 import { ItemButton } from '@/components/ui/controls';
 import { Card, Empty, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
-import { planById } from '@/lib/plans';
+import { planName } from '@/lib/plans';
 import { useLang, useT } from '@/lib/store';
 
 /**
@@ -64,7 +64,7 @@ export function PaymentsView({ rows, failed }: { rows: PaymentRow[]; failed?: bo
             <ItemButton
               key={r.id}
               title={t('account.receiptLine', { amount: (r.amount ?? 0).toLocaleString() })}
-              sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short', year: 'numeric' })} · ${planById(r.plan ?? 'monthly').name}`}
+              sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short', year: 'numeric' })} · ${planName(r.plan ?? 'monthly', lang)}`}
               icon="card"
               last={i === rows.length - 1}
               right={

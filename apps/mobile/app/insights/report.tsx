@@ -61,7 +61,7 @@ export default function Report() {
         </Row>
 
         <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink, marginTop: S.md }}>
-          {state.user?.name ?? 'Student'} ·{' '}
+          {state.user?.name ?? t('common.student')} ·{' '}
           {t('account.classLine', {
             class: state.onboarding?.classLevel ?? 9,
             board: boardName(state.onboarding?.board, lang),

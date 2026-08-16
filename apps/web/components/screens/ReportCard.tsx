@@ -54,7 +54,7 @@ export function ReportCard() {
         </div>
 
         <p className="mt-4 text-[15px] font-extrabold text-ink">
-          {state.user?.name ?? 'Student'} ·{' '}
+          {state.user?.name ?? t('common.student')} ·{' '}
           {t('account.classLine', {
             class: state.onboarding?.classLevel ?? 9,
             board: boardName(state.onboarding?.board, lang),
@@ -102,7 +102,7 @@ export function ReportCard() {
           className="flex-1"
           onClick={() => {
             const summary =
-              `${state.user?.name ?? 'Student'} · MatricMate report card, ${month}\n` +
+              `${state.user?.name ?? t('common.student')} · MatricMate report card, ${month}\n` +
               `Overall grade: ${grade(overallAcc)} · ${state.attempts.length} questions this month\n` +
               rows
                 .filter((r) => r.attempted)
