@@ -11,6 +11,7 @@ import { useApp, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 import { NoSession } from './NoSession';
 import { Page } from '@/components/app/Page';
+import { Markdown } from '@/components/ui/Markdown';
 
 const LEVELS: { value: Confidence; label: StringKey }[] = [
   { value: 0, label: 'session.conf0' },
@@ -194,7 +195,7 @@ export function McqScreen() {
 
           <Card>
             <Label className="text-teal">{t('session.why')}</Label>
-            <div className="mt-1"><ScriptText text={mcq.explanation} className="text-[14.5px] leading-[1.6] text-ink" urduClassName="text-[14px] text-ink" /></div>
+            <Markdown text={mcq.explanation} className="mt-1 text-[14.5px] leading-[1.6] text-ink" />
             <Link
               href={`/learn/reader/${mcq.chapterId}`}
               className="mt-3 inline-block text-[12.5px] font-extrabold text-teal hover:underline"
@@ -222,7 +223,9 @@ export function McqScreen() {
                   const prompt = wrong
                     ? `I answered "${mcq.options[chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
                     : mcq.q;
-                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}`);
+                  // The chapter rides along, so the tutor answers from the very notes
+                  // this question came from instead of from general memory.
+                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}&chapter=${mcq.chapterId}`);
                 })
               }
             />

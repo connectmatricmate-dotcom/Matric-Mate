@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: AI_MODEL,
       max_tokens: 6000,
-      output_config: { format: { type: 'json_schema', schema: LONG_SCHEMA } },
+      output_config: { effort: 'medium', format: { type: 'json_schema', schema: LONG_SCHEMA } },
       system:
         `You write Section C long questions for an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) board paper. Work ONLY from the chapter text provided. Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ` +
         (medium === 'ur'

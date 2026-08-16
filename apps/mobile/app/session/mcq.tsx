@@ -13,6 +13,7 @@ import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
+import { Markdown } from '../../src/components/Markdown';
 
 const LEVELS: { value: Confidence; label: StringKey }[] = [
   { value: 0, label: 'session.conf0' },
@@ -120,7 +121,9 @@ export default function McqScreen() {
                   const prompt = wrong
                     ? `I answered "${mcq.options[chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
                     : mcq.q;
-                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}`);
+                  // The chapter rides along, so the tutor answers from the very notes
+                  // this question came from instead of from general memory.
+                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}&chapter=${mcq.chapterId}`);
                 }}
               />
             </View>
@@ -271,7 +274,7 @@ export default function McqScreen() {
 
           <Card style={{ marginTop: S.sm }}>
             <Label style={{ color: C.teal }}>{t('session.why')}</Label>
-            <ScriptText text={mcq.explanation} size={14} style={{ marginTop: 4 }} />
+            <View style={{ marginTop: 4 }}><Markdown text={mcq.explanation} size={14} /></View>
             <Spacer h={S.sm} />
             <Tap onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)} hit>
               <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.teal }}>{t('session.readInChapter')} →</Text>

@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
 import { Page } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
+import { Markdown } from '@/components/ui/Markdown';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
 const isUrduText = (s: string) => /[؀-ۿ]/.test(s);
@@ -112,6 +113,9 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
+  /** The last question asked in the sheet, so "continue in chat" opens on it
+   *  instead of an empty thread that forgets what was being discussed. */
+  const [asked, setAsked] = useState<string | null>(null);
 
   const id = chapter.id;
   // Urdu-medium students get the Urdu sections where the client has supplied them.
@@ -130,6 +134,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
   }
 
   async function ask(prompt: string) {
+    setAsked(prompt);
     setAsking(true);
     setAnswer(null);
     // The server enforces quota and plan; the answer says why if it can't.
@@ -246,9 +251,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
           </Card>
         ) : answer ? (
           <Card flat className="mt-4">
-            <p className={`whitespace-pre-wrap text-[14.5px] leading-[1.65] text-ink ${answer.steps?.length ? 'font-extrabold' : ''}`}>
-              {answer.text}
-            </p>
+            <Markdown text={answer.text} className="text-[14.5px] leading-[1.65] text-ink" />
             <ol className="mt-2 flex flex-col gap-2">
               {answer.steps?.map((step, i) => (
                 <li key={i} className="flex items-start gap-2.5">
@@ -260,7 +263,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
               ))}
             </ol>
             <Link
-              href={`/tutor/chat?chapter=${id}`}
+              href={`/tutor/chat?chapter=${id}${asked ? `&q=${encodeURIComponent(asked)}` : ''}`}
               className="mt-4 inline-block text-[13px] font-extrabold text-teal hover:underline"
             >
               {t('reader.openChat')}

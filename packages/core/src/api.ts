@@ -98,7 +98,7 @@ export const api = {
    */
   async askTutor(
     question: string,
-    opts?: { context?: string; threadId?: string | null; profile?: TutorProfile; image?: TutorImage },
+    opts?: { context?: string; chapterId?: string; threadId?: string | null; profile?: TutorProfile; image?: TutorImage },
     /** Streaming: called with the answer-so-far while the tutor writes. */
     onDelta?: (textSoFar: string) => void,
   ): Promise<{
@@ -115,6 +115,7 @@ export const api = {
           message: question,
           threadId: opts?.threadId,
           context: opts?.context,
+          chapterId: opts?.chapterId,
           profile: opts?.profile,
           image: opts?.image,
         },

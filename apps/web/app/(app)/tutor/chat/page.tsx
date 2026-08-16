@@ -10,5 +10,12 @@ export default async function ChatPage({
   searchParams: Promise<{ q?: string; chapter?: string; thread?: string }>;
 }) {
   const { q, chapter, thread } = await searchParams;
-  return <ChatScreen initialQuestion={q} chapterLabel={chapter ? chapterById(chapter)?.title : undefined} threadId={thread} />;
+  return (
+    <ChatScreen
+      initialQuestion={q}
+      chapterId={chapter}
+      chapterLabel={chapter ? chapterById(chapter)?.title : undefined}
+      threadId={thread}
+    />
+  );
 }

@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { AI_QUOTA, SUBJECTS } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { chapterGrounding } from '@/lib/ai/guard';
 
 /**
  * The tutor, for real. One route serves both apps: the website calls it with
@@ -182,6 +183,9 @@ export async function POST(req: NextRequest) {
     message?: string;
     threadId?: string;
     context?: string;
+    /** Set when the question was asked from inside a chapter, so the answer
+     *  can be grounded in the very notes the student is reading. */
+    chapterId?: string;
     image?: { data?: string; mediaType?: string };
     profile?: { name?: string; medium?: string; language?: string; subjects?: string[]; weakTopics?: string[] };
   };
@@ -248,6 +252,22 @@ export async function POST(req: NextRequest) {
 
   const standing = await buildStandingContext(admin, grade);
 
+  /**
+   * When the student asks from a chapter (the Ask AI buttons on MCQs, short
+   * questions, blanks and the reader all pass its id), the tutor reads that
+   * chapter's own published notes before answering. Same wording as the
+   * screen they came from, instead of a generic recital of the topic.
+   * chapterGrounding rejects a chapter from the other class, so this cannot
+   * leak Class 9 material into a Class 10 answer.
+   */
+  const chapterId = (body.chapterId ?? '').slice(0, 40);
+  const grounding = chapterId
+    ? await chapterGrounding(admin, chapterId, profile.medium === 'ur' ? 'ur' : 'en', 12_000, grade)
+    : null;
+  const groundingBlock = grounding
+    ? `\n\nTHE CHAPTER THEY ARE STUDYING (${grounding.title}). Answer from this text where it applies, and use its wording and symbols so the answer matches their notes:\n${grounding.text}`
+    : '';
+
   const userContent: Anthropic.ContentBlockParam[] = [];
   if (image) userContent.push({ type: 'image', source: { type: 'base64', ...image } });
   userContent.push({ type: 'text', text: message || 'Solve or explain what is in this photo, step by step.' });
@@ -277,7 +297,7 @@ export async function POST(req: NextRequest) {
               // student block after it, so the big block caches across
               // every student.
               { type: 'text', text: personaFor(grade) + standing, cache_control: { type: 'ephemeral' } },
-              { type: 'text', text: studentBlock },
+              { type: 'text', text: studentBlock + groundingBlock },
             ],
             tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }],
             messages: turns,

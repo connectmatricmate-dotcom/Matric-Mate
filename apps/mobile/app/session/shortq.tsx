@@ -11,6 +11,7 @@ import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb } from '../../src/theme';
+import { Markdown } from '../../src/components/Markdown';
 
 type Mark = 'got' | 'partial' | 'missed';
 
@@ -209,7 +210,7 @@ export default function ShortQuestions() {
                 <Text style={{ fontFamily: F.display, fontSize: 19, color: C.ink }}>
                   {t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}
                 </Text>
-                <ScriptText text={verdict.feedback} size={14} style={{ marginTop: 6 }} />
+                <View style={{ marginTop: 6 }}><Markdown text={verdict.feedback} size={14} /></View>
                 {verdict.missed.length ? (
                   <>
                     <Spacer h={S.sm} />
@@ -227,7 +228,7 @@ export default function ShortQuestions() {
           ) : null}
           <Card flat tint={C.greenTint} border={C.green}>
             <Label style={{ color: C.green }}>{t('session.modelAnswer')}</Label>
-            <ScriptText text={item?.answer ?? ''} size={14} style={{ marginTop: 4 }} />
+            <View style={{ marginTop: 4 }}><Markdown text={item?.answer ?? ''} size={14} /></View>
             <Spacer h={S.sm} />
             <Label style={{ color: C.ink2 }}>{t('session.markingPoints')}</Label>
             <View style={{ gap: 4, marginTop: 4 }}>
@@ -242,7 +243,7 @@ export default function ShortQuestions() {
             title={t('session.askAi')}
             variant="line"
             sm
-            onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item?.q ?? ''}`)}`)}
+            onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item?.q ?? ''}`)}&chapter=${chapterId}`)}
           />
 
           <Spacer h={S.lg} />

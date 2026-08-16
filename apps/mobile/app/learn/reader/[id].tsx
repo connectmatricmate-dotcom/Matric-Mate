@@ -30,6 +30,7 @@ import { useT } from '../../../src/i18n';
 import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S, isWeb } from '../../../src/theme';
+import { Markdown } from '../../../src/components/Markdown';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
 const isUrduText = (s: string) => /[؀-ۿ]/.test(s);
@@ -142,6 +143,9 @@ export default function Reader() {
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
+  /** The last question asked in the sheet, so "continue in chat" opens on
+   *  it instead of an empty thread. */
+  const [asked, setAsked] = useState<string | null>(null);
   // True while this screen is mounted; ask() checks it before setState after
   // its await, because the student may have left mid-request.
   const aliveRef = useRef(true);
@@ -171,6 +175,7 @@ export default function Reader() {
   }
 
   async function ask(prompt: string) {
+    setAsked(prompt);
     setAsking(true);
     setAnswer(null);
     try {
@@ -339,7 +344,7 @@ export default function Reader() {
           </Card>
         ) : answer ? (
           <Card flat style={{ marginTop: S.md }}>
-            <Body style={{ fontFamily: answer.steps?.length ? F.bodyBold : F.body }}>{answer.text}</Body>
+            <Markdown text={answer.text} size={14} />
             {answer.steps?.map((step, i) => (
               <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                 <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
@@ -355,7 +360,7 @@ export default function Reader() {
               sm
               onPress={() => {
                 setAskOpen(false);
-                router.push(`/tutor/chat?chapter=${id}`);
+                router.push(`/tutor/chat?chapter=${id}${asked ? `&q=${encodeURIComponent(asked)}` : ''}`);
               }}
             />
           </Card>

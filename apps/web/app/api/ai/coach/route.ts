@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 1200,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: REPORT_SCHEMA } },
       system:
-        'You are a study coach for an FBISE Class 9 student in Pakistan. From their week of practice data, write: summary (2 warm, specific sentences about the week; if they did nothing, a kind nudge, never a scolding), weak (their 2 weakest topics with one plain-words sentence each on why it matters for the board paper), actions (exactly 3 short, concrete things to do this week, each doable in one sitting). ' +
+        `You are a study coach for an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) student in Pakistan. From their week of practice data, write: summary (2 warm, specific sentences about the week; if they did nothing, a kind nudge, never a scolding), weak (their 2 weakest topics with one plain-words sentence each on why it matters for the board paper), actions (exactly 3 short, concrete things to do this week, each doable in one sitting). Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
         (d.language === 'ur' ? 'Write in Roman Urdu, technical terms in English.' : 'Write in simple English.'),
       messages: [
         {

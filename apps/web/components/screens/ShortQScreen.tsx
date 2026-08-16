@@ -10,6 +10,7 @@ import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/pr
 import { useToast } from '@/components/ui/toast';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
+import { Markdown } from '@/components/ui/Markdown';
 
 type Mark = 'got' | 'partial' | 'missed';
 
@@ -163,7 +164,7 @@ export function ShortQScreen({
               className="mb-4"
             >
               <p className="font-display text-[19px] text-ink">{t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}</p>
-              <div className="mt-1.5"><ScriptText text={verdict.feedback} className="text-[14px] leading-[1.6] text-ink" urduClassName="text-[13.5px] text-ink" /></div>
+              <Markdown text={verdict.feedback} className="mt-1.5 text-[14px] leading-[1.6] text-ink" />
               {verdict.missed.length ? (
                 <div className="mt-3">
                   <Label className="text-orangedark">{t('tutor.checkMissed')}</Label>
@@ -180,7 +181,7 @@ export function ShortQScreen({
           ) : null}
           <Card flat tint="bg-greentint" border="border-green">
             <Label className="text-green">{t('session.modelAnswer')}</Label>
-            <div className="mt-1"><ScriptText text={item.answer} className="text-[14.5px] leading-[1.6] text-ink" urduClassName="text-[14px] text-ink" /></div>
+            <Markdown text={item.answer} className="mt-1 text-[14.5px] leading-[1.6] text-ink" />
             <div className="mt-3">
               <Label>{t('session.markingPoints')}</Label>
               <ul className="mt-1 flex flex-col gap-1">
@@ -198,7 +199,7 @@ export function ShortQScreen({
               title={t('session.askAi')}
               variant="line"
               sm
-              href={`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item.q}`)}`}
+              href={`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item.q}`)}&chapter=${chapterId}`}
             />
           </div>
 

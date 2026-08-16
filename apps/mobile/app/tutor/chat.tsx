@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
 import { Body, Card, IconButton, Pill, Row, Screen, Small, Tap, useToast } from '../../src/components/ui';
-import { api, chapterById, ChatMessage, fetchTutorQuota, weakTopics } from '@matricmate/core';
+import { ChatMessage, api, chapterById, fetchTutorQuota, isUrduScript, weakTopics } from '@matricmate/core';
 import type { TutorImage, TutorQuota } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb } from '../../src/theme';
+import { Markdown } from '../../src/components/Markdown';
 
 /** "21:00" style local clock time out of the server's reset instant. */
 const clock = (iso: string) =>
@@ -40,6 +42,8 @@ export default function Chat() {
    * row-level security, so the same chat shows up on the website too.
    */
   const [threadId, setThreadId] = useState<string | null>(thread ?? null);
+  /** Which answers the student rated, so the pill can show it back. */
+  const [feedback, setFeedback] = useState<Record<string, 'up' | 'down'>>({});
   const [contextLabel, setContextLabel] = useState<string | undefined>(
     chapter ? chapterById(chapter)?.title : undefined
   );
@@ -111,6 +115,7 @@ export default function Chat() {
       {
         threadId,
         context: contextLabel,
+        chapterId: chapter,
         image: image ? { data: image.data, mediaType: image.mediaType } : undefined,
         profile: {
           name: state.user?.name,
@@ -283,18 +288,9 @@ export default function Chat() {
                   borderBottomLeftRadius: 6,
                 }}
               >
-                {/* A real answer is paragraphs, not a headline: body weight.
-                    The bold treatment stays for the stepped mock shape. */}
-                <Text
-                  style={{
-                    fontFamily: m.steps?.length ? F.bodyBold : F.body,
-                    fontSize: 13.5,
-                    lineHeight: 21,
-                    color: C.ink,
-                  }}
-                >
-                  {m.text}
-                </Text>
+                {/* Markdown-aware: the model sometimes marks up its answer,
+                    and students should read headings and lists, not asterisks. */}
+                <Markdown text={m.text} size={13.5} />
                 {m.steps?.map((step, i) => (
                   <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                     <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
@@ -303,17 +299,61 @@ export default function Chat() {
                     <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, lineHeight: 22, color: C.ink }}>{step}</Text>
                   </Row>
                 ))}
-                <Row gap={S.sm} style={{ marginTop: S.md }}>
-                  <Pill tone="grey" onPress={() => toast(t('tutor.helpful'))}>
+                <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
+                  {/* Latching, like the website: a rating you cannot see you
+                      gave is a rating people give twice. */}
+                  <Pill
+                    tone={feedback[m.id] === 'up' ? 'teal' : 'grey'}
+                    onPress={() => {
+                      setFeedback((f) => ({ ...f, [m.id]: 'up' }));
+                      toast(t('tutor.helpful'));
+                    }}
+                  >
                     👍
                   </Pill>
-                  <Pill tone="grey" onPress={() => toast(t('tutor.notHelpful'))}>
+                  <Pill
+                    tone={feedback[m.id] === 'down' ? 'red' : 'grey'}
+                    onPress={() => {
+                      setFeedback((f) => ({ ...f, [m.id]: 'down' }));
+                      toast(t('tutor.notHelpful'));
+                    }}
+                  >
                     👎
                   </Pill>
-                  <Pill tone="teal" onPress={() => send(t('tutor.reExplainUrdu'))}>
-                    {t('tutor.inUrdu')}
+                  {/* Only when the answer is NOT already Urdu: asking for
+                      Urdu on an Urdu reply spends a question for nothing. */}
+                  {isUrduScript(m.text) ? null : (
+                    <Pill tone="teal" onPress={() => send(t('tutor.reExplainUrdu'))}>
+                      {t('tutor.inUrdu')}
+                    </Pill>
+                  )}
+                  <Pill
+                    tone="grey"
+                    onPress={() => {
+                      Clipboard.setStringAsync(m.text);
+                      toast(t('tutor.copied'));
+                    }}
+                  >
+                    {t('tutor.copyAnswer')}
                   </Pill>
                 </Row>
+                {/* Follow-ups on the newest answer only. One tap continues
+                    the thread the way students actually go next, and the
+                    chapter context rides along with it. */}
+                {m.id === messages[messages.length - 1]?.id && !thinking ? (
+                  <View style={{ marginTop: S.md, borderTopWidth: 1, borderTopColor: C.line, paddingTop: S.md, gap: S.sm }}>
+                    <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.7, color: C.ink3 }}>
+                      {t('tutor.askFollowUp').toUpperCase()}
+                    </Text>
+                    <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+                      {(['followUpSimpler', 'followUpExample', 'followUpExam'] as const).map((k) => (
+                        <Pill key={k} tone="grey" onPress={() => send(t(`tutor.${k}`))}>
+                          {t(`tutor.${k}`)}
+                        </Pill>
+                      ))}
+                    </Row>
+                  </View>
+                ) : null}
               </View>
             )
           )}
@@ -331,7 +371,7 @@ export default function Chat() {
                 borderBottomLeftRadius: 6,
               }}
             >
-              <Text style={{ fontFamily: F.body, fontSize: 13.5, lineHeight: 21, color: C.ink }}>{liveText}</Text>
+              <Markdown text={liveText} size={13.5} />
             </View>
           ) : thinking ? (
             <View style={{ alignSelf: 'flex-start', backgroundColor: C.card, borderWidth: 1, borderColor: C.line, padding: 14, borderRadius: 18 }}>

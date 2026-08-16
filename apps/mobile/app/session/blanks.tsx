@@ -222,7 +222,7 @@ export default function Blanks() {
                   router.push(
                     `/tutor/chat?q=${encodeURIComponent(
                       `Why does "${item.answer}" fit here: "${item.sentence[0]} ____ ${item.sentence[1]}"?`
-                    )}`
+                    )}&chapter=${chapterId}`
                   )
                 }
               />

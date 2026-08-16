@@ -5,6 +5,7 @@ import { chapterById, fetchCheatSheet } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Card, Skeleton } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
+import { Markdown } from '@/components/ui/Markdown';
 
 /**
  * The AI revision sheet: one page per chapter, definitions, formulas,
@@ -52,7 +53,7 @@ export function SheetScreen({ chapterId }: { chapterId: string }) {
       ) : (
         <>
           <Card flat>
-            <pre className="whitespace-pre-wrap font-[inherit] text-[14px] leading-[1.7] text-ink">{sheet}</pre>
+            <Markdown text={sheet ?? ''} className="text-[14px] leading-[1.7] text-ink" />
           </Card>
           <p className="mt-3 text-center text-[12px] text-ink3">
             {t('tutor.aiMade')} · {t('tutor.disclaimer')}

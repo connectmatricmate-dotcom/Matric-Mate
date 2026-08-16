@@ -5,6 +5,7 @@ import { useAsync } from '../core/useAsync';
 import { useT } from '../i18n';
 import { useApp } from '../store/app';
 import { C, F } from '../theme';
+import { Markdown } from './Markdown';
 
 /**
  * The weekly AI coach on the dashboard: two sentences about the week, the
@@ -36,7 +37,7 @@ export function CoachCard() {
   return (
     <Card flat tint={C.tealTint} border={C.teal} style={{ gap: 8 }}>
       <Label style={{ color: C.teal }}>{t('tutor.coachTitle')}</Label>
-      <Text style={{ fontFamily: F.body, fontSize: 13.5, lineHeight: 21, color: C.ink }}>{data.summary}</Text>
+      <Markdown text={data.summary} size={13.5} />
       {data.weak.slice(0, 2).map((w) => (
         <View key={w.topic}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>{w.topic}</Text>
@@ -47,7 +48,8 @@ export function CoachCard() {
       <View style={{ gap: 4 }}>
         {data.actions.slice(0, 3).map((a, i) => (
           <Small key={i}>
-            {i + 1}. {a}
+            {/* The list supplies the number; strip one the model wrote. */}
+            {i + 1}. {a.replace(/^\s*\d{1,2}[.)]\s*/, '')}
           </Small>
         ))}
       </View>

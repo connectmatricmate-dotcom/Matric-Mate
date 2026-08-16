@@ -154,7 +154,7 @@ export function BlanksScreen({
               title={t('session.askAi')}
               variant="line"
               sm
-              href={`/tutor/chat?q=${encodeURIComponent(`Why does "${item.answer}" fit here: "${item.sentence[0]} ____ ${item.sentence[1]}"?`)}`}
+              href={`/tutor/chat?q=${encodeURIComponent(`Why does "${item.answer}" fit here: "${item.sentence[0]} ____ ${item.sentence[1]}"?`)}&chapter=${chapterId}`}
             />
           ) : null}
         </Card>

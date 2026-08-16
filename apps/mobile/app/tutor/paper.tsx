@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Body, Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, ShortQ } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
@@ -9,6 +9,7 @@ import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S, isWeb } from '../../src/theme';
+import { Markdown } from '../../src/components/Markdown';
 
 /**
  * The board mock paper. Without an id: pick a subject and have one set.
@@ -197,13 +198,13 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
               <Text style={{ fontFamily: F.display, fontSize: 17, color: C.ink }}>
                 {t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}
               </Text>
-              <Body style={{ marginTop: 4 }}>{verdict.feedback}</Body>
+              <View style={{ marginTop: 4 }}><Markdown text={verdict.feedback} size={13.5} /></View>
             </Card>
           ) : null}
           {revealed ? (
             <Card flat tint={C.greenTint} border={C.green}>
               <Label style={{ color: C.green }}>{t('session.modelAnswer')}</Label>
-              <Body style={{ marginTop: 4 }}>{q.answer}</Body>
+              <View style={{ marginTop: 4 }}><Markdown text={q.answer} size={14} /></View>
               {q.points.length ? (
                 <>
                   <Spacer h={S.sm} />

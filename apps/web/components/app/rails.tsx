@@ -11,6 +11,7 @@ import type { CoachReport } from '@matricmate/core';
 import { Bar, Card, Icon, Label, Pill, Ring } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
+import { Markdown } from '@/components/ui/Markdown';
 
 /**
  * The Pakka-meter, promoted out of a sub-page.
@@ -265,7 +266,7 @@ export function CoachRail() {
   return (
     <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
       <Label className="text-teal">{t('tutor.coachTitle')}</Label>
-      <p className="text-[13px] leading-[1.6] text-ink">{report.summary}</p>
+      <Markdown text={report.summary} className="text-[13px] leading-[1.6] text-ink" />
       {report.weak.slice(0, 2).map((w) => (
         <div key={w.topic}>
           <p className="text-[13px] font-extrabold text-ink">{w.topic}</p>
@@ -276,7 +277,9 @@ export function CoachRail() {
       <ol className="flex flex-col gap-1">
         {report.actions.slice(0, 3).map((a, i) => (
           <li key={i} className="text-[12.5px] leading-[1.5] text-ink2">
-            {i + 1}. {a}
+            {/* The list supplies the number. Strip one the model wrote, or
+                a student reads "1. 1. Revise circular motion". */}
+            {i + 1}. {a.replace(/^\s*\d{1,2}[.)]\s*/, '')}
           </li>
         ))}
       </ol>

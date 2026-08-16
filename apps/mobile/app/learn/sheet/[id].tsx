@@ -1,11 +1,12 @@
-import { Text } from 'react-native';
+
 import { useLocalSearchParams } from 'expo-router';
 import { Card, ErrorState, Header, Screen, Skeleton, Small, Spacer } from '../../../src/components/ui';
 import { chapterById, fetchCheatSheet } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
-import { C, F, S } from '../../../src/theme';
+import { S } from '../../../src/theme';
+import { Markdown } from '../../../src/components/Markdown';
 
 /**
  * The AI revision sheet: one page per chapter, definitions, formulas,
@@ -42,7 +43,7 @@ export default function RevisionSheet() {
       ) : (
         <>
           <Card flat>
-            <Text style={{ fontFamily: F.body, fontSize: 13.5, lineHeight: 22, color: C.ink }}>{sheet.data}</Text>
+            <Markdown text={sheet.data} size={13.5} />
           </Card>
           <Spacer h={S.md} />
           <Small style={{ textAlign: 'center' }}>{t('tutor.aiMade')} · {t('tutor.disclaimer')}</Small>

@@ -8,6 +8,7 @@ import { Card, Icon, Label, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { session } from '@/lib/session';
 import { NoSession } from './NoSession';
+import { Markdown } from '@/components/ui/Markdown';
 
 type Filter = 'all' | 'wrong' | 'flagged';
 
@@ -94,7 +95,7 @@ export function ReviewScreen() {
                 {isOpen ? (
                   <div className="mt-3">
                     <Label className="text-teal">{t('session.why')}</Label>
-                    <p className="mt-0.5 text-[13.5px] leading-[1.6] text-ink">{mcq.explanation}</p>
+                    <Markdown text={mcq.explanation} className="mt-0.5 text-[13.5px] leading-[1.6] text-ink" />
                     <div className="mt-3 flex flex-wrap gap-2">
                       <LinkBtn
                         title={t('session.askAi')}
@@ -102,7 +103,7 @@ export function ReviewScreen() {
                           a?.chosen != null && a.chosen !== mcq.answer
                             ? `I answered "${mcq.options[a.chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
                             : mcq.q,
-                        )}`}
+                        )}&chapter=${mcq.chapterId}`}
                         variant="line"
                         sm
                       />

@@ -73,6 +73,9 @@ export async function askTutorLive(
     message: string;
     threadId?: string | null;
     context?: string;
+    /** The chapter the question came from. The server reads that chapter's
+     *  own notes so the answer matches what the student is looking at. */
+    chapterId?: string;
     profile?: TutorProfile;
     image?: TutorImage;
   },
@@ -89,6 +92,7 @@ export async function askTutorLive(
         message: input.message,
         threadId: input.threadId ?? undefined,
         context: input.context,
+        chapterId: input.chapterId,
         profile: input.profile,
         image: input.image ? { data: input.image.data, mediaType: input.image.mediaType } : undefined,
       }),

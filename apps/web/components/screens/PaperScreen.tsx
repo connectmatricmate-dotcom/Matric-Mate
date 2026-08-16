@@ -10,6 +10,7 @@ import { Card, Label, Pill, SectionTitle, Skeleton } from '@/components/ui/primi
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
 import { useApp, useT } from '@/lib/store';
+import { Markdown } from '@/components/ui/Markdown';
 
 /**
  * The board mock paper. Without an id: pick a subject and have one set.
@@ -225,13 +226,13 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
               border={verdict.score >= verdict.maxMarks ? 'border-green' : 'border-orange'}
             >
               <p className="font-display text-[17px] text-ink">{t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}</p>
-              <p className="mt-1 text-[13.5px] leading-[1.6] text-ink">{verdict.feedback}</p>
+              <Markdown text={verdict.feedback} className="mt-1 text-[13.5px] leading-[1.6] text-ink" />
             </Card>
           ) : null}
           {revealed ? (
             <Card flat tint="bg-greentint" border="border-green">
               <Label className="text-green">{t('session.modelAnswer')}</Label>
-              <p className="mt-1 text-[14px] leading-[1.6] text-ink">{q.answer}</p>
+              <Markdown text={q.answer} className="mt-1 text-[14px] leading-[1.6] text-ink" />
               {q.points.length ? (
                 <ul className="mt-2 flex flex-col gap-1">
                   {q.points.map((p, i) => (

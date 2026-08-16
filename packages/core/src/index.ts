@@ -8,6 +8,7 @@
 export * from './types';
 export * from './avatars';
 export * from './glyphs';
+export * from './markdown';
 export * from './tutor';
 export * from './ai';
 export * from './content';

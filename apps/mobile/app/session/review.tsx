@@ -5,6 +5,7 @@ import { Body, Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer } from
 import { useT } from '../../src/i18n';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
+import { Markdown } from '../../src/components/Markdown';
 
 type Filter = 'all' | 'wrong' | 'flagged';
 
@@ -91,7 +92,7 @@ export default function Review() {
                   <>
                     <Spacer h={S.sm} />
                     <Label style={{ color: C.teal }}>{t('session.why')}</Label>
-                    <Body style={{ fontSize: 13.5, marginTop: 2 }}>{mcq.explanation}</Body>
+                    <View style={{ marginTop: 2 }}><Markdown text={mcq.explanation} size={13.5} /></View>
                     <Spacer h={S.sm} />
                     <Row gap={S.sm}>
                       <Btn
@@ -103,7 +104,7 @@ export default function Review() {
                             a?.chosen != null && a.chosen !== mcq.answer
                               ? `I answered "${mcq.options[a.chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
                               : mcq.q;
-                          router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}`);
+                          router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}&chapter=${mcq.chapterId}`);
                         }}
                       />
                       <Btn

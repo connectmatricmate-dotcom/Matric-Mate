@@ -2,20 +2,25 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { type ChatMessage, type TutorImage, api, weakTopics } from '@matricmate/core';
+import { api, isUrduScript, type ChatMessage, type TutorImage, weakTopics } from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
+import { Markdown } from '@/components/ui/Markdown';
 import { useApp, useT } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 import { quotaClock, useTutorQuota } from '@/lib/use-tutor-quota';
 
 export function ChatScreen({
   initialQuestion,
+  chapterId,
   chapterLabel,
   threadId: threadParam,
 }: {
   initialQuestion?: string;
+  /** Set when the question came from a chapter: the tutor then answers
+   *  from that chapter's own notes rather than from memory. */
+  chapterId?: string;
   chapterLabel?: string;
   threadId?: string;
 }) {
@@ -102,6 +107,7 @@ export function ChatScreen({
       {
         threadId,
         context: contextLabel,
+        chapterId,
         image: image ? { data: image.data, mediaType: image.mediaType } : undefined,
         profile: {
           name: state.user?.name,
@@ -238,13 +244,9 @@ export function ChatScreen({
               key={m.id}
               className="max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-card p-4"
             >
-              {/* A real answer is paragraphs, not a headline: body weight.
-                  The bold treatment stays for the stepped mock shape. */}
-              <p
-                className={`whitespace-pre-wrap text-[13.5px] leading-[1.65] text-ink ${m.steps?.length ? 'font-extrabold' : ''}`}
-              >
-                {m.text}
-              </p>
+              {/* Markdown-aware: the model sometimes marks up its answer,
+                  and students should read headings and lists, not asterisks. */}
+              <Markdown text={m.text} className="text-[13.5px] leading-[1.65] text-ink" />
               {m.steps?.length ? (
                 <ol className="mt-2 flex flex-col gap-2">
                   {m.steps.map((step, i) => (
@@ -286,17 +288,49 @@ export function ChatScreen({
                 >
                   <Icon name="thumbsDown" size={16} strokeWidth={2.2} />
                 </button>
-                <PillButton tone="teal" className="min-h-10" onClick={() => send(t('tutor.reExplainUrdu'))}>
-                  {t('tutor.inUrdu')}
-                </PillButton>
+                {/* Only offered when the answer is NOT already in Urdu:
+                    asking for Urdu on an Urdu reply spends a question to
+                    get the same thing back. */}
+                {isUrduScript(m.text) ? null : (
+                  <PillButton tone="teal" className="min-h-10" onClick={() => send(t('tutor.reExplainUrdu'))}>
+                    {t('tutor.inUrdu')}
+                  </PillButton>
+                )}
+                {/* Copy the answer: students paste these into their notes. */}
+                <button
+                  type="button"
+                  aria-label={t('tutor.copyAnswer')}
+                  onClick={() => {
+                    void navigator.clipboard?.writeText(m.text);
+                    toast(t('tutor.copied'));
+                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-grey text-ink2 transition-colors duration-200 hover:text-ink"
+                >
+                  <Icon name="doc" size={16} strokeWidth={2.2} />
+                </button>
               </div>
+              {/* Follow-ups on the newest answer only. One tap continues the
+                  thread in the direction students actually go next, and the
+                  chapter context rides along with it. */}
+              {m.id === messages[messages.length - 1]?.id && !thinking ? (
+                <div className="mt-3 flex flex-wrap gap-2 border-t border-line pt-3">
+                  <span className="w-full text-[11px] font-extrabold uppercase tracking-[0.07em] text-ink3">
+                    {t('tutor.askFollowUp')}
+                  </span>
+                  {(['followUpSimpler', 'followUpExample', 'followUpExam'] as const).map((k) => (
+                    <PillButton key={k} tone="grey" className="min-h-9" onClick={() => send(t(`tutor.${k}`))}>
+                      {t(`tutor.${k}`)}
+                    </PillButton>
+                  ))}
+                </div>
+              ) : null}
             </div>
           )
         )}
 
         {thinking && liveText ? (
           <div className="max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-card p-4">
-            <p className="whitespace-pre-wrap text-[13.5px] leading-[1.65] text-ink">{liveText}</p>
+            <Markdown text={liveText} className="text-[13.5px] leading-[1.65] text-ink" />
           </div>
         ) : thinking ? (
           <div

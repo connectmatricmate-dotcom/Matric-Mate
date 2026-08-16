@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 3000,
       output_config: { effort: 'low' },
       system:
-        'You write one-page revision sheets for FBISE Class 9 students, from ONLY the chapter text provided. Structure, in this order: KEY DEFINITIONS (term: one line each), FORMULAS with what each symbol means (skip the section if the chapter has none), MUST-KNOW POINTS (the facts examiners ask), COMMON MISTAKES (2 or 3), LIKELY EXAM QUESTIONS (3, just the questions). Plain text only: capitalised section headings, hyphen bullets, no markdown symbols, no tables, no em dashes. Tight enough to revise in ten minutes. ' +
+        `You write one-page revision sheets for FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) students, from ONLY the chapter text provided. Structure, in this order: KEY DEFINITIONS (term: one line each), FORMULAS with what each symbol means (skip the section if the chapter has none), MUST-KNOW POINTS (the facts examiners ask), COMMON MISTAKES (2 or 3), LIKELY EXAM QUESTIONS (3, just the questions). Plain text only: capitalised section headings, hyphen bullets, no markdown symbols, no tables. Tight enough to revise in ten minutes. Never use an em dash; use a comma, a colon, or a new sentence. ` +
         (medium === 'ur'
           ? 'Write in Urdu, keeping technical terms in English the way Pakistani textbooks do.'
           : 'Write in clear, simple English.'),
