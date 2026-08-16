@@ -41,7 +41,7 @@ export const en = {
 
   welcome: {
     slide1Title: 'Everything in one app',
-    slide1Body: 'Chapter-wise notes, audio lessons and examples for FBISE Class 9.',
+    slide1Body: 'Chapter-wise notes, audio lessons and examples for FBISE Class 9 and Class 10.',
     slide2Title: 'Practice until it sticks',
     slide2Body: 'MCQs, flashcards, past papers and timed tests, with instant explanations.',
     slide3Title: 'Your AI tutor, any time',
@@ -58,7 +58,7 @@ export const en = {
     class10: 'Class 10',
     class10Sub: 'Matric part two',
     comingSoon: 'Coming soon',
-    class10Toast: 'Class 10 comes after the Class 9 launch.',
+    class10Toast: 'Class 10 is not open yet. It arrives with its own catalogue.',
 
     boardTitle: 'Which board?',
     boardSub: 'Syllabus and past papers follow your board',
@@ -873,7 +873,7 @@ export const ur: typeof en = {
 
   welcome: {
     slide1Title: 'Sab kuch aik app mein',
-    slide1Body: 'FBISE Class 9 ke har chapter ke notes, audio lessons aur examples.',
+    slide1Body: 'FBISE Class 9 aur Class 10 ke har chapter ke notes, audio lessons aur examples.',
     slide2Title: 'Itni practice ke pakka yaad ho jaye',
     slide2Body: 'MCQs, flashcards, past papers aur timed tests, foran explanation ke saath.',
     slide3Title: 'Aap ka AI tutor, har waqt',
@@ -890,7 +890,7 @@ export const ur: typeof en = {
     class10: 'Class 10',
     class10Sub: 'Matric part two',
     comingSoon: 'Jald aa raha hai',
-    class10Toast: 'Pehle Class 9 aa rahi hai, Class 10 iske foran baad.',
+    class10Toast: 'Class 10 abhi khuli nahi. Apne poore catalogue ke saath aayegi.',
 
     boardTitle: 'Aap ka board kaunsa hai?',
     boardSub: 'Syllabus aur past papers aap ke board ke mutabiq hon ge',

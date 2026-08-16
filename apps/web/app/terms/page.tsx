@@ -12,7 +12,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'What MatricMate is',
     paragraphs: [
-      'MatricMate is exam-preparation software for FBISE Class 9. It gives you notes, audio lessons, practice questions, past papers and an AI tutor. It is a study aid. It does not set, mark or influence any board examination, and it is not affiliated with the Federal Board of Intermediate and Secondary Education.',
+      'MatricMate is exam-preparation software for FBISE Class 9 and Class 10. It gives you notes, audio lessons, practice questions, past papers and an AI tutor. It is a study aid. It does not set, mark or influence any board examination, and it is not affiliated with the Federal Board of Intermediate and Secondary Education.',
       'Study content follows the FBISE syllabus and model papers. Payments are processed by Safepay, a Pakistani payment gateway, which handles cards and mobile wallets on our behalf.',
     ],
   },
