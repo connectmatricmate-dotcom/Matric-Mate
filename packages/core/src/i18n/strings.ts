@@ -69,12 +69,12 @@ export const en = {
     punjabSub: 'BISE Lahore, Rawalpindi and others',
 
     mediumTitle: 'Which medium do you study in?',
-    mediumSub: 'Your notes and questions come in this language',
+    mediumSub: 'Your notes, questions and the app all use this language',
     mediumEn: 'English medium',
-    mediumEnSub: 'Notes and questions in English',
+    mediumEnSub: 'Notes, questions and the app in English',
     mediumUr: 'Urdu medium',
-    mediumUrSub: 'Notes and questions in Urdu',
-    mediumFootnote: 'This is about your textbooks, not the app. You can change it later in Settings.',
+    mediumUrSub: 'Notes, questions and the app in Urdu',
+    mediumFootnote: 'One choice for your study material and the app together. You can change it later in Settings.',
 
     subjectsTitle: 'Pick your subjects',
     subjectsSub: 'Compulsory ones are already added',
@@ -902,12 +902,12 @@ export const ur: typeof en = {
     punjabSub: 'BISE Lahore, Rawalpindi aur deegar',
 
     mediumTitle: 'Aap kis medium mein parhte hain?',
-    mediumSub: 'Notes aur sawal isi zaban mein aayein ge',
+    mediumSub: 'Notes, sawal aur app, sab isi zaban mein',
     mediumEn: 'English medium',
-    mediumEnSub: 'Notes aur sawal English mein',
+    mediumEnSub: 'Notes, sawal aur app English mein',
     mediumUr: 'Urdu medium',
-    mediumUrSub: 'Notes aur sawal Urdu mein',
-    mediumFootnote: 'Yeh aap ki school books ki zaban hai, app ki nahi. Baad mein Settings se badal sakte hain.',
+    mediumUrSub: 'Notes, sawal aur app Urdu mein',
+    mediumFootnote: 'Ek hi choice study material aur app dono ke liye. Baad mein Settings se badal sakte hain.',
 
     subjectsTitle: 'Apne subjects chunein',
     subjectsSub: 'Compulsory subjects pehle se shamil hain',
