@@ -3,8 +3,27 @@
 Research for the client's request: when Urdu is the app language, the app should be written in real
 Urdu, in Nastaliq, and laid out right to left. Written 16 Aug 2026, after the language merge landed.
 
-Nothing in here is built yet. It is a survey of what exists, what is missing, and what each piece
-costs, so the work can be approved in stages instead of all at once.
+**All four stages shipped the same day, 16 Aug 2026.** The survey below is kept as written, because
+the measurements in it are what the decisions were made on and they are worth being able to check.
+What was built:
+
+| | Stage | Shipped as |
+| :-- | :-- | :-- |
+| A | The AI prompts | `apps/web/lib/ai/language.ts`, used by all six AI routes |
+| B | 727 interface strings | `packages/core/src/i18n/strings.ts` |
+| C | 7 subject and 135 chapter names | `packages/core/src/i18n/names-ur.ts` + `scripts/backfill-urdu-names.mjs` |
+| D | Right-to-left layout | `apps/mobile/src/theme.ts` (`isRTL`, `rowDir`, `textStart`), `apps/web/components/app/Localized.tsx` |
+
+Two judgement calls made during the build that the survey did not anticipate:
+
+- **Direction is scoped to the four translated surfaces, not the document.** The landing page,
+  pricing, terms and refunds are written in English in the source and never go through the
+  dictionary, so a document-level `dir="rtl"` would have laid English prose out backwards. That is
+  what `<Localized>` exists for.
+- **The language had to become readable on the server**, through a cookie, and the store's server
+  snapshot had to be seeded from it. Without that the words were English on the first paint and
+  rewrote themselves on hydration, which is a worse flash than the one the direction fix removed.
+  The Android equivalent is holding the splash until AsyncStorage reports back.
 
 ---
 
