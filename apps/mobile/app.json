@@ -2,7 +2,7 @@
   "expo": {
     "name": "MatricMate",
     "slug": "matricmate",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "scheme": "matricmate",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
