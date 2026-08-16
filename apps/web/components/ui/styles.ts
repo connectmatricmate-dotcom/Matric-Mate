@@ -72,7 +72,7 @@ export function pillClasses(tone: Tone = 'teal', interactive = false, className 
 
 export function itemClasses(interactive: boolean, last?: boolean) {
   return [
-    'flex w-full items-center gap-3 py-3.5 text-left',
+    'flex w-full items-center gap-3 py-3.5 text-start',
     last ? '' : 'border-b border-line',
     interactive ? 'cursor-pointer transition-colors duration-200 hover:bg-paper' : '',
   ].join(' ');

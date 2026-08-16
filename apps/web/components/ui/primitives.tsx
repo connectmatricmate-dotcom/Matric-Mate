@@ -88,6 +88,9 @@ import type { BtnVariant } from './styles';
 
 /* ------------------------------------------------------------------ icon */
 
+/** Glyphs that mean "forward" or "back" and must flip with the reading order. */
+const DIRECTIONAL = new Set<IconName>(['chevron', 'back', 'arrowRight']);
+
 export function Icon({
   name,
   size = 20,
@@ -108,6 +111,13 @@ export function Icon({
     <Glyph
       size={size}
       strokeWidth={strokeWidth}
+      /**
+       * An arrow is a direction, not a decoration. In a right-to-left page a
+       * chevron pointing right points back the way the student came, so the
+       * directional glyphs are mirrored by one CSS rule keyed on this marker
+       * rather than by a conditional at each of the dozen call sites.
+       */
+      data-dir={DIRECTIONAL.has(name) ? '' : undefined}
       className={className}
       aria-hidden={label ? undefined : true}
       aria-label={label}

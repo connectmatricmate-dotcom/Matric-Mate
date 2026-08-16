@@ -2,7 +2,21 @@ import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
-import { Card, Empty, Item, Pill, Ring, Row, Screen, SectionTitle, Small, Spacer, TileGrid, Tiny } from '../../src/components/ui';
+import {
+  Card,
+  Chevron,
+  Empty,
+  Item,
+  Pill,
+  Ring,
+  Row,
+  Screen,
+  SectionTitle,
+  Small,
+  Spacer,
+  TileGrid,
+  Tiny,
+} from '../../src/components/ui';
 import { BILLING_SITE, fetchTutorQuota } from '@matricmate/core';
 import type { TutorQuota } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
@@ -10,7 +24,7 @@ import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, rowDir } from '../../src/theme';
 
 const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: string }[] = [
   { label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark', prompt: '' },
@@ -100,28 +114,28 @@ export default function Tutor() {
       <Card
         onPress={() => router.push('/tutor/ai-test')}
         border={C.orange}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: S.md }}
+        style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.md }}
       >
         <Icon name="spark" color={C.orangeDark} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('tutor.makeTest')}</Text>
           <Small>{t('tutor.makeTestSub')}</Small>
         </View>
-        <Icon name="chevron" size={18} color={C.ink3} />
+        <Chevron size={18} color={C.ink3} />
       </Card>
 
       <Spacer h={S.sm} />
       <Card
         onPress={() => router.push('/tutor/paper')}
         border={C.teal}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: S.md }}
+        style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.md }}
       >
         <Icon name="doc" color={C.teal} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('tutor.paperTitle')}</Text>
           <Small>{t('tutor.paperSub')}</Small>
         </View>
-        <Icon name="chevron" size={18} color={C.ink3} />
+        <Chevron size={18} color={C.ink3} />
       </Card>
 
       {/* Two different states wearing one face. A free account never had a

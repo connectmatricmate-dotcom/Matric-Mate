@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { Language } from '@matricmate/core';
-import { GRADE_10_READY, levelProgress, xpToNextLevel } from '@matricmate/core';
+import { GRADE_10_READY, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
 import { planById } from '@/lib/plans';
 import { APP_VERSION } from '@/lib/site';
@@ -14,7 +14,7 @@ import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
 import { useToast } from '@/components/ui/toast';
 import { Bar, Card, Icon, Item, Label, LinkBtn, Pill } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 /** A titled group of rows, so a toggle never floats away from its label. */
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
@@ -40,6 +40,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 export function AccountView() {
   const { state, actions, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [confirmOut, setConfirmOut] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
@@ -70,8 +71,8 @@ export function AccountView() {
               <p className="text-[13.5px] text-ink2">
                 {t('account.classLine', {
                   class: setup?.classLevel ?? 9,
-                  board: setup?.board === 'punjab' ? 'Punjab Board' : 'FBISE',
-                  medium: setup?.medium === 'ur' ? 'Urdu' : 'English',
+                  board: boardName(setup?.board, lang),
+                  medium: mediumName(setup?.medium, lang),
                 })}
               </p>
               <p className="truncate text-[13.5px] text-ink2">{state.user?.contact}</p>
@@ -139,7 +140,7 @@ export function AccountView() {
                 <span className="block text-[13px] text-ink2">
                   {state.premium.active && state.premium.validTill
                     ? t('account.premiumTill', {
-                        date: new Date(state.premium.validTill).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+                        date: formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short' }),
                       })
                     : t('account.freeModeSub')}
                 </span>

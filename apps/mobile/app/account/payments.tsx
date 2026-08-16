@@ -1,8 +1,9 @@
+import { formatDate } from '@matricmate/core';
 import * as Clipboard from 'expo-clipboard';
 import { Card, Empty, ErrorState, Header, Item, Pill, Screen, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { useAsync } from '../../src/core/useAsync';
 import { supabase } from '../../src/lib/supabase';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { S } from '../../src/theme';
 import { View } from 'react-native';
@@ -22,6 +23,7 @@ type Receipt = { id: string; at: string; amount: number; plan: string | null; re
 export default function Payments() {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
 
   const userId = state.user?.id ?? null;
@@ -61,7 +63,7 @@ export default function Payments() {
               // two-second toast: gone before anyone could write it down, and
               // invisible to anyone who never thought to tap a receipt.
               sub={[
-                `${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · Rs ${r.amount}`,
+                `${formatDate(r.at, lang, { day: 'numeric', month: 'short', year: 'numeric' })} · Rs ${r.amount}`,
                 r.reference ? t('checkout.reference', { ref: r.reference }) : null,
               ]
                 .filter(Boolean)

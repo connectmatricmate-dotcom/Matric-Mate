@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AvatarBadge } from './AvatarBadge';
 import { useApp } from '../store/app';
-import { C, F, S } from '../theme';
+import { C, F, S, rowDir } from '../theme';
 import { H2, IconButton, Pill, Small, Tap } from './ui';
 
 /** Tab-root header: streak → progress, gear → settings, bell → notifications.
@@ -20,7 +20,7 @@ export function AppHeader({
   const unread = state.notifications.some((n) => !n.read);
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: S.sm, paddingTop: S.sm, paddingBottom: S.md }}>
+    <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.sm, paddingTop: S.sm, paddingBottom: S.md }}>
       {/* The avatar disc carries its own tint; a second box behind it read
           as a mistake (the client's words: double background). */}
       <AvatarBadge index={state.settings.avatar ?? 0} size={42} />

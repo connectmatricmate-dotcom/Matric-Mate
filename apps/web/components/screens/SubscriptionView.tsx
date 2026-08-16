@@ -1,5 +1,6 @@
 'use client';
 
+import { formatDate } from '@matricmate/core';
 /**
  * The web app is the only surface where a subscription can be started, renewed
  * or cancelled, the Android build shows the same status read-only, because
@@ -12,7 +13,7 @@ import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Item, LinkBtn, Pill, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { planById, rupees } from '@/lib/plans';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 const PERKS: [IconName, StringKey][] = [
   ['book', 'billing.perk1'],
@@ -25,6 +26,7 @@ const PERKS: [IconName, StringKey][] = [
 export function SubscriptionView() {
   const { state, actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const [checking, setChecking] = useState(false);
   const active = state.premium.active;
@@ -49,7 +51,7 @@ export function SubscriptionView() {
           <p className="text-[13px] text-ink2">
             {active && state.premium.validTill
               ? t('billing.activeTill', {
-                  date: new Date(state.premium.validTill).toLocaleDateString('en-GB', {
+                  date: formatDate(state.premium.validTill, lang, {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',

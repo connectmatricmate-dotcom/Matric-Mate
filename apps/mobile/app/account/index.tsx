@@ -20,8 +20,8 @@ import {
   Toggle,
   useToast,
 } from '../../src/components/ui';
-import { GRADE_10_READY, Language, levelProgress, xpToNextLevel } from '@matricmate/core';
-import { useT } from '../../src/i18n';
+import { GRADE_10_READY, Language, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
+import { useLang, useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
@@ -39,6 +39,7 @@ export default function Account() {
   const { state, actions, derived } = useApp();
   const { signOut } = useAuth();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const [confirmOut, setConfirmOut] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -63,8 +64,8 @@ export default function Account() {
               <Small>
                 {t('account.classLine', {
                   class: classLevel,
-                  board: setup?.board === 'punjab' ? 'Punjab Board' : 'FBISE',
-                  medium: setup?.medium === 'ur' ? 'Urdu' : 'English',
+                  board: boardName(setup?.board, lang),
+                  medium: mediumName(setup?.medium, lang),
                 })}
               </Small>
               <Small numberOfLines={1}>{state.user?.contact}</Small>
@@ -89,7 +90,7 @@ export default function Account() {
               <Small>
                 {state.premium.active && state.premium.validTill
                   ? t('account.premiumTill', {
-                      date: new Date(state.premium.validTill).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+                      date: formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short' }),
                     })
                   : t('account.freeModeSub')}
               </Small>

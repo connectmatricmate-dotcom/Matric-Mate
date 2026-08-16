@@ -22,7 +22,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
-import { C, F, R, S, T, WEB_MAX, isWeb, shadow, urdu } from '../theme';
+import { C, F, R, S, T, WEB_MAX, isRTL, isWeb, rowDir, shadow, urdu } from '../theme';
 import { isUrduScript } from '@matricmate/core';
 import { Icon, IconName } from './Icon';
 
@@ -202,9 +202,9 @@ export function Header({
   onBack?: () => void;
 }) {
   return (
-    <View style={st.header}>
+    <View style={[st.header, { flexDirection: rowDir() }]}>
       {back ? (
-        <View style={{ marginLeft: -10 }}>
+        <View style={isRTL() ? { marginRight: -10 } : { marginLeft: -10 }}>
           <IconButton icon="back" onPress={onBack ?? (() => router.back())} />
         </View>
       ) : null}
@@ -226,7 +226,9 @@ export function Header({
 }
 
 export function Row({ children, gap = S.sm, style }: { children: React.ReactNode; gap?: number; style?: ViewStyle }) {
-  return <View style={[{ flexDirection: 'row', alignItems: 'center', gap }, style]}>{children}</View>;
+  // Reversed in Urdu, so an icon that leads a row in English leads it on the
+  // right instead of stranding itself on the wrong side of the label.
+  return <View style={[{ flexDirection: rowDir(), alignItems: 'center', gap }, style]}>{children}</View>;
 }
 export function Col({ children, gap = S.sm, style }: { children: React.ReactNode; gap?: number; style?: ViewStyle }) {
   return <View style={[{ gap }, style]}>{children}</View>;
@@ -686,7 +688,17 @@ export function Toggle({ on, onPress }: { on: boolean; onPress?: () => void }) {
 export function Bar({ pct, tone = 'orange', h = 7 }: { pct: number; tone?: 'orange' | 'teal' | 'green' | 'red'; h?: number }) {
   const col = { orange: C.orange, teal: C.teal, green: C.green, red: C.red }[tone];
   return (
-    <View style={{ height: h, backgroundColor: '#EAF0EC', borderRadius: R.pill, overflow: 'hidden' }}>
+    <View
+      style={{
+        height: h,
+        backgroundColor: '#EAF0EC',
+        borderRadius: R.pill,
+        overflow: 'hidden',
+        // Progress grows the way the language reads, so a bar filling left to
+        // right under Urdu text would read as emptying.
+        alignItems: isRTL() ? 'flex-end' : 'flex-start',
+      }}
+    >
       <View style={{ width: `${Math.max(0, Math.min(100, pct))}%`, height: '100%', backgroundColor: col, borderRadius: R.pill }} />
     </View>
   );
@@ -714,7 +726,7 @@ export function Ring({
   const circ = 2 * Math.PI * r;
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}>
+      <View style={{ position: 'absolute', transform: isRTL() ? [{ rotate: '-90deg' }, { scaleY: -1 }] : [{ rotate: '-90deg' }] }}>
         <Svg width={size} height={size}>
           {fill ? <Circle cx={size / 2} cy={size / 2} r={r - stroke / 2 + 1} fill={fill} /> : null}
           <Circle cx={size / 2} cy={size / 2} r={r} stroke="#EAF0EC" strokeWidth={stroke} fill="none" />
@@ -797,7 +809,7 @@ export function Item({
    * say so. `urduTitle` stays as an override for a title we know is Urdu
    * before it arrives.
    */
-  const rtl = urduTitle || isUrduScript(title) || isUrduScript(sub ?? '');
+  const rtl = isRTL() || urduTitle || isUrduScript(title) || isUrduScript(sub ?? '');
   return (
     <Tap
       onPress={onPress}
@@ -832,8 +844,21 @@ export function Item({
           </View>
         ) : null}
       </View>
-      {right ?? (onPress ? <Icon name="chevron" size={18} color={C.ink3} /> : null)}
+      {right ?? (onPress ? <Chevron /> : null)}
     </Tap>
+  );
+}
+
+/**
+ * The "go on" arrow. Mirrored in Urdu, because an arrow is a direction, not a
+ * decoration: pointing right in a right-to-left app points back the way the
+ * student came.
+ */
+export function Chevron({ size = 18, color = C.ink3 }: { size?: number; color?: string }) {
+  return (
+    <View style={isRTL() ? { transform: [{ scaleX: -1 }] } : undefined}>
+      <Icon name="chevron" size={size} color={color} />
+    </View>
   );
 }
 
@@ -1043,7 +1068,11 @@ const st = StyleSheet.create({
   // pressed and selected states could paint a square outside the corners. The
   // elevation shadow went for the same reason: a white pill on a grey track
   // needs no shadow, and elevation drew its own rectangle behind the radius.
-  segBtn: { flex: 1, height: 36, justifyContent: 'center', borderRadius: R.sm, alignItems: 'center', overflow: 'hidden' },
+  // No fixed height and no overflow clip: Nastaliq needs about twice the
+  // leading of Latin and its ink hangs below the baseline, so a 36px box with
+  // `overflow: hidden` cut the descenders off its own Urdu label. (The same
+  // clip is what made example boxes render blank on Android.)
+  segBtn: { flex: 1, minHeight: 36, paddingVertical: 4, justifyContent: 'center', borderRadius: R.sm, alignItems: 'center' },
   segBtnOn: { backgroundColor: C.card },
   field: {
     flexDirection: 'row',

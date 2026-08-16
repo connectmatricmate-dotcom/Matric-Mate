@@ -1,10 +1,10 @@
 import { View } from 'react-native';
 import { Btn, Card, Check, H3, Header, Pill, Screen, Small, Tap, Ur } from './ui';
-import { C, S } from '../theme';
+import { C, S, rowDir } from '../theme';
 
 export function Steps({ step, total = 4 }: { step: number; total?: number }) {
   return (
-    <View style={{ flexDirection: 'row', gap: 6, justifyContent: 'center', marginBottom: S.lg }}>
+    <View style={{ flexDirection: rowDir(), gap: 6, justifyContent: 'center', marginBottom: S.lg }}>
       {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
         <View
           key={n}
@@ -51,7 +51,7 @@ export function ChoiceCard({
         flat={!selected}
         tint={selected ? C.tealTint : undefined}
         border={selected ? C.teal : undefined}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: S.md, opacity: disabled ? 0.55 : 1 }}
+        style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.md, opacity: disabled ? 0.55 : 1 }}
       >
         <View style={{ flex: 1 }}>
           <H3>{title}</H3>

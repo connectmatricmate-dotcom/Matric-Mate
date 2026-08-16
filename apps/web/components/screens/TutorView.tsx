@@ -1,12 +1,13 @@
 'use client';
 
+import { formatDate } from '@matricmate/core';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { TutorBudgetRail, WeakRail } from '@/components/app/rails';
 import { Card, Empty, Icon, Item } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
 
@@ -27,6 +28,7 @@ const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: strin
 export function TutorView() {
   const { derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
 
   // The server's numbers, with the local mirror as the pre-fetch fallback.
   const [quota] = useTutorQuota();
@@ -118,7 +120,7 @@ export function TutorView() {
                     key={thread.id}
                     href={`/tutor/chat?thread=${thread.id}`}
                     title={thread.title}
-                    sub={`${thread.context_label ?? ''} ${new Date(thread.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`.trim()}
+                    sub={`${thread.context_label ?? ''} ${formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })}`.trim()}
                     icon="spark"
                     last={i === threads.length - 1}
                   />

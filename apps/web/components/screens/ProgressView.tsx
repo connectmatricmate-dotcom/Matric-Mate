@@ -1,16 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import { useNow } from '@/lib/now';
 import { useMemo } from 'react';
-import { accuracy, grade, overallPct, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import { accuracy, formatDate, grade, overallPct, subjectById, subjectPct, weakTopics } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { ConfidenceRail, StreakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, Item, Kpi, LinkBtn, Pill, Ring } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function ProgressView() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
 
   const overall = useMemo(
     () => overallPct(derived.subjects, state.readSections, state.attempts),
@@ -26,7 +28,10 @@ export function ProgressView() {
   );
   // Real days with activity. The tile here used to be hours invented from
   // a formula over answer and section counts, which nothing ever measured.
-  const month = new Date().toLocaleDateString('en-GB', { month: 'long' });
+  // Read through useNow so the clock is not touched during render; 0 until
+  // the client has one, and an empty month label beats "January 1970".
+  const now = useNow();
+  const month = now ? formatDate(now, lang, { month: 'long' }) : '';
 
   return (
     <Page>

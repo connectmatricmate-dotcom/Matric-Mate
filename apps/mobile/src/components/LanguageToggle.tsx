@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { useLang } from '../i18n';
-import { C, F, R } from '../theme';
+import { C, F, R, rowDir } from '../theme';
 import { Tap } from './ui';
 
 /**
@@ -26,7 +26,7 @@ export function LanguageToggle({ compact }: { compact?: boolean }) {
   return (
     <View
       style={{
-        flexDirection: 'row',
+        flexDirection: rowDir(),
         backgroundColor: C.grey,
         borderRadius: R.pill,
         padding: 3,

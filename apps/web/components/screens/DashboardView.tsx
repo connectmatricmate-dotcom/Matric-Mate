@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { type IconName, SUBJECT_ICON, type StringKey, accuracy, chapterById, chapterPct, subjectById } from '@matricmate/core';
+import { SUBJECT_ICON, accuracy, chapterById, chapterPct, formatDate, subjectById, type IconName, type StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoachRail, ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
 import { createClient } from '@/lib/supabase/client';
 import { useNow } from '@/lib/now';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
   { label: 'dash.quickMcq', icon: 'target', href: '/session/setup' },
@@ -21,6 +21,7 @@ const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
 export function DashboardView() {
   const { state, derived, actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const now = useNow();
   const firstName = (state.user?.name ?? 'Student').split(' ')[0];
 
@@ -78,7 +79,7 @@ export function DashboardView() {
     <Page>
       <PageHead
         // `now` is 0 until the client reads its clock, better no date than 1970.
-        eyebrow={now ? new Date(now).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : undefined}
+        eyebrow={now ? formatDate(now, lang, { weekday: 'long', day: 'numeric', month: 'long' }) : undefined}
         title={t('dash.greeting', { name: firstName })}
         sub={t('dash.weekLine', { q: week.questions, acc: week.accuracy, days: week.days })}
       />

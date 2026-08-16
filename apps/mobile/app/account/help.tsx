@@ -4,7 +4,7 @@ import { Body, Btn, Card, Header, Screen, SectionTitle, Small, Spacer, useToast 
 import { Icon } from '../../src/components/Icon';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, rowDir } from '../../src/theme';
 
 const FAQ: [StringKey, StringKey][] = [
   ['account.faq1Q', 'account.faq1A'],
@@ -30,7 +30,7 @@ export default function Help() {
       <View style={{ gap: S.sm }}>
         {FAQ.map(([q, a], i) => (
           <Card key={q} flat onPress={() => setOpen(open === i ? null : i)}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: S.sm }}>
+            <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.sm }}>
               <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 13.5, lineHeight: 20, color: C.ink }}>{t(q)}</Text>
               <Icon name={open === i ? 'close' : 'plus'} size={16} color={C.ink3} />
             </View>

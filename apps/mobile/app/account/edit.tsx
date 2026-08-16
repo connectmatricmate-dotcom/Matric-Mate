@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, Field, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
-import { useT } from '../../src/i18n';
-import { AVATARS } from '@matricmate/core';
+import { useLang, useT } from '../../src/i18n';
+import { AVATARS, boardName } from '@matricmate/core';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
@@ -15,6 +15,7 @@ export default function EditProfile() {
   const { state, actions } = useApp();
   const { updateName } = useAuth();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const [name, setName] = useState(state.user?.name ?? '');
   // Persisted, not local: the picker used to keep its choice in component
@@ -66,7 +67,7 @@ export default function EditProfile() {
       <Card flat style={{ paddingVertical: 0 }}>
         <Item
           title={t('account.classAndBoard')}
-          sub={`Class ${setup?.classLevel ?? 9} · ${setup?.board === 'punjab' ? 'Punjab Board' : 'FBISE'}`}
+          sub={`Class ${setup?.classLevel ?? 9} · ${boardName(setup?.board, lang)}`}
           icon="book"
           onPress={() => router.push('/onboarding/class')}
         />

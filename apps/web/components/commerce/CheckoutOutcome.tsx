@@ -1,12 +1,13 @@
 'use client';
 
+import { formatDate } from '@matricmate/core';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn } from '@/components/ui/primitives';
 import { planById } from '@/lib/plans';
-import { useT } from '@/lib/store';
+import { useLang, useT } from '@/lib/store';
 
 /**
  * Shows what the database says, and grants nothing itself.
@@ -29,6 +30,7 @@ export function CheckoutOutcome({
   validTill: string | null;
 }) {
   const t = useT();
+  const { lang } = useLang();
   const router = useRouter();
   const [rechecking, startRecheck] = useTransition();
   const [waited, setWaited] = useState(0);
@@ -57,7 +59,7 @@ export function CheckoutOutcome({
             {t('checkout.paidBody', {
               plan: p.name.toLowerCase(),
               date: validTill
-                ? new Date(validTill).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                ? formatDate(validTill, lang, { day: 'numeric', month: 'long', year: 'numeric' })
                 : t('checkout.periodEnd'),
             })}
           </p>

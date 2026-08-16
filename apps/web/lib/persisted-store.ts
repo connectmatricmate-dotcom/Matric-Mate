@@ -133,7 +133,32 @@ export const subscribe = (listener: () => void) => {
 };
 
 export const getSnapshot = () => state;
-export const getServerSnapshot = () => EMPTY;
+
+/**
+ * What the server renders with, before localStorage exists.
+ *
+ * Returning the plain defaults meant every server-rendered page came out in
+ * English and then swapped to Urdu the moment the store hydrated: an Urdu
+ * student watched a page of English words, laid out right to left, rewrite
+ * itself. The language cookie is the one piece of the preference the server
+ * can see, so the server snapshot starts from it.
+ *
+ * Only the language is taken from the cookie. Everything else here is
+ * per-device progress that has no business being guessed.
+ *
+ * Two frozen objects rather than one mutable module variable: this runs on a
+ * server handling many requests at once, and a module-level "current language"
+ * would let an Urdu request repaint an English one. And they must be stable by
+ * reference, because useSyncExternalStore compares snapshots by identity and a
+ * fresh object per call never settles.
+ */
+const SERVER_SNAPSHOTS: Record<'en' | 'ur', State> = {
+  en: EMPTY,
+  ur: { ...EMPTY, settings: { ...DEFAULT_SETTINGS, language: 'ur', contentMedium: 'ur' } },
+};
+
+export const serverSnapshotFor = (lang: 'en' | 'ur') => SERVER_SNAPSHOTS[lang];
+export const getServerSnapshot = () => SERVER_SNAPSHOTS.en;
 
 function persist() {
   if (saveTimer) clearTimeout(saveTimer);

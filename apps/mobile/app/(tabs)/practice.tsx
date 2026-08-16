@@ -1,14 +1,28 @@
+import { formatDate } from '@matricmate/core';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName } from '../../src/components/Icon';
-import { Btn, Card, Empty, Item, Pill, Screen, SectionTitle, Sheet, Small, Spacer, TileGrid } from '../../src/components/ui';
+import {
+  Btn,
+  Card,
+  Chevron,
+  Empty,
+  Item,
+  Pill,
+  Screen,
+  SectionTitle,
+  Sheet,
+  Small,
+  Spacer,
+  TileGrid,
+} from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, rowDir } from '../../src/theme';
 
 const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; accent?: boolean }[] = [
   { label: 'practice.mcqs', sub: 'practice.mcqsSub', icon: 'target', href: '/session/setup' },
@@ -23,6 +37,7 @@ const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; a
 export default function Practice() {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const recent = state.results.slice(0, 4);
   /**
    * Paid-only: the practice grid is the shop window for unpaid accounts.
@@ -59,14 +74,14 @@ export default function Practice() {
               <Card
                 onPress={open ? () => router.push(m.href as never) : () => setShowLocked(true)}
                 border={C.orange}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: S.md, opacity: open ? 1 : 0.62 }}
+                style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.md, opacity: open ? 1 : 0.62 }}
               >
                 <Icon name={open ? m.icon : 'lock'} color={C.orangeDark} />
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t(m.label)}</Text>
                   <Small style={{ fontSize: 11.5 }}>{t(m.sub)}</Small>
                 </View>
-                <Icon name="chevron" size={18} color={C.ink3} />
+                <Chevron size={18} color={C.ink3} />
               </Card>
             ) : (
               <Card
@@ -87,14 +102,14 @@ export default function Practice() {
       <Spacer h={S.md} />
       <Card
         onPress={() => router.push('/tutor/ai-test')}
-        style={{ borderStyle: 'dashed', borderColor: C.tealTint2, flexDirection: 'row', alignItems: 'center', gap: S.md }}
+        style={{ borderStyle: 'dashed', borderColor: C.tealTint2, flexDirection: rowDir(), alignItems: 'center', gap: S.md }}
       >
         <Icon name="spark" color={C.orangeDark} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('practice.aiTest')}</Text>
           <Small>{t('practice.aiTestSub')}</Small>
         </View>
-        <Icon name="chevron" size={18} color={C.ink3} />
+        <Chevron size={18} color={C.ink3} />
       </Card>
 
       <SectionTitle>{t('practice.recent')}</SectionTitle>
@@ -106,7 +121,7 @@ export default function Practice() {
             <Item
               key={r.id}
               title={r.label}
-              sub={`${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
+              sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
               icon={r.mode === 'exam' ? 'clock' : 'target'}
               tone={r.mode === 'exam' ? 'orange' : 'teal'}
               last={i === recent.length - 1}

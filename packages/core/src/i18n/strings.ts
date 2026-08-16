@@ -35,6 +35,11 @@ export const en = {
     label: 'Language',
     english: 'English',
     urdu: 'Urdu',
+    /* The medium as a bare noun, for sentences that already supply the word
+       "medium" around it. Distinct from `english`/`urdu` above, which name a
+       language inside a picker and so stay in that language's own script. */
+    mediumEnglish: 'English',
+    mediumUrdu: 'Urdu',
     oneSwitchSub: 'Sets the app and your study material together',
     englishHint: 'Use the app in English',
     urduHint: 'App Roman Urdu mein, jaise “Aaj ka plan”',
@@ -870,6 +875,8 @@ export const ur: typeof en = {
     label: 'زبان',
     english: 'English',
     urdu: 'اردو',
+    mediumEnglish: 'انگریزی',
+    mediumUrdu: 'اردو',
     oneSwitchSub: 'ایپ اور مطالعے کا مواد، دونوں اسی سے بدلتے ہیں',
     englishHint: 'ایپ انگریزی میں استعمال کریں',
     urduHint: 'ایپ اردو میں چلے گی، جیسے ”آج کا منصوبہ“',

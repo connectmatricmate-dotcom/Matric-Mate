@@ -1,16 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Bar, Card, Item, Kpi, Pill, Ring, Row, Screen, SectionTitle, Small, Spacer, Tap } from '../../src/components/ui';
-import { subjectById , accuracy, grade, last14, overallPct, subjectPct, weakTopics } from '@matricmate/core';
-import { useT } from '../../src/i18n';
+import { accuracy, formatDate, grade, last14, overallPct, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function Progress() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
 
   const overall = useMemo(
     () => overallPct(derived.subjects, state.readSections, state.attempts),
@@ -19,7 +20,10 @@ export default function Progress() {
   const days = useMemo(() => last14(state.activeDays), [state.activeDays]);
   const weak = useMemo(() => weakTopics(state.attempts).slice(0, 3), [state.attempts]);
   const acc = accuracy(state.attempts);
-  const month = new Date().toLocaleDateString('en-GB', { month: 'long' });
+  // Pinned once on mount rather than read during render: a render must be
+  // repeatable, and the month label has no business changing mid-screen.
+  const [now] = useState(() => Date.now());
+  const month = formatDate(now, lang, { month: 'long' });
 
   const link = (label: string, href: string) => (
     <Tap onPress={() => router.push(href as never)} hit>

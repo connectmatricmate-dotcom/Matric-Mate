@@ -6,6 +6,7 @@ import { Icon, IconName, SUBJECT_ICON } from '../../src/components/Icon';
 import {
   Bar,
   Card,
+  Chevron,
   H3,
   Kpi,
   Row,
@@ -19,15 +20,15 @@ import {
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { SUBJECT_COLORS, chapterById, subjectById , accuracy, chapterPct, todayKey } from '@matricmate/core';
+import { SUBJECT_COLORS, accuracy, chapterById, chapterPct, formatDate, subjectById, todayKey } from '@matricmate/core';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { useAsync } from '../../src/core/useAsync';
 import { supabase } from '../../src/lib/supabase';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, rowDir } from '../../src/theme';
 
 const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
   { label: 'dash.quickMcq', icon: 'target', href: '/session/setup' },
@@ -40,6 +41,7 @@ const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
 export default function Dashboard() {
   const { state, derived, actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const firstName = (state.user?.name ?? 'Student').split(' ')[0];
 
   /**
@@ -95,7 +97,7 @@ export default function Dashboard() {
   const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
   const planDone = derived.plan.filter((task) => task.done).length;
-  const today = new Date(now).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+  const today = formatDate(now, lang, { weekday: 'long', day: 'numeric', month: 'short' });
 
   /** Plan labels are composed here so they follow the app language. */
   function planLabel(task: (typeof derived.plan)[number]) {
@@ -156,7 +158,7 @@ export default function Dashboard() {
           <View
             key={task.id}
             style={{
-              flexDirection: 'row',
+              flexDirection: rowDir(),
               alignItems: 'center',
               gap: S.md,
               paddingVertical: 10,
@@ -214,7 +216,7 @@ export default function Dashboard() {
               </Text>
             </Tap>
 
-            <Icon name="chevron" size={18} color="rgba(255,255,255,0.8)" />
+            <Chevron size={18} color="rgba(255,255,255,0.8)" />
           </View>
         ))}
       </Card>
@@ -229,7 +231,7 @@ export default function Dashboard() {
                 <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('cert.dashCard')}</Text>
                 <Small>{t('cert.dashCardSub')}</Small>
               </View>
-              <Icon name="chevron" size={18} color={C.ink3} />
+              <Chevron size={18} color={C.ink3} />
             </Row>
           </Card>
         </>
@@ -283,7 +285,7 @@ export default function Dashboard() {
                   <Bar pct={lastPct} />
                 </View>
               </View>
-              <Icon name="chevron" size={18} color={C.ink3} />
+              <Chevron size={18} color={C.ink3} />
             </Row>
           </Card>
         </>
@@ -301,7 +303,7 @@ export default function Dashboard() {
           node: (
             <Card
               onPress={() => router.push(q.href as never)}
-              style={{ flex: 1, minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: S.sm }}
+              style={{ flex: 1, minHeight: 58, flexDirection: rowDir(), alignItems: 'center', gap: S.sm }}
             >
               <Icon name={q.icon} color={C.teal} />
               <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(q.label)}</Text>

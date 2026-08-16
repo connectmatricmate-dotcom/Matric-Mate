@@ -7,15 +7,16 @@ import { Btn, ErrorBanner, Field } from '@/components/ui/controls';
 import { Card, Item, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { createClient } from '@/lib/supabase/client';
-import { AVATARS } from '@matricmate/core';
+import { AVATARS, boardName } from '@matricmate/core';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { validateName } from '@/lib/validation';
 
 
 export function EditProfile() {
   const { state, actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const router = useRouter();
   const toast = useToast();
   const [name, setName] = useState(state.user?.name ?? '');
@@ -104,7 +105,7 @@ export function EditProfile() {
           <Item
             href="/onboarding/class"
             title={t('account.classAndBoard')}
-            sub={`Class ${setup?.classLevel ?? 9} · ${setup?.board === 'punjab' ? 'Punjab Board' : 'FBISE'}`}
+            sub={`Class ${setup?.classLevel ?? 9} · ${boardName(setup?.board, lang)}`}
             icon="book"
           />
           <Item

@@ -1,9 +1,10 @@
+import { formatDate } from '@matricmate/core';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
 import { LockedNotice } from '../../src/components/LockedNotice';
 import { Btn, Card, Header, Item, Pill, Row, Screen, SectionTitle, Small, Spacer, useToast } from '../../src/components/ui';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
@@ -26,6 +27,7 @@ export default function Subscription() {
   const { refresh, checking } = useAuth();
   const toast = useToast();
   const t = useT();
+  const { lang } = useLang();
   const active = state.premium.active;
 
   return (
@@ -42,7 +44,7 @@ export default function Subscription() {
             <Small>
               {active && state.premium.validTill
                 ? t('billing.activeTill', {
-                    date: new Date(state.premium.validTill).toLocaleDateString('en-GB', {
+                    date: formatDate(state.premium.validTill, lang, {
                       day: 'numeric',
                       month: 'short',
                       year: 'numeric',

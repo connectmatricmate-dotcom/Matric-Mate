@@ -8,7 +8,7 @@ import { SegmentTrack } from '../../src/components/SessionHeader';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, isRTL } from '../../src/theme';
 
 export default function Exam() {
   const { actions } = useApp();
@@ -109,7 +109,7 @@ export default function Exam() {
         }
       >
         <Row style={{ paddingTop: S.xs }} gap={S.sm}>
-          <View style={{ marginLeft: -10 }}>
+          <View style={isRTL() ? { marginRight: -10 } : { marginLeft: -10 }}>
             <IconButton icon="close" onPress={() => setConfirm(true)} />
           </View>
           <View style={{ flex: 1, alignItems: 'center' }}>

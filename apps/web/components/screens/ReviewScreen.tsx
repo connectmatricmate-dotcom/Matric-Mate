@@ -67,7 +67,7 @@ export function ReviewScreen() {
               <Card
                 key={mcq.id}
                 flat
-                className={`border-l-4 ${wrong ? 'border-l-red' : 'border-l-green opacity-90'}`}
+                className={`border-s-4 ${wrong ? 'border-s-red' : 'border-s-green opacity-90'}`}
               >
                 <button
                   type="button"

@@ -44,7 +44,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen md:flex">
       {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-r border-line bg-card px-3 py-5 md:flex">
+      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-e border-line bg-card px-3 py-5 md:flex">
         <Link href="/dashboard" className="mb-7 px-2">
           <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} priority />
         </Link>

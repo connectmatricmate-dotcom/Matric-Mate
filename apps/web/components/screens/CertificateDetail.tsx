@@ -1,8 +1,9 @@
 'use client';
 
+import { formatDate } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Card, Label } from '@/components/ui/primitives';
-import { useT } from '@/lib/store';
+import { useLang, useT } from '@/lib/store';
 
 export type CertDetailRow = {
   id: string;
@@ -20,6 +21,7 @@ export type CertDetailRow = {
  */
 export function CertificateDetail({ cert }: { cert: CertDetailRow }) {
   const t = useT();
+  const { lang } = useLang();
 
   return (
     <Page width="focus">
@@ -29,7 +31,7 @@ export function CertificateDetail({ cert }: { cert: CertDetailRow }) {
         {cert.issued_on ? (
           <p className="text-[13px] text-ink2">
             {t('cert.issued', {
-              date: new Date(cert.issued_on).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+              date: formatDate(cert.issued_on, lang, { day: 'numeric', month: 'long', year: 'numeric' }),
             })}
           </p>
         ) : null}

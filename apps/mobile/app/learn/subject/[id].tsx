@@ -2,7 +2,22 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../../src/components/Icon';
-import { Bar, Btn, Card, ErrorState, Header, Pill, Row, Screen, Sheet, Skeleton, Small, Spacer, Ur } from '../../../src/components/ui';
+import {
+  Bar,
+  Btn,
+  Card,
+  Chevron,
+  ErrorState,
+  Header,
+  Pill,
+  Row,
+  Screen,
+  Sheet,
+  Skeleton,
+  Small,
+  Spacer,
+  Ur,
+} from '../../../src/components/ui';
 import { LockedNotice } from '../../../src/components/LockedNotice';
 import { api , chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
@@ -124,7 +139,7 @@ export default function Chapters() {
                   ) : current ? (
                     <Pill tone="orange">{t('common.continue')}</Pill>
                   ) : (
-                    <Icon name="chevron" size={18} color={C.ink3} />
+                    <Chevron size={18} color={C.ink3} />
                   )}
                 </Row>
                 {empty ? (

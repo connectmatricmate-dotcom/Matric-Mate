@@ -93,6 +93,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
    * ~340KB of study data they never read. The segments that use the store,
    * (app), (auth), onboarding and checkout, each mount it in their own layout.
    */
+  /*
+   * The document declares English, because it also carries the marketing
+   * pages, which are written in English in the source and never translated.
+   * The four signed-in surfaces declare their own language and direction
+   * through <Localized>, so an Urdu account mirrors the app without laying out
+   * the landing page right to left.
+   */
   return (
     <html lang="en" className={`${baloo.variable} ${nunito.variable} ${nastaliq.variable}`}>
       <body>

@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import Svg, { Circle, Polyline, Rect } from 'react-native-svg';
 import { Bar, Card, Header, Item, Label, Row, Screen, SectionTitle, Seg, Small, Spacer } from '../../src/components/ui';
-import { accuracy, confidenceBreakdown } from '@matricmate/core';
-import { useT } from '../../src/i18n';
+import { accuracy, confidenceBreakdown, formatDate } from '@matricmate/core';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
@@ -20,6 +20,7 @@ const yFor = (pct: number) => 80 - (pct / 100) * 70; // 0% -> y=80, 100% -> y=10
 export default function Performance() {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [range, setRange] = useState<Range>('month');
 
   /**
@@ -158,7 +159,7 @@ export default function Performance() {
             <Item
               key={r.id}
               title={r.label}
-              sub={`${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
+              sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
               icon={r.mode === 'exam' ? 'clock' : 'target'}
               tone={r.mode === 'exam' ? 'orange' : 'teal'}
               last={i === Math.min(5, state.results.length - 1)}

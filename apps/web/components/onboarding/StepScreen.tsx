@@ -51,7 +51,7 @@ export function ChoiceCard({
       onClick={onClick}
       aria-pressed={disabled ? undefined : !!selected}
       aria-disabled={disabled || undefined}
-      className={`w-full text-left transition-transform duration-200 ease-out ${
+      className={`w-full text-start transition-transform duration-200 ease-out ${
         disabled ? 'opacity-55' : 'active:scale-[0.99]'
       }`}
     >

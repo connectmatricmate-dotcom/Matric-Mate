@@ -36,5 +36,31 @@ export function translate(
   return raw.replace(/\{(\w+)\}/g, (_, p: string) => String(params[p] ?? `{${p}}`));
 }
 
+/**
+ * Values that get interpolated into translated sentences, and so have to
+ * follow the sentence.
+ *
+ * These were written inline at a dozen call sites as `medium === 'ur' ?
+ * 'Urdu' : 'English'`, which put an English word in the middle of an Urdu
+ * line: "کلاس 9 · FBISE · English میڈیم". A board's initials stay Latin
+ * because that is how the board writes them; a language's name does not.
+ */
+export function boardName(board: string | undefined, lang: Language): string {
+  return translate(lang, board === 'punjab' ? 'onboarding.punjab' : 'onboarding.fbise');
+}
+
+export function mediumName(medium: string | undefined, lang: Language): string {
+  return translate(lang, medium === 'ur' ? 'lang.mediumUrdu' : 'lang.mediumEnglish');
+}
+
+/**
+ * Dates in the reader's language: Urdu month and weekday names, but Latin
+ * digits. Pakistani boards, schoolbooks and mark sheets all write numbers in
+ * Latin, so `-u-nu-latn` keeps "15 اگست" rather than "۱۵ اگست".
+ */
+export function formatDate(at: number | string | Date, lang: Language, opts: Intl.DateTimeFormatOptions): string {
+  return new Date(at).toLocaleDateString(lang === 'ur' ? 'ur-PK-u-nu-latn' : 'en-GB', opts);
+}
+
 export { en, ur };
 export { SUBJECT_NAMES_UR, CHAPTER_TITLES_UR } from './names-ur';

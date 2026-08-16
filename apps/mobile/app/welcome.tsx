@@ -5,7 +5,7 @@ import { LanguageToggle } from '../src/components/LanguageToggle';
 import { Body, Btn, H1, Screen, Tap } from '../src/components/ui';
 import { useT } from '../src/i18n';
 import type { StringKey } from '../src/i18n';
-import { C, S } from '../src/theme';
+import { C, S, rowDir } from '../src/theme';
 
 const SLIDES: { emoji: string; title: StringKey; body: StringKey }[] = [
   { emoji: '📚', title: 'welcome.slide1Title', body: 'welcome.slide1Body' },
@@ -34,7 +34,7 @@ export default function Welcome() {
       }
     >
       <View style={{ flex: 1, paddingHorizontal: S.lg }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: S.sm }}>
+        <View style={{ flexDirection: rowDir(), alignItems: 'center', marginTop: S.sm }}>
           <Image
             source={require('../assets/wordmark.png')}
             style={{ width: 132, height: 26 }}
@@ -49,7 +49,7 @@ export default function Welcome() {
           <H1 style={{ textAlign: 'center', fontSize: 25 }}>{t(slide.title)}</H1>
           <Body style={{ textAlign: 'center', color: C.ink2, maxWidth: 340 }}>{t(slide.body)}</Body>
 
-          <View style={{ flexDirection: 'row', gap: 6, marginTop: S.sm }}>
+          <View style={{ flexDirection: rowDir(), gap: 6, marginTop: S.sm }}>
             {SLIDES.map((_, n) => (
               <Tap key={n} onPress={() => setI(n)} hit>
                 <View

@@ -29,7 +29,7 @@ export default async function CheckoutPage({
           <Link href="/" aria-label="MatricMate home">
             <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} priority />
           </Link>
-          <span className="ml-auto inline-flex items-center gap-1.5 text-[12.5px] font-extrabold text-ink2">
+          <span className="ms-auto inline-flex items-center gap-1.5 text-[12.5px] font-extrabold text-ink2">
             <Icon name="lock" size={14} strokeWidth={2.4} className="text-green" />
             Secure checkout
           </span>

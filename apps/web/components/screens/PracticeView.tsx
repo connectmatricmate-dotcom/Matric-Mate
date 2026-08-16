@@ -1,11 +1,12 @@
 'use client';
 
+import { formatDate } from '@matricmate/core';
 import Link from 'next/link';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { ConfidenceRail, TutorBudgetRail, WeakRail } from '@/components/app/rails';
 import { Card, Empty, Icon, Item, Pill } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; accent?: boolean }[] = [
   { label: 'practice.mcqs', sub: 'practice.mcqsSub', icon: 'target', href: '/session/setup' },
@@ -20,6 +21,7 @@ const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; a
 export function PracticeView() {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const recent = state.results.slice(0, 5);
 
   return (
@@ -90,7 +92,7 @@ export function PracticeView() {
                   <Item
                     key={r.id}
                     title={r.label}
-                    sub={`${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
+                    sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
                     icon={r.mode === 'exam' ? 'clock' : 'target'}
                     tone={r.mode === 'exam' ? 'orange' : 'teal'}
                     last={i === recent.length - 1}

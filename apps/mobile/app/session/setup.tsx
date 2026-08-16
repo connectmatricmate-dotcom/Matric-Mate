@@ -7,7 +7,7 @@ import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
-import { C, S } from '../../src/theme';
+import { C, S, rowDir } from '../../src/theme';
 
 export default function SessionSetup() {
   const { chapter: chapterParam } = useLocalSearchParams<{ chapter?: string }>();
@@ -82,7 +82,7 @@ export default function SessionSetup() {
       <Header title={t('session.setupTitle')} sub={t('session.setupSub')} back />
 
       <SectionTitle>{t('session.subject')}</SectionTitle>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: S.sm }}>
+      <View style={{ flexDirection: rowDir(), flexWrap: 'wrap', gap: S.sm }}>
         {derived.subjects.map((sid) => (
           <Pill
             key={sid}
@@ -114,7 +114,7 @@ export default function SessionSetup() {
               <View
                 key={i}
                 style={{
-                  flexDirection: 'row',
+                  flexDirection: rowDir(),
                   alignItems: 'center',
                   gap: S.md,
                   paddingVertical: 14,

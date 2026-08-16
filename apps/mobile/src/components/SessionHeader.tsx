@@ -12,7 +12,7 @@
  */
 import { Text, View } from 'react-native';
 import { Bar, IconButton } from './ui';
-import { C, F } from '../theme';
+import { C, F, isRTL, rowDir } from '../theme';
 
 const MAX_SEGMENTS = 16;
 
@@ -36,7 +36,7 @@ export function SegmentTrack({ segments }: { segments: SegmentMark[] }) {
     return <Bar pct={(passed / segments.length) * 100} tone="teal" h={6} />;
   }
   return (
-    <View style={{ flexDirection: 'row', gap: 4 }}>
+    <View style={{ flexDirection: rowDir(), gap: 4 }}>
       {segments.map((m, i) =>
         m === 'current' ? (
           <View
@@ -67,8 +67,8 @@ export function SessionHeader({
 }) {
   const segmented = segments && segments.length > 1 && segments.length <= MAX_SEGMENTS;
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: 4 }}>
-      <View style={{ marginLeft: -10 }}>
+    <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: 10, paddingTop: 4 }}>
+      <View style={isRTL() ? { marginRight: -10 } : { marginLeft: -10 }}>
         <IconButton icon="close" onPress={onClose} />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>

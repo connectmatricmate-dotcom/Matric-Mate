@@ -3,16 +3,29 @@ import { Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
-import { Card, Empty, ErrorState, Ring, Row, Screen, ScriptText, Skeleton, Small, Ur } from '../../src/components/ui';
-import { api , hasStudyMaterial, subjectPct , SUBJECT_COLORS } from '@matricmate/core';
+import {
+  Card,
+  Chevron,
+  Empty,
+  ErrorState,
+  Ring,
+  Row,
+  Screen,
+  ScriptText,
+  Skeleton,
+  Small,
+  Ur,
+} from '../../src/components/ui';
+import { SUBJECT_COLORS, api, boardName, hasStudyMaterial, mediumName, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S, isWeb } from '../../src/theme';
+import { C, F, S, isWeb, rowDir } from '../../src/theme';
 
 export default function Study() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [q, setQ] = useState('');
   // One fetch for both: a subject list without its chapters can't render a
   // chapter count or a "continue" chapter, so there's nothing useful to show
@@ -52,8 +65,8 @@ export default function Study() {
   const eyebrow = setup
     ? t('study.setupLine', {
         class: setup.classLevel,
-        board: setup.board === 'fbise' ? 'FBISE' : 'Punjab Board',
-        medium: setup.medium === 'en' ? 'English' : 'Urdu',
+        board: boardName(setup.board, lang),
+        medium: mediumName(setup.medium, lang),
       })
     : undefined;
 
@@ -63,7 +76,7 @@ export default function Study() {
 
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: rowDir(),
           alignItems: 'center',
           gap: S.sm,
           backgroundColor: C.card,
@@ -143,7 +156,7 @@ export default function Study() {
                     />
                   ) : null}
                 </View>
-                <Icon name="chevron" size={18} color={C.ink3} />
+                <Chevron size={18} color={C.ink3} />
               </Row>
             </Card>
           ))}

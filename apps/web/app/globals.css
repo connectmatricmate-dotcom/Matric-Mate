@@ -79,6 +79,57 @@ body {
 }
 
 /**
+ * The Urdu interface.
+ *
+ * When the app language is Urdu, every label on the page is Urdu, so the
+ * question stops being "is this string Urdu" and becomes "what language is the
+ * app in". Redefining the two type tokens at the root turns the whole
+ * interface Nastaliq in one place, and every component that already consumes
+ * `--font-display` and `--font-body` follows without touching a single one.
+ *
+ * The Latin faces stay reachable through `--font-latin` for the handful of
+ * things that must not change script: FBISE, MCQ, XP, and every digit.
+ *
+ * Line height goes with it. Nastaliq needs roughly twice the leading of Latin,
+ * and Tailwind's own leading utilities are per-element, so the floor is set
+ * here and a tight utility can still override it where a designer wants one.
+ */
+[lang='ur'] {
+  --font-display: var(--font-urdu);
+  --font-body: var(--font-urdu);
+  --font-latin: var(--font-nunito), system-ui, sans-serif;
+  font-family: var(--font-urdu);
+  line-height: 1.9;
+}
+
+/* Cursive scripts have no capitals to switch to: asking for them only breaks
+   the joins between letters. */
+[lang='ur'] .uppercase {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Chevrons, arrows and back glyphs point the way the page reads. Marked by the
+   Icon primitive so this is one rule rather than a conditional at each of the
+   dozen call sites.
+
+   `scale`, the standalone property, not `transform: scaleX(-1)`. A back link
+   already carries `rotate-180`, and a transform here would replace that
+   rotation instead of adding to it, leaving the arrow pointing forward on a
+   button that goes back. The individual properties compose. */
+[dir='rtl'] [data-dir] {
+  scale: -1 1;
+}
+
+/* Numbers, units, codes and brand names keep the Latin face inside an Urdu
+   line, the way an Urdu newspaper sets them. */
+[lang='ur'] .latin {
+  font-family: var(--font-latin);
+  direction: ltr;
+  display: inline-block;
+}
+
+/**
  * Urdu, two ways.
  *
  * Nastaliq is a steeply sloped script: its glyphs need roughly twice the leading

@@ -36,6 +36,7 @@ import { AI_QUOTA, XP, buildPlan, level, setContentGrade, setContentMedium, stre
 import { useAuth } from './auth';
 import { supabase } from '../lib/supabase';
 import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
+import { setUrduUi } from '../theme';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
@@ -456,6 +457,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setContentMedium(contentMedium);
   }, [contentMedium]);
+
+  /**
+   * The same switch drives how the interface is drawn: Nastaliq type, and the
+   * layout running right to left. Set during render, not in an effect, because
+   * an effect runs after the first paint and the app would flash one frame of
+   * left-to-right Latin every cold start.
+   */
+  setUrduUi(contentMedium === 'ur');
 
   // And on the student's class. The server filters by it (RLS); this keeps
   // the local cache and labels honest.

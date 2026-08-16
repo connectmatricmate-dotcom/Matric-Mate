@@ -2,19 +2,22 @@
 
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { accuracy, grade, subjectById, subjectPct } from '@matricmate/core';
+import { accuracy, boardName, formatDate, grade, mediumName, subjectById, subjectPct } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Label, Pill } from '@/components/ui/primitives';
+import { useNow } from '@/lib/now';
 import { useToast } from '@/components/ui/toast';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function ReportCard() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
 
-  const month = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const now = useNow();
+  const month = now ? formatDate(now, lang, { month: 'long', year: 'numeric' }) : '';
   const overallAcc = accuracy(state.attempts);
 
   const rows = useMemo(
@@ -54,8 +57,8 @@ export function ReportCard() {
           {state.user?.name ?? 'Student'} ·{' '}
           {t('account.classLine', {
             class: state.onboarding?.classLevel ?? 9,
-            board: state.onboarding?.board === 'punjab' ? 'Punjab Board' : 'FBISE',
-            medium: state.onboarding?.medium === 'ur' ? 'Urdu' : 'English',
+            board: boardName(state.onboarding?.board, lang),
+            medium: mediumName(state.onboarding?.medium, lang),
           })}
         </p>
 

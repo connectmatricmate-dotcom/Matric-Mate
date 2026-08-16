@@ -162,7 +162,7 @@ export function AiTestScreen() {
           <div className="mt-6"><SectionTitle>{t('tutor.aiTestTitle')}</SectionTitle></div>
           <button
             type="button"
-            className="w-full text-left"
+            className="w-full text-start"
             onClick={() =>
               router.push(
                 `/session/exam-intro?ai=1&topics=${encodeURIComponent(weak.map((w) => w.topic).join('|'))}&count=15&difficulty=board`,

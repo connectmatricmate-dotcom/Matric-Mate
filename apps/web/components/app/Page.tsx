@@ -67,7 +67,7 @@ export function PageHead({
       {back ? (
         <Link
           href={back}
-          className="-ml-1 mb-1 inline-flex min-h-11 items-center gap-1 pr-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
+          className="-ms-1 mb-1 inline-flex min-h-11 items-center gap-1 pe-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
         >
           <Icon name="chevron" size={17} className="rotate-180" />
           {backLabel ?? 'Back'}

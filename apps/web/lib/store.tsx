@@ -45,7 +45,7 @@ import {
   State,
   aiLimitFor,
   getQueue,
-  getServerSnapshot,
+  serverSnapshotFor,
   getSnapshot,
   hydrate,
   loadQueue,
@@ -57,6 +57,7 @@ import {
   xpFor,
 } from './persisted-store';
 import { createClient } from './supabase/client';
+import { writeLanguageCookie } from './ui-language';
 
 /**
  * The tutor rides same-origin: /api/ai/* on this very deployment, with the
@@ -276,6 +277,19 @@ const actions: Actions = {
       settings: { ...s.settings, language: next, contentMedium: next },
       onboarding: s.onboarding ? { ...s.onboarding, medium: next } : s.onboarding,
     }));
+    /**
+     * The server needs this too. It renders <html lang dir> before any
+     * JavaScript runs, and localStorage is invisible to it, so without the
+     * cookie the next cold load would paint left-to-right Latin and flip.
+     * The reload is what makes the switch feel instantaneous rather than
+     * half-applied: direction is set on the document element, which React
+     * does not re-render.
+     */
+    writeLanguageCookie(next);
+    if (typeof window !== 'undefined' && document.documentElement.lang !== next) {
+      document.documentElement.lang = next;
+      document.documentElement.dir = next === 'ur' ? 'rtl' : 'ltr';
+    }
     const onboarding = getSnapshot().onboarding;
     if (onboarding) {
       void createClient().auth.getUser().then(({ data }) => {
@@ -408,8 +422,20 @@ async function syncStudyState(userId: string): Promise<void> {
   void flush(userId);
 }
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+export function AppProvider({
+  children,
+  initialLanguage = 'en',
+}: {
+  children: React.ReactNode;
+  /**
+   * What the server rendered with, read from the language cookie by the
+   * layout. Without it the server always renders English and an Urdu student
+   * watches the page rewrite itself on hydration.
+   */
+  initialLanguage?: Language;
+}) {
+  const serverSnapshot = useCallback(() => serverSnapshotFor(initialLanguage), [initialLanguage]);
+  const state = useSyncExternalStore(subscribe, getSnapshot, serverSnapshot);
 
   // Reads the saved snapshot into the external store; not a setState cascade.
   useEffect(() => {
@@ -546,6 +572,23 @@ export function useT() {
 
   useEffect(() => {
     setContentMedium(contentMedium);
+  }, [contentMedium]);
+
+  /**
+   * Reconcile the document with the store once, after hydration.
+   *
+   * The server dressed the page from a cookie, and the cookie can be behind:
+   * an account that chose Urdu on another device, or before this cookie
+   * existed at all. Correcting it here means the preference always wins, and
+   * writing the cookie back means the next cold load is right from the first
+   * byte instead of flipping again.
+   */
+  useEffect(() => {
+    if (document.documentElement.lang !== contentMedium) {
+      document.documentElement.lang = contentMedium;
+      document.documentElement.dir = contentMedium === 'ur' ? 'rtl' : 'ltr';
+    }
+    writeLanguageCookie(contentMedium);
   }, [contentMedium]);
 
   const lang = state.settings.language;

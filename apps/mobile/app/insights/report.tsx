@@ -1,17 +1,19 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
-import { subjectById , accuracy, grade } from '@matricmate/core';
-import { useT } from '../../src/i18n';
+import { accuracy, boardName, formatDate, grade, mediumName, subjectById } from '@matricmate/core';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function Report() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
 
-  const month = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const [now] = useState(() => Date.now());
+  const month = formatDate(now, lang, { month: 'long', year: 'numeric' });
   const overallAcc = accuracy(state.attempts);
 
   const rows = useMemo(
@@ -62,8 +64,8 @@ export default function Report() {
           {state.user?.name ?? 'Student'} ·{' '}
           {t('account.classLine', {
             class: state.onboarding?.classLevel ?? 9,
-            board: state.onboarding?.board === 'punjab' ? 'Punjab Board' : 'FBISE',
-            medium: state.onboarding?.medium === 'ur' ? 'Urdu' : 'English',
+            board: boardName(state.onboarding?.board, lang),
+            medium: mediumName(state.onboarding?.medium, lang),
           })}
         </Text>
 

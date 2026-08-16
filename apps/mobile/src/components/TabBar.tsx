@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconName } from './Icon';
 import { TabGlyph } from './TabGlyph';
 import { Tap } from './ui';
-import { C, F, R, isWeb } from '../theme';
+import { C, F, R, isRTL, isWeb, rowDir } from '../theme';
 
 /**
  * Only the parts of the navigator's tabBar props we actually use, typed here so
@@ -116,8 +116,11 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
         style={{
           width: 210,
           backgroundColor: C.card,
-          borderRightWidth: 1,
-          borderRightColor: C.line,
+          // The divider is the edge facing the content, which swaps with the
+          // sidebar itself once the app reads right to left.
+          ...(isRTL()
+            ? { borderLeftWidth: 1, borderLeftColor: C.line }
+            : { borderRightWidth: 1, borderRightColor: C.line }),
           paddingTop: 20,
           paddingHorizontal: 10,
           gap: 4,
@@ -127,7 +130,7 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
           <Tap key={it.key} onPress={it.onPress}>
             <View
               style={{
-                flexDirection: 'row',
+                flexDirection: rowDir(),
                 alignItems: 'center',
                 gap: 10,
                 paddingVertical: 11,
@@ -150,7 +153,9 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
   return (
     <View
       style={{
-        flexDirection: 'row',
+        // Home first means first in reading order, which is the right-hand end
+        // of the bar in Urdu.
+        flexDirection: rowDir(),
         backgroundColor: C.card,
         borderTopWidth: 1,
         borderTopColor: C.line,

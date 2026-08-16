@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { SUBJECT_COLORS, SUBJECT_ICON, type Chapter, type Subject, hasStudyMaterial, subjectPct } from '@matricmate/core';
+import { SUBJECT_COLORS, SUBJECT_ICON, boardName, hasStudyMaterial, mediumName, subjectPct, type Chapter, type Subject } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Empty, Icon, Skeleton, Ur } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function StudyListSkeleton() {
   return (
@@ -48,14 +48,15 @@ export function StudyList({
 }) {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [q, setQ] = useState('');
 
   const setup = state.onboarding;
   const eyebrow = setup
     ? t('study.setupLine', {
         class: setup.classLevel,
-        board: setup.board === 'fbise' ? 'FBISE' : 'Punjab Board',
-        medium: setup.medium === 'en' ? 'English' : 'Urdu',
+        board: boardName(setup.board, lang),
+        medium: mediumName(setup.medium, lang),
       })
     : undefined;
 

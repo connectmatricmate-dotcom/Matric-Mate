@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon } from '../../../src/components/Icon';
 import {
   Bar,
   Body,
   Btn,
   Card,
+  Chevron,
   ErrorState,
   H2,
   IconButton,
@@ -336,7 +336,7 @@ export default function Reader() {
           ) : (
             <Tap onPress={() => advance(1)}>
               <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name="chevron" size={19} color="#fff" />
+                <Chevron size={19} color="#fff" />
               </View>
             </Tap>
           )}

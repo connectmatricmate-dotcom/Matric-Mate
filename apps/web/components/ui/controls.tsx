@@ -182,7 +182,7 @@ export function Field({
     <div className="mb-3">
       <label htmlFor={inputId} className="mb-1.5 block text-[12.5px] font-extrabold text-ink2">
         {label}
-        {required ? <span className="ml-0.5 text-red">*</span> : null}
+        {required ? <span className="ms-0.5 text-red">*</span> : null}
       </label>
       {/* .field-shell owns the focus ring, see globals.css */}
       <div

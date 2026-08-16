@@ -1,9 +1,10 @@
+import { formatDate } from '@matricmate/core';
 import { useEffect, useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Card, ErrorState, Header, Label, Screen, Skeleton, Small, Spacer } from '../../src/components/ui';
 import { useAsync } from '../../src/core/useAsync';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import { supabase } from '../../src/lib/supabase';
 import { C, F, S } from '../../src/theme';
 
@@ -24,6 +25,7 @@ type CertDetail = {
 export default function Certificate() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const t = useT();
+  const { lang } = useLang();
   const { data: cert, loading, error, reload } = useAsync<CertDetail | null>(async () => {
     const { data, error: qErr } = await supabase
       .from('certificates')
@@ -61,7 +63,7 @@ export default function Certificate() {
             {cert.issued_on ? (
               <Small style={{ marginTop: 2 }}>
                 {t('cert.issued', {
-                  date: new Date(cert.issued_on).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+                  date: formatDate(cert.issued_on, lang, { day: 'numeric', month: 'long', year: 'numeric' }),
                 })}
               </Small>
             ) : null}
