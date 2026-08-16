@@ -44,13 +44,16 @@ export function DashboardView() {
   const week = useMemo(() => {
     const since = now - 7 * 864e5;
     const recent = state.attempts.filter((a) => a.at >= since);
-    const minutes = Math.round(recent.length * 1.6 + state.readSections.length * 4);
+    // Days actually studied, counted from real activity. This line used to
+    // show minutes invented by a formula over counts, and it mixed an
+    // all-time section total into a sentence that says "this week".
+    const days = state.activeDays.filter((d) => Date.parse(d) >= since).length;
     return {
       accuracy: accuracy(recent),
       questions: recent.length,
-      time: minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes}m`,
+      days: Math.min(7, days),
     };
-  }, [state.attempts, state.readSections, now]);
+  }, [state.attempts, state.activeDays, now]);
 
   const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
@@ -77,7 +80,7 @@ export function DashboardView() {
         // `now` is 0 until the client reads its clock, better no date than 1970.
         eyebrow={now ? new Date(now).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : undefined}
         title={t('dash.greeting', { name: firstName })}
-        sub={t('dash.weekLine', { q: week.questions, acc: week.accuracy, time: week.time })}
+        sub={t('dash.weekLine', { q: week.questions, acc: week.accuracy, days: week.days })}
       />
       {/* Which class this whole dashboard is showing. One line, always on. */}
       <p className="-mt-4 mb-5 text-[13px] font-extrabold text-teal">

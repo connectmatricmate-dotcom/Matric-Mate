@@ -50,14 +50,21 @@ type Catalogue = {
 
 const catalogue = catalogueJson as Catalogue;
 
-/** Class 9 FBISE past papers, newest year first. */
-export function fbisePastPapers(): FbisePastPaper[] {
-  return catalogue.pastPapers.filter((p) => p.classLevel === 9).slice().sort((a, b) => b.year - a.year);
+/**
+ * FBISE past papers for a class, newest year first.
+ *
+ * The grade is a parameter and not a constant because both classes exist now.
+ * The catalogue currently holds SSC-I papers only, so a Class 10 student gets
+ * an empty list and the screen says so, which is the honest answer. Showing
+ * them Class 9 papers as "your board's papers" was not.
+ */
+export function fbisePastPapers(grade: number = 9): FbisePastPaper[] {
+  return catalogue.pastPapers.filter((p) => p.classLevel === grade).slice().sort((a, b) => b.year - a.year);
 }
 
 /** The same papers grouped by year, newest year first. */
-export function fbisePastPapersByYear(): { year: number; papers: FbisePastPaper[] }[] {
-  const papers = fbisePastPapers();
+export function fbisePastPapersByYear(grade: number = 9): { year: number; papers: FbisePastPaper[] }[] {
+  const papers = fbisePastPapers(grade);
   const years = [...new Set(papers.map((p) => p.year))];
   return years.map((year) => ({ year, papers: papers.filter((p) => p.year === year) }));
 }

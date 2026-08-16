@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
-import { Card, Empty, Item, Ring, Row, Screen, SectionTitle, Small, Spacer, TileGrid, Tiny } from '../../src/components/ui';
-import { fetchTutorQuota } from '@matricmate/core';
+import { Card, Empty, Item, Pill, Ring, Row, Screen, SectionTitle, Small, Spacer, TileGrid, Tiny } from '../../src/components/ui';
+import { BILLING_SITE, fetchTutorQuota } from '@matricmate/core';
 import type { TutorQuota } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useAsync } from '../../src/core/useAsync';
@@ -65,11 +65,17 @@ export default function Tutor() {
           <Text style={{ fontFamily: F.display, fontSize: 21, color: C.ink }}>{t('tutor.title')}</Text>
           <Small style={{ fontFamily: F.bodyBold }}>{t('tutor.sub')}</Small>
         </View>
-        <Ring pct={usedPct} size={46} stroke={6} color={low ? C.orange : C.teal}>
-          <Text style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: C.ink }}>
-            {left}/{limit}
-          </Text>
-        </Ring>
+        {/* An account with no plan has no allowance to draw a ring around.
+            "0/0" read as a used-up plan, which is the opposite of the truth. */}
+        {limit === 0 ? (
+          <Pill tone="grey">{t('billing.statusFree')}</Pill>
+        ) : (
+          <Ring pct={usedPct} size={46} stroke={6} color={low ? C.orange : C.teal}>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: C.ink }}>
+              {left}/{limit}
+            </Text>
+          </Ring>
+        )}
       </Row>
 
       <TileGrid
@@ -118,14 +124,27 @@ export default function Tutor() {
         <Icon name="chevron" size={18} color={C.ink3} />
       </Card>
 
-      {left === 0 ? (
+      {/* Two different states wearing one face. A free account never had a
+          daily allowance, so "Daily limit reached. Your plan includes 50 a
+          day." told it about a plan it does not hold and a reset that will
+          never come. It gets its own, calmer card, and the red one is kept
+          for the account that genuinely spent today's questions. */}
+      {limit === 0 ? (
+        <>
+          <Spacer h={S.md} />
+          <Card flat tint={C.tealTint} border={C.teal}>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.ink }}>{t('tutor.noPlanTitle')}</Text>
+            <Small style={{ marginTop: 2 }}>{t('tutor.noPlanBody')}</Small>
+            {/* Plain text, never tappable: see core/billing.ts. */}
+            <Small style={{ marginTop: 4 }}>{t('billing.manageNote', { site: BILLING_SITE })}</Small>
+          </Card>
+        </>
+      ) : left === 0 ? (
         <>
           <Spacer h={S.md} />
           <Card flat tint={C.redTint} border={C.red}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.red }}>{t('tutor.limitTitle')}</Text>
-            <Small style={{ marginTop: 2 }}>
-              {limit === 0 ? t('tutor.limitPremium') : t('tutor.limitBody', { n: limit })}
-            </Small>
+            <Small style={{ marginTop: 2 }}>{t('tutor.limitBody', { n: limit })}</Small>
           </Card>
         </>
       ) : null}

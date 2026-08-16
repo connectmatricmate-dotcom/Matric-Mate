@@ -84,7 +84,16 @@ export function totalXp(attempts: Attempt[], cardsKnown: string[]): number {
   return attempts.reduce((sum, a) => sum + XP.forAnswer(a.correct, a.confidence), 0) + cardsKnown.length * XP.card;
 }
 
-const dayKey = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+/**
+ * The calendar day where the students are, not where the device thinks it is.
+ *
+ * This was UTC, so a student in Pakistan working after midnight had the whole
+ * session credited to the previous day: their streak broke a day early and
+ * "today's plan" turned over five hours late. The server counts AI quota in
+ * Asia/Karachi for the same reason.
+ */
+const dayKey = (ms: number) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date(ms));
 
 /** Consecutive days with activity, counting back from today. */
 export function streakFrom(activeDays: string[]): number {
@@ -93,7 +102,7 @@ export function streakFrom(activeDays: string[]): number {
   let streak = 0;
   const d = new Date();
   for (;;) {
-    const key = d.toISOString().slice(0, 10);
+    const key = dayKey(d.getTime());
     if (set.has(key)) {
       streak += 1;
       d.setDate(d.getDate() - 1);
@@ -111,7 +120,7 @@ export function last14(activeDays: string[]): boolean[] {
   return Array.from({ length: 14 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (13 - i));
-    return set.has(d.toISOString().slice(0, 10));
+    return set.has(dayKey(d.getTime()));
   });
 }
 
@@ -165,9 +174,12 @@ export function chapterPct(chapterId: string, readSections: string[], attempts: 
   const readCount = readSections.filter((id) => id === chapterId || id.startsWith(`${chapterId}-`)).length;
   const answered = new Set(attempts.filter((a) => a.chapterId === chapterId).map((a) => a.mcqId)).size;
   const qTarget = Math.min(chapter?.mcqCount || content.mcqs.length || 1, 10);
-  const readPart = (readCount / totalSections) * 70;
+  const readPart = (Math.min(readCount, totalSections) / totalSections) * 70;
   const practicePart = (Math.min(answered, qTarget) / qTarget) * 30;
-  return Math.round(readPart + practicePart);
+  // Clamped: when a chapter's counts are unknown the divisor falls back to 1,
+  // and five read sections turned into "350% complete" on the shelf and in
+  // the syllabus-covered average.
+  return Math.min(100, Math.round(readPart + practicePart));
 }
 
 export function subjectPct(subjectId: string, readSections: string[], attempts: Attempt[]): number {
@@ -197,19 +209,25 @@ export function buildPlan(opts: {
   const ch = chapterById(chId);
   const weak = weakTopics(opts.attempts)[0];
   const weakCh = weak ? chapterById(weak.chapterId) : undefined;
+  /**
+   * Today's date is part of every task id, which is what makes this "today's"
+   * plan. Without it the ticks were permanent: a student who finished the
+   * plan once saw "3/3 done", struck through, every morning after.
+   */
+  const day = todayKey();
   const tasks: Omit<PlanTask, 'done'>[] = [
-    { id: `plan-read-${chId}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'read' },
-    { id: `plan-mcq-${chId}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'mcq' },
+    { id: `plan-read-${chId}-${day}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'read' },
+    { id: `plan-mcq-${chId}-${day}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'mcq' },
     weak && weakCh
       ? {
-          id: `plan-weak-${weak.topic}`,
+          id: `plan-weak-${weak.topic}-${day}`,
           subjectId: weak.subjectId,
           chapterId: weak.chapterId,
           kind: 'cards',
           weakTopic: weak.topic,
           weakAccuracy: weak.accuracy,
         }
-      : { id: 'plan-cards-default', subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'cards' },
+      : { id: `plan-cards-default-${day}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'cards' },
   ];
   return tasks.map((task) => ({ ...task, done: opts.doneIds.includes(task.id) }));
 }

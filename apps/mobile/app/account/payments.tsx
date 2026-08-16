@@ -1,3 +1,4 @@
+import * as Clipboard from 'expo-clipboard';
 import { Card, Empty, ErrorState, Header, Item, Pill, Screen, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { useAsync } from '../../src/core/useAsync';
 import { supabase } from '../../src/lib/supabase';
@@ -55,10 +56,26 @@ export default function Payments() {
             <Item
               key={r.id}
               title={t('billing.premium')}
-              sub={`${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · Rs ${r.amount}`}
+              // The footnote tells students to quote the reference to support,
+              // so it has to be on the row, readable. It used to live in a
+              // two-second toast: gone before anyone could write it down, and
+              // invisible to anyone who never thought to tap a receipt.
+              sub={[
+                `${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · Rs ${r.amount}`,
+                r.reference ? t('checkout.reference', { ref: r.reference }) : null,
+              ]
+                .filter(Boolean)
+                .join('\n')}
               icon="card"
               last={i === receipts.length - 1}
-              onPress={r.reference ? () => toast(r.reference as string) : undefined}
+              onPress={
+                r.reference
+                  ? () => {
+                      void Clipboard.setStringAsync(r.reference as string);
+                      toast(t('account.referenceCopied'));
+                    }
+                  : undefined
+              }
               right={<Pill tone="green">{t('account.paidLabel')}</Pill>}
             />
           ))}

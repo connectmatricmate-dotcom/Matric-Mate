@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, Empty, ErrorState, Header, Row, Screen, ScriptText, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
-import { api, blankHalves, chaptersFor, fetchAiSession, isUrduScript, normalizeAiBlanks } from '@matricmate/core';
+import { api, blankHalves, chapterById, chaptersFor, fetchAiSession, isUrduScript, normalizeAiBlanks } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer, thud, tick } from '../../src/core/haptics';
@@ -82,7 +82,11 @@ export default function Blanks() {
       mcqId: item.id,
       chapterId,
       subjectId: chapterId.split('-')[0],
-      topic: t('practice.blanks'),
+      // The chapter's own title, not the name of the exercise. This used
+      // to store the translated UI label, so Weak topics listed
+      // "Fill in the blanks" as a syllabus topic, and switching language
+      // forked it into a second one.
+      topic: chapterById(chapterId)?.title ?? chapterId,
       correct: ok,
       confidence: null,
       mode: 'blanks',

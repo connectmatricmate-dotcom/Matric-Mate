@@ -78,7 +78,11 @@ export function ShortQScreen({
       mcqId: item.id,
       chapterId,
       subjectId: chapterId.split('-')[0],
-      topic: t('practice.shortQ'),
+      // The chapter's own title, not the name of the exercise. This used
+      // to store the translated UI label, so Weak topics listed
+      // "Fill in the blanks" as a syllabus topic, and switching language
+      // forked it into a second one.
+      topic: chapterTitle,
       correct: m === 'got',
       confidence: null,
       mode: 'shortq',

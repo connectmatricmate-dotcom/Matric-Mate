@@ -11,9 +11,12 @@ export const metadata: Metadata = {
 
 /**
  * Google Play requires a publicly reachable page explaining account deletion,
- * usable without installing the app, for any app that has accounts. It has to
- * be reachable without signing in, which is why the instructions come first
- * and the signed-in shortcut second.
+ * usable without installing the app, for any app that has accounts.
+ *
+ * It says "email us" rather than "tap here" because there is no delete control
+ * in the product yet. Play accepts a request-based route as long as the page
+ * spells out how to ask and how long it takes; what it does not forgive is a
+ * page describing a button that is not there.
  */
 export default function DeleteAccountPage() {
   return (
@@ -28,20 +31,30 @@ export default function DeleteAccountPage() {
         </p>
 
         <Card className="mt-8">
-          <h2 className="font-display text-[20px] text-ink">Delete it yourself</h2>
+          <h2 className="font-display text-[20px] text-ink">Ask us to delete it</h2>
           <p className="mt-2 text-mk-body text-ink2">
-            Sign in, open Profile, then Settings, then Delete account. You will be asked to confirm, and the account
-            is gone immediately.
+            There is no delete button inside MatricMate yet, so this is done by request and a person handles it. Email{' '}
+            <span className="font-extrabold text-ink">help@matricmate.pk</span> from the address on the account, with
+            “delete my account” in the subject. You do not have to give a reason.
           </p>
-          <LinkBtn title="Sign in and delete" href="/login?next=/account/settings" className="mt-4" />
+          <p className="mt-2 text-mk-body text-ink2">
+            We reply within two working days to confirm the request is really yours, and the account is deleted within
+            seven days of that.
+          </p>
+          <LinkBtn
+            title="Email help@matricmate.pk"
+            href="mailto:help@matricmate.pk?subject=Delete%20my%20account"
+            icon="mail"
+            className="mt-4"
+          />
         </Card>
 
         <Card className="mt-4">
-          <h2 className="font-display text-[20px] text-ink">Ask us to delete it</h2>
+          <h2 className="font-display text-[20px] text-ink">If you cannot sign in</h2>
           <p className="mt-2 text-mk-body text-ink2">
-            If you cannot sign in, email <span className="font-extrabold text-ink">help@matricmate.com.pk</span> from
-            any address, or message the support number, with the mobile number on the account. We verify ownership by
-            sending a code to that number, then delete it within seven days.
+            Email <span className="font-extrabold text-ink">help@matricmate.pk</span> from any address, or message the
+            support number, with the mobile number on the account. We verify ownership by sending a code to that
+            number, then delete it within seven days.
           </p>
         </Card>
 
@@ -52,7 +65,6 @@ export default function DeleteAccountPage() {
             'Every answer, test attempt, score and weak-topic record',
             'Reading progress, downloads, flashcard history and study plans',
             'AI tutor conversations',
-            'Push notification tokens for your devices',
           ].map((li) => (
             <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink2">
               <Icon name="check" size={17} strokeWidth={2.6} className="mt-0.5 shrink-0 text-green" />

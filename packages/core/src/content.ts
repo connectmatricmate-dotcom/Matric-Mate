@@ -483,7 +483,7 @@ const AUTHORED: Record<string, ChapterContent> = {
     audioTitle: 'Structure of Atoms, full chapter',
     sections: [
       {
-        id: 'chem-2-s1',
+        id: 'chem-3-s1',
         title: 'Rutherford’s atomic model',
         blocks: [
           { kind: 'h', text: 'The gold-foil experiment' },
@@ -493,7 +493,7 @@ const AUTHORED: Record<string, ChapterContent> = {
         ],
       },
       {
-        id: 'chem-2-s2',
+        id: 'chem-3-s2',
         title: 'Bohr’s model and electronic configuration',
         blocks: [
           { kind: 'p', text: 'Bohr proposed that electrons revolve in fixed circular orbits (shells) of definite energy, and that energy is absorbed or emitted only when an electron jumps between shells.' },
@@ -502,7 +502,7 @@ const AUTHORED: Record<string, ChapterContent> = {
         ],
       },
       {
-        id: 'chem-2-s3',
+        id: 'chem-3-s3',
         title: 'Isotopes',
         blocks: [
           { kind: 'def', term: 'Isotopes', text: 'Atoms of the same element with the same atomic number but different mass numbers: same protons, different neutrons.' },
@@ -536,7 +536,7 @@ const AUTHORED: Record<string, ChapterContent> = {
     audioTitle: 'Cells and Tissues, full chapter',
     sections: [
       {
-        id: 'bio-4-s1',
+        id: 'bio-3-s1',
         title: 'The cell and microscopy',
         blocks: [
           { kind: 'h', text: 'Discovery of the cell' },
@@ -545,7 +545,7 @@ const AUTHORED: Record<string, ChapterContent> = {
         ],
       },
       {
-        id: 'bio-4-s2',
+        id: 'bio-3-s2',
         title: 'Cell organelles',
         blocks: [
           { kind: 'list', items: ['Nucleus: contains DNA and controls cell activities.', 'Mitochondria: site of aerobic respiration, the “power house”.', 'Chloroplast: photosynthesis in plant cells.', 'Ribosomes: protein synthesis.', 'Vacuole: storage, large and central in plant cells.'] },
@@ -553,7 +553,7 @@ const AUTHORED: Record<string, ChapterContent> = {
         ],
       },
       {
-        id: 'bio-4-s3',
+        id: 'bio-3-s3',
         title: 'Transport across the membrane',
         blocks: [
           { kind: 'def', term: 'Diffusion', text: 'Movement of molecules from a region of higher concentration to lower concentration.' },

@@ -12,6 +12,7 @@ import { useApp, useT } from '@/lib/store';
 import { Page } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Markdown } from '@/components/ui/Markdown';
+import { LockedNotice } from '@/components/app/LockedNotice';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
 const isUrduText = (s: string) => /[؀-ۿ]/.test(s);
@@ -184,7 +185,13 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
       {/* Same task frame as the practice screens: the notes read on paper of their own. */}
       <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:px-8 md:py-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
       <article>
-        {section ? (
+        {/* No accessible sections means the plan wall, not an empty chapter:
+            row level security serves nothing to an account without one. This
+            rendered as a blank white page with a working Finish button, which
+            is the worst way to tell somebody they need to subscribe. */}
+        {!content.sections.length ? (
+          <LockedNotice body={t('billing.lockedBody')} cta={t('states.unlock')} />
+        ) : section ? (
           <>
             {urduMedium && !content.sectionsUr ? (
               <Card flat tint="bg-tealtint" border="border-tealtint2" className="mb-4">
@@ -209,7 +216,9 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
       </div>
       </div>
 
-      {/* pager */}
+      {/* pager. Hidden when there is nothing to page through, or it offers to
+          save progress on a chapter the student cannot read. */}
+      {content.sections.length ? (
       <div className="mt-4 flex items-center gap-3 rounded-[16px] border border-line bg-card px-4 py-3">
         <IconButton icon="back" label={t('common.back')} onClick={() => advance(-1)} disabled={idx === 0} tone="card" />
         <p className="flex-1 text-center text-[13px] font-extrabold text-ink2">{t('reader.section', { a: idx + 1, b: total })}</p>
@@ -226,6 +235,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
           <IconButton icon="chevron" label={t('common.next')} tone="active" onClick={() => advance(1)} />
         )}
       </div>
+      ) : null}
 
       <Sheet open={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>
         <div className="mb-4 flex flex-wrap gap-2">

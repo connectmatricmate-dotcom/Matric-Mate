@@ -5,14 +5,14 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Refund and cancellation policy',
-  description: 'When MatricMate refunds a payment, how to cancel, and how long money takes to come back.',
+  description: 'When MatricMate refunds a payment, how to ask for one, and how long money takes to come back.',
 };
 
 const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
-    heading: 'Cancelling',
+    heading: 'Stopping',
     paragraphs: [
-      'You can cancel at any time from Profile, then Subscription, in either the app or the website. Cancelling stops the next payment. Nothing about MatricMate renews on its own, so if you do nothing at all, the plan simply ends on its last paid day.',
+      'There is no subscription to cancel, and that is deliberate. A plan is one payment for a fixed stretch of time, we keep no card on file, and nothing charges you again, so if you do nothing at all the plan simply ends on its last paid day.',
       'When a plan ends you keep your account and everything in it: your progress, your practice history and your weak-topic analysis. What stops is access to chapters, tests and the AI tutor.',
     ],
   },
@@ -20,7 +20,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     heading: 'When we refund in full',
     paragraphs: [
       'If you were charged twice for the same plan, we refund the duplicate in full, and you do not need to ask. We check for duplicates ourselves.',
-      'If you were charged after cancelling, we refund it in full.',
+      'If a payment went through for a plan you did not choose, we refund it in full.',
       'If a technical fault on our side stopped you using what you paid for and we could not fix it within three working days, we refund the unused part of the plan.',
       'If you paid within the last seven days and have not opened more than one chapter, we refund it in full, no reason needed.',
     ],
@@ -28,14 +28,14 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'When we do not refund',
     paragraphs: [
-      'We do not refund a plan that has been used for more than seven days, because the content has been delivered. If more than seven days have passed, cancelling stops the next payment rather than returning the last one.',
+      'We do not refund a plan that has been used for more than seven days, because the content has been delivered. The plan then runs to its end date, and since nothing renews there is no further payment to worry about.',
       'We do not refund on the grounds of exam results. MatricMate is a study aid and cannot promise a grade.',
     ],
   },
   {
     heading: 'How to ask for one',
     paragraphs: [
-      'Message us on WhatsApp or email help@matricmate.com.pk with the mobile number on the account and the date of the payment. That is all we need to find it.',
+      'Message us on WhatsApp or email help@matricmate.pk with the mobile number on the account and the date of the payment. That is all we need to find it.',
       'We reply within two working days. Approved refunds are sent back through Safepay to the same method you paid with, which is the only place they can go. JazzCash and Easypaisa usually take two to three working days, and cards five to ten working days, depending on the bank.',
     ],
   },

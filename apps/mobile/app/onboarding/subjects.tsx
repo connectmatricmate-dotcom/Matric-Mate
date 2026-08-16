@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { router } from 'expo-router';
 import { Steps } from '../../src/components/OnboardingStep';
 import { Icon } from '../../src/components/Icon';
-import { Btn, Card, Check, Header, Item, Screen, SectionTitle, Seg, Small, useToast } from '../../src/components/ui';
-import { SUBJECTS , Group } from '@matricmate/core';
+import { Btn, Card, Check, Header, Item, Screen, SectionTitle, Small, useToast } from '../../src/components/ui';
+import { SUBJECTS } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
@@ -12,18 +12,18 @@ export default function ChooseSubjects() {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
-  const [group, setGroup] = useState<Group>('science');
   const compulsory = useMemo(() => SUBJECTS.filter((s) => s.compulsory), []);
-  const electives = useMemo(
-    () => SUBJECTS.filter((s) => !s.compulsory && (group === 'science' ? true : s.id === 'cs')),
-    [group]
-  );
+  /**
+   * Every elective we carry belongs to the science group. The picker used to
+   * offer an Arts tab that filtered the list down to Computer Science alone,
+   * which is not a subject group anyone studies. The tab comes back when
+   * Arts subjects do.
+   */
+  const electives = useMemo(() => SUBJECTS.filter((s) => !s.compulsory), []);
   const [picked, setPicked] = useState<string[]>(['phy', 'chem', 'bio']);
 
   const total = compulsory.length + picked.length;
-  // "Pick two" assumed the science list. Arts currently offers one elective,
-  // so demanding two locked every arts student on this step forever.
-  const enough = picked.length >= Math.min(2, electives.length);
+  const enough = picked.length >= 2;
 
   return (
     <Screen
@@ -32,7 +32,7 @@ export default function ChooseSubjects() {
           title={enough ? t('onboarding.continueWith', { n: total }) : t('onboarding.pickTwo')}
           disabled={!enough}
           onPress={() => {
-            actions.setOnboarding({ group, subjects: [...compulsory.map((s) => s.id), ...picked] });
+            actions.setOnboarding({ group: 'science', subjects: [...compulsory.map((s) => s.id), ...picked] });
             // A student who signed in first and was sent here to pick their
             // subjects already has the account this flow used to demand next.
             // Routing them to signup told them to create one again.
@@ -43,18 +43,6 @@ export default function ChooseSubjects() {
     >
       <Header title={t('onboarding.subjectsTitle')} sub={t('onboarding.subjectsSub')} back />
       <Steps step={4} />
-
-      <Seg
-        value={group}
-        onChange={(g) => {
-          setGroup(g);
-          setPicked(g === 'science' ? ['phy', 'chem', 'bio'] : ['cs']);
-        }}
-        options={[
-          { value: 'science', label: t('onboarding.scienceGroup') },
-          { value: 'arts', label: t('onboarding.artsGroup') },
-        ]}
-      />
 
       <SectionTitle>{t('onboarding.compulsory')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>

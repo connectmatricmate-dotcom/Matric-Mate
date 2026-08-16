@@ -80,6 +80,11 @@ export type PaymentProvider = {
   readonly id: string;
   /** False when keys are missing, which is the normal state on a fresh clone. */
   readonly isConfigured: boolean;
+  /**
+   * True only when a real card will really be charged. Sandbox carries keys
+   * too, so any copy about money must read this and not isConfigured.
+   */
+  readonly isLive: boolean;
 
   /** Reserves a payment and returns somewhere to send the browser. */
   startCheckout(req: CheckoutRequest): Promise<CheckoutStart>;

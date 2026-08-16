@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/toast';
+import { GRADE_10_READY } from '@matricmate/core';
 import { useApp, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen } from './StepScreen';
 
@@ -31,12 +32,16 @@ export function ChooseClass() {
         selected={value === 9}
         onClick={() => setValue(9)}
       />
+      {/* Class 10 is a real choice the day its catalogue ships. Hardcoding
+          the card shut meant a Class 10 student had to sign up as Class 9
+          and then switch, which costs them their progress and a cooldown. */}
       <ChoiceCard
         title={t('onboarding.class10')}
         sub={t('onboarding.class10Sub')}
-        disabled
-        disabledLabel={t('onboarding.comingSoon')}
-        onClick={() => toast(t('onboarding.class10Toast'))}
+        selected={value === 10}
+        disabled={!GRADE_10_READY}
+        disabledLabel={GRADE_10_READY ? undefined : t('onboarding.comingSoon')}
+        onClick={() => (GRADE_10_READY ? setValue(10) : toast(t('onboarding.class10Toast')))}
       />
     </StepScreen>
   );

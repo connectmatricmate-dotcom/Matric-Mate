@@ -24,7 +24,8 @@ export function ProgressView() {
     () => derived.subjects.map((sid) => ({ sid, pct: subjectPct(sid, state.readSections, state.attempts) })),
     [derived.subjects, state.readSections, state.attempts]
   );
-  const minutes = state.attempts.length * 1.6 + state.readSections.length * 4;
+  // Real days with activity. The tile here used to be hours invented from
+  // a formula over answer and section counts, which nothing ever measured.
   const month = new Date().toLocaleDateString('en-GB', { month: 'long' });
 
   return (
@@ -49,7 +50,7 @@ export function ProgressView() {
               <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                 <Kpi value={`${state.attempts.length}`} label={t('dash.questions')} />
                 <Kpi value={`${acc}%`} label={t('dash.accuracy')} />
-                <Kpi value={`${Math.round(minutes / 60)}h`} label={t('dash.studyTime')} />
+                <Kpi value={`${state.activeDays.length}`} label={t('dash.activeDays')} />
                 <Kpi value={`${state.results.length}`} label={t('progress.tests')} />
               </div>
             </div>

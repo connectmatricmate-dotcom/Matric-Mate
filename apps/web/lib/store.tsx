@@ -17,6 +17,7 @@ import {
   StringKey,
   SyncOp,
   TestResult,
+  XP,
   buildPlan,
   configureTutor,
   flushQueue,
@@ -153,7 +154,16 @@ const actions: Actions = {
     const day = todayKey();
     const isNewDay = !getSnapshot().activeDays.includes(day);
     const full: Attempt = { ...a, id: `a-${Date.now()}-${getSnapshot().attempts.length}`, at: Date.now() };
-    update((s) => touchToday({ ...s, attempts: [...s.attempts, full], xp: s.xp + xpFor(a.correct, a.confidence) }));
+    // Exam answers earn the doubled XP the result screen advertises. It was
+    // shown there and credited here at single rate, so the total never
+    // matched the number the student had just been congratulated with.
+    update((s) =>
+      touchToday({
+        ...s,
+        attempts: [...s.attempts, full],
+        xp: s.xp + xpFor(a.correct, a.confidence) * (a.mode === 'exam' ? XP.examMultiplier : 1),
+      }),
+    );
     // Queued, not awaited: the store already updated and the screen already
     // moved on. See queueAndFlush below for what happens to this in the
     // background.
@@ -171,7 +181,9 @@ const actions: Actions = {
       touchToday({
         ...s,
         attempts: [...s.attempts, ...full],
-        xp: s.xp + list.reduce((sum, a) => sum + xpFor(a.correct, a.confidence), 0),
+        xp:
+          s.xp +
+          list.reduce((sum, a) => sum + xpFor(a.correct, a.confidence) * (a.mode === 'exam' ? XP.examMultiplier : 1), 0),
       })
     );
     // Each answer in the paper is still its own row server-side (attempts is
@@ -210,7 +222,12 @@ const actions: Actions = {
   togglePlanTask: (id) =>
     update((s) => ({
       ...s,
-      planDone: s.planDone.includes(id) ? s.planDone.filter((x) => x !== id) : [...s.planDone, id],
+      // Task ids carry the day, so anything from an earlier day is dead
+      // weight. Dropping it here keeps the list to today's three.
+      planDone: (s.planDone.includes(id)
+        ? s.planDone.filter((x) => x !== id)
+        : [...s.planDone, id]
+      ).filter((x) => x.endsWith(todayKey())),
     })),
   markCard: (cardId, known) => {
     const wasKnown = getSnapshot().cardsKnown.includes(cardId);

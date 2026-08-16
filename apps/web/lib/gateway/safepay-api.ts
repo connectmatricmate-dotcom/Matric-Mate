@@ -38,6 +38,15 @@ const CHECKOUT_PAY = `${HOST}/checkout/pay/`;
 export const isSafepayConfigured = Boolean(MERCHANT_API_KEY && SECRET_KEY);
 
 /**
+ * Whether a real card is really about to be charged.
+ *
+ * Copy must never key off `isSafepayConfigured`: sandbox has keys too, so
+ * that flag stays true when we switch to production and the page would go on
+ * telling a paying customer that no real money moves.
+ */
+export const isSafepayLive = isSafepayConfigured && ENV === 'production';
+
+/**
  * A student's identity at Safepay.
  *
  * A **customer** (`cus_…`) is a merchant-scoped record: it owns saved payment

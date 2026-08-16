@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { type Group, SUBJECTS } from '@matricmate/core';
-import { ItemButton, Seg } from '@/components/ui/controls';
+import { SUBJECTS } from '@matricmate/core';
+import { ItemButton } from '@/components/ui/controls';
 import { Card, Check, Icon, Item, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
@@ -14,14 +14,16 @@ export function ChooseSubjects() {
   const t = useT();
   const router = useRouter();
   const toast = useToast();
-  const [group, setGroup] = useState<Group>('science');
   const [picked, setPicked] = useState<string[]>(['phy', 'chem', 'bio']);
 
   const compulsory = useMemo(() => SUBJECTS.filter((s) => s.compulsory), []);
-  const electives = useMemo(
-    () => SUBJECTS.filter((s) => !s.compulsory && (group === 'science' ? true : s.id === 'cs')),
-    [group]
-  );
+  /**
+   * Every elective we carry belongs to the science group. The picker used to
+   * offer an Arts tab that filtered the list down to Computer Science alone,
+   * while still demanding two electives, so an Arts student could never
+   * finish signing up. The tab comes back when Arts subjects do.
+   */
+  const electives = useMemo(() => SUBJECTS.filter((s) => !s.compulsory), []);
 
   const total = compulsory.length + picked.length;
   const enough = picked.length >= 2;
@@ -35,24 +37,10 @@ export function ChooseSubjects() {
       disabled={!enough}
       footnote={t('onboarding.subjectsFootnote')}
       onNext={() => {
-        actions.setOnboarding({ group, subjects: [...compulsory.map((s) => s.id), ...picked] });
+        actions.setOnboarding({ group: 'science', subjects: [...compulsory.map((s) => s.id), ...picked] });
         router.push('/dashboard');
       }}
     >
-      <Seg
-        value={group}
-        label="Subject group"
-        className="w-full"
-        onChange={(g) => {
-          setGroup(g);
-          setPicked(g === 'science' ? ['phy', 'chem', 'bio'] : ['cs']);
-        }}
-        options={[
-          { value: 'science' as Group, label: t('onboarding.scienceGroup') },
-          { value: 'arts' as Group, label: t('onboarding.artsGroup') },
-        ]}
-      />
-
       <SectionTitle>{t('onboarding.compulsory')}</SectionTitle>
       <Card flat className="py-0">
         {compulsory.map((s, i) => (

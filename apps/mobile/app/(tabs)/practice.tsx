@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName } from '../../src/components/Icon';
-import { Card, Empty, Item, Pill, Screen, SectionTitle, Small, Spacer, TileGrid } from '../../src/components/ui';
+import { Btn, Card, Empty, Item, Pill, Screen, SectionTitle, Sheet, Small, Spacer, TileGrid } from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
@@ -31,6 +32,9 @@ export default function Practice() {
    * our content.
    */
   const paid = state.premium.active;
+  // A dimmed tile that swallows the tap teaches nothing: the student cannot
+  // tell the app from a dead one. Same sheet the study shelf opens.
+  const [showLocked, setShowLocked] = useState(false);
 
   return (
     <Screen tabbed>
@@ -53,7 +57,7 @@ export default function Practice() {
               // The timed test is the special one, so it gets a whole row,
               // laid out like the AI banner below it rather than a stray tile.
               <Card
-                onPress={open ? () => router.push(m.href as never) : undefined}
+                onPress={open ? () => router.push(m.href as never) : () => setShowLocked(true)}
                 border={C.orange}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: S.md, opacity: open ? 1 : 0.62 }}
               >
@@ -66,7 +70,7 @@ export default function Practice() {
               </Card>
             ) : (
               <Card
-                onPress={open ? () => router.push(m.href as never) : undefined}
+                onPress={open ? () => router.push(m.href as never) : () => setShowLocked(true)}
                 style={{ flex: 1, gap: 6, minHeight: 106, opacity: open ? 1 : 0.62 }}
               >
                 <Icon name={open ? m.icon : 'lock'} color={C.teal} />
@@ -114,6 +118,12 @@ export default function Practice() {
 
       <Spacer h={S.md} />
       <Small>{t('practice.answered', { n: state.attempts.length })}</Small>
+
+      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={t('billing.premium')}>
+        <LockedNotice variant="free" />
+        <Spacer h={S.md} />
+        <Btn title={t('common.close')} variant="line" onPress={() => setShowLocked(false)} />
+      </Sheet>
     </Screen>
   );
 }

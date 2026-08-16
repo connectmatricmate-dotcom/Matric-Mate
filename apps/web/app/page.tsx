@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { PAPER_CONTENT, contentFor } from '@matricmate/core';
+import { AI_QUOTA, PAPER_CONTENT, contentFor } from '@matricmate/core';
 import { AudioSample } from '@/components/landing/AudioSample';
-import { CountUp } from '@/components/landing/CountUp';
 import { CursorGlow } from '@/components/landing/CursorGlow';
 import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
@@ -10,13 +9,14 @@ import { Reveal } from '@/components/landing/Reveal';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { SubjectMarquee } from '@/components/landing/SubjectMarquee';
 import { Tilt } from '@/components/landing/Tilt';
-import { Bar, Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
+import { Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
 import type { IconName } from '@matricmate/core';
 
-/** Everything on this page is real product content, not marketing mock-ups. */
+/** The chapter and questions here are the ones the app ships, not marketing filler. */
 const dynamics = contentFor('phy-3');
 /** Four questions for the self-playing hero, so the loop does not repeat fast. */
 const heroMcqs = dynamics.mcqs.slice(0, 4);
+/** Written by us to the board's pattern, so the card that renders it says so. */
 const physicsPaper = PAPER_CONTENT.pp1;
 
 const PAINS: { icon: IconName; title: string; body: string }[] = [
@@ -47,11 +47,23 @@ const STEPS = [
 /** Chip tones rotate so the feature grid carries colour, not just copy. */
 const INSIDE: { icon: IconName; tone: string; title: string; body: string }[] = [
   { icon: 'book', tone: 'bg-tealtint text-teal', title: 'Chapter-wise notes', body: 'Every chapter split into short sections with definitions, formulas and worked examples, in your medium.' },
-  { icon: 'headphones', tone: 'bg-orangetint text-orangedark', title: 'Audio lessons', body: 'Listen to the whole chapter in English or Urdu. Download it in the Android app and it costs no data on the second listen.' },
+  { icon: 'headphones', tone: 'bg-orangetint text-orangedark', title: 'Audio lessons', body: 'Listen to the whole chapter in English or Urdu, in the browser today. The Android app adds a download, so the second listen costs no data.' },
   { icon: 'cards', tone: 'bg-greentint text-green', title: 'Flashcards', body: 'Active recall for the definitions that show up in Section A. Cards you miss come back first.' },
   { icon: 'target', tone: 'bg-greentint text-green', title: 'MCQs with explanations', body: 'Every question tells you why the right answer is right, which is the part that actually teaches.' },
   { icon: 'edit', tone: 'bg-tealtint text-teal', title: 'Blanks and short questions', body: 'Model answers with the marking points, so you know what earns each mark.' },
   { icon: 'clock', tone: 'bg-orangetint text-orangedark', title: 'Timed tests', body: 'Full paper conditions with a question palette and flagging, so exam day isn’t the first time.' },
+];
+
+/**
+ * The three buttons a student actually taps after every question, with the XP
+ * the app really awards for them (XP.forAnswer in core). This panel used to
+ * show accuracy percentages instead. Nobody has answered a question in
+ * MatricMate yet, so those numbers could only ever have been invented.
+ */
+const CONFIDENCE_TAGS: { label: string; tone: 'green' | 'orange' | 'red'; body: string }[] = [
+  { label: 'Certain', tone: 'green', body: 'Pakka. 12 XP when you are right, and first in the revision queue when you are not.' },
+  { label: 'Fairly sure', tone: 'orange', body: 'Thora pakka. 10 XP, and the topic stays on the watch list.' },
+  { label: 'Guess', tone: 'red', body: 'Tukka. 5 XP even when it lands, because a lucky answer is not knowledge.' },
 ];
 
 const FAQ = [
@@ -61,7 +73,7 @@ const FAQ = [
   },
   {
     q: 'Does it work without internet?',
-    a: 'Downloads are an Android app feature. Save a chapter there and its notes, audio and MCQs work with no signal, and answers sync when you reconnect. The website needs a connection. The AI tutor and timed tests need one on both.',
+    a: 'The website needs a connection, and it is what MatricMate runs on today: any phone or laptop browser, nothing to install. Offline study belongs to the Android app, which is not on Play yet. Once it is, a saved chapter keeps its notes, audio and MCQs with no signal, and answers sync when you reconnect. The AI tutor and timed tests need a connection either way.',
   },
   {
     q: 'My child studies in Urdu medium. Is the content really in Urdu?',
@@ -73,11 +85,11 @@ const FAQ = [
   },
   {
     q: 'Can I use it on both phone and computer?',
-    a: 'Yes. The Android app and this website share one account, so your progress follows you.',
+    a: 'Yes. The website runs the same on a phone browser and a laptop, and your progress lives on the account rather than the device. The Android app signs in to that same account when it reaches Play.',
   },
   {
     q: 'Can I stop whenever I want?',
-    a: 'Yes. You pay month to month, nothing renews on its own, and there is no lock-in. Cancel from Profile, then Subscription, and you keep access until the date you have already paid for.',
+    a: 'Yes, and there is nothing to cancel. A plan is one payment that runs to its end date; no card is kept and nothing charges you again. If you want to carry on you pay for another stretch, and if you don’t, the plan just ends.',
   },
 ];
 
@@ -146,7 +158,7 @@ export default function LandingPage() {
                 </div>
 
                 <p className="fx-rise fx-d6 mt-4 text-mk-small text-tealtint/80">
-                  Rs 1,000/month · cancel any time · JazzCash, Easypaisa or card
+                  Rs 1,000/month · nothing renews on its own · JazzCash, Easypaisa or card
                 </p>
               </div>
 
@@ -283,33 +295,26 @@ export default function LandingPage() {
             <Tilt max={6}>
               <Card className="shadow-[0_24px_70px_rgba(4,34,47,0.5)]">
                 <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">
-                  How sure you were vs how right you were
+                  How sure vs how right
                 </p>
-                <div className="mt-4 flex flex-col gap-4">
-                  {(
-                    [
-                      { label: 'Certain', pct: 91, tone: 'green', said: '96×' },
-                      { label: 'Fairly sure', pct: 68, tone: 'orange', said: '74×' },
-                      { label: 'Guess', pct: 39, tone: 'red', said: '41×' },
-                    ] as const
-                  ).map((r) => (
-                    <div key={r.label}>
-                      <div className="flex justify-between text-[13.5px] font-extrabold text-ink">
-                        <span>{r.label}</span>
-                        <span className="text-ink2 tabular">
-                          <CountUp to={r.pct} />% right · said {r.said}
-                        </span>
-                      </div>
-                      {/* rv-bar: draws from zero to the real value on reveal */}
-                      <div className="rv-bar mt-1.5">
-                        <Bar pct={r.pct} tone={r.tone} h={8} />
-                      </div>
+                <p className="mt-2 text-mk-body text-ink2">
+                  Every question ends with the same three buttons, and you press one before you find out whether you
+                  were right.
+                </p>
+                <div className="mt-4 flex flex-col gap-2.5">
+                  {CONFIDENCE_TAGS.map((c) => (
+                    <div key={c.label} className="flex items-start gap-3 rounded-[13px] border border-line px-3 py-2.5">
+                      <span className="shrink-0">
+                        <Pill tone={c.tone}>{c.label}</Pill>
+                      </span>
+                      <span className="min-w-0 flex-1 text-[13.5px] leading-[1.55] text-ink2">{c.body}</span>
                     </div>
                   ))}
                 </div>
                 <p className="mt-4 text-mk-small text-ink2">
-                  “When you say you’re certain, you’re right 91% of the time, so trust that. The guessing is where the
-                  marks are leaking.”
+                  Practise for a couple of weeks and this panel fills with your own figures: how often “certain”
+                  actually meant right, and which topics you keep getting confidently wrong. It stays empty until then,
+                  because the only numbers worth showing you are yours.
                 </p>
               </Card>
             </Tilt>
@@ -329,7 +334,7 @@ export default function LandingPage() {
                 examiner actually uses. Read a paper, or sit it under a timer with a question palette and flagging.
               </p>
               <ul className="mt-6 flex flex-col gap-3">
-                {['FBISE papers from 2019 onwards', 'Attempt as a timed test with double XP', 'Answers reviewed question by question', 'Download to read offline in the Android app'].map((li) => (
+                {['The board’s own SSC-I papers from 2023, 2024 and 2025', 'Attempt as a timed test with double XP', 'Answers reviewed question by question', 'Offline reading arrives with the Android app'].map((li) => (
                   <li key={li} className="flex items-center gap-2.5 text-[15.5px] text-ink">
                     <Icon name="check" size={18} className="text-green" strokeWidth={2.6} />
                     {li}
@@ -338,14 +343,19 @@ export default function LandingPage() {
               </ul>
             </Reveal>
 
-            {/* a genuine excerpt, typeset the way the board prints it */}
+            {/* Ours, not the board's. The board publishes scans with no text
+                layer, so a real paper can only be linked, never typeset inline.
+                This one is written to the same pattern and says so, because a
+                board masthead over our own questions would be a forgery. */}
             <Reveal>
               <Tilt max={5}>
                 <Card>
-                  <p className="text-center font-display text-[16px] text-ink">FEDERAL BOARD SSC-I EXAMINATION</p>
-                  <p className="text-center text-mk-small font-extrabold text-ink">PHYSICS · 2025</p>
+                  <p className="text-center">
+                    <Pill tone="teal">Sample paper</Pill>
+                  </p>
+                  <p className="mt-2 text-center font-display text-[16px] text-ink">Physics · SSC-I pattern</p>
                   <p className="mt-1 text-center text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
-                    65 marks · 2h 30m
+                    65 marks · three sections
                   </p>
                   <div className="my-4 border-t border-line" />
                   {physicsPaper.slice(0, 2).map((sec) => (
@@ -364,6 +374,10 @@ export default function LandingPage() {
                     </div>
                   ))}
                   <p className="text-[13px] text-ink3">…continues to Section C</p>
+                  <p className="mt-2 text-[12.5px] leading-[1.55] text-ink3">
+                    Written by us so you can see the shape of it. The board’s own papers open as the original FBISE
+                    PDFs.
+                  </p>
                 </Card>
               </Tilt>
             </Reveal>
@@ -389,13 +403,17 @@ export default function LandingPage() {
               </p>
             </div>
 
+            {/* Said twice, in the header and under the rows: this is a layout,
+                not a student. Nobody has finished a month on MatricMate yet, so
+                any grade here is drawn, and it should never be mistaken for a
+                report a parent has been sent. */}
             <Tilt max={6}>
               <Card className="border-2 border-teal">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-3">
                   <div>
                     <Image src="/brand/wordmark.png" alt="" width={110} height={22} />
                     <p className="mt-1.5 text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
-                      Monthly report · June
+                      Monthly report · sample
                     </p>
                   </div>
                   <span className="flex h-[62px] w-[62px] items-center justify-center rounded-full bg-orangetint font-display text-[24px] text-orangedark">
@@ -431,10 +449,11 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Pill tone="teal">22 active days</Pill>
-                  <Pill tone="orange">9 tests</Pill>
-                </div>
+                <p className="mt-3 text-[12.5px] leading-[1.55] text-ink3">
+                  <span className="font-extrabold text-ink2">A sample layout.</span> The real one carries your child’s
+                  own subjects and grades, the days they studied, the tests they sat, and the topics still costing
+                  marks.
+                </p>
               </Card>
             </Tilt>
           </Reveal>
@@ -452,23 +471,20 @@ export default function LandingPage() {
           <Reveal className="mx-auto mt-10 max-w-[560px]">
             <Tilt max={4}>
               <Card className="relative flex h-full flex-col border-2 border-orange shadow-[0_18px_50px_rgba(255,138,0,0.16)]">
-                <span className="absolute -top-3 right-5">
-                  <Pill tone="orange">Most students pick monthly</Pill>
-                </span>
                 <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium</p>
                 <p className="mt-1 font-display text-[52px] leading-none text-ink">
                   Rs 1,000
                   <span className="ml-1 text-[16px] font-normal text-ink2">/ month</span>
                 </p>
-                <p className="text-mk-small text-ink2">Cancel any time · nothing renews on its own</p>
+                <p className="text-mk-small text-ink2">One payment · nothing renews on its own</p>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5">
                   {[
                     'Every chapter, note and audio lesson',
                     'Unlimited MCQs, tests and past papers',
-                    'AI tutor: 50 questions a day',
+                    `AI tutor: ${AI_QUOTA.premium} questions a day`,
                     'Weak topics and monthly report card',
-                    'Offline downloads in the Android app',
-                    'Android app and website, one account',
+                    'Offline downloads in the Android app, coming to Play',
+                    'Website now, Android app next, one account',
                   ].map((li) => (
                     <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink">
                       <Icon name="check" size={17} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
@@ -527,7 +543,8 @@ export default function LandingPage() {
                 The exam is a date. Start before it’s a deadline.
               </h2>
               <p className="relative mx-auto mt-4 max-w-[520px] text-mk-lead text-tealtint">
-                Rs 1,000 a month, cancel whenever you like. Set up in two minutes and study your first chapter tonight.
+                Rs 1,000 a month, and nothing renews on its own. Set up in two minutes and study your first chapter
+                tonight.
               </p>
               <div className="relative mt-8 flex flex-wrap justify-center gap-3">
                 <span className="pulse-glow rounded-[16px]">

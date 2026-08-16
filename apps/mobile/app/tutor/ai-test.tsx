@@ -150,10 +150,17 @@ export default function AiBuilder() {
         ]}
       />
 
-      <Spacer h={S.md} />
-      <Card flat tint={C.tealTint}>
-        <Small>{t('tutor.costNote', { n: 2, limit: 50 })}</Small>
-      </Card>
+      {/* The allowance comes from the account, not from a literal: 50 was
+          only ever the premium number, and an account with none at all was
+          told it was spending out of a bucket it does not have. */}
+      {derived.aiLimit > 0 ? (
+        <>
+          <Spacer h={S.md} />
+          <Card flat tint={C.tealTint}>
+            <Small>{t('tutor.costNote', { n: 2, limit: derived.aiLimit })}</Small>
+          </Card>
+        </>
+      ) : null}
 
       {weak.length ? (
         <>

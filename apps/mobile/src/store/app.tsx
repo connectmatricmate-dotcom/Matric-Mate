@@ -524,7 +524,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       togglePlanTask: (id) =>
         setState((s) => ({
           ...s,
-          planDone: s.planDone.includes(id) ? s.planDone.filter((x) => x !== id) : [...s.planDone, id],
+          // Task ids carry the day, so anything from an earlier day is dead
+          // weight. Dropping it here keeps the list to today's three.
+          planDone: (s.planDone.includes(id)
+            ? s.planDone.filter((x) => x !== id)
+            : [...s.planDone, id]
+          ).filter((x) => x.endsWith(todayKey())),
         })),
       toggleDownload: async (chapterId) => {
         const isDownloaded = stateRef.current.downloads.includes(chapterId);

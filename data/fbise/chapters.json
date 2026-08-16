@@ -578,35 +578,8 @@
     "math": {
       "totalMarks": 135,
       "sourcePage": "Table of Specification, Model Question Paper Mathematics - Grade IX (SSC-I), content/fbise/text/framework-math.txt lines 1011-1036 (PDF page 26 of framework-math.pdf)",
-      "chapters": [
-        {
-          "number": 1,
-          "title": "Numbers and Algebra",
-          "slos": [
-            "A"
-          ],
-          "marks": 41,
-          "share": 30
-        },
-        {
-          "number": 2,
-          "title": "Geometry",
-          "slos": [
-            "B"
-          ],
-          "marks": 71,
-          "share": 53
-        },
-        {
-          "number": 3,
-          "title": "Information Handling",
-          "slos": [
-            "C"
-          ],
-          "marks": 23,
-          "share": 17
-        }
-      ]
+      "chapters": [],
+      "_note": "The board's Table of Specification for Class 9 Mathematics gives marks per DOMAIN (Numbers and Algebra 41, Geometry 71, Information Handling 23), not per chapter. Those three rows used to sit here with number 1, 2 and 3, and the ingest matches on number, so they landed on Matrices, Sets and Logarithms and told students those chapters were 30%, 53% and 17% of the paper. Matrices is not even examined. Until the board publishes a per-chapter split, Maths carries no weight and the app shows none."
     },
     "pst": {
       "totalMarks": 90,

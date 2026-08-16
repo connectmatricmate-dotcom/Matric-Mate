@@ -38,7 +38,7 @@ export default async function CheckoutPage({
 
       <CheckoutForm
         plan={planById(plan ?? 'quarter')}
-        live={gateway.isConfigured}
+        live={gateway.isLive}
         cancelled={cancelled === '1'}
         accountEmail={user?.email ?? null}
       />

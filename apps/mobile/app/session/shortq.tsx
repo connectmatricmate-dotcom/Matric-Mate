@@ -3,7 +3,7 @@ import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
-import { api, chaptersFor, checkAnswerLive, fetchAiSession, normalizeAiShortQs } from '@matricmate/core';
+import { api, chapterById, chaptersFor, checkAnswerLive, fetchAiSession, normalizeAiShortQs } from '@matricmate/core';
 import type { AiCheckVerdict } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
@@ -109,7 +109,11 @@ export default function ShortQuestions() {
       mcqId: item.id,
       chapterId,
       subjectId: chapterId.split('-')[0],
-      topic: t('practice.shortQ'),
+      // The chapter's own title, not the name of the exercise. This used
+      // to store the translated UI label, so Weak topics listed
+      // "Fill in the blanks" as a syllabus topic, and switching language
+      // forked it into a second one.
+      topic: chapterById(chapterId)?.title ?? chapterId,
       correct: m === 'got',
       confidence: null,
       mode: 'shortq',

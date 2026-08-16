@@ -7,6 +7,8 @@
  * is the wrong home for them.
  */
 
+import { AI_QUOTA } from '@matricmate/core';
+
 export type PlanId = 'monthly' | 'quarter' | 'year';
 
 export type Plan = {
@@ -19,6 +21,11 @@ export type Plan = {
   perMonth: number;
   saving?: string;
   note: string;
+  /**
+   * Stays unset until sales tell us which length people actually choose. The
+   * pill it drives says "most students pick this", and with nobody subscribed
+   * yet that is a claim we cannot make.
+   */
   popular?: boolean;
 };
 
@@ -29,7 +36,7 @@ export const PLANS: Plan[] = [
     price: 1000,
     months: 1,
     perMonth: 1000,
-    note: 'Pay as you go. Cancel any month.',
+    note: 'Pay as you go, one month at a time.',
   },
   {
     id: 'quarter',
@@ -39,7 +46,6 @@ export const PLANS: Plan[] = [
     perMonth: 900,
     saving: 'Save Rs 300',
     note: 'Covers a full term, mid-terms included.',
-    popular: true,
   },
   {
     id: 'year',
@@ -79,13 +85,18 @@ export const PAYMENT_METHODS = [
   { id: 'card' as const, label: 'Debit or credit card', hint: 'Visa, Mastercard', logo: null },
 ];
 
+/**
+ * The quota comes from AI_QUOTA rather than a literal because this list and the
+ * landing page and the terms page all quote it, and they had already drifted to
+ * two different numbers.
+ */
 export const INCLUDED = [
   'Every chapter, note and audio lesson',
   'Unlimited MCQs, tests and past papers',
-  'AI tutor: 20 questions a day',
+  `AI tutor: ${AI_QUOTA.premium} questions a day`,
   'Weak topics and monthly report card',
-  'Offline downloads in the Android app',
-  'Android app and website, one account',
+  'Offline downloads in the Android app, coming to Play',
+  'Website now, Android app next, one account',
 ];
 
 /*

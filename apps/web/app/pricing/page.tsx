@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { AI_QUOTA } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { PayMark } from '@/components/commerce/PayMark';
@@ -10,7 +11,7 @@ import { PAYMENT_METHODS } from '@/lib/plans';
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'Rs 1,000 a month for everything in MatricMate: every chapter, unlimited practice, past papers and the AI tutor. Cancel any time.',
+    'Rs 1,000 a month for everything in MatricMate: every chapter, unlimited practice, past papers and the AI tutor. Nothing renews on its own.',
 };
 
 /** Row-by-row, so a parent can see exactly where the money goes. */
@@ -18,16 +19,18 @@ const COMPARE: { feature: string; premium: string }[] = [
   { feature: 'Chapters, notes and audio lessons', premium: 'All of them, English and Urdu' },
   { feature: 'MCQs, blanks and short questions', premium: 'Unlimited' },
   { feature: 'Timed tests and past papers', premium: 'Unlimited' },
-  { feature: 'AI tutor questions a day', premium: '20' },
+  // Straight from the limit the tutor route enforces, so the table cannot
+  // quietly promise a different number from the one the API allows.
+  { feature: 'AI tutor questions a day', premium: String(AI_QUOTA.premium) },
   { feature: 'Weak topics and monthly report card', premium: 'Included' },
-  { feature: 'Offline downloads (Android app)', premium: 'Included' },
-  { feature: 'Android app and website', premium: 'One account, both' },
+  { feature: 'Offline downloads', premium: 'With the Android app, coming to Play' },
+  { feature: 'Where it works', premium: 'Website now, Android app next' },
 ];
 
 const QUESTIONS = [
   {
     q: 'What happens when my plan runs out?',
-    a: 'Nothing renews on its own. We message you two days before your plan runs out; if you want to carry on, you pay then. If you don’t, your progress stays on the account and it simply stops unlocking new chapters.',
+    a: 'Nothing renews on its own. The end date sits on your account page from the day you pay, so you can see it coming; if you want to carry on, you pay then. If you don’t, your progress stays on the account and it simply stops unlocking new chapters.',
   },
   {
     q: 'Can I pay from a mobile account?',
@@ -38,8 +41,8 @@ const QUESTIONS = [
     a: 'Yes. One account, both surfaces. Study on your laptop at home and on your phone on the bus, and the same progress follows you.',
   },
   {
-    q: 'Can I cancel?',
-    a: 'Any time, from Profile, then Subscription. You keep access until the date you’ve already paid for, and chapters downloaded in the Android app stay on your phone.',
+    q: 'What if I want to stop?',
+    a: 'Then you stop, and there is nothing to cancel. A plan is a single payment that runs to its end date; we keep no card on file and never charge you again, so leaving it alone is enough. You keep access to the last day you paid for.',
   },
   {
     q: 'Is there a discount for a whole class or school?',
@@ -54,9 +57,9 @@ export default function PricingPage() {
 
       <main>
         <section className="mx-auto max-w-[1100px] px-5 pb-4 pt-14 text-center">
-          <Pill tone="orange">Cancel any time</Pill>
+          <Pill tone="orange">Nothing auto-renews</Pill>
           <h1 className="mx-auto mt-3 max-w-[640px] font-display text-mk-h1 text-ink">
-            One plan. Every subject, every chapter, both apps.
+            One plan. Every subject, every chapter, nothing held back.
           </h1>
           <p className="mx-auto mt-3 max-w-[560px] text-mk-lead text-ink2">
             A month of MatricMate costs less than one hour of home tuition, and it doesn’t go home at nine.
@@ -116,8 +119,8 @@ export default function PricingPage() {
             ))}
           </div>
           <p className="mt-4 text-mk-small text-ink2">
-            Handled by Safepay. We never see or store your card or wallet details, and nothing renews on its own. We
-            remind you two days before your plan ends and you decide.
+            Handled by Safepay. We never see or store your card or wallet details, and nothing renews on its own. Your
+            plan runs to the end date shown on your account, and paying again is always your move.
           </p>
         </section>
 

@@ -60,6 +60,22 @@ export const metadata: Metadata = {
     siteName: 'MatricMate',
     locale: 'en_PK',
     type: 'website',
+    /*
+     * Without an image a shared link renders as a grey box with a URL under it,
+     * and WhatsApp is how this product will actually get passed around.
+     *
+     * icon-512 rather than the 1024: WhatsApp fetches preview images with a
+     * tight size budget and quietly drops anything much over a few hundred KB,
+     * and the 1024 is 1.2MB. 512 square also clears the 200px minimum that
+     * Facebook and LinkedIn enforce.
+     */
+    images: [{ url: '/brand/icon-512.png', width: 512, height: 512, alt: 'MatricMate' }],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'MatricMate · FBISE Class 9 exam preparation',
+    description: 'Notes, audio lessons, past papers and an AI tutor for FBISE Class 9, in English and Urdu.',
+    images: ['/brand/icon-512.png'],
   },
 };
 

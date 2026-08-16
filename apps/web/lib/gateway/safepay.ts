@@ -1,7 +1,7 @@
 import 'server-only';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
-import { checkoutUrl, createTracker, fetchTracker, isSafepayConfigured, verifySignature } from './safepay-api';
+import { checkoutUrl, createTracker, fetchTracker, isSafepayConfigured, isSafepayLive, verifySignature } from './safepay-api';
 import type {
   CheckoutRequest,
   CheckoutStart,
@@ -60,6 +60,11 @@ export const safepayProvider: PaymentProvider = {
 
   get isConfigured() {
     return isSafepayConfigured;
+  },
+
+  /** True only when a real payment will really be taken. */
+  get isLive() {
+    return isSafepayLive;
   },
 
   async startCheckout(req: CheckoutRequest): Promise<CheckoutStart> {
