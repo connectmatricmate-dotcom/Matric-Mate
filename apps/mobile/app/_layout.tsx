@@ -9,7 +9,7 @@ import { Nunito_400Regular, Nunito_600SemiBold, Nunito_800ExtraBold } from '@exp
 import { NotoNastaliqUrdu_400Regular, NotoNastaliqUrdu_600SemiBold } from '@expo-google-fonts/noto-nastaliq-urdu';
 import { ConnectivityProvider } from '../src/core/connectivity';
 import { AuthProvider } from '../src/store/auth';
-import { AppProvider } from '../src/store/app';
+import { AppProvider, useApp } from '../src/store/app';
 import { ToastHost } from '../src/components/ui';
 import { C } from '../src/theme';
 
@@ -30,9 +30,6 @@ export default function RootLayout() {
   // error branch, fontsLoaded stayed false forever and the splash never hid.
   // System fonts are a downgrade; a frozen splash is an outage.
   const ready = fontsLoaded || !!fontError;
-  useEffect(() => {
-    if (ready) SplashScreen.hideAsync().catch(() => {});
-  }, [ready]);
 
   if (!ready) return null;
 
@@ -42,6 +39,7 @@ export default function RootLayout() {
       <ConnectivityProvider>
         <AuthProvider>
           <AppProvider>
+            <SplashGate />
             <ToastHost>
               <StatusBar style="dark" />
               <Stack
@@ -60,4 +58,29 @@ export default function RootLayout() {
       </ConnectivityProvider>
     </SafeAreaProvider>
   );
+}
+
+/**
+ * Holds the splash until the saved settings are back from storage.
+ *
+ * The splash used to lift as soon as the fonts were ready, but the language
+ * lives in AsyncStorage and arrives a moment later, so an Urdu student saw one
+ * frame of a left-to-right English app before it flipped. Waiting for
+ * hydration costs a few milliseconds and removes the flash entirely.
+ *
+ * The timeout is the same reasoning as the font error branch above: if
+ * hydration somehow never reports, a slightly wrong first frame is a blemish
+ * and a splash that never lifts is an outage.
+ */
+function SplashGate() {
+  const { hydrated } = useApp();
+  useEffect(() => {
+    if (hydrated) {
+      SplashScreen.hideAsync().catch(() => {});
+      return;
+    }
+    const bail = setTimeout(() => SplashScreen.hideAsync().catch(() => {}), 2500);
+    return () => clearTimeout(bail);
+  }, [hydrated]);
+  return null;
 }
