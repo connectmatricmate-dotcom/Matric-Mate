@@ -16,6 +16,7 @@ import { AI_QUOTA, XP, buildPlan, level, setContentGrade, setContentMedium, stre
   Attempt,
   ChatThread,
   Group,
+  Language,
   Medium,
   Notification,
   PlanTask,
@@ -185,6 +186,8 @@ type Actions = {
   saveThread: (t: ChatThread) => void;
   readNotifications: () => void;
   setSettings: (s: Partial<Settings>) => void;
+  /** The single language switch: interface and syllabus move together. */
+  setLanguage: (next: Language) => void;
   /** Server-enforced class change; 'cooldown' when the 7-day wall says no. */
   switchClass: (next: 9 | 10) => Promise<'ok' | 'cooldown' | 'error'>;
   resetDemo: () => void;
@@ -244,7 +247,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const raw = await AsyncStorage.getItem(KEY);
         if (raw) {
           const parsed = JSON.parse(raw) as State;
-          setState({ ...EMPTY, ...parsed, settings: { ...DEFAULT_SETTINGS, ...parsed.settings } });
+          const settings = { ...DEFAULT_SETTINGS, ...parsed.settings };
+          /**
+           * Interface language and syllabus language are one choice now. An
+           * account saved under the old split can hold two different values,
+           * so the syllabus wins: it is the one attached to real content, and
+           * a student reading Urdu notes wants an Urdu app.
+           */
+          const one = parsed.onboarding?.medium ?? settings.contentMedium ?? settings.language;
+          setState({
+            ...EMPTY,
+            ...parsed,
+            settings: { ...settings, language: one, contentMedium: one },
+            onboarding: parsed.onboarding ? { ...parsed.onboarding, medium: one } : parsed.onboarding,
+          });
         }
       } catch {
         // corrupt cache, start clean rather than crash
@@ -436,7 +452,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * translation of all nine subjects sat in the database that no Urdu-medium
    * student could reach.
    */
-  const contentMedium = state.settings.contentMedium;
+  const contentMedium = state.settings.language;
   useEffect(() => {
     setContentMedium(contentMedium);
   }, [contentMedium]);
@@ -583,6 +599,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       readNotifications: () =>
         setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
       setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
+      /**
+       * One language for the whole app.
+       *
+       * The interface language and the syllabus language used to be two
+       * separate switches, which let a student sit in an English interface
+       * reading Urdu notes, or the reverse. The client asked for one choice,
+       * and it is also the honest one: a student who studies in Urdu wants
+       * the app in Urdu. This writes all three places that carried the old
+       * split, so nothing can drift: the interface setting, the content
+       * medium the query layer filters on, and the medium stored on the
+       * profile that the website's server reads.
+       */
+      setLanguage: (next) => {
+        setState((s) => ({
+          ...s,
+          settings: { ...s.settings, language: next, contentMedium: next },
+          onboarding: s.onboarding ? { ...s.onboarding, medium: next } : s.onboarding,
+        }));
+        const uid = syncedForRef.current;
+        const onboarding = stateRef.current.onboarding;
+        if (uid && onboarding) {
+          void supabase.from('profiles').update({ onboarding: { ...onboarding, medium: next } }).eq('id', uid);
+        }
+      },
       /**
        * Change class, the four-step contract: server first (the trigger there
        * enforces the 7 day cooldown and RLS follows profiles.grade), then

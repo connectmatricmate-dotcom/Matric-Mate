@@ -87,6 +87,8 @@ type Actions = {
   saveThread: (t: ChatThread) => void;
   readNotifications: () => void;
   setSettings: (s: Partial<Settings>) => void;
+  /** The single language switch: interface and syllabus move together. */
+  setLanguage: (next: Language) => void;
   resetDemo: () => void;
   /** Re-reads entitlement from the server. Returns whether premium is on. */
   refreshPremium: () => Promise<boolean>;
@@ -258,6 +260,29 @@ const actions: Actions = {
   saveThread: (t) => update((s) => ({ ...s, threads: [t, ...s.threads.filter((x) => x.id !== t.id)].slice(0, 20) })),
   readNotifications: () => update((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
   setSettings: (patch) => update((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
+  /**
+   * One language for the whole app.
+   *
+   * The interface language and the syllabus language used to be two separate
+   * switches, and the two apps did not even agree on which one drove the
+   * content: Android followed the settings toggle, the website followed the
+   * medium picked at onboarding, so the same control did different things.
+   * One choice now writes all three places, and the profile write is what
+   * lets the server-rendered pages read the right medium.
+   */
+  setLanguage: (next) => {
+    update((s) => ({
+      ...s,
+      settings: { ...s.settings, language: next, contentMedium: next },
+      onboarding: s.onboarding ? { ...s.onboarding, medium: next } : s.onboarding,
+    }));
+    const onboarding = getSnapshot().onboarding;
+    if (onboarding) {
+      void createClient().auth.getUser().then(({ data }) => {
+        if (data.user) void createClient().from('profiles').update({ onboarding }).eq('id', data.user.id);
+      });
+    }
+  },
   resetDemo: () =>
     update((s) => {
       // The server too, not just localStorage. Progress syncs now, so clearing
@@ -513,7 +538,7 @@ export function useT() {
    * Urdu translation sat unread in the database. The medium chosen at
    * onboarding is the syllabus language, which is what content is keyed on.
    */
-  const contentMedium = state.onboarding?.medium ?? 'en';
+  const contentMedium = state.settings.language;
   const classLevel = state.onboarding?.classLevel ?? 9;
   useEffect(() => {
     setContentGrade(classLevel);
@@ -535,6 +560,6 @@ export function useLang() {
   return {
     lang: state.settings.language,
     isUrdu: state.settings.language === 'ur',
-    setLang: (next: Language) => a.setSettings({ language: next }),
+    setLang: (next: Language) => a.setLanguage(next),
   };
 }

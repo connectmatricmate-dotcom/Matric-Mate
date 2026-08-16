@@ -25,7 +25,7 @@ export function useLang() {
     () => ({
       lang,
       isUrdu: lang === 'ur',
-      setLang: (next: Language) => actions.setSettings({ language: next }),
+      setLang: (next: Language) => actions.setLanguage(next),
     }),
     [lang, actions]
   );

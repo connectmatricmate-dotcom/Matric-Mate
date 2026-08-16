@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import type { Language, Medium } from '@matricmate/core';
+import type { Language } from '@matricmate/core';
 import { GRADE_10_READY, levelProgress, xpToNextLevel } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
 import { planById } from '@/lib/plans';
@@ -148,15 +148,17 @@ export function AccountView() {
             </Card>
           </Link>
 
-          {/* App language sits alone: it changes every other word on this page. */}
+          {/* One switch for the app and the syllabus. Two controls let a
+              student sit in an English app reading Urdu notes, and the two
+              apps did not even agree on which one drove the content. */}
           <Card className="flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
             <div className="min-w-0">
               <p className="text-[14.5px] font-extrabold text-ink">{t('lang.label')}</p>
-              <p className="text-[13px] text-ink2">{s.language === 'en' ? t('lang.englishHint') : t('lang.urduHint')}</p>
+              <p className="text-[13px] text-ink2">{t('lang.oneSwitchSub')}</p>
             </div>
             <Seg
               value={s.language}
-              onChange={(l: Language) => actions.setSettings({ language: l })}
+              onChange={(l: Language) => actions.setLanguage(l)}
               label={t('lang.label')}
               options={[
                 { value: 'en' as Language, label: t('lang.english') },
@@ -167,22 +169,6 @@ export function AccountView() {
 
           <CardGrid>
             <Group title={t('account.content')}>
-              <Item
-                title={t('account.contentMedium')}
-                sub={t('account.contentMediumSub')}
-                icon="layers"
-                right={
-                  <Seg
-                    value={s.contentMedium}
-                    onChange={(m: Medium) => actions.setSettings({ contentMedium: m })}
-                    label={t('account.contentMedium')}
-                    options={[
-                      { value: 'en' as Medium, label: 'Eng' },
-                      { value: 'ur' as Medium, label: 'Urdu' },
-                    ]}
-                  />
-                }
-              />
               <ItemButton
                 title={t('account.readingSize')}
                 sub={sizeLabel}

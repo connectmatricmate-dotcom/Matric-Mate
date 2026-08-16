@@ -167,10 +167,19 @@ export function hydrate() {
     const raw = window.localStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<State>;
+      const settings = { ...DEFAULT_SETTINGS, ...parsed.settings };
+      /**
+       * Interface language and syllabus language are one choice now. A
+       * snapshot written under the old split can hold two different values,
+       * so the syllabus wins: it is the one attached to real content, and a
+       * student reading Urdu notes wants an Urdu app.
+       */
+      const one = parsed.onboarding?.medium ?? settings.contentMedium ?? settings.language;
       restored = {
         ...EMPTY,
         ...parsed,
-        settings: { ...DEFAULT_SETTINGS, ...parsed.settings },
+        settings: { ...settings, language: one, contentMedium: one },
+        onboarding: parsed.onboarding ? { ...parsed.onboarding, medium: one } : (parsed.onboarding ?? null),
         // Snapshots written before premium was excluded may still carry one.
         premium: EMPTY.premium,
         hydrated: true,

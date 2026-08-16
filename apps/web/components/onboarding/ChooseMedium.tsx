@@ -25,8 +25,11 @@ export function ChooseMedium() {
       cta={t('common.continue')}
       footnote={t('onboarding.mediumFootnote')}
       onNext={() => {
+        // One choice, whole app: the interface and the syllabus both follow
+        // this, so a student never ends up reading Urdu notes in an English
+        // app or the reverse.
         actions.setOnboarding({ medium: value });
-        actions.setSettings({ contentMedium: value });
+        actions.setLanguage(value);
         router.push('/onboarding/subjects');
       }}
     >

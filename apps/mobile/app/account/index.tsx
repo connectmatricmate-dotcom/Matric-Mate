@@ -2,7 +2,6 @@ import Constants from 'expo-constants';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { LanguageToggle } from '../../src/components/LanguageToggle';
 import {
   Bar,
   Btn,
@@ -21,7 +20,7 @@ import {
   Toggle,
   useToast,
 } from '../../src/components/ui';
-import { GRADE_10_READY, Medium, levelProgress, xpToNextLevel } from '@matricmate/core';
+import { GRADE_10_READY, Language, levelProgress, xpToNextLevel } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { useApp } from '../../src/store/app';
@@ -136,15 +135,18 @@ export default function Account() {
               setConfirmClass(next);
             }}
           />
+          {/* One switch for the app and the syllabus. Two controls let a
+              student sit in an English app reading Urdu notes, and nobody
+              wanted that combination. */}
           <Item
-            title={t('account.contentMedium')}
-            sub={t('account.contentMediumSub')}
+            title={t('lang.label')}
+            sub={t('lang.oneSwitchSub')}
             icon="book2"
             right={
               <View style={{ width: 118 }}>
-                <Seg<Medium>
-                  value={s.contentMedium}
-                  onChange={(m) => actions.setSettings({ contentMedium: m })}
+                <Seg<Language>
+                  value={s.language}
+                  onChange={(next) => actions.setLanguage(next)}
                   options={[
                     { value: 'en', label: 'English' },
                     { value: 'ur', label: 'Urdu' },
@@ -160,13 +162,6 @@ export default function Account() {
             last
             onPress={() => actions.setSettings({ fontScale: ((s.fontScale + 1) % 3) as 0 | 1 | 2 })}
           />
-        </Card>
-
-        {/* App language, the interface, not the syllabus */}
-        <SectionTitle>{t('lang.label')}</SectionTitle>
-        <Card flat style={{ alignItems: 'center', gap: S.sm }}>
-          <LanguageToggle />
-          <Small style={{ textAlign: 'center' }}>{s.language === 'en' ? t('lang.englishHint') : t('lang.urduHint')}</Small>
         </Card>
 
         <SectionTitle>{t('account.appearance')}</SectionTitle>
