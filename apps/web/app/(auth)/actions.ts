@@ -1,6 +1,8 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { type StringKey, translate } from '@matricmate/core';
+import { readUiLanguage } from '@/lib/ui-language.server';
 import { z } from 'zod';
 import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
@@ -22,18 +24,24 @@ export type AuthState = {
   email?: string;
 };
 
-const email = z.string().trim().min(1, 'Enter your email.').email('That does not look like an email address.');
-const password = z.string().min(6, 'Passwords need at least 6 characters.');
+/*
+ * The messages below are string keys, not sentences. These schemas are module
+ * constants, evaluated once at import, so they cannot know who is asking. The
+ * action translates the key it gets back, where the language cookie is
+ * readable, and an Urdu student is told what is wrong in Urdu.
+ */
+const email = z.string().trim().min(1, 'auth.errEmailEmpty').email('auth.errEmailInvalid');
+const password = z.string().min(6, 'auth.errWeakPassword');
 
 const SignUp = z.object({
-  name: z.string().trim().min(2, 'Enter your full name.').max(80, 'That name is too long.'),
+  name: z.string().trim().min(2, 'auth.errNameEmpty').max(80, 'auth.errNameLong'),
   email,
   password,
 });
 
 const SignIn = z.object({ email, password });
 
-const first = (err: z.ZodError) => err.issues[0]?.message ?? 'Check the form and try again.';
+const first = (err: z.ZodError) => (err.issues[0]?.message ?? 'auth.errForm') as StringKey;
 
 export async function signUpAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = SignUp.safeParse({
@@ -41,7 +49,7 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
     email: formData.get('email'),
     password: formData.get('password'),
   });
-  if (!parsed.success) return { error: first(parsed.error) };
+  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -54,7 +62,7 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
   if (error) {
     // Supabase says "User already registered". Say something a person can act on.
     if (/already registered/i.test(error.message)) {
-      return { error: 'That email already has an account. Log in instead.' };
+      return { error: translate(await readUiLanguage(), 'auth.errRegistered') };
     }
     return { error: error.message };
   }
@@ -78,7 +86,7 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
 
 export async function signInAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = SignIn.safeParse({ email: formData.get('email'), password: formData.get('password') });
-  if (!parsed.success) return { error: first(parsed.error) };
+  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
@@ -86,7 +94,11 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
   if (error) {
     // Deliberately does not distinguish "no such account" from "wrong password".
     // The difference tells a stranger which emails are registered here.
-    return { error: 'Wrong email or password.' };
+    //
+    // Translated here rather than on the client: this is a server action, and
+    // it can read the language cookie, so an Urdu student is not told their
+    // password is wrong in English.
+    return { error: translate(await readUiLanguage(), 'auth.errCredentials') };
   }
 
   redirect(safePath(formData.get('next')));
@@ -94,7 +106,7 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
 
 export async function resetPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = email.safeParse(formData.get('email'));
-  if (!parsed.success) return { error: first(parsed.error) };
+  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
 
   const supabase = await createClient();
   // The link has to land on /auth/callback, which is the only place that can
@@ -118,15 +130,15 @@ export async function resetPasswordAction(_prev: AuthState, formData: FormData):
 export async function setPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = z
     .object({ password, confirm: z.string() })
-    .refine((v) => v.password === v.confirm, { message: 'Both passwords need to match.' })
+    .refine((v) => v.password === v.confirm, { message: 'auth.errPasswordsMatch' })
     .safeParse({ password: formData.get('password'), confirm: formData.get('confirm') });
-  if (!parsed.success) return { error: first(parsed.error) };
+  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: 'That reset link has expired. Ask for a new one.' };
+  if (!user) return { error: translate(await readUiLanguage(), 'auth.errLinkExpired') };
 
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return { error: error.message };

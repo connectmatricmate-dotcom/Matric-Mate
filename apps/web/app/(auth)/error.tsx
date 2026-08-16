@@ -3,5 +3,5 @@
 import { RouteError } from '@/components/app/RouteError';
 
 export default function Error(props: { error: Error & { digest?: string }; reset: () => void }) {
-  return <RouteError {...props} homeHref="/login" homeLabel="Back to log in" />;
+  return <RouteError {...props} homeHref="/login" homeLabelKey="auth.backToLogin" />;
 }

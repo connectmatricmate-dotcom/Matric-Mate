@@ -68,11 +68,11 @@ export function ReportCard() {
             {rows.map((r) => (
               <tr key={r.sid} className="border-b border-line">
                 <td className="py-2.5 text-[13.5px] text-ink">{subjectById(r.sid)?.name}</td>
-                <td className="w-11 py-2.5 text-right font-display text-[15px] text-ink">
+                <td className="w-11 py-2.5 text-end font-display text-[15px] text-ink">
                   {r.attempted ? grade(r.acc) : 'n/a'}
                 </td>
                 <td
-                  className={`w-7 py-2.5 text-right text-[14px] font-extrabold ${
+                  className={`w-7 py-2.5 text-end text-[14px] font-extrabold ${
                     r.trend === '↑' ? 'text-green' : r.trend === '↓' ? 'text-red' : 'text-ink3'
                   }`}
                 >

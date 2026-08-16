@@ -139,6 +139,24 @@ export const en = {
     logOutConfirm: 'Log out?',
     logOutBody: 'Your progress stays saved on this device.',
     stayLoggedIn: 'Stay logged in',
+
+    /* What a failed sign-in says. Deliberately never distinguishes "no such
+       account" from "wrong password": the difference tells a stranger which
+       email addresses are registered here. */
+    errCredentials: 'Wrong email or password.',
+    errNotConfirmed: 'Confirm your email first. Check your inbox for the link.',
+    errRegistered: 'That email already has an account. Log in instead.',
+    errWeakPassword: 'Passwords need at least 6 characters.',
+    errRateLimit: 'Too many tries. Wait a minute and try again.',
+    errNetwork: 'No internet connection. Check your data and try again.',
+    errGeneric: 'Something went wrong. Try again in a moment.',
+    errEmailEmpty: 'Enter your email.',
+    errEmailInvalid: 'That does not look like an email address.',
+    errNameEmpty: 'Enter your full name.',
+    errNameLong: 'That name is too long.',
+    errForm: 'Check the form and try again.',
+    errLinkExpired: 'That reset link has expired. Ask for a new one.',
+    errPasswordsMatch: 'Both passwords need to match.',
   },
 
   billing: {
@@ -847,6 +865,12 @@ export const en = {
     errorBody: 'Check your connection and try again.',
     premiumLocked: 'This chapter is Premium',
     unlock: 'Unlock',
+    crashTitle: 'Something went wrong',
+    crashBody: 'This screen could not load. Try again. If it keeps happening, tell us from Help so we can fix it.',
+    goHome: 'Go to Home',
+    goBack: 'Go back',
+    restartSetup: 'Restart setup',
+    backToPlans: 'Back to plans',
   },
 };
 
@@ -980,6 +1004,21 @@ export const ur: typeof en = {
     logOutConfirm: 'لاگ آؤٹ کرنا ہے؟',
     logOutBody: 'آپ کی پیش رفت اسی فون پر محفوظ رہے گی۔',
     stayLoggedIn: 'لاگ اِن رہنے دیں',
+
+    errCredentials: 'ای میل یا پاس ورڈ غلط ہے۔',
+    errNotConfirmed: 'پہلے اپنا ای میل تصدیق کریں۔ اِن باکس میں لنک دیکھیں۔',
+    errRegistered: 'اس ای میل کا اکاؤنٹ پہلے سے موجود ہے۔ لاگ اِن کریں۔',
+    errWeakPassword: 'پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔',
+    errRateLimit: 'بہت زیادہ کوششیں۔ ایک منٹ رک کر دوبارہ کوشش کریں۔',
+    errNetwork: 'انٹرنیٹ کنکشن نہیں ہے۔ اپنا ڈیٹا دیکھ کر دوبارہ کوشش کریں۔',
+    errGeneric: 'کچھ غلط ہو گیا۔ تھوڑی دیر بعد دوبارہ کوشش کریں۔',
+    errEmailEmpty: 'اپنا ای میل لکھیں۔',
+    errEmailInvalid: 'یہ ای میل ایڈریس نہیں لگتا۔',
+    errNameEmpty: 'اپنا پورا نام لکھیں۔',
+    errNameLong: 'یہ نام بہت لمبا ہے۔',
+    errForm: 'فارم دیکھ کر دوبارہ کوشش کریں۔',
+    errLinkExpired: 'یہ ری سیٹ لنک ختم ہو گیا ہے۔ نیا لنک منگوائیں۔',
+    errPasswordsMatch: 'دونوں پاس ورڈ ایک جیسے ہونے چاہئیں۔',
   },
 
   billing: {
@@ -1688,5 +1727,11 @@ export const ur: typeof en = {
     errorBody: 'اپنا انٹرنیٹ دیکھیں اور دوبارہ کوشش کریں۔',
     premiumLocked: 'یہ باب پریمیم ہے',
     unlock: 'کھولیں',
+    crashTitle: 'کچھ غلط ہو گیا',
+    crashBody: 'یہ صفحہ لوڈ نہیں ہو سکا۔ دوبارہ کوشش کریں۔ اگر بار بار ایسا ہو تو مدد سے ہمیں بتائیں، ہم ٹھیک کر دیں گے۔',
+    goHome: 'ہوم پر جائیں',
+    goBack: 'واپس جائیں',
+    restartSetup: 'سیٹ اپ دوبارہ شروع کریں',
+    backToPlans: 'واپس پلانز پر',
   },
 };

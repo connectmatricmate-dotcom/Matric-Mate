@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
-import { useAuth } from '../src/store/auth';
+import { isAuthErrorKey, useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
 import { Icon } from '../src/components/Icon';
 import { C, S } from '../src/theme';
@@ -47,7 +47,10 @@ export default function SignUp() {
       // would look like the account did not save.
       else router.replace(state.onboarding?.subjects?.length ? '/(tabs)' : '/onboarding/class');
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('states.errorBody'));
+      // The auth store hands back a string key, because it has no
+      // language of its own to translate with.
+      const key = e instanceof Error ? e.message : '';
+      setError(isAuthErrorKey(key) ? t(key) : t('states.errorBody'));
     } finally {
       setBusy(false);
     }

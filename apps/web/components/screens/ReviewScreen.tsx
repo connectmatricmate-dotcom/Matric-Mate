@@ -73,7 +73,7 @@ export function ReviewScreen() {
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => setOpen(isOpen ? null : mcq.id)}
-                  className="w-full text-left"
+                  className="w-full text-start"
                 >
                   <ScriptText
                     text={mcq.q}

@@ -51,6 +51,11 @@ export function textStart(): 'left' | 'right' {
   return urduUi ? 'right' : 'left';
 }
 
+/** The far edge, for a column of figures that hangs off the end of a row. */
+export function textEnd(): 'left' | 'right' {
+  return urduUi ? 'left' : 'right';
+}
+
 /**
  * The type. In Urdu every face resolves to Nastaliq, so a screen built from
  * plain `<Text style={{ fontFamily: F.body }}>` needs no changes to render

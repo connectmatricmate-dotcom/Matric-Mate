@@ -1,3 +1,4 @@
+import type { StringKey } from '@matricmate/core';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -105,15 +106,27 @@ const cacheKey = (userId: string) => `mm.entitlement.${userId}`;
  * fifteen year old on a phone, and they never reveal whether an email is
  * registered, which would turn the login form into an address checker.
  */
-function readable(message: string): string {
+function readable(message: string): StringKey {
   const m = message.toLowerCase();
-  if (m.includes('invalid login credentials')) return 'Wrong email or password.';
-  if (m.includes('email not confirmed')) return 'Confirm your email first. Check your inbox for the link.';
-  if (m.includes('already registered')) return 'That email already has an account. Log in instead.';
-  if (m.includes('weak password') || m.includes('at least')) return 'Passwords need at least 6 characters.';
-  if (m.includes('rate limit') || m.includes('too many')) return 'Too many tries. Wait a minute and try again.';
-  if (m.includes('network') || m.includes('fetch')) return 'No internet connection. Check your data and try again.';
-  return 'Something went wrong. Try again in a moment.';
+  if (m.includes('invalid login credentials')) return 'auth.errCredentials';
+  if (m.includes('email not confirmed')) return 'auth.errNotConfirmed';
+  if (m.includes('already registered')) return 'auth.errRegistered';
+  if (m.includes('weak password') || m.includes('at least')) return 'auth.errWeakPassword';
+  if (m.includes('rate limit') || m.includes('too many')) return 'auth.errRateLimit';
+  if (m.includes('network') || m.includes('fetch')) return 'auth.errNetwork';
+  return 'auth.errGeneric';
+}
+
+/**
+ * Returns a string key, not a sentence.
+ *
+ * This runs in the auth store, which sits above the app store and so has no
+ * language to translate with. It used to return English prose, which then went
+ * straight onto the login screen of an Urdu app. Handing back the key lets the
+ * screen that shows the message translate it, where the language is known.
+ */
+export function isAuthErrorKey(value: string): value is StringKey {
+  return value.startsWith('auth.err');
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

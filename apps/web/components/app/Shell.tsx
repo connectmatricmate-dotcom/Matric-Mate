@@ -110,7 +110,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Image src="/brand/wordmark.png" alt="MatricMate" width={116} height={23} />
           </Link>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ms-auto flex items-center gap-2">
             {derived.streak > 0 ? (
               <Link
                 href="/progress"
@@ -142,7 +142,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             >
               <Icon name="bell" size={19} />
               {unread ? (
-                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border-2 border-card bg-orange" />
+                <span className="absolute end-2 top-2 h-2.5 w-2.5 rounded-full border-2 border-card bg-orange" />
               ) : null}
             </Link>
           </div>

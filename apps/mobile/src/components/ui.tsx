@@ -268,7 +268,7 @@ export function TileGrid({ tiles }: { tiles: { key: string; full?: boolean; node
   return (
     <View style={{ gap: S.sm }}>
       {rows.map((row, i) => (
-        <View key={row[0].key} style={{ flexDirection: 'row', gap: S.sm }}>
+        <View key={row[0].key} style={{ flexDirection: rowDir(), gap: S.sm }}>
           {row.map((tile) => (
             <View key={tile.key} style={{ flex: 1 }}>
               {tile.node}
@@ -283,7 +283,7 @@ export function TileGrid({ tiles }: { tiles: { key: string; full?: boolean; node
 
 export function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <View style={st.sectionTitle}>
+    <View style={[st.sectionTitle, { flexDirection: rowDir() }]}>
       <H3>{children}</H3>
       {action}
     </View>
@@ -442,7 +442,7 @@ export function IconButton({
             style={{
               position: 'absolute',
               top: 9,
-              right: 9,
+              ...(isRTL() ? { left: 9 } : { right: 9 }),
               width: 9,
               height: 9,
               borderRadius: 99,
@@ -498,6 +498,7 @@ export function Btn({
       <View
         style={[
           st.btn,
+          { flexDirection: rowDir() },
           { backgroundColor: bg[variant] },
           sm && { paddingVertical: 10, paddingHorizontal: 16, borderRadius: R.md },
           variant === 'line' && { borderWidth: 1.5, borderColor: C.tealTint2 },
@@ -542,7 +543,7 @@ export function Pill({
   // array of them) must be wrapped in <Text>, a bare text node inside a View
   // is invalid in React Native.
   const body = (
-    <View style={[st.pill, { backgroundColor: bg }, style]}>
+    <View style={[st.pill, { flexDirection: rowDir(), backgroundColor: bg }, style]}>
       {icon ? <Icon name={icon} size={12} color={fg} strokeWidth={2.4} /> : null}
       {children == null || React.isValidElement(children) ? (
         children
@@ -578,7 +579,7 @@ export function Seg<Tv extends string>({
   style?: ViewStyle;
 }) {
   return (
-    <View style={[st.seg, style]}>
+    <View style={[st.seg, { flexDirection: rowDir() }, style]}>
       {options.map((o) => {
         const on = o.value === value;
         return (
@@ -644,7 +645,7 @@ export function Field({
   return (
     <View style={{ marginBottom: S.md }}>
       <Text style={[T.tiny, { marginBottom: 6, color: C.ink2 }]}>{label}</Text>
-      <View style={[st.field, focus && { borderColor: C.teal }, !!error && { borderColor: C.red }]}>
+      <View style={[st.field, { flexDirection: rowDir() }, focus && { borderColor: C.teal }, !!error && { borderColor: C.red }]}>
         {icon ? <Icon name={icon} size={18} color={C.ink3} /> : null}
         <TextInput
           value={value}
@@ -680,7 +681,7 @@ export function Toggle({ on, onPress }: { on: boolean; onPress?: () => void }) {
   return (
     <Tap onPress={onPress} hit>
       <View style={[st.toggle, { backgroundColor: on ? C.teal : '#D7E0DB' }]}>
-        <View style={[st.knob, on ? { right: 3 } : { left: 3 }]} />
+        <View style={[st.knob, (on ? !isRTL() : isRTL()) ? { right: 3 } : { left: 3 }]} />
       </View>
     </Tap>
   );

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { useT } from '../src/i18n';
-import { useAuth } from '../src/store/auth';
+import { isAuthErrorKey, useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
 import { Icon } from '../src/components/Icon';
 import { C, S } from '../src/theme';
@@ -31,7 +31,10 @@ export default function Forgot() {
       await requestPasswordReset(email);
       setSent(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('states.errorBody'));
+      // The auth store hands back a string key, because it has no
+      // language of its own to translate with.
+      const key = e instanceof Error ? e.message : '';
+      setError(isAuthErrorKey(key) ? t(key) : t('states.errorBody'));
     } finally {
       setBusy(false);
     }

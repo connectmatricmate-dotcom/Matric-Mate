@@ -123,7 +123,7 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
           }
 
           return isLocked ? (
-            <button key={c.id} type="button" onClick={() => setLocked(c)} className="text-left">
+            <button key={c.id} type="button" onClick={() => setLocked(c)} className="text-start">
               {body}
             </button>
           ) : (

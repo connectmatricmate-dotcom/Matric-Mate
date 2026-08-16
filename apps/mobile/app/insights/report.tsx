@@ -4,7 +4,7 @@ import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } 
 import { accuracy, boardName, formatDate, grade, mediumName, subjectById } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, textEnd } from '../../src/theme';
 
 export default function Report() {
   const { state, derived } = useApp();
@@ -76,13 +76,13 @@ export default function Report() {
               style={{ paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: C.line, justifyContent: 'space-between' }}
             >
               <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, color: C.ink }}>{subjectById(r.sid)?.name}</Text>
-              <Text style={{ fontFamily: F.display, fontSize: 15, color: C.ink, width: 44, textAlign: 'right' }}>
+              <Text style={{ fontFamily: F.display, fontSize: 15, color: C.ink, width: 44, textAlign: textEnd() }}>
                 {r.attempted ? grade(r.acc) : 'n/a'}
               </Text>
               <Text
                 style={{
                   width: 26,
-                  textAlign: 'right',
+                  textAlign: textEnd(),
                   fontFamily: F.bodyBold,
                   fontSize: 14,
                   color: r.trend === '↑' ? C.green : r.trend === '↓' ? C.red : C.ink3,

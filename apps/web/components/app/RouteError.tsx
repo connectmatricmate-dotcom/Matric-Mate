@@ -6,21 +6,37 @@
  * exist per group so a crash inside a screen keeps its surrounding chrome (the
  * Shell, the checkout frame) instead of tearing down to a bare page.
  */
-import { useEffect } from 'react';
+import { useCallback, useEffect, useSyncExternalStore } from 'react';
+import { type StringKey, translate } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn } from '@/components/ui/primitives';
+import { getServerSnapshot, getSnapshot, subscribe } from '@/lib/persisted-store';
 
 export function RouteError({
   error,
   reset,
   homeHref,
-  homeLabel,
+  homeLabelKey,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
   homeHref?: string;
-  homeLabel?: string;
+  /** A string key, not a sentence: this card renders in the student's language. */
+  homeLabelKey?: StringKey;
 }) {
+  /**
+   * Not useT(): this is an error boundary, and a hook that throws when its
+   * provider is missing would turn a recoverable screen crash into a blank
+   * page. The store lives outside React, so reading the language straight from
+   * it gives the same strings and falls back to English instead of failing.
+   */
+  const lang = useSyncExternalStore(
+    subscribe,
+    () => getSnapshot().settings.language,
+    () => getServerSnapshot().settings.language,
+  );
+  const t = useCallback((key: StringKey) => translate(lang, key), [lang]);
+
   useEffect(() => {
     // Surfaces in the server log / error tracker without showing the user a stack.
     console.error(error);
@@ -32,13 +48,11 @@ export function RouteError({
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-redtint text-red">
           <Icon name="alert" size={26} />
         </span>
-        <h1 className="mt-3 font-display text-[22px] text-ink">Something went wrong</h1>
-        <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2">
-          This screen couldn&rsquo;t load. Try again. If it keeps happening, tell us from Help so we can fix it.
-        </p>
+        <h1 className="mt-3 font-display text-[22px] text-ink">{t('states.crashTitle')}</h1>
+        <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2">{t('states.crashBody')}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          <Btn title="Try again" onClick={reset} />
-          {homeHref ? <LinkBtn title={homeLabel ?? 'Go back'} href={homeHref} variant="line" /> : null}
+          <Btn title={t('common.retry')} onClick={reset} />
+          {homeHref ? <LinkBtn title={t(homeLabelKey ?? 'states.goBack')} href={homeHref} variant="line" /> : null}
         </div>
       </Card>
     </main>

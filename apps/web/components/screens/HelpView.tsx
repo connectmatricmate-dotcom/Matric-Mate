@@ -40,7 +40,7 @@ export function HelpView() {
               type="button"
               aria-expanded={open === i}
               onClick={() => setOpen(open === i ? null : i)}
-              className="flex min-h-11 w-full items-center gap-2.5 text-left"
+              className="flex min-h-11 w-full items-center gap-2.5 text-start"
             >
               <span className="min-w-0 flex-1 text-[13.5px] font-extrabold leading-[1.5] text-ink">{t(q)}</span>
               <Icon name={open === i ? 'close' : 'plus'} size={16} className="shrink-0 text-ink2" />

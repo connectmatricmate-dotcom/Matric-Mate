@@ -231,7 +231,7 @@ export function ChatScreen({
           m.role === 'user' ? (
             <div
               key={m.id}
-              className="max-w-[84%] self-end rounded-[18px] rounded-br-[6px] bg-teal px-4 py-3 text-[14px] leading-[1.6] text-white"
+              className="max-w-[84%] self-end rounded-[18px] rounded-ee-[6px] bg-teal px-4 py-3 text-[14px] leading-[1.6] text-white"
             >
               {sentPhotos[m.id] ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -244,7 +244,7 @@ export function ChatScreen({
           ) : (
             <div
               key={m.id}
-              className="max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-card p-4"
+              className="max-w-[92%] self-start rounded-[18px] rounded-es-[6px] border border-line bg-card p-4"
             >
               {/* Markdown-aware: the model sometimes marks up its answer,
                   and students should read headings and lists, not asterisks. */}
@@ -331,14 +331,14 @@ export function ChatScreen({
         )}
 
         {thinking && liveText ? (
-          <div className="max-w-[92%] self-start rounded-[18px] rounded-bl-[6px] border border-line bg-card p-4">
+          <div className="max-w-[92%] self-start rounded-[18px] rounded-es-[6px] border border-line bg-card p-4">
             <Markdown text={liveText} className="text-[13.5px] leading-[1.65] text-ink" />
           </div>
         ) : thinking ? (
           <div
             role="status"
             aria-label={t('tutor.thinking')}
-            className="self-start rounded-[18px] rounded-bl-[6px] border border-line bg-card px-4 py-[15px]"
+            className="self-start rounded-[18px] rounded-es-[6px] border border-line bg-card px-4 py-[15px]"
           >
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 animate-pulse rounded-full bg-ink3" />
