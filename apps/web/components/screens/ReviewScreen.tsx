@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
-import { Card, Icon, Label, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { session } from '@/lib/session';
 import { NoSession } from './NoSession';
@@ -75,7 +75,11 @@ export function ReviewScreen() {
                   onClick={() => setOpen(isOpen ? null : mcq.id)}
                   className="w-full text-left"
                 >
-                  <p className="text-[13.5px] font-extrabold leading-[1.5] text-ink">{mcq.q}</p>
+                  <ScriptText
+                    text={mcq.q}
+                    className="text-[13.5px] font-extrabold leading-[1.5] text-ink"
+                    urduClassName="text-[13.5px] text-ink"
+                  />
                   <span className="mt-2 flex flex-wrap gap-2">
                     {a?.chosen != null ? (
                       <Pill tone={wrong ? 'red' : 'green'}>

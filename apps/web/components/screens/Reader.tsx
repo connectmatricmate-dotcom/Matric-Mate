@@ -61,9 +61,8 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           border="border-tealtint2"
           className={`mb-4 ${rtl ? 'border-r-4 border-r-teal' : 'border-l-4 border-l-teal'}`}
         >
-          <Label className={`text-teal ${rtl ? 'block text-right' : ''}`}>
-            {labels.definition} · {b.term}
-          </Label>
+          <Label className={`text-teal ${rtl ? 'block text-right' : ''}`}>{labels.definition}</Label>
+          {b.term ? <Prose text={b.term} size={14 * scale} /> : null}
           <div className="mt-1">
             <Prose text={b.text} size={14.5 * scale} />
           </div>
@@ -76,7 +75,11 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           <p className="font-display tracking-[0.05em] text-ink" style={{ fontSize: 24 * scale }}>
             {b.text}
           </p>
-          {b.caption ? <p className="mt-1 text-[13px] text-ink2">{b.caption}</p> : null}
+          {b.caption ? (
+            <div className="mt-1 text-ink2">
+              <Prose text={b.caption} size={13 * scale} />
+            </div>
+          ) : null}
         </Card>
       );
     case 'ur':
@@ -215,7 +218,10 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
                 <p className="text-[13px] text-ink2">{t('reader.urduMediumNote')}</p>
               </Card>
             ) : null}
-            {urduMedium && content.sectionsUr ? (
+            {/* Gated on a bundled-sample field before, so a real Urdu chapter
+                never showed its section heading. The title's own script is
+                the honest test. */}
+            {isUrduScript(section.title) ? (
               <h2 lang="ur" dir="rtl" className="urdu mb-2 text-[19px] text-ink">
                 {section.title}
               </h2>

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { type IconName, SUBJECT_ICON, type StringKey, accuracy, chapterById, chapterPct, subjectById } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoachRail, ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
-import { Bar, Card, Icon, Label } from '@/components/ui/primitives';
+import { Bar, Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
 import { createClient } from '@/lib/supabase/client';
 import { useNow } from '@/lib/now';
 import { useApp, useT } from '@/lib/store';
@@ -126,11 +126,11 @@ export function DashboardView() {
 
                   <Link href={taskHref(task)} className="flex min-w-0 flex-1 items-center gap-3 py-2.5">
                     <span className="min-w-0 flex-1">
-                      <span
-                        className={`block text-[13.5px] font-extrabold text-white ${task.done ? 'line-through opacity-70' : ''}`}
-                      >
-                        {planLabel(task)}
-                      </span>
+                      <ScriptText
+                        text={planLabel(task)}
+                        className={`text-[13.5px] font-extrabold text-white ${task.done ? 'line-through opacity-70' : ''}`}
+                        urduClassName={`text-[13.5px] text-white ${task.done ? 'line-through opacity-70' : ''}`}
+                      />
                       <span className="block text-[11.5px] font-extrabold text-white/70">
                         {subjectById(task.subjectId)?.name}
                       </span>

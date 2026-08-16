@@ -209,8 +209,16 @@ export function Header({
         </View>
       ) : null}
       <View style={{ flex: 1, minWidth: 0 }}>
-        {title ? <H2>{title}</H2> : null}
-        {sub ? <Small style={{ fontFamily: F.bodyBold }}>{sub}</Small> : null}
+        {/* Screen titles are often a chapter or subject name, which is Urdu
+            for an Urdu-medium student. */}
+        {title ? isUrduScript(title) ? <Ur size={19}>{title}</Ur> : <H2>{title}</H2> : null}
+        {sub ? (
+          isUrduScript(sub) ? (
+            <Ur size={13} style={{ color: C.ink2 }}>{sub}</Ur>
+          ) : (
+            <Small style={{ fontFamily: F.bodyBold }}>{sub}</Small>
+          )
+        ) : null}
       </View>
       {right}
     </View>
@@ -536,6 +544,9 @@ export function Pill({
       {icon ? <Icon name={icon} size={12} color={fg} strokeWidth={2.4} /> : null}
       {children == null || React.isValidElement(children) ? (
         children
+      ) : isUrduScript(String(children)) ? (
+        // Pills carry topics and chapter names, not only fixed labels.
+        <Ur size={12} style={{ color: fg }}>{String(children)}</Ur>
       ) : (
         <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: fg }}>{children}</Text>
       )}
@@ -779,20 +790,42 @@ export function Item({
 }) {
   const bgMap = { teal: C.tealTint, orange: C.orangeTint, green: C.greenTint, red: C.redTint, grey: C.grey };
   const fgMap = { teal: C.teal, orange: C.orangeDark, green: C.green, red: C.red, grey: C.ink2 };
+  /**
+   * Rows carry content, not just labels: weak topics, chat titles, AI set
+   * names and chapter names all land here and any of them can be Urdu. The
+   * script decides the face and the direction, so a caller cannot forget to
+   * say so. `urduTitle` stays as an override for a title we know is Urdu
+   * before it arrives.
+   */
+  const rtl = urduTitle || isUrduScript(title) || isUrduScript(sub ?? '');
   return (
-    <Tap onPress={onPress} style={[st.item, last && { borderBottomWidth: 0 }, dim && { opacity: 0.6 }]}>
+    <Tap
+      onPress={onPress}
+      style={[
+        st.item,
+        rtl && { flexDirection: 'row-reverse' },
+        last && { borderBottomWidth: 0 },
+        dim && { opacity: 0.6 },
+      ]}
+    >
       {emoji || icon ? (
         <View style={[st.itemIcon, { backgroundColor: bgMap[tone] }]}>
           {emoji ? <Text style={{ fontSize: 19 }}>{emoji}</Text> : <Icon name={icon!} size={20} color={fgMap[tone]} />}
         </View>
       ) : null}
       <View style={{ flex: 1, minWidth: 0 }}>
-        {urduTitle ? (
+        {urduTitle || isUrduScript(title) ? (
           <Ur size={15}>{title}</Ur>
         ) : (
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{title}</Text>
         )}
-        {sub ? <Small style={{ marginTop: 1 }}>{sub}</Small> : null}
+        {sub ? (
+          isUrduScript(sub) ? (
+            <Ur size={13} style={{ color: C.ink2, marginTop: 1 }}>{sub}</Ur>
+          ) : (
+            <Small style={{ marginTop: 1 }}>{sub}</Small>
+          )
+        ) : null}
         {pct != null ? (
           <View style={{ marginTop: 7 }}>
             <Bar pct={pct} tone="teal" />
@@ -934,7 +967,13 @@ export function Sheet({
       <Pressable style={st.sheetBack} onPress={onClose}>
         <Pressable style={st.sheet} onPress={() => {}}>
           <View style={st.grab} />
-          {title ? <H2 style={{ marginBottom: S.sm }}>{title}</H2> : null}
+          {title ? (
+            isUrduScript(title) ? (
+              <Ur size={19} style={{ marginBottom: S.sm }}>{title}</Ur>
+            ) : (
+              <H2 style={{ marginBottom: S.sm }}>{title}</H2>
+            )
+          ) : null}
           {children}
         </Pressable>
       </Pressable>

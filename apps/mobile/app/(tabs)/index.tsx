@@ -10,6 +10,7 @@ import {
   Kpi,
   Row,
   Screen,
+  ScriptText,
   SectionTitle,
   Small,
   Spacer,
@@ -196,17 +197,18 @@ export default function Dashboard() {
                 )
               }
             >
-              <Text
+              {/* The task line embeds a chapter or weak-topic name, which is
+                  Urdu on an Urdu-medium account. */}
+              <ScriptText
+                text={planLabel(task)}
+                face="bodyBold"
+                size={13.5}
+                color="#fff"
                 style={{
-                  fontFamily: F.bodyBold,
-                  fontSize: 13.5,
-                  color: '#fff',
                   textDecorationLine: task.done ? 'line-through' : 'none',
                   opacity: task.done ? 0.7 : 1,
                 }}
-              >
-                {planLabel(task)}
-              </Text>
+              />
               <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: 'rgba(255,255,255,0.92)' }}>
                 {subjectById(task.subjectId)?.name}
               </Text>

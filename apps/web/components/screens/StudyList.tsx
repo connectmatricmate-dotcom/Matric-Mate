@@ -85,7 +85,12 @@ export function StudyList({
     const needle = q.trim().toLowerCase();
     if (!needle) return base;
     return base.filter(
-      ({ s, chapters }) => s.name.toLowerCase().includes(needle) || chapters.some((c) => c.title.toLowerCase().includes(needle))
+      ({ s, chapters }) =>
+        // Urdu names count as names. Matching only the English columns meant
+        // a student searching in Urdu never found their own subject.
+        s.name.toLowerCase().includes(needle) ||
+        (s.urduName ?? '').includes(needle) ||
+        chapters.some((c) => c.title.toLowerCase().includes(needle) || (c.urduTitle ?? '').includes(needle))
     );
   }, [base, q]);
 

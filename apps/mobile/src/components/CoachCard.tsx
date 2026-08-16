@@ -1,10 +1,10 @@
-import { Text, View } from 'react-native';
-import { buildCoachDigest, fetchCoachReport } from '@matricmate/core';
-import { Card, Label, Small } from './ui';
+import { View } from 'react-native';
+import { buildCoachDigest, fetchCoachReport, isUrduScript } from '@matricmate/core';
+import { Card, Label, ScriptText, Small } from './ui';
 import { useAsync } from '../core/useAsync';
 import { useT } from '../i18n';
 import { useApp } from '../store/app';
-import { C, F } from '../theme';
+import { C } from '../theme';
 import { Markdown } from './Markdown';
 
 /**
@@ -40,18 +40,27 @@ export function CoachCard() {
       <Markdown text={data.summary} size={13.5} />
       {data.weak.slice(0, 2).map((w) => (
         <View key={w.topic}>
-          <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>{w.topic}</Text>
-          <Small style={{ fontSize: 12 }}>{w.why}</Small>
+          <ScriptText text={w.topic} face="bodyBold" size={13} />
+          <ScriptText text={w.why} size={12} color={C.ink2} />
         </View>
       ))}
       <Label style={{ color: C.ink2, marginTop: 2 }}>{t('tutor.coachActions')}</Label>
       <View style={{ gap: 4 }}>
-        {data.actions.slice(0, 3).map((a, i) => (
-          <Small key={i}>
-            {/* The list supplies the number; strip one the model wrote. */}
-            {i + 1}. {a.replace(/^\s*\d{1,2}[.)]\s*/, '')}
-          </Small>
-        ))}
+        {data.actions.slice(0, 3).map((a, i) => {
+          // The list supplies the number; strip one the model wrote.
+          const action = a.replace(/^\s*\d{1,2}[.)]\s*/, '');
+          // An Urdu action reads right to left, so its number belongs at the
+          // right-hand start of the line, not stranded on the left.
+          const rtl = isUrduScript(action);
+          return (
+            <View key={i} style={{ flexDirection: rtl ? 'row-reverse' : 'row', alignItems: 'flex-start', gap: 6 }}>
+              <Small>{i + 1}.</Small>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <ScriptText text={action} size={13} color={C.ink2} />
+              </View>
+            </View>
+          );
+        })}
       </View>
     </Card>
   );

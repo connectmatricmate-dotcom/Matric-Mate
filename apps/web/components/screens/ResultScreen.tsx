@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { XP, accuracy, chapterById, grade } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
-import { Card, Pill, Ring } from '@/components/ui/primitives';
+import { Card, Pill, Ring, ScriptText } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
 import { session } from '@/lib/session';
@@ -127,7 +127,11 @@ export function ResultScreen() {
 
       {weakest ? (
         <Card flat tint="bg-redtint" border="border-red" className="mt-6">
-          <p className="text-[13.5px] font-extrabold text-red">{t('session.weakSpot', { topic: weakest })}</p>
+          <ScriptText
+            text={t('session.weakSpot', { topic: weakest })}
+            className="text-[13.5px] font-extrabold text-red"
+            urduClassName="text-[13.5px] text-red"
+          />
           <p className="mt-0.5 text-[13px] text-ink2">{t('session.weakSpotSub')}</p>
           <Btn
             title={t('session.studyNow')}

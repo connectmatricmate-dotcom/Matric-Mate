@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Btn, Card, Empty, Header, Row, Screen, SectionTitle, Small, Spacer } from '../../src/components/ui';
+import { Btn, Card, Empty, Header, Row, Screen, ScriptText, SectionTitle, Small, Spacer } from '../../src/components/ui';
 import { subjectById , weakTopics } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -36,7 +36,7 @@ export default function Weak() {
               {list.map((w) => (
                 <Card key={w.topic} flat>
                   <Row>
-                    <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{w.topic}</Text>
+                    <ScriptText text={w.topic} face="bodyBold" size={14} style={{ flex: 1 }} />
                     <Text style={{ fontFamily: F.display, fontSize: 17, color: w.accuracy < 50 ? C.red : C.orangeDark }}>
                       {w.accuracy}%
                     </Text>

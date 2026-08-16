@@ -8,7 +8,8 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { accuracy, buildCoachDigest, confidenceBreakdown, fetchCoachReport, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
 import type { CoachReport } from '@matricmate/core';
-import { Bar, Card, Icon, Label, Pill, Ring } from '@/components/ui/primitives';
+import { Bar, Card, Icon, Label, Pill, Ring, ScriptText } from '@/components/ui/primitives';
+import { ScriptNumbers } from '@/components/ui/ScriptList';
 import { useApp, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
 import { Markdown } from '@/components/ui/Markdown';
@@ -138,7 +139,13 @@ export function WeakRail({ limit = 3 }: { limit?: number }) {
         {rows.map((w) => (
           <li key={w.topic}>
             <Link href={`/session/setup?chapter=${w.chapterId}`} className="flex items-center gap-2">
-              <span className="min-w-0 flex-1 truncate text-[13px] font-extrabold text-ink">{w.topic}</span>
+              {/* truncate clips the line's logical end, so an Urdu topic has
+                  to carry dir="rtl" or the ellipsis eats its first word. */}
+              <ScriptText
+                text={w.topic}
+                className="min-w-0 flex-1 truncate text-[13px] font-extrabold text-ink"
+                urduClassName="min-w-0 flex-1 truncate text-[13px] text-ink"
+              />
               <Pill tone={w.accuracy < 50 ? 'red' : 'orange'}>{w.accuracy}%</Pill>
             </Link>
           </li>
@@ -269,20 +276,18 @@ export function CoachRail() {
       <Markdown text={report.summary} className="text-[13px] leading-[1.6] text-ink" />
       {report.weak.slice(0, 2).map((w) => (
         <div key={w.topic}>
-          <p className="text-[13px] font-extrabold text-ink">{w.topic}</p>
-          <p className="text-[12px] leading-[1.5] text-ink2">{w.why}</p>
+          <ScriptText text={w.topic} className="text-[13px] font-extrabold text-ink" urduClassName="text-[13px] text-ink" />
+          <ScriptText text={w.why} className="text-[12px] leading-[1.5] text-ink2" urduClassName="text-[12px] text-ink2" />
         </div>
       ))}
       <Label>{t('tutor.coachActions')}</Label>
-      <ol className="flex flex-col gap-1">
-        {report.actions.slice(0, 3).map((a, i) => (
-          <li key={i} className="text-[12.5px] leading-[1.5] text-ink2">
-            {/* The list supplies the number. Strip one the model wrote, or
-                a student reads "1. 1. Revise circular motion". */}
-            {i + 1}. {a.replace(/^\s*\d{1,2}[.)]\s*/, '')}
-          </li>
-        ))}
-      </ol>
+      {/* The list supplies the number. Strip one the model wrote, or a
+          student reads "1. 1. Revise circular motion". */}
+      <ScriptNumbers
+        items={report.actions.slice(0, 3).map((a) => a.replace(/^\s*\d{1,2}[.)]\s*/, ''))}
+        className="text-[12.5px] leading-[1.5] text-ink2"
+        listClassName="flex flex-col gap-1"
+      />
     </Card>
   );
 }

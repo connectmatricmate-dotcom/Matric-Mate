@@ -80,9 +80,8 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
             marginBottom: S.md,
           }}
         >
-          <Label style={{ color: C.teal, textAlign: rtl ? 'right' : 'left' }}>
-            {labels.definition} · {b.term}
-          </Label>
+          <Label style={{ color: C.teal, textAlign: rtl ? 'right' : 'left' }}>{labels.definition}</Label>
+          {b.term ? <Prose text={b.term} size={14 * scale} style={{ fontFamily: F.bodyBold }} /> : null}
           <View style={{ marginTop: 4 }}>
             <Prose text={b.text} size={14.5 * scale} />
           </View>
@@ -93,7 +92,7 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
       return (
         <Card flat style={{ alignItems: 'center', marginBottom: S.md }}>
           <Text style={{ fontFamily: F.display, fontSize: 24 * scale, letterSpacing: 1.2, color: C.ink }}>{b.text}</Text>
-          {b.caption ? <Small style={{ marginTop: 4 }}>{b.caption}</Small> : null}
+          {b.caption ? <Prose text={b.caption} size={13 * scale} style={{ color: C.ink2, marginTop: 4 }} /> : null}
         </Card>
       );
     case 'ur':
@@ -281,7 +280,9 @@ export default function Reader() {
                   <Small>{t('reader.urduMediumNote')}</Small>
                 </Card>
               ) : null}
-              {urduMedium && content?.sectionsUr ? (
+              {/* Gated on a bundled-sample field before, so a real Urdu
+                  chapter never showed its section heading. */}
+              {isUrduScript(section.title) ? (
                 <View style={{ marginBottom: S.sm }}>
                   <Ur size={19}>{section.title}</Ur>
                 </View>

@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { subjectById, weakTopics } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Empty, LinkBtn, SectionTitle } from '@/components/ui/primitives';
+import { Card, Empty, LinkBtn, ScriptText, SectionTitle } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 export function WeakTopicsScreen() {
@@ -40,7 +40,11 @@ export function WeakTopicsScreen() {
               {list.map((w) => (
                 <Card key={w.topic} flat>
                   <div className="flex items-baseline gap-3">
-                    <p className="min-w-0 flex-1 text-[14px] font-extrabold text-ink">{w.topic}</p>
+                    <ScriptText
+                      text={w.topic}
+                      className="min-w-0 flex-1 text-[14px] font-extrabold text-ink"
+                      urduClassName="min-w-0 flex-1 text-[14px] text-ink"
+                    />
                     <p className={`font-display text-[17px] tabular ${w.accuracy < 50 ? 'text-red' : 'text-orangedark'}`}>
                       {w.accuracy}%
                     </p>

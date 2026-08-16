@@ -6,7 +6,8 @@ import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById } from 
 import type { AiCheckVerdict, AiPaperItems, AiSessionRow, ShortQ } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
-import { Card, Label, Pill, SectionTitle, Skeleton } from '@/components/ui/primitives';
+import { Card, Label, Pill, ScriptText, SectionTitle, Skeleton } from '@/components/ui/primitives';
+import { ScriptBullets } from '@/components/ui/ScriptList';
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
 import { useApp, useT } from '@/lib/store';
@@ -192,7 +193,7 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
         <Label className="text-teal">Q{n}</Label>
         <Pill tone="grey">{t('session.marks', { n: q.marks })}</Pill>
       </div>
-      <p className="text-[14.5px] font-extrabold leading-[1.55] text-ink">{q.q}</p>
+      <ScriptText text={q.q} className="text-[14.5px] font-extrabold leading-[1.55] text-ink" urduClassName="text-[14.5px] text-ink" />
       {open ? (
         <>
           <div className="field-shell rounded-[14px] border-[1.5px] border-line bg-paper transition-[border-color,box-shadow] duration-200">
@@ -234,13 +235,7 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
               <Label className="text-green">{t('session.modelAnswer')}</Label>
               <Markdown text={q.answer} className="mt-1 text-[14px] leading-[1.6] text-ink" />
               {q.points.length ? (
-                <ul className="mt-2 flex flex-col gap-1">
-                  {q.points.map((p, i) => (
-                    <li key={i} className="text-[13px] text-ink2">
-                      • {p}
-                    </li>
-                  ))}
-                </ul>
+                <ScriptBullets items={q.points} className="text-[13px] text-ink2" listClassName="mt-2 flex flex-col gap-1" />
               ) : null}
             </Card>
           ) : null}

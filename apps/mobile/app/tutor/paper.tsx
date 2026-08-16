@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, ShortQ } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
@@ -167,7 +167,7 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
         <Label style={{ color: C.teal }}>Q{n}</Label>
         <Pill tone="grey">{t('session.marks', { n: q.marks })}</Pill>
       </Row>
-      <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, lineHeight: 22, color: C.ink }}>{q.q}</Text>
+      <ScriptText text={q.q} face="bodyBold" size={14.5} />
       {open ? (
         <>
           <View style={{ backgroundColor: C.paper, borderWidth: 1.5, borderColor: C.line, borderRadius: 12, padding: 12 }}>
@@ -217,8 +217,10 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
                   <Spacer h={S.sm} />
                   <Label style={{ color: C.ink2 }}>{t('session.markingPoints')}</Label>
                   <View style={{ gap: 4, marginTop: 4 }}>
+                    {/* The bullet rides inside the string so an Urdu point
+                        keeps it on the right, as the short-answer screen does. */}
                     {q.points.map((p, i) => (
-                      <Small key={i}>• {p}</Small>
+                      <ScriptText key={i} text={`• ${p}`} size={13} color={C.ink2} />
                     ))}
                   </View>
                 </>

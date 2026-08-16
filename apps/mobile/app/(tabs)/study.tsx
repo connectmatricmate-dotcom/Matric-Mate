@@ -3,7 +3,7 @@ import { Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
-import { Card, Empty, ErrorState, Ring, Row, Screen, Skeleton, Small, Ur } from '../../src/components/ui';
+import { Card, Empty, ErrorState, Ring, Row, Screen, ScriptText, Skeleton, Small, Ur } from '../../src/components/ui';
 import { api , hasStudyMaterial, subjectPct , SUBJECT_COLORS } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
@@ -38,7 +38,13 @@ export default function Study() {
       .filter(({ s, chapters }) =>
         !needle
           ? true
-          : s.name.toLowerCase().includes(needle) || chapters.some((c) => c.title.toLowerCase().includes(needle))
+          : // Urdu names count as names. Matching only the English columns
+            // meant a student searching in Urdu never found their own subject.
+            s.name.toLowerCase().includes(needle) ||
+            (s.urduName ?? '').includes(needle) ||
+            chapters.some(
+              (c) => c.title.toLowerCase().includes(needle) || (c.urduTitle ?? '').includes(needle),
+            )
       );
   }, [subjects, q, state.readSections, state.attempts, state.lastChapterId]);
 
@@ -125,9 +131,16 @@ export default function Study() {
                     {t('study.chapterCount', { n: chapters.length })} · {t('study.percentComplete', { n: pct })}
                   </Small>
                   {next ? (
-                    <Text style={{ fontFamily: F.bodyBold, fontSize: 12, color: C.teal, marginTop: 2 }} numberOfLines={1}>
-                      {t('study.continueChapter', { chapter: next.title })}
-                    </Text>
+                    <ScriptText
+                      text={t('study.continueChapter', {
+                        chapter: (state.settings.language === 'ur' && next.urduTitle) || next.title,
+                      })}
+                      face="bodyBold"
+                      size={12}
+                      color={C.teal}
+                      lines={1}
+                      style={{ marginTop: 2 }}
+                    />
                   ) : null}
                 </View>
                 <Icon name="chevron" size={18} color={C.ink3} />

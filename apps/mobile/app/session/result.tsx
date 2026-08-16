@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Btn, Card, H2, Pill, Ring, Row, Screen, Small, Spacer } from '../../src/components/ui';
+import { Btn, Card, H2, Pill, Ring, Row, Screen, ScriptText, Small, Spacer } from '../../src/components/ui';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { Icon } from '../../src/components/Icon';
@@ -154,9 +154,8 @@ export default function Result() {
         <>
           <Spacer h={S.lg} />
           <Card flat tint={C.redTint} border={C.red}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.red }}>
-              {t('session.weakSpot', { topic: weakest })}
-            </Text>
+            {/* The line names a topic, which is Urdu on an Urdu-medium account. */}
+            <ScriptText text={t('session.weakSpot', { topic: weakest })} face="bodyBold" size={13.5} color={C.red} />
             <Small style={{ marginTop: 2 }}>{t('session.weakSpotSub')}</Small>
             <Spacer h={S.md} />
             <Btn

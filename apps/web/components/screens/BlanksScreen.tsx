@@ -78,6 +78,8 @@ export function BlanksScreen({
     );
   }
 
+  const verdictLine = correct ? t('session.blanksCorrect') : t('session.blanksWrong', { a: item.answer });
+
   return (
     <Page width="focus">
       <SessionHeader
@@ -147,12 +149,16 @@ export function BlanksScreen({
           flat
           tint={correct ? 'bg-greentint' : 'bg-redtint'}
           border={correct ? 'border-green' : 'border-red'}
-          className="mt-4 flex items-center gap-2.5"
+          /* The verdict carries the answer, so it can be Urdu. Then the tick
+             belongs where the line starts, on the right. */
+          className={`mt-4 flex items-center gap-2.5 ${isUrduScript(verdictLine) ? 'flex-row-reverse' : ''}`}
         >
           <Icon name={correct ? 'check' : 'close'} size={18} strokeWidth={2.6} className={correct ? 'text-green' : 'text-red'} />
-          <p className={`flex-1 text-[13.5px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}>
-            {correct ? t('session.blanksCorrect') : t('session.blanksWrong', { a: item.answer })}
-          </p>
+          <ScriptText
+            text={verdictLine}
+            className={`flex-1 text-[13.5px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}
+            urduClassName={`flex-1 text-[13.5px] ${correct ? 'text-green' : 'text-red'}`}
+          />
           {!correct ? (
             <LinkBtn
               title={t('session.askAi')}

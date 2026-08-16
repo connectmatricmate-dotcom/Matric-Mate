@@ -103,7 +103,14 @@ export function Markdown({ text, className = '' }: { text: string; className?: s
             );
           case 'quote':
             return (
-              <div key={i} className="border-l-[3px] border-tealtint2 pl-3">
+              <div
+                key={i}
+                className={
+                  isUrduScript(spanText(b.spans))
+                    ? 'border-r-[3px] border-tealtint2 pr-3'
+                    : 'border-l-[3px] border-tealtint2 pl-3'
+                }
+              >
                 <Block spans={b.spans} className="text-ink2" />
               </div>
             );

@@ -14,7 +14,7 @@ import {
 import type { AiSessionKind, AiSessionRow } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, PillButton, Seg } from '@/components/ui/controls';
-import { Card, Check, SectionTitle } from '@/components/ui/primitives';
+import { Card, Check, ScriptText, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
 import { useApp, useT } from '@/lib/store';
@@ -171,7 +171,7 @@ export function AiTestScreen() {
           >
             <Card border="border-orange" className="transition-colors duration-200 hover:brightness-[0.99]">
               <p className="text-[13.5px] font-extrabold text-ink">{t('tutor.aiTestSub')}</p>
-              <p className="mt-0.5 text-[12.5px] text-ink2">{weak.map((w) => w.topic).join(' · ')}</p>
+              <ScriptText text={weak.map((w) => w.topic).join(' · ')} className="mt-0.5 text-[12.5px] text-ink2" />
             </Card>
           </button>
         </>

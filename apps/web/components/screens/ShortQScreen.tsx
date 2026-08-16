@@ -7,6 +7,7 @@ import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
+import { ScriptBullets } from '@/components/ui/ScriptList';
 import { useToast } from '@/components/ui/toast';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
@@ -172,13 +173,7 @@ export function ShortQScreen({
               {verdict.missed.length ? (
                 <div className="mt-3">
                   <Label className="text-orangedark">{t('tutor.checkMissed')}</Label>
-                  <ul className="mt-1 flex flex-col gap-1">
-                    {verdict.missed.map((p, n) => (
-                      <li key={n} className="text-[13px] text-ink2">
-                        • {p}
-                      </li>
-                    ))}
-                  </ul>
+                  <ScriptBullets items={verdict.missed} className="text-[13px] text-ink2" />
                 </div>
               ) : null}
             </Card>
@@ -188,13 +183,7 @@ export function ShortQScreen({
             <Markdown text={item.answer} className="mt-1 text-[14.5px] leading-[1.6] text-ink" />
             <div className="mt-3">
               <Label>{t('session.markingPoints')}</Label>
-              <ul className="mt-1 flex flex-col gap-1">
-                {item.points.map((p, n) => (
-                  <li key={n} className="text-[13px] text-ink2">
-                    • {p}
-                  </li>
-                ))}
-              </ul>
+              <ScriptBullets items={item.points} className="text-[13px] text-ink2" />
             </div>
           </Card>
 

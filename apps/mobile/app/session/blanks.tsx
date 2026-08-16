@@ -121,6 +121,8 @@ export default function Blanks() {
     );
   }
 
+  const verdictLine = correct ? t('session.blanksCorrect') : t('session.blanksWrong', { a: item?.answer ?? '' });
+
   return (
     <Screen
       footer={
@@ -209,11 +211,11 @@ export default function Blanks() {
 
       {checked ? (
         <Card flat tint={correct ? C.greenTint : C.redTint} border={correct ? C.green : C.red} style={{ marginTop: S.md }}>
-          <Row gap={S.sm}>
+          {/* The verdict quotes the answer, so it can be Urdu. Then the tick
+              belongs where the line starts, on the right. */}
+          <Row gap={S.sm} style={{ flexDirection: isUrduScript(verdictLine) ? 'row-reverse' : 'row' }}>
             <Icon name={correct ? 'check' : 'close'} size={18} color={correct ? C.green : C.red} strokeWidth={2.6} />
-            <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 13.5, color: correct ? C.green : C.red }}>
-              {correct ? t('session.blanksCorrect') : t('session.blanksWrong', { a: item?.answer ?? '' })}
-            </Text>
+            <ScriptText text={verdictLine} face="bodyBold" size={13.5} color={correct ? C.green : C.red} style={{ flex: 1 }} />
           </Row>
           {!correct && item ? (
             <>

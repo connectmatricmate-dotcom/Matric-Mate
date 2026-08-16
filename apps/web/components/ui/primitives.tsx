@@ -303,7 +303,8 @@ export function Pill({
   return (
     <span className={pillClasses(tone, false, className)}>
       {icon ? <Icon name={icon} size={12} strokeWidth={2.4} /> : null}
-      {children}
+      {/* Pills carry topics and chapter names, not only fixed labels. */}
+      {typeof children === 'string' && isUrduScript(children) ? <Ur>{children}</Ur> : children}
     </span>
   );
 }
@@ -507,8 +508,22 @@ export function ItemBody({
         </span>
       ) : null}
       <span className="min-w-0 flex-1">
-        {urduTitle ? <Ur>{title}</Ur> : <span className="block text-[14.5px] font-extrabold text-ink">{title}</span>}
-        {sub ? <span className="mt-0.5 block text-[13px] text-ink2">{sub}</span> : null}
+        {/* Rows carry content, not just labels: weak topics, chat titles, AI
+            set names and chapter names all land here and any of them can be
+            Urdu. The script decides the face, so a caller cannot forget to
+            say so. `urduTitle` stays as an override for a known Urdu title. */}
+        {urduTitle || (typeof title === 'string' && isUrduScript(title)) ? (
+          <Ur block>{title}</Ur>
+        ) : (
+          <span className="block text-[14.5px] font-extrabold text-ink">{title}</span>
+        )}
+        {sub ? (
+          typeof sub === 'string' && isUrduScript(sub) ? (
+            <Ur block className="mt-0.5 text-[13px] text-ink2">{sub}</Ur>
+          ) : (
+            <span className="mt-0.5 block text-[13px] text-ink2">{sub}</span>
+          )
+        ) : null}
         {pct != null ? (
           <span className="mt-2 block">
             <Bar pct={pct} tone="teal" />

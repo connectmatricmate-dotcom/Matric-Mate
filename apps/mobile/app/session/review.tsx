@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Body, Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer } from '../../src/components/ui';
+import { Body, Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
 import { session } from '../../src/store/session';
-import { C, F, S } from '../../src/theme';
+import { C, S } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 type Filter = 'all' | 'wrong' | 'flagged';
@@ -74,7 +74,7 @@ export default function Review() {
                 style={{ borderLeftWidth: 4, borderLeftColor: wrong ? C.red : C.green, opacity: wrong ? 1 : 0.85 }}
                 onPress={() => setOpen(isOpen ? null : mcq.id)}
               >
-                <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, lineHeight: 20, color: C.ink }}>{mcq.q}</Text>
+                <ScriptText text={mcq.q} face="bodyBold" size={13.5} />
                 <Row gap={S.sm} style={{ marginTop: S.sm, flexWrap: 'wrap' }}>
                   {a?.chosen != null ? (
                     <Pill tone={wrong ? 'red' : 'green'}>{t('session.yourAnswer', { a: String.fromCharCode(65 + a.chosen) })}</Pill>

@@ -125,7 +125,14 @@ export function Markdown({
             );
           case 'quote':
             return (
-              <View key={i} style={{ borderLeftWidth: 3, borderLeftColor: C.tealTint2, paddingLeft: 10 }}>
+              <View
+                key={i}
+                style={
+                  isUrduScript(spanText(b.spans))
+                    ? { borderRightWidth: 3, borderRightColor: C.tealTint2, paddingRight: 10 }
+                    : { borderLeftWidth: 3, borderLeftColor: C.tealTint2, paddingLeft: 10 }
+                }
+              >
                 <Block spans={b.spans} size={size} color={C.ink2} />
               </View>
             );
