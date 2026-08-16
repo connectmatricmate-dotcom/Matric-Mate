@@ -37,3 +37,4 @@ export function translate(
 }
 
 export { en, ur };
+export { SUBJECT_NAMES_UR, CHAPTER_TITLES_UR } from './names-ur';

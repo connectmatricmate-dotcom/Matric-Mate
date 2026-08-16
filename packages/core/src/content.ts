@@ -1,3 +1,4 @@
+import { CHAPTER_TITLES_UR, SUBJECT_NAMES_UR } from './i18n/names-ur';
 /**
  * MOCK CONTENT. FBISE Class 9.
  *
@@ -16,15 +17,15 @@ import {
 } from './types';
 
 export const SUBJECTS: Subject[] = [
-  { id: 'phy', name: 'Physics', icon: 'bolt', compulsory: false, group: 'science', chapterCount: 9 },
-  { id: 'chem', name: 'Chemistry', icon: 'flask', compulsory: false, group: 'science', chapterCount: 20 },
-  { id: 'bio', name: 'Biology', icon: 'leaf', compulsory: false, group: 'science', chapterCount: 10 },
-  { id: 'math', name: 'Mathematics', icon: 'calc', compulsory: true, chapterCount: 17 },
-  { id: 'eng', name: 'English', icon: 'book', compulsory: true, chapterCount: 4 },
+  { id: 'phy', name: 'Physics', urduName: SUBJECT_NAMES_UR['phy'], icon: 'bolt', compulsory: false, group: 'science', chapterCount: 9 },
+  { id: 'chem', name: 'Chemistry', urduName: SUBJECT_NAMES_UR['chem'], icon: 'flask', compulsory: false, group: 'science', chapterCount: 20 },
+  { id: 'bio', name: 'Biology', urduName: SUBJECT_NAMES_UR['bio'], icon: 'leaf', compulsory: false, group: 'science', chapterCount: 10 },
+  { id: 'math', name: 'Mathematics', urduName: SUBJECT_NAMES_UR['math'], icon: 'calc', compulsory: true, chapterCount: 17 },
+  { id: 'eng', name: 'English', urduName: SUBJECT_NAMES_UR['eng'], icon: 'book', compulsory: true, chapterCount: 4 },
   { id: 'urd', name: 'Urdu', urduName: 'اردو', icon: 'quill', compulsory: true, chapterCount: 5 },
   { id: 'isl', name: 'Islamiyat', urduName: 'اسلامیات', icon: 'star', compulsory: true, chapterCount: 7 },
-  { id: 'pst', name: 'Pakistan Studies', icon: 'globe', compulsory: true, chapterCount: 8 },
-  { id: 'cs', name: 'Computer Science', icon: 'book2', compulsory: false, group: 'science', chapterCount: 7 },
+  { id: 'pst', name: 'Pakistan Studies', urduName: SUBJECT_NAMES_UR['pst'], icon: 'globe', compulsory: true, chapterCount: 8 },
+  { id: 'cs', name: 'Computer Science', urduName: SUBJECT_NAMES_UR['cs'], icon: 'book2', compulsory: false, group: 'science', chapterCount: 7 },
 ];
 
 const CH: Record<string, [string, string, string?][]> = {
@@ -193,7 +194,10 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       subjectId,
       number: i + 1,
       title: subjectId === 'urd' || subjectId === 'isl' ? (r[2] as string) : r[0],
-      urduTitle: subjectId === 'urd' || subjectId === 'isl' ? r[0] : undefined,
+      // Urdu and Islamiat carry their Urdu title in the row itself, because
+      // that is the name the chapter is actually known by. Everything else
+      // looks it up, so one map covers all nine subjects.
+      urduTitle: subjectId === 'urd' || subjectId === 'isl' ? r[0] : CHAPTER_TITLES_UR[`${subjectId}-${i + 1}`],
       blurb: subjectId === 'urd' || subjectId === 'isl' ? r[1] : r[1],
       // Paid-only, the client's call after M2: there is no free chapter any
       // more, so the flag no longer varies. It stays because the apps and the
