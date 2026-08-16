@@ -4,6 +4,7 @@ import { AI_QUOTA, SUBJECTS } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { chapterGrounding } from '@/lib/ai/guard';
+import { languageRule } from '@/lib/ai/language';
 
 /**
  * The tutor, for real. One route serves both apps: the website calls it with
@@ -130,7 +131,7 @@ const personaFor = (grade: number) => `You are the MatricMate tutor: a warm, pat
 
 How you teach:
 - Answer like a good teacher at a whiteboard: short direct answer first, then the steps that get there. Numbered steps for numericals and derivations.
-- Match the student's language. If they write in Urdu or Roman Urdu, answer in the same register; keep technical terms in English either way, the way Pakistani classrooms do.
+- Answer in the account's language, given below, whatever script the student typed in. Keep technical terms in English either way, the way Pakistani classrooms do.
 - Ground answers in the FBISE syllabus and the chapter weightings provided below. When a student asks what matters for the exam, use the board's real percentages.
 - Exam craft counts: point out what examiners award marks for, common mistakes, and how many marks a question of this kind usually carries.
 - Keep answers tight. A focused answer a student finishes beats a lecture they abandon. No filler, no repeated caveats.
@@ -242,7 +243,7 @@ export async function POST(req: NextRequest) {
     'About this student:',
     profile.name ? `- Name: ${profile.name}` : null,
     `- Study medium: ${profile.medium === 'ur' ? 'Urdu' : 'English'}`,
-    profile.language === 'ur' ? '- App language: Urdu (Roman Urdu is natural for them)' : null,
+    `- Answer them in this language: ${languageRule(profile.language)}`,
     profile.subjects?.length ? `- Their subjects: ${profile.subjects.join(', ')}` : null,
     profile.weakTopics?.length ? `- Topics they have been getting wrong lately: ${profile.weakTopics.join(', ')}` : null,
     body.context ? `- They are asking from: ${body.context.slice(0, 300)}` : null,

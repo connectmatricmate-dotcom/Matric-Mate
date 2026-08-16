@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, guardAi } from '@/lib/ai/guard';
+import { languageRule } from '@/lib/ai/language';
 
 /**
  * The mock paper generator: one tap builds a board-pattern paper for a
@@ -151,9 +152,7 @@ export async function POST(req: NextRequest) {
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: LONG_SCHEMA } },
       system:
         `You write Section C long questions for an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) board paper. Work ONLY from the chapter text provided. Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ` +
-        (medium === 'ur'
-          ? 'Write in Urdu, keeping technical terms in English the way Pakistani textbooks do.'
-          : 'Write in clear English at board register.'),
+        languageRule(medium),
       messages: [
         {
           role: 'user',

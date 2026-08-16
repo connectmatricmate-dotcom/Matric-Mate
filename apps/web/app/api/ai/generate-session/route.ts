@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, guardAi } from '@/lib/ai/guard';
+import { languageRule } from '@/lib/ai/language';
 
 /**
  * The AI session builder: a student picks a chapter, a practice type and a
@@ -140,9 +141,7 @@ export async function POST(req: NextRequest) {
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: ITEM_SCHEMAS[kind] } },
       system:
         `You write practice material for FBISE Class ${g.grade} students (SSC-${g.grade === 10 ? 'II' : 'I'}, Pakistan). Work ONLY from the chapter text the user provides: every item must be answerable from it. Match the board register. Plain text only: no markdown headings, no asterisks or bold markers. Never use an em dash; use a comma, a colon, or a new sentence. ` +
-        (medium === 'ur'
-          ? 'Write in Urdu, keeping technical terms in English the way Pakistani textbooks do.'
-          : 'Write in clear, simple English suited to a 14-year-old.'),
+        languageRule(medium),
       messages: [
         {
           role: 'user',
