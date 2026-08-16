@@ -1,5 +1,6 @@
 'use client';
 
+import { isUrduScript } from '@matricmate/core';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { SessionHeader } from '@/components/app/SessionHeader';
@@ -154,7 +155,7 @@ export function ExamScreen() {
                   type="button"
                   aria-pressed={sel}
                   onClick={() => setAnswers((a) => ({ ...a, [mcq.id]: n }))}
-                  className={`flex min-h-14 w-full items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-3.5 text-left transition-colors duration-200 ${
+                  className={`flex min-h-14 w-full items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-3.5 text-left transition-colors duration-200 ${isUrduScript(opt) ? 'flex-row-reverse' : ''} ${
                     sel ? 'border-teal bg-tealtint' : 'border-line bg-card hover:border-tealtint2'
                   }`}
                 >

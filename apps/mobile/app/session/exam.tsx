@@ -3,6 +3,7 @@ import { BackHandler, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, H3, IconButton, Pill, Row, Screen, ScriptText, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { isUrduScript } from '@matricmate/core';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -143,7 +144,8 @@ export default function Exam() {
             <Tap key={n} onPress={() => setAnswers((a) => ({ ...a, [mcq.id]: n }))}>
               <View
                 style={{
-                  flexDirection: 'row',
+                  // The letter key sits on the side the option starts from.
+                  flexDirection: isUrduScript(opt) ? 'row-reverse' : 'row',
                   alignItems: 'center',
                   gap: S.md,
                   backgroundColor: sel ? C.tealTint : C.card,

@@ -15,10 +15,9 @@ import { Markdown } from '@/components/ui/Markdown';
 import { LockedNotice } from '@/components/app/LockedNotice';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
-const isUrduText = (s: string) => /[؀-ۿ]/.test(s);
 
 function Prose({ text, size, className = '' }: { text: string; size: number; className?: string }) {
-  if (isUrduText(text)) {
+  if (isUrduScript(text)) {
     return (
       <p lang="ur" dir="rtl" className={`urdu text-ink ${className}`} style={{ fontSize: size }}>
         {text}
@@ -36,7 +35,7 @@ function Prose({ text, size, className = '' }: { text: string; size: number; cla
 function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { definition: string; example: string } }) {
   switch (b.kind) {
     case 'h':
-      return isUrduText(b.text) ? (
+      return isUrduScript(b.text) ? (
         <h2 lang="ur" dir="rtl" className="urdu mt-4 mb-2 text-ink" style={{ fontSize: 20 * scale }}>
           {b.text}
         </h2>
@@ -51,10 +50,18 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           <Prose text={b.text} size={15.5 * scale} />
         </div>
       );
-    case 'def':
+    case 'def': {
+      // Urdu reads right to left, so the accent bar and the label move to
+      // that side. A left bar beside right-aligned text reads as a mistake.
+      const rtl = isUrduScript(b.text) || isUrduScript(b.term ?? '');
       return (
-        <Card flat tint="bg-tealtint" border="border-tealtint2" className="mb-4 border-l-4 border-l-teal">
-          <Label className="text-teal">
+        <Card
+          flat
+          tint="bg-tealtint"
+          border="border-tealtint2"
+          className={`mb-4 ${rtl ? 'border-r-4 border-r-teal' : 'border-l-4 border-l-teal'}`}
+        >
+          <Label className={`text-teal ${rtl ? 'block text-right' : ''}`}>
             {labels.definition} · {b.term}
           </Label>
           <div className="mt-1">
@@ -62,6 +69,7 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           </div>
         </Card>
       );
+    }
     case 'formula':
       return (
         <Card flat className="mb-4 text-center">
@@ -95,7 +103,7 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
     case 'example':
       return (
         <Card flat tint="bg-orangetint" border="border-orangetint" className="mb-4">
-          <Label className="text-orangedark">{labels.example}</Label>
+          <Label className={`text-orangedark ${isUrduScript(b.text) ? 'block text-right' : ''}`}>{labels.example}</Label>
           <div className="mt-1">
             <Prose text={b.text} size={14.5 * scale} />
           </div>

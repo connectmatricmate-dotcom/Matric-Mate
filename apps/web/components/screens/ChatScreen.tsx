@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { api, isUrduScript, type ChatMessage, type TutorImage, weakTopics } from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
-import { Card, Icon, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Pill, ScriptText } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { Markdown } from '@/components/ui/Markdown';
 import { useApp, useT } from '@/lib/store';
@@ -237,7 +237,9 @@ export function ChatScreen({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={sentPhotos[m.id]} alt="" className="mb-2 max-h-44 rounded-[10px]" />
               ) : null}
-              {m.text}
+              {/* A question typed in Urdu comes back in Nastaliq, right to
+                  left, rather than in the Latin face. */}
+              <ScriptText text={m.text} className="text-[14px] leading-[1.6] text-white" urduClassName="text-[13.5px] text-white" />
             </div>
           ) : (
             <div
@@ -405,7 +407,11 @@ export function ChatScreen({
                 : t('tutor.placeholder')
             }
             aria-label={t('tutor.placeholder')}
-            className="w-full bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3 disabled:cursor-not-allowed"
+            lang={isUrduScript(input) ? 'ur' : undefined}
+            dir={isUrduScript(input) ? 'rtl' : undefined}
+            className={`w-full bg-transparent text-ink outline-none placeholder:text-ink3 disabled:cursor-not-allowed ${
+              isUrduScript(input) ? 'urdu-inline text-[15px]' : 'text-[14px]'
+            }`}
           />
         </div>
         <button

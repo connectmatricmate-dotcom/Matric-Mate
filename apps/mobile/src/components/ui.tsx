@@ -966,7 +966,20 @@ const st = StyleSheet.create({
     borderColor: C.line,
     borderRadius: R.lg,
     padding: S.lg,
-    overflow: 'hidden',
+    /**
+     * Deliberately NOT `overflow: 'hidden'`.
+     *
+     * Clipping to a rounded corner makes Android render the card into an
+     * offscreen layer, and on some devices that layer intermittently comes
+     * back empty: the reader's tinted example and definition boxes would
+     * paint as blank coloured rectangles over real text. A border was added
+     * earlier and helped, because it pushes the view onto a different draw
+     * path, but it did not remove the clip that causes it.
+     *
+     * Nothing inside a card needs clipping. The two children that have square
+     * corners of their own, the progress bar and the segmented control, clip
+     * themselves.
+     */
   },
   btn: {
     flexDirection: 'row',

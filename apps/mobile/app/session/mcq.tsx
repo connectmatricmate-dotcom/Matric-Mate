@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Body, Btn, Card, H3, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Tap } from '../../src/components/ui';
 import { SessionHeader } from '../../src/components/SessionHeader';
-import { XP , Confidence } from '@matricmate/core';
+import { Confidence, XP, isUrduScript } from '@matricmate/core';
 import Animated from 'react-native-reanimated';
 import { Pop, useShake } from '../../src/components/celebration';
 import { thud, tick } from '../../src/core/haptics';
@@ -188,7 +188,10 @@ export default function McqScreen() {
           <Tap key={n} onPress={checked ? undefined : () => setChosen(n)}>
             <View
               style={{
-                flexDirection: 'row',
+                // The letter key sits on the side the option starts from, so
+                // an Urdu choice reads A on the right rather than stranded
+                // across the row from its own text.
+                flexDirection: isUrduScript(opt) ? 'row-reverse' : 'row',
                 alignItems: 'center',
                 gap: S.md,
                 backgroundColor: bg,

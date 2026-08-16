@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { type Confidence, type StringKey, XP } from '@matricmate/core';
+import { XP, isUrduScript, type Confidence, type StringKey } from '@matricmate/core';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Label, Pill, ScriptText } from '@/components/ui/primitives';
@@ -120,7 +120,7 @@ export function McqScreen() {
               disabled={checked}
               aria-pressed={isChosen}
               onClick={() => setChosen(n)}
-              className={`flex min-h-14 w-full items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-3.5 text-left transition-colors duration-200 disabled:cursor-default ${shell}`}
+              className={`flex min-h-14 w-full items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-3.5 text-left transition-colors duration-200 disabled:cursor-default ${isUrduScript(opt) ? 'flex-row-reverse' : ''} ${shell}`}
             >
               <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12.5px] font-extrabold ${key}`}>
                 {String.fromCharCode(65 + n)}

@@ -33,11 +33,10 @@ import { C, F, S, isWeb } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
-const isUrduText = (s: string) => /[؀-ۿ]/.test(s);
 
 /** Body text in whichever script it's written in. */
 function Prose({ text, size, style }: { text: string; size: number; style?: object }) {
-  if (isUrduText(text)) {
+  if (isUrduScript(text)) {
     return (
       <Ur size={size} style={style}>
         {text}
@@ -53,7 +52,7 @@ function Prose({ text, size, style }: { text: string; size: number; style?: obje
 function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { definition: string; example: string } }) {
   switch (b.kind) {
     case 'h':
-      return isUrduText(b.text) ? (
+      return isUrduScript(b.text) ? (
         <View style={{ marginTop: S.md, marginBottom: S.sm }}>
           <Ur size={20 * scale}>{b.text}</Ur>
         </View>
@@ -66,10 +65,22 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           <Prose text={b.text} size={15.5 * scale} />
         </View>
       );
-    case 'def':
+    case 'def': {
+      // Urdu reads right to left, so the accent bar and the label move to
+      // that side. A left bar beside right-aligned text reads as a mistake.
+      const rtl = isUrduScript(b.text) || isUrduScript(b.term ?? '');
       return (
-        <Card flat tint={C.tealTint} style={{ borderLeftWidth: 4, borderLeftColor: C.teal, marginBottom: S.md }}>
-          <Label style={{ color: C.teal }}>
+        <Card
+          flat
+          tint={C.tealTint}
+          style={{
+            ...(rtl
+              ? { borderRightWidth: 4, borderRightColor: C.teal }
+              : { borderLeftWidth: 4, borderLeftColor: C.teal }),
+            marginBottom: S.md,
+          }}
+        >
+          <Label style={{ color: C.teal, textAlign: rtl ? 'right' : 'left' }}>
             {labels.definition} · {b.term}
           </Label>
           <View style={{ marginTop: 4 }}>
@@ -77,6 +88,7 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           </View>
         </Card>
       );
+    }
     case 'formula':
       return (
         <Card flat style={{ alignItems: 'center', marginBottom: S.md }}>
@@ -119,7 +131,9 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
       // It also matches the MCQ explanation card, which already wears one.
       return (
         <Card flat tint={C.orangeTint} border={C.orange} style={{ marginBottom: S.md }}>
-          <Label style={{ color: C.orangeDark }}>{labels.example}</Label>
+          <Label style={{ color: C.orangeDark, textAlign: isUrduScript(b.text) ? 'right' : 'left' }}>
+            {labels.example}
+          </Label>
           <View style={{ marginTop: 4 }}>
             <Prose text={b.text} size={14.5 * scale} />
           </View>

@@ -5,13 +5,13 @@ import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
-import { Body, Card, IconButton, Pill, Row, Screen, Small, Tap, useToast } from '../../src/components/ui';
+import { Body, Card, IconButton, Pill, Row, Screen, ScriptText, Small, Tap, useToast } from '../../src/components/ui';
 import { ChatMessage, api, chapterById, fetchTutorQuota, isUrduScript, weakTopics } from '@matricmate/core';
 import type { TutorImage, TutorQuota } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S, isWeb } from '../../src/theme';
+import { C, F, S, isWeb, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 /** "21:00" style local clock time out of the server's reset instant. */
@@ -272,7 +272,7 @@ export default function Chat() {
                     resizeMode="cover"
                   />
                 ) : null}
-                <Text style={{ fontFamily: F.body, fontSize: 14, lineHeight: 22, color: '#fff' }}>{m.text}</Text>
+                <ScriptText text={m.text} size={14} color="#fff" />
               </View>
             ) : (
               <View
@@ -424,6 +424,9 @@ export default function Chat() {
               returnKeyType="send"
               style={[
                 { fontFamily: F.body, fontSize: 14, color: C.ink, paddingVertical: 0 },
+                // Composed in the script being typed: an Urdu question reads
+                // right to left in Nastaliq as it is written, not after send.
+                isUrduScript(input) ? { ...urdu(14), paddingVertical: 0 } : null,
                 isWeb && ({ outlineStyle: 'none' } as object),
               ]}
             />
