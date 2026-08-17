@@ -13,6 +13,7 @@ export * from './tutor';
 export * from './ai';
 export * from './content';
 export * from './quota';
+export * from './report-html';
 export * from './domain';
 export * from './billing';
 export * from './tokens';

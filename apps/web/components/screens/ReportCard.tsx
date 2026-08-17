@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { accuracy, boardName, formatDate, grade, mediumName, subjectById, subjectPct } from '@matricmate/core';
+import { accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Label, Pill } from '@/components/ui/primitives';
@@ -24,17 +24,60 @@ export function ReportCard() {
     () =>
       derived.subjects.map((sid) => {
         const set = state.attempts.filter((a) => a.subjectId === sid);
-        const acc = set.length ? accuracy(set) : subjectPct(sid, state.readSections, state.attempts);
+        // Zero when unattempted. The old fallback graded syllabus coverage as
+        // if it were accuracy, so a student who had read most of Chemistry
+        // without answering a question scored a Chemistry grade for reading.
+        // The row prints "n/a" in that case anyway, so it could only ever have
+        // misled. Android fixed this; the website had not.
+        const acc = set.length ? accuracy(set) : 0;
         const half = Math.floor(set.length / 2);
         const older = set.slice(0, half);
         const recent = set.slice(half);
         const delta = older.length && recent.length ? accuracy(recent) - accuracy(older) : 0;
         return { sid, acc, trend: delta > 4 ? '↑' : delta < -4 ? '↓' : '→', attempted: set.length };
       }),
-    [derived.subjects, state.attempts, state.readSections]
+    [derived.subjects, state.attempts]
   );
 
   const activeDays = state.activeDays.filter((d) => d.slice(0, 7) === new Date().toISOString().slice(0, 7)).length;
+
+  /** The printable sheet, shared with the Android PDF. */
+  function printableReport(): string {
+    return reportHtml({
+      studentName: state.user?.name ?? t('common.student'),
+      classLine: t('account.classLine', {
+        class: state.onboarding?.classLevel ?? 9,
+        board: boardName(state.onboarding?.board, lang),
+        medium: mediumName(state.onboarding?.medium, lang),
+      }),
+      month,
+      overallGrade: grade(overallAcc),
+      overallAccuracy: overallAcc,
+      questions: state.attempts.length,
+      activeDays,
+      rtl: lang === 'ur',
+      rows: rows.map((r) => ({
+        subject: subjectById(r.sid)?.name ?? r.sid,
+        grade: r.attempted ? grade(r.acc) : 'n/a',
+        accuracy: r.acc,
+        attempted: r.attempted,
+        trend: r.trend,
+      })),
+      labels: {
+        title: t('progress.reportTitle'),
+        month: t('progress.month'),
+        overall: t('progress.reportCardSub', { grade: '' }).trim() || t('progress.reportTitle'),
+        questions: t('dash.questions'),
+        activeDays: t('dash.activeDays'),
+        subject: t('session.subject'),
+        grade: t('session.grade', { g: '' }).trim(),
+        accuracy: t('dash.accuracy'),
+        attempted: t('progress.reportAttempted'),
+        footnote: t('progress.reportFootnote'),
+        generated: t('progress.reportGenerated'),
+      },
+    });
+  }
 
   return (
     <Page width="focus">
@@ -117,8 +160,26 @@ export function ReportCard() {
           icon="download"
           className="flex-1"
           onClick={() => {
-            toast(t('progress.pdfToast'));
-            window.print();
+            /*
+             * A purpose-built sheet, not the page.
+             *
+             * window.print() on the live page produced whatever the browser
+             * decided to include: the app chrome, the rails, the nav. What a
+             * parent should get is one branded page with the student's name,
+             * class and board on it, which is what reportHtml builds. The same
+             * generator feeds the Android PDF, so the two are the same
+             * document.
+             */
+            const win = window.open('', '_blank', 'noopener,width=820,height=900');
+            if (!win) {
+              toast(t('progress.shareFailed'));
+              return;
+            }
+            win.document.write(printableReport());
+            win.document.close();
+            // Give the document a tick to lay out before the dialog opens, or
+            // Safari prints a blank first page.
+            win.setTimeout(() => win.print(), 250);
           }}
         />
       </div>

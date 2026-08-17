@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, Share, Text, View } from 'react-native';
 import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
-import { accuracy, boardName, formatDate, grade, mediumName, subjectById } from '@matricmate/core';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import { accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, textEnd } from '../../src/theme';
@@ -35,6 +37,85 @@ export default function Report() {
   );
 
   const activeDays = state.activeDays.filter((d) => d.slice(0, 7) === new Date().toISOString().slice(0, 7)).length;
+
+  const [busy, setBusy] = useState(false);
+
+  /** The printable sheet, built by the same generator the website prints. */
+  function printable(): string {
+    return reportHtml({
+      studentName: state.user?.name ?? t('common.student'),
+      classLine: t('account.classLine', {
+        class: state.onboarding?.classLevel ?? 9,
+        board: boardName(state.onboarding?.board, lang),
+        medium: mediumName(state.onboarding?.medium, lang),
+      }),
+      month,
+      overallGrade: grade(overallAcc),
+      overallAccuracy: overallAcc,
+      questions: state.attempts.length,
+      activeDays,
+      rtl: lang === 'ur',
+      rows: rows.map((r) => ({
+        subject: subjectById(r.sid)?.name ?? r.sid,
+        grade: r.attempted ? grade(r.acc) : 'n/a',
+        accuracy: r.acc,
+        attempted: r.attempted,
+        trend: r.trend,
+      })),
+      labels: {
+        title: t('progress.reportTitle'),
+        month: t('progress.month'),
+        overall: t('progress.reportTitle'),
+        questions: t('dash.questions'),
+        activeDays: t('dash.activeDays'),
+        subject: t('session.subject'),
+        grade: t('session.grade', { g: '' }).trim(),
+        accuracy: t('dash.accuracy'),
+        attempted: t('progress.reportAttempted'),
+        footnote: t('progress.reportFootnote'),
+        generated: t('progress.reportGenerated'),
+      },
+    });
+  }
+
+  /**
+   * Both buttons do what they say now. They used to show a toast claiming the
+   * share sheet had opened and then do nothing at all, on the one screen built
+   * for handing to a parent.
+   *
+   * Text goes through the share sheet as a summary, matching what the website
+   * sends to WhatsApp. PDF renders the same branded sheet the website prints
+   * and hands the file to the share sheet, so a parent gets a document with
+   * the student's name and school on it rather than a screenshot.
+   */
+  async function shareReport(kind: 'text' | 'pdf') {
+    if (busy) return;
+    setBusy(true);
+    try {
+      if (kind === 'text') {
+        const summary =
+          `${state.user?.name ?? t('common.student')} · MatricMate · ${month}\n` +
+          `${t('dash.accuracy')}: ${overallAcc}% · ${state.attempts.length} ${t('common.questions')}\n` +
+          rows
+            .filter((r) => r.attempted)
+            .map((r) => `${subjectById(r.sid)?.name}: ${grade(r.acc)}`)
+            .join(' · ');
+        await Share.share({ message: summary });
+        return;
+      }
+
+      const { uri } = await Print.printToFileAsync({ html: printable() });
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: t('progress.reportTitle') });
+      } else {
+        toast(t('progress.reportShared'));
+      }
+    } catch {
+      toast(t('progress.shareFailed'));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <Screen>
@@ -105,10 +186,10 @@ export default function Report() {
       <Spacer h={S.lg} />
       <Row gap={S.sm}>
         <View style={{ flex: 1 }}>
-          <Btn title={t('progress.share')} variant="whatsapp" icon="whatsapp" onPress={() => toast(t('progress.shareToast'))} />
+          <Btn title={t('progress.share')} variant="whatsapp" icon="whatsapp" loading={busy} onPress={() => void shareReport('text')} />
         </View>
         <View style={{ flex: 1 }}>
-          <Btn title={t('progress.savePdf')} variant="line" icon="download" onPress={() => toast(t('progress.pdfToast'))} />
+          <Btn title={t('progress.savePdf')} variant="line" icon="download" loading={busy} onPress={() => void shareReport('pdf')} />
         </View>
       </Row>
       <Spacer h={S.md} />

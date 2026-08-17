@@ -18,7 +18,7 @@ export default function Progress() {
     [derived.subjects, state.readSections, state.attempts]
   );
   const days = useMemo(() => last14(state.activeDays), [state.activeDays]);
-  const weak = useMemo(() => weakTopics(state.attempts).slice(0, 3), [state.attempts]);
+  const weak = useMemo(() => weakTopics(state.attempts).slice(0, 4), [state.attempts]);
   const acc = accuracy(state.attempts);
   // Pinned once on mount rather than read during render: a render must be
   // repeatable, and the month label has no business changing mid-screen.
