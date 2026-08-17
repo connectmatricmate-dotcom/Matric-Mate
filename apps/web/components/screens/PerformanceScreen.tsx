@@ -1,18 +1,19 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { accuracy, confidenceBreakdown } from '@matricmate/core';
+import { accuracy, confidenceBreakdown, formatDate } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Seg } from '@/components/ui/controls';
 import { Bar, Card, Item, Label } from '@/components/ui/primitives';
 import { useNow } from '@/lib/now';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 type Range = 'week' | 'month' | 'all';
 
 export function PerformanceScreen() {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const now = useNow();
   const [range, setRange] = useState<Range>('month');
 
@@ -42,7 +43,9 @@ export function PerformanceScreen() {
     return valid.map((x) => `${(x.i / (trend.length - 1)) * w},${h - ((x.acc as number) / 100) * (h - 10) - 5}`).join(' ');
   }, [trend]);
 
-  const conf = useMemo(() => confidenceBreakdown(attempts), [attempts]);
+  // Every attempt, not the selected range, so this block matches the card
+  // on the dashboard. The range picker above governs the trend chart.
+  const conf = useMemo(() => confidenceBreakdown(state.attempts), [state.attempts]);
   const maxCount = Math.max(1, ...trend.map((x) => x.count));
   const confLabels = [t('session.conf0'), t('session.conf1'), t('session.conf2')];
   const last = points ? points.split(' ').slice(-1)[0].split(',') : null;
@@ -148,7 +151,7 @@ export function PerformanceScreen() {
                 <Item
                   key={r.id}
                   title={r.label}
-                  sub={`${new Date(r.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
+                  sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
                   icon={r.mode === 'exam' ? 'clock' : 'target'}
                   tone={r.mode === 'exam' ? 'orange' : 'teal'}
                   last={i === Math.min(5, state.results.length - 1)}

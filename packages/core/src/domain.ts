@@ -128,15 +128,24 @@ export const accuracy = (attempts: Attempt[]) =>
   attempts.length ? Math.round((attempts.filter((a) => a.correct).length / attempts.length) * 100) : 0;
 
 /** Accuracy per confidence level, the Pakka-meter payoff shown in analytics. */
+/**
+ * How often each confidence level turned out to be right.
+ *
+ * Deliberately over every attempt ever, not a window. The question this
+ * answers is "does this student know when they know", which is a habit that
+ * takes months to show and would be noise over seven days. It also keeps the
+ * dashboard card and its Details view saying the same thing: the range picker
+ * on that screen governs the trend chart, not this.
+ *
+ * No label here any more. It used to return 'Pakka ✓', 'Thora pakka' and
+ * 'Tukka 🎲', hardcoded Roman Urdu inside a domain function, which no screen
+ * rendered but which would have shown Roman to an Urdu student the first time
+ * anyone used it. Screens read session.conf0/1/2 from the dictionary.
+ */
 export function confidenceBreakdown(attempts: Attempt[]) {
   return ([2, 1, 0] as Confidence[]).map((c) => {
     const set = attempts.filter((a) => a.confidence === c);
-    return {
-      confidence: c,
-      label: c === 2 ? 'Pakka ✓' : c === 1 ? 'Thora pakka' : 'Tukka 🎲',
-      said: set.length,
-      accuracy: accuracy(set),
-    };
+    return { confidence: c, said: set.length, accuracy: accuracy(set) };
   });
 }
 

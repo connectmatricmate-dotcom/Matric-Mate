@@ -58,7 +58,9 @@ export default function Performance() {
     return valid.map((x) => `${(x.i / (trend.length - 1)) * CHART_W},${yFor(x.acc as number)}`).join(' ');
   }, [trend]);
 
-  const conf = useMemo(() => confidenceBreakdown(attempts), [attempts]);
+  // Every attempt, not the selected range, so this block matches the card
+  // on the dashboard. The range picker above governs the trend chart.
+  const conf = useMemo(() => confidenceBreakdown(state.attempts), [state.attempts]);
   const maxCount = Math.max(1, ...trend.map((x) => x.count));
   const confLabels = [t('session.conf0'), t('session.conf1'), t('session.conf2')];
 

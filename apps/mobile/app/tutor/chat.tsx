@@ -17,7 +17,7 @@ import { useQuota } from '../../src/core/useQuota';
 
 /** "21:00" style local clock time out of the server's reset instant. */
 const clock = (iso: string) =>
-  new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });  // 24h clock, same in both languages
 
 export default function Chat() {
   const { q, chapter, thread } = useLocalSearchParams<{ q?: string; chapter?: string; thread?: string }>();

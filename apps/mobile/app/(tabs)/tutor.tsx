@@ -16,10 +16,10 @@ import {
   TileGrid,
   Tiny,
 } from '../../src/components/ui';
-import { BILLING_SITE } from '@matricmate/core';
+import { BILLING_SITE, formatDate } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useAsync } from '../../src/core/useAsync';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, rowDir } from '../../src/theme';
@@ -37,6 +37,7 @@ type ThreadRow = { id: string; title: string; context_label: string | null; upda
 export default function Tutor() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
 
   /**
    * The server's quota is the truth; the local counter is only the fallback
@@ -164,7 +165,7 @@ export default function Tutor() {
             <Item
               key={thread.id}
               title={thread.title}
-              sub={`${thread.context_label ?? ''} ${new Date(thread.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`.trim()}
+              sub={`${thread.context_label ?? ''} ${formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })}`.trim()}
               icon="spark"
               last={i === threads.data!.length - 1}
               onPress={() => router.push(`/tutor/chat?thread=${thread.id}`)}
