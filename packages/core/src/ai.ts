@@ -8,7 +8,7 @@
  * ids, so the session screens run an AI set exactly like a bank set.
  */
 import { weakTopics } from './domain';
-import { aiPost } from './tutor';
+import { aiGet, aiPost } from './tutor';
 import type { AiFail, TutorQuota } from './tutor';
 import type { Attempt, Blank, Flashcard, Mcq, ShortQ } from './types';
 
@@ -162,4 +162,17 @@ export async function fetchCheatSheet(input: {
 export async function fetchUpgradeLink(): Promise<string | null> {
   const res = await aiPost<{ url?: string }>('/api/upgrade-link', {});
   return res.ok ? (res.data.url ?? null) : null;
+}
+
+/**
+ * The student's latest coach report, if the nightly job has written one.
+ *
+ * A read, not a generation: null simply means there is nothing to say yet,
+ * which is the normal state for a student who signed up an hour ago. The card
+ * greets them itself in that case rather than showing nothing, which is what
+ * it used to do.
+ */
+export async function fetchLatestCoachReport(): Promise<CoachReport | null> {
+  const res = await aiGet<{ report: CoachReport | null }>('/api/ai/coach');
+  return res.ok ? (res.data.report ?? null) : null;
 }

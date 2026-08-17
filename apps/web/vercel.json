@@ -3,5 +3,11 @@
   "framework": "nextjs",
   "github": {
     "silent": true
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/coach",
+      "schedule": "30 1 * * *"
+    }
+  ]
 }

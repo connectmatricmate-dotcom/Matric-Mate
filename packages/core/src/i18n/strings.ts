@@ -649,6 +649,15 @@ export const en = {
     paperStart: 'Start Section A',
     coachTitle: 'Your AI coach',
     coachActions: 'This week',
+    /* Shown to a student with no history yet. Written here rather than asked
+       of the model: there is nothing to report on, and a coach inventing a
+       week the student has not had is worse than a plain welcome. */
+    coachWelcome: 'Welcome, {name}. Your coach starts writing once you have practised a little.',
+    coachFirstSteps: 'Start here',
+    coachStep1: 'Open {chapter} and read the notes.',
+    coachStep2: 'Try 10 MCQs from the same chapter.',
+    coachStep3: 'Ask the AI tutor the first thing that does not make sense.',
+    coachQuiet: 'Nothing new since your last report. Practise a little and your coach will have something to say tomorrow.',
     checkTitle: 'Check my answer',
     checkPlaceholder: 'Write your answer here, like in the paper…',
     checkBusy: 'Marking…',
@@ -1515,6 +1524,12 @@ export const ur: typeof en = {
     paperStart: 'حصہ الف شروع کریں',
     coachTitle: 'آپ کا AI کوچ',
     coachActions: 'اس ہفتے',
+    coachWelcome: 'خوش آمدید، {name}۔ تھوڑی مشق کے بعد آپ کا کوچ لکھنا شروع کر دے گا۔',
+    coachFirstSteps: 'یہاں سے شروع کریں',
+    coachStep1: '{chapter} کھولیں اور نوٹس پڑھیں۔',
+    coachStep2: 'اسی باب سے 10 MCQs کریں۔',
+    coachStep3: 'جو بات سمجھ نہ آئے، سب سے پہلے وہی AI ٹیوٹر سے پوچھیں۔',
+    coachQuiet: 'پچھلی رپورٹ کے بعد کچھ نیا نہیں۔ تھوڑی مشق کریں، کل آپ کا کوچ کچھ بتانے کے قابل ہوگا۔',
     checkTitle: 'میرا جواب جانچیں',
     checkPlaceholder: 'اپنا جواب یہاں لکھیں، پرچے کی طرح…',
     checkBusy: 'نمبر لگائے جا رہے ہیں…',

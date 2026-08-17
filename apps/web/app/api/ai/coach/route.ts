@@ -34,6 +34,28 @@ const REPORT_SCHEMA: Record<string, unknown> = {
   additionalProperties: false,
 };
 
+/**
+ * The card reads through here and never generates.
+ *
+ * Generation moved to the nightly cron (/api/cron/coach), because having the
+ * dashboard trigger it meant whoever opened it first waited on a model call to
+ * see their own home screen. Reading is free, costs no quota, and returns null
+ * rather than an error when there is no report yet: a student with no history
+ * has nothing to report on, and the card says something welcoming instead.
+ */
+export async function GET(req: NextRequest) {
+  const g = await guardAi(req, 0);
+  if (g instanceof NextResponse) return g;
+  const { data } = await g.admin
+    .from('coach_reports')
+    .select('body,period')
+    .eq('user_id', g.userId)
+    .order('period', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return NextResponse.json({ report: data?.body ?? null, period: data?.period ?? null, quota: g.quota });
+}
+
 export async function POST(req: NextRequest) {
   const g = await guardAi(req, AI_COST.coach);
   if (g instanceof NextResponse) return g;
@@ -43,7 +65,7 @@ export async function POST(req: NextRequest) {
     .from('coach_reports')
     .select('body')
     .eq('user_id', g.userId)
-    .eq('week', week)
+    .eq('period', week)
     .maybeSingle();
   if (cached) return NextResponse.json({ report: cached.body, cached: true, quota: g.quota });
 
@@ -92,7 +114,7 @@ export async function POST(req: NextRequest) {
     if (!block) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
     const report = JSON.parse(block.text);
 
-    await g.admin.from('coach_reports').insert({ user_id: g.userId, week, body: report });
+    await g.admin.from('coach_reports').upsert({ user_id: g.userId, period: week, body: report }, { onConflict: 'user_id,period' });
     const quota = await chargeQuota(g, AI_COST.coach);
     return NextResponse.json({ report, cached: false, quota });
   } catch (e) {

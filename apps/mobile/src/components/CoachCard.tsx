@@ -1,39 +1,57 @@
 import { View } from 'react-native';
-import { buildCoachDigest, fetchCoachReport, isUrduScript } from '@matricmate/core';
+import { chapterById, chaptersFor, fetchLatestCoachReport, isUrduScript } from '@matricmate/core';
 import { Card, Label, ScriptText, Small } from './ui';
 import { useAsync } from '../core/useAsync';
 import { useT } from '../i18n';
 import { useApp } from '../store/app';
-import { C } from '../theme';
+import { C, rowDir } from '../theme';
 import { Markdown } from './Markdown';
 
 /**
- * The weekly AI coach on the dashboard: two sentences about the week, the
- * two weakest topics with why they matter, three things to do next. The
- * server caches one report per week, so this costs one model call every
- * Monday, not one per open. Renders nothing until a report exists, and
- * nothing at all offline: a coach who cannot see the week stays quiet.
+ * The AI coach on the dashboard: two sentences about the week, the two weakest
+ * topics with why they matter, three things to do next.
+ *
+ * This only reads. Reports are written by the nightly job in
+ * /api/cron/coach, so opening the dashboard never waits on a model call and
+ * the text keeps up with a student who studies daily rather than being fixed
+ * from Monday to Sunday.
+ *
+ * And it is never blank. It used to return null for a student with no history,
+ * so the newest students, the ones with the least idea what to do, got the
+ * least guidance. They now get a welcome and three concrete first steps,
+ * written locally: there is nothing to report on yet, and a coach inventing a
+ * week they have not had would be worse than saying so plainly.
  */
 export function CoachCard() {
   const { state, derived } = useApp();
   const t = useT();
 
-  const { data } = useAsync(async () => {
-    // No practice yet means nothing to coach; skip the call entirely.
-    if (!state.attempts.length) return null;
-    const res = await fetchCoachReport(
-      buildCoachDigest({
-        attempts: state.attempts,
-        streak: derived.streak,
-        xp: state.xp,
-        subjects: derived.subjects,
-        language: state.settings.language,
-      }),
-    );
-    return res.ok ? res.report : null;
-  }, [state.attempts.length > 0 ? 'y' : 'n']);
+  const { data } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '']);
 
-  if (!data) return null;
+  if (!data) {
+    const firstName = (state.user?.name ?? '').split(' ')[0];
+    const chapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
+    const first = chapter ?? chaptersFor(derived.subjects[0] ?? 'phy')[0];
+    return (
+      <Card flat tint={C.tealTint} border={C.teal} style={{ gap: 8 }}>
+        <Label style={{ color: C.teal }}>{t('tutor.coachTitle')}</Label>
+        <ScriptText text={t('tutor.coachWelcome', { name: firstName })} size={13.5} />
+        <Label style={{ color: C.ink2, marginTop: 2 }}>{t('tutor.coachFirstSteps')}</Label>
+        <View style={{ gap: 4 }}>
+          {[t('tutor.coachStep1', { chapter: first?.title ?? '' }), t('tutor.coachStep2'), t('tutor.coachStep3')].map(
+            (step, i) => (
+              <View key={i} style={{ flexDirection: rowDir(), alignItems: 'flex-start', gap: 6 }}>
+                <Small>{i + 1}.</Small>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <ScriptText text={step} size={13} color={C.ink2} />
+                </View>
+              </View>
+            ),
+          )}
+        </View>
+      </Card>
+    );
+  }
   return (
     <Card flat tint={C.tealTint} border={C.teal} style={{ gap: 8 }}>
       <Label style={{ color: C.teal }}>{t('tutor.coachTitle')}</Label>

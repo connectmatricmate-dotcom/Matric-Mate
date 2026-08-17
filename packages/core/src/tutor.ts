@@ -207,3 +207,17 @@ export async function aiPost<T>(path: string, payload: object): Promise<{ ok: tr
     return { ok: false, reason: 'offline' };
   }
 }
+
+/** GET twin of aiPost, for the AI reads that cost nothing. */
+export async function aiGet<T>(path: string): Promise<{ ok: true; data: T } | AiFail> {
+  if (!config) return { ok: false, reason: 'offline' };
+  try {
+    const res = await doFetch(`${config.siteUrl}${path}`, { headers: await headers(), credentials: 'include' });
+    const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
+    setQuota(body.quota);
+    if (!res.ok) return { ok: false, reason: failFrom(res.status, body).ok ? 'error' : 'error' };
+    return { ok: true, data: body };
+  } catch {
+    return { ok: false, reason: 'offline' };
+  }
+}

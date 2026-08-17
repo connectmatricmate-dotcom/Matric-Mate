@@ -7,7 +7,7 @@
 import Link from 'next/link';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
-import { accuracy, buildCoachDigest, confidenceBreakdown, fetchCoachReport, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import { accuracy, chapterById, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
 import type { CoachReport } from '@matricmate/core';
 import { Bar, Card, Icon, Label, Pill, Ring, ScriptText } from '@/components/ui/primitives';
 import { ScriptNumbers } from '@/components/ui/ScriptList';
@@ -243,29 +243,48 @@ export function CoachRail() {
   const { state, derived } = useApp();
   const t = useT();
   const [report, setReport] = useState<CoachReport | null>(null);
-  const hasAttempts = state.attempts.length > 0;
+  const userId = state.user?.id ?? '';
   useEffect(() => {
-    if (!hasAttempts) return;
+    if (!userId) return;
     let alive = true;
-    fetchCoachReport(
-      buildCoachDigest({
-        attempts: state.attempts,
-        streak: derived.streak,
-        xp: state.xp,
-        subjects: derived.subjects,
-        language: state.settings.language,
-      }),
-    ).then((res) => {
-      if (alive && res.ok) setReport(res.report);
+    // A read. Reports are written by the nightly job, so opening the dashboard
+    // never waits on a model call and never spends a question.
+    void fetchLatestCoachReport().then((r) => {
+      if (alive) setReport(r);
     });
     return () => {
       alive = false;
     };
-    // One fetch per mount is right: the report is cached per week server-side.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasAttempts]);
+  }, [userId]);
 
-  if (!report) return null;
+  if (!report) {
+    /*
+     * Never blank. This used to render nothing for a student with no history,
+     * so the newest students, the ones least sure what to do, got the least
+     * guidance. Written locally rather than asked of the model: there is
+     * nothing to report on yet, and inventing a week they have not had would
+     * be worse than saying so.
+     */
+    const firstName = (state.user?.name ?? '').split(' ')[0];
+    const chapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
+    const first = chapter ?? chaptersFor(derived.subjects[0] ?? 'phy')[0];
+    return (
+      <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
+        <Label className="text-teal">{t('tutor.coachTitle')}</Label>
+        <ScriptText
+          text={t('tutor.coachWelcome', { name: firstName })}
+          className="text-[13px] leading-[1.6] text-ink"
+          urduClassName="text-[13px] text-ink"
+        />
+        <Label>{t('tutor.coachFirstSteps')}</Label>
+        <ScriptNumbers
+          items={[t('tutor.coachStep1', { chapter: first?.title ?? '' }), t('tutor.coachStep2'), t('tutor.coachStep3')]}
+          className="text-[12.5px] leading-[1.5] text-ink2"
+          listClassName="flex flex-col gap-1"
+        />
+      </Card>
+    );
+  }
   return (
     <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
       <Label className="text-teal">{t('tutor.coachTitle')}</Label>
