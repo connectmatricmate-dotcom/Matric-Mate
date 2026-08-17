@@ -21,7 +21,8 @@
       "predictiveBackGestureEnabled": false,
       "runtimeVersion": {
         "policy": "appVersion"
-      }
+      },
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -44,6 +45,13 @@
           "imageWidth": 220,
           "resizeMode": "contain",
           "backgroundColor": "#FAFBF7"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#0A7EA4"
         }
       ]
     ],

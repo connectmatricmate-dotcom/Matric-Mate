@@ -11,6 +11,7 @@ import { ConnectivityProvider } from '../src/core/connectivity';
 import { AuthProvider } from '../src/store/auth';
 import { AppProvider, useApp } from '../src/store/app';
 import { useQuotaRealtime } from '../src/core/useQuota';
+import { usePush } from '../src/core/usePush';
 import { ToastHost } from '../src/components/ui';
 import { C } from '../src/theme';
 
@@ -42,6 +43,7 @@ export default function RootLayout() {
           <AppProvider>
             <SplashGate />
             <QuotaLive />
+            <PushLive />
             <ToastHost>
               <Chrome />
             </ToastHost>
@@ -116,5 +118,18 @@ function SplashGate() {
 function QuotaLive() {
   const { state } = useApp();
   useQuotaRealtime(state.user?.id);
+  return null;
+}
+
+/**
+ * Registers this phone for push and routes a tap on a notification.
+ *
+ * Mounted inside AppProvider because it needs the signed-in user, and once
+ * rather than per screen: the permission prompt and the token write should
+ * happen on launch, not every time somebody opens a tab.
+ */
+function PushLive() {
+  const { state } = useApp();
+  usePush(state.user?.id ?? null);
   return null;
 }
