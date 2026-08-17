@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { translate } from '@matricmate/core';
-import type { Language } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { nothingStudiedToday, notify, streakAtRisk } from '@/lib/notify';
 
 /**
  * The evening nudge, and the thing that finally makes two settings real.
@@ -97,8 +96,7 @@ export async function GET(req: NextRequest) {
     ((profiles ?? []) as { id: string; settings: unknown; onboarding: unknown }[]).map((p) => [p.id, p]),
   );
 
-  type Row = { user_id: string; kind: string; title: string; body: string; target: string };
-  const rows: Row[] = [];
+  let written = 0;
 
   for (const [userId, days] of candidates) {
     if (already.has(userId)) continue;
@@ -111,35 +109,19 @@ export async function GET(req: NextRequest) {
     const wantsStreak = settings.streakAlerts !== false;
     if (!wantsReminder && !wantsStreak) continue;
 
-    const medium = (profile?.onboarding as { medium?: string } | null)?.medium;
-    const lang: Language = medium === 'ur' ? 'ur' : 'en';
-
     // A streak that is still alive as of yesterday is the more urgent of the
     // two, and it says something the plain reminder does not, so it wins.
     const streak = streakEndingAt(days, yesterday);
-    if (wantsStreak && streak >= 2) {
-      rows.push({
-        user_id: userId,
-        kind: 'streak',
-        title: translate(lang, 'notifications.streakTitle', { n: streak }),
-        body: translate(lang, 'notifications.streakBody'),
-        target: 'session-setup',
-      });
-    } else if (wantsReminder) {
-      rows.push({
-        user_id: userId,
-        kind: 'reminder',
-        title: translate(lang, 'notifications.reminderTitle'),
-        body: translate(lang, 'notifications.reminderBody'),
-        target: 'home',
-      });
-    }
+    const notice = wantsStreak && streak >= 2 ? streakAtRisk(streak) : wantsReminder ? nothingStudiedToday() : null;
+    if (!notice) continue;
+
+    // Through the dispatcher, so a nudge reaches the phone as well as the
+    // inbox once push is switched on, without this job knowing about either.
+    // Sequential rather than a batch insert: it is one row per student either
+    // way, and a fan-out per student is not something to run 500 of at once.
+    const report = await notify(userId, notice);
+    if (report.inbox === 'sent') written++;
   }
 
-  if (!rows.length) return NextResponse.json({ considered: candidates.length, written: 0 });
-
-  const { error: insertError } = await admin.from('notifications').insert(rows);
-  if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 });
-
-  return NextResponse.json({ considered: candidates.length, written: rows.length });
+  return NextResponse.json({ considered: candidates.length, written });
 }

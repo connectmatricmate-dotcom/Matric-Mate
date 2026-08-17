@@ -75,12 +75,18 @@ export type Settings = {
   reminders: boolean;
   reminderTime: string;
   streakAlerts: boolean;
+  /** Which channels may carry a notification. See AccountPrefs in core. */
+  channelPush: boolean;
+  channelEmail: boolean;
+  channelWhatsapp: boolean;
   contentMedium: Medium;
   fontScale: 0 | 1 | 2;
 };
 
 export type State = {
   user: { id: string; name: string; contact: string } | null;
+  /** Optional WhatsApp number, +92 format. A contact detail, never a login. */
+  phone: string | null;
   onboarding: Onboarding | null;
   premium: { active: boolean; validTill: number | null; ref?: string };
   readSections: string[];
@@ -110,12 +116,16 @@ const DEFAULT_SETTINGS: Settings = {
   reminders: true,
   reminderTime: '7:00 PM',
   streakAlerts: true,
+  channelPush: true,
+  channelEmail: true,
+  channelWhatsapp: false,
   contentMedium: 'en',
   fontScale: 1,
 };
 
 const EMPTY: State = {
   user: null,
+  phone: null,
   onboarding: null,
   premium: { active: false, validTill: null },
   readSections: [],
@@ -375,7 +385,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             // copy wins outright. Null means the student has never set them
             // and this device's defaults stand.
             const settings = server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings;
-            return { ...merged, onboarding, settings, xp: totalXp(merged.attempts, merged.cardsKnown) };
+            return { ...merged, onboarding, settings, phone: server.phone, xp: totalXp(merged.attempts, merged.cardsKnown) };
           });
         }
         // The account had no saved choices but this device does: an account
@@ -484,6 +494,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             // Same reasoning: a switch turned off on the laptop must turn off
             // here, and a merge would never let it.
             settings: server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings,
+            phone: server.phone,
             xp: totalXp(merged.attempts, merged.cardsKnown),
           };
         });
@@ -687,12 +698,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           // The three nudge preferences are account-level, so they go up. The
           // rest describe this device and stay on it.
           const uid = syncedForRef.current;
-          if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch)) {
+          if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch ||
+        'channelPush' in patch || 'channelEmail' in patch || 'channelWhatsapp' in patch)) {
             void syncAccountPrefs(supabase, uid, {
               reminders: settings.reminders,
               streakAlerts: settings.streakAlerts,
               reminderTime: settings.reminderTime,
               dark: settings.dark,
+              channelPush: settings.channelPush,
+              channelEmail: settings.channelEmail,
+              channelWhatsapp: settings.channelWhatsapp,
             });
           }
           return { ...s, settings };

@@ -22,6 +22,8 @@ export type AuthState = {
   sent?: boolean;
   /** Where that link went, so the page can name it rather than saying "your email". */
   email?: string;
+  /** A confirmation to show above the form, as a dictionary key. */
+  notice?: StringKey;
 };
 
 /*
@@ -55,8 +57,16 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    // Read by the on_auth_user_created trigger to seed the profile row.
-    options: { data: { name: parsed.data.name } },
+    options: {
+      // Read by the on_auth_user_created trigger to seed the profile row.
+      data: { name: parsed.data.name },
+      /*
+       * Where the confirmation link lands. Without this Supabase falls back to
+       * the project's Site URL, which on a preview deployment is the wrong
+       * host, so the link works locally and quietly breaks in review.
+       */
+      emailRedirectTo: `${SITE_URL}/auth/callback?next=/onboarding/class`,
+    },
   });
 
   if (error) {
@@ -82,6 +92,27 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
   if (!data.session) return { sent: true, email: parsed.data.email };
 
   redirect(safePath(formData.get('next'), '/onboarding/class'));
+}
+
+/**
+ * Send the confirmation email again.
+ *
+ * Without this a student whose first one went to spam has no way forward:
+ * they cannot sign in, and signing up again answers "already registered".
+ * Supabase rate limits the resend itself, so a repeated press costs nothing.
+ */
+export async function resendConfirmationAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const address = String(formData.get('email') ?? '').trim();
+  if (!address) return { error: translate(await readUiLanguage(), 'auth.resendConfirmFail') };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email: address,
+    options: { emailRedirectTo: `${SITE_URL}/auth/callback?next=/onboarding/class` },
+  });
+  if (error) return { error: translate(await readUiLanguage(), 'auth.resendConfirmFail') };
+  return { sent: true, email: address, notice: 'auth.resendConfirmDone' };
 }
 
 export async function signInAction(_prev: AuthState, formData: FormData): Promise<AuthState> {

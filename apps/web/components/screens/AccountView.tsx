@@ -52,6 +52,7 @@ export function AccountView() {
   const s = state.settings;
   const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
   const unreadCount = state.notifications.filter((n) => !n.read).length;
+  const hasWhatsapp = Boolean(state.phone);
 
   return (
     <Page>
@@ -208,6 +209,53 @@ export function AccountView() {
               />
               {/* The count is the only thing that makes the inbox
                   discoverable: nothing else in the app points at it. */}
+              {/* Which notifications exist is above. This is how they reach
+                  the student, which is a different question: someone can want
+                  a streak nudge on their phone and not in their inbox. */}
+              <Item
+                title={t('account.channelPush')}
+                sub={t('account.channelPushSub')}
+                icon="bell"
+                right={
+                  <Toggle
+                    on={s.channelPush}
+                    label={t('account.channelPush')}
+                    onClick={() => actions.setSettings({ channelPush: !s.channelPush })}
+                  />
+                }
+              />
+              <Item
+                title={t('account.channelEmail')}
+                sub={t('account.channelEmailSub')}
+                icon="mail"
+                right={
+                  <Toggle
+                    on={s.channelEmail}
+                    label={t('account.channelEmail')}
+                    onClick={() => actions.setSettings({ channelEmail: !s.channelEmail })}
+                  />
+                }
+              />
+              {/* Only offered once there is a number to send to. A switch that
+                  cannot do anything yet is the thing this whole sweep has been
+                  removing, so it points at the profile instead. */}
+              <Item
+                title={t('account.channelWhatsapp')}
+                sub={hasWhatsapp ? t('account.channelWhatsappSub') : t('account.channelWhatsappNeedsNumber')}
+                icon="whatsapp"
+                tone="green"
+                right={
+                  hasWhatsapp ? (
+                    <Toggle
+                      on={s.channelWhatsapp}
+                      label={t('account.channelWhatsapp')}
+                      onClick={() => actions.setSettings({ channelWhatsapp: !s.channelWhatsapp })}
+                    />
+                  ) : (
+                    <Pill tone="grey">{t('account.editTitle')}</Pill>
+                  )
+                }
+              />
               <Item
                 href="/notifications"
                 title={t('account.notifications')}

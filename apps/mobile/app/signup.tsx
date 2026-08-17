@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { isAuthErrorKey, useAuth } from '../src/store/auth';
-import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
+import { Body, Btn, Card, Field, Header, Screen, Small, Spacer, useToast } from '../src/components/ui';
 import { Icon } from '../src/components/Icon';
 import { C, S } from '../src/theme';
 
@@ -20,7 +20,7 @@ import { C, S } from '../src/theme';
  * What this screen must never grow: a price, a plan, or a way to pay.
  */
 export default function SignUp() {
-  const { signUp } = useAuth();
+  const { signUp, resendConfirmation } = useAuth();
   const { state } = useApp();
   const t = useT();
   const [name, setName] = useState('');
@@ -29,6 +29,8 @@ export default function SignUp() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmSent, setConfirmSent] = useState(false);
+  const [resending, setResending] = useState(false);
+  const toast = useToast();
 
   const valid = name.trim().length >= 2 && email.trim().includes('@') && password.length >= 6;
 
@@ -64,7 +66,27 @@ export default function SignUp() {
           <Icon name="mail" size={34} color={C.green} strokeWidth={2.4} />
           <Body style={{ textAlign: 'center', fontSize: 15 }}>{t('auth.checkInboxBody', { email: email.trim() })}</Body>
           <Spacer h={S.sm} />
-          <Btn title={t('auth.backToLogin')} variant="line" sm onPress={() => router.replace('/login')} />
+          {/* Without this, an email that went to spam is a dead end: they
+              cannot sign in, and signing up again says "already registered". */}
+          <Btn
+            title={t('auth.resendConfirm')}
+            variant="line"
+            sm
+            loading={resending}
+            onPress={async () => {
+              setResending(true);
+              try {
+                await resendConfirmation(email);
+                toast(t('auth.resendConfirmDone'));
+              } catch {
+                toast(t('auth.resendConfirmFail'));
+              } finally {
+                setResending(false);
+              }
+            }}
+          />
+          <Spacer h={S.sm} />
+          <Btn title={t('auth.backToLogin')} variant="ghost" sm onPress={() => router.replace('/login')} />
         </Card>
       </Screen>
     );

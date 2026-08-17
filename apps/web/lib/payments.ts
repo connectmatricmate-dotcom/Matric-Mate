@@ -1,6 +1,6 @@
 import 'server-only';
-import { formatDate, translate } from '@matricmate/core';
-import type { Language } from '@matricmate/core';
+import { formatDate } from '@matricmate/core';
+import { loadRecipient, notify, paymentReceived } from '@/lib/notify';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { gateway } from '@/lib/gateway';
 import { planById } from '@/lib/plans';
@@ -109,18 +109,18 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
     { onConflict: 'user_id' }
   );
 
-  // In the student's own language. This was hardcoded English, which nobody
-  // noticed because until now no app ever read the notifications table.
-  const { data: profile } = await admin.from('profiles').select('onboarding').eq('id', payment.user_id).maybeSingle();
-  const lang: Language = (profile?.onboarding as { medium?: string } | null)?.medium === 'ur' ? 'ur' : 'en';
-
-  await admin.from('notifications').insert({
-    user_id: payment.user_id,
-    kind: 'payment',
-    title: translate(lang, 'notifications.paymentTitle'),
-    body: translate(lang, 'notifications.paymentBody', { date: formatDate(validTill, lang, { day: 'numeric', month: 'long', year: 'numeric' }) }),
-    target: 'payments',
-  });
+  /*
+   * Through the dispatcher, not straight into the table. A receipt should
+   * reach the student wherever they are: the inbox always, a push if the app
+   * is installed, an email because this is the one message they may want to
+   * keep, and WhatsApp once that is switched on. It was a hardcoded English
+   * row, which nobody noticed because until recently no app read the table.
+   */
+  const to = await loadRecipient(payment.user_id);
+  if (to) {
+    const date = formatDate(validTill, to.lang, { day: 'numeric', month: 'long', year: 'numeric' });
+    await notify(to, paymentReceived(date));
+  }
 
   return { handled: true as const, userId: payment.user_id };
 }

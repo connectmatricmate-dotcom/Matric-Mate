@@ -281,12 +281,16 @@ const actions: Actions = {
       // The three nudge preferences are account-level, so they go up. The rest
       // describe this browser and stay in it.
       const uid = s.user?.id;
-      if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch)) {
+      if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch ||
+        'channelPush' in patch || 'channelEmail' in patch || 'channelWhatsapp' in patch)) {
         void syncAccountPrefs(createClient(), uid, {
           reminders: settings.reminders,
           streakAlerts: settings.streakAlerts,
           reminderTime: settings.reminderTime,
           dark: settings.dark,
+          channelPush: settings.channelPush,
+          channelEmail: settings.channelEmail,
+          channelWhatsapp: settings.channelWhatsapp,
         });
       }
       return { ...s, settings };
@@ -449,7 +453,7 @@ async function syncStudyState(userId: string): Promise<void> {
       // The nudge preferences belong to the account, so the server's copy
       // wins. Null means never set, and this browser's defaults stand.
       const settings = server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings;
-      return { ...merged, settings, xp: totalXp(merged.attempts, merged.cardsKnown) };
+      return { ...merged, settings, phone: server.phone, xp: totalXp(merged.attempts, merged.cardsKnown) };
     });
   }
   void flush(userId);
@@ -662,6 +666,7 @@ export function useT() {
             // Same reasoning: a switch turned off on the phone must turn off
             // here, and a merge would never let it.
             settings: server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings,
+            phone: server.phone,
             xp: totalXp(merged.attempts, merged.cardsKnown),
           };
         });

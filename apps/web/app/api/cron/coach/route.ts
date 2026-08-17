@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { translate } from '@matricmate/core';
-import type { Language } from '@matricmate/core';
 import { buildDigestFromDb, writeCoachReport } from '@/lib/ai/coach-report';
+import { notify, reportReady } from '@/lib/notify';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -82,14 +81,7 @@ export async function GET(req: NextRequest) {
         // Tell them it exists. A report nobody knows was rewritten is a report
         // nobody reads, and the inbox's own empty state has always promised
         // exactly this.
-        const lang: Language = digest.language === 'ur' ? 'ur' : 'en';
-        await admin.from('notifications').insert({
-          user_id: userId,
-          kind: 'report',
-          title: translate(lang, 'notifications.reportTitle'),
-          body: translate(lang, 'notifications.reportBody'),
-          target: 'report',
-        });
+        await notify(userId, reportReady());
       } else skipped++;
     } catch {
       skipped++;

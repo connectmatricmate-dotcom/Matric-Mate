@@ -35,12 +35,18 @@ export type Settings = {
   reminders: boolean;
   reminderTime: string;
   streakAlerts: boolean;
+  /** Which channels may carry a notification. See AccountPrefs in core. */
+  channelPush: boolean;
+  channelEmail: boolean;
+  channelWhatsapp: boolean;
   contentMedium: Medium;
   fontScale: 0 | 1 | 2;
 };
 
 export type State = {
   user: { id: string; name: string; contact: string } | null;
+  /** Optional WhatsApp number, +92 format. A contact detail, never a login. */
+  phone: string | null;
   onboarding: Onboarding | null;
   /** `plan` is the PlanId from lib/plans, so the app can name what was bought
    * instead of just saying "Premium". */
@@ -69,6 +75,9 @@ export const DEFAULT_SETTINGS: Settings = {
   reminders: true,
   reminderTime: '7:00 PM',
   streakAlerts: true,
+  channelPush: true,
+  channelEmail: true,
+  channelWhatsapp: false,
   contentMedium: 'en',
   fontScale: 1,
 };
@@ -76,6 +85,7 @@ export const DEFAULT_SETTINGS: Settings = {
 /** Stable reference, `useSyncExternalStore` requires the server snapshot not to change identity. */
 export const EMPTY: State = {
   user: null,
+  phone: null,
   onboarding: null,
   premium: { active: false, validTill: null },
   readSections: [],

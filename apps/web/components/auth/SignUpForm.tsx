@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
-import { type AuthState, signUpAction } from '@/app/(auth)/actions';
+import { type AuthState, resendConfirmationAction, signUpAction } from '@/app/(auth)/actions';
 import { ErrorBanner, Field, SubmitButton } from '@/components/ui/controls';
 import { Card } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
@@ -11,6 +11,7 @@ import { isFormValid, validateEmail, validateName, validatePassword } from '@/li
 export function SignUpForm({ next }: { next?: string }) {
   const t = useT();
   const [state, action] = useActionState<AuthState, FormData>(signUpAction, {});
+  const [resent, resendAction] = useActionState<AuthState, FormData>(resendConfirmationAction, {});
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -35,12 +36,25 @@ export function SignUpForm({ next }: { next?: string }) {
         <p className="mt-2 text-[14.5px] leading-[1.7] text-ink2">
           {t('auth.checkInboxBody', { email: state.email ?? '' })}
         </p>
-        <Link
-          href="/login"
-          className="mt-4 inline-flex h-11 items-center rounded-xl border border-line px-4 font-extrabold text-[14px] text-ink transition hover:border-teal hover:text-teal"
-        >
-          {t('auth.backToLogin')}
-        </Link>
+        {resent.notice ? (
+          <p className="mt-3 rounded-xl bg-greentint px-3 py-2 text-[13.5px] font-extrabold text-green" role="status">
+            {t(resent.notice)}
+          </p>
+        ) : null}
+        {resent.error ? <div className="mt-3"><ErrorBanner message={resent.error} /></div> : null}
+
+        {/* Without this, an email that went to spam is a dead end: they cannot
+            sign in, and signing up again answers "already registered". */}
+        <form action={resendAction} className="mt-4 flex flex-wrap items-center gap-2.5">
+          <input type="hidden" name="email" value={state.email ?? ''} />
+          <SubmitButton title={t('auth.resendConfirm')} variant="line" />
+          <Link
+            href="/login"
+            className="inline-flex h-11 items-center rounded-xl px-4 font-extrabold text-[14px] text-ink2 transition hover:text-teal"
+          >
+            {t('auth.backToLogin')}
+          </Link>
+        </form>
       </Card>
     );
   }

@@ -3,8 +3,9 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, Field, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { useLang, useT } from '../../src/i18n';
-import { AVATARS, boardName } from '@matricmate/core';
+import { AVATARS, boardName, normalisePhone, syncPhone } from '@matricmate/core';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
+import { supabase } from '../../src/lib/supabase';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { C, S } from '../../src/theme';
@@ -18,6 +19,14 @@ export default function EditProfile() {
   const { lang } = useLang();
   const toast = useToast();
   const [name, setName] = useState(state.user?.name ?? '');
+  /*
+   * A contact detail, not a login. Sign-in stays on email so that no messaging
+   * provider is ever in the path of creating an account: if WhatsApp or the
+   * SMS gateway has a bad day, nobody is locked out. Shown as the student
+   * typed it, stored as +92.
+   */
+  const [phone, setPhone] = useState(state.phone ?? '');
+  const phoneBad = phone.trim().length > 0 && !normalisePhone(phone);
   // Persisted, not local: the picker used to keep its choice in component
   // state, so the selection silently vanished on the way out of the screen.
   const avatar = state.settings.avatar ?? 0;
@@ -30,9 +39,14 @@ export default function EditProfile() {
       footer={
         <Btn
           title={t('common.save')}
+          disabled={phoneBad}
           onPress={async () => {
             try {
               await updateName(name);
+              // Empty clears both the number and the consent that went with
+              // it, so a number removed today cannot be messaged tomorrow.
+              const uid = state.user?.id;
+              if (uid) await syncPhone(supabase, uid, phone.trim() ? normalisePhone(phone) : null);
               toast(t('account.profileSaved'));
               router.back();
             } catch (e) {
@@ -70,6 +84,18 @@ export default function EditProfile() {
         icon="user"
         autoCapitalize="words"
       />
+      <Spacer h={S.sm} />
+      <Field
+        label={t('account.whatsappNumber')}
+        placeholder="03001234567"
+        value={phone}
+        onChangeText={setPhone}
+        icon="whatsapp"
+        keyboardType="phone-pad"
+        error={phoneBad ? t('account.whatsappNumberBad') : undefined}
+      />
+      <Spacer h={S.xs} />
+      <Small>{t('account.whatsappNumberHint')}</Small>
 
       <SectionTitle>{t('account.studySetup')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>

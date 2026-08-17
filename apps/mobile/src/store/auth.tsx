@@ -82,6 +82,8 @@ type Ctx = {
   checking: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<SignUpResult>;
+  /** Sends the confirmation email again, for one that never arrived. */
+  resendConfirmation: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   /** Re-reads entitlement from the server. Called on resume, and by hand after paying. */
@@ -292,9 +294,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          // Read by the on_auth_user_created trigger to seed the profile row,
-          // exactly as the website does, so one account looks the same in both.
-          options: { data: { name: name.trim() } },
+          options: {
+            // Read by the on_auth_user_created trigger to seed the profile row,
+            // exactly as the website does, so one account looks the same in both.
+            data: { name: name.trim() },
+            // The link is opened in a phone browser, not in the app, so it has
+            // to land on the website. They confirm there and come back to sign
+            // in, which is what the "back to sign in" button here expects.
+            emailRedirectTo: `${SITE}/auth/callback?next=/dashboard`,
+          },
         });
         if (error) throw new Error(readable(error.message));
         /**
@@ -302,6 +310,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
          * The account exists; it just cannot be used until the link is clicked.
          */
         return { ok: true, needsConfirmation: !data.session };
+      },
+
+      /**
+       * Send the confirmation email again.
+       *
+       * Without this a student whose first one went to spam, or who mistyped
+       * nothing at all but simply lost it, has no way forward: they cannot
+       * sign in, and signing up again returns "already registered". Supabase
+       * rate limits this itself, so a repeated tap costs nothing.
+       */
+      async resendConfirmation(email) {
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email: email.trim(),
+          options: { emailRedirectTo: `${SITE}/auth/callback?next=/dashboard` },
+        });
+        if (error) throw new Error(readable(error.message));
       },
 
       async signOut() {
