@@ -132,8 +132,8 @@ Not defects. Recording them so they are not rediscovered as bugs.
   billing for in-app digital purchases, so the app copies a link to the website
   instead. The trade-off is written up in `LockedNotice.tsx`.
 - **Audio for five Class 9 chapters** was missing because those chapters had no
-  text when the audio ran. Being generated now; everything else has audio in
-  both mediums.
+  text when the audio ran. Filled: 314 published tracks now, every chapter in
+  both mediums, none with a missing file or zero length.
 
 ---
 
