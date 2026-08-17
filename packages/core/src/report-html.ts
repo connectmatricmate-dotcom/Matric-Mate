@@ -44,7 +44,9 @@ export type ReportData = {
     accuracy: string;
     attempted: string;
     footnote: string;
+    /** "Generated 18 August 2026", already formatted by the caller. */
     generated: string;
+    trend: string;
   };
   /** Right to left when the app is in Urdu, so the sheet matches the app. */
   rtl?: boolean;
@@ -113,7 +115,7 @@ export function reportHtml(d: ReportData): string {
         <th style="padding:9px 10px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:${colors.ink2}">${esc(d.labels.grade)}</th>
         <th style="padding:9px 10px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:${colors.ink2}">${esc(d.labels.accuracy)}</th>
         <th style="padding:9px 10px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:${colors.ink2}">${esc(d.labels.attempted)}</th>
-        <th style="padding:9px 10px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:${colors.ink2}">&nbsp;</th>
+        <th style="padding:9px 10px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:${colors.ink2}">${esc(d.labels.trend)}</th>
       </tr>
     </thead>
     <tbody>${rows}</tbody>

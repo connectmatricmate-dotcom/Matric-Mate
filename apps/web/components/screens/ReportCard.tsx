@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
+import { WORDMARK_DATA_URI, accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Label, Pill } from '@/components/ui/primitives';
@@ -19,6 +19,7 @@ export function ReportCard() {
   const now = useNow();
   const month = now ? formatDate(now, lang, { month: 'long', year: 'numeric' }) : '';
   const overallAcc = accuracy(state.attempts);
+  const printedOn = now ? formatDate(now, lang, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
   const rows = useMemo(
     () =>
@@ -56,6 +57,7 @@ export function ReportCard() {
       questions: state.attempts.length,
       activeDays,
       rtl: lang === 'ur',
+      logoDataUri: WORDMARK_DATA_URI,
       rows: rows.map((r) => ({
         subject: subjectById(r.sid)?.name ?? r.sid,
         grade: r.attempted ? grade(r.acc) : 'n/a',
@@ -66,7 +68,7 @@ export function ReportCard() {
       labels: {
         title: t('progress.reportTitle'),
         month: t('progress.month'),
-        overall: t('progress.reportCardSub', { grade: '' }).trim() || t('progress.reportTitle'),
+        overall: t('progress.reportOverall'),
         questions: t('dash.questions'),
         activeDays: t('dash.activeDays'),
         subject: t('session.subject'),
@@ -74,7 +76,8 @@ export function ReportCard() {
         accuracy: t('dash.accuracy'),
         attempted: t('progress.reportAttempted'),
         footnote: t('progress.reportFootnote'),
-        generated: t('progress.reportGenerated'),
+        generated: t('progress.reportGenerated', { date: printedOn }),
+        trend: t('progress.reportTrend'),
       },
     });
   }

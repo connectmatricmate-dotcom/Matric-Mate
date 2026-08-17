@@ -3,7 +3,7 @@ import { Image, Share, Text, View } from 'react-native';
 import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
+import { WORDMARK_DATA_URI, accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, textEnd } from '../../src/theme';
@@ -17,6 +17,7 @@ export default function Report() {
   const [now] = useState(() => Date.now());
   const month = formatDate(now, lang, { month: 'long', year: 'numeric' });
   const overallAcc = accuracy(state.attempts);
+  const printedOn = formatDate(now, lang, { day: 'numeric', month: 'long', year: 'numeric' });
 
   const rows = useMemo(
     () =>
@@ -55,6 +56,7 @@ export default function Report() {
       questions: state.attempts.length,
       activeDays,
       rtl: lang === 'ur',
+      logoDataUri: WORDMARK_DATA_URI,
       rows: rows.map((r) => ({
         subject: subjectById(r.sid)?.name ?? r.sid,
         grade: r.attempted ? grade(r.acc) : 'n/a',
@@ -65,7 +67,7 @@ export default function Report() {
       labels: {
         title: t('progress.reportTitle'),
         month: t('progress.month'),
-        overall: t('progress.reportTitle'),
+        overall: t('progress.reportOverall'),
         questions: t('dash.questions'),
         activeDays: t('dash.activeDays'),
         subject: t('session.subject'),
@@ -73,7 +75,8 @@ export default function Report() {
         accuracy: t('dash.accuracy'),
         attempted: t('progress.reportAttempted'),
         footnote: t('progress.reportFootnote'),
-        generated: t('progress.reportGenerated'),
+        generated: t('progress.reportGenerated', { date: printedOn }),
+        trend: t('progress.reportTrend'),
       },
     });
   }
