@@ -165,17 +165,21 @@ export async function POST(req: NextRequest) {
    * same content (measured), which pushed a paper that finished in English
    * straight past the limit and returned a 504 to the student.
    *
-   * Splitting by chapter fixes it twice over. The wall clock becomes the
-   * slowest single chapter rather than the sum of all three questions, and
-   * each call carries only the chapter it is writing about instead of both,
-   * so the input is smaller too.
+   * One question per request now, all three at once, so the wall clock is a
+   * single question rather than three in a row. Splitting only by chapter was
+   * not enough: the chapter holding two questions still took 59s in Urdu,
+   * which passes and then fails the first time the model is a little slower.
+   *
+   * The grounding goes out once per question instead of once per chapter, so
+   * this trades some input tokens for latency. Worth it: a student waiting a
+   * minute for a paper assumes it is broken.
    */
-  const split = groundings.map((gr, i) => ({
-    grounding: gr,
-    chapterId: heavy[i]?.id ?? heavy[0]?.id ?? '',
-    // 3 questions over 2 chapters: the heavier one carries the extra.
-    count: i === 0 ? LONG_COUNT - Math.floor(LONG_COUNT / 2) : Math.floor(LONG_COUNT / 2),
-  })).filter((part) => part.count > 0);
+  const split = Array.from({ length: LONG_COUNT }, (_, i) => {
+    // Round robin across the heavy chapters, so the first and heaviest gets
+    // the extra question when the count does not divide evenly.
+    const pick = i % Math.max(1, groundings.length);
+    return { grounding: groundings[pick], chapterId: heavy[pick]?.id ?? heavy[0]?.id ?? '', count: 1 };
+  }).filter((part) => part.grounding);
 
   try {
     const batches = await Promise.all(
