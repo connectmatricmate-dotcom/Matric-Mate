@@ -47,7 +47,7 @@ const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 /** ~5 MB of base64: generous for a downscaled phone photo, a wall for abuse. */
 const IMAGE_MAX_CHARS = 7_000_000;
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const anthropic = new Anthropic();
 

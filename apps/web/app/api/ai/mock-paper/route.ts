@@ -15,7 +15,18 @@ import { languageRule } from '@/lib/ai/language';
  * short answers and a board paper needs full 5-to-8-mark questions with
  * marking points. One model call per paper.
  */
-export const maxDuration = 60;
+/*
+ * Urdu costs roughly 1.6x the wall clock of English for the same content:
+ * Arabic script tokenises far worse, so the model has to emit many more tokens
+ * to say the same thing. Measured, not guessed: 5 MCQs took 13.6s in English
+ * and 21.2s in Urdu. At 60s a mock paper that finished in English returned a
+ * 504 in Urdu, which is what the client hit.
+ *
+ * 300 is Vercel's ceiling on the paid plans. If this project is on Hobby the
+ * build refuses it, in which case the previous deployment keeps serving and
+ * this comes back to 60.
+ */
+export const maxDuration = 300;
 
 const anthropic = new Anthropic();
 
@@ -145,27 +156,59 @@ export async function POST(req: NextRequest) {
     await Promise.all(heavy.map((c) => chapterGrounding(g.admin, c.id, medium, 9000, g.grade)))
   ).filter(Boolean) as { title: string; text: string }[];
 
+  /**
+   * Section C, one request per chapter, in parallel.
+   *
+   * This was a single call holding both chapters' text and writing all three
+   * long questions in sequence, and in Urdu it stopped fitting in the function
+   * budget: Arabic script costs roughly 1.6x the wall clock of Latin for the
+   * same content (measured), which pushed a paper that finished in English
+   * straight past the limit and returned a 504 to the student.
+   *
+   * Splitting by chapter fixes it twice over. The wall clock becomes the
+   * slowest single chapter rather than the sum of all three questions, and
+   * each call carries only the chapter it is writing about instead of both,
+   * so the input is smaller too.
+   */
+  const split = groundings.map((gr, i) => ({
+    grounding: gr,
+    chapterId: heavy[i]?.id ?? heavy[0]?.id ?? '',
+    // 3 questions over 2 chapters: the heavier one carries the extra.
+    count: i === 0 ? LONG_COUNT - Math.floor(LONG_COUNT / 2) : Math.floor(LONG_COUNT / 2),
+  })).filter((part) => part.count > 0);
+
   try {
-    const response = await anthropic.messages.create({
-      model: AI_MODEL,
-      max_tokens: 6000,
-      output_config: { effort: 'medium', format: { type: 'json_schema', schema: LONG_SCHEMA } },
-      system:
-        `You write Section C long questions for an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) board paper. Work ONLY from the chapter text provided. Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ` +
-        languageRule(medium),
-      messages: [
-        {
-          role: 'user',
-          content: `${groundings.map((gr) => `Chapter: ${gr.title}\n${gr.text}`).join('\n\n---\n\n')}\n\n---\nWrite exactly ${LONG_COUNT} long questions in board style.`,
-        },
-      ],
-    });
-    if (response.stop_reason === 'refusal') {
-      return NextResponse.json({ error: 'refused', quota: g.quota }, { status: 200 });
-    }
-    const block = response.content.find((b) => b.type === 'text');
-    if (!block) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
-    const longQs = (JSON.parse(block.text) as { items: { q: string; answer: string; points: string[]; marks: number }[] }).items;
+    const batches = await Promise.all(
+      split.map(async (part) => {
+        const response = await anthropic.messages.create({
+          model: AI_MODEL,
+          // Sized for this chapter's share of the paper, with headroom for
+          // Urdu, which needs far more tokens to say the same thing.
+          max_tokens: 2600 * part.count,
+          output_config: { effort: 'medium', format: { type: 'json_schema', schema: LONG_SCHEMA } },
+          system:
+            `You write Section C long questions for an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) board paper. Work ONLY from the chapter text provided. Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ` +
+            languageRule(medium),
+          messages: [
+            {
+              role: 'user',
+              content: `Chapter: ${part.grounding.title}\n${part.grounding.text}\n\n---\nWrite exactly ${part.count} long question${part.count === 1 ? '' : 's'} in board style.`,
+            },
+          ],
+        });
+        if (response.stop_reason === 'refusal') return null;
+        const block = response.content.find((b) => b.type === 'text');
+        if (!block) return null;
+        const parsed = JSON.parse(block.text) as { items: { q: string; answer: string; points: string[]; marks: number }[] };
+        return parsed.items.map((item) => ({ ...item, chapterId: part.chapterId }));
+      }),
+    );
+
+    // A refusal on one chapter is not a failed paper. Sections A and B are
+    // real board questions and stand on their own, so the paper still ships
+    // with whatever Section C came back.
+    const longQs = batches.filter(Boolean).flat() as { q: string; answer: string; points: string[]; marks: number; chapterId: string }[];
+    if (!longQs.length) return NextResponse.json({ error: 'refused', quota: g.quota }, { status: 200 });
 
     const items = {
       mcqs: mcqs.map((m) => ({
@@ -179,7 +222,7 @@ export async function POST(req: NextRequest) {
         difficulty: m.difficulty,
       })),
       shortQs: shortQs.map((s) => ({ id: s.id, chapterId: s.chapter_id, marks: s.marks, q: s.q, answer: s.answer, points: s.points })),
-      longQs: longQs.map((l, i) => ({ id: `lq-${i + 1}`, chapterId: heavy[0]?.id ?? '', ...l })),
+      longQs: longQs.map((l, i) => ({ id: `lq-${i + 1}`, ...l })),
     };
 
     const { data: saved, error } = await g.admin

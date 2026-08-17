@@ -14,7 +14,7 @@ import { languageRule } from '@/lib/ai/language';
  * the student's id, labelled AI-made in the UI, never mixed into the
  * human-reviewed shared bank.
  */
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const anthropic = new Anthropic();
 

@@ -10,7 +10,7 @@ import { languageRule } from '@/lib/ai/language';
  * charge for: not "what is the answer" but "what would MY answer have
  * scored, and where did the marks go".
  */
-export const maxDuration = 30;
+export const maxDuration = 120;
 
 const anthropic = new Anthropic();
 

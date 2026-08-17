@@ -11,7 +11,7 @@ import { languageRule } from '@/lib/ai/language';
  * dashboard card costs one model call a week, not one per visit. A cached
  * week is free and does not touch the quota.
  */
-export const maxDuration = 30;
+export const maxDuration = 120;
 
 const anthropic = new Anthropic();
 
