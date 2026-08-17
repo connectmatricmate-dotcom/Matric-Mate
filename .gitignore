@@ -55,3 +55,9 @@ content/
 
 # Screenshots dropped in the repo root while checking the app
 image*.png
+
+# Firebase credentials. The service account key can send push as us and read
+# the project; it belongs in a password manager and in Vercel, never in git.
+*-firebase-adminsdk-*.json
+google-services.json
+GoogleService-Info.plist
