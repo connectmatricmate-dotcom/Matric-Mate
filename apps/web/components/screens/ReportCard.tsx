@@ -8,6 +8,7 @@ import { Btn } from '@/components/ui/controls';
 import { Card, Label, Pill } from '@/components/ui/primitives';
 import { useNow } from '@/lib/now';
 import { useToast } from '@/components/ui/toast';
+import { printSheet } from '@/lib/print-sheet';
 import { useApp, useLang, useT } from '@/lib/store';
 
 export function ReportCard() {
@@ -173,16 +174,7 @@ export function ReportCard() {
              * generator feeds the Android PDF, so the two are the same
              * document.
              */
-            const win = window.open('', '_blank', 'noopener,width=820,height=900');
-            if (!win) {
-              toast(t('progress.shareFailed'));
-              return;
-            }
-            win.document.write(printableReport());
-            win.document.close();
-            // Give the document a tick to lay out before the dialog opens, or
-            // Safari prints a blank first page.
-            win.setTimeout(() => win.print(), 250);
+            printSheet(printableReport(), () => toast(t('progress.shareFailed')));
           }}
         />
       </div>
