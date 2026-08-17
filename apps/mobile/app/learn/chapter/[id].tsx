@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
+import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
 import { api , chapterPct, hasStudyMaterial , isUrduScript, pickAudioTrack, subjectById } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack } from '../../../src/core/downloads';
 import { Confetti, Pop } from '../../../src/components/celebration';
@@ -266,6 +266,39 @@ export default function ChapterHub() {
           onPress={() => router.push(`/session/blanks?chapter=${id}`)}
         />
       </Card>
+
+      {/* What to do next, which the website's chapter hub has had and this
+          did not. The advice is not decoration: it follows how much of the
+          chapter has actually been read, and the button changes with it, so
+          a student who has finished the notes is sent to the chapter test
+          rather than back into practice. */}
+      {content ? (
+        <>
+          <SectionTitle>{t('study.upNext')}</SectionTitle>
+          <Card flat>
+            <Small style={{ color: C.ink }}>
+              {readCount === 0
+                ? t('study.coachStart')
+                : readCount < content.sections.length
+                  ? t('study.coachKeepGoing')
+                  : t('study.coachDone')}
+            </Small>
+            <Spacer h={S.sm} />
+            <Btn
+              title={readCount >= content.sections.length ? t('study.chapterTest') : t('study.mcqs')}
+              variant="line"
+              sm
+              onPress={() =>
+                router.push(
+                  readCount >= content.sections.length
+                    ? `/session/exam-intro?chapter=${id}`
+                    : `/session/setup?chapter=${id}`,
+                )
+              }
+            />
+          </Card>
+        </>
+      ) : null}
 
       <Spacer h={S.lg} />
       <Row gap={S.sm}>

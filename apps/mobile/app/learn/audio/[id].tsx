@@ -197,9 +197,28 @@ function RealPlayer({ id }: { id: string }) {
   }, [player, speed]);
 
   // Until the file's own metadata arrives, the row's measured duration is the
-  // truth. audioMinutes is the bundled chapter constant and is always zero.
+  // truth. audioMinutes on the chapter row is a summary for the lists.
   const duration = status.duration || picked?.durationSecs || 0;
   const position = status.currentTime || 0;
+
+  /**
+   * Listening counts as studying.
+   *
+   * It used to count as nothing: the player recorded no attempt, no section
+   * and no active day, so a student who worked through an hour of audio ended
+   * the day with no streak and a chapter still at zero. A minute in is the
+   * threshold, which is past skimming and well short of demanding the whole
+   * lesson.
+   */
+  const counted = useRef(false);
+  useEffect(() => {
+    if (counted.current || position < 60) return;
+    counted.current = true;
+    actions.markStudied();
+  }, [position, actions]);
+  useEffect(() => {
+    counted.current = false;
+  }, [id, medium]);
 
   return (
     <PlayerChrome

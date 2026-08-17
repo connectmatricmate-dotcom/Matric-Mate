@@ -27,7 +27,7 @@ export function AudioLesson({
   /** Published recordings for this chapter, straight from Supabase Storage. */
   tracks: PlayableTrack[];
 }) {
-  const { state } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
   const audio = useRef<HTMLAudioElement>(null);
 
@@ -57,6 +57,15 @@ export function AudioLesson({
     if (audio.current) audio.current.playbackRate = SPEEDS[speed];
   }, [speed]);
 
+  const counted = useRef(false);
+
+  useEffect(() => {
+
+    counted.current = false;
+
+  }, [id, medium]);
+
+
   function toggle() {
     const el = audio.current;
     if (!el || !src) return;
@@ -85,7 +94,20 @@ export function AudioLesson({
           preload="metadata"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          onTimeUpdate={(e) => setPosition(e.currentTarget.currentTime)}
+          onTimeUpdate={(e) => {
+            const at = e.currentTarget.currentTime;
+            setPosition(at);
+            /*
+             * Listening counts as studying. It used to count as nothing: the
+             * player recorded no attempt, no section and no active day, so an
+             * hour of audio left the streak untouched. A minute in is past
+             * skimming and well short of demanding the whole lesson.
+             */
+            if (at >= 60 && !counted.current) {
+              counted.current = true;
+              actions.markStudied();
+            }
+          }}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || (track?.durationSecs ?? 0))}
           onEnded={() => setPlaying(false)}
         />

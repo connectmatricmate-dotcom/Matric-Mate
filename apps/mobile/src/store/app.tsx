@@ -153,6 +153,15 @@ type Actions = {
   markSectionRead: (sectionId: string, chapterId: string, index: number) => void;
   togglePlanTask: (id: string) => void;
   /**
+   * Marks today as studied, with nothing else to record.
+   *
+   * Every other action that counts as studying does this on the way past:
+   * answering a question, reading a section, finishing a test. Listening to an
+   * audio lesson recorded nothing at all, so a student who studies by ear got
+   * no streak and no active day for an hour of work.
+   */
+  markStudied: () => void;
+  /**
    * Downloads a chapter for offline use, or removes it. Async, and reports
    * which of the three actually happened: a download is a real network fetch
    * plus a disk write, not a state flip, so a failed fetch or a failed write
@@ -578,6 +587,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // student reached, not wherever they last happened to be re-reading.
         if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
         if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
+      },
+      markStudied: () => {
+        const day = todayKey();
+        if (stateRef.current.activeDays.includes(day)) return;
+        setState((st) => (st.activeDays.includes(day) ? st : { ...st, activeDays: [...st.activeDays, day] }));
+        queueAndFlush(syncActiveDay(day));
       },
       togglePlanTask: (id) => {
         const nowDone = !stateRef.current.planDone.includes(id);

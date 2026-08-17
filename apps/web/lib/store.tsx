@@ -55,6 +55,15 @@ type Actions = {
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
   markSectionRead: (sectionId: string, chapterId: string, index: number) => void;
   togglePlanTask: (id: string) => void;
+  /**
+   * Marks today as studied, with nothing else to record.
+   *
+   * Every other action that counts as studying does this on the way past:
+   * answering a question, reading a section, finishing a test. Listening to an
+   * audio lesson recorded nothing at all, so a student who studies by ear got
+   * no streak and no active day for an hour of work.
+   */
+  markStudied: () => void;
   markCard: (cardId: string, known: boolean) => void;
   consumeAi: () => boolean;
   saveThread: (t: ChatThread) => void;
@@ -193,6 +202,12 @@ const actions: Actions = {
     // student last happened to be re-reading.
     if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
     if (isNewDay) queueAndFlush(syncActiveDay(day));
+  },
+  markStudied: () => {
+    const day = todayKey();
+    if (getSnapshot().activeDays.includes(day)) return;
+    update((s) => (s.activeDays.includes(day) ? s : { ...s, activeDays: [...s.activeDays, day] }));
+    queueAndFlush(syncActiveDay(day));
   },
   togglePlanTask: (id) => {
     const nowDone = !getSnapshot().planDone.includes(id);

@@ -79,10 +79,16 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
                 )}
                 {empty ? null : (
                   <span className="block truncate text-[13px] text-ink2">
-                    {/* The share leads: it is the number the board itself
-                        publishes and the one that decides study order. */}
+                    {/* Section count, not audio length, and the same three
+                        facts the Android list shows. This read audioMinutes,
+                        a denormalised column nothing populates, so every
+                        chapter advertised a "0 min audio lesson" while the
+                        chapter hub, which reads the audio_tracks row, showed
+                        the real length. The share leads: it is the number the
+                        board itself publishes and the one that decides study
+                        order. */}
                     {c.examShare ? `${t('study.examShare', { n: c.examShare })} · ` : ''}
-                    {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.audioSub', { n: c.audioMinutes })}
+                    {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.sectionsSub', { n: c.sectionCount })}
                   </span>
                 )}
                 {!empty && p > 0 && p < 100 ? (
