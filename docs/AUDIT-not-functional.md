@@ -57,22 +57,23 @@ Tick three tasks on the phone, open the laptop, and all three are unticked.
 the five kinds already there. It follows an established pattern in
 `packages/core/src/sync.ts`, so it is small.
 
-## 3. Four controls that do nothing when pressed
+## 3. Four controls that do nothing when pressed · FIXED
 
-All on Android. Each shows a toast and changes nothing.
+All were on Android. Each showed a toast and changed nothing.
 
-| Control | Where | What happens |
-| :-- | :-- | :-- |
-| Dark mode | Settings | Toggle never latches, toast says "coming soon" |
-| Study reminder | Settings | Toggle never latches, toast says "coming soon" |
-| Streak alerts | Settings | Toggle never latches, toast says "coming soon" |
-| Terms and privacy | Settings | Toast; the website has a real /terms page |
+| Control | Now |
+| :-- | :-- |
+| Dark mode | A real theme on both apps. Second palette in core, getters on Android, variable overrides on the web. |
+| Study reminder | Latches, syncs to the account, and is read by the evening job that writes the nudge. |
+| Streak alerts | Same, and outranks the plain reminder when a streak is actually at risk. |
+| Terms and privacy | Opens the website's /terms. No price and no checkout on that page, so it stays inside the Play rules. |
 
-The toggles are honest in that they refuse to latch, so nobody is told a
-setting is on when it is off. They are still four rows that lead nowhere.
+One thing was worse on the website than on Android: its reminder switches
+latched and persisted, so they looked on while doing nothing, which is the
+trust problem the Android side had deliberately avoided by refusing to latch.
 
-Terms is the odd one out: the page exists on the website, so this is a missing
-link rather than a missing feature.
+Account deletion was missing from both, which Play requires to be reachable
+from inside the product. Both settings screens link to /delete-account now.
 
 ## 4. Report card sharing works on the web and not on Android
 
@@ -88,24 +89,36 @@ the screen built for showing a parent.
 **Fix:** `expo-sharing` for the share, and either `expo-print` or the same
 summary text through the share sheet for the PDF.
 
-## 5. Notification inbox can only ever hold payments
+## 5. Notification inbox can only ever hold payments · FIXED, and it was worse than this
 
-The table allows four kinds: `streak`, `reminder`, `report`, `payment`. Only
-`payment` is ever written, by the webhook. So the inbox is real, and works, but
-three quarters of what it was designed for never arrives. There are five rows
-in it today, all payments.
+This entry understated it. The inbox did not merely lack three of its four
+kinds: **neither app had ever read the table at all.** Both stores initialised
+`notifications` to an empty array and no code path filled it, so the five
+payment receipts sitting in the database had never been shown to anyone. Every
+student saw "No notifications yet", including the ones who had paid.
 
-Tied to item 3: streak and reminder notifications need scheduling to exist
-before they can be delivered, and `expo-notifications` is not installed.
+Now: hydration reads the rows, marking them read is written through instead of
+being undone by the next load, a broadcast trigger (migration 0020) brings one
+in live, and the account row shows the unread count so the screen is findable.
 
-## 6. Settings that are stored and never read
+All four kinds are written. `payment` by the webhook, `report` by the nightly
+coach job when it writes a new card, `streak` and `reminder` by a new evening
+job at 14:00 UTC (19:00 in Karachi), which is why the reminder time reads
+7:00 PM. One nudge per student per night, in their own language, and only for
+students who have studied in the last fortnight.
 
-`reminders`, `streakAlerts` and `reminderTime` persist correctly and are read
-by nothing except the controls that set them. `dark` is read by nothing at all,
-not even a control.
+Still open: these are in-app inbox items, not phone push. Real push needs
+`expo-notifications` and a rebuild.
 
-Harmless in itself, but it means the settings screen implies four capabilities
-the app does not have.
+## 6. Settings that are stored and never read · FIXED
+
+All four are read now. They also moved off the device and onto the account
+(`profiles.settings`, which existed since the first migration and had never
+been written), because they describe the person rather than the screen: the
+same student saw the reminder switches on in one app and off in the other, and
+turning the lights off on a phone should not have to be done again on a laptop.
+
+`profiles.settings` had no reader and no writer before this.
 
 ## 7. Dead code left by the paywall
 
@@ -139,13 +152,22 @@ Not defects. Recording them so they are not rediscovered as bugs.
 
 ## Suggested order
 
+Items 2 to 5 are done. What is left:
+
 1. **The sample certificate.** Fabricated content in front of every student,
-   and a one-line fix.
-2. **Report card share and PDF on Android.** A visible promise that does
-   nothing, on the screen meant for parents.
-3. **Today's plan syncing.** Silent, and it undermines "one account, every
-   device".
-4. **The four dead controls.** Either build them or take them out; a settings
-   screen of things that do not work costs trust on every visit.
-5. **Streak and reminder notifications**, which is the largest piece and the
-   only one needing a new dependency.
+   and a one-line fix. It is production data, so it is the client's call
+   whether to delete the row or replace it with a real reviewer.
+2. **Phone push notifications.** The inbox is fed and the preferences are read,
+   but a nudge only arrives when the student opens the app, which is a weak
+   place for something called a reminder. Real push needs `expo-notifications`,
+   a config plugin, a permission flow and a rebuild.
+3. **A picker for the reminder time.** It is stored, synced and displayed, and
+   the evening job runs at the hour it names, but nothing can change it yet,
+   so every student reads 7:00 PM.
+4. **`help@matricmate.pk`.** Every legal page and both help screens now read
+   one constant, `SUPPORT_EMAIL` in `packages/core/src/billing.ts`, currently
+   pointing at the Gmail account because that mailbox certainly exists. Point
+   it at the domain once that domain receives mail. It is one line.
+5. **White on orange, green and red** fails AA in the *light* theme: 2.4:1,
+   3.4:1 and 4.0:1. Pre-existing and untouched, because changing it moves the
+   look the client has already approved. Worth raising with them.
