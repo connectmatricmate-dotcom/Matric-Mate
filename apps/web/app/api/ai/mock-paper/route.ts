@@ -174,11 +174,37 @@ export async function POST(req: NextRequest) {
    * this trades some input tokens for latency. Worth it: a student waiting a
    * minute for a paper assumes it is broken.
    */
+  /*
+   * Topics already known for each chapter, from the MCQ bank we just read.
+   * Free: no extra query, and they are the board's own topic labels.
+   */
+  const topicsByChapter = new Map<string, string[]>();
+  for (const row of (mcqRows as { chapter_id: string; topic: string }[]) ?? []) {
+    if (!row.topic) continue;
+    const list = topicsByChapter.get(row.chapter_id) ?? [];
+    if (!list.includes(row.topic)) list.push(row.topic);
+    topicsByChapter.set(row.chapter_id, list);
+  }
+
+  let taken = 0;
   const split = Array.from({ length: LONG_COUNT }, (_, i) => {
     // Round robin across the heavy chapters, so the first and heaviest gets
     // the extra question when the count does not divide evenly.
     const pick = i % Math.max(1, groundings.length);
-    return { grounding: groundings[pick], chapterId: heavy[pick]?.id ?? heavy[0]?.id ?? '', count: 1 };
+    const chapterId = heavy[pick]?.id ?? heavy[0]?.id ?? '';
+    /*
+     * Each question gets its own topic to sit on.
+     *
+     * The three calls run at once and cannot see each other, so two questions
+     * drawn from the same chapter can land on the same idea and the paper
+     * repeats itself. Handing each one a different topic from that chapter is
+     * what keeps them apart. Advisory rather than binding: if a chapter has
+     * fewer topics than questions the model still writes a whole question,
+     * it just is not steered.
+     */
+    const pool = topicsByChapter.get(chapterId) ?? [];
+    const topic = pool.length ? pool[taken++ % pool.length] : null;
+    return { grounding: groundings[pick], chapterId, topic, count: 1 };
   }).filter((part) => part.grounding);
 
   try {
@@ -196,7 +222,12 @@ export async function POST(req: NextRequest) {
           messages: [
             {
               role: 'user',
-              content: `Chapter: ${part.grounding.title}\n${part.grounding.text}\n\n---\nWrite exactly ${part.count} long question${part.count === 1 ? '' : 's'} in board style.`,
+              content:
+                `Chapter: ${part.grounding.title}\n${part.grounding.text}\n\n---\n` +
+                `Write exactly ${part.count} long question${part.count === 1 ? '' : 's'} in board style.` +
+                (part.topic
+                  ? ` Build it around "${part.topic}". Other questions on this paper cover the chapter's other topics, so do not stray onto them.`
+                  : ''),
             },
           ],
         });
