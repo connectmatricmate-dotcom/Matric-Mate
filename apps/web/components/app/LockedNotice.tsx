@@ -6,7 +6,8 @@
  * app is where the subscription is actually sold, so here the same notice ends
  * in a real Upgrade button. Same copy keys, one extra affordance.
  */
-import { Card, Icon, LinkBtn } from '@/components/ui/primitives';
+import { UpgradeButton } from '@/components/commerce/UpgradeButton';
+import { Card, Icon } from '@/components/ui/primitives';
 
 export function LockedNotice({
   variant = 'locked',
@@ -22,11 +23,14 @@ export function LockedNotice({
       <Icon name="lock" size={18} className="mt-0.5 shrink-0 text-teal" />
       <div className="min-w-0 flex-1">
         <p className="text-[13.5px] leading-[1.6] text-ink">{body}</p>
-        <LinkBtn
-          title={cta}
-          href="/pricing"
+        {/* Straight to Safepay. A student who has just hit a locked chapter
+            has already decided; sending them to a pricing page to decide again
+            is where they used to fall out. */}
+        <UpgradeButton
+          label={cta}
           sm
           variant={variant === 'expired' ? 'orange' : 'primary'}
+          icon={null}
           className="mt-3"
         />
       </div>

@@ -493,11 +493,11 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <span className="pulse-glow mt-6 rounded-[16px]">
-                  <LinkBtn title="Subscribe now" href="/checkout?plan=monthly" variant="orange" className="w-full" />
+                  <LinkBtn title="Subscribe now" href="/checkout" variant="orange" className="w-full" />
                 </span>
                 <p className="mt-3 text-center text-[13px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
                 <Link href="/pricing" className="mt-2 text-center text-[13.5px] font-extrabold text-teal hover:underline">
-                  Compare plan lengths
+                  What the plan includes
                 </Link>
               </Card>
             </Tilt>

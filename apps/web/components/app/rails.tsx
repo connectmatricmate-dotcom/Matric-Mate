@@ -5,6 +5,7 @@
  * itself. Deliberately small, quiet and never the primary action.
  */
 import Link from 'next/link';
+import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
 import { accuracy, buildCoachDigest, confidenceBreakdown, fetchCoachReport, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
 import type { CoachReport } from '@matricmate/core';
@@ -228,12 +229,7 @@ export function UpgradeRail() {
         <p className="text-[13px] font-extrabold text-ink">{t('billing.statusFree')}</p>
       </div>
       <p className="mt-1.5 text-[12.5px] leading-[1.6] text-ink2">{t('billing.freeBody')}</p>
-      <Link
-        href="/pricing"
-        className="mt-3 inline-flex min-h-10 items-center rounded-[12px] bg-teal px-3.5 text-[13px] font-extrabold text-white transition-colors duration-200 hover:bg-tealdark"
-      >
-        {t('account.upgrade')}
-      </Link>
+      <UpgradeButton sm className="mt-3" />
     </Card>
   );
 }

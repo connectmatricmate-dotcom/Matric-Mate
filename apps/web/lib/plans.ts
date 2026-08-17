@@ -1,7 +1,6 @@
 import { type Language, translate } from '@matricmate/core';
 /**
- * What Premium costs. One product, three billing lengths, the longer ones exist
- * because Pakistani families budget by exam season, not by month.
+ * What Premium costs. One product, one price: Rs 1,000 a month.
  *
  * Prices live here rather than in @matricmate/core on purpose: the Android app
  * must never render a price (see packages/core/src/billing.ts), so shared code
@@ -30,6 +29,14 @@ export type Plan = {
   popular?: boolean;
 };
 
+/**
+ * The only plan you can buy: Rs 1,000 a month.
+ *
+ * There were three lengths, and the client cut them to one. Two reasons it
+ * reads better this way: a student choosing between three prices has to do
+ * arithmetic before they can buy anything, and a monthly price is the one a
+ * family can say yes to without a conversation.
+ */
 export const PLANS: Plan[] = [
   {
     id: 'monthly',
@@ -37,29 +44,25 @@ export const PLANS: Plan[] = [
     price: 1000,
     months: 1,
     perMonth: 1000,
-    note: 'Pay as you go, one month at a time.',
-  },
-  {
-    id: 'quarter',
-    name: '3 months',
-    price: 2700,
-    months: 3,
-    perMonth: 900,
-    saving: 'Save Rs 300',
-    note: 'Covers a full term, mid-terms included.',
-  },
-  {
-    id: 'year',
-    name: 'Full year',
-    price: 9000,
-    months: 12,
-    perMonth: 750,
-    saving: 'Save Rs 3,000',
-    note: 'Class 9 to the board exam, one payment.',
+    note: 'Everything, one month at a time. Renew whenever you like.',
   },
 ];
 
-export const planById = (id: string): Plan => PLANS.find((p) => p.id === id) ?? PLANS[0];
+/**
+ * Lengths we used to sell. Nobody can buy these any more, but accounts and
+ * receipts still reference them, and a payment history that renders "Monthly"
+ * against a year's charge would be wrong. Lookup only, never offered.
+ */
+const RETIRED: Plan[] = [
+  { id: 'quarter', name: '3 months', price: 2700, months: 3, perMonth: 900, note: '' },
+  { id: 'year', name: 'Full year', price: 9000, months: 12, perMonth: 750, note: '' },
+];
+
+export const planById = (id: string): Plan =>
+  PLANS.find((p) => p.id === id) ?? RETIRED.find((p) => p.id === id) ?? PLANS[0];
+
+/** The one plan on sale. Everything that starts a checkout goes through this. */
+export const THE_PLAN = PLANS[0];
 
 /**
  * The plan's name in the student's language. `plan.name` above is the English

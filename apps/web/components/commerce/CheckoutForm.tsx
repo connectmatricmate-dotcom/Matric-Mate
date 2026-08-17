@@ -35,10 +35,13 @@ const METHOD_COPY = {
 export function CheckoutForm({
   plan,
   live,
+  configured,
   cancelled,
   accountEmail,
 }: {
   plan: Plan;
+  /** Keys are present, so a checkout can actually be started. */
+  configured: boolean;
   /** True when this deployment has Safepay keys. */
   live: boolean;
   cancelled?: boolean;
@@ -56,10 +59,16 @@ export function CheckoutForm({
     setBusy(true);
     setError(null);
 
-    if (!live) {
-      // No gateway on this deployment. Say so rather than faking a receipt:
-      // entitlement is written by the webhook now, and a pretend one here would
-      // disagree with the database the moment anything reloaded.
+    if (!configured) {
+      // No keys on this deployment, so there is no gateway to send anyone to.
+      // Say so rather than faking a receipt: entitlement is written by the
+      // webhook, and a pretend one here would disagree with the database the
+      // moment anything reloaded.
+      //
+      // Sandbox is deliberately NOT a reason to stop. Sandbox exists so the
+      // whole flow can be walked end to end, and refusing here meant the one
+      // environment built for testing payments was the one that could not test
+      // them. The banner above already says no real money moves.
       setBusy(false);
       setError(t('checkout.notLive'));
       return;

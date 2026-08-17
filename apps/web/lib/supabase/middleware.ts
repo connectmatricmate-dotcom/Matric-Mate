@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /** Signed-in students only. Everything else is public or handles its own state. */
-const PROTECTED = ['/dashboard', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout', '/certificates', '/onboarding'];
+const PROTECTED = ['/dashboard', '/upgrade', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout', '/certificates', '/onboarding'];
 
 /** Already signed in? These two have nothing left to offer you. */
 const AUTH_ONLY = ['/login', '/signup'];
@@ -48,9 +48,21 @@ const AUTH_TIMEOUT_MS = 5000;
  * route actually needs to know who is asking.
  */
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
-
   const { pathname } = request.nextUrl;
+
+  /**
+   * The path, forwarded to the render.
+   *
+   * A Server Component layout is not told which URL it is rendering, and the
+   * paywall guard has to know: the same layout wraps both the screens that
+   * need a plan and the account screens that must stay reachable without one.
+   * Middleware is the only place that sees the path before the page renders.
+   */
+  const withPath = new Headers(request.headers);
+  withPath.set('x-pathname', pathname);
+  const requestWithPath = { headers: withPath };
+
+  let response = NextResponse.next({ request: requestWithPath });
   const starts = (list: string[]) => list.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
   const isProtected = starts(PROTECTED) && !starts(PUBLIC_INSIDE_PROTECTED);
@@ -88,7 +100,7 @@ export async function updateSession(request: NextRequest) {
         getAll: () => request.cookies.getAll(),
         setAll: (toSet) => {
           toSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
+          response = NextResponse.next({ request: requestWithPath });
           toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },

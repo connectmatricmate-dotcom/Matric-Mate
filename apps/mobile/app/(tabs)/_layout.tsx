@@ -37,6 +37,21 @@ export default function TabLayout() {
    */
   if (hydrated && state.user && !online) return <Redirect href="/offline" />;
 
+  /**
+   * No plan, no tabs.
+   *
+   * There is no free tier any more, so a signed-in student without a plan has
+   * nothing to do on any of these five screens: every chapter, question and
+   * the tutor need one. Sending them to the paywall is honest about that,
+   * rather than showing five screens of locks.
+   *
+   * Checked after the offline redirect on purpose: somebody who has already
+   * paid and downloaded chapters can still read them on a plane, and bouncing
+   * them to a paywall they cannot reach the server to satisfy would take away
+   * something they bought.
+   */
+  if (hydrated && state.user && !state.premium.active) return <Redirect href="/upgrade" />;
+
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}

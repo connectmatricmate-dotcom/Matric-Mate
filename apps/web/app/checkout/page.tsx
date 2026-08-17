@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/primitives';
 import { CheckoutForm } from '@/components/commerce/CheckoutForm';
-import { planById } from '@/lib/plans';
+import { THE_PLAN, planById } from '@/lib/plans';
 import { gateway } from '@/lib/gateway';
 import { getUser } from '@/lib/supabase/server';
 
@@ -37,8 +37,9 @@ export default async function CheckoutPage({
       </header>
 
       <CheckoutForm
-        plan={planById(plan ?? 'quarter')}
+        plan={planById(plan ?? THE_PLAN.id)}
         live={gateway.isLive}
+        configured={gateway.isConfigured}
         cancelled={cancelled === '1'}
         accountEmail={user?.email ?? null}
       />

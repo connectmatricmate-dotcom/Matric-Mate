@@ -183,6 +183,10 @@ export const en = {
     perk3: 'AI tutor: 50 questions a day',
     perk4: 'Weak topics and monthly report card',
     perk5: 'Offline downloads in the Android app',
+    copyLink: 'Copy the subscribe link',
+    linkCopied: 'Link copied. Paste it into your browser to subscribe.',
+    linkFailed: 'Could not get the link. Check your connection and try again.',
+    copyLinkNote: 'Subscriptions are handled on our website. This copies a link that signs you in there, so you do not have to log in twice.',
     emailLink: 'Email me the link',
     emailLinkSent: 'Sent. Check your email for the link.',
     howToUpgrade:
@@ -1045,6 +1049,10 @@ export const ur: typeof en = {
     perk3: 'AI ٹیوٹر: روز 50 سوال',
     perk4: 'کمزور موضوعات اور ماہانہ رپورٹ کارڈ',
     perk5: 'اینڈرائیڈ ایپ میں آف لائن ڈاؤن لوڈ',
+    copyLink: 'سبسکرائب لنک نقل کریں',
+    linkCopied: 'لنک نقل ہو گیا۔ سبسکرائب کرنے کے لیے اسے اپنے براؤزر میں پیسٹ کریں۔',
+    linkFailed: 'لنک نہیں مل سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔',
+    copyLinkNote: 'سبسکرپشن ہماری ویب سائٹ پر ہوتی ہے۔ یہ ایسا لنک نقل کرتا ہے جو آپ کو وہاں خود لاگ اِن کر دیتا ہے، تاکہ دو بار لاگ اِن نہ کرنا پڑے۔',
     emailLink: 'لنک ای میل کریں',
     emailLinkSent: 'بھیج دیا۔ ای میل میں لنک مل جائے گا۔',
     howToUpgrade:

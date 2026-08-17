@@ -1,6 +1,7 @@
 'use client';
 
 import { formatDate } from '@matricmate/core';
+import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 /**
  * The web app is the only surface where a subscription can be started, renewed
  * or cancelled, the Android build shows the same status read-only, because
@@ -10,9 +11,9 @@ import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, Item, LinkBtn, Pill, SectionTitle } from '@/components/ui/primitives';
+import { Card, Icon, Item, Pill, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
-import { planById, planName, rupees } from '@/lib/plans';
+import { planById, planName } from '@/lib/plans';
 import { useApp, useLang, useT } from '@/lib/store';
 
 const PERKS: [IconName, StringKey][] = [
@@ -97,12 +98,7 @@ export function SubscriptionView() {
       <div className="mt-6 flex flex-col gap-2.5">
         {active ? (
           <>
-            <LinkBtn
-              title={t('billing.renewCta', { plan: planName(plan.id, lang), price: rupees(plan.price) })}
-              href={`/checkout?plan=${plan.id}`}
-              variant="orange"
-              icon="card"
-            />
+            <UpgradeButton label={t('billing.premium')} variant="orange" icon="card" />
             {/* No cancel button, because there is nothing to cancel: plans are
                 paid once and never auto-charge. Offering "Cancel subscription"
                 would imply a recurring charge that does not exist, and worry
@@ -112,8 +108,7 @@ export function SubscriptionView() {
           </>
         ) : (
           <>
-            <LinkBtn title={t('account.upgrade')} href="/pricing" icon="crown" />
-            <p className="text-[13px] text-ink2">{t('billing.fromMonthly', { price: rupees(750) })}</p>
+            <UpgradeButton />
           </>
         )}
       </div>

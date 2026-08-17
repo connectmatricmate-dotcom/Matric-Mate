@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { gateway } from '@/lib/gateway';
 import { recordPendingPayment } from '@/lib/payments';
-import { PLANS, planById } from '@/lib/plans';
+import { PLANS, THE_PLAN, planById } from '@/lib/plans';
 import { SITE_URL } from '@/lib/site';
 import { getUser } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   }
 
   const parsed = Body.safeParse(await request.json().catch(() => ({})));
-  const plan = planById(parsed.success ? (parsed.data.plan ?? 'quarter') : 'quarter');
+  const plan = planById(parsed.success ? (parsed.data.plan ?? THE_PLAN.id) : THE_PLAN.id);
 
   /**
    * No phone number is asked for any more.

@@ -21,6 +21,8 @@ export const config = {
      * in lib/supabase/middleware.ts.
      */
     '/dashboard/:path*',
+    '/upgrade/:path*',
+    '/upgrade',
     '/study/:path*',
     '/practice/:path*',
     '/tutor/:path*',

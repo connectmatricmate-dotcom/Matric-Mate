@@ -1,6 +1,7 @@
 'use client';
 
 import { formatDate } from '@matricmate/core';
+import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { Page, PageHead } from '@/components/app/Page';
 import { ItemButton } from '@/components/ui/controls';
 import { Card, Empty, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
@@ -56,7 +57,7 @@ export function PaymentsView({ rows, failed }: { rows: PaymentRow[]; failed?: bo
           icon="receipt"
           title={t('account.noPaymentsTitle')}
           sub={t('account.noPaymentsBody')}
-          cta={<LinkBtn title={t('account.upgrade')} href="/pricing" sm variant="line" />}
+          cta={<UpgradeButton sm variant="line" />}
         />
       ) : (
         <Card flat className="py-0">

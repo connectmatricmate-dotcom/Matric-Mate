@@ -149,3 +149,17 @@ export async function fetchCheatSheet(input: {
   const res = await aiPost<{ sheet: string; cached: boolean }>('/api/ai/cheat-sheet', input);
   return res.ok ? { ok: true, ...res.data } : res;
 }
+
+/**
+ * A one-time link that opens the website already signed in, on the upgrade
+ * page. The Android app can only be consumed from, not bought in, so this
+ * exists so a student does not have to sign in a second time on a phone
+ * keyboard just to pay.
+ *
+ * Returns null rather than throwing: a student who cannot get a link should
+ * still see the plain address they can type, not an error.
+ */
+export async function fetchUpgradeLink(): Promise<string | null> {
+  const res = await aiPost<{ url?: string }>('/api/upgrade-link', {});
+  return res.ok ? (res.data.url ?? null) : null;
+}
