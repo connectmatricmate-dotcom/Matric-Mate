@@ -470,6 +470,25 @@ SCHEMA:
  */
 function sift(out, slos) {
   const codes = new Set(slos.map((s) => s.code));
+  /*
+   * A chapter the board never mapped has no codes to match against, and the
+   * model still labels its questions because the schema asks for a code. Every
+   * item then failed the check below and the whole chapter was dropped: "0 of
+   * 10 questions usable", which is what happened on the first run for all ten
+   * math and urd chapter-media.
+   *
+   * So the codes are stripped instead. They have to be: slo_code is a foreign
+   * key into curriculum_slos, and inventing one would fail the insert anyway.
+   */
+  const unmapped = codes.size === 0;
+  if (unmapped) {
+    for (const list of [out.mcqs, out.flashcards, out.shortQs, out.blanks, out.sections]) {
+      for (const item of list ?? []) {
+        delete item.slo_code;
+        delete item.slo_codes;
+      }
+    }
+  }
   const dropped = [];
   const keepIf = (ok, label) => {
     if (!ok) dropped.push(label);

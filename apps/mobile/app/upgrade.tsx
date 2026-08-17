@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { View } from 'react-native';
 import { AI_QUOTA } from '@matricmate/core';
@@ -24,6 +25,18 @@ export default function Upgrade() {
   const t = useT();
   const { state } = useApp();
   const { refresh } = useAuth();
+
+  /**
+   * A plan arriving is the way out of here.
+   *
+   * Entitlement can land after this screen opens: a student pays in the
+   * browser and comes back, or their plan simply had not loaded yet. Without
+   * this they would sit on a paywall they have already satisfied, because
+   * nothing else on this screen navigates away.
+   */
+  useEffect(() => {
+    if (state.premium.active) router.replace('/(tabs)');
+  }, [state.premium.active]);
 
   const perks = ['billing.perk1', 'billing.perk2', 'billing.perk3', 'billing.perk4', 'billing.perk5'] as const;
   const expired = Boolean(state.premium.validTill);

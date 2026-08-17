@@ -72,6 +72,8 @@ export type SignUpResult = { ok: true; needsConfirmation: boolean };
 type Ctx = {
   /** Null until the stored session has been read back. Nothing should route on this until it is false. */
   loading: boolean;
+  /** Entitlement has been settled at least once; gates on "no plan" must wait for it. */
+  entitlementReady: boolean;
   session: Session | null;
   user: AuthUser | null;
   entitlement: Entitlement;
@@ -138,6 +140,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [session, setSession] = useState<Session | null>(null);
   const [entitlement, setEntitlement] = useState<Entitlement>(NONE);
+  /**
+   * Whether entitlement has been settled at least once for the signed-in user.
+   *
+   * `loading` cannot answer this. It tracks the session, and adopt() starts the
+   * entitlement fetch without awaiting it, so there is a window where a student
+   * is signed in, loading is false, and entitlement is still NONE. Anything
+   * that gates on "no plan" during that window punishes a paying student for
+   * the network being slow, which is exactly what the tab paywall did.
+   */
+  const [entitlementReady, setEntitlementReady] = useState(false);
   const [checking, setChecking] = useState(false);
   const [profileName, setProfileName] = useState<string | null>(null);
 
@@ -177,6 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setEntitlement(next);
       await AsyncStorage.setItem(cacheKey(userId), JSON.stringify({ ...next, cachedAt: Date.now() }));
     } finally {
+      if (currentUserId.current === userId) setEntitlementReady(true);
       setChecking(false);
     }
   }, []);
@@ -195,9 +208,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!id) {
         setEntitlement(NONE);
+        setEntitlementReady(true);
         setProfileName(null);
         return;
       }
+      setEntitlementReady(false);
       // Cached value first so the UI is right immediately, server second. Goes
       // through the same grace check, so a stale cache cannot outlive the
       // window just because this path reads it before loadEntitlement does.
@@ -261,6 +276,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return {
       loading,
+      entitlementReady,
       session,
       user: authUser,
       entitlement,
@@ -323,7 +339,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfileName(clean);
       },
     };
-  }, [loading, session, entitlement, checking, profileName, adopt, loadEntitlement]);
+  }, [loading, entitlementReady, session, entitlement, checking, profileName, adopt, loadEntitlement]);
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

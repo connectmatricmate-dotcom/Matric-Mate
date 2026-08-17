@@ -5,6 +5,7 @@ import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useOnline } from '../../src/core/connectivity';
 import { useApp } from '../../src/store/app';
+import { useAuth } from '../../src/store/auth';
 import { C } from '../../src/theme';
 
 const TABS: { name: string; label: StringKey; icon: IconName }[] = [
@@ -21,6 +22,7 @@ const TABS: { name: string; label: StringKey; icon: IconName }[] = [
  */
 export default function TabLayout() {
   const { state, hydrated } = useApp();
+  const { entitlementReady } = useAuth();
   const online = useOnline();
   const t = useT();
 
@@ -49,8 +51,13 @@ export default function TabLayout() {
    * paid and downloaded chapters can still read them on a plane, and bouncing
    * them to a paywall they cannot reach the server to satisfy would take away
    * something they bought.
+   *
+   * And it waits for entitlementReady. Entitlement starts as "none" and is
+   * fetched without blocking sign-in, so without that wait a paying student
+   * on a slow connection gets thrown at the paywall for the second or two
+   * before their plan loads, and nothing on the paywall sends them back.
    */
-  if (hydrated && state.user && !state.premium.active) return <Redirect href="/upgrade" />;
+  if (hydrated && state.user && entitlementReady && !state.premium.active) return <Redirect href="/upgrade" />;
 
   return (
     <Tabs
