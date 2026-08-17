@@ -73,20 +73,26 @@ export function PerformanceScreen() {
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <Card>
           <Label>{t('progress.accuracyTrend')}</Label>
-          <svg viewBox="0 0 300 90" className="mt-2 h-[90px] w-full" role="img" aria-label={t('progress.accuracyTrend')}>
-            {[25, 50, 75].map((g) => (
-              <rect key={g} x={0} y={85 - (g / 100) * 80} width={300} height={1} fill="var(--color-grey)" />
-            ))}
-            {points ? (
-              <polyline points={points} fill="none" stroke="var(--color-teal)" strokeWidth={3} strokeLinecap="round" />
-            ) : null}
-            {last ? <circle cx={Number(last[0])} cy={Number(last[1])} r={4.5} fill="var(--color-orange)" /> : null}
-          </svg>
-          {!points ? <p className="text-center text-[13px] text-ink2">{t('progress.notEnoughData')}</p> : null}
-          <div className="flex justify-between text-[10.5px] font-extrabold text-ink2">
-            <span>{t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}</span>
-            <span>{t('progress.today', { n: accuracy(attempts) })}</span>
-          </div>
+          {/* Gridlines and an axis with no line through them read as a chart
+              that failed to load rather than one with nothing to show yet, so
+              an empty period draws no frame at all. */}
+          {points ? (
+            <>
+              <svg viewBox="0 0 300 90" className="mt-2 h-[90px] w-full" role="img" aria-label={t('progress.accuracyTrend')}>
+                {[25, 50, 75].map((g) => (
+                  <rect key={g} x={0} y={85 - (g / 100) * 80} width={300} height={1} fill="var(--color-grey)" />
+                ))}
+                <polyline points={points} fill="none" stroke="var(--color-teal)" strokeWidth={3} strokeLinecap="round" />
+                {last ? <circle cx={Number(last[0])} cy={Number(last[1])} r={4.5} fill="var(--color-orange)" /> : null}
+              </svg>
+              <div className="flex justify-between text-[10.5px] font-extrabold text-ink2">
+                <span>{t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}</span>
+                <span>{t('progress.today', { n: accuracy(attempts) })}</span>
+              </div>
+            </>
+          ) : (
+            <p className="mt-3 text-[13px] leading-[1.6] text-ink2">{t('progress.notEnoughData')}</p>
+          )}
         </Card>
 
         <Card>

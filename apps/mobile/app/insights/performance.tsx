@@ -81,29 +81,35 @@ export default function Performance() {
       <Spacer h={S.md} />
       <Card>
         <Label>{t('progress.accuracyTrend')}</Label>
-        <View style={{ marginTop: S.sm }}>
-          <Svg width="100%" height={90} viewBox="0 0 300 90">
-            {[25, 50, 75].map((g) => (
-              <Rect key={g} x={0} y={yFor(g)} width={CHART_W} height={1} fill="#EFF3F0" />
-            ))}
-            {points ? <Polyline points={points} fill="none" stroke={C.teal} strokeWidth={3} strokeLinecap="round" /> : null}
-            {points ? (
-              <Circle
-                cx={Number(points.split(' ').slice(-1)[0].split(',')[0])}
-                cy={Number(points.split(' ').slice(-1)[0].split(',')[1])}
-                r={4.5}
-                fill={C.orange}
-              />
-            ) : null}
-          </Svg>
-          {!points ? <Small style={{ textAlign: 'center' }}>{t('progress.notEnoughData')}</Small> : null}
-        </View>
-        <Row style={{ justifyContent: 'space-between' }}>
-          <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>
-            {t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}
-          </Small>
-          <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>{t('progress.today', { n: accuracy(attempts) })}</Small>
-        </Row>
+        {/* Gridlines with no line through them read as a chart that failed to
+            load rather than one with nothing to show yet, so an empty period
+            draws no frame at all. Same on the website. */}
+        {points ? (
+          <>
+            <View style={{ marginTop: S.sm }}>
+              <Svg width="100%" height={90} viewBox="0 0 300 90">
+                {[25, 50, 75].map((g) => (
+                  <Rect key={g} x={0} y={yFor(g)} width={CHART_W} height={1} fill="#EFF3F0" />
+                ))}
+                <Polyline points={points} fill="none" stroke={C.teal} strokeWidth={3} strokeLinecap="round" />
+                <Circle
+                  cx={Number(points.split(' ').slice(-1)[0].split(',')[0])}
+                  cy={Number(points.split(' ').slice(-1)[0].split(',')[1])}
+                  r={4.5}
+                  fill={C.orange}
+                />
+              </Svg>
+            </View>
+            <Row style={{ justifyContent: 'space-between' }}>
+              <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>
+                {t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}
+              </Small>
+              <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>{t('progress.today', { n: accuracy(attempts) })}</Small>
+            </Row>
+          </>
+        ) : (
+          <Small style={{ marginTop: S.sm }}>{t('progress.notEnoughData')}</Small>
+        )}
       </Card>
 
       <Spacer h={S.md} />
