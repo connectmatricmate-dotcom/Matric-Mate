@@ -1,15 +1,15 @@
 import { Text, View } from 'react-native';
-import { useLang } from '../i18n';
+import { useLang, useT } from '../i18n';
 import { C, F, R, rowDir } from '../theme';
 import { Tap } from './ui';
 
 /**
  * English / Urdu switch.
  *
- * Both labels are Latin on purpose. The Nastaliq "اردو" here promised the wrong
- * thing: the app switches to Roman Urdu, not to Urdu script, and a label in
- * script implied the whole interface would convert. "Urdu" says what the
- * student actually gets.
+ * Each option is labelled in its own language, so Urdu reads "اردو". That is
+ * how a language picker is meant to work, and it is now honest: the label used
+ * to be Latin because picking Urdu only gave you Roman Urdu, and Nastaliq here
+ * promised an interface the app could not deliver. It can now.
  *
  * The radius, background and clipping all live on the pressable itself. When
  * the background sat on a child view, Android's ripple layer could paint a
@@ -18,9 +18,10 @@ import { Tap } from './ui';
  */
 export function LanguageToggle({ compact }: { compact?: boolean }) {
   const { lang, setLang } = useLang();
-  const options: { value: 'en' | 'ur'; label: string }[] = [
-    { value: 'en', label: 'English' },
-    { value: 'ur', label: 'Urdu' },
+  const t = useT();
+  const options: { value: 'en' | 'ur'; label: string; urdu?: boolean }[] = [
+    { value: 'en', label: t('lang.english') },
+    { value: 'ur', label: t('lang.urdu'), urdu: true },
   ];
 
   return (
@@ -51,7 +52,20 @@ export function LanguageToggle({ compact }: { compact?: boolean }) {
               justifyContent: 'center',
             }}
           >
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: on ? C.teal : C.ink2 }}>{o.label}</Text>
+            {/* Each label keeps its own script's font whichever language the
+                app is in, and Nastaliq gets the pill's full height as its line
+                box so the ink hanging below the baseline is not clipped. */}
+            <Text
+              style={{
+                fontFamily: o.urdu ? F.urduBold : F.bodyBold,
+                fontSize: o.urdu ? 14.5 : 13.5,
+                lineHeight: compact ? 32 : 38,
+                includeFontPadding: false,
+                color: on ? C.teal : C.ink2,
+              }}
+            >
+              {o.label}
+            </Text>
           </Tap>
         );
       })}

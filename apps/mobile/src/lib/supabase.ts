@@ -15,6 +15,7 @@ import { fetch as expoFetch } from 'expo/fetch';
 import { AppState } from 'react-native';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { configureTutor, connectContent, primeAllContent } from '@matricmate/core';
+import { SITE_URL } from './site';
 
 /**
  * The Supabase client for the app. Same project, same tables, same rules as the
@@ -124,7 +125,7 @@ void primeAllContent(client ?? undefined);
  * production deployment so a build without the env var still reaches it.
  */
 configureTutor({
-  siteUrl: process.env.EXPO_PUBLIC_SITE_URL ?? 'https://matric-mate-web.vercel.app',
+  siteUrl: SITE_URL,
   getToken: async () => {
     if (!client) return null;
     try {

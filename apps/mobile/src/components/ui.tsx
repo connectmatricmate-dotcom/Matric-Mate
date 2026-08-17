@@ -311,6 +311,7 @@ export function Card({
     <View
       style={[
         st.card,
+        { backgroundColor: C.card, borderColor: C.line },
         !flat && shadow,
         tint ? { backgroundColor: tint } : null,
         border ? { borderColor: border, borderWidth: 1.5 } : null,
@@ -393,7 +394,7 @@ export function Check({
         justifyContent: 'center',
       }}
     >
-      {on ? <Icon name="check" size={size * 0.62} color="#fff" strokeWidth={3} /> : null}
+      {on ? <Icon name="check" size={size * 0.62} color={C.onBrand} strokeWidth={3} /> : null}
     </View>
   );
   return onPress ? (
@@ -492,7 +493,7 @@ export function Btn({
   // after seeing ink on the orange ("all buttons with dark bg should have
   // light label"). The extra-bold face is what keeps it legible on the
   // brighter fills. Same rule as the web button recipe.
-  const fg = variant === 'ghost' || variant === 'line' ? C.teal : '#fff';
+  const fg = variant === 'ghost' || variant === 'line' ? C.teal : C.onBrand;
   return (
     <Tap onPress={onPress} disabled={disabled || loading} style={[{ opacity: disabled ? 0.45 : 1 }, style]}>
       <View
@@ -579,11 +580,11 @@ export function Seg<Tv extends string>({
   style?: ViewStyle;
 }) {
   return (
-    <View style={[st.seg, { flexDirection: rowDir() }, style]}>
+    <View style={[st.seg, { flexDirection: rowDir(), backgroundColor: C.grey }, style]}>
       {options.map((o) => {
         const on = o.value === value;
         return (
-          <Tap key={o.value} onPress={() => onChange(o.value)} style={[st.segBtn, on && st.segBtnOn]}>
+          <Tap key={o.value} onPress={() => onChange(o.value)} style={[st.segBtn, on && { backgroundColor: C.card }]}>
             {/* One line height for both scripts; see LanguageToggle for why. */}
             {o.urdu ? (
               <Text
@@ -645,7 +646,7 @@ export function Field({
   return (
     <View style={{ marginBottom: S.md }}>
       <Text style={[T.tiny, { marginBottom: 6, color: C.ink2 }]}>{label}</Text>
-      <View style={[st.field, { flexDirection: rowDir() }, focus && { borderColor: C.teal }, !!error && { borderColor: C.red }]}>
+      <View style={[st.field, { flexDirection: rowDir(), backgroundColor: C.card, borderColor: C.line }, focus && { borderColor: C.teal }, !!error && { borderColor: C.red }]}>
         {icon ? <Icon name={icon} size={18} color={C.ink3} /> : null}
         <TextInput
           value={value}
@@ -695,7 +696,7 @@ export function Bar({ pct, tone = 'orange', h = 7 }: { pct: number; tone?: 'oran
     <View
       style={{
         height: h,
-        backgroundColor: '#EAF0EC',
+        backgroundColor: C.track,
         borderRadius: R.pill,
         overflow: 'hidden',
         // Progress grows the way the language reads, so a bar filling left to
@@ -733,7 +734,7 @@ export function Ring({
       <View style={{ position: 'absolute', transform: isRTL() ? [{ rotate: '-90deg' }, { scaleY: -1 }] : [{ rotate: '-90deg' }] }}>
         <Svg width={size} height={size}>
           {fill ? <Circle cx={size / 2} cy={size / 2} r={r - stroke / 2 + 1} fill={fill} /> : null}
-          <Circle cx={size / 2} cy={size / 2} r={r} stroke="#EAF0EC" strokeWidth={stroke} fill="none" />
+          <Circle cx={size / 2} cy={size / 2} r={r} stroke={C.track} strokeWidth={stroke} fill="none" />
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -764,7 +765,7 @@ export function Kpi({ value, label, small }: { value: string; label: string; sma
    * tabular figures keep the numbers from shifting as they change.
    */
   return (
-    <View style={[st.kpi, small ? { paddingVertical: 10, paddingHorizontal: 10, minHeight: 58 } : { minHeight: 74 }]}>
+    <View style={[st.kpi, { backgroundColor: C.card, borderColor: C.line }, small ? { paddingVertical: 10, paddingHorizontal: 10, minHeight: 58 } : { minHeight: 74 }]}>
       <Text
         style={{ fontFamily: F.display, fontSize: small ? 17 : 22, color: C.ink, fontVariant: ['tabular-nums'] }}
         numberOfLines={1}
@@ -819,6 +820,7 @@ export function Item({
       onPress={onPress}
       style={[
         st.item,
+        { borderBottomColor: C.line },
         rtl && { flexDirection: 'row-reverse' },
         last && { borderBottomWidth: 0 },
         dim && { opacity: 0.6 },
@@ -889,7 +891,7 @@ export function Skeleton({ w = '100%', h = 14, style }: { w?: number | `${number
     loop.start();
     return () => loop.stop();
   }, [a]);
-  return <Animated.View style={[{ width: w, height: h, borderRadius: R.md, backgroundColor: '#EAF0EC', opacity: a }, style]} />;
+  return <Animated.View style={[{ width: w, height: h, borderRadius: R.md, backgroundColor: C.track, opacity: a }, style]} />;
 }
 
 /**
@@ -971,8 +973,8 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
     <ToastCtx.Provider value={value}>
       {children}
       {msg ? (
-        <Animated.View pointerEvents="none" style={[st.toast, { opacity: op }]}>
-          <Text style={{ color: '#fff', fontFamily: F.bodyBold, fontSize: 13, textAlign: 'center' }}>{msg}</Text>
+        <Animated.View pointerEvents="none" style={[st.toast, { opacity: op, backgroundColor: C.ink }]}>
+          <Text style={{ color: C.paper, fontFamily: F.bodyBold, fontSize: 13, textAlign: 'center' }}>{msg}</Text>
         </Animated.View>
       ) : null}
     </ToastCtx.Provider>
@@ -994,8 +996,8 @@ export function Sheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={st.sheetBack} onPress={onClose}>
-        <Pressable style={st.sheet} onPress={() => {}}>
-          <View style={st.grab} />
+        <Pressable style={[st.sheet, { backgroundColor: C.paper }]} onPress={() => {}}>
+          <View style={[st.grab, { backgroundColor: C.mute }]} />
           {title ? (
             isUrduScript(title) ? (
               <Ur size={19} style={{ marginBottom: S.sm }}>{title}</Ur>
@@ -1029,9 +1031,7 @@ const st = StyleSheet.create({
     marginBottom: S.sm,
   },
   card: {
-    backgroundColor: C.card,
     borderWidth: 1,
-    borderColor: C.line,
     borderRadius: R.lg,
     padding: S.lg,
     /**
@@ -1067,7 +1067,7 @@ const st = StyleSheet.create({
     borderRadius: R.pill,
     alignSelf: 'flex-start',
   },
-  seg: { flexDirection: 'row', backgroundColor: C.grey, borderRadius: 13, padding: 3, gap: 3 },
+  seg: { flexDirection: 'row', borderRadius: 13, padding: 3, gap: 3 },
   // overflow hidden clips Android's ripple layer to the radius; without it the
   // pressed and selected states could paint a square outside the corners. The
   // elevation shadow went for the same reason: a white pill on a grey track
@@ -1077,14 +1077,11 @@ const st = StyleSheet.create({
   // `overflow: hidden` cut the descenders off its own Urdu label. (The same
   // clip is what made example boxes render blank on Android.)
   segBtn: { flex: 1, minHeight: 36, paddingVertical: 4, justifyContent: 'center', borderRadius: R.sm, alignItems: 'center' },
-  segBtnOn: { backgroundColor: C.card },
   field: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: S.sm,
-    backgroundColor: C.card,
     borderWidth: 1.5,
-    borderColor: C.line,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'ios' ? 14 : 12,
@@ -1094,9 +1091,7 @@ const st = StyleSheet.create({
   kpi: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: C.card,
     borderWidth: 1,
-    borderColor: C.line,
     borderRadius: R.lg,
     paddingVertical: 12,
     paddingHorizontal: 14,
@@ -1108,7 +1103,6 @@ const st = StyleSheet.create({
     paddingVertical: 14,
     minHeight: 62,
     borderBottomWidth: 1,
-    borderBottomColor: C.line,
   },
   itemIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
   toast: {
@@ -1116,14 +1110,12 @@ const st = StyleSheet.create({
     bottom: 100,
     alignSelf: 'center',
     maxWidth: 320,
-    backgroundColor: C.ink,
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: R.pill,
   },
   sheetBack: { flex: 1, backgroundColor: 'rgba(11,46,58,0.45)', justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: C.paper,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
     padding: S.lg,
@@ -1132,7 +1124,7 @@ const st = StyleSheet.create({
     width: '100%',
     ...(isWeb ? { maxWidth: 520, alignSelf: 'center' } : null),
   },
-  grab: { width: 44, height: 5, borderRadius: R.pill, backgroundColor: '#C9D6D2', alignSelf: 'center', marginBottom: S.md },
+  grab: { width: 44, height: 5, borderRadius: R.pill, alignSelf: 'center', marginBottom: S.md },
 });
 
 export { st as uiStyles };

@@ -12,8 +12,8 @@ import { TAB_GLYPHS, TabGlyphName } from '@matricmate/core';
 type Tone = { main: string; accent: string; hole: string };
 
 const ACTIVE: Tone = { main: 'var(--color-teal)', accent: 'var(--color-orange)', hole: 'var(--color-card)' };
-const ACTIVE_UNDER: Tone = { main: '#075B78', accent: '#C96D00', hole: '#075B78' };
-const REST: Tone = { main: '#AEBEB6', accent: '#C6D2CB', hole: 'var(--color-card)' };
+const ACTIVE_UNDER: Tone = { main: 'var(--glyph-under)', accent: 'var(--glyph-under-accent)', hole: 'var(--glyph-under)' };
+const REST: Tone = { main: 'var(--glyph-rest)', accent: 'var(--glyph-rest-accent)', hole: 'var(--color-card)' };
 
 function Pieces({ name, tone }: { name: TabGlyphName; tone: Tone }) {
   return (

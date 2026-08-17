@@ -98,7 +98,7 @@ export function IconButton({
 }) {
   const tones = {
     card: 'border border-line bg-card text-ink hover:bg-paper',
-    active: 'border border-teal bg-teal text-white hover:bg-tealdark',
+    active: 'border border-teal bg-teal text-onbrand hover:bg-tealdark',
     plain: 'text-ink2 hover:bg-paper',
   };
   return (

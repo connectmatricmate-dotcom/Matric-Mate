@@ -82,9 +82,9 @@ export function ExamScreen() {
         const isFlagged = flags.includes(m.id);
         const current = n === i;
         const style = current
-          ? 'bg-orange text-white'
+          ? 'bg-orange text-onbrand'
           : answered
-            ? 'bg-teal text-white'
+            ? 'bg-teal text-onbrand'
             : isFlagged
               ? 'bg-orangetint text-orangedark'
               : 'bg-grey text-ink2';
@@ -143,7 +143,7 @@ export function ExamScreen() {
       <Split>
         <Work>
           {/* Same desktop framing as McqScreen: the paper the student writes on. */}
-          <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+          <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_var(--shadow-soft)]">
           <h1 className="mb-4"><ScriptText text={mcq.q} className="font-display text-[19px] leading-[1.5] text-ink md:text-[22px]" urduClassName="text-[18px] text-ink" /></h1>
 
           <div className="flex flex-col gap-2.5">
@@ -161,7 +161,7 @@ export function ExamScreen() {
                 >
                   <span
                     className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12.5px] font-extrabold ${
-                      sel ? 'bg-teal text-white' : 'bg-grey text-ink2'
+                      sel ? 'bg-teal text-onbrand' : 'bg-grey text-ink2'
                     }`}
                   >
                     {String.fromCharCode(65 + n)}

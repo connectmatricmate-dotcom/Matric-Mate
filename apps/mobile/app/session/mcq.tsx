@@ -183,7 +183,7 @@ export default function McqScreen() {
         const border = { ok: C.green, bad: C.red, sel: C.teal, idle: C.line }[kind];
         const bg = { ok: C.greenTint, bad: C.redTint, sel: C.tealTint, idle: C.card }[kind];
         const keyBg = { ok: C.green, bad: C.red, sel: C.teal, idle: C.grey }[kind];
-        const keyFg = kind === 'idle' ? C.ink2 : '#fff';
+        const keyFg = kind === 'idle' ? C.ink2 : C.onBrand;
         return (
           <Tap key={n} onPress={checked ? undefined : () => setChosen(n)}>
             <View

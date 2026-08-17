@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { SUPPORT_EMAIL } from '@matricmate/core';
 
 export const metadata: Metadata = {
   title: 'Refund and cancellation policy',
@@ -35,7 +36,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'How to ask for one',
     paragraphs: [
-      'Message us on WhatsApp or email help@matricmate.pk with the mobile number on the account and the date of the payment. That is all we need to find it.',
+      `Message us on WhatsApp or email ${SUPPORT_EMAIL} with the mobile number on the account and the date of the payment. That is all we need to find it.`,
       'We reply within two working days. Approved refunds are sent back through Safepay to the same method you paid with, which is the only place they can go. JazzCash and Easypaisa usually take two to three working days, and cards five to ten working days, depending on the bank.',
     ],
   },

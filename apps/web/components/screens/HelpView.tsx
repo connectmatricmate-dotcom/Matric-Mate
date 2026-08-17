@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { StringKey } from '@matricmate/core';
+import { SUPPORT_EMAIL, type StringKey } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { buttonClasses } from '@/components/ui/styles';
 import { Card, Icon } from '@/components/ui/primitives';
@@ -15,8 +15,6 @@ const FAQ: [StringKey, StringKey][] = [
   ['account.faq4Q', 'account.faq4A'],
 ];
 
-const SUPPORT_EMAIL = 'help@matricmate.pk';
-
 export function HelpView() {
   const t = useT();
   const [open, setOpen] = useState<number | null>(0);
@@ -29,7 +27,7 @@ export function HelpView() {
           it once the number exists; until then the screen offers nothing fake. */}
       <a href={`mailto:${SUPPORT_EMAIL}`} className={buttonClasses({ className: 'w-full' })}>
         <Icon name="mail" size={18} />
-        {t('account.emailUs')}
+        {t('account.emailUs', { email: SUPPORT_EMAIL })}
       </a>
 
       <SectionTitle>{t('account.commonQuestions')}</SectionTitle>

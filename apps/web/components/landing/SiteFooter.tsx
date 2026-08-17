@@ -4,6 +4,7 @@
  */
 import Image from 'next/image';
 import Link from 'next/link';
+import { SUPPORT_EMAIL } from '@matricmate/core';
 
 const PRODUCT = [
   { href: '#inside', label: 'What’s inside' },
@@ -60,8 +61,8 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
                 </Link>
               </li>
               <li>
-                <a className="hover:text-teal" href="mailto:help@matricmate.pk">
-                  help@matricmate.pk
+                <a className="hover:text-teal" href={`mailto:${SUPPORT_EMAIL}`}>
+                  {SUPPORT_EMAIL}
                 </a>
               </li>
               {/* Plain text on purpose: there is no WhatsApp number to link yet,

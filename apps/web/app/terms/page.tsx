@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { AI_QUOTA } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { SUPPORT_EMAIL } from '@matricmate/core';
 
 export const metadata: Metadata = {
   title: 'Terms and privacy',
@@ -47,12 +48,12 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'Deleting your account',
     paragraphs: [
-      'Message us on WhatsApp or write to help@matricmate.pk and we will delete the account and everything attached to it within seven days. Receipts are kept as long as tax rules require.',
+      `Message us on WhatsApp or write to ${SUPPORT_EMAIL} and we will delete the account and everything attached to it within seven days. Receipts are kept as long as tax rules require.`,
     ],
   },
   {
     heading: 'Getting in touch',
-    paragraphs: ['help@matricmate.pk · WhatsApp support, 10am to 10pm.'],
+    paragraphs: [`${SUPPORT_EMAIL} · WhatsApp support, 10am to 10pm.`],
   },
 ];
 

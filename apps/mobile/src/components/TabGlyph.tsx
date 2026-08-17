@@ -10,14 +10,35 @@
  */
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 import { TAB_GLYPHS, TabGlyphName } from '@matricmate/core';
-import { C } from '../theme';
+import { C, isDark } from '../theme';
 import type { IconName } from './Icon';
 
 type Tone = { main: string; accent: string; hole: string };
 
-const ACTIVE: Tone = { main: C.teal, accent: C.orange, hole: C.card };
-const ACTIVE_UNDER: Tone = { main: '#075B78', accent: '#C96D00', hole: '#075B78' };
-const REST: Tone = { main: '#AEBEB6', accent: '#C6D2CB', hole: C.card };
+/**
+ * Functions, not constants. As constants these were evaluated once when the
+ * module was first imported, which pinned the tab bar to whichever theme was
+ * loaded at launch: switching to dark left five pale stickers glowing on a
+ * dark bar. Called per render, they follow the palette like everything else.
+ *
+ * The two off-palette tones stay off-palette because they are not roles that
+ * appear anywhere else: the under-layer is the drop-shadow copy that gives the
+ * active glyph its sticker depth, and the resting tone is deliberately quieter
+ * than any text colour we have. Both keep their light values exactly, and gain
+ * a dark counterpart chosen the same way: the under-layer a step darker than
+ * the colour it sits beneath, the resting glyph lifted just clear of the bar.
+ */
+const ACTIVE = (): Tone => ({ main: C.teal, accent: C.orange, hole: C.card });
+
+const ACTIVE_UNDER = (): Tone =>
+  isDark()
+    ? { main: '#1B6F8C', accent: '#B36A12', hole: '#1B6F8C' }
+    : { main: '#075B78', accent: '#C96D00', hole: '#075B78' };
+
+const REST = (): Tone =>
+  isDark()
+    ? { main: '#63838F', accent: '#4B6875', hole: C.card }
+    : { main: '#AEBEB6', accent: '#C6D2CB', hole: C.card };
 
 function Pieces({ name, tone }: { name: TabGlyphName; tone: Tone }) {
   return (
@@ -46,10 +67,10 @@ export function TabGlyph({ name, focused }: { name: IconName; focused: boolean }
         // A string transform, because the translateY prop leaks to the DOM
         // as an unknown attribute when react-native-svg renders on the web.
         <G transform="translate(0 1.2)">
-          <Pieces name={glyph} tone={ACTIVE_UNDER} />
+          <Pieces name={glyph} tone={ACTIVE_UNDER()} />
         </G>
       ) : null}
-      <Pieces name={glyph} tone={focused ? ACTIVE : REST} />
+      <Pieces name={glyph} tone={focused ? ACTIVE() : REST()} />
       {focused ? <Ellipse cx={gloss.cx} cy={gloss.cy} rx={3.4} ry={2.1} fill="#FFFFFF" opacity={0.32} /> : null}
     </Svg>
   );

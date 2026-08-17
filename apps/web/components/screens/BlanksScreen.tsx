@@ -92,7 +92,7 @@ export function BlanksScreen({
       />
 
       {/* Same task frame as the MCQ and exam screens */}
-      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_var(--shadow-soft)]">
       <Card className="md:border-0 md:bg-transparent md:p-0 md:shadow-none">
         <p
           lang={isUrduScript(item.sentence.join('')) ? 'ur' : undefined}

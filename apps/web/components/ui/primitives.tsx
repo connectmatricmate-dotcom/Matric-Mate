@@ -288,7 +288,7 @@ export function Card({
         'rounded-[16px] border p-4',
         tint ?? 'bg-card',
         border ?? 'border-line',
-        flat ? '' : 'shadow-[0_5px_14px_rgba(15,80,100,0.07)]',
+        flat ? '' : 'shadow-[0_5px_14px_var(--shadow-soft)]',
         className,
       ].join(' ')}
     >
@@ -409,7 +409,7 @@ export function Check({ on, round, size = 26 }: { on: boolean; round?: boolean; 
       className={[
         'inline-flex shrink-0 items-center justify-center transition-colors duration-200',
         round ? 'rounded-full' : 'rounded-[9px]',
-        on ? 'bg-teal text-white' : 'border-2 border-mute',
+        on ? 'bg-teal text-onbrand' : 'border-2 border-mute',
       ].join(' ')}
     >
       {on ? <Icon name="check" size={size * 0.62} strokeWidth={3} /> : null}

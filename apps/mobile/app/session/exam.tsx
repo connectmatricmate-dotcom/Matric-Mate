@@ -168,7 +168,7 @@ export default function Exam() {
                     justifyContent: 'center',
                   }}
                 >
-                  <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: sel ? '#fff' : C.ink2 }}>
+                  <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: sel ? C.onBrand : C.ink2 }}>
                     {String.fromCharCode(65 + n)}
                   </Text>
                 </View>
@@ -185,7 +185,7 @@ export default function Exam() {
             const isFlagged = flags.includes(m.id);
             const current = n === i;
             const bg = current ? C.orange : answered ? C.teal : isFlagged ? C.orangeTint : C.grey;
-            const fg = current || answered ? '#fff' : isFlagged ? C.orangeDark : C.ink2;
+            const fg = current || answered ? C.onBrand : isFlagged ? C.orangeDark : C.ink2;
             return (
               <Tap key={m.id} onPress={() => setI(n)} hit>
                 <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>

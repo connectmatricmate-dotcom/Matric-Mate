@@ -4,12 +4,13 @@ import { Card, Empty, ErrorState, Header, Item, Pill, Screen, Skeleton, Small, S
 import { useAsync } from '../../src/core/useAsync';
 import { supabase } from '../../src/lib/supabase';
 import { useLang, useT } from '../../src/i18n';
+import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { S } from '../../src/theme';
 import { View } from 'react-native';
 
 /** A paid row from the payments table, already shaped for the list. */
-type Receipt = { id: string; at: string; amount: number; plan: string | null; reference: string | null };
+type Receipt = { id: string; at: string; amount: number; plan: string | null; reference: string | null; status: string };
 
 /**
  * Real receipts from the payments table, the same rows Safepay's webhook
@@ -20,6 +21,23 @@ type Receipt = { id: string; at: string; amount: number; plan: string | null; re
  * list at best and a fabricated one at worst. RLS scopes the query to the
  * signed-in student's own rows.
  */
+const TONE: Record<string, 'green' | 'orange' | 'red' | 'grey'> = {
+  paid: 'green',
+  pending: 'orange',
+  failed: 'red',
+  refunded: 'grey',
+  cancelled: 'grey',
+};
+
+/** The status in the student's language, never the raw column value. */
+const STATUS: Record<string, StringKey> = {
+  paid: 'account.paidLabel',
+  pending: 'account.statusPending',
+  failed: 'account.statusFailed',
+  refunded: 'account.statusRefunded',
+  cancelled: 'account.statusCancelled',
+};
+
 export default function Payments() {
   const { state } = useApp();
   const t = useT();
@@ -33,7 +51,10 @@ export default function Payments() {
       .from('payments')
       .select('id,at,amount,plan,reference,status')
       .eq('user_id', userId)
-      .eq('status', 'paid')
+      // Every attempt, not only the ones that went through. A payment that
+      // failed or never completed is the first thing a student points at when
+      // they say the money left and the plan did not arrive, and the website
+      // has always listed them.
       .order('at', { ascending: false })
       .limit(24);
     if (qErr) throw qErr;
@@ -78,7 +99,7 @@ export default function Payments() {
                     }
                   : undefined
               }
-              right={<Pill tone="green">{t('account.paidLabel')}</Pill>}
+              right={<Pill tone={TONE[r.status] ?? 'grey'}>{STATUS[r.status] ? t(STATUS[r.status]) : r.status}</Pill>}
             />
           ))}
         </Card>

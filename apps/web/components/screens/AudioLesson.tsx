@@ -146,7 +146,7 @@ export function AudioLesson({
           onClick={toggle}
           disabled={!src}
           aria-label={playing ? t('audio.pause') : t('audio.play')}
-          className="flex h-[76px] w-[76px] items-center justify-center rounded-full bg-teal text-white transition-[background-color,transform] duration-200 ease-out active:scale-[0.97] hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
+          className="flex h-[76px] w-[76px] items-center justify-center rounded-full bg-teal text-onbrand transition-[background-color,transform] duration-200 ease-out active:scale-[0.97] hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
         >
           <Icon name={playing ? 'pause' : 'play'} size={30} strokeWidth={2.2} />
         </button>

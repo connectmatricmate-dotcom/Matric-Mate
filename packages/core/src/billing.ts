@@ -25,3 +25,15 @@ export const CAN_SELL_IN_APP = false;
 
 /** Mentioned as plain text only, never a link, never a button. */
 export const BILLING_SITE = 'matricmate.pk';
+
+/**
+ * The one address a student is told to write to.
+ *
+ * It lived in two places and they disagreed: the website's help page offered
+ * help@matricmate.pk while the Android app opened a draft to the Gmail
+ * account. A student who mailed the wrong one got silence, which is worse than
+ * either address on its own. This is the mailbox that certainly exists. Point
+ * it at help@matricmate.pk here, in this one line, once that domain is
+ * receiving mail.
+ */
+export const SUPPORT_EMAIL = 'connect.matricmate@gmail.com';

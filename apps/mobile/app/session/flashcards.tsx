@@ -190,7 +190,7 @@ export default function Flashcards() {
             <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: 'rgba(255,255,255,0.7)' }}>
               {t('session.cardDefinition')}
             </Text>
-            <ScriptText text={card?.back ?? ''} size={16} color="#fff" center />
+            <ScriptText text={card?.back ?? ''} size={16} color={C.onBrand} center />
             {card?.urduBack ? (
               <Ur size={14} style={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
                 {card.urduBack}

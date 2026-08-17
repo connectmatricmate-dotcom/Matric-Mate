@@ -44,7 +44,8 @@ export default function EditProfile() {
     >
       <Header title={t('account.editTitle')} back />
 
-      <Row gap={S.sm} style={{ justifyContent: 'center', flexWrap: 'wrap', marginVertical: S.md }}>
+      <SectionTitle>{t('account.avatar')}</SectionTitle>
+      <Row gap={S.sm} style={{ justifyContent: 'center', flexWrap: 'wrap', marginBottom: S.md }}>
         {AVATARS.map((a, i) => (
           <Tap key={a.id} onPress={() => setAvatar(i)}>
             <View
@@ -61,7 +62,14 @@ export default function EditProfile() {
         ))}
       </Row>
 
-      <Field label={t('auth.fullName')} value={name} onChangeText={setName} icon="user" autoCapitalize="words" />
+      <Field
+        label={t('auth.fullName')}
+        placeholder={t('auth.namePlaceholder')}
+        value={name}
+        onChangeText={setName}
+        icon="user"
+        autoCapitalize="words"
+      />
 
       <SectionTitle>{t('account.studySetup')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>

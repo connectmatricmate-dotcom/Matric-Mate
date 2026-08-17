@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { translate } from '@matricmate/core';
+import type { Language } from '@matricmate/core';
 import { buildDigestFromDb, writeCoachReport } from '@/lib/ai/coach-report';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -75,8 +77,20 @@ export async function GET(req: NextRequest) {
     }
     // One student's bad report must not end the run for everyone after them.
     try {
-      if (await writeCoachReport(admin, userId, digest, period)) written++;
-      else skipped++;
+      if (await writeCoachReport(admin, userId, digest, period)) {
+        written++;
+        // Tell them it exists. A report nobody knows was rewritten is a report
+        // nobody reads, and the inbox's own empty state has always promised
+        // exactly this.
+        const lang: Language = digest.language === 'ur' ? 'ur' : 'en';
+        await admin.from('notifications').insert({
+          user_id: userId,
+          kind: 'report',
+          title: translate(lang, 'notifications.reportTitle'),
+          body: translate(lang, 'notifications.reportBody'),
+          target: 'report',
+        });
+      } else skipped++;
     } catch {
       skipped++;
     }

@@ -12,7 +12,7 @@ export function Steps({ step, total = 4 }: { step: number; total?: number }) {
             width: n === step ? 22 : 8,
             height: 8,
             borderRadius: 99,
-            backgroundColor: n <= step ? C.teal : '#DDE6E1',
+            backgroundColor: n <= step ? C.teal : C.mute,
           }}
         />
       ))}

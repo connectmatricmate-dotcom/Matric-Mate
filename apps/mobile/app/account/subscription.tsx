@@ -94,7 +94,17 @@ export default function Subscription() {
       {/* Someone with an active plan needs no upgrade guidance at all. The
           old ternary showed them the "locked chapter" notice, which told a
           paying subscriber their chapter was not in their plan. */}
-      {active ? null : (
+      {active ? (
+        // What a subscriber does need, and the website already said: there is
+        // no cancel button here because there is nothing to cancel. Without
+        // this line the absence reads as a missing control rather than as the
+        // point, and someone goes looking for how to stop a charge that is
+        // never going to happen.
+        <>
+          <Spacer h={S.md} />
+          <Small>{t('account.noAutoCharge')}</Small>
+        </>
+      ) : (
         <>
           <Spacer h={S.lg} />
           <LockedNotice variant="free" />

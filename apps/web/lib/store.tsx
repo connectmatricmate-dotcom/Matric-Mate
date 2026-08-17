@@ -9,7 +9,7 @@
  * without rewiring.
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
-import { Attempt, ChatThread, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory } from '@matricmate/core';
+import { Attempt, ChatThread, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory } from '@matricmate/core';
 import {
   EMPTY,
   Onboarding,
@@ -29,7 +29,7 @@ import {
   xpFor,
 } from './persisted-store';
 import { createClient } from './supabase/client';
-import { writeLanguageCookie } from './ui-language';
+import { writeLanguageCookie, writeThemeCookie } from './ui-language';
 
 /**
  * The tutor rides same-origin: /api/ai/* on this very deployment, with the
@@ -239,19 +239,58 @@ const actions: Actions = {
   },
   consumeAi: () => {
     let allowed = false;
+    const day = todayKey();
+    // Read before the update, like every other action that can start a day.
+    const isNewDay = !getSnapshot().activeDays.includes(day);
     update((s) => {
-      const day = todayKey();
       const used = s.ai.day === day ? s.ai.used : 0;
       const limit = aiLimitFor(s.premium.active);
       if (used >= limit) return { ...s, ai: { day, used } };
       allowed = true;
       return touchToday({ ...s, ai: { day, used: used + 1 } });
     });
+    // Asking the tutor is studying, so it counts, but it has to be written
+    // through like the rest. Marking the day locally and never syncing it is
+    // what left the streak disagreeing between the phone and the laptop.
+    if (allowed && isNewDay) queueAndFlush(syncActiveDay(day));
     return allowed;
   },
   saveThread: (t) => update((s) => ({ ...s, threads: [t, ...s.threads.filter((x) => x.id !== t.id)].slice(0, 20) })),
-  readNotifications: () => update((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
-  setSettings: (patch) => update((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
+  readNotifications: () =>
+    update((s) => {
+      // The server too. Flipping only local state meant the badge cleared
+      // until the next hydration read the same rows back, still unread.
+      const uid = s.user?.id;
+      if (uid) void markNotificationsRead(createClient(), uid);
+      return { ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) };
+    }),
+  setSettings: (patch) =>
+    update((s) => {
+      const settings = { ...s.settings, ...patch };
+      /**
+       * The theme lives on the document element, which React does not
+       * re-render, so it is set here the same way the language direction is.
+       * The cookie is what makes the next cold load paint dark immediately
+       * rather than flashing white first (see readUiTheme).
+       */
+      if ('dark' in patch && typeof document !== 'undefined') {
+        const theme = settings.dark ? 'dark' : 'light';
+        document.documentElement.dataset.theme = theme;
+        writeThemeCookie(theme);
+      }
+      // The three nudge preferences are account-level, so they go up. The rest
+      // describe this browser and stay in it.
+      const uid = s.user?.id;
+      if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch)) {
+        void syncAccountPrefs(createClient(), uid, {
+          reminders: settings.reminders,
+          streakAlerts: settings.streakAlerts,
+          reminderTime: settings.reminderTime,
+          dark: settings.dark,
+        });
+      }
+      return { ...s, settings };
+    }),
   /**
    * One language for the whole app.
    *
@@ -407,7 +446,10 @@ async function syncStudyState(userId: string): Promise<void> {
   if (server) {
     update((s) => {
       const merged = mergeHydratedState(s, server);
-      return { ...merged, xp: totalXp(merged.attempts, merged.cardsKnown) };
+      // The nudge preferences belong to the account, so the server's copy
+      // wins. Null means never set, and this browser's defaults stand.
+      const settings = server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings;
+      return { ...merged, settings, xp: totalXp(merged.attempts, merged.cardsKnown) };
     });
   }
   void flush(userId);
@@ -434,6 +476,22 @@ export function AppProvider({
   }, []);
 
   /**
+   * Keeps the document element on whatever theme the store currently holds.
+   *
+   * setSettings already flips it on the tap, for immediacy. This is the case
+   * that tap does not cover: the theme is an account setting now, so it also
+   * arrives from the server on hydration and from the other device over the
+   * realtime channel, and neither of those goes through setSettings here.
+   */
+  const dark = state.settings.dark;
+  useEffect(() => {
+    const theme = dark ? 'dark' : 'light';
+    if (document.documentElement.dataset.theme === theme) return;
+    document.documentElement.dataset.theme = theme;
+    writeThemeCookie(theme);
+  }, [dark]);
+
+  /**
    * Identity comes from Supabase, not from localStorage.
    *
    * proxy.ts already refuses protected routes server-side, so this is not the
@@ -452,7 +510,19 @@ export function AppProvider({
           contact: u.email ?? '',
         };
         if (s.user?.id === user.id && s.user.name === user.name) return s;
-        return touchToday({ ...s, user });
+        /**
+         * Signing in is not studying.
+         *
+         * This used to mark today active, which did two things wrong at once.
+         * It inflated the streak, so a student who opened the page and read
+         * nothing still got credit for the day. And because it did not queue
+         * the matching write, it burned the "is this a new day" flag before
+         * any real study action could claim it: every later `isNewDay` check
+         * that day saw the day already present and skipped its sync. That is
+         * why active_days sat completely empty while attempts were landing
+         * normally, and why every streak in the product was stuck at zero.
+         */
+        return { ...s, user };
       });
 
     void supabase.auth.getUser().then(({ data }) => {
@@ -586,7 +656,14 @@ export function useT() {
           // The server wins on plan ticks. The other sets only ever grow, so a
           // union suits them; a tick can be taken back, and a union would
           // restore a task the student just uncrossed on their phone.
-          return { ...merged, planDone: server.planDone, xp: totalXp(merged.attempts, merged.cardsKnown) };
+          return {
+            ...merged,
+            planDone: server.planDone,
+            // Same reasoning: a switch turned off on the phone must turn off
+            // here, and a merge would never let it.
+            settings: server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings,
+            xp: totalXp(merged.attempts, merged.cardsKnown),
+          };
         });
       }, 1200);
     };

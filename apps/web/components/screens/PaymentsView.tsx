@@ -1,10 +1,10 @@
 'use client';
 
-import { formatDate } from '@matricmate/core';
+import { formatDate, type StringKey } from '@matricmate/core';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { Page, PageHead } from '@/components/app/Page';
 import { ItemButton } from '@/components/ui/controls';
-import { Card, Empty, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
+import { Card, Empty, Icon, Item, LinkBtn, Pill } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { planName } from '@/lib/plans';
 import { useLang, useT } from '@/lib/store';
@@ -35,10 +35,27 @@ const TONE = {
   cancelled: 'grey',
 } as const;
 
+/** The status in the student's language. It used to print the column value. */
+const STATUS: Record<string, StringKey> = {
+  paid: 'account.paidLabel',
+  pending: 'account.statusPending',
+  failed: 'account.statusFailed',
+  refunded: 'account.statusRefunded',
+  cancelled: 'account.statusCancelled',
+};
+
 export function PaymentsView({ rows, failed }: { rows: PaymentRow[]; failed?: boolean }) {
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
+
+  const copyRef = (ref: string | null) => {
+    if (!ref) return;
+    void navigator.clipboard?.writeText(ref).then(
+      () => toast(t('account.referenceCopied')),
+      () => toast(t('states.errorTitle')),
+    );
+  };
 
   return (
     <Page width="focus">
@@ -61,21 +78,38 @@ export function PaymentsView({ rows, failed }: { rows: PaymentRow[]; failed?: bo
         />
       ) : (
         <Card flat className="py-0">
-          {rows.map((r, i) => (
-            <ItemButton
-              key={r.id}
-              title={t('account.receiptLine', { amount: (r.amount ?? 0).toLocaleString() })}
-              sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short', year: 'numeric' })} · ${planName(r.plan ?? 'monthly', lang)}`}
-              icon="card"
-              last={i === rows.length - 1}
-              right={
+          {rows.map((r, i) => {
+            const body = {
+              title: t('account.receiptLine', { amount: (r.amount ?? 0).toLocaleString() }),
+              /*
+               * The footnote tells students to quote the reference to support,
+               * so it has to be on the row where it can be read and copied. It
+               * used to appear in a two-second toast: gone before anyone could
+               * write it down, and invisible to anyone who never thought to tap
+               * a receipt. The Android app already fixed this.
+               */
+              sub: [
+                `${formatDate(r.at, lang, { day: 'numeric', month: 'short', year: 'numeric' })} · ${planName(r.plan ?? 'monthly', lang)}`,
+                r.reference ? t('checkout.reference', { ref: r.reference }) : null,
+              ]
+                .filter(Boolean)
+                .join('\n'),
+              icon: 'card' as const,
+              last: i === rows.length - 1,
+              right: (
                 <Pill tone={TONE[r.status as keyof typeof TONE] ?? 'grey'}>
-                  {r.status === 'paid' ? t('account.paidLabel') : r.status}
+                  {STATUS[r.status] ? t(STATUS[r.status]) : r.status}
                 </Pill>
-              }
-              onClick={() => toast(t('account.lastReceipt', { ref: r.reference ?? r.id.slice(0, 8) }))}
-            />
-          ))}
+              ),
+            };
+            // A payment that never completed has no reference to copy, so it
+            // is a plain row rather than a button that does nothing.
+            return r.reference ? (
+              <ItemButton key={r.id} {...body} onClick={() => copyRef(r.reference)} />
+            ) : (
+              <Item key={r.id} {...body} />
+            );
+          })}
         </Card>
       )}
 

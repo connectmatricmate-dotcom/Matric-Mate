@@ -76,9 +76,9 @@ export default function ChapterHub() {
         <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
         <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
           {state.settings.language === 'ur' && chapter.urduTitle ? (
-            <Ur size={20} style={{ color: '#fff' }}>{chapter.urduTitle}</Ur>
+            <Ur size={20} style={{ color: C.onBrand }}>{chapter.urduTitle}</Ur>
           ) : (
-            <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
+            <H2 style={{ color: C.onBrand }}>{chapter.title}</H2>
           )}
           {isUrduScript(chapter.blurb) ? (
             <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter.blurb}</Ur>
@@ -109,9 +109,9 @@ export default function ChapterHub() {
         <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
         <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
           {state.settings.language === 'ur' && chapter.urduTitle ? (
-            <Ur size={20} style={{ color: '#fff' }}>{chapter.urduTitle}</Ur>
+            <Ur size={20} style={{ color: C.onBrand }}>{chapter.urduTitle}</Ur>
           ) : (
-            <H2 style={{ color: '#fff' }}>{chapter.title}</H2>
+            <H2 style={{ color: C.onBrand }}>{chapter.title}</H2>
           )}
           {isUrduScript(chapter.blurb) ? (
             <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter.blurb}</Ur>
@@ -181,9 +181,9 @@ export default function ChapterHub() {
 
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         {state.settings.language === 'ur' && chapter?.urduTitle ? (
-          <Ur size={20} style={{ color: '#fff' }}>{chapter.urduTitle}</Ur>
+          <Ur size={20} style={{ color: C.onBrand }}>{chapter.urduTitle}</Ur>
         ) : (
-          <H2 style={{ color: '#fff' }}>{chapter?.title ?? ''}</H2>
+          <H2 style={{ color: C.onBrand }}>{chapter?.title ?? ''}</H2>
         )}
         {/* The board's own weighting, front and centre: it is the single most
             useful planning number a student can have. Hidden when the table
@@ -206,7 +206,7 @@ export default function ChapterHub() {
           <View style={{ flex: 1, height: 7, backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 99, overflow: 'hidden' }}>
             <View style={{ width: `${pct}%`, height: '100%', backgroundColor: C.orange, borderRadius: 99 }} />
           </View>
-          <Text style={{ fontFamily: F.display, fontSize: 15, color: '#fff' }}>{pct}%</Text>
+          <Text style={{ fontFamily: F.display, fontSize: 15, color: C.onBrand }}>{pct}%</Text>
         </Row>
       </Card>
 

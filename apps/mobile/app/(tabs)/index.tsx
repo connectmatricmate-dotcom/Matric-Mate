@@ -135,9 +135,9 @@ export default function Dashboard() {
       {/* Today's plan */}
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         <Row>
-          <H3 style={{ color: '#fff', flex: 1 }}>{t('dash.todayPlan')}</H3>
+          <H3 style={{ color: C.onBrand, flex: 1 }}>{t('dash.todayPlan')}</H3>
           <View style={{ backgroundColor: 'rgba(255,255,255,0.18)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 }}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: '#fff' }}>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: C.onBrand }}>
               {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
             </Text>
           </View>
@@ -181,7 +181,7 @@ export default function Dashboard() {
               >
                 {task.done ? (
                   <Pop>
-                    <Icon name="check" size={14} color="#fff" strokeWidth={3} />
+                    <Icon name="check" size={14} color={C.onBrand} strokeWidth={3} />
                   </Pop>
                 ) : null}
               </View>
@@ -205,7 +205,7 @@ export default function Dashboard() {
                 text={planLabel(task)}
                 face="bodyBold"
                 size={13.5}
-                color="#fff"
+                color={C.onBrand}
                 style={{
                   textDecorationLine: task.done ? 'line-through' : 'none',
                   opacity: task.done ? 0.7 : 1,

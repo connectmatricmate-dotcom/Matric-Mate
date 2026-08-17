@@ -1,4 +1,6 @@
 import 'server-only';
+import { formatDate, translate } from '@matricmate/core';
+import type { Language } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { gateway } from '@/lib/gateway';
 import { planById } from '@/lib/plans';
@@ -107,11 +109,16 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
     { onConflict: 'user_id' }
   );
 
+  // In the student's own language. This was hardcoded English, which nobody
+  // noticed because until now no app ever read the notifications table.
+  const { data: profile } = await admin.from('profiles').select('onboarding').eq('id', payment.user_id).maybeSingle();
+  const lang: Language = (profile?.onboarding as { medium?: string } | null)?.medium === 'ur' ? 'ur' : 'en';
+
   await admin.from('notifications').insert({
     user_id: payment.user_id,
     kind: 'payment',
-    title: 'Payment received',
-    body: `Premium is active until ${new Date(validTill).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.`,
+    title: translate(lang, 'notifications.paymentTitle'),
+    body: translate(lang, 'notifications.paymentBody', { date: formatDate(validTill, lang, { day: 'numeric', month: 'long', year: 'numeric' }) }),
     target: 'payments',
   });
 

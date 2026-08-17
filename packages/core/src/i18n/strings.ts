@@ -43,7 +43,7 @@ export const en = {
     mediumUrdu: 'Urdu',
     oneSwitchSub: 'Sets the app and your study material together',
     englishHint: 'Use the app in English',
-    urduHint: 'App Roman Urdu mein, jaise “Aaj ka plan”',
+    urduHint: 'The whole app in Urdu, like “آج کا منصوبہ”',
   },
 
   welcome: {
@@ -312,6 +312,16 @@ export const en = {
     earlier: 'Earlier',
     emptyTitle: 'No notifications yet',
     emptyBody: 'We’ll remind you about your plan, streaks and report card.',
+    /* Written by the server, in the language the student last chose, so they
+       are stored already translated rather than translated on the way out. */
+    paymentTitle: 'Payment received',
+    paymentBody: 'Premium is active until {date}.',
+    reminderTitle: 'Nothing studied today',
+    reminderBody: 'A few questions now still counts. Even ten minutes keeps you moving.',
+    streakTitle: '{n} day streak at risk',
+    streakBody: 'You have not studied today. Answer a few questions before midnight to keep it.',
+    reportTitle: 'Your report card is ready',
+    reportBody: 'Fresh notes from your coach on how this week went.',
   },
 
   study: {
@@ -829,6 +839,14 @@ export const en = {
     noPaymentsTitle: 'No payments yet',
     noPaymentsBody: 'Receipts appear here after your first Premium payment.',
     paidLabel: 'Paid',
+    /* A payment that never completed still belongs in the history: it is the
+       first thing a student points at when they say the money left and the
+       plan did not arrive. The raw database word was being printed straight
+       onto the screen, in English, whatever language the app was in. */
+    statusPending: 'Not completed',
+    statusFailed: 'Failed',
+    statusRefunded: 'Refunded',
+    statusCancelled: 'Cancelled',
     receiptLine: 'Rs {amount} · Premium',
     referenceCopied: 'Reference copied',
     paymentsFootnote: 'Every receipt carries a Safepay reference you can quote to support.',
@@ -855,11 +873,13 @@ export const en = {
     resetDone: 'App data cleared',
     about: 'About',
     terms: 'Terms and privacy',
+    deleteAccount: 'Delete my account',
+    deleteAccountSub: 'How to have everything removed',
     termsToast: 'Legal pages ship with the landing page',
 
     helpTitle: 'Help and support',
     whatsapp: 'Chat on WhatsApp · 10am to 10pm',
-    emailUs: 'Email us: help@matricmate.pk',
+    emailUs: 'Email us: {email}',
     whatsappToast: 'WhatsApp support is coming soon',
     commonQuestions: 'Common questions',
     faq1Q: 'How do I renew Premium?',
@@ -1193,6 +1213,14 @@ export const ur: typeof en = {
     earlier: 'پہلے',
     emptyTitle: 'ابھی کوئی اطلاع نہیں',
     emptyBody: 'پلان، تسلسل اور رپورٹ کارڈ کے بارے میں ہم یہاں یاد دلائیں گے۔',
+    paymentTitle: 'ادائیگی موصول ہوئی',
+    paymentBody: 'پریمیم {date} تک فعال ہے۔',
+    reminderTitle: 'آج کچھ نہیں پڑھا',
+    reminderBody: 'ابھی چند سوال بھی شمار ہوتے ہیں۔ دس منٹ بھی آپ کو آگے رکھتے ہیں۔',
+    streakTitle: '{n} دن کا تسلسل خطرے میں',
+    streakBody: 'آج آپ نے کچھ نہیں پڑھا۔ رات بارہ بجے سے پہلے چند سوال کر لیں تو تسلسل بچ جائے گا۔',
+    reportTitle: 'آپ کا رپورٹ کارڈ تیار ہے',
+    reportBody: 'اس ہفتے کی کارکردگی پر آپ کے کوچ کی تازہ رائے۔',
   },
 
   study: {
@@ -1707,6 +1735,10 @@ export const ur: typeof en = {
     noPaymentsTitle: 'ابھی کوئی ادائیگی نہیں',
     noPaymentsBody: 'پہلی پریمیم ادائیگی کے بعد رسیدیں یہاں آئیں گی۔',
     paidLabel: 'ادا شدہ',
+    statusPending: 'مکمل نہیں ہوئی',
+    statusFailed: 'ناکام',
+    statusRefunded: 'رقم واپس',
+    statusCancelled: 'منسوخ',
     receiptLine: '{amount} روپے · پریمیم',
     referenceCopied: 'حوالہ نقل ہو گیا',
     paymentsFootnote: 'ہر رسید پر Safepay کا حوالہ ہوتا ہے، معاونت سے بات کرتے وقت یہی بتائیں۔',
@@ -1733,11 +1765,13 @@ export const ur: typeof en = {
     resetDone: 'ایپ کا ڈیٹا صاف ہو گیا',
     about: 'ایپ کے بارے میں',
     terms: 'شرائط اور پرائیویسی',
+    deleteAccount: 'میرا اکاؤنٹ حذف کریں',
+    deleteAccountSub: 'سب کچھ ہٹوانے کا طریقہ',
     termsToast: 'قانونی صفحات لینڈنگ پیج کے ساتھ آئیں گے',
 
     helpTitle: 'مدد اور معاونت',
     whatsapp: 'WhatsApp پر بات کریں · صبح 10 سے رات 10 بجے',
-    emailUs: 'ای میل کریں: help@matricmate.pk',
+    emailUs: 'ای میل کریں: {email}',
     whatsappToast: 'WhatsApp معاونت جلد آ رہی ہے',
     commonQuestions: 'عام سوالات',
     faq1Q: 'پریمیم کیسے تجدید کروں؟',

@@ -28,7 +28,9 @@ import { C } from '../theme';
 
 /* ------------------------------------------------------------- confetti */
 
-const PIECE_COLORS = [C.teal, C.orange, C.green, '#F7C948', C.tealTint2, C.orangeDark];
+/* A function, so the confetti is mixed from the palette in force when it is
+   thrown rather than the one loaded at launch. */
+const pieceColors = () => [C.teal, C.orange, C.green, '#F7C948', C.tealTint2, C.orangeDark];
 
 type Seed = { x: number; delay: number; sway: number; spin: number; size: number; color: string; height: number };
 
@@ -39,13 +41,14 @@ type Seed = { x: number; delay: number; sway: number; spin: number; size: number
  */
 function rollSeeds(count: number): Seed[] {
   const { width, height } = Dimensions.get('window');
+  const palette = pieceColors();
   return Array.from({ length: count }, (_, i) => ({
     x: ((i + 0.5) / count) * width + (Math.random() - 0.5) * 40,
     delay: Math.random() * 350,
     sway: (Math.random() - 0.5) * 90,
     spin: (Math.random() - 0.5) * 720,
     size: 7 + Math.random() * 6,
-    color: PIECE_COLORS[i % PIECE_COLORS.length],
+    color: palette[i % palette.length],
     height,
   }));
 }

@@ -43,22 +43,41 @@ export default function RootLayout() {
             <SplashGate />
             <QuotaLive />
             <ToastHost>
-              <StatusBar style="dark" />
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: C.paper },
-                  animation: 'slide_from_right',
-                }}
-              >
-                <Stack.Screen name="index" options={{ animation: 'none' }} />
-                <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
-              </Stack>
+              <Chrome />
             </ToastHost>
           </AppProvider>
         </AuthProvider>
       </ConnectivityProvider>
     </SafeAreaProvider>
+  );
+}
+
+/**
+ * The navigator and the system bars, as a child of AppProvider rather than a
+ * part of RootLayout.
+ *
+ * Both read the palette, and RootLayout does not subscribe to the store, so
+ * from up there they were evaluated once and kept whatever theme was current
+ * at launch: switching to dark left a white status bar and a white flash
+ * behind every screen transition. Down here the store re-renders them.
+ */
+function Chrome() {
+  const { state } = useApp();
+  return (
+    <>
+      {/* The bar's own text, so it is light on a dark ground and vice versa. */}
+      <StatusBar style={state.settings.dark ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: C.paper },
+          animation: 'slide_from_right',
+        }}
+      >
+        <Stack.Screen name="index" options={{ animation: 'none' }} />
+        <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+      </Stack>
+    </>
   );
 }
 

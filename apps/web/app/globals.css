@@ -29,6 +29,24 @@
   --color-redtint: #fbeceb;
   --color-grey: #eff3f0;
   --color-whatsapp: #25d366;
+  /* Text and icons ON a saturated fill. See tokens.ts: this was a literal
+     white everywhere, which stops working the moment the fill brightens for
+     dark mode. */
+  --color-onbrand: #ffffff;
+
+  /* Shadow colours, so depth can change with the theme. A 7% ink drop reads as
+     lift on paper and as nothing at all on a dark ground, where the surfaces
+     themselves carry the hierarchy and the shadow only has to stop a card
+     floating. */
+  --shadow-soft: rgba(15, 80, 100, 0.07);
+  --shadow-lift: rgba(15, 61, 76, 0.22);
+  --shadow-sheet: rgba(15, 61, 76, 0.18);
+  --shadow-ring: rgba(15, 61, 76, 0.08);
+
+  --glyph-under: #075b78;
+  --glyph-under-accent: #c96d00;
+  --glyph-rest: #aebeb6;
+  --glyph-rest-accent: #c6d2cb;
 
   --font-display: var(--font-baloo), ui-rounded, system-ui, sans-serif;
   --font-body: var(--font-nunito), system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -94,6 +112,66 @@ body {
  * and Tailwind's own leading utilities are per-element, so the floor is set
  * here and a tight utility can still override it where a designer wants one.
  */
+/**
+ * Dark mode.
+ *
+ * The same trick as `[lang='ur']` above, and it works for the same reason:
+ * every screen in this app is built from the semantic colour tokens and none
+ * of them names a hex. So the dark theme is this one block redefining what
+ * those tokens mean, and not a single component, page or utility class had to
+ * change. The values are the shared palette from packages/core/src/tokens.ts,
+ * so the Android app is running the identical theme.
+ *
+ * On the root element rather than a wrapper, so the page's own background and
+ * the overscroll area go with it. `data-theme` is written by the store and
+ * mirrored into a cookie, so the server can set it on the first byte and a
+ * dark student never gets a white flash before hydration.
+ */
+[data-theme='dark'] {
+  --color-teal: #3fb6dc;
+  --color-tealdark: #8fd6ee;
+  --color-cyan: #22c7d6;
+  --color-tealtint: #103848;
+  --color-tealtint2: #164c61;
+  --color-ink: #eaf4f7;
+  --color-ink2: #a9c6d1;
+  --color-ink3: #7fa3b1;
+  --color-paper: #07202b;
+  --color-card: #0e2e3b;
+  --color-line: #1d4757;
+  --color-track: #173f4e;
+  --color-mute: #2a5a6b;
+  --color-orange: #ff9f2e;
+  --color-orangedark: #ffc178;
+  --color-orangetint: #3a2712;
+  --color-green: #48c77a;
+  --color-greentint: #123322;
+  --color-red: #f2726e;
+  --color-redtint: #3a1e1d;
+  --color-grey: #143a48;
+  --color-onbrand: #04222f;
+  /* `night` and `whatsapp` are deliberately absent: one is already the dark
+     end of the brand and still the hero's ground, the other is not ours. */
+
+  /* Tuned as pale ink drops on paper, which on a dark ground read as haze
+     rather than lift. They deepen instead, and the surface steps above do the
+     rest of the work. */
+  --shadow-soft: rgba(0, 0, 0, 0.38);
+  --shadow-lift: rgba(0, 0, 0, 0.55);
+  --shadow-sheet: rgba(0, 0, 0, 0.5);
+  --shadow-ring: rgba(255, 255, 255, 0.09);
+
+  /* The tab glyph's two off-palette tones: the drop-shadow copy that gives the
+     active icon its sticker depth, and the quiet resting icon. Same values as
+     the Android app, see components/TabGlyph.tsx there. */
+  --glyph-under: #1b6f8c;
+  --glyph-under-accent: #b36a12;
+  --glyph-rest: #63838f;
+  --glyph-rest-accent: #4b6875;
+
+  color-scheme: dark;
+}
+
 [lang='ur'] {
   --font-display: var(--font-urdu);
   --font-body: var(--font-urdu);

@@ -72,7 +72,7 @@ export function Sheet({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative max-h-[88vh] w-full overflow-y-auto rounded-t-[22px] bg-card p-5 shadow-[0_-8px_30px_rgba(15,61,76,0.18)] outline-none md:rounded-[22px] ${
+        className={`relative max-h-[88vh] w-full overflow-y-auto rounded-t-[22px] bg-card p-5 shadow-[0_-8px_30px_var(--shadow-sheet)] outline-none md:rounded-[22px] ${
           wide ? 'md:max-w-[640px]' : 'md:max-w-[460px]'
         }`}
       >

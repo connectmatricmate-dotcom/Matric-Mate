@@ -92,7 +92,7 @@ export function McqScreen() {
 
       {/* On a desktop the question earns a surface of its own; unframed, the
           same markup read as a phone screen stretched across empty paper. */}
-      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_var(--shadow-soft)]">
       <h1 className="mb-4"><ScriptText text={mcq.q} className="font-display text-[19px] leading-[1.5] text-ink md:text-[22px]" urduClassName="text-[18px] text-ink" /></h1>
 
       <div className="flex flex-col gap-2.5">
@@ -107,9 +107,9 @@ export function McqScreen() {
             idle: 'border-line bg-card hover:border-tealtint2',
           }[kind];
           const key = {
-            ok: 'bg-green text-white',
-            bad: 'bg-red text-white',
-            sel: 'bg-teal text-white',
+            ok: 'bg-green text-onbrand',
+            bad: 'bg-red text-onbrand',
+            sel: 'bg-teal text-onbrand',
             idle: 'bg-grey text-ink2',
           }[kind];
 

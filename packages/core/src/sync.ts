@@ -15,7 +15,7 @@
  * foreground, browser online event, right after enqueuing) are per-app,
  * because those APIs differ and core has no dependency on either.
  */
-import { Attempt, Confidence, TestResult } from './types';
+import { Attempt, Confidence, Notification, NotificationTarget, TestResult } from './types';
 import { todayKey } from './domain';
 
 /**
@@ -365,6 +365,29 @@ const fromResultRow = (r: ResultRow): TestResult => ({
   attemptIds: [],
 });
 
+type NotificationRow = {
+  id: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  target: string | null;
+  read: boolean;
+  at: string;
+};
+
+/** The column is free text; only the destinations both apps can route to survive. */
+const TARGETS: NotificationTarget[] = ['home', 'study', 'practice', 'progress', 'session-setup', 'report', 'payments', 'subscription'];
+
+const fromNotificationRow = (r: NotificationRow): Notification => ({
+  id: r.id,
+  kind: r.kind as Notification['kind'],
+  title: r.title,
+  body: r.body ?? '',
+  at: Date.parse(r.at),
+  target: TARGETS.includes(r.target as NotificationTarget) ? (r.target as NotificationTarget) : undefined,
+  read: r.read,
+});
+
 export type HydratedStudyState = {
   /**
    * The student's saved class/board/subjects choices, opaque to core. The app
@@ -381,15 +404,79 @@ export type HydratedStudyState = {
   activeDays: string[];
   /** Task ids ticked on today's plan, from any device. */
   planDone: string[];
+  /**
+   * The student's inbox.
+   *
+   * Both apps have always had a notifications screen, and the payment webhook
+   * has always written rows into the table it reads from. Nothing ever
+   * connected the two: the stores initialised `notifications` to an empty
+   * array and no code path ever filled it, so five real payment receipts sat
+   * in the database while both inboxes told the student they had nothing.
+   */
+  notifications: Notification[];
+  /** Null when the student has never touched them, meaning "use the defaults". */
+  accountPrefs: AccountPrefs | null;
   lastChapterId?: string;
   lastSectionIndex: number;
 };
+
+/**
+ * The settings that belong to the account rather than to one device.
+ *
+ * Text size and which avatar are properties of the screen you are looking at.
+ * These are properties of the person: when they want to be nudged, and whether
+ * they read in the dark. They lived in device storage only, which had two
+ * visible consequences. The same student saw the reminder switches on in the
+ * website and off in the phone, and nothing anywhere ever read either one.
+ *
+ * `dark` is here for the first reason rather than the second: nothing on the
+ * server cares about it, but a student who turns the lights off on their phone
+ * should not have to do it again on the laptop.
+ */
+export type AccountPrefs = {
+  reminders: boolean;
+  streakAlerts: boolean;
+  reminderTime: string;
+  dark: boolean;
+};
+
+const readAccountPrefs = (settings: unknown): AccountPrefs | null => {
+  if (!settings || typeof settings !== 'object') return null;
+  const s = settings as Record<string, unknown>;
+  // Nothing stored yet reads as "never set", not as "all off".
+  const known = ['reminders', 'streakAlerts', 'dark'].some((k) => typeof s[k] === 'boolean');
+  if (!known) return null;
+  return {
+    reminders: s.reminders !== false,
+    streakAlerts: s.streakAlerts !== false,
+    reminderTime: typeof s.reminderTime === 'string' ? s.reminderTime : '7:00 PM',
+    dark: s.dark === true,
+  };
+};
+
+/**
+ * Write the nudge preferences to the account.
+ *
+ * Merged into the existing jsonb rather than replacing it, so a future setting
+ * stored alongside them is not wiped by someone flipping a switch. Silent on
+ * failure: a preference that did not reach the server is retried the next time
+ * it is touched, and is not worth interrupting anyone over.
+ */
+export async function syncAccountPrefs(client: SyncClient, userId: string, prefs: AccountPrefs): Promise<void> {
+  try {
+    const { data } = await client.from('profiles').select('settings').eq('id', userId).maybeSingle();
+    const current = ((data as { settings?: Record<string, unknown> | null } | null)?.settings ?? {}) as Record<string, unknown>;
+    await client.from('profiles').update({ settings: { ...current, ...prefs } }).eq('id', userId);
+  } catch {
+    /* Deliberately silent, see above. */
+  }
+}
 
 /** How long a hydration attempt is allowed to hang before giving up on it. */
 const HYDRATE_TIMEOUT_MS = 8000;
 
 async function fetchStudyState(client: SyncClient, userId: string): Promise<HydratedStudyState> {
-  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, planRes, profileRes] = await Promise.all([
+  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, planRes, profileRes, notifsRes] = await Promise.all([
     client.from('attempts').select('id,mcq_id,chapter_id,subject_id,topic,correct,confidence,mode,at').eq('user_id', userId).order('at', { ascending: true }).limit(1000),
     client.from('results').select('id,subject_id,chapter_id,label,score,total,xp,mode,at').eq('user_id', userId).order('at', { ascending: false }).limit(100),
     client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: true }),
@@ -398,11 +485,14 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     // Today only: yesterday's ticks belong to yesterday's plan, and the task
     // ids carry the date anyway.
     client.from('plan_done').select('task_id').eq('user_id', userId).eq('day', todayKey()),
-    client.from('profiles').select('onboarding,grade').eq('id', userId).maybeSingle(),
+    client.from('profiles').select('onboarding,grade,settings').eq('id', userId).maybeSingle(),
+    // Capped at the same 50 the screens show. An inbox is a recent list, not
+    // an archive, and nobody scrolls to a receipt from four months ago.
+    client.from('notifications').select('id,kind,title,body,target,read,at').eq('user_id', userId).order('at', { ascending: false }).limit(50),
   ]);
 
   const error =
-    attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error ?? planRes.error ?? profileRes.error;
+    attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error ?? planRes.error ?? profileRes.error ?? notifsRes.error;
   if (error) throw error;
 
   // Ordered ascending by `at`, so the last row is the most recently read
@@ -420,6 +510,8 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     cardsKnown: ((cardsRes.data ?? []) as { card_id: string }[]).map((c) => c.card_id),
     activeDays: ((daysRes.data ?? []) as { day: string }[]).map((d) => d.day),
     planDone: ((planRes.data ?? []) as { task_id: string }[]).map((r) => r.task_id),
+    notifications: ((notifsRes.data ?? []) as NotificationRow[]).map(fromNotificationRow),
+    accountPrefs: readAccountPrefs((profileRes.data as { settings?: unknown } | null)?.settings),
     lastChapterId: last?.chapter_id,
     lastSectionIndex: last?.section_index ?? 0,
   };
@@ -453,6 +545,7 @@ export type SyncableState = {
   cardsKnown: string[];
   activeDays: string[];
   planDone: string[];
+  notifications: Notification[];
   lastChapterId?: string;
   lastSectionIndex: number;
 };
@@ -482,6 +575,10 @@ export function mergeHydratedState<S extends SyncableState>(local: S, server: Hy
     // A union, like the rest: ticking on the phone and on the laptop should
     // add up rather than one device's view erasing the other's.
     planDone: union(local.planDone, server.planDone),
+    // The server is the only writer of notifications, so this is a straight
+    // adopt rather than a union: nothing on the device can be newer. Newest
+    // first, matching the order both inboxes render in.
+    notifications: byId(server.notifications, local.notifications).sort((a, b) => b.at - a.at),
     // Local wins whenever it already has a reading position: either this
     // device is mid-session and knows something the last sync does not, or
     // nothing has been read here yet, in which case the server's last
@@ -491,6 +588,22 @@ export function mergeHydratedState<S extends SyncableState>(local: S, server: Hy
   };
 }
 
+
+/**
+ * Mark every unread notification read, on the server as well as on screen.
+ *
+ * Both apps flipped `read` in local state only, so opening the inbox cleared
+ * it until the next hydration brought all of them back unread. Not queued
+ * through the offline queue on purpose: if this write is lost the worst case
+ * is a badge that reappears, which is a great deal cheaper than a lost answer.
+ */
+export async function markNotificationsRead(client: SyncClient, userId: string): Promise<void> {
+  try {
+    await client.from('notifications').update({ read: true }).eq('user_id', userId).eq('read', false);
+  } catch {
+    /* Deliberately silent: a stale badge is not worth an error message. */
+  }
+}
 
 /* ------------------------------------------------------------ hard reset */
 

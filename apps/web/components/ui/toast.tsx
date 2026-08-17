@@ -45,7 +45,7 @@ function ToastRow({ toast, onDone }: { toast: Toast; onDone: (id: number) => voi
   }, [toast.id, onDone]);
 
   return (
-    <div className="max-w-[440px] rounded-[14px] bg-ink px-4 py-2.5 text-[13.5px] font-bold text-white shadow-[0_8px_22px_rgba(15,61,76,0.22)]">
+    <div className="max-w-[440px] rounded-[14px] bg-ink px-4 py-2.5 text-[13.5px] font-bold text-paper shadow-[0_8px_22px_var(--shadow-lift)]">
       {toast.message}
     </div>
   );

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { Card, Icon, LinkBtn } from '@/components/ui';
+import { SUPPORT_EMAIL } from '@matricmate/core';
 
 export const metadata: Metadata = {
   title: 'Delete your account',
@@ -34,7 +35,7 @@ export default function DeleteAccountPage() {
           <h2 className="font-display text-[20px] text-ink">Ask us to delete it</h2>
           <p className="mt-2 text-mk-body text-ink2">
             There is no delete button inside MatricMate yet, so this is done by request and a person handles it. Email{' '}
-            <span className="font-extrabold text-ink">help@matricmate.pk</span> from the address on the account, with
+            <span className="font-extrabold text-ink">{SUPPORT_EMAIL}</span> from the address on the account, with
             “delete my account” in the subject. You do not have to give a reason.
           </p>
           <p className="mt-2 text-mk-body text-ink2">
@@ -42,8 +43,8 @@ export default function DeleteAccountPage() {
             seven days of that.
           </p>
           <LinkBtn
-            title="Email help@matricmate.pk"
-            href="mailto:help@matricmate.pk?subject=Delete%20my%20account"
+            title={`Email ${SUPPORT_EMAIL}`}
+            href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Delete my account')}`}
             icon="mail"
             className="mt-4"
           />
@@ -52,7 +53,7 @@ export default function DeleteAccountPage() {
         <Card className="mt-4">
           <h2 className="font-display text-[20px] text-ink">If you cannot sign in</h2>
           <p className="mt-2 text-mk-body text-ink2">
-            Email <span className="font-extrabold text-ink">help@matricmate.pk</span> from any address, or message the
+            Email <span className="font-extrabold text-ink">{SUPPORT_EMAIL}</span> from any address, or message the
             support number, with the mobile number on the account. We verify ownership by sending a code to that
             number, then delete it within seven days.
           </p>

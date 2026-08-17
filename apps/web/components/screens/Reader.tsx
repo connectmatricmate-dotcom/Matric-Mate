@@ -206,7 +206,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
       />
 
       {/* Same task frame as the practice screens: the notes read on paper of their own. */}
-      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:px-8 md:py-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:px-8 md:py-7 md:shadow-[0_5px_14px_var(--shadow-soft)]">
       <article>
         {/* No accessible sections means the plan wall, not an empty chapter:
             row level security serves nothing to an account without one. This

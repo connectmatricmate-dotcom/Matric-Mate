@@ -126,7 +126,7 @@ export function ShortQScreen({
       />
 
       {/* Same task frame as the MCQ and exam screens */}
-      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_rgba(15,80,100,0.07)]">
+      <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_var(--shadow-soft)]">
       <Card flat className="md:border-0 md:bg-transparent md:p-0">
         <ScriptText text={item.q} className="font-display text-[17px] leading-[1.55] text-ink md:text-[20px]" urduClassName="text-[16px] text-ink" />
       </Card>

@@ -117,7 +117,7 @@ function PlayerChrome({
               justifyContent: 'center',
             }}
           >
-            <Icon name={playing ? 'pause' : 'play'} size={30} color="#fff" strokeWidth={2.2} />
+            <Icon name={playing ? 'pause' : 'play'} size={30} color={C.onBrand} strokeWidth={2.2} />
           </View>
         </Tap>
         <Tap onPress={() => onSeek(15)} disabled={disabled}>

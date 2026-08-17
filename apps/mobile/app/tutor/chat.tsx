@@ -275,7 +275,7 @@ export default function Chat() {
                     resizeMode="cover"
                   />
                 ) : null}
-                <ScriptText text={m.text} size={14} color="#fff" />
+                <ScriptText text={m.text} size={14} color={C.onBrand} />
               </View>
             ) : (
               <View
@@ -448,7 +448,7 @@ export default function Chat() {
                 justifyContent: 'center',
               }}
             >
-              <Icon name="send" size={19} color="#fff" />
+              <Icon name="send" size={19} color={C.onBrand} />
             </View>
           </Tap>
         </Row>

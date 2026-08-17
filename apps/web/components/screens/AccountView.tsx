@@ -51,6 +51,7 @@ export function AccountView() {
   const setup = state.onboarding;
   const s = state.settings;
   const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
+  const unreadCount = state.notifications.filter((n) => !n.read).length;
 
   return (
     <Page>
@@ -126,7 +127,7 @@ export function AccountView() {
             >
               <span
                 className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] ${
-                  state.premium.active ? 'bg-orange text-white' : 'bg-grey text-ink2'
+                  state.premium.active ? 'bg-orange text-onbrand' : 'bg-grey text-ink2'
                 }`}
               >
                 <Icon name={state.premium.active ? 'crown' : 'lock'} size={22} />
@@ -163,7 +164,7 @@ export function AccountView() {
               label={t('lang.label')}
               options={[
                 { value: 'en' as Language, label: t('lang.english') },
-                { value: 'ur' as Language, label: t('lang.urdu') },
+                { value: 'ur' as Language, label: t('lang.urdu'), urdu: true },
               ]}
             />
           </Card>
@@ -205,18 +206,30 @@ export function AccountView() {
                   />
                 }
               />
-              <Item href="/notifications" title={t('account.notifications')} icon="bell" last />
+              {/* The count is the only thing that makes the inbox
+                  discoverable: nothing else in the app points at it. */}
+              <Item
+                href="/notifications"
+                title={t('account.notifications')}
+                icon="bell"
+                last
+                right={unreadCount ? <Pill tone="red">{String(unreadCount)}</Pill> : undefined}
+              />
             </Group>
 
             <Group title={t('account.appearance')}>
-              {/* No toggle until dark mode exists. A switch that visibly flips and
-                  changes nothing is the fastest way to lose a user's trust. */}
               <Item
                 title={t('account.darkMode')}
                 sub={t('account.darkModeSub')}
                 icon="moon"
                 last
-                right={<Pill tone="grey">{t('onboarding.comingSoon')}</Pill>}
+                right={
+                  <Toggle
+                    on={s.dark}
+                    label={t('account.darkMode')}
+                    onClick={() => actions.setSettings({ dark: !s.dark })}
+                  />
+                }
               />
             </Group>
 
@@ -235,6 +248,15 @@ export function AccountView() {
             <Group title={t('account.about')}>
               <Item href="/account/help" title={t('account.help')} icon="help" />
               <Item href="/terms" title={t('account.terms')} icon="doc" />
+              {/* Play requires the deletion route to be reachable from inside
+                  the product, not only from the marketing footer. */}
+              <Item
+                href="/delete-account"
+                title={t('account.deleteAccount')}
+                sub={t('account.deleteAccountSub')}
+                icon="trash"
+                tone="red"
+              />
               <Item title={t('account.version', { v: APP_VERSION })} icon="help" />
               <ItemButton
                 title={t('auth.logOut')}

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { ToastProvider } from '@/components/ui/toast';
 import { ALLOW_INDEXING, SITE_URL } from '@/lib/site';
+import { readUiTheme } from '@/lib/ui-language.server';
 import './globals.css';
 
 /*
@@ -85,7 +86,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   /**
    * No AppProvider here on purpose. The store binds the shared content dataset
    * and both language dictionaries into whatever client bundle mounts it, and
@@ -100,8 +101,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
    * through <Localized>, so an Urdu account mirrors the app without laying out
    * the landing page right to left.
    */
+  /*
+   * The theme, unlike the language, goes on the document. A student who wants
+   * a dark app wants a dark page under it too, including the overscroll strip
+   * and the marketing pages they arrive through, and the tokens carry every
+   * one of those. Read here rather than in the app segment so the very first
+   * byte is already the right colour.
+   */
+  const theme = await readUiTheme();
+
   return (
-    <html lang="en" className={`${baloo.variable} ${nunito.variable} ${nastaliq.variable}`}>
+    <html
+      lang="en"
+      data-theme={theme}
+      className={`${baloo.variable} ${nunito.variable} ${nastaliq.variable}`}
+    >
       <body>
         <ToastProvider>{children}</ToastProvider>
       </body>

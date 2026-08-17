@@ -17,7 +17,7 @@ export function AvatarBadge({ index, size = 40 }: { index: number; size?: number
         height: size,
         borderRadius: '50%',
         background: avatar.bg,
-        boxShadow: 'inset 0 0 0 1px rgba(15,61,76,0.08)',
+        boxShadow: 'inset 0 0 0 1px var(--shadow-ring)',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',

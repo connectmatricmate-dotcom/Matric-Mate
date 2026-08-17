@@ -340,7 +340,7 @@ export default function Reader() {
           ) : (
             <Tap onPress={() => advance(1)}>
               <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
-                <Chevron size={19} color="#fff" />
+                <Chevron size={19} color={C.onBrand} />
               </View>
             </Tap>
           )}

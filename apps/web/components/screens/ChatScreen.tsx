@@ -243,7 +243,7 @@ export function ChatScreen({
           m.role === 'user' ? (
             <div
               key={m.id}
-              className="max-w-[84%] self-end rounded-[18px] rounded-ee-[6px] bg-teal px-4 py-3 text-[14px] leading-[1.6] text-white"
+              className="max-w-[84%] self-end rounded-[18px] rounded-ee-[6px] bg-teal px-4 py-3 text-[14px] leading-[1.6] text-onbrand"
             >
               {sentPhotos[m.id] ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -251,7 +251,7 @@ export function ChatScreen({
               ) : null}
               {/* A question typed in Urdu comes back in Nastaliq, right to
                   left, rather than in the Latin face. */}
-              <ScriptText text={m.text} className="text-[14px] leading-[1.6] text-white" urduClassName="text-[13.5px] text-white" />
+              <ScriptText text={m.text} className="text-[14px] leading-[1.6] text-onbrand" urduClassName="text-[13.5px] text-onbrand" />
             </div>
           ) : (
             <div
@@ -432,7 +432,7 @@ export function ChatScreen({
           type="submit"
           disabled={(!input.trim() && !photo) || thinking || outOfQuestions}
           aria-label={t('tutor.send')}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-teal text-white transition-colors duration-200 hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-teal text-onbrand transition-colors duration-200 hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
         >
           <Icon name="send" size={19} />
         </button>

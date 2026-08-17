@@ -6,9 +6,57 @@
  * shadows, Urdu text helper).
  */
 import { Platform, TextStyle } from 'react-native';
-import { CONTENT_MAX, URDU_LINE_HEIGHT, colors, fonts, fontSize, radius, space } from '@matricmate/core';
+import { CONTENT_MAX, Palette, URDU_LINE_HEIGHT, colors, darkColors, fonts, fontSize, radius, space } from '@matricmate/core';
 
-export const C = colors;
+/**
+ * Dark mode, by the same mechanism as Urdu above and for the same reason.
+ *
+ * Every screen in this app styles through `C`, in 390 places across 54 files.
+ * None of them picks a colour: they name a role, and this decides what that
+ * role looks like right now. So the dark theme is a second palette in core
+ * plus these getters, and not a single screen needed editing.
+ *
+ * The getters are what make it live. Each one is evaluated during render, and
+ * flipping the setting updates the store, which re-renders the tree, so the
+ * whole app changes at once with no reload and no restart.
+ */
+let darkUi = false;
+
+export function setDarkUi(on: boolean) {
+  darkUi = on;
+}
+
+/** True when the interface is dark. For the few places that need to branch. */
+export function isDark() {
+  return darkUi;
+}
+
+export const C: Palette = {
+  get teal() { return (darkUi ? darkColors : colors).teal; },
+  get tealDark() { return (darkUi ? darkColors : colors).tealDark; },
+  get night() { return (darkUi ? darkColors : colors).night; },
+  get cyan() { return (darkUi ? darkColors : colors).cyan; },
+  get tealTint() { return (darkUi ? darkColors : colors).tealTint; },
+  get tealTint2() { return (darkUi ? darkColors : colors).tealTint2; },
+  get ink() { return (darkUi ? darkColors : colors).ink; },
+  get ink2() { return (darkUi ? darkColors : colors).ink2; },
+  get ink3() { return (darkUi ? darkColors : colors).ink3; },
+  get paper() { return (darkUi ? darkColors : colors).paper; },
+  get card() { return (darkUi ? darkColors : colors).card; },
+  get line() { return (darkUi ? darkColors : colors).line; },
+  get track() { return (darkUi ? darkColors : colors).track; },
+  get mute() { return (darkUi ? darkColors : colors).mute; },
+  get orange() { return (darkUi ? darkColors : colors).orange; },
+  get orangeDark() { return (darkUi ? darkColors : colors).orangeDark; },
+  get orangeTint() { return (darkUi ? darkColors : colors).orangeTint; },
+  get green() { return (darkUi ? darkColors : colors).green; },
+  get greenTint() { return (darkUi ? darkColors : colors).greenTint; },
+  get red() { return (darkUi ? darkColors : colors).red; },
+  get redTint() { return (darkUi ? darkColors : colors).redTint; },
+  get grey() { return (darkUi ? darkColors : colors).grey; },
+  get whatsapp() { return (darkUi ? darkColors : colors).whatsapp; },
+  get onBrand() { return (darkUi ? darkColors : colors).onBrand; },
+};
 export const S = space;
 export const R = radius;
 

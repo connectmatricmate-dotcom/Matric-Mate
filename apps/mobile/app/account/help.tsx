@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Linking, Text, View } from 'react-native';
+import { SUPPORT_EMAIL } from '@matricmate/core';
 import { Body, Btn, Card, Header, Screen, SectionTitle, Small, Spacer, useToast } from '../../src/components/ui';
 import { Icon } from '../../src/components/Icon';
 import { useT } from '../../src/i18n';
@@ -18,6 +19,14 @@ export default function Help() {
   const toast = useToast();
   const [open, setOpen] = useState<number | null>(0);
 
+  const mail = async (subject?: string) => {
+    try {
+      await Linking.openURL(`mailto:${SUPPORT_EMAIL}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}`);
+    } catch {
+      toast(t('common.openLinkError'));
+    }
+  };
+
   return (
     <Screen>
       <Header title={t('account.helpTitle')} back />
@@ -25,6 +34,8 @@ export default function Help() {
       {/* The WhatsApp button is parked until the client provides the business
           number (docs/CLIENT-ACTIONS.md). A button that only toasts teaches
           students that buttons here do nothing. */}
+
+      <Btn title={t('account.emailUs', { email: SUPPORT_EMAIL })} icon="mail" onPress={() => mail()} />
 
       <SectionTitle>{t('account.commonQuestions')}</SectionTitle>
       <View style={{ gap: S.sm }}>
@@ -43,14 +54,8 @@ export default function Help() {
       <Btn
         title={t('account.reportProblem')}
         variant="line"
-        onPress={async () => {
-          // A real mail draft, as the toast copy always claimed.
-          try {
-            await Linking.openURL('mailto:connect.matricmate@gmail.com?subject=MatricMate%20problem%20report');
-          } catch {
-            toast(t('common.openLinkError'));
-          }
-        }}
+        // A real mail draft, as the toast copy always claimed.
+        onPress={() => mail('MatricMate: problem report')}
       />
       <Spacer h={S.md} />
       <Small>{t('account.replyTime')}</Small>

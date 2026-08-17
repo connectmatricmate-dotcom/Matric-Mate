@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Linking, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   Bar,
@@ -25,6 +25,7 @@ import { useLang, useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
+import { SITE_URL } from '../../src/lib/site';
 import { C, F, S } from '../../src/theme';
 
 /**
@@ -49,6 +50,7 @@ export default function Account() {
   const classLevel = setup?.classLevel ?? 9;
   const s = state.settings;
   const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
+  const unreadCount = state.notifications.filter((n) => !n.read).length;
 
   return (
     <>
@@ -149,8 +151,8 @@ export default function Account() {
                   value={s.language}
                   onChange={(next) => actions.setLanguage(next)}
                   options={[
-                    { value: 'en', label: 'English' },
-                    { value: 'ur', label: 'Urdu' },
+                    { value: 'en', label: t('lang.english') },
+                    { value: 'ur', label: t('lang.urdu'), urdu: true },
                   ]}
                 />
               </View>
@@ -172,12 +174,7 @@ export default function Account() {
             sub={t('account.darkModeSub')}
             icon="moon"
             last
-            right={
-              // Never latches on: no dark theme exists yet, and a switch that
-              // visibly turns on and does nothing trains people to distrust
-              // every other switch on the page.
-              <Toggle on={false} onPress={() => toast(t('account.darkToast'))} />
-            }
+            right={<Toggle on={s.dark} onPress={() => actions.setSettings({ dark: !s.dark })} />}
           />
         </Card>
 
@@ -187,16 +184,24 @@ export default function Account() {
             title={t('account.studyReminder')}
             sub={t('account.studyReminderSub', { time: s.reminderTime })}
             icon="bell"
-            right={<Toggle on={false} onPress={() => toast(t('onboarding.comingSoon'))} />}
+            right={<Toggle on={s.reminders} onPress={() => actions.setSettings({ reminders: !s.reminders })} />}
           />
           <Item
             title={t('account.streakAlerts')}
             sub={t('account.streakAlertsSub')}
             icon="flame"
             tone="orange"
-            right={<Toggle on={false} onPress={() => toast(t('onboarding.comingSoon'))} />}
+            right={<Toggle on={s.streakAlerts} onPress={() => actions.setSettings({ streakAlerts: !s.streakAlerts })} />}
           />
-          <Item title={t('account.notifications')} icon="bell" last onPress={() => router.push('/notifications')} />
+          {/* The count is the only thing that makes the inbox discoverable:
+              it is three taps deep and nothing else ever points at it. */}
+          <Item
+            title={t('account.notifications')}
+            icon="bell"
+            last
+            right={unreadCount ? <Pill tone="red">{String(unreadCount)}</Pill> : undefined}
+            onPress={() => router.push('/notifications')}
+          />
         </Card>
 
         <SectionTitle>{t('account.storage')}</SectionTitle>
@@ -221,7 +226,36 @@ export default function Account() {
         <SectionTitle>{t('account.about')}</SectionTitle>
         <Card flat style={{ paddingVertical: 0 }}>
           <Item title={t('account.help')} icon="help" onPress={() => router.push('/account/help')} />
-          <Item title={t('account.terms')} icon="doc" onPress={() => toast(t('account.termsToast'))} />
+          {/* The toast here said legal pages would ship with the landing page.
+              They did. Opening a page with no price and no checkout on it is
+              not selling, so this stays within core/billing.ts. */}
+          <Item
+            title={t('account.terms')}
+            icon="doc"
+            onPress={async () => {
+              try {
+                await Linking.openURL(`${SITE_URL}/terms`);
+              } catch {
+                toast(t('common.openLinkError'));
+              }
+            }}
+          />
+          {/* Play requires the deletion route to be reachable from inside the
+              app. The page is on the website because deleting has to work for
+              someone who has already uninstalled. */}
+          <Item
+            title={t('account.deleteAccount')}
+            sub={t('account.deleteAccountSub')}
+            icon="trash"
+            tone="red"
+            onPress={async () => {
+              try {
+                await Linking.openURL(`${SITE_URL}/delete-account`);
+              } catch {
+                toast(t('common.openLinkError'));
+              }
+            }}
+          />
           <Item title={t('account.version', { v: Constants.expoConfig?.version ?? '' })} icon="help" />
           <Item title={t('auth.logOut')} icon="logout" tone="red" last onPress={() => setConfirmOut(true)} right={<View />} />
         </Card>

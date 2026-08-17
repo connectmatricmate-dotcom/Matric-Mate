@@ -12,11 +12,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, Attempt, ChatThread, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory } from '@matricmate/core';
+import { AI_QUOTA, Attempt, ChatThread, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory } from '@matricmate/core';
 import { useAuth } from './auth';
 import { supabase } from '../lib/supabase';
 import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
-import { setUrduUi } from '../theme';
+import { setDarkUi, setUrduUi } from '../theme';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
@@ -371,7 +371,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const onboarding = s.onboarding?.subjects?.length
               ? s.onboarding
               : ((server.onboarding as Onboarding | null) ?? s.onboarding);
-            return { ...merged, onboarding, xp: totalXp(merged.attempts, merged.cardsKnown) };
+            // The nudge preferences belong to the account, so the server's
+            // copy wins outright. Null means the student has never set them
+            // and this device's defaults stand.
+            const settings = server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings;
+            return { ...merged, onboarding, settings, xp: totalXp(merged.attempts, merged.cardsKnown) };
           });
         }
         // The account had no saved choices but this device does: an account
@@ -477,6 +481,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
              * restore a task the student just uncrossed on their laptop.
              */
             planDone: server.planDone,
+            // Same reasoning: a switch turned off on the laptop must turn off
+            // here, and a merge would never let it.
+            settings: server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings,
             xp: totalXp(merged.attempts, merged.cardsKnown),
           };
         });
@@ -507,6 +514,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * left-to-right Latin every cold start.
    */
   setUrduUi(contentMedium === 'ur');
+
+  /* Same reasoning for the palette: set during render so a dark-mode student
+     never gets one white frame on a cold start. */
+  setDarkUi(state.settings.dark);
 
   // And on the student's class. The server filters by it (RLS); this keeps
   // the local cache and labels honest.
@@ -639,8 +650,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       },
       consumeAi: () => {
         let allowed = false;
+        const day = todayKey();
+        // Read before the update, like every other action that can start a day.
+        const isNewDay = !stateRef.current.activeDays.includes(day);
         setState((s) => {
-          const day = todayKey();
           const used = s.ai.day === day ? s.ai.used : 0;
           const limit = s.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
           if (used >= limit) {
@@ -650,6 +663,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           allowed = true;
           return touchToday({ ...s, ai: { day, used: used + 1 } });
         });
+        // Asking the tutor is studying, so it counts, but it has to be written
+        // through like the rest. Marking the day locally and never syncing it
+        // is what left the streak disagreeing between the phone and laptop.
+        if (allowed && isNewDay) queueAndFlush(syncActiveDay(day));
         return allowed;
       },
       saveThread: (t) =>
@@ -657,9 +674,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           ...s,
           threads: [t, ...s.threads.filter((x) => x.id !== t.id)].slice(0, 20),
         })),
-      readNotifications: () =>
-        setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
-      setSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
+      readNotifications: () => {
+        // The server too. Flipping only local state meant the badge cleared
+        // until the next hydration read the same rows back, still unread.
+        const uid = syncedForRef.current;
+        if (uid) void markNotificationsRead(supabase, uid);
+        setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) }));
+      },
+      setSettings: (patch) => {
+        setState((s) => {
+          const settings = { ...s.settings, ...patch };
+          // The three nudge preferences are account-level, so they go up. The
+          // rest describe this device and stay on it.
+          const uid = syncedForRef.current;
+          if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch)) {
+            void syncAccountPrefs(supabase, uid, {
+              reminders: settings.reminders,
+              streakAlerts: settings.streakAlerts,
+              reminderTime: settings.reminderTime,
+              dark: settings.dark,
+            });
+          }
+          return { ...s, settings };
+        });
+      },
       /**
        * One language for the whole app.
        *

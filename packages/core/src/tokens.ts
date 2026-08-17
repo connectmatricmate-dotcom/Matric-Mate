@@ -48,7 +48,85 @@ export const colors = {
   redTint: '#FBECEB',
   grey: '#EFF3F0',
   whatsapp: '#25D366',
+  /**
+   * Text and icons sitting ON a saturated fill: a primary button, a tone
+   * badge, the play control on a teal disc.
+   *
+   * It was written as a literal white in both apps, which is correct here and
+   * wrong after dark. A dark theme's brand colours have to brighten to stay
+   * visible on a dark ground, and white on a brightened teal falls to 2.4:1.
+   * Naming the foreground lets it flip with the palette: dark text on a bright
+   * fill is what every dark interface ends up doing.
+   */
+  onBrand: '#FFFFFF',
 } as const;
+
+/** Every colour role, as one object. `ColorToken` is declared further down. */
+export type Palette = Record<ColorToken, string>;
+
+/**
+ * The same tokens after dark, so nothing in either app has to know a second
+ * set of names.
+ *
+ * Every screen in both apps already styles exclusively through these keys, so
+ * dark mode is this object plus a switch: no component chooses a colour, and
+ * none of them needs a dark variant. That is the whole reason the palette was
+ * kept semantic rather than literal.
+ *
+ * It is not an inversion. Flipping lightness turns a warm paper white into a
+ * flat grey and leaves the brand teal glowing at a strength that hurts at
+ * night. This is built from the brand's own dark end instead, `night` and
+ * `tealDark`, so the dark app reads as the same product with the lights off:
+ *
+ *   · grounds are the deep blue-teal of the landing hero, not neutral black,
+ *     which is also why a pure #000 never appears here
+ *   · surfaces get lighter as they come forward: paper, then card, then grey
+ *   · text lightens rather than dimming; ink holds ~15:1 on paper, ink2 ~8:1
+ *     and ink3 ~5:1, so the same three tiers stay legible and stay distinct
+ *   · saturated colours are lifted, because a mid-tone that sings on white
+ *     goes muddy on a dark ground: teal, orange, green and red all brighten
+ *   · the tints inverted their job. On paper a tint is a pale wash of a hue;
+ *     here it is a dark, desaturated version of it, still clearly that hue
+ *     but able to carry light text
+ *   · `orangeDark` is the one that catches people out. It exists to write
+ *     orange as TEXT, so on a dark ground it has to become lighter than
+ *     `orange`, not darker. Same for `tealDark`, which is a hover state.
+ */
+export const darkColors: Palette = {
+  /* Brand, lifted so it reads on a dark ground rather than sinking into it. */
+  teal: '#3FB6DC',
+  /* A hover and pressed state, and inline code. Lighter than teal here. */
+  tealDark: '#8FD6EE',
+  /* Unchanged: it was always the dark end, and the hero still uses it. */
+  night: '#04222F',
+  cyan: '#22C7D6',
+  /* Tints are now dark washes that carry light text, not pale ones. */
+  tealTint: '#103848',
+  tealTint2: '#164C61',
+  ink: '#EAF4F7',
+  ink2: '#A9C6D1',
+  ink3: '#7FA3B1',
+  /* The three grounds, in the order they stack. */
+  paper: '#07202B',
+  card: '#0E2E3B',
+  grey: '#143A48',
+  /* Quiet but present, the same job the light border has. */
+  line: '#1D4757',
+  track: '#173F4E',
+  mute: '#2A5A6B',
+  orange: '#FF9F2E',
+  orangeDark: '#FFC178',
+  orangeTint: '#3A2712',
+  green: '#48C77A',
+  greenTint: '#123322',
+  red: '#F2726E',
+  redTint: '#3A1E1D',
+  /* Their own brand colours, and not ours to restyle. */
+  whatsapp: '#25D366',
+  /* Dark ink on the lifted fills, 7:1 on teal and no worse than 5.8:1 on any
+     of them. White here would have been 2.4:1. */
+  onBrand: '#04222F',
+};
 
 /** Font families. The web app self-hosts the same three faces. */
 export const fonts = {

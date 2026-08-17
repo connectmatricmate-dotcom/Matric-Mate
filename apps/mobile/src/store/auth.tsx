@@ -4,6 +4,7 @@ import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { SITE_URL } from '../lib/site';
 
 /**
  * Who is signed in, and what they have paid for.
@@ -98,7 +99,7 @@ const AuthCtx = createContext<Ctx | null>(null);
  * password-reset email, which is sent by Supabase and read outside Play's
  * surface. See core/billing.ts for why that distinction matters.
  */
-const SITE = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://matric-mate-web.vercel.app';
+const SITE = SITE_URL;
 
 /** Last known entitlement, so a paid student is not locked out on a bad connection. */
 const cacheKey = (userId: string) => `mm.entitlement.${userId}`;

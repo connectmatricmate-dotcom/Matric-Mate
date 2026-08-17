@@ -57,7 +57,7 @@ export default function Welcome() {
                     width: n === i ? 22 : 8,
                     height: 8,
                     borderRadius: 99,
-                    backgroundColor: n === i ? C.orange : '#DDE6E1',
+                    backgroundColor: n === i ? C.orange : C.mute,
                   }}
                 />
               </Tap>

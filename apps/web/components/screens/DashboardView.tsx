@@ -93,8 +93,8 @@ export function DashboardView() {
           {/* Today's plan, the only thing on this page with a coloured ground */}
           <Card tint="bg-teal" border="border-teal">
             <div className="flex items-center gap-3">
-              <h2 className="flex-1 font-display text-[18px] text-white">{t('dash.todayPlan')}</h2>
-              <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11.5px] font-extrabold text-white tabular">
+              <h2 className="flex-1 font-display text-[18px] text-onbrand">{t('dash.todayPlan')}</h2>
+              <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11.5px] font-extrabold text-onbrand tabular">
                 {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
               </span>
             </div>
@@ -108,7 +108,7 @@ export function DashboardView() {
 
             <ul>
               {derived.plan.map((task) => (
-                <li key={task.id} className="flex items-center gap-2 border-t border-white/15">
+                <li key={task.id} className="flex items-center gap-2 border-t border-onbrand/15">
                   <button
                     type="button"
                     aria-pressed={task.done}
@@ -118,7 +118,7 @@ export function DashboardView() {
                   >
                     <span
                       className={`flex h-6 w-6 items-center justify-center rounded-[8px] border-2 transition-colors duration-200 ${
-                        task.done ? 'border-orange bg-orange text-white' : 'border-white/55 hover:border-white'
+                        task.done ? 'border-orange bg-orange text-onbrand' : 'border-onbrand/55 hover:border-onbrand'
                       }`}
                     >
                       {task.done ? <Icon name="check" size={14} strokeWidth={3} /> : null}
@@ -129,14 +129,14 @@ export function DashboardView() {
                     <span className="min-w-0 flex-1">
                       <ScriptText
                         text={planLabel(task)}
-                        className={`text-[13.5px] font-extrabold text-white ${task.done ? 'line-through opacity-70' : ''}`}
-                        urduClassName={`text-[13.5px] text-white ${task.done ? 'line-through opacity-70' : ''}`}
+                        className={`text-[13.5px] font-extrabold text-onbrand ${task.done ? 'line-through opacity-70' : ''}`}
+                        urduClassName={`text-[13.5px] text-onbrand ${task.done ? 'line-through opacity-70' : ''}`}
                       />
-                      <span className="block text-[11.5px] font-extrabold text-white/70">
+                      <span className="block text-[11.5px] font-extrabold text-onbrand/70">
                         {subjectById(task.subjectId)?.name}
                       </span>
                     </span>
-                    <Icon name="chevron" size={17} className="shrink-0 text-white/70" />
+                    <Icon name="chevron" size={17} className="shrink-0 text-onbrand/70" />
                   </Link>
                 </li>
               ))}

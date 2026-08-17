@@ -89,7 +89,7 @@ export default function Performance() {
             <View style={{ marginTop: S.sm }}>
               <Svg width="100%" height={90} viewBox="0 0 300 90">
                 {[25, 50, 75].map((g) => (
-                  <Rect key={g} x={0} y={yFor(g)} width={CHART_W} height={1} fill="#EFF3F0" />
+                  <Rect key={g} x={0} y={yFor(g)} width={CHART_W} height={1} fill={C.grey} />
                 ))}
                 <Polyline points={points} fill="none" stroke={C.teal} strokeWidth={3} strokeLinecap="round" />
                 <Circle
