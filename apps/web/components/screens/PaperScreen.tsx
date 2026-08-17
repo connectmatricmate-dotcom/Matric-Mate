@@ -30,17 +30,21 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
   // Keyed by the paper id, so navigating between papers shows the loading
   // state again without a synchronous reset inside the effect.
   const [settled, setSettled] = useState<{ key: string; row: AiSessionRow | null } | null>(null);
+  // A nonce, so asking for the same paper again counts as a new request.
+  const [attempt, setAttempt] = useState(0);
+  const loadKey = paperId ? `${paperId}:${attempt}` : '';
   useEffect(() => {
     if (!paperId) return;
     let alive = true;
     fetchAiSession(paperId).then((row) => {
-      if (alive) setSettled({ key: paperId, row });
+      if (alive) setSettled({ key: loadKey, row });
     });
     return () => {
       alive = false;
     };
-  }, [paperId]);
-  const loading = !!paperId && settled?.key !== paperId;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadKey]);
+  const loading = !!paperId && settled?.key !== loadKey;
   const paper = loading || !paperId ? null : settled?.row ?? null;
 
   async function build() {
@@ -108,6 +112,9 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
         <Card flat tint="bg-redtint" border="border-red">
           <p className="text-[13.5px] font-extrabold text-red">{t('states.errorTitle')}</p>
           <p className="mt-0.5 text-[13px] text-ink2">{t('states.errorBody')}</p>
+          {/* Android offered a retry here and the website did not, so a paper
+              that failed to load was a dead end short of reloading by hand. */}
+          <Btn title={t('common.retry')} variant="line" sm className="mt-3" onClick={() => setAttempt((n) => n + 1)} />
         </Card>
       </Page>
     );
@@ -235,7 +242,13 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
               <Label className="text-green">{t('session.modelAnswer')}</Label>
               <Markdown text={q.answer} className="mt-1 text-[14px] leading-[1.6] text-ink" />
               {q.points.length ? (
-                <ScriptBullets items={q.points} className="text-[13px] text-ink2" listClassName="mt-2 flex flex-col gap-1" />
+                <>
+                  {/* Named, like Android names them. Unlabelled bullets under a
+                      model answer read as more of the answer, when they are
+                      the marks an examiner is actually looking for. */}
+                  <Label className="mt-3 block text-ink2">{t('session.markingPoints')}</Label>
+                  <ScriptBullets items={q.points} className="text-[13px] text-ink2" listClassName="mt-2 flex flex-col gap-1" />
+                </>
               ) : null}
             </Card>
           ) : null}

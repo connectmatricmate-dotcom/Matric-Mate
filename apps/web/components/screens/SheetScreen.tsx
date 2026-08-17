@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { chapterById, fetchCheatSheet } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { Btn } from '@/components/ui/controls';
 import { Card, Skeleton } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
@@ -21,7 +22,8 @@ export function SheetScreen({ chapterId }: { chapterId: string }) {
   const medium = state.settings.contentMedium;
   // Keyed by request, so switching chapter or medium shows the loading state
   // again without a synchronous reset inside the effect.
-  const key = `${chapterId}:${medium}`;
+  const [attempt, setAttempt] = useState(0);
+  const key = `${chapterId}:${medium}:${attempt}`;
   const [settled, setSettled] = useState<{ key: string; sheet: string | null } | null>(null);
   useEffect(() => {
     let alive = true;
@@ -44,6 +46,10 @@ export function SheetScreen({ chapterId }: { chapterId: string }) {
         <Card flat tint="bg-redtint" border="border-red">
           <p className="text-[13.5px] font-extrabold text-red">{t('states.errorTitle')}</p>
           <p className="mt-0.5 text-[13px] text-ink2">{t('states.errorBody')}</p>
+          {/* Android offered a retry here and the website did not, so a failed
+              sheet was a dead end short of reloading the page by hand. Worth
+              more now that generation is slow enough to time out. */}
+          <Btn title={t('common.retry')} variant="line" sm className="mt-3" onClick={() => setAttempt((n) => n + 1)} />
         </Card>
       ) : loading ? (
         <>

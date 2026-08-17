@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { api, isUrduScript, type ChatMessage, type TutorImage, weakTopics } from '@matricmate/core';
+import { api, isUrduScript, rateTutorAnswer, type ChatMessage, type TutorImage, weakTopics } from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
 import { Card, Icon, Pill, ScriptText } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
@@ -41,6 +41,18 @@ export function ChatScreen({
   const fileInput = useRef<HTMLInputElement>(null);
   /** One vote per answer, kept so the buttons latch instead of only toasting. */
   const [feedback, setFeedback] = useState<Record<string, 'up' | 'down'>>({});
+
+  /**
+   * The rating goes to the server, not just to local state. It used to do
+   * neither: the button latched, the toast said "noted", and nothing was.
+   * Only real answers can be rated, so a message id the server never
+   * minted is skipped rather than written as a dangling row.
+   */
+  const rate = (messageId: string, rating: 'up' | 'down') => {
+    const uid = state.user?.id;
+    if (!uid || !/^[0-9a-f-]{36}$/i.test(messageId)) return;
+    void rateTutorAnswer(createClient(), { messageId, userId: uid, rating });
+  };
   /**
    * The server owns the conversation. The tutor route mints the thread id on
    * the first answer; opening a saved chat passes it in and history is read
@@ -268,6 +280,7 @@ export function ChatScreen({
                   aria-label={t('tutor.rateHelpful')}
                   onClick={() => {
                     setFeedback((f) => ({ ...f, [m.id]: 'up' }));
+                    rate(m.id, 'up');
                     toast(t('tutor.helpful'));
                   }}
                   className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-200 ${
@@ -282,6 +295,7 @@ export function ChatScreen({
                   aria-label={t('tutor.rateNotHelpful')}
                   onClick={() => {
                     setFeedback((f) => ({ ...f, [m.id]: 'down' }));
+                    rate(m.id, 'down');
                     toast(t('tutor.notHelpful'));
                   }}
                   className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-200 ${

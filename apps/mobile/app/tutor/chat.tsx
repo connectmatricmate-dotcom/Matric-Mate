@@ -6,7 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
 import { Body, Card, IconButton, Pill, Row, Screen, ScriptText, Small, Tap, useToast } from '../../src/components/ui';
-import { ChatMessage, api, chapterById, isUrduScript, weakTopics } from '@matricmate/core';
+import { ChatMessage, api, chapterById, isUrduScript, rateTutorAnswer, weakTopics } from '@matricmate/core';
 import type { TutorImage } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
@@ -45,6 +45,18 @@ export default function Chat() {
   const [threadId, setThreadId] = useState<string | null>(thread ?? null);
   /** Which answers the student rated, so the pill can show it back. */
   const [feedback, setFeedback] = useState<Record<string, 'up' | 'down'>>({});
+
+  /**
+   * The rating goes to the server, not just to local state. It used to do
+   * neither: the button latched, the toast said "noted", and nothing was.
+   * Only real answers can be rated, so a message id the server never
+   * minted is skipped rather than written as a dangling row.
+   */
+  const rate = (messageId: string, rating: 'up' | 'down') => {
+    const uid = state.user?.id;
+    if (!uid || !/^[0-9a-f-]{36}$/i.test(messageId)) return;
+    void rateTutorAnswer(supabase, { messageId, userId: uid, rating });
+  };
   const [contextLabel, setContextLabel] = useState<string | undefined>(
     chapter ? chapterById(chapter)?.title : undefined
   );
@@ -297,6 +309,7 @@ export default function Chat() {
                     tone={feedback[m.id] === 'up' ? 'teal' : 'grey'}
                     onPress={() => {
                       setFeedback((f) => ({ ...f, [m.id]: 'up' }));
+                      rate(m.id, 'up');
                       toast(t('tutor.helpful'));
                     }}
                   >
@@ -306,6 +319,7 @@ export default function Chat() {
                     tone={feedback[m.id] === 'down' ? 'red' : 'grey'}
                     onPress={() => {
                       setFeedback((f) => ({ ...f, [m.id]: 'down' }));
+                      rate(m.id, 'down');
                       toast(t('tutor.notHelpful'));
                     }}
                   >

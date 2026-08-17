@@ -9,6 +9,7 @@
  */
 import { weakTopics } from './domain';
 import { aiGet, aiPost } from './tutor';
+import type { SyncClient } from './sync';
 import type { AiFail, TutorQuota } from './tutor';
 import type { Attempt, Blank, Flashcard, Mcq, ShortQ } from './types';
 
@@ -175,4 +176,31 @@ export async function fetchUpgradeLink(): Promise<string | null> {
 export async function fetchLatestCoachReport(): Promise<CoachReport | null> {
   const res = await aiGet<{ report: CoachReport | null }>('/api/ai/coach');
   return res.ok ? (res.data.report ?? null) : null;
+}
+
+/**
+ * Record a thumbs up or down on a tutor answer.
+ *
+ * Both apps showed the buttons, latched them, and told the student it was
+ * noted. Nothing was written anywhere, so the one signal a student actually
+ * volunteers about answer quality was being thrown away and they were being
+ * told otherwise.
+ *
+ * Fire and forget by design: a rating that fails to save must not interrupt
+ * the conversation, and the student has already been thanked.
+ */
+export async function rateTutorAnswer(
+  client: SyncClient,
+  input: { messageId: string; userId: string; rating: 'up' | 'down' },
+): Promise<void> {
+  try {
+    await client
+      .from('tutor_feedback')
+      .upsert(
+        { message_id: input.messageId, user_id: input.userId, rating: input.rating, at: new Date().toISOString() },
+        { onConflict: 'message_id,user_id' },
+      );
+  } catch {
+    // Deliberately silent. See above.
+  }
 }
