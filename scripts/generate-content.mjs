@@ -6,6 +6,7 @@
  *   node scripts/generate-content.mjs --subject phy
  *   node scripts/generate-content.mjs                      every chapter
  *   node scripts/generate-content.mjs --medium ur          Urdu only
+ *   node scripts/generate-content.mjs --chapter isl-6      one chapter only
  *   node scripts/generate-content.mjs --remap              redo SLO to chapter mapping
  *
  * TWO PHASES
@@ -78,6 +79,15 @@ const BRIEFS = args.includes('--briefs');
 const FROM_DISK = args.includes('--from-disk');
 const REMAP = args.includes('--remap');
 const ONLY_SUBJECT = flag('subject');
+/**
+ * One chapter, by id. For filling a single hole without respending on the
+ * whole subject: `--chapter isl-6`, optionally with `--medium ur`. Repeatable
+ * as a comma separated list.
+ */
+const ONLY_CHAPTERS = (() => {
+  const v = flag('chapter');
+  return typeof v === 'string' ? v.split(',').map((x) => x.trim()).filter(Boolean) : null;
+})();
 const LIMIT = Number(flag('limit', 0)) || 0;
 /** Parallel chapter-media generations. Serial (1) unless asked. */
 const CONCURRENCY = Number(flag('concurrency', 1)) || 1;
@@ -369,17 +379,38 @@ first time a technical word appears, because that is what the exam paper does.`
  */
 async function generateChapter(env, { subject, chapter, slos, medium }) {
   const sloText = slos.map((s) => `${s.code} [${s.cognitive ?? 'unspecified'}]: ${s.text}`).join('\n');
+  /*
+   * Some chapters carry no mapped outcomes at all. Seven of them do: the
+   * board's 2022-23 framework reorganised Maths, and Urdu's Listening and
+   * Speaking are oral skills a written paper never assesses. They were left
+   * empty, which is defensible for a syllabus and useless for a student, who
+   * still sees the chapter in the app and taps it.
+   *
+   * So they are written from the chapter title instead of from outcomes. The
+   * model is told plainly which footing it is on, and told not to claim board
+   * weighting it does not have. Their exam_share stays null either way, so the
+   * app keeps labelling them "not on the annual paper", which is true.
+   */
+  const grounded = slos.length > 0;
   const head = `Subject: ${subject.name}, FBISE ${GRADE_LABEL}.
 Chapter ${chapter.number}: ${chapter.title}
 ${chapter.blurb ? `Scope: ${chapter.blurb}` : ''}
 
-THE OUTCOMES THIS CHAPTER IS EXAMINED ON:
-${sloText}`;
+${
+  grounded
+    ? `THE OUTCOMES THIS CHAPTER IS EXAMINED ON:\n${sloText}`
+    : `THIS CHAPTER HAS NO MAPPED BOARD OUTCOMES. The board's framework does not list
+assessable outcomes under this title, so work from what the FBISE ${GRADE_LABEL} syllabus
+covers for a chapter of this name and from standard textbook treatment of it. Stay
+inside this chapter's scope, do not stray into neighbouring chapters, and do not claim
+any exam weighting or marks distribution for it.`
+}`;
 
   // Scale the ask to the chapter. Three outcomes do not need twenty questions,
-  // and padding to a quota is how filler gets written.
-  const mcqCount = Math.min(20, Math.max(8, slos.length * 2));
-  const cardCount = Math.min(16, Math.max(6, slos.length));
+  // and padding to a quota is how filler gets written. Unmapped chapters get
+  // the floor: enough to practise with, not a pretence of coverage.
+  const mcqCount = grounded ? Math.min(20, Math.max(8, slos.length * 2)) : 10;
+  const cardCount = grounded ? Math.min(16, Math.max(6, slos.length)) : 8;
 
   const notes = await ask(env, {
     system: GEN_SYSTEM,
@@ -761,12 +792,23 @@ async function main() {
 
     for (const chapter of targets) {
       const mine = slos.filter((s) => mapping[s.code] === chapter.number);
-      if (!mine.length) {
+      // Unmapped chapters are skipped in a bulk run, because a whole-syllabus
+      // pass should follow the board. Naming one with --chapter is a decision
+      // to write it anyway, and then it goes through on title alone.
+      if (!mine.length && !ONLY_CHAPTERS) {
         console.log(`${C.dim('  --  ')} ${chapter.id.padEnd(10)} ${C.dim('no outcomes mapped here')}`);
         continue;
       }
       for (const medium of MEDIA) jobs.push({ doc, chapter, mine, medium });
     }
+  }
+
+  if (ONLY_CHAPTERS) {
+    const before = jobs.length;
+    for (let i = jobs.length - 1; i >= 0; i--) {
+      if (!ONLY_CHAPTERS.includes(jobs[i].chapter.id)) jobs.splice(i, 1);
+    }
+    console.log(C.dim(`  --chapter: kept ${jobs.length} of ${before}`));
   }
 
   // Already-generated chapter-media are skipped when asked, so an
