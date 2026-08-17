@@ -265,9 +265,16 @@ export async function POST(req: NextRequest) {
   const grounding = chapterId
     ? await chapterGrounding(admin, chapterId, profile.medium === 'ur' ? 'ur' : 'en', 12_000, grade)
     : null;
-  const groundingBlock = grounding
-    ? `\n\nTHE CHAPTER THEY ARE STUDYING (${grounding.title}). Answer from this text where it applies, and use its wording and symbols so the answer matches their notes:\n${grounding.text}`
-    : '';
+  /*
+   * A chapter with no notes of ours still names what they are studying. The
+   * tutor knows the syllabus; withholding the chapter title just because we
+   * have no text for it would make the answer vaguer than it needs to be.
+   */
+  const groundingBlock = !grounding
+    ? ''
+    : grounding.grounded
+      ? `\n\nTHE CHAPTER THEY ARE STUDYING (${grounding.title}). Answer from this text where it applies, and use its wording and symbols so the answer matches their notes:\n${grounding.text}`
+      : `\n\nTHE CHAPTER THEY ARE STUDYING: ${grounding.title}. We have no notes on file for it, so answer from the FBISE Class ${grade} syllabus for that chapter and stay inside its scope.`;
 
   const userContent: Anthropic.ContentBlockParam[] = [];
   if (image) userContent.push({ type: 'image', source: { type: 'base64', ...image } });

@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { AI_QUOTA } from '@matricmate/core';
+import { AI_QUOTA, SUBJECTS } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -115,6 +115,17 @@ export async function chargeQuota(g: Guarded, cost: number): Promise<QuotaState>
 
 type BlockRow = { kind: string; text?: string; term?: string; caption?: string; items?: string[] };
 
+/** A chapter to write about, with or without our own text behind it. */
+export type Grounding = {
+  title: string;
+  subjectId: string;
+  /** Empty when `grounded` is false. */
+  text: string;
+  /** True when this is our published chapter text, false when the model must
+   *  fall back on what it knows of the syllabus. */
+  grounded: boolean;
+};
+
 /**
  * A chapter's sections flattened to plain text, the grounding for every
  * generation route. Capped so a long chapter cannot blow up the prompt.
@@ -126,7 +137,7 @@ export async function chapterGrounding(
   maxChars = 24_000,
   /** When given, a chapter from another class reads as not-found. */
   grade?: 9 | 10,
-): Promise<{ title: string; text: string } | null> {
+): Promise<Grounding | null> {
   const { data: chapter } = await admin
     .from('chapters')
     .select('id,title,subject_id,grade')
@@ -152,7 +163,27 @@ export async function chapterGrounding(
       .eq('review_status', 'published')
       .order('position'));
   }
-  if (!sections?.length) return null;
+  /*
+   * No chapter text. This used to be the end of the request: the route
+   * returned no_content, the app turned that into "something went wrong", and
+   * a student sat looking at a chapter the app itself had offered them.
+   *
+   * Five Class 9 chapters are in that state (math-1, math-10, math-13, urd-4,
+   * urd-5: written but never published), and math-1 is the first chapter of
+   * Maths, so it is what the practice builder lands on by default. That is the
+   * bug the client hit as "it only works one time".
+   *
+   * So we hand back the chapter without text and let the model work from what
+   * it knows of the board syllabus instead. A generated question about
+   * Matrices and Determinants is worth more to a student than an error, and
+   * the alternative, hiding the chapter, is worse: it makes the syllabus look
+   * incomplete. The draft rows are deliberately NOT used as a middle step;
+   * they are placeholder scaffolding ("Detailed notes, ...") and would ground
+   * the model in nothing.
+   */
+  if (!sections?.length) {
+    return { title: chapter.title as string, subjectId: chapter.subject_id as string, text: '', grounded: false };
+  }
 
   const parts: string[] = [];
   for (const s of sections) {
@@ -164,5 +195,31 @@ export async function chapterGrounding(
       else if (b.text) parts.push(b.text);
     }
   }
-  return { title: chapter.title as string, text: parts.join('\n').slice(0, maxChars) };
+  return {
+    title: chapter.title as string,
+    subjectId: chapter.subject_id as string,
+    text: parts.join('\n').slice(0, maxChars),
+    grounded: true,
+  };
+}
+
+/**
+ * The chapter half of a prompt, written either way.
+ *
+ * Grounded, the model is pinned to our own text and may not wander. Ungrounded,
+ * it is told plainly that there is no text and to work from the board syllabus,
+ * and told just as plainly not to pretend otherwise: the failure mode to avoid
+ * is a confident question about content this chapter does not actually contain.
+ */
+export function groundingBrief(g: Grounding, grade: 9 | 10): string {
+  if (g.grounded) return `Chapter: ${g.title}\n${g.text}`;
+  const subject = SUBJECTS.find((s) => s.id === g.subjectId)?.name ?? g.subjectId;
+  return (
+    `Chapter: ${g.title} (${subject}, FBISE Class ${grade}).\n` +
+    'There is no chapter text available for this one, so work from your own knowledge of what the ' +
+    `FBISE Class ${grade} syllabus covers under this chapter title. Stay inside that scope: no topic ` +
+    'that belongs to another chapter, and nothing beyond this class. Keep to the standard, ' +
+    'uncontroversial content every textbook for this chapter covers, and do not invent board ' +
+    'policies, mark distributions or quotations from a textbook you cannot see.'
+  );
 }

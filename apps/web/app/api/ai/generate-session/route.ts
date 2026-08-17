@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, guardAi } from '@/lib/ai/guard';
+import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -132,6 +132,8 @@ export async function POST(req: NextRequest) {
   const topic = (body.topic ?? '').slice(0, 120);
 
   const grounding = await chapterGrounding(g.admin, chapterId, medium, 24_000, g.grade);
+  // Null only means the chapter does not exist, or belongs to the other class.
+  // A chapter with no text of ours still builds, from the syllabus.
   if (!grounding) return NextResponse.json({ error: 'no_content' }, { status: 404 });
 
   try {
@@ -140,12 +142,12 @@ export async function POST(req: NextRequest) {
       max_tokens: 8000,
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: ITEM_SCHEMAS[kind] } },
       system:
-        `You write practice material for FBISE Class ${g.grade} students (SSC-${g.grade === 10 ? 'II' : 'I'}, Pakistan). Work ONLY from the chapter text the user provides: every item must be answerable from it. Match the board register. Plain text only: no markdown headings, no asterisks or bold markers. Never use an em dash; use a comma, a colon, or a new sentence. ` +
+        `You write practice material for FBISE Class ${g.grade} students (SSC-${g.grade === 10 ? 'II' : 'I'}, Pakistan). ${grounding.grounded ? 'Work ONLY from the chapter text the user provides: every item must be answerable from it.' : 'Follow the chapter brief the user provides.'} Match the board register. Plain text only: no markdown headings, no asterisks or bold markers. Never use an em dash; use a comma, a colon, or a new sentence. ` +
         languageRule(medium),
       messages: [
         {
           role: 'user',
-          content: `Chapter: ${grounding.title}\n\n${grounding.text}\n\n---\nWrite exactly ${count} ${KIND_BRIEF[kind]}${topic ? `, focused on "${topic}"` : ''}. Mixed difficulty.`,
+          content: `${groundingBrief(grounding, g.grade)}\n\n---\nWrite exactly ${count} ${KIND_BRIEF[kind]}${topic ? `, focused on "${topic}"` : ''}. Mixed difficulty.`,
         },
       ],
     });

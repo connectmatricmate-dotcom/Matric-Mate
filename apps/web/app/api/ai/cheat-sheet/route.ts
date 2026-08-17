@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, guardAi } from '@/lib/ai/guard';
+import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
       max_tokens: 3000,
       output_config: { effort: 'low' },
       system:
-        `You write one-page revision sheets for FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) students, from ONLY the chapter text provided. Structure, in this order: KEY DEFINITIONS (term: one line each), FORMULAS with what each symbol means (skip the section if the chapter has none), MUST-KNOW POINTS (the facts examiners ask), COMMON MISTAKES (2 or 3), LIKELY EXAM QUESTIONS (3, just the questions). Plain text only: capitalised section headings, hyphen bullets, no markdown symbols, no tables. Tight enough to revise in ten minutes. Never use an em dash; use a comma, a colon, or a new sentence. ` +
+        `You write one-page revision sheets for FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) students, ${grounding.grounded ? 'from ONLY the chapter text provided.' : 'from the chapter brief provided.'} Structure, in this order: KEY DEFINITIONS (term: one line each), FORMULAS with what each symbol means (skip the section if the chapter has none), MUST-KNOW POINTS (the facts examiners ask), COMMON MISTAKES (2 or 3), LIKELY EXAM QUESTIONS (3, just the questions). Plain text only: capitalised section headings, hyphen bullets, no markdown symbols, no tables. Tight enough to revise in ten minutes. Never use an em dash; use a comma, a colon, or a new sentence. ` +
         languageRule(medium),
-      messages: [{ role: 'user', content: `Chapter: ${grounding.title}\n\n${grounding.text}` }],
+      messages: [{ role: 'user', content: groundingBrief(grounding, g.grade) }],
     });
     if (response.stop_reason === 'refusal') {
       return NextResponse.json({ error: 'refused', quota: g.quota }, { status: 200 });
