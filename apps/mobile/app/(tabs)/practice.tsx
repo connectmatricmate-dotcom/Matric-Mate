@@ -38,7 +38,7 @@ export default function Practice() {
   const { state } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const recent = state.results.slice(0, 4);
+  const recent = state.results.slice(0, 5);
   /**
    * Paid-only: the practice grid is the shop window for unpaid accounts.
    * Everything stays visible so they can see what they would get, nothing

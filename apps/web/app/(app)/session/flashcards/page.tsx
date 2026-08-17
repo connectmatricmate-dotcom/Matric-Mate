@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { chapterById, normalizeAiCards } from '@matricmate/core';
-import { getAiSession, getFlashcards } from '@/lib/content-readers';
+import { defaultChapterId, getAiSession, getFlashcards } from '@/lib/content-readers';
 import { FlashcardsScreen } from '@/components/screens/FlashcardsScreen';
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function FlashcardsPage({ searchParams }: { searchParams: Promise<{ chapter?: string; ai?: string }> }) {
   const { chapter, ai } = await searchParams;
-  const chapterId = chapter ?? 'phy-3';
+  const chapterId = chapter ?? (await defaultChapterId());
   // An ?ai= id swaps the bank for a set the student asked the AI to build.
   if (ai) {
     const s = await getAiSession(ai);

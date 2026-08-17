@@ -46,6 +46,44 @@ const studentMedium = cache(async (): Promise<Medium> => {
   return onboarding?.medium === 'ur' ? 'ur' : 'en';
 });
 
+/**
+ * Where to start a practice session when the URL names no chapter.
+ *
+ * The three practice pages defaulted to 'phy-3', a hardcoded Physics chapter,
+ * so every student who tapped Flashcards, Blanks or Short questions from the
+ * practice tab landed on the same Class 9 physics chapter regardless of their
+ * class, their subjects, or what they had been reading. Android fixed this and
+ * the website did not, so the two apps sent the same tap to different places.
+ *
+ * Follows the student instead: the chapter they read last, else the first
+ * chapter of their first subject. Falls back to the same constant only when
+ * there is nothing at all to go on.
+ */
+export const defaultChapterId = cache(async (): Promise<string> => {
+  const supabase = await client();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return 'phy-1';
+
+  // The most recently read section carries the chapter they were last in.
+  const { data: last } = await supabase
+    .from('read_sections')
+    .select('chapter_id')
+    .eq('user_id', auth.user.id)
+    .order('at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (last?.chapter_id) return last.chapter_id as string;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('onboarding,grade')
+    .eq('id', auth.user.id)
+    .maybeSingle();
+  const subjects = (profile?.onboarding as { subjects?: string[] } | null)?.subjects ?? [];
+  const chapters = await api.getChapters(subjects[0] ?? 'phy', supabase);
+  return chapters[0]?.id ?? 'phy-1';
+});
+
 export const getChapter = cache(async (id: string) => api.getChapter(id, await client()));
 export const getChapterContent = cache(async (id: string) =>
   api.getChapterContent(id, await client(), await studentMedium()),
