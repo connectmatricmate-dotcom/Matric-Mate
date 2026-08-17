@@ -1,3 +1,4 @@
+import { setQuota } from './quota';
 /**
  * The client half of the real tutor and its sibling AI routes.
  *
@@ -63,6 +64,8 @@ async function headers(): Promise<Record<string, string>> {
 const doFetch: FetchLike = (url, init) => (config?.fetchImpl ?? fetch)(url, init);
 
 function failFrom(status: number, body: { error?: string; quota?: TutorQuota }): TutorReply {
+  // A refusal still spent the student's allowance, and the server says so.
+  setQuota(body.quota);
   if (status === 402) return { ok: false, reason: 'plan' };
   if (status === 429) return { ok: false, reason: body.error === 'rate_limited' ? 'rate' : 'quota', quota: body.quota };
   return { ok: false, reason: 'error', quota: body.quota };
@@ -112,6 +115,7 @@ export async function askTutorLive(
         error?: string;
       };
       if (body.text && body.threadId && body.quota) {
+        setQuota(body.quota);
         return { ok: true, text: body.text, threadId: body.threadId, quota: body.quota };
       }
       return failFrom(res.status, body);
@@ -131,6 +135,7 @@ export async function askTutorLive(
         text += msg.text;
         onDelta?.(text);
       } else if (msg.t === 'done' && msg.threadId && msg.quota) {
+        setQuota(msg.quota);
         finale = { ok: true, text: text.trim(), threadId: msg.threadId, quota: msg.quota };
       } else if (msg.t === 'err') {
         finale = { ok: false, reason: (msg.reason as 'refused' | 'error') ?? 'error', quota: msg.quota };
@@ -166,7 +171,9 @@ export async function fetchTutorQuota(): Promise<TutorQuota | null> {
   try {
     const res = await doFetch(`${config.siteUrl}/api/ai/quota`, { headers: await headers(), credentials: 'include' });
     if (!res.ok) return null;
-    return (await res.json()) as TutorQuota;
+    const quota = (await res.json()) as TutorQuota;
+    setQuota(quota);
+    return quota;
   } catch {
     return null;
   }
@@ -192,6 +199,7 @@ export async function aiPost<T>(path: string, payload: object): Promise<{ ok: tr
     });
     const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
     if (res.ok) return { ok: true, data: body };
+    setQuota(body.quota);
     if (body.error === 'refused') return { ok: false, reason: 'refused', quota: body.quota };
     const fail = failFrom(res.status, body);
     return { ok: false, reason: fail.ok ? 'error' : fail.reason, quota: fail.ok ? undefined : fail.quota };

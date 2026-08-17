@@ -10,6 +10,7 @@ import { NotoNastaliqUrdu_400Regular, NotoNastaliqUrdu_600SemiBold } from '@expo
 import { ConnectivityProvider } from '../src/core/connectivity';
 import { AuthProvider } from '../src/store/auth';
 import { AppProvider, useApp } from '../src/store/app';
+import { useQuotaRealtime } from '../src/core/useQuota';
 import { ToastHost } from '../src/components/ui';
 import { C } from '../src/theme';
 
@@ -40,6 +41,7 @@ export default function RootLayout() {
         <AuthProvider>
           <AppProvider>
             <SplashGate />
+            <QuotaLive />
             <ToastHost>
               <StatusBar style="dark" />
               <Stack
@@ -82,5 +84,18 @@ function SplashGate() {
     const bail = setTimeout(() => SplashScreen.hideAsync().catch(() => {}), 2500);
     return () => clearTimeout(bail);
   }, [hydrated]);
+  return null;
+}
+
+/**
+ * Keeps the AI quota current for as long as the app is open.
+ *
+ * Mounted once, at the root, so every screen's number moves together: a
+ * question asked on this student's laptop lands here too, and a charge the
+ * app did not make itself still shows up.
+ */
+function QuotaLive() {
+  const { state } = useApp();
+  useQuotaRealtime(state.user?.id);
   return null;
 }

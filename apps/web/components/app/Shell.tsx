@@ -14,6 +14,7 @@ import { levelProgress } from '@matricmate/core';
 import { Bar, Icon } from '@/components/ui/primitives';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { TabGlyph } from '@/components/app/TabGlyph';
+import { useQuotaRealtime, useTutorQuota } from '@/lib/use-tutor-quota';
 import { useApp, useT } from '@/lib/store';
 
 /**
@@ -36,6 +37,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const t = useT();
   const { state, derived } = useApp();
+  /*
+   * One number for the whole app. The header is the pill a student sees on
+   * every page, so it was the loudest half of the disagreement: it read a
+   * local per-action counter while the tutor page read the server's.
+   */
+  const [quota] = useTutorQuota();
+  useQuotaRealtime(state.user?.id);
+  const aiLimit = quota?.limit ?? derived.aiLimit;
+  const aiLeft = quota?.remaining ?? derived.aiLeft;
   const unread = state.notifications.some((n) => !n.read);
 
   // No client-side auth redirect: proxy.ts turns away unauthenticated requests
@@ -126,13 +136,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
             <Link
               href="/tutor"
-              title={t('tutor.leftToday', { n: derived.aiLeft })}
+              title={t('tutor.leftToday', { n: aiLeft })}
               className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-extrabold transition-colors duration-200 hover:brightness-95 ${
-                derived.aiLeft ? 'bg-tealtint text-teal' : 'bg-redtint text-red'
+                aiLeft ? 'bg-tealtint text-teal' : 'bg-redtint text-red'
               }`}
             >
               <Icon name="spark" size={14} strokeWidth={2.4} />
-              {derived.aiLeft}/{derived.aiLimit}
+              {aiLeft}/{aiLimit}
             </Link>
 
             <Link

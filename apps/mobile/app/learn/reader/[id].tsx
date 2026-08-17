@@ -31,6 +31,7 @@ import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S, isWeb } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
+import { useQuota } from '../../../src/core/useQuota';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
 
@@ -146,6 +147,9 @@ const SUGGESTIONS: StringKey[] = ['reader.suggest1', 'reader.suggest2', 'reader.
 export default function Reader() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, actions, derived } = useApp();
+  // One number app-wide; the local counter under-counts a paper by two.
+  const quota = useQuota();
+  const aiLeft = quota?.remaining ?? derived.aiLeft;
   const t = useT();
   const online = useOnline();
   const toast = useToast();
@@ -346,7 +350,7 @@ export default function Reader() {
       <Sheet visible={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>
         <Row gap={S.sm} style={{ marginBottom: S.md, flexWrap: 'wrap' }}>
           {chapter ? <Pill tone="teal">{chapter.title}</Pill> : null}
-          <Pill tone={derived.aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: derived.aiLeft })}</Pill>
+          <Pill tone={aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: aiLeft })}</Pill>
         </Row>
         <View style={{ gap: S.sm }}>
           {SUGGESTIONS.map((key) => (

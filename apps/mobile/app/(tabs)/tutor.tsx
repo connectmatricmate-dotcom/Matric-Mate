@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
@@ -17,14 +16,14 @@ import {
   TileGrid,
   Tiny,
 } from '../../src/components/ui';
-import { BILLING_SITE, fetchTutorQuota } from '@matricmate/core';
-import type { TutorQuota } from '@matricmate/core';
+import { BILLING_SITE } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useAsync } from '../../src/core/useAsync';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, rowDir } from '../../src/theme';
+import { useQuota } from '../../src/core/useQuota';
 
 const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: string }[] = [
   { label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark', prompt: '' },
@@ -44,14 +43,7 @@ export default function Tutor() {
    * for the moment before the fetch lands. Same numbers the chat screen and
    * the website show, so the ring never disagrees with the input box.
    */
-  const [quota, setQuota] = useState<TutorQuota | null>(null);
-  useEffect(() => {
-    let alive = true;
-    fetchTutorQuota().then((q) => alive && q && setQuota(q));
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const quota = useQuota();
   const left = quota ? quota.remaining : derived.aiLeft;
   const limit = quota ? quota.limit : derived.aiLimit;
   const usedPct = (limit ? (limit - left) / limit : 0) * 100;

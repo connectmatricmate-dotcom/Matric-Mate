@@ -8,6 +8,7 @@ import { Btn, IconButton } from '@/components/ui/controls';
 import { Card, Label, Pill, Skeleton } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
+import { useTutorQuota } from '@/lib/use-tutor-quota';
 import { useApp, useT } from '@/lib/store';
 import { Page } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
@@ -119,6 +120,8 @@ const SUGGESTIONS: StringKey[] = ['reader.suggest1', 'reader.suggest2', 'reader.
 
 export function Reader({ chapter, content }: { chapter: Chapter; content: ChapterContent }) {
   const { state, actions, derived } = useApp();
+  const [quota] = useTutorQuota();
+  const aiLeft = quota?.remaining ?? derived.aiLeft;
   const t = useT();
   const toast = useToast();
   const [idx, setIdx] = useState(0);
@@ -263,7 +266,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
       <Sheet open={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>
         <div className="mb-4 flex flex-wrap gap-2">
           <Pill tone="teal">{chapter.title}</Pill>
-          <Pill tone={derived.aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: derived.aiLeft })}</Pill>
+          <Pill tone={aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: aiLeft })}</Pill>
         </div>
 
         <div className="flex flex-col gap-2">

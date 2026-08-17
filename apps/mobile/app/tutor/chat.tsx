@@ -6,13 +6,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
 import { Body, Card, IconButton, Pill, Row, Screen, ScriptText, Small, Tap, useToast } from '../../src/components/ui';
-import { ChatMessage, api, chapterById, fetchTutorQuota, isUrduScript, weakTopics } from '@matricmate/core';
-import type { TutorImage, TutorQuota } from '@matricmate/core';
+import { ChatMessage, api, chapterById, isUrduScript, weakTopics } from '@matricmate/core';
+import type { TutorImage } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb, textStart, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
+import { useQuota } from '../../src/core/useQuota';
 
 /** "21:00" style local clock time out of the server's reset instant. */
 const clock = (iso: string) =>
@@ -48,15 +49,7 @@ export default function Chat() {
     chapter ? chapterById(chapter)?.title : undefined
   );
   /** The server's count, not a local guess. Null until the first fetch lands. */
-  const [quota, setQuota] = useState<TutorQuota | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    fetchTutorQuota().then((qta) => alive && qta && setQuota(qta));
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const quota = useQuota();
 
   /** A saved thread's history, loaded once. New chats skip this entirely. */
   useEffect(() => {
@@ -139,7 +132,6 @@ export default function Chat() {
       setMessages((m) => m.filter((x) => x.id !== mine.id));
       setInput(clean);
       if (image) setPhoto(image);
-      if (res.quota) setQuota(res.quota);
       const note = {
         offline: t('tutor.offline'),
         quota: t('tutor.limitToast'),
@@ -155,7 +147,6 @@ export default function Chat() {
     const reply: ChatMessage = { id: `m-${Date.now()}-ai`, role: 'ai', text: res.text, steps: res.steps, at: Date.now() };
     setMessages((m) => [...m, reply]);
     if (res.threadId) setThreadId(res.threadId);
-    if (res.quota) setQuota(res.quota);
     // Mirror into the local counter so the tutor tab's ring stays roughly
     // right between server fetches. The server remains the authority.
     actions.consumeAi();

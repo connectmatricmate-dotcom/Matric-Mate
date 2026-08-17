@@ -12,6 +12,7 @@ export * from './markdown';
 export * from './tutor';
 export * from './ai';
 export * from './content';
+export * from './quota';
 export * from './domain';
 export * from './billing';
 export * from './tokens';
