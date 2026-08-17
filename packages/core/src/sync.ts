@@ -16,6 +16,7 @@
  * because those APIs differ and core has no dependency on either.
  */
 import { Attempt, Confidence, TestResult } from './types';
+import { todayKey } from './domain';
 
 /**
  * The slice of a Supabase client this file needs to write with.
@@ -47,7 +48,8 @@ export type SyncOp =
   | { id: string; kind: 'read_section'; sectionId: string; chapterId: string; sectionIndex: number; at: number }
   | { id: string; kind: 'card_known'; cardId: string; at: number }
   | { id: string; kind: 'card_unknown'; cardId: string }
-  | { id: string; kind: 'active_day'; day: string };
+  | { id: string; kind: 'active_day'; day: string }
+  | { id: string; kind: 'plan_task'; taskId: string; day: string; done: boolean };
 
 /**
  * A row id assigned on the device, before the write ever reaches Postgres.
@@ -78,6 +80,21 @@ export const syncReadSection = (sectionId: string, chapterId: string, sectionInd
 export const syncCardKnown = (cardId: string): SyncOp => ({ id: randomSyncId(), kind: 'card_known', cardId, at: Date.now() });
 export const syncCardUnknown = (cardId: string): SyncOp => ({ id: randomSyncId(), kind: 'card_unknown', cardId });
 export const syncActiveDay = (day: string): SyncOp => ({ id: randomSyncId(), kind: 'active_day', day });
+/**
+ * A ticked or unticked task on today's plan.
+ *
+ * The plan_done table has existed since the first migration and nothing ever
+ * wrote to it, so ticks lived only on the device that made them: three tasks
+ * ticked on a phone were three empty boxes on the laptop, for the same student
+ * on the same day.
+ */
+export const syncPlanTask = (taskId: string, day: string, done: boolean): SyncOp => ({
+  id: randomSyncId(),
+  kind: 'plan_task',
+  taskId,
+  day,
+  done,
+});
 
 /** The natural key a duplicate op would share. Used to dedupe the queue, not the row. */
 function opKey(op: SyncOp): string {
@@ -94,6 +111,10 @@ function opKey(op: SyncOp): string {
       return `card_unknown:${op.cardId}`;
     case 'active_day':
       return `active_day:${op.day}`;
+    // Keyed without `done`, so ticking and unticking the same task collapses
+    // to the latest intent instead of queueing a contradictory pair.
+    case 'plan_task':
+      return `plan_task:${op.taskId}`;
   }
 }
 
@@ -247,6 +268,12 @@ export async function applySyncOp(client: SyncClient, userId: string, op: SyncOp
         result = await write(client, 'active_days', { user_id: userId, day: op.day }, 'user_id,day');
         break;
       }
+      case 'plan_task': {
+        result = op.done
+          ? await write(client, 'plan_done', { user_id: userId, task_id: op.taskId, day: op.day }, 'user_id,task_id,day')
+          : await remove(client, 'plan_done', { user_id: userId, task_id: op.taskId, day: op.day });
+        break;
+      }
     }
     return classify(result.error, result.status);
   } catch {
@@ -352,6 +379,8 @@ export type HydratedStudyState = {
   results: TestResult[];
   cardsKnown: string[];
   activeDays: string[];
+  /** Task ids ticked on today's plan, from any device. */
+  planDone: string[];
   lastChapterId?: string;
   lastSectionIndex: number;
 };
@@ -360,16 +389,20 @@ export type HydratedStudyState = {
 const HYDRATE_TIMEOUT_MS = 8000;
 
 async function fetchStudyState(client: SyncClient, userId: string): Promise<HydratedStudyState> {
-  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, profileRes] = await Promise.all([
+  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, planRes, profileRes] = await Promise.all([
     client.from('attempts').select('id,mcq_id,chapter_id,subject_id,topic,correct,confidence,mode,at').eq('user_id', userId).order('at', { ascending: true }).limit(1000),
     client.from('results').select('id,subject_id,chapter_id,label,score,total,xp,mode,at').eq('user_id', userId).order('at', { ascending: false }).limit(100),
     client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: true }),
     client.from('cards_known').select('card_id').eq('user_id', userId),
     client.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: true }).limit(400),
+    // Today only: yesterday's ticks belong to yesterday's plan, and the task
+    // ids carry the date anyway.
+    client.from('plan_done').select('task_id').eq('user_id', userId).eq('day', todayKey()),
     client.from('profiles').select('onboarding,grade').eq('id', userId).maybeSingle(),
   ]);
 
-  const error = attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error ?? profileRes.error;
+  const error =
+    attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error ?? planRes.error ?? profileRes.error;
   if (error) throw error;
 
   // Ordered ascending by `at`, so the last row is the most recently read
@@ -386,6 +419,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     readSections: sections.map((s) => s.section_id),
     cardsKnown: ((cardsRes.data ?? []) as { card_id: string }[]).map((c) => c.card_id),
     activeDays: ((daysRes.data ?? []) as { day: string }[]).map((d) => d.day),
+    planDone: ((planRes.data ?? []) as { task_id: string }[]).map((r) => r.task_id),
     lastChapterId: last?.chapter_id,
     lastSectionIndex: last?.section_index ?? 0,
   };
@@ -418,6 +452,7 @@ export type SyncableState = {
   results: TestResult[];
   cardsKnown: string[];
   activeDays: string[];
+  planDone: string[];
   lastChapterId?: string;
   lastSectionIndex: number;
 };
@@ -444,6 +479,9 @@ export function mergeHydratedState<S extends SyncableState>(local: S, server: Hy
     results: byId(local.results, server.results).sort((a, b) => b.at - a.at),
     cardsKnown: union(local.cardsKnown, server.cardsKnown),
     activeDays: union(local.activeDays, server.activeDays),
+    // A union, like the rest: ticking on the phone and on the laptop should
+    // add up rather than one device's view erasing the other's.
+    planDone: union(local.planDone, server.planDone),
     // Local wins whenever it already has a reading position: either this
     // device is mid-session and knows something the last sync does not, or
     // nothing has been read here yet, in which case the server's last

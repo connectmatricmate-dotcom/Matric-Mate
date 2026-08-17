@@ -203,7 +203,10 @@ export function buildPlan(opts: {
   subjectIds: string[];
   lastChapterId?: string;
   attempts: Attempt[];
+  /** Ticked by hand, from any device. */
   doneIds: string[];
+  readSections: string[];
+  cardsKnown: string[];
 }): PlanTask[] {
   const chId = opts.lastChapterId ?? (opts.subjectIds.length ? `${opts.subjectIds[0]}-1` : 'phy-1');
   const ch = chapterById(chId);
@@ -229,8 +232,93 @@ export function buildPlan(opts: {
         }
       : { id: `plan-cards-default-${day}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'cards' },
   ];
-  return tasks.map((task) => ({ ...task, done: opts.doneIds.includes(task.id) }));
+  /*
+   * Done means done, whether the student said so or simply did it.
+   *
+   * The automatic half is derived from work that already syncs (sections read,
+   * answers given, cards known), so it needs no storage of its own and cannot
+   * disagree between a phone and a laptop. The manual half is the plan_done
+   * table. A task is finished if either says so.
+   */
+  const withDone = tasks.map((task) => ({ ...task, done: opts.doneIds.includes(task.id) }));
+  const auto = planAutoDone(withDone, {
+    attempts: opts.attempts,
+    readSections: opts.readSections,
+    cardsKnown: opts.cardsKnown,
+  });
+  return withDone.map((task) => (task.done ? task : { ...task, done: auto.includes(task.id) }));
 }
+
+/**
+ * Which of today's tasks the student's actual work has already finished.
+ *
+ * The plan used to be three checkboxes you ticked yourself, which made it a
+ * to-do list the app wrote and then took your word for. A student could read
+ * the whole chapter and still look at an empty box, or tick all three without
+ * opening anything.
+ *
+ * So completion is read from the work instead. Every signal here is something
+ * already recorded for another reason, which is what makes it trustworthy:
+ * sections read, answers given, cards marked known. Nothing new is stored and
+ * nothing is inferred from time spent on a screen.
+ *
+ * Manual ticking still works and still wins. This only ever adds: a student
+ * who wants a task off their list can say so, and a student who genuinely did
+ * the work does not have to.
+ */
+export function planAutoDone(
+  plan: PlanTask[],
+  data: { attempts: Attempt[]; readSections: string[]; cardsKnown: string[] },
+): string[] {
+  const since = startOfTodayMs();
+  const todays = data.attempts.filter((a) => a.at >= since);
+  const done: string[] = [];
+
+  for (const task of plan) {
+    const ch = chapterById(task.chapterId);
+    const forChapter = (id: string) => id === task.chapterId || id.startsWith(`${task.chapterId}-`);
+
+    if (task.kind === 'read') {
+      // The whole chapter, not one section: the task says "read {chapter}".
+      const total = ch?.sectionCount || contentFor(task.chapterId).sections.length || 0;
+      const read = data.readSections.filter(forChapter).length;
+      if (total > 0 && read >= total) done.push(task.id);
+      continue;
+    }
+
+    if (task.kind === 'mcq') {
+      // Ten distinct questions today, which is what the task asks for. Distinct
+      // so re-answering the same question ten times does not count.
+      const answered = new Set(todays.filter((a) => a.chapterId === task.chapterId).map((a) => a.mcqId));
+      if (answered.size >= PLAN_MCQ_TARGET) done.push(task.id);
+      continue;
+    }
+
+    // Cards. A weak-topic task is really "practise this topic", so answering
+    // it counts as well as reviewing the cards.
+    if (task.weakTopic) {
+      const onTopic = todays.filter((a) => a.topic === task.weakTopic);
+      if (onTopic.length >= PLAN_WEAK_TARGET) done.push(task.id);
+      continue;
+    }
+    const known = data.cardsKnown.filter(forChapter).length;
+    if (known >= PLAN_CARDS_TARGET) done.push(task.id);
+  }
+
+  return done;
+}
+
+/** Midnight in Pakistan, as a timestamp, so "today" means the student's today. */
+function startOfTodayMs(): number {
+  const key = todayKey();
+  // todayKey is already the Asia/Karachi date; PKT is UTC+5 with no DST.
+  return Date.parse(`${key}T00:00:00+05:00`);
+}
+
+/** What each planned task asks for. The copy in the plan quotes these. */
+export const PLAN_MCQ_TARGET = 10;
+export const PLAN_CARDS_TARGET = 10;
+export const PLAN_WEAK_TARGET = 5;
 
 /** Daily AI message quota (D7, confirm with client). */
 /**

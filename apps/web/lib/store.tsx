@@ -9,35 +9,7 @@
  * without rewiring.
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
-import {
-  Attempt,
-  ChatThread,
-  Language,
-  PlanTask,
-  StringKey,
-  SyncOp,
-  TestResult,
-  XP,
-  buildPlan,
-  configureTutor,
-  flushQueue,
-  setContentGrade,
-  hydrateStudyState,
-  level,
-  mergeHydratedState,
-  setContentMedium,
-  streakFrom,
-  wipeStudyHistory,
-  syncActiveDay,
-  syncAttempt,
-  syncCardKnown,
-  syncCardUnknown,
-  syncReadSection,
-  syncResult,
-  todayKey,
-  totalXp,
-  translate,
-} from '@matricmate/core';
+import { Attempt, ChatThread, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory } from '@matricmate/core';
 import {
   EMPTY,
   Onboarding,
@@ -222,7 +194,8 @@ const actions: Actions = {
     if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
     if (isNewDay) queueAndFlush(syncActiveDay(day));
   },
-  togglePlanTask: (id) =>
+  togglePlanTask: (id) => {
+    const nowDone = !getSnapshot().planDone.includes(id);
     update((s) => ({
       ...s,
       // Task ids carry the day, so anything from an earlier day is dead
@@ -231,7 +204,10 @@ const actions: Actions = {
         ? s.planDone.filter((x) => x !== id)
         : [...s.planDone, id]
       ).filter((x) => x.endsWith(todayKey())),
-    })),
+    }));
+    // And on the server, so the same tick shows on their phone.
+    queueAndFlush(syncPlanTask(id, todayKey(), nowDone));
+  },
   markCard: (cardId, known) => {
     const wasKnown = getSnapshot().cardsKnown.includes(cardId);
     update((s) => ({
@@ -537,6 +513,10 @@ export function AppProvider({
         lastChapterId: state.lastChapterId,
         attempts: state.attempts,
         doneIds: state.planDone,
+        // Real work counts as completion, and all three of these sync, so the
+        // plan reads the same on every device without storing anything extra.
+        readSections: state.readSections,
+        cardsKnown: state.cardsKnown,
       }),
     };
   }, [state]);
@@ -564,6 +544,50 @@ export function useT() {
    * Urdu translation sat unread in the database. The medium chosen at
    * onboarding is the syllabus language, which is what content is keyed on.
    */
+  /**
+   * The home screen, live.
+   *
+   * Same reasoning as the Android side: streak, today's plan and the week
+   * chips all read from synced rows, so the two apps agreed eventually but not
+   * promptly. A question answered on the phone did not move this page's streak
+   * until a reload. The broadcast (migration 0016) carries only which table
+   * moved, never a row, so the re-read happens through the student's own
+   * session. Debounced, because a ten question set writes ten rows.
+   */
+  const liveUserId = state.user?.id ?? null;
+  useEffect(() => {
+    if (!liveUserId) return;
+    const supabase = createClient();
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const refresh = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(async () => {
+        const server = await hydrateStudyState(supabase, liveUserId);
+        if (cancelled || !server) return;
+        update((s) => {
+          const merged = mergeHydratedState(s, server);
+          // The server wins on plan ticks. The other sets only ever grow, so a
+          // union suits them; a tick can be taken back, and a union would
+          // restore a task the student just uncrossed on their phone.
+          return { ...merged, planDone: server.planDone, xp: totalXp(merged.attempts, merged.cardsKnown) };
+        });
+      }, 1200);
+    };
+
+    const channel = supabase
+      .channel(`study:${liveUserId}`, { config: { private: false } })
+      .on('broadcast', { event: 'change' }, refresh)
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      void supabase.removeChannel(channel);
+    };
+  }, [liveUserId]);
+
   const contentMedium = state.settings.language;
   const classLevel = state.onboarding?.classLevel ?? 9;
   useEffect(() => {

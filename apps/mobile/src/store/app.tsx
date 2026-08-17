@@ -12,27 +12,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, XP, buildPlan, level, setContentGrade, setContentMedium, streakFrom, todayKey, totalXp, wipeStudyHistory,
-  Attempt,
-  ChatThread,
-  Group,
-  Language,
-  Medium,
-  Notification,
-  PlanTask,
-  SyncOp,
-  TestResult,
-  enqueueOp,
-  flushQueue,
-  hydrateStudyState,
-  mergeHydratedState,
-  syncActiveDay,
-  syncAttempt,
-  syncCardKnown,
-  syncCardUnknown,
-  syncReadSection,
-  syncResult,
-} from '@matricmate/core';
+import { AI_QUOTA, Attempt, ChatThread, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory } from '@matricmate/core';
 import { useAuth } from './auth';
 import { supabase } from '../lib/supabase';
 import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
@@ -453,6 +433,59 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * translation of all nine subjects sat in the database that no Urdu-medium
    * student could reach.
    */
+  /**
+   * The home screen, live.
+   *
+   * Streak, today's plan and the week chips are all read from synced rows, so
+   * the two apps agreed eventually but not promptly: a question answered on
+   * the website did not move this phone's streak until it happened to hydrate
+   * again, which in practice meant killing the app.
+   *
+   * The broadcast carries no data, only which table moved (migration 0016), so
+   * a public topic never exposes a student's work. This re-reads through their
+   * own session. Debounced, because finishing a ten question set writes ten
+   * rows and one refresh at the end is the useful one.
+   */
+  const liveUserId = authUser?.id ?? null;
+  useEffect(() => {
+    if (!liveUserId) return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const refresh = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(async () => {
+        const server = await hydrateStudyState(supabase, liveUserId);
+        if (cancelled || !server) return;
+        setState((s) => {
+          const merged = mergeHydratedState(s, server);
+          return {
+            ...merged,
+            /*
+             * The server wins on plan ticks, unlike everything else here.
+             * The rest are sets that only ever grow, so a union is right for
+             * them. A tick can be taken back, and a union would quietly
+             * restore a task the student just uncrossed on their laptop.
+             */
+            planDone: server.planDone,
+            xp: totalXp(merged.attempts, merged.cardsKnown),
+          };
+        });
+      }, 1200);
+    };
+
+    const channel = supabase
+      .channel(`study:${liveUserId}`, { config: { private: false } })
+      .on('broadcast', { event: 'change' }, refresh)
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      void supabase.removeChannel(channel);
+    };
+  }, [liveUserId]);
+
   const contentMedium = state.settings.language;
   useEffect(() => {
     setContentMedium(contentMedium);
@@ -546,7 +579,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
         if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
       },
-      togglePlanTask: (id) =>
+      togglePlanTask: (id) => {
+        const nowDone = !stateRef.current.planDone.includes(id);
         setState((s) => ({
           ...s,
           // Task ids carry the day, so anything from an earlier day is dead
@@ -555,7 +589,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             ? s.planDone.filter((x) => x !== id)
             : [...s.planDone, id]
           ).filter((x) => x.endsWith(todayKey())),
-        })),
+        }));
+        // And on the server, so the same tick shows on their other device.
+        queueAndFlush(syncPlanTask(id, todayKey(), nowDone));
+      },
       toggleDownload: async (chapterId) => {
         const isDownloaded = stateRef.current.downloads.includes(chapterId);
         if (isDownloaded) {
@@ -722,6 +759,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         lastChapterId: view.lastChapterId,
         attempts: view.attempts,
         doneIds: view.planDone,
+        // Real work counts as completion, and all three of these sync, so the
+        // plan reads the same on every device without storing anything extra.
+        readSections: view.readSections,
+        cardsKnown: view.cardsKnown,
       }),
     };
   }, [view]);
