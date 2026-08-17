@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "802528471165",
+    "project_id": "matricmate-98057",
+    "storage_bucket": "matricmate-98057.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802528471165:android:6e755363a295618eeea914",
+        "android_client_info": {
+          "package_name": "pk.matricmate.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjoCvBCeMZL_Q01jvP3noHJNk15f_ta3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

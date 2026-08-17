@@ -12,7 +12,6 @@ contract/credentials.md
 .env.*
 *.keystore
 *.jks
-google-services.json
 
 # editor / OS
 .DS_Store
@@ -56,8 +55,12 @@ content/
 # Screenshots dropped in the repo root while checking the app
 image*.png
 
-# Firebase credentials. The service account key can send push as us and read
-# the project; it belongs in a password manager and in Vercel, never in git.
+# The Firebase service account key. It can send push as us and read the
+# project; it belongs in a password manager and in Vercel, never in git.
 *-firebase-adminsdk-*.json
-google-services.json
-GoogleService-Info.plist
+
+# NOT ignored, deliberately: apps/mobile/google-services.json. It holds the
+# project id, the app id and the Android API key, all of which ship inside
+# every APK and are restricted to our package name, so there is nothing in it
+# to leak. Ignoring it broke the build instead: EAS decides what to archive
+# from this file, so the Android build reached Gradle with no FCM config.
