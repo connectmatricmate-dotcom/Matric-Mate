@@ -961,6 +961,17 @@ export const en = {
     goBack: 'Go back',
     restartSetup: 'Restart setup',
     backToPlans: 'Back to plans',
+    /* The wait while the AI writes something. The real work takes twenty to
+       forty seconds, and a button that only dims for that long reads as a tap
+       that missed, so both apps put a full screen over it. These lines rotate,
+       and every one of them describes something the route genuinely does,
+       which is also why there is no percentage anywhere: we do not have one. */
+    workReading: 'Reading your chapters',
+    workPattern: 'Following the board’s own pattern',
+    workWriting: 'Writing the questions',
+    workChecking: 'Checking every answer',
+    workAlmost: 'Almost there',
+    workStay: 'This takes about half a minute. Keep this screen open.',
   },
 };
 
@@ -1893,5 +1904,11 @@ export const ur: typeof en = {
     goBack: 'واپس جائیں',
     restartSetup: 'سیٹ اپ دوبارہ شروع کریں',
     backToPlans: 'واپس پلانز پر',
+    workReading: 'آپ کے ابواب پڑھے جا رہے ہیں',
+    workPattern: 'بورڈ کے اپنے پیٹرن کے مطابق',
+    workWriting: 'سوالات لکھے جا رہے ہیں',
+    workChecking: 'ہر جواب جانچا جا رہا ہے',
+    workAlmost: 'بس تھوڑا سا اور',
+    workStay: 'اس میں تقریباً آدھا منٹ لگتا ہے۔ یہ صفحہ کھلا رکھیں۔',
   },
 };

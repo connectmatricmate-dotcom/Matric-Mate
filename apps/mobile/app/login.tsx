@@ -44,7 +44,7 @@ export default function Login() {
   }
 
   return (
-    <Screen avoidKeyboard>
+    <Screen>
       <Header title={t('auth.loginTitle')} sub={t('auth.loginSub')} back />
       <Image
         source={require('../assets/monogram.png')}

@@ -93,7 +93,7 @@ export default function SignUp() {
   }
 
   return (
-    <Screen avoidKeyboard>
+    <Screen>
       <Header title={t('auth.signUpTitle')} sub={t('auth.signUpSub')} back />
       {error ? (
         <Card flat tint={C.redTint} border={C.red} style={{ marginBottom: S.md }}>

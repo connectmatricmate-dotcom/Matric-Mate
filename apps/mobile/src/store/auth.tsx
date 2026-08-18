@@ -4,6 +4,7 @@ import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { releasePushToken } from '../core/usePush';
 import { SITE_URL } from '../lib/site';
 
 /**
@@ -349,6 +350,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
 
       async signOut() {
+        // Before the session goes, not after: the phone has to be handed back
+        // while we can still prove who is handing it over. Otherwise the next
+        // student to sign in on this device inherits the last one's push.
+        await releasePushToken();
         await supabase.auth.signOut();
         const id = currentUserId.current;
         // Drop the cached entitlement with the session. Leaving it behind would

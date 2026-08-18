@@ -90,15 +90,39 @@ async function register(userId: string): Promise<void> {
   if (typeof token !== 'string' || !token) return;
 
   /*
-   * Upsert, because the same device keeps its token across launches and we
-   * want last_seen_at moved forward rather than a duplicate row. That column
-   * is the only way to tell a live device from one that was uninstalled
-   * months ago, since Firebase never tells us either way.
+   * claim_push_token, not an upsert.
+   *
+   * The token belongs to the phone and survives signing out, so the second
+   * student to use a phone tries to write the row the first one owns. Row
+   * level security refuses that, correctly, and an upsert therefore failed
+   * with 42501 while the app looked away: the new account got no push at all
+   * and the old account's notifications kept arriving on a phone they had
+   * signed out of. See migration 0025. The function does the handover in one
+   * privileged step and can only ever write the caller's own id.
    */
-  await supabase.from('push_tokens').upsert(
-    { token, user_id: userId, platform: 'android', last_seen_at: new Date().toISOString() },
-    { onConflict: 'token' },
-  );
+  const { error } = await supabase.rpc('claim_push_token', { p_token: token, p_platform: 'android' });
+  // Worth a line in the log rather than another silent failure: without a row
+  // here the student is simply never pushed to, and nothing else would say so.
+  if (error) console.warn('push: could not claim this device', error.message);
+}
+
+/**
+ * Hand this phone back before signing out.
+ *
+ * Called while the session is still valid, because the function is scoped to
+ * the caller. Skipping it would leave the phone addressed to an account
+ * nobody is signed in to any more.
+ */
+export async function releasePushToken(): Promise<void> {
+  try {
+    if (!Device.isDevice) return;
+    if ((await Notifications.getPermissionsAsync()).status !== 'granted') return;
+    const token = (await Notifications.getDevicePushTokenAsync()).data;
+    if (typeof token !== 'string' || !token) return;
+    await supabase.rpc('release_push_token', { p_token: token });
+  } catch {
+    // Signing out must not be blocked by anything to do with notifications.
+  }
 }
 
 export function usePush(userId: string | null) {

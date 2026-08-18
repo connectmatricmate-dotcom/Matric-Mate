@@ -41,7 +41,7 @@ export default function Forgot() {
   }
 
   return (
-    <Screen avoidKeyboard>
+    <Screen>
       <Header title={t('auth.resetTitle')} sub={t('auth.resetSub')} back />
       {sent ? (
         <Card tint={C.greenTint} border={C.green} style={{ alignItems: 'center', gap: S.sm, paddingVertical: 26 }}>

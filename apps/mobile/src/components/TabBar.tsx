@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconName } from './Icon';
 import { TabGlyph } from './TabGlyph';
 import { Tap } from './ui';
+import { useKeyboardHeight } from '../core/keyboard';
 import { C, F, R, isRTL, isWeb, rowDir } from '../theme';
 
 /**
@@ -95,6 +96,7 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const sidebar = isWeb && width >= 900;
+  const keyboard = useKeyboardHeight();
 
   const items = state.routes.map((route, index) => {
     const { options } = descriptors[route.key];
@@ -149,6 +151,17 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
       </View>
     );
   }
+
+  /*
+   * Out of the way while somebody is typing.
+   *
+   * The keyboard covers the bar anyway, so leaving it mounted only means the
+   * screen above it reserves room for something nobody can see or reach: the
+   * search box on Study ended up floating a tab bar's height above the keys.
+   * This is what react-navigation calls tabBarHideOnKeyboard, which the
+   * default bar does on Android and ours, being hand-written, did not.
+   */
+  if (keyboard > 0) return null;
 
   return (
     <View

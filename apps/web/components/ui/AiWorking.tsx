@@ -1,0 +1,82 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import type { StringKey } from '@matricmate/core';
+import { useT } from '@/lib/store';
+
+/**
+ * The screen a student looks at while the AI writes something.
+ *
+ * Twenty to forty seconds is a long time to sit in front of a button that has
+ * only gone dim: the client read that as a tap that had missed. So this takes
+ * the whole viewport, names what is being made, and keeps moving. The Android
+ * app has the same thing, deliberately (src/components/AiWorking.tsx).
+ *
+ * No percentage. The route reports no progress, and a bar that creeps to 90%
+ * and waits there is the oldest lie in software. These stages rotate on a
+ * timer and each one names something the route genuinely does.
+ */
+
+const STAGES: StringKey[] = [
+  'states.workReading',
+  'states.workPattern',
+  'states.workWriting',
+  'states.workChecking',
+  'states.workAlmost',
+];
+
+const STAGE_MS = 6500;
+
+export function AiWorking({ open, title }: { open: boolean; title: string }) {
+  // Mounted only while it is wanted, so the stage counter starts at the first
+  // line every time rather than wherever the last run left it.
+  if (!open) return null;
+  return <Working title={title} />;
+}
+
+function Working({ title }: { title: string }) {
+  const t = useT();
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setStage((n) => Math.min(n + 1, STAGES.length - 1)), STAGE_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  /*
+   * The page underneath must not scroll behind this, and a student pressing
+   * Escape or Tab must not land on a control they cannot see.
+   */
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-paper px-6 text-center"
+    >
+      <div className="flex h-[54px] items-end gap-2.5" aria-hidden>
+        <span className="fx-work h-[54px] w-3 rounded-full bg-teal" />
+        <span className="fx-work fx-work-2 h-[54px] w-3 rounded-full bg-orange" />
+        <span className="fx-work fx-work-3 h-[54px] w-3 rounded-full bg-green" />
+      </div>
+
+      <div>
+        <h2 className="font-display text-[24px] leading-[1.15] text-ink md:text-[28px]">{title}</h2>
+        {/* Fixed height, so a longer line does not shove the heading up the
+            screen every time the stage changes. */}
+        <p className="flex h-12 items-center justify-center text-[15px] text-ink2">{t(STAGES[stage])}</p>
+      </div>
+
+      <p className="max-w-[320px] rounded-full bg-tealtint px-4 py-2.5 text-[13px] font-extrabold text-teal">
+        {t('states.workStay')}
+      </p>
+    </div>
+  );
+}

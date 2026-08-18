@@ -731,3 +731,14 @@ button:disabled,
   50% { transform: scale(1.18); }
 }
 .fx-pulse { animation: fx-pulse 1.25s ease-in-out infinite; }
+
+/* The full-screen wait while the AI writes. Three brand bars breathing out of
+   phase, which reads as work rather than as a page loading. Flattened by the
+   reduced-motion block above, so the words still do the telling. */
+@keyframes fx-work {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.55; }
+  50%      { transform: scaleY(1);   opacity: 1; }
+}
+.fx-work { animation: fx-work 1.05s ease-in-out infinite; transform-origin: bottom; }
+.fx-work-2 { animation-duration: 1.23s; }
+.fx-work-3 { animation-duration: 1.41s; }

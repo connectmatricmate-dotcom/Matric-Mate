@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, AiSessionRow, ShortQ } from '@matricmate/core';
+import { AiWorking } from '@/components/ui/AiWorking';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
 import { Card, Label, Pill, ScriptText, SectionTitle, Skeleton } from '@/components/ui/primitives';
@@ -70,6 +71,9 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
   if (!paperId) {
     return (
       <Page width="focus">
+        {/* Half a minute of real work, so it gets the whole viewport rather
+            than a button that dims. See components/ui/AiWorking. */}
+        <AiWorking open={busy} title={t('tutor.paperBuilding')} />
         <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.paperTitle')} sub={t('tutor.paperSub')} />
         <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
         <div className="flex flex-wrap gap-2">
@@ -84,7 +88,7 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
         </Card>
         <div className="mt-5">
           <Btn
-            title={busy ? t('tutor.paperBuilding') : t('tutor.buildIt')}
+            title={t('tutor.buildIt')}
             variant="orange"
             className="w-full"
             loading={busy}

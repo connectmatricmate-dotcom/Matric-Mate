@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Image, ScrollView, Text, TextInput, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
-import { Body, Card, IconButton, Pill, Row, Screen, ScriptText, Small, Tap, useToast } from '../../src/components/ui';
+import { Body, Card, IconButton, Pill, Row, Screen, ScriptText, Small, Tap, TypingDots, useRevealed, useToast } from '../../src/components/ui';
+import { useKeyboardHeight } from '../../src/core/keyboard';
 import { ChatMessage, api, chapterById, isUrduScript, rateTutorAnswer, weakTopics } from '@matricmate/core';
 import type { TutorImage } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
@@ -19,12 +20,40 @@ import { useQuota } from '../../src/core/useQuota';
 const clock = (iso: string) =>
   new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });  // 24h clock, same in both languages
 
+/**
+ * The answer as it is being written.
+ *
+ * Its own component so the reveal timer lives and dies with the bubble: it
+ * exists only while an answer is in flight, and nothing has to remember to
+ * stop it.
+ */
+function LiveAnswer({ text }: { text: string }) {
+  const shown = useRevealed(text);
+  return (
+    <View
+      style={{
+        alignSelf: 'flex-start',
+        maxWidth: '92%',
+        backgroundColor: C.card,
+        borderWidth: 1,
+        borderColor: C.line,
+        padding: 15,
+        borderRadius: 18,
+        borderBottomLeftRadius: 6,
+      }}
+    >
+      <Markdown text={shown} size={13.5} />
+    </View>
+  );
+}
+
 export default function Chat() {
   const { q, chapter, thread } = useLocalSearchParams<{ q?: string; chapter?: string; thread?: string }>();
   const { state, actions, derived } = useApp();
   const t = useT();
   const toast = useToast();
   const insets = useSafeAreaInsets();
+  const keyboard = useKeyboardHeight();
   const scroller = useRef<ScrollView | null>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -216,155 +245,82 @@ export default function Chat() {
     return () => clearTimeout(timer);
   }, [messages.length, thinking]);
 
+  /**
+   * Follow the answer down the screen while it is being written.
+   *
+   * Without this the streaming worked and nobody could tell: the live bubble
+   * grew below the fold, the view stayed where it was, and the whole answer
+   * seemed to appear at once the moment it finished and the list scrolled.
+   */
+  useEffect(() => {
+    if (!liveText) return;
+    const timer = setTimeout(() => scroller.current?.scrollToEnd({ animated: false }), 30);
+    return () => clearTimeout(timer);
+  }, [liveText]);
+
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Screen scroll={false} padded={false}>
-        <Row style={{ paddingHorizontal: S.md, paddingBottom: S.sm, borderBottomWidth: 1, borderBottomColor: C.line }} gap={S.sm}>
-          <IconButton icon="back" onPress={() => router.back()} />
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{t('tutor.title')}</Text>
-            {contextLabel ? <Small numberOfLines={1}>{t('tutor.context', { label: contextLabel })}</Small> : null}
+    <Screen scroll={false} padded={false}>
+      <Row style={{ paddingHorizontal: S.md, paddingBottom: S.sm, borderBottomWidth: 1, borderBottomColor: C.line }} gap={S.sm}>
+        <IconButton icon="back" onPress={() => router.back()} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{t('tutor.title')}</Text>
+          {contextLabel ? <Small numberOfLines={1}>{t('tutor.context', { label: contextLabel })}</Small> : null}
+        </View>
+        {quota ? (
+          <View style={{ alignItems: 'flex-end' }}>
+            <Pill tone={outOfQuestions ? 'red' : 'grey'}>
+              {t('tutor.quotaPill', { n: quota.remaining, limit: quota.limit })}
+            </Pill>
+            {outOfQuestions ? (
+              <Text style={{ fontFamily: F.body, fontSize: 10.5, color: C.ink3, marginTop: 3 }}>
+                {t('tutor.resetsAt', { time: clock(quota.resetAt) })}
+              </Text>
+            ) : null}
           </View>
-          {quota ? (
-            <View style={{ alignItems: 'flex-end' }}>
-              <Pill tone={outOfQuestions ? 'red' : 'grey'}>
-                {t('tutor.quotaPill', { n: quota.remaining, limit: quota.limit })}
-              </Pill>
-              {outOfQuestions ? (
-                <Text style={{ fontFamily: F.body, fontSize: 10.5, color: C.ink3, marginTop: 3 }}>
-                  {t('tutor.resetsAt', { time: clock(quota.resetAt) })}
-                </Text>
-              ) : null}
-            </View>
-          ) : null}
-        </Row>
+        ) : null}
+      </Row>
 
-        <ScrollView
-          ref={scroller}
-          contentContainerStyle={[
-            { padding: S.lg, gap: S.md },
-            isWeb && { maxWidth: 760, width: '100%', alignSelf: 'center' },
-          ]}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {messages.length === 0 && !thinking ? (
-            <Card flat tint={C.tealTint}>
-              <Body>{t('tutor.starter')}</Body>
-            </Card>
-          ) : null}
+      <ScrollView
+        ref={scroller}
+        contentContainerStyle={[
+          { padding: S.lg, gap: S.md },
+          isWeb && { maxWidth: 760, width: '100%', alignSelf: 'center' },
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {messages.length === 0 && !thinking ? (
+          <Card flat tint={C.tealTint}>
+            <Body>{t('tutor.starter')}</Body>
+          </Card>
+        ) : null}
 
-          {messages.map((m) =>
-            m.role === 'user' ? (
-              <View
-                key={m.id}
-                style={{
-                  alignSelf: 'flex-end',
-                  maxWidth: '84%',
-                  backgroundColor: C.teal,
-                  paddingVertical: 12,
-                  paddingHorizontal: 15,
-                  borderRadius: 18,
-                  borderBottomRightRadius: 6,
-                }}
-              >
-                {sentPhotos[m.id] ? (
-                  <Image
-                    source={{ uri: sentPhotos[m.id] }}
-                    style={{ width: 180, height: 135, borderRadius: 10, marginBottom: 8 }}
-                    resizeMode="cover"
-                  />
-                ) : null}
-                <ScriptText text={m.text} size={14} color={C.onBrand} />
-              </View>
-            ) : (
-              <View
-                key={m.id}
-                style={{
-                  alignSelf: 'flex-start',
-                  maxWidth: '92%',
-                  backgroundColor: C.card,
-                  borderWidth: 1,
-                  borderColor: C.line,
-                  padding: 15,
-                  borderRadius: 18,
-                  borderBottomLeftRadius: 6,
-                }}
-              >
-                {/* Markdown-aware: the model sometimes marks up its answer,
-                    and students should read headings and lists, not asterisks. */}
-                <Markdown text={m.text} size={13.5} />
-                {m.steps?.map((step, i) => (
-                  <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
-                    <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
-                      <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: C.teal }}>{i + 1}</Text>
-                    </View>
-                    <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, lineHeight: 22, color: C.ink }}>{step}</Text>
-                  </Row>
-                ))}
-                <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
-                  {/* Latching, like the website: a rating you cannot see you
-                      gave is a rating people give twice. */}
-                  <Pill
-                    tone={feedback[m.id] === 'up' ? 'teal' : 'grey'}
-                    onPress={() => {
-                      setFeedback((f) => ({ ...f, [m.id]: 'up' }));
-                      rate(m.id, 'up');
-                      toast(t('tutor.helpful'));
-                    }}
-                  >
-                    👍
-                  </Pill>
-                  <Pill
-                    tone={feedback[m.id] === 'down' ? 'red' : 'grey'}
-                    onPress={() => {
-                      setFeedback((f) => ({ ...f, [m.id]: 'down' }));
-                      rate(m.id, 'down');
-                      toast(t('tutor.notHelpful'));
-                    }}
-                  >
-                    👎
-                  </Pill>
-                  {/* Only when the answer is NOT already Urdu: asking for
-                      Urdu on an Urdu reply spends a question for nothing. */}
-                  {isUrduScript(m.text) ? null : (
-                    <Pill tone="teal" onPress={() => send(t('tutor.reExplainUrdu'))}>
-                      {t('tutor.inUrdu')}
-                    </Pill>
-                  )}
-                  <Pill
-                    tone="grey"
-                    onPress={() => {
-                      Clipboard.setStringAsync(m.text);
-                      toast(t('tutor.copied'));
-                    }}
-                  >
-                    {t('tutor.copyAnswer')}
-                  </Pill>
-                </Row>
-                {/* Follow-ups on the newest answer only. One tap continues
-                    the thread the way students actually go next, and the
-                    chapter context rides along with it. */}
-                {m.id === messages[messages.length - 1]?.id && !thinking ? (
-                  <View style={{ marginTop: S.md, borderTopWidth: 1, borderTopColor: C.line, paddingTop: S.md, gap: S.sm }}>
-                    <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.7, color: C.ink3 }}>
-                      {t('tutor.askFollowUp').toUpperCase()}
-                    </Text>
-                    <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
-                      {(['followUpSimpler', 'followUpExample', 'followUpExam'] as const).map((k) => (
-                        <Pill key={k} tone="grey" onPress={() => send(t(`tutor.${k}`))}>
-                          {t(`tutor.${k}`)}
-                        </Pill>
-                      ))}
-                    </Row>
-                  </View>
-                ) : null}
-              </View>
-            )
-          )}
-
-          {thinking && liveText ? (
+        {messages.map((m) =>
+          m.role === 'user' ? (
             <View
+              key={m.id}
+              style={{
+                alignSelf: 'flex-end',
+                maxWidth: '84%',
+                backgroundColor: C.teal,
+                paddingVertical: 12,
+                paddingHorizontal: 15,
+                borderRadius: 18,
+                borderBottomRightRadius: 6,
+              }}
+            >
+              {sentPhotos[m.id] ? (
+                <Image
+                  source={{ uri: sentPhotos[m.id] }}
+                  style={{ width: 180, height: 135, borderRadius: 10, marginBottom: 8 }}
+                  resizeMode="cover"
+                />
+              ) : null}
+              <ScriptText text={m.text} size={14} color={C.onBrand} />
+            </View>
+          ) : (
+            <View
+              key={m.id}
               style={{
                 alignSelf: 'flex-start',
                 maxWidth: '92%',
@@ -376,83 +332,171 @@ export default function Chat() {
                 borderBottomLeftRadius: 6,
               }}
             >
-              <Markdown text={liveText} size={13.5} />
+              {/* Markdown-aware: the model sometimes marks up its answer,
+                  and students should read headings and lists, not asterisks. */}
+              <Markdown text={m.text} size={13.5} />
+              {m.steps?.map((step, i) => (
+                <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
+                  <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: C.teal }}>{i + 1}</Text>
+                  </View>
+                  <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, lineHeight: 22, color: C.ink }}>{step}</Text>
+                </Row>
+              ))}
+              <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
+                {/* Latching, like the website: a rating you cannot see you
+                    gave is a rating people give twice. */}
+                <Pill
+                  tone={feedback[m.id] === 'up' ? 'teal' : 'grey'}
+                  onPress={() => {
+                    setFeedback((f) => ({ ...f, [m.id]: 'up' }));
+                    rate(m.id, 'up');
+                    toast(t('tutor.helpful'));
+                  }}
+                >
+                  👍
+                </Pill>
+                <Pill
+                  tone={feedback[m.id] === 'down' ? 'red' : 'grey'}
+                  onPress={() => {
+                    setFeedback((f) => ({ ...f, [m.id]: 'down' }));
+                    rate(m.id, 'down');
+                    toast(t('tutor.notHelpful'));
+                  }}
+                >
+                  👎
+                </Pill>
+                {/* Only when the answer is NOT already Urdu: asking for
+                    Urdu on an Urdu reply spends a question for nothing. */}
+                {isUrduScript(m.text) ? null : (
+                  <Pill tone="teal" onPress={() => send(t('tutor.reExplainUrdu'))}>
+                    {t('tutor.inUrdu')}
+                  </Pill>
+                )}
+                <Pill
+                  tone="grey"
+                  onPress={() => {
+                    Clipboard.setStringAsync(m.text);
+                    toast(t('tutor.copied'));
+                  }}
+                >
+                  {t('tutor.copyAnswer')}
+                </Pill>
+              </Row>
+              {/* Follow-ups on the newest answer only. One tap continues
+                  the thread the way students actually go next, and the
+                  chapter context rides along with it. */}
+              {m.id === messages[messages.length - 1]?.id && !thinking ? (
+                <View style={{ marginTop: S.md, borderTopWidth: 1, borderTopColor: C.line, paddingTop: S.md, gap: S.sm }}>
+                  <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.7, color: C.ink3 }}>
+                    {t('tutor.askFollowUp').toUpperCase()}
+                  </Text>
+                  <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+                    {(['followUpSimpler', 'followUpExample', 'followUpExam'] as const).map((k) => (
+                      <Pill key={k} tone="grey" onPress={() => send(t(`tutor.${k}`))}>
+                        {t(`tutor.${k}`)}
+                      </Pill>
+                    ))}
+                  </Row>
+                </View>
+              ) : null}
             </View>
-          ) : thinking ? (
-            <View style={{ alignSelf: 'flex-start', backgroundColor: C.card, borderWidth: 1, borderColor: C.line, padding: 14, borderRadius: 18 }}>
-              <Small>{t('tutor.thinking')}</Small>
-            </View>
-          ) : null}
-        </ScrollView>
+          )
+        )}
 
-        {photo ? (
-          <Row style={{ paddingHorizontal: S.md, paddingVertical: 6, backgroundColor: C.card }} gap={S.sm}>
-            <Image source={{ uri: photo.uri }} style={{ width: 44, height: 44, borderRadius: 8 }} resizeMode="cover" />
-            <Small style={{ flex: 1 }}>{t('tutor.photoAttached')}</Small>
-            <IconButton icon="close" onPress={() => setPhoto(null)} />
-          </Row>
-        ) : null}
-        <Row
-          style={{
-            paddingHorizontal: S.md,
-            paddingTop: S.sm,
-            paddingBottom: Math.max(insets.bottom, S.md),
-            borderTopWidth: 1,
-            borderTopColor: C.line,
-            backgroundColor: C.card,
-          }}
-          gap={S.sm}
-        >
-          <IconButton icon="camera" onPress={pickPhotoSource} />
+        {thinking && liveText ? (
+          <LiveAnswer text={liveText} />
+        ) : thinking ? (
           <View
             style={{
-              flex: 1,
-              backgroundColor: outOfQuestions ? C.line : C.paper,
-              borderWidth: 1.5,
+              alignSelf: 'flex-start',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: S.sm,
+              backgroundColor: C.card,
+              borderWidth: 1,
               borderColor: C.line,
-              borderRadius: 99,
+              paddingVertical: 14,
               paddingHorizontal: 16,
-              paddingVertical: 11,
+              borderRadius: 18,
+              borderBottomLeftRadius: 6,
             }}
           >
-            <TextInput
-              value={input}
-              onChangeText={setInput}
-              editable={!outOfQuestions}
-              placeholder={
-                outOfQuestions && quota
-                  ? t('tutor.limitInputHint', { time: clock(quota.resetAt) })
-                  : t('tutor.placeholder')
-              }
-              placeholderTextColor={C.ink3}
-              onSubmitEditing={() => send(input)}
-              returnKeyType="send"
-              style={[
-                // The student's own question, typed in the script they read in.
-                { fontFamily: F.body, fontSize: 14, color: C.ink, paddingVertical: 0, textAlign: textStart() },
-                // Composed in the script being typed: an Urdu question reads
-                // right to left in Nastaliq as it is written, not after send.
-                isUrduScript(input) ? { ...urdu(14), paddingVertical: 0 } : null,
-                isWeb && ({ outlineStyle: 'none' } as object),
-              ]}
-            />
+            <TypingDots />
+            <Small>{t('tutor.thinking')}</Small>
           </View>
-          <Tap onPress={() => send(input)}>
-            <View
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 99,
-                backgroundColor: (input.trim() || photo) && !outOfQuestions ? C.teal : C.ink3,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon name="send" size={19} color={C.onBrand} />
-            </View>
-          </Tap>
+        ) : null}
+      </ScrollView>
+
+      {photo ? (
+        <Row style={{ paddingHorizontal: S.md, paddingVertical: 6, backgroundColor: C.card }} gap={S.sm}>
+          <Image source={{ uri: photo.uri }} style={{ width: 44, height: 44, borderRadius: 8 }} resizeMode="cover" />
+          <Small style={{ flex: 1 }}>{t('tutor.photoAttached')}</Small>
+          <IconButton icon="close" onPress={() => setPhoto(null)} />
         </Row>
-      </Screen>
-    </KeyboardAvoidingView>
+      ) : null}
+      <Row
+        style={{
+          paddingHorizontal: S.md,
+          paddingTop: S.sm,
+          // The gesture pill is behind the keyboard while typing, so clearing
+          // it then would only be a dead strip between the box and the keys.
+          paddingBottom: keyboard > 0 ? S.sm : Math.max(insets.bottom, S.md),
+          borderTopWidth: 1,
+          borderTopColor: C.line,
+          backgroundColor: C.card,
+        }}
+        gap={S.sm}
+      >
+        <IconButton icon="camera" onPress={pickPhotoSource} />
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: outOfQuestions ? C.line : C.paper,
+            borderWidth: 1.5,
+            borderColor: C.line,
+            borderRadius: 99,
+            paddingHorizontal: 16,
+            paddingVertical: 11,
+          }}
+        >
+          <TextInput
+            value={input}
+            onChangeText={setInput}
+            editable={!outOfQuestions}
+            placeholder={
+              outOfQuestions && quota
+                ? t('tutor.limitInputHint', { time: clock(quota.resetAt) })
+                : t('tutor.placeholder')
+            }
+            placeholderTextColor={C.ink3}
+            onSubmitEditing={() => send(input)}
+            returnKeyType="send"
+            style={[
+              // The student's own question, typed in the script they read in.
+              { fontFamily: F.body, fontSize: 14, color: C.ink, paddingVertical: 0, textAlign: textStart() },
+              // Composed in the script being typed: an Urdu question reads
+              // right to left in Nastaliq as it is written, not after send.
+              isUrduScript(input) ? { ...urdu(14), paddingVertical: 0 } : null,
+              isWeb && ({ outlineStyle: 'none' } as object),
+            ]}
+          />
+        </View>
+        <Tap onPress={() => send(input)}>
+          <View
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 99,
+              backgroundColor: (input.trim() || photo) && !outOfQuestions ? C.teal : C.ink3,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icon name="send" size={19} color={C.onBrand} />
+          </View>
+        </Tap>
+      </Row>
+    </Screen>
   );
 }

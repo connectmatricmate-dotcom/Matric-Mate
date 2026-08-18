@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { router } from 'expo-router';
 import { Btn, Card, Check, Header, Item, Pill, Row, Screen, SectionTitle, Seg, Small, Spacer, useToast } from '../../src/components/ui';
+import { AiWorking } from '../../src/components/AiWorking';
 import {
   chaptersFor,
   fetchAiSession,
@@ -107,7 +108,10 @@ export default function AiBuilder() {
   }
 
   return (
-    <Screen footer={<Btn title={busy ? t('tutor.building') : t('tutor.buildIt')} variant="orange" icon="spark" loading={busy} onPress={build} />}>
+    <Screen footer={<Btn title={t('tutor.buildIt')} variant="orange" icon="spark" loading={busy} onPress={build} />}>
+      {/* Writing a fresh set is twenty seconds of real work, so it gets the
+          whole screen rather than a button that dims. See AiWorking. */}
+      <AiWorking visible={busy} title={t('tutor.building')} />
       <Header title={t('tutor.builderTitle')} sub={t('tutor.builderSub')} back />
 
       <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>

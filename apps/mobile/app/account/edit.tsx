@@ -26,7 +26,6 @@ export default function EditProfile() {
 
   return (
     <Screen
-      avoidKeyboard
       footer={
         <Btn
           title={t('common.save')}

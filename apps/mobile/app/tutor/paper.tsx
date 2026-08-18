@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { AiWorking } from '../../src/components/AiWorking';
 import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, ShortQ } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
@@ -49,7 +50,10 @@ export default function MockPaper() {
 
   if (!id) {
     return (
-      <Screen footer={<Btn title={busy ? t('tutor.paperBuilding') : t('tutor.buildIt')} variant="orange" icon="spark" loading={busy} onPress={build} />}>
+      <Screen footer={<Btn title={t('tutor.buildIt')} variant="orange" icon="spark" loading={busy} onPress={build} />}>
+        {/* Half a minute of real work, so it gets the whole screen rather
+            than a button that dims. See components/AiWorking. */}
+        <AiWorking visible={busy} title={t('tutor.paperBuilding')} />
         <Header title={t('tutor.paperTitle')} sub={t('tutor.paperSub')} back />
         <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
         <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>

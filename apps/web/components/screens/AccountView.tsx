@@ -14,7 +14,7 @@ import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
 import { useToast } from '@/components/ui/toast';
 import { Bar, Card, Icon, Item, Label, LinkBtn, Pill } from '@/components/ui/primitives';
 import { Confirm, Sheet } from '@/components/ui/sheet';
-import { pushPermission, registerWebPush } from '@/lib/web-push';
+import { pushPermission, registerWebPush, releaseWebPush } from '@/lib/web-push';
 import { useApp, useLang, useT } from '@/lib/store';
 
 /** A titled group of rows, so a toggle never floats away from its label. */
@@ -244,7 +244,7 @@ export function AccountView() {
                       onClick={async () => {
                         if (!state.user) return;
                         setEnabling(true);
-                        const r = await registerWebPush(state.user.id, true);
+                        const r = await registerWebPush(true);
                         setPushState(r === 'registered' ? 'granted' : r === 'denied' ? 'denied' : null);
                         setEnabling(false);
                       }}
@@ -402,6 +402,9 @@ export function AccountView() {
           // The sheet stays open and the button spins until the server action
           // redirects; closing first left a signed-out shell with no feedback.
           setSigningOut(true);
+          // Before the session goes: the browser has to be handed back while
+          // we can still prove who is handing it over.
+          await releaseWebPush();
           actions.signOut();
           try {
             await signOutAction();

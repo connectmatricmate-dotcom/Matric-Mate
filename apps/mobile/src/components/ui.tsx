@@ -2,11 +2,10 @@
  * MatricMate shared UI kit. Every screen composes these, no screen styles colours directly.
  * Works identically on Android and web (React Native Web).
  */
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
-  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -19,9 +18,12 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useReducedMotion } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
+import { useKeyboardHeight } from '../core/keyboard';
 import { C, F, R, S, T, WEB_MAX, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
 import { isUrduScript } from '@matricmate/core';
 import { Icon, IconName } from './Icon';
@@ -99,12 +101,19 @@ export function ScriptText({
 /* ---------------------------------------------------------------- layout */
 
 /**
- * Page wrapper. Handles the three things every screen needs:
- * the status-bar inset at the top, the gesture-bar inset at the bottom, and
- * (on web) a centred column instead of full-bleed text.
+ * Page wrapper. Handles the four things every screen needs:
+ * the status-bar inset at the top, the gesture-bar inset at the bottom,
+ * the keyboard when one is open, and (on web) a centred column instead of
+ * full-bleed text.
  *
  * `tabbed`, set on the five tab roots, where the tab bar already occupies the
  * bottom inset and adding it again would leave a dead gap.
+ *
+ * The keyboard is not opt-in. It used to be, through an `avoidKeyboard` prop
+ * that four screens passed and that did nothing on Android anyway, so in
+ * practice every input in the app was typed at blind, behind the keyboard. A
+ * screen with no input never sees a keyboard event, so handling it here costs
+ * those screens two idle listeners and changes nothing else.
  */
 export function Screen({
   children,
@@ -112,16 +121,22 @@ export function Screen({
   footer,
   padded = true,
   tabbed = false,
-  avoidKeyboard = false,
 }: {
   children: React.ReactNode;
   scroll?: boolean;
   footer?: React.ReactNode;
   padded?: boolean;
   tabbed?: boolean;
-  avoidKeyboard?: boolean;
 }) {
   const insets = useSafeAreaInsets();
+  const keyboard = useKeyboardHeight();
+  const scroller = useRef<ScrollView | null>(null);
+  /** A plain View wrapped around the scroll area purely so there is something
+   *  we can measure in window coordinates. Comparing an input's position
+   *  against the area it has to fit inside is then one subtraction, with no
+   *  assumptions about who is padding what. */
+  const frame = useRef<View | null>(null);
+  const offset = useRef(0);
 
   /**
    * Insets are the phone's hard edges, not a design margin. Padding by exactly
@@ -134,13 +149,48 @@ export function Screen({
   const topGap = insets.top + S.sm;
   const bottomGap = tabbed || footer ? S.lg : Math.max(insets.bottom, S.md) + S.sm;
 
+  /**
+   * Bringing the field the student is actually typing in above the keyboard.
+   *
+   * Shortening the screen is only half of it. React Native does scroll a child
+   * into view when it takes focus, but that happens while the keyboard is
+   * still opening, so it measures against the full-height screen, decides the
+   * input is already visible, and does nothing. By the time the keyboard has
+   * landed nobody looks again. So we look again here, once the padding below
+   * has been applied.
+   */
+  useEffect(() => {
+    if (!scroll || keyboard <= 0) return;
+    const input = TextInput.State.currentlyFocusedInput();
+    if (!input) return;
+    // One frame for the padding below to land, or we measure the old, taller
+    // scroll area and the answer is always "nothing needs to move".
+    const timer = setTimeout(() => {
+      frame.current?.measureInWindow((_fx, frameY, _fw, frameH) => {
+        if (!frameH) return;
+        input.measureInWindow((_x, y, _w, h) => {
+          // How far the bottom of the field, plus a little air, falls past the
+          // bottom of what is still visible.
+          const hidden = y + h + S.md - (frameY + frameH);
+          if (hidden > 0) scroller.current?.scrollTo({ y: Math.max(0, offset.current + hidden), animated: true });
+        });
+      });
+    }, 60);
+    return () => clearTimeout(timer);
+  }, [keyboard, scroll]);
+
   const body = scroll ? (
     <ScrollView
+      ref={scroller}
       style={{ flex: 1 }}
       contentContainerStyle={[
         { paddingHorizontal: padded ? S.lg : 0, paddingBottom: bottomGap },
         isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
       ]}
+      onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        offset.current = e.nativeEvent.contentOffset.y;
+      }}
+      scrollEventThrottle={32}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
@@ -153,17 +203,24 @@ export function Screen({
     </View>
   );
 
-  const content = (
-    <View style={{ flex: 1, backgroundColor: C.paper, paddingTop: topGap }}>
-      {body}
+  return (
+    <View style={{ flex: 1, backgroundColor: C.paper, paddingTop: topGap, paddingBottom: keyboard }}>
+      {/* collapsable={false}: without it Android flattens a View that draws
+          nothing, and there is nothing left to measure. */}
+      <View ref={frame} collapsable={false} style={{ flex: 1 }}>
+        {body}
+      </View>
       {footer ? (
         <View
           style={[
             {
               paddingHorizontal: S.lg,
               paddingTop: S.sm,
-              // The footer button clears the gesture pill instead of hugging it.
-              paddingBottom: tabbed ? S.md : Math.max(insets.bottom, S.md) + S.sm,
+              /* The footer button clears the gesture pill instead of hugging
+                 it, except when the keyboard is up: the pill is behind the
+                 keyboard then, and the gap would just be dead space between
+                 the button and the keys. */
+              paddingBottom: keyboard > 0 ? S.md : tabbed ? S.md : Math.max(insets.bottom, S.md) + S.sm,
             },
             isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
           ]}
@@ -173,19 +230,88 @@ export function Screen({
       ) : null}
     </View>
   );
+}
 
-  // Forms need the keyboard pushed out of the way rather than covering the CTA.
-  return avoidKeyboard ? (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={0}
-    >
-      {content}
-    </KeyboardAvoidingView>
-  ) : (
-    content
+/**
+ * Three dots, breathing. The honest picture of "the tutor is reading your
+ * question", which on a real answer is four or five seconds of nothing:
+ * long enough that a line of static text reads as a screen that has hung.
+ *
+ * Hand-rolled rather than an ActivityIndicator because a spinner says
+ * "loading a page" and this is somebody about to write.
+ */
+export function TypingDots({ color = C.ink3, size = 7 }: { color?: string; size?: number }) {
+  const reduced = useReducedMotion();
+  // useState, not useRef: these are read during render, and three Animated
+  // values created once are exactly what a lazy initialiser is for.
+  const [dots] = useState(() => [new Animated.Value(0.35), new Animated.Value(0.35), new Animated.Value(0.35)]);
+
+  useEffect(() => {
+    if (reduced) return;
+    const loops = dots.map((v, i) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(i * 160),
+          Animated.timing(v, { toValue: 1, duration: 320, useNativeDriver: true }),
+          Animated.timing(v, { toValue: 0.35, duration: 320, useNativeDriver: true }),
+          Animated.delay((2 - i) * 160),
+        ]),
+      ),
+    );
+    loops.forEach((l) => l.start());
+    return () => loops.forEach((l) => l.stop());
+  }, [dots, reduced]);
+
+  return (
+    <View style={{ flexDirection: 'row', gap: size * 0.7, alignItems: 'center' }}>
+      {dots.map((v, i) => (
+        <Animated.View
+          key={i}
+          style={{ width: size, height: size, borderRadius: size, backgroundColor: color, opacity: reduced ? 0.6 : v }}
+        />
+      ))}
+    </View>
   );
+}
+
+/**
+ * Text that arrives in lumps, shown as if it were being written.
+ *
+ * The tutor genuinely streams, but the model hands over 100 to 200 characters
+ * at a time roughly once a second, so what a student saw was four or five
+ * paragraph-sized jumps: indistinguishable from an answer that simply
+ * appeared. Nothing here invents text. It only paces the reveal of text we
+ * already have, and catches up proportionally so a big lump never takes
+ * longer to draw than the next one takes to arrive.
+ *
+ * Mounted only while an answer is in flight, which is what owns the timer.
+ */
+export function useRevealed(text: string): string {
+  const [shown, setShown] = useState('');
+  const latest = useRef(text);
+  const reduced = useReducedMotion();
+
+  // The timer reads the newest text without being restarted by it.
+  useEffect(() => {
+    latest.current = text;
+  }, [text]);
+
+  useEffect(() => {
+    if (reduced) return;
+    const id = setInterval(() => {
+      setShown((cur) => {
+        const target = latest.current;
+        // A retry or a correction: never animate backwards, just take it.
+        if (!target.startsWith(cur)) return target;
+        if (cur.length >= target.length) return cur;
+        const step = Math.max(2, Math.ceil((target.length - cur.length) / 10));
+        return target.slice(0, cur.length + step);
+      });
+    }, 26);
+    return () => clearInterval(id);
+  }, [reduced]);
+
+  return reduced ? text : shown;
 }
 
 export function Header({

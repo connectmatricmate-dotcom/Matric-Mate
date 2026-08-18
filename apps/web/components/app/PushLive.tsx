@@ -23,7 +23,7 @@ export function PushLive() {
     done.current = userId;
     // Never allowed to break a page: an unsupported browser, a blocked worker
     // and a private window all resolve rather than throw.
-    void registerWebPush(userId, false);
+    void registerWebPush(false);
   }, [userId]);
 
   return null;

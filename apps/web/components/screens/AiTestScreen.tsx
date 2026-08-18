@@ -12,6 +12,7 @@ import {
   weakTopics,
 } from '@matricmate/core';
 import type { AiSessionKind, AiSessionRow } from '@matricmate/core';
+import { AiWorking } from '@/components/ui/AiWorking';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, PillButton, Seg } from '@/components/ui/controls';
 import { Card, Check, ScriptText, SectionTitle } from '@/components/ui/primitives';
@@ -106,6 +107,9 @@ export function AiTestScreen() {
 
   return (
     <Page width="focus">
+      {/* Writing a fresh set is twenty seconds of real work, so it gets the
+          whole viewport rather than a button that dims. See AiWorking. */}
+      <AiWorking open={busy} title={t('tutor.building')} />
       <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.builderTitle')} sub={t('tutor.builderSub')} />
 
       <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
@@ -154,7 +158,7 @@ export function AiTestScreen() {
       </Card>
 
       <div className="mt-5">
-        <Btn title={busy ? t('tutor.building') : t('tutor.buildIt')} variant="orange" className="w-full" loading={busy} onClick={build} />
+        <Btn title={t('tutor.buildIt')} variant="orange" className="w-full" loading={busy} onClick={build} />
       </div>
 
       {weak.length ? (

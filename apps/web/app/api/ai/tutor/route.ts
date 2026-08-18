@@ -83,13 +83,6 @@ async function authenticate(req: NextRequest): Promise<string | null> {
 
 type QuotaState = { limit: number; used: number; remaining: number; resetAt: string };
 
-async function readQuota(admin: ReturnType<typeof createAdminClient>, userId: string): Promise<QuotaState> {
-  const { data } = await admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle();
-  const used = data?.used ?? 0;
-  const limit = AI_QUOTA.premium;
-  return { limit, used, remaining: Math.max(0, limit - used), resetAt: resetAt() };
-}
-
 /**
  * The teacher's standing knowledge: persona plus the board's own weighting
  * of every chapter, so "is this chapter important?" gets the real number.
@@ -147,39 +140,11 @@ Chapter weightage from the board's assessment frameworks (share of the annual pa
 `;
 
 export async function POST(req: NextRequest) {
-  const userId = await authenticate(req);
-  if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
-
-  const admin = createAdminClient();
-
-  // Paid-only: the same wall RLS enforces on content, applied to the tutor.
-  const [{ data: ent }, { data: prof }] = await Promise.all([
-    admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade').eq('id', userId).maybeSingle(),
-  ]);
-  const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
-  if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
-  // The tutor teaches the student's own class: persona, weightage and all.
-  const grade = prof?.grade === 10 ? 10 : 9;
-
-  const quota = await readQuota(admin, userId);
-  if (quota.remaining <= 0) {
-    return NextResponse.json({ error: 'quota_exhausted', quota }, { status: 429 });
-  }
-
-  // The abuse wall: a human student cannot ask five thoughtful questions in
-  // a minute; a script can. Counted from persisted messages, so it cannot be
-  // reset by reinstalling the app.
-  const { count: lastMinute } = await admin
-    .from('chat_messages')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('role', 'user')
-    .gte('at', new Date(Date.now() - 60_000).toISOString());
-  if ((lastMinute ?? 0) >= RATE_LIMIT_PER_MINUTE) {
-    return NextResponse.json({ error: 'rate_limited', quota }, { status: 429 });
-  }
-
+  /*
+   * Read the body before anything that touches the network. It is free, and
+   * having the question in hand means every database read below can be
+   * started at once rather than discovered one at a time.
+   */
   let body: {
     message?: string;
     threadId?: string;
@@ -207,38 +172,115 @@ export async function POST(req: NextRequest) {
   }
   if (!message && !image) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
+  const userId = await authenticate(req);
+  if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
+
+  const admin = createAdminClient();
+  const profile = body.profile ?? {};
+  const askedFrom = (body.chapterId ?? '').slice(0, 40);
+
+  /*
+   * Everything the walls need, in one round trip instead of four.
+   *
+   * These used to run one after another, each waiting on the last, and with
+   * the database in Mumbai and the function elsewhere that was most of a
+   * second per read. A student watched five to six seconds of nothing before
+   * the first word of an answer appeared, which is long enough that the
+   * streaming we do have was invisible: the reply looked like it arrived in
+   * one piece. None of these four reads depends on any of the others.
+   */
+  const [{ data: ent }, { data: prof }, usage, { count: lastMinute }, owned] = await Promise.all([
+    admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
+    admin.from('profiles').select('grade').eq('id', userId).maybeSingle(),
+    admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
+    // The abuse wall: a human student cannot ask five thoughtful questions in
+    // a minute; a script can. Counted from persisted messages, so it cannot be
+    // reset by reinstalling the app.
+    admin
+      .from('chat_messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('role', 'user')
+      .gte('at', new Date(Date.now() - 60_000).toISOString()),
+    // Speculative: only meaningful if they named a thread, and cheap enough to
+    // ask for alongside the rest rather than in a round trip of its own.
+    body.threadId
+      ? admin.from('chat_threads').select('id').eq('id', body.threadId).eq('user_id', userId).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  // Paid-only: the same wall RLS enforces on content, applied to the tutor.
+  const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
+  if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
+  // The tutor teaches the student's own class: persona, weightage and all.
+  const grade = prof?.grade === 10 ? 10 : 9;
+
+  const used = usage.data?.used ?? 0;
+  const quota: QuotaState = {
+    limit: AI_QUOTA.premium,
+    used,
+    remaining: Math.max(0, AI_QUOTA.premium - used),
+    resetAt: resetAt(),
+  };
+  if (quota.remaining <= 0) {
+    return NextResponse.json({ error: 'quota_exhausted', quota }, { status: 429 });
+  }
+  if ((lastMinute ?? 0) >= RATE_LIMIT_PER_MINUTE) {
+    return NextResponse.json({ error: 'rate_limited', quota }, { status: 429 });
+  }
+
   // What the thread remembers about this turn. Photos are answered live but
   // not stored, so the saved history marks that one was here.
   const persistedQuestion = message || 'Photo question';
   const savedUserText = image ? `[photo] ${persistedQuestion}` : persistedQuestion;
 
-  // Thread: reuse if owned, else start one named after the question.
-  let threadId = body.threadId ?? null;
-  if (threadId) {
-    const { data: owned } = await admin.from('chat_threads').select('id').eq('id', threadId).eq('user_id', userId).maybeSingle();
-    if (!owned) threadId = null;
-  }
-  if (!threadId) {
-    const title = persistedQuestion.length > 42 ? `${persistedQuestion.slice(0, 42)}…` : persistedQuestion;
-    const { data: created, error: tErr } = await admin
-      .from('chat_threads')
-      .insert({ user_id: userId, title, context_label: body.context?.slice(0, 120) ?? null })
-      .select('id')
-      .single();
-    if (tErr || !created) return NextResponse.json({ error: 'server_error' }, { status: 500 });
-    threadId = created.id;
-  }
-  const thread = threadId;
+  /*
+   * The second and last round trip before the model.
+   *
+   * A thread the student already owns has history to read; a new one has none
+   * by definition, so its row is created here instead. Either way that runs
+   * beside the chapter notes and the board's weightage table rather than
+   * after them.
+   *
+   * chapterGrounding rejects a chapter from the other class, so this cannot
+   * leak Class 9 material into a Class 10 answer.
+   */
+  const existing = (owned as { data: { id: string } | null }).data?.id ?? null;
+  const [threadResult, historyRows, grounding, standing] = await Promise.all([
+    existing
+      ? Promise.resolve({ id: existing })
+      : admin
+          .from('chat_threads')
+          .insert({
+            user_id: userId,
+            title: persistedQuestion.length > 42 ? `${persistedQuestion.slice(0, 42)}…` : persistedQuestion,
+            context_label: body.context?.slice(0, 120) ?? null,
+          })
+          .select('id')
+          .single()
+          .then(({ data }) => data),
+    existing
+      ? admin
+          .from('chat_messages')
+          .select('role,content')
+          .eq('thread_id', existing)
+          .order('at', { ascending: true })
+          .limit(HISTORY_TURNS)
+          .then(({ data }) => data)
+      : Promise.resolve([] as { role: string; content: string }[]),
+    /*
+     * When the student asks from a chapter (the Ask AI buttons on MCQs, short
+     * questions, blanks and the reader all pass its id), the tutor reads that
+     * chapter's own published notes before answering. Same wording as the
+     * screen they came from, instead of a generic recital of the topic.
+     */
+    askedFrom ? chapterGrounding(admin, askedFrom, profile.medium === 'ur' ? 'ur' : 'en', 12_000, grade) : null,
+    buildStandingContext(admin, grade),
+  ]);
 
-  // History, oldest first, trimmed to keep the request lean.
-  const { data: historyRows } = await admin
-    .from('chat_messages')
-    .select('role,content')
-    .eq('thread_id', thread)
-    .order('at', { ascending: true })
-    .limit(HISTORY_TURNS);
+  const thread = threadResult?.id ?? null;
+  if (!thread) return NextResponse.json({ error: 'server_error' }, { status: 500 });
 
-  const profile = body.profile ?? {};
   const studentBlock = [
     'About this student:',
     profile.name ? `- Name: ${profile.name}` : null,
@@ -251,20 +293,6 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join('\n');
 
-  const standing = await buildStandingContext(admin, grade);
-
-  /**
-   * When the student asks from a chapter (the Ask AI buttons on MCQs, short
-   * questions, blanks and the reader all pass its id), the tutor reads that
-   * chapter's own published notes before answering. Same wording as the
-   * screen they came from, instead of a generic recital of the topic.
-   * chapterGrounding rejects a chapter from the other class, so this cannot
-   * leak Class 9 material into a Class 10 answer.
-   */
-  const chapterId = (body.chapterId ?? '').slice(0, 40);
-  const grounding = chapterId
-    ? await chapterGrounding(admin, chapterId, profile.medium === 'ur' ? 'ur' : 'en', 12_000, grade)
-    : null;
   /*
    * A chapter with no notes of ours still names what they are studying. The
    * tutor knows the syllabus; withholding the chapter title just because we

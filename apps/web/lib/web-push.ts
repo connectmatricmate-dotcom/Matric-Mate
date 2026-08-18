@@ -51,8 +51,11 @@ export async function pushPermission(): Promise<NotificationPermission | null> {
  *
  * `ask` false is the silent path used on load: it does nothing unless the
  * student has already granted permission. `ask` true is the settings control.
+ *
+ * Who it registers is not a parameter: the database takes the caller from the
+ * session, which is the only account it could honestly belong to.
  */
-export async function registerWebPush(userId: string, ask = false): Promise<'registered' | 'denied' | 'unsupported' | 'skipped'> {
+export async function registerWebPush(ask = false): Promise<'registered' | 'denied' | 'unsupported' | 'skipped'> {
   if (!(await pushSupported())) return 'unsupported';
 
   if (Notification.permission === 'denied') return 'denied';
@@ -70,13 +73,16 @@ export async function registerWebPush(userId: string, ask = false): Promise<'reg
     if (!token) return 'skipped';
 
     /*
-     * Upsert on the token, so reopening the tab moves last_seen_at forward
-     * rather than adding a row. That column is the only way to tell a live
-     * browser from one somebody used once in March: Firebase never says.
+     * claim_push_token, not an upsert on the table.
+     *
+     * A shared browser is the same problem as a shared phone: the FCM token
+     * belongs to the browser profile, so the second account to sign in here
+     * tries to write a row the first one owns, and row level security refuses
+     * it (42501). The result was a silent one, which is how it went unnoticed
+     * on Android for a fortnight. See migration 0025.
      */
-    await createClient()
-      .from('push_tokens')
-      .upsert({ token, user_id: userId, platform: 'web', last_seen_at: new Date().toISOString() }, { onConflict: 'token' });
+    const { error } = await createClient().rpc('claim_push_token', { p_token: token, p_platform: 'web' });
+    if (error) return 'skipped';
 
     /*
      * A message arriving while the tab is focused is NOT shown as a system
@@ -91,5 +97,27 @@ export async function registerWebPush(userId: string, ask = false): Promise<'reg
     // A blocked service worker, a private window, an extension in the way.
     // None of it is worth an error message on a page about something else.
     return 'unsupported';
+  }
+}
+
+/**
+ * Hand this browser back before signing out.
+ *
+ * Called while the session is still valid, because the function is scoped to
+ * the caller. A shared laptop is the same problem as a shared phone: without
+ * this, the next student to sign in here would keep receiving the last one's
+ * notifications. Never throws, and never blocks a sign-out.
+ */
+export async function releaseWebPush(): Promise<void> {
+  try {
+    if (!(await pushSupported()) || Notification.permission !== 'granted') return;
+    const app = getApps().length ? getApps()[0] : initializeApp(config);
+    const registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
+    if (!registration) return;
+    const token = await getToken(getMessaging(app), { vapidKey: VAPID, serviceWorkerRegistration: registration });
+    if (!token) return;
+    await createClient().rpc('release_push_token', { p_token: token });
+  } catch {
+    // Nothing about notifications may stand between a student and signing out.
   }
 }

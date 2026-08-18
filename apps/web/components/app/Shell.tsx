@@ -115,9 +115,23 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {/* utility strip, streak, AI budget, notifications */}
         {/* Fixed h-14: screen-level sticky headers pin themselves to top-14,
             so the shell's height is a contract, not a measurement. */}
+        {/*
+          On a phone this is the Android app's header, deliberately: avatar,
+          streak, gear, bell, in that order (see AppHeader.tsx there). It was
+          the wordmark and a bell, and that left the whole of Account
+          unreachable on a phone, because the only link to it lived in the
+          desktop sidebar. Settings, the plan, payments, help and Edit profile
+          were all behind a door with no handle.
+
+          The avatar is identity, not a control, which is the app's rule too:
+          nothing marks a face as tappable, so settings live behind the gear.
+        */}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
+          <span className="md:hidden">
+            <AvatarBadge index={state.settings.avatar ?? 0} size={34} />
+          </span>
           <Link href="/dashboard" className="md:hidden">
-            <Image src="/brand/wordmark.png" alt="MatricMate" width={116} height={23} />
+            <Image src="/brand/wordmark.png" alt="MatricMate" width={104} height={21} />
           </Link>
 
           <div className="ms-auto flex items-center gap-2">
@@ -134,15 +148,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
               </Link>
             ) : null}
 
+            {/* Desktop only, again matching the app, where the AI budget lives
+                on the tutor tab rather than in the header. Five controls do not
+                fit across a 360px phone without everything shrinking. */}
             <Link
               href="/tutor"
               title={t('tutor.leftToday', { n: aiLeft })}
-              className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-extrabold transition-colors duration-200 hover:brightness-95 ${
+              className={`hidden min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-extrabold transition-colors duration-200 hover:brightness-95 md:inline-flex ${
                 aiLeft ? 'bg-tealtint text-teal' : 'bg-redtint text-red'
               }`}
             >
               <Icon name="spark" size={14} strokeWidth={2.4} />
               {aiLeft}/{aiLimit}
+            </Link>
+
+            <Link
+              href="/account"
+              aria-label={t('account.settings')}
+              className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper md:hidden"
+            >
+              <Icon name="gear" size={19} />
             </Link>
 
             <Link
