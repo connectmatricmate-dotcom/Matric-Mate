@@ -51,7 +51,6 @@ export default function Account() {
   const s = state.settings;
   const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
   const unreadCount = state.notifications.filter((n) => !n.read).length;
-  const hasWhatsapp = Boolean(state.phone);
 
   return (
     <>
@@ -208,21 +207,6 @@ export default function Account() {
             sub={t('account.channelEmailSub')}
             icon="mail"
             right={<Toggle on={s.channelEmail} onPress={() => actions.setSettings({ channelEmail: !s.channelEmail })} />}
-          />
-          {/* Only offered once there is a number to send to. A switch that
-              cannot do anything yet is exactly what this sweep has been
-              removing, so without one the row points at the profile instead. */}
-          <Item
-            title={t('account.channelWhatsapp')}
-            sub={hasWhatsapp ? t('account.channelWhatsappSub') : t('account.channelWhatsappNeedsNumber')}
-            icon="whatsapp"
-            tone="green"
-            onPress={hasWhatsapp ? undefined : () => router.push('/account/edit')}
-            right={
-              hasWhatsapp ? (
-                <Toggle on={s.channelWhatsapp} onPress={() => actions.setSettings({ channelWhatsapp: !s.channelWhatsapp })} />
-              ) : undefined
-            }
           />
           {/* The count is the only thing that makes the inbox discoverable:
               it is three taps deep and nothing else ever points at it. */}

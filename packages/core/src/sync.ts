@@ -416,13 +416,6 @@ export type HydratedStudyState = {
   notifications: Notification[];
   /** Null when the student has never touched them, meaning "use the defaults". */
   accountPrefs: AccountPrefs | null;
-  /**
-   * Optional WhatsApp number, +92 format, and deliberately not an identifier:
-   * sign-in stays on email so no messaging provider is ever in the login path.
-   */
-  phone: string | null;
-  /** When they agreed to WhatsApp messages. Null means they have not. */
-  whatsappOptIn: string | null;
   lastChapterId?: string;
   lastSectionIndex: number;
 };
@@ -457,8 +450,6 @@ export type AccountPrefs = {
    */
   channelPush: boolean;
   channelEmail: boolean;
-  /** Off until explicitly turned on: it costs money and Meta requires consent. */
-  channelWhatsapp: boolean;
 };
 
 const readAccountPrefs = (settings: unknown): AccountPrefs | null => {
@@ -474,11 +465,10 @@ const readAccountPrefs = (settings: unknown): AccountPrefs | null => {
     streakAlerts: s.streakAlerts !== false,
     reminderTime: typeof s.reminderTime === 'string' ? s.reminderTime : '7:00 PM',
     dark: s.dark === true,
-    // The two free channels are on unless turned off; the paid one is the
-    // other way round. Same defaults the server applies in notify/index.ts.
+    // Both on unless turned off. Same defaults the server applies in
+    // notify/index.ts.
     channelPush: s.channelPush !== false,
     channelEmail: s.channelEmail !== false,
-    channelWhatsapp: s.channelWhatsapp === true,
   };
 };
 
@@ -500,42 +490,6 @@ export async function syncAccountPrefs(client: SyncClient, userId: string, prefs
   }
 }
 
-/**
- * Save the WhatsApp number and, with it, the consent that makes it usable.
- *
- * The two are written together because they are one decision: a student types
- * a number in order to be messaged on it, and Meta requires us to be able to
- * show when they agreed. Clearing the number clears the consent, so a number
- * removed today cannot be messaged tomorrow on the strength of a tick from
- * last month.
- *
- * The column rejects anything that is not +92 followed by ten digits, so the
- * caller normalises first and this reports whether it was accepted.
- */
-export async function syncPhone(client: SyncClient, userId: string, phone: string | null): Promise<boolean> {
-  try {
-    const { error } = await client
-      .from('profiles')
-      .update({ phone, whatsapp_opt_in: phone ? new Date().toISOString() : null })
-      .eq('id', userId);
-    return !error;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * `03001234567` and the half-dozen other ways people write a Pakistani mobile
- * number, turned into the one the column will accept. Null for anything that
- * is not a plausible mobile number, so a typo is refused rather than stored.
- */
-export function normalisePhone(input: string): string | null {
-  const digits = input.replace(/[^\d+]/g, '');
-  const local = digits.replace(/^\+92/, '').replace(/^0092/, '').replace(/^92/, '').replace(/^0/, '');
-  // Pakistani mobiles are ten digits after the country code and start with 3.
-  return /^3\d{9}$/.test(local) ? `+92${local}` : null;
-}
-
 /** How long a hydration attempt is allowed to hang before giving up on it. */
 const HYDRATE_TIMEOUT_MS = 8000;
 
@@ -549,7 +503,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     // Today only: yesterday's ticks belong to yesterday's plan, and the task
     // ids carry the date anyway.
     client.from('plan_done').select('task_id').eq('user_id', userId).eq('day', todayKey()),
-    client.from('profiles').select('onboarding,grade,settings,phone,whatsapp_opt_in').eq('id', userId).maybeSingle(),
+    client.from('profiles').select('onboarding,grade,settings').eq('id', userId).maybeSingle(),
     // Capped at the same 50 the screens show. An inbox is a recent list, not
     // an archive, and nobody scrolls to a receipt from four months ago.
     client.from('notifications').select('id,kind,title,body,target,read,at').eq('user_id', userId).order('at', { ascending: false }).limit(50),
@@ -576,8 +530,6 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     planDone: ((planRes.data ?? []) as { task_id: string }[]).map((r) => r.task_id),
     notifications: ((notifsRes.data ?? []) as NotificationRow[]).map(fromNotificationRow),
     accountPrefs: readAccountPrefs((profileRes.data as { settings?: unknown } | null)?.settings),
-    phone: ((profileRes.data as { phone?: string | null } | null)?.phone) ?? null,
-    whatsappOptIn: ((profileRes.data as { whatsapp_opt_in?: string | null } | null)?.whatsapp_opt_in) ?? null,
     lastChapterId: last?.chapter_id,
     lastSectionIndex: last?.section_index ?? 0,
   };

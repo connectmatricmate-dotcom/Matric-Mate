@@ -13,8 +13,6 @@ import type { Notice } from './types';
  *   · inbox  always, it is free and it is the record inside the app
  *   · push   anything timely, it is free and unlimited
  *   · email  anything worth keeping, and nothing routine
- *   · whatsapp only where reaching the student protects a subscription, since
- *     it is the one channel that costs per message
  */
 
 export const streakAtRisk = (days: number): Notice => ({
@@ -52,9 +50,8 @@ export const paymentReceived = (date: string): Notice => ({
   body: 'notifications.paymentBody',
   params: { date },
   target: 'payments',
-  // Every channel that will carry it. This is money: the student wants a
-  // written record, and it is worth paying to confirm.
-  channels: ['inbox', 'push', 'email', 'whatsapp'],
+  // Every channel there is. This is money, and the student wants a record.
+  channels: ['inbox', 'push', 'email'],
 });
 
 /* ------------------------------------------------------- the evening nudge */

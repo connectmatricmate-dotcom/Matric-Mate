@@ -144,6 +144,11 @@ Not defects. Recording them so they are not rediscovered as bugs.
 - **The Android app cannot take a payment.** Google Play requires its own
   billing for in-app digital purchases, so the app copies a link to the website
   instead. The trade-off is written up in `LockedNotice.tsx`.
+- **WhatsApp messaging.** Built as a fourth channel on 18 Aug and removed the
+  same day at the client's request. Notifications are the in-app inbox, push
+  and email. The report card's share-to-WhatsApp button is a different thing
+  and stays: it hands a summary to the student's own WhatsApp, and sends
+  nothing itself.
 - **Audio for five Class 9 chapters** was missing because those chapters had no
   text when the audio ran. Filled: 314 published tracks now, every chapter in
   both mediums, none with a missing file or zero length.
@@ -169,9 +174,8 @@ shipped the same day.
    evening job really does run at the hour it names, but nothing can change it,
    so every student reads 7:00 PM.
 4. **Tidy-up.** The mobile dashboard still branches on `!state.premium.active`
-   for a notice an unpaid account can no longer reach, and six strings are
-   orphaned: `account.whatsapp`, `account.whatsappToast`, `account.darkToast`,
-   `account.termsToast`, `lang.englishHint`, `lang.urduHint`.
+   for a notice an unpaid account can no longer reach. The orphaned strings are
+   gone, removed with the WhatsApp channel.
 
 ### Blocked on the client
 
@@ -184,25 +188,22 @@ shipped the same day.
 7. **`help@matricmate.pk`.** One constant, `SUPPORT_EMAIL` in
    `packages/core/src/billing.ts`, currently the Gmail account because that
    mailbox certainly exists. One line to move it.
-8. **WhatsApp.** Needs Meta business verification, which needs the domain live,
-   plus a number never used on ordinary WhatsApp. The adapter and the consent
-   record are already built.
-9. **White on orange, green and red** fails AA in the *light* theme: 2.4:1,
+8. **White on orange, green and red** fails AA in the *light* theme: 2.4:1,
    3.4:1 and 4.0:1. Pre-existing, untouched, because changing it moves a look
    the client has approved. Worth raising rather than deciding for them.
 
 ### Credentials to rotate
 
-10. **The Anthropic key**, exposed in chat twice and still outstanding.
-11. **The Firebase service account key**, printed to a terminal on 18 Aug while
+9. **The Anthropic key**, exposed in chat twice and still outstanding.
+10. **The Firebase service account key**, printed to a terminal on 18 Aug while
     checking the env file. Key id `551b31697a…`. Create the replacement first,
     then delete the old one.
-12. **The Resend key**, pasted into chat when it was handed over.
+11. **The Resend key**, pasted into chat when it was handed over.
 
 ### Not verified by looking
 
-13. **Dark mode on a real screen**, either app. It typechecks, builds, the
+12. **Dark mode on a real screen**, either app. It typechecks, builds, the
     tokens are in the compiled CSS and the server sets `data-theme` on the
     first byte. Nobody has looked at it.
-14. **The notification icon on the built APK.** The asset is correct and the
+13. **The notification icon on the built APK.** The asset is correct and the
     plugin is wired; the rendering has not been seen.

@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { inbox } from './channels/inbox';
 import { push } from './channels/push';
 import { email } from './channels/email';
-import { whatsapp } from './channels/whatsapp';
 import type { Channel, ChannelAdapter, DeliveryResult, Notice, Recipient } from './types';
 
 export type { Notice, Recipient } from './types';
@@ -36,7 +35,6 @@ const ADAPTERS: Record<Channel, ChannelAdapter> = {
   inbox,
   push,
   email,
-  whatsapp,
 };
 
 /** Everything the channels need about a student, in one read. */
@@ -44,7 +42,7 @@ export async function loadRecipient(userId: string): Promise<Recipient | null> {
   const admin = createAdminClient();
 
   const [{ data: profile }, { data: auth }] = await Promise.all([
-    admin.from('profiles').select('settings,onboarding,phone,whatsapp_opt_in').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('settings,onboarding').eq('id', userId).maybeSingle(),
     admin.auth.admin.getUserById(userId),
   ]);
   if (!profile && !auth?.user) return null;
@@ -56,15 +54,11 @@ export async function loadRecipient(userId: string): Promise<Recipient | null> {
     userId,
     lang: (medium === 'ur' ? 'ur' : 'en') as Language,
     email: auth?.user?.email ?? null,
-    phone: (profile?.phone as string | null) ?? null,
-    whatsappOptIn: (profile?.whatsapp_opt_in as string | null) ?? null,
     prefs: {
-      // Absent means never set, and the two free channels default to on. Only
-      // an explicit false is the student saying no. WhatsApp is the opposite:
-      // it costs money and needs consent, so it is off until switched on.
+      // Absent means never set, and both default to on. Only an explicit false
+      // is the student saying no.
       channelPush: settings.channelPush !== false,
       channelEmail: settings.channelEmail !== false,
-      channelWhatsapp: settings.channelWhatsapp === true,
     },
   };
 }
@@ -101,6 +95,5 @@ export function channelStatus(): Record<Channel, boolean> {
     inbox: inbox.configured(),
     push: push.configured(),
     email: email.configured(),
-    whatsapp: whatsapp.configured(),
   };
 }

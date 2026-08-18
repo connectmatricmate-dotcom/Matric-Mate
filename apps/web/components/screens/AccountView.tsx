@@ -52,7 +52,6 @@ export function AccountView() {
   const s = state.settings;
   const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
   const unreadCount = state.notifications.filter((n) => !n.read).length;
-  const hasWhatsapp = Boolean(state.phone);
 
   return (
     <Page>
@@ -234,26 +233,6 @@ export function AccountView() {
                     label={t('account.channelEmail')}
                     onClick={() => actions.setSettings({ channelEmail: !s.channelEmail })}
                   />
-                }
-              />
-              {/* Only offered once there is a number to send to. A switch that
-                  cannot do anything yet is the thing this whole sweep has been
-                  removing, so it points at the profile instead. */}
-              <Item
-                title={t('account.channelWhatsapp')}
-                sub={hasWhatsapp ? t('account.channelWhatsappSub') : t('account.channelWhatsappNeedsNumber')}
-                icon="whatsapp"
-                tone="green"
-                right={
-                  hasWhatsapp ? (
-                    <Toggle
-                      on={s.channelWhatsapp}
-                      label={t('account.channelWhatsapp')}
-                      onClick={() => actions.setSettings({ channelWhatsapp: !s.channelWhatsapp })}
-                    />
-                  ) : (
-                    <Pill tone="grey">{t('account.editTitle')}</Pill>
-                  )
                 }
               />
               <Item

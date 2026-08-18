@@ -1,7 +1,7 @@
 # Setting up notification delivery
 
-What to create, where to put it, and what works before it exists. Written 18 Aug 2026, when the
-dispatcher landed with email live and push and WhatsApp waiting on credentials.
+What to create, where to put it, and what works before it exists. Written 18 Aug 2026, updated the
+same evening once the Firebase credentials landed and WhatsApp was dropped.
 
 The design decisions behind all of this are in `NOTIFICATIONS.md`. This file is only the setup.
 
@@ -11,8 +11,7 @@ The design decisions behind all of this are in `NOTIFICATIONS.md`. This file is 
 | :-- | :-- | :-- |
 | In-app inbox | Live | nothing |
 | Email | Live, but only reaches the Resend account owner | a verified sending domain |
-| Push | Written, reports itself unconfigured | a Firebase project |
-| WhatsApp | Written, reports itself unconfigured | Meta verification, which needs the domain live |
+| Push | Live on Android, verified against the real project | the browser half needs a service worker |
 
 A channel with no credentials returns `unconfigured`, which is deliberately distinct from `failed`
 so that a channel nobody has switched on yet does not look like an outage in the logs.
@@ -106,12 +105,15 @@ Existing accounts are unaffected: all of them are already confirmed and stay tha
 
 ## What is deliberately not here
 
+**WhatsApp.** Built on 18 Aug and removed the same day: the client decided
+against it. Three channels only, and the one the student sees most is free.
+The report card's share button is unrelated and still there.
+
 **SMS.** The most expensive channel, the most paperwork (a sender name needs an NTN with
 "MatricMate" as the registered trade name, plus two to four weeks), and the most regulated. In
-Pakistan WhatsApp reaches the same person for a similar price. See `NOTIFICATIONS.md` §2 if it is
-ever revisited.
+Pakistan WhatsApp would have reached the same person for a similar price, and that was dropped too.
+See `NOTIFICATIONS.md` §2 if either is ever revisited.
 
 **Phone number sign-in.** Considered and rejected: it puts the SMS provider inside the login path,
-so a provider outage stops anyone creating an account. The number we collect is a contact detail on
-the profile, never an identifier, which is what lets us add WhatsApp later without touching how
-anybody signs in.
+so a provider outage stops anyone creating an account. Sign-in is by email, and no number is
+collected by either app.

@@ -25,7 +25,7 @@ export type NotificationTarget =
   | 'payments'
   | 'subscription';
 
-export type Channel = 'inbox' | 'push' | 'email' | 'whatsapp';
+export type Channel = 'inbox' | 'push' | 'email';
 
 /**
  * A message before it has been rendered for any particular channel.
@@ -55,14 +55,9 @@ export type Recipient = {
   userId: string;
   lang: Language;
   email: string | null;
-  /** +92 format, or null. A contact detail, never how they sign in. */
-  phone: string | null;
-  /** When they agreed to WhatsApp. Null means they have not, so we do not. */
-  whatsappOptIn: string | null;
   prefs: {
     channelPush: boolean;
     channelEmail: boolean;
-    channelWhatsapp: boolean;
   };
 };
 
