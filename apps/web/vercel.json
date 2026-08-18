@@ -3,15 +3,5 @@
   "framework": "nextjs",
   "github": {
     "silent": true
-  },
-  "crons": [
-    {
-      "path": "/api/cron/coach",
-      "schedule": "30 1 * * *"
-    },
-    {
-      "path": "/api/cron/nudge",
-      "schedule": "0 11-16 * * *"
-    }
-  ]
+  }
 }
