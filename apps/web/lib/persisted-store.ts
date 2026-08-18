@@ -43,6 +43,15 @@ export type Settings = {
 };
 
 export type State = {
+  /**
+   * Which account the rest of this object belongs to.
+   *
+   * Everything below is a cache of one student, and the moment a different
+   * one signs in in this browser it is not merely stale, it is somebody
+   * else's. Persisted so the check survives the tab being closed between the
+   * two sign-ins.
+   */
+  ownerId: string | null;
   user: { id: string; name: string; contact: string } | null;
   onboarding: Onboarding | null;
   /** `plan` is the PlanId from lib/plans, so the app can name what was bought
@@ -80,6 +89,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
 /** Stable reference, `useSyncExternalStore` requires the server snapshot not to change identity. */
 export const EMPTY: State = {
+  ownerId: null,
   user: null,
   onboarding: null,
   premium: { active: false, validTill: null },
@@ -282,3 +292,20 @@ export function pushToQueue(userId: string, op: SyncOp): SyncOp[] {
   saveQueue(userId, next);
   return next;
 }
+
+/**
+ * The settings that describe this browser rather than this student, kept when
+ * the account changes.
+ *
+ * Language, reading size and dark mode are about the person at the screen, so
+ * making somebody set them again because a sibling signed in would be obtuse.
+ * Everything else resets: the avatar is part of a profile, and the
+ * notification preferences come back from the server on the next hydrate.
+ */
+export const devicePrefs = (s: Settings): Settings => ({
+  ...EMPTY.settings,
+  language: s.language,
+  contentMedium: s.contentMedium,
+  dark: s.dark,
+  fontScale: s.fontScale,
+});

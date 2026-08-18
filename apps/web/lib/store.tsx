@@ -16,6 +16,7 @@ import {
   Settings,
   State,
   aiLimitFor,
+  devicePrefs,
   getQueue,
   serverSnapshotFor,
   getSnapshot,
@@ -108,7 +109,17 @@ function markDayActive(): void {
 
 const actions: Actions = {
   setName: (name) => update((s) => (s.user ? { ...s, user: { ...s.user, name } } : s)),
-  signOut: () => update((s) => ({ ...s, user: null, premium: { active: false, validTill: null } })),
+  /**
+   * Signing out takes this account's data off the machine.
+   *
+   * It used to null the user and the plan and leave everything else: the
+   * class, the subjects, every attempt, the streak, the notifications. The
+   * hydrate merges rather than replaces and prefers local onboarding, so the
+   * next account to sign in here inherited all of it permanently, and a brand
+   * new one skipped onboarding because the subjects were already "chosen".
+   * On a shared computer that is one student reading another's marks.
+   */
+  signOut: () => update((s) => ({ ...EMPTY, hydrated: true, settings: devicePrefs(s.settings) })),
   setOnboarding: (o) => {
     update((s) => ({
       ...s,
@@ -518,26 +529,42 @@ export function AppProvider({
 
     const apply = (u: { id: string; email?: string; user_metadata?: { name?: string } } | null) =>
       update((s) => {
-        if (!u) return s.user ? { ...s, user: null } : s;
+        /*
+         * Signed out, by whatever route: the action below, an expired session,
+         * or another tab. This account's data leaves the machine either way.
+         * It used to null the user and leave the class, the subjects, every
+         * attempt and the streak behind, and since the hydrate merges rather
+         * than replaces and prefers local onboarding, the next account to sign
+         * in here inherited all of it. On a shared computer that is one
+         * student reading another's marks.
+         */
+        if (!u) return s.user || s.ownerId ? { ...EMPTY, hydrated: true, settings: devicePrefs(s.settings) } : s;
+
         const user = {
           id: u.id,
           name: u.user_metadata?.name?.trim() || (u.email ?? '').split('@')[0] || 'Student',
           contact: u.email ?? '',
         };
-        if (s.user?.id === user.id && s.user.name === user.name) return s;
-        /**
-         * Signing in is not studying.
-         *
-         * This used to mark today active, which did two things wrong at once.
-         * It inflated the streak, so a student who opened the page and read
-         * nothing still got credit for the day. And because it did not queue
-         * the matching write, it burned the "is this a new day" flag before
-         * any real study action could claim it: every later `isNewDay` check
-         * that day saw the day already present and skipped its sync. That is
-         * why active_days sat completely empty while attempts were landing
-         * normally, and why every streak in the product was stuck at zero.
+
+        /*
+         * A different student in the same browser. Checked before anything
+         * else, so it also catches the tab being closed mid-sign-out and
+         * signing in as somebody else directly.
          */
-        return { ...s, user };
+        if (s.ownerId && s.ownerId !== user.id) {
+          return { ...EMPTY, hydrated: true, ownerId: user.id, user, settings: devicePrefs(s.settings) };
+        }
+
+        /*
+         * Note what does NOT happen here: signing in is not studying. This
+         * used to mark today active, which inflated the streak and, because
+         * it did not queue the matching write, burned the "is this a new day"
+         * flag before any real study action could claim it. That is why
+         * active_days sat empty while attempts landed normally, and why every
+         * streak in the product read zero.
+         */
+        if (s.ownerId === user.id && s.user?.id === user.id && s.user.name === user.name) return s;
+        return { ...s, ownerId: user.id, user };
       });
 
     void supabase.auth.getUser().then(({ data }) => {

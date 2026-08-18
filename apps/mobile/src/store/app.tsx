@@ -83,6 +83,15 @@ export type Settings = {
 };
 
 export type State = {
+  /**
+   * Which account the rest of this object belongs to.
+   *
+   * Everything below is a cache of one student, and the moment a different
+   * one signs in on this phone it is not merely stale, it is somebody else's.
+   * Persisted so the check survives the app being killed between the two
+   * sign-ins.
+   */
+  ownerId: string | null;
   user: { id: string; name: string; contact: string } | null;
   onboarding: Onboarding | null;
   premium: { active: boolean; validTill: number | null; ref?: string };
@@ -120,6 +129,7 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 const EMPTY: State = {
+  ownerId: null,
   user: null,
   onboarding: null,
   premium: { active: false, validTill: null },
@@ -139,6 +149,24 @@ const EMPTY: State = {
   xp: 0,
   cardsKnown: [],
 };
+
+/**
+ * The settings that describe this phone rather than this student, kept when
+ * the account changes.
+ *
+ * Language, reading size and dark mode are about the person holding the
+ * device and the screen they are holding, so making somebody set them again
+ * because a sibling signed in would be obtuse. Everything else resets: the
+ * avatar is part of a profile, and the notification preferences come back
+ * from the server on the next hydrate anyway.
+ */
+const devicePrefs = (s: Settings): Settings => ({
+  ...DEFAULT_SETTINGS,
+  language: s.language,
+  contentMedium: s.contentMedium,
+  dark: s.dark,
+  fontScale: s.fontScale,
+});
 
 /* ------------------------------------------------------------------ context */
 
@@ -344,6 +372,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       syncedForRef.current = uid;
 
+      /**
+       * A different student is now holding this phone, so nothing cached here
+       * belongs to them.
+       *
+       * Signing out used to clear the sync queue and nothing else. The class,
+       * the subjects, every attempt, the streak, the notifications and the
+       * downloaded chapters all stayed, and because the hydrate below merges
+       * rather than replaces, and prefers local onboarding over the server's,
+       * the next account to sign in inherited all of it permanently. Creating
+       * a brand new account landed straight on a dashboard showing somebody
+       * else's history and skipped onboarding entirely, because the subjects
+       * were already "chosen".
+       *
+       * On a phone shared between siblings, or handed round a classroom, that
+       * is not just wrong data, it is one student reading another's marks.
+       */
+      const previousOwner = stateRef.current.ownerId;
+      const switchedAccount = Boolean(previousOwner) && previousOwner !== uid;
+      if (switchedAccount) {
+        // Paid chapters on disk go too. They were bought by the account that
+        // is leaving, and the reader does not ask who downloaded them.
+        void deleteAllDownloads();
+        if (previousOwner) await AsyncStorage.removeItem(queueKey(previousOwner));
+        setState((s) => ({ ...EMPTY, ownerId: uid, settings: devicePrefs(s.settings) }));
+      } else if (uid) {
+        setState((s) => (s.ownerId === uid ? s : { ...s, ownerId: uid }));
+      }
+
       if (!uid) {
         queueRef.current = [];
         setHydrated(true);
@@ -412,10 +468,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       };
 
       const local = stateRef.current;
+      /*
+       * `switchedAccount` short-circuits this deliberately. The reset above is
+       * a setState, and stateRef only catches up on the next render, so
+       * reading it here can still see the previous student's attempts and
+       * conclude the device has state worth showing. It would then render
+       * their history immediately while the new account's hydrate is still in
+       * flight. The updater inside apply() is safe by contrast, because React
+       * runs queued updaters in order.
+       */
       const deviceHasState =
-        local.attempts.length > 0 ||
-        local.readSections.length > 0 ||
-        (local.onboarding?.subjects?.length ?? 0) > 0;
+        !switchedAccount &&
+        (local.attempts.length > 0 ||
+          local.readSections.length > 0 ||
+          (local.onboarding?.subjects?.length ?? 0) > 0);
 
       if (deviceHasState) {
         setHydrated(true);
