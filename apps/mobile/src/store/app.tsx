@@ -12,7 +12,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, Attempt, ChatThread, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory } from '@matricmate/core';
+import { AI_QUOTA, Attempt, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory } from '@matricmate/core';
 import { useAuth } from './auth';
 import { supabase } from '../lib/supabase';
 import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
@@ -101,7 +101,6 @@ export type State = {
   planDone: string[];
   downloads: string[];
   ai: { day: string; used: number };
-  threads: ChatThread[];
   notifications: Notification[];
   settings: Settings;
   lastChapterId?: string;
@@ -139,7 +138,6 @@ const EMPTY: State = {
   planDone: [],
   downloads: [],
   ai: { day: todayKey(), used: 0 },
-  threads: [],
   notifications: [],
   settings: DEFAULT_SETTINGS,
   celebratedChapters: [],
@@ -206,7 +204,6 @@ type Actions = {
   toggleDownload: (chapterId: string) => Promise<'downloaded' | 'removed' | 'failed'>;
   markCard: (cardId: string, known: boolean) => void;
   consumeAi: () => boolean;
-  saveThread: (t: ChatThread) => void;
   readNotifications: () => void;
   setSettings: (s: Partial<Settings>) => void;
   /** The single language switch: interface and syllabus move together. */
@@ -770,11 +767,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (allowed) markDayActive();
         return allowed;
       },
-      saveThread: (t) =>
-        setState((s) => ({
-          ...s,
-          threads: [t, ...s.threads.filter((x) => x.id !== t.id)].slice(0, 20),
-        })),
       readNotifications: () => {
         // The server too. Flipping only local state meant the badge cleared
         // until the next hydration read the same rows back, still unread.

@@ -9,7 +9,7 @@
  * without rewiring.
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
-import { Attempt, ChatThread, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory } from '@matricmate/core';
+import { Attempt, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory } from '@matricmate/core';
 import {
   EMPTY,
   Onboarding,
@@ -67,7 +67,6 @@ type Actions = {
   markStudied: () => void;
   markCard: (cardId: string, known: boolean) => void;
   consumeAi: () => boolean;
-  saveThread: (t: ChatThread) => void;
   readNotifications: () => void;
   setSettings: (s: Partial<Settings>) => void;
   /** The single language switch: interface and syllabus move together. */
@@ -278,7 +277,6 @@ const actions: Actions = {
     if (allowed) markDayActive();
     return allowed;
   },
-  saveThread: (t) => update((s) => ({ ...s, threads: [t, ...s.threads.filter((x) => x.id !== t.id)].slice(0, 20) })),
   readNotifications: () =>
     update((s) => {
       // The server too. Flipping only local state meant the badge cleared

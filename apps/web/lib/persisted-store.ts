@@ -11,7 +11,7 @@
  * The state shape matches the Android app's store deliberately, see
  * apps/mobile/src/store/app.tsx.
  */
-import { AI_QUOTA, Attempt, ChatThread, Language, Medium, Group, Notification, SyncOp, TestResult, XP, enqueueOp, todayKey } from '@matricmate/core';
+import { AI_QUOTA, Attempt, Language, Medium, Group, Notification, SyncOp, TestResult, XP, enqueueOp, todayKey } from '@matricmate/core';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
@@ -62,7 +62,6 @@ export type State = {
   results: TestResult[];
   planDone: string[];
   ai: { day: string; used: number };
-  threads: ChatThread[];
   notifications: Notification[];
   settings: Settings;
   lastChapterId?: string;
@@ -98,7 +97,6 @@ export const EMPTY: State = {
   results: [],
   planDone: [],
   ai: { day: todayKey(), used: 0 },
-  threads: [],
   notifications: [],
   settings: DEFAULT_SETTINGS,
   lastSectionIndex: 0,
