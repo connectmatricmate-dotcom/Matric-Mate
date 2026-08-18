@@ -16,20 +16,25 @@ not use so the question does not come back later.
 
 ## 2. Required accounts
 
+Two lines below changed on 18 Aug and are worth reading before budgeting: SMS and WhatsApp are no
+longer used at all, and Vercel does not need to be Pro because the scheduled jobs moved to
+Supabase, which is already paid for. Push and email cost nothing at this size.
+
+
 | Service | What it is for | Cost | Owner |
 | :-- | :-- | --: | :-- |
 | Google Play Console | Publishing the Android app | $25 one-time | Client |
 | Expo EAS, Starter plan | Building the app, over-the-air updates | $19/mo | Client |
-| Vercel Pro | Hosting the website | $20/mo | Client |
-| Supabase Pro | Database, accounts, file storage | $25/mo | Client |
+| Vercel | Hosting the website | Hobby today, Pro if crons ever return to it | Client |
+| Supabase Pro | Database, accounts, file storage, **and all scheduled jobs** | $25/mo | Client |
 | Domain `matricmate.com.pk` | The web address | ~Rs 1,750/yr | Client |
 | Cloudflare | DNS | Free | Client |
-| Firebase | Push notifications | Free | Client |
+| Firebase (Cloud Messaging only) | Push notifications, Android and web | Free, no card | Client · **live since 18 Aug** |
 | Anthropic (Claude) | The AI tutor | Per use | Client |
 | Safepay | Taking payments | Per payment | Client |
-| SMS aggregator (SendPK) | Sign-in codes and text messages | Rs 5,000/yr plus per message | Client |
-| Resend | Sending email | Free to $20/mo | Client |
-| WhatsApp Business API | Renewal reminders | Per message | Client |
+| ~~SMS aggregator (SendPK)~~ | Not used. Dropped 18 Aug with phone sign-in | Rs 0 | n/a |
+| Resend | Sending email | Free to 3,000/mo, then $20/mo | Client · **key live, domain unverified** |
+| ~~WhatsApp Business API~~ | Built and removed 18 Aug at the client's request | Rs 0 | n/a |
 | GitHub | Code storage | Free | Us, transferred at handover |
 | Sentry | Crash reporting | Free | Either |
 | UptimeRobot | Downtime alerts | Free | Either |

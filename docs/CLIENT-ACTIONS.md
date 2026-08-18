@@ -8,22 +8,14 @@ Ordered by how long the wait is, not by how important they are.
 
 ---
 
-## 1. SMS sender name · 2 to 4 weeks
+## 1. SMS sender name · NO LONGER NEEDED
 
-**What:** register a branded SMS sender ID (for example `MatricMate`) so verification codes arrive
-from a name rather than a random number.
+Struck on 18 Aug. We are not sending SMS, and we are not using phone numbers to sign in, so there
+is nothing to register and nothing to pay for. Notifications reach students three ways instead:
+inside the app, as a push notification on their phone, and by email. All three are built and
+working, and between them they cost nothing per message.
 
-**Why it blocks:** students sign up with a phone number, not an email. No sender name means no
-verification codes, which means no signup at all.
-
-**Why now:** this is the longest wait on the whole project and nothing else depends on the clock
-starting. Every day it is not filed is a day added to launch.
-
-**What is needed:** the SMS provider applies to the PTA on your behalf, and they will ask for the
-FBISE NTN carrying the trade name "MatricMate", your CNIC, a stamped letterhead request, and a
-business bank account.
-
----
+Do not start this process. If somebody has already begun it, it can be abandoned with no loss.
 
 ## 2. Google Play testing · 14 continuous days, plus recruiting
 
@@ -41,14 +33,19 @@ willing to install and open the app each day for two weeks.
 
 ---
 
-## 3. Domain · a few days, but two things wait on it
+## 3. Domain · a few days, and FOUR things now wait on it
 
 **What:** buy and point the domain.
 
-**Why it blocks two things:** Safepay's KYC is per-website, so production payments cannot be
-approved until the real site is live at the real address. And `BILLING_SITE` currently reads
-`matricmate.pk`, which we do not own; it ships inside the Android app, so it has to be right before
-the next build.
+**Why it blocks four things now.** Safepay's KYC is per-website, so production payments cannot be
+approved until the real site is live at the real address. `BILLING_SITE` reads `matricmate.pk`,
+which we do not own, and it ships inside the Android app, so it has to be right before the next
+build. Email cannot reach a single real student until the domain is verified in Resend, because
+the test sender only delivers to the account owner. And Supabase email confirmation cannot be
+switched on until that same verification is done, since its built-in sender is rate limited to a
+handful of messages an hour and fails silently past that.
+
+That last pair is the live cost: receipts, report cards and password resets all wait on it.
 
 **What is needed:** the domain purchased and DNS access shared.
 
@@ -61,9 +58,15 @@ the next build.
 **Why it waits:** their review looks at the live website, so doing it before the domain resolves
 means doing it twice.
 
-**What is needed:** the same document set as the SMS sender name, plus the business address and a
-real WhatsApp number for the site footer. **We will not invent those two.** Safepay's website review
-checks them, and `help@matricmate.pk` currently points at a domain nobody owns.
+**What is needed:** CNIC, FBR NTN, and a business letterhead, plus the business address and a real
+WhatsApp number for the site footer. **We will not invent those two.** Safepay's website review
+checks them.
+
+One related decision while you are here: every support address in both apps and on all four legal
+pages now reads from a single constant, `SUPPORT_EMAIL` in `packages/core/src/billing.ts`. It
+currently points at the Gmail account, because that mailbox certainly exists and
+`help@matricmate.pk` does not yet. Say the word once the domain receives mail and it is a one line
+change.
 
 ---
 

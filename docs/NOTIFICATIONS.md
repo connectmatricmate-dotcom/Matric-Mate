@@ -1,21 +1,28 @@
 # MatricMate · Sign-in and messaging requirements
 
-Phone number sign-in, plus SMS, WhatsApp and email messaging. What each one needs, what it costs,
-and what has to be built. Researched 10 Aug 2026 against Supabase's documentation, the providers'
-own pricing pages, and PTA sources.
+Researched 10 Aug 2026. **Superseded in part on 18 Aug**, when the messaging was actually built.
+Read the box below before acting on anything further down: the research still holds, but three of
+the decisions it locked were later reversed, and the file is kept because the costings and the
+regulatory detail are still the best record we have.
 
-## Decisions, locked 10 Aug 2026
+## What actually shipped, 18 Aug 2026
 
-| | |
-| :-- | :-- |
-| Sign-in | Phone number and a password. No email field at signup. |
-| Verification codes | At signup and password reset only, never on every login. |
-| Platform | **Stay on Supabase.** Its Send SMS Hook routes codes to a local provider. |
-| Channels | SMS, WhatsApp, email, and push notifications from the app. |
-| Vendors | Two: SendPK for SMS and WhatsApp, Resend for email. |
+| | Decided 10 Aug | Built |
+| :-- | :-- | :-- |
+| Sign-in | Phone number and a password, no email | **Email and a password.** Phone auth rejected: it puts the SMS provider inside the login path, so a provider outage stops anyone signing up, and it needs a hand-built reset flow. |
+| Channels | SMS, WhatsApp, email, push | **In-app inbox, push, email.** |
+| Vendors | SendPK for SMS and WhatsApp, Resend for email | **Firebase for push, Resend for email.** No SMS vendor. |
+| WhatsApp | Renewal and payment messages | **Built and removed the same day**, at the client's request. |
+| SMS | Sign-in codes and service messages | **Not built.** Most expensive channel, most paperwork, most regulated. |
 
-The reasoning behind each is below. These are settled and should not be reopened without a reason
-that is not already covered here.
+The one number worth carrying forward: an SMS to every student costs roughly Rs 7,700 and the
+same message by email costs nothing. That is why email and push carry everything now.
+
+Phone numbers are not collected anywhere. `profiles.phone` still exists from migration 0003 and
+nothing writes to it.
+
+Setup instructions for what was built are in `SETUP-NOTIFICATIONS.md`. What follows is the
+original research.
 
 ## Short answer
 

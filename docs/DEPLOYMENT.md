@@ -66,6 +66,35 @@ international card once you leave the free tier.
   records to add at the registrar. Once it resolves, also set `NEXT_PUBLIC_SITE_URL` to
   `https://matricmate.pk` so link previews on WhatsApp point at the right place.
 
+## Scheduled jobs do NOT live on Vercel
+
+Worth knowing before anyone adds a `crons` block back to `apps/web/vercel.json`.
+
+**Vercel Hobby allows one cron run per day.** A schedule with more is rejected at config
+validation, and that fails the *build*: no deployment of any commit, for any change, until the
+schedule is removed. It presents exactly like a broken git integration, with nothing appearing in
+the Deployments tab at all. It cost most of an afternoon on 18 Aug.
+
+The nudge has to run hourly through the evening, because each student picks the hour they are
+reminded at. So all scheduling moved to Supabase, which is on a paid plan:
+
+| Job | Schedule (UTC) | Karachi |
+| :-- | :-- | :-- |
+| `matricmate-nudge` | `0 11-16 * * *` | hourly, 4pm to 9pm |
+| `matricmate-coach` | `30 1 * * *` | 6:30am |
+
+They are pg_cron entries created by migration 0024, calling the same HTTP routes with the same
+`CRON_SECRET`. Nothing about the routes changed; Postgres just holds the clock. The secret and the
+site URL live in Supabase Vault, seeded by `scripts/db-cron-secrets.mjs`.
+
+**Re-run that script after rotating `CRON_SECRET`, or after moving to the real domain.** Neither
+is detected: the jobs simply stop working, and the only symptom is that nothing arrives.
+
+To see the schedule: `select jobname, schedule, active from cron.job;`
+To see what happened: `select status_code, content from net._http_response order by id desc limit 5;`
+
+---
+
 ## The one thing that will cost money
 
 **Vercel's Hobby tier is licensed for non-commercial use only.** It is fine for a prototype the
