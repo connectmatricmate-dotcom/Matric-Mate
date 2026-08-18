@@ -108,7 +108,7 @@ export function DashboardView() {
 
             <ul>
               {derived.plan.map((task) => (
-                <li key={task.id} className="flex items-center gap-2 border-t border-onbrand/15">
+                <li key={task.id} className="flex items-center gap-2 border-t border-onbrand-hair">
                   <button
                     type="button"
                     aria-pressed={task.done}
@@ -118,7 +118,7 @@ export function DashboardView() {
                   >
                     <span
                       className={`flex h-6 w-6 items-center justify-center rounded-[8px] border-2 transition-colors duration-200 ${
-                        task.done ? 'border-orange bg-orange text-onbrand' : 'border-onbrand/55 hover:border-onbrand'
+                        task.done ? 'border-orange bg-orange text-onbrand' : 'border-onbrand-line hover:border-onbrand'
                       }`}
                     >
                       {task.done ? <Icon name="check" size={14} strokeWidth={3} /> : null}
@@ -132,11 +132,11 @@ export function DashboardView() {
                         className={`text-[13.5px] font-extrabold text-onbrand ${task.done ? 'line-through opacity-70' : ''}`}
                         urduClassName={`text-[13.5px] text-onbrand ${task.done ? 'line-through opacity-70' : ''}`}
                       />
-                      <span className="block text-[11.5px] font-extrabold text-onbrand/70">
+                      <span className="block text-[11.5px] font-extrabold text-onbrand-soft">
                         {subjectById(task.subjectId)?.name}
                       </span>
                     </span>
-                    <Icon name="chevron" size={17} className="shrink-0 text-onbrand/70" />
+                    <Icon name="chevron" size={17} className="shrink-0 text-onbrand-soft" />
                   </Link>
                 </li>
               ))}

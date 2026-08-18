@@ -50,6 +50,11 @@ const CHECKS = [
   { pkg: 'mobile', workspace: 'apps/mobile', script: 'deps' },
   { pkg: 'mobile', workspace: 'apps/mobile', script: 'typecheck' },
   { pkg: 'web', workspace: 'apps/web', script: 'lint' },
+  // Catches `bg-ink/15`: Tailwind bakes the light hex for an opacity modifier
+  // on a theme colour, so it stops following the dark block. Its own check
+  // because typecheck, lint and build all pass and the page looks right in
+  // whichever theme you happen to have open.
+  { pkg: 'web', workspace: 'apps/web', script: 'tokens' },
   { pkg: 'web', workspace: 'apps/web', script: 'typecheck' },
   // Last because it is by far the slowest, and because it only makes sense to
   // read once the cheaper checks have had their say. It catches what neither of

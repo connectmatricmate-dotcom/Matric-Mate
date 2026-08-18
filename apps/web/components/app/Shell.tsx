@@ -115,7 +115,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {/* utility strip, streak, AI budget, notifications */}
         {/* Fixed h-14: screen-level sticky headers pin themselves to top-14,
             so the shell's height is a contract, not a measurement. */}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-paper/90 px-4 backdrop-blur md:px-8">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
           <Link href="/dashboard" className="md:hidden">
             <Image src="/brand/wordmark.png" alt="MatricMate" width={116} height={23} />
           </Link>

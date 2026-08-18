@@ -66,7 +66,7 @@ export function Sheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/40" />
+      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default bg-scrim" />
       <div
         ref={panel}
         tabIndex={-1}

@@ -19,7 +19,7 @@ export function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-line bg-glass backdrop-blur">
       {/* Three tracks, so the links are centred on the page rather than pushed
           along by whatever the logo and the buttons happen to measure. */}
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between gap-6 px-5 py-3.5 md:grid md:grid-cols-[1fr_auto_1fr]">

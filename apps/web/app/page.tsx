@@ -157,7 +157,7 @@ export default function LandingPage() {
                   </Link>
                 </div>
 
-                <p className="fx-rise fx-d6 mt-4 text-mk-small text-tealtint/80">
+                <p className="fx-rise fx-d6 mt-4 text-mk-small text-[color-mix(in_oklab,var(--color-tealtint)_80%,transparent)]">
                   Rs 1,000/month · nothing renews on its own · JazzCash, Easypaisa or card
                 </p>
               </div>

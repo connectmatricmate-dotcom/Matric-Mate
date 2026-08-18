@@ -103,9 +103,9 @@ export function FlashcardsScreen({
 
           {/* definition */}
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-y-auto rounded-[22px] bg-teal p-6 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <span className="text-[11px] font-extrabold tracking-[0.08em] text-onbrand/70">{t('session.cardDefinition')}</span>
+            <span className="text-[11px] font-extrabold tracking-[0.08em] text-onbrand-soft">{t('session.cardDefinition')}</span>
             <ScriptText text={card.back} className="text-center text-[16px] leading-[1.6] text-onbrand" urduClassName="text-center text-[15px] text-onbrand" />
-            {card.urduBack ? <Ur block className="block text-center text-[14px] text-onbrand/85">{card.urduBack}</Ur> : null}
+            {card.urduBack ? <Ur block className="block text-center text-[14px] text-onbrand-soft">{card.urduBack}</Ur> : null}
           </span>
         </span>
       </button>

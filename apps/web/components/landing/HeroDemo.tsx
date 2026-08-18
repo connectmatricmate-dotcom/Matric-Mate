@@ -194,7 +194,7 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
                   className={`min-h-10 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[13px] font-extrabold transition-all duration-300 ${
                     confidence === c.value
                       ? 'border-orange bg-orangetint text-orangedark'
-                      : 'border-line bg-card text-ink2 hover:border-orange/40'
+                      : 'border-line bg-card text-ink2 hover:border-[color-mix(in_oklab,var(--color-orange)_40%,transparent)]'
                   }`}
                 >
                   {c.en}

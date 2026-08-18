@@ -42,6 +42,17 @@
   --color-inkghost: rgba(15, 61, 76, 0.15);
   --color-ink2ghost: rgba(62, 100, 115, 0.15);
 
+  /* Translucent roles. Every one of these was written as an opacity modifier
+     on a theme colour, which Tailwind resolves at build time: the sticky
+     headers would have stayed white in dark mode, and the text on a teal band
+     would have stayed white where it needs to go dark. Named for the job so
+     the alpha is decided once rather than at each call site. */
+  --color-glass: rgba(250, 251, 247, 0.9);      /* sticky header over content */
+  --color-scrim: rgba(15, 61, 76, 0.4);         /* behind a modal */
+  --color-onbrand-soft: rgba(255, 255, 255, 0.7);     /* secondary text on a fill */
+  --color-onbrand-line: rgba(255, 255, 255, 0.55);    /* a visible border on a fill */
+  --color-onbrand-hair: rgba(255, 255, 255, 0.15);    /* a divider on a fill */
+
   /* Shadow colours, so depth can change with the theme. A 7% ink drop reads as
      lift on paper and as nothing at all on a dark ground, where the surfaces
      themselves carry the hierarchy and the shadow only has to stop a card
@@ -160,6 +171,13 @@ body {
   --color-onbrand: #04222f;
   --color-inkghost: rgba(234, 244, 247, 0.15);
   --color-ink2ghost: rgba(169, 198, 209, 0.15);
+  --color-glass: rgba(7, 32, 43, 0.9);
+  /* A scrim is dark in both themes: it is shadow, not surface. */
+  --color-scrim: rgba(0, 0, 0, 0.6);
+  /* onBrand goes dark after dark, so everything sitting on a fill goes with it. */
+  --color-onbrand-soft: rgba(4, 34, 47, 0.72);
+  --color-onbrand-line: rgba(4, 34, 47, 0.55);
+  --color-onbrand-hair: rgba(4, 34, 47, 0.18);
   /* `night` and `whatsapp` are deliberately absent: one is already the dark
      end of the brand and still the hero's ground, the other is not ours. */
 
