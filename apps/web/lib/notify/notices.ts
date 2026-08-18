@@ -56,3 +56,99 @@ export const paymentReceived = (date: string): Notice => ({
   // written record, and it is worth paying to confirm.
   channels: ['inbox', 'push', 'email', 'whatsapp'],
 });
+
+/* ------------------------------------------------------- the evening nudge */
+
+/**
+ * A streak that is about to break, warned in proportion to what it is worth.
+ *
+ * Losing a two day streak is a shrug. Losing a five week one is the thing that
+ * makes a student close the app for good, so it gets a louder sentence.
+ */
+export const streakAtRiskTiered = (days: number): Notice =>
+  days >= 30
+    ? { ...streakAtRisk(days), title: 'notifications.streakEpicTitle', body: 'notifications.streakEpicBody' }
+    : days >= 7
+      ? { ...streakAtRisk(days), title: 'notifications.streakLongTitle', body: 'notifications.streakLongBody' }
+      : streakAtRisk(days);
+
+/** Reaching a streak, rather than nearly losing one. The only happy nudge. */
+export const streakMilestone = (days: number): Notice => ({
+  kind: 'streak',
+  title: 'notifications.streakMilestoneTitle',
+  body: 'notifications.streakMilestoneBody',
+  params: { n: days },
+  target: 'home',
+  channels: ['inbox', 'push'],
+});
+
+/** They stopped partway through a chapter and never came back to it. */
+export const resumeChapter = (chapter: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.resumeChapterTitle',
+  body: 'notifications.resumeChapterBody',
+  params: { chapter },
+  target: 'study',
+  channels: ['inbox', 'push'],
+});
+
+/** Their actual worst topic, named. Vague encouragement is easy to ignore. */
+export const weakTopicNudge = (topic: string, pct: number): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.weakTopicTitle',
+  body: 'notifications.weakTopicBody',
+  params: { topic, pct },
+  target: 'practice',
+  channels: ['inbox', 'push'],
+});
+
+/** Today's plan, still with tasks on it, while there is still an evening left. */
+export const planUnfinished = (left: number): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.planLeftTitle',
+  body: 'notifications.planLeftBody',
+  params: { n: left },
+  target: 'home',
+  channels: ['inbox', 'push'],
+});
+
+/**
+ * The general evening nudge, in four flavours.
+ *
+ * Rotated rather than random, keyed on the day, so a student gets a different
+ * sentence each night instead of the same one for a month. Random would repeat
+ * by chance; a rotation cannot.
+ */
+const COMEBACK = ['comeback1', 'comeback2', 'comeback3', 'comeback4'] as const;
+
+export const comeBack = (dayIndex: number): Notice => {
+  const pick = COMEBACK[Math.abs(dayIndex) % COMEBACK.length];
+  return {
+    kind: 'reminder',
+    title: `notifications.${pick}Title` as Notice['title'],
+    body: `notifications.${pick}Body` as Notice['body'],
+    target: 'home',
+    channels: ['inbox', 'push'],
+  };
+};
+
+/**
+ * Win-back, for a student who has stopped altogether.
+ *
+ * Three rungs and then silence, and each rung fires on its exact day rather
+ * than on "at least". With `>=` the fortnight message repeated every night
+ * from day 14 to day 21, which is eight identical notifications to somebody
+ * who is already drifting away: the surest way to have them turn notifications
+ * off rather than come back.
+ */
+export const awayFor = (days: number): Notice | null => {
+  const stage = days === 14 ? 'away14' : days === 7 ? 'away7' : days === 3 ? 'away3' : null;
+  if (!stage) return null;
+  return {
+    kind: 'reminder',
+    title: `notifications.${stage}Title` as Notice['title'],
+    body: `notifications.${stage}Body` as Notice['body'],
+    target: 'home',
+    channels: ['inbox', 'push'],
+  };
+};

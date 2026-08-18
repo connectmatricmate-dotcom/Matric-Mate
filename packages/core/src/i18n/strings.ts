@@ -325,6 +325,46 @@ export const en = {
     streakBody: 'You have not studied today. Answer a few questions before midnight to keep it.',
     reportTitle: 'Your report card is ready',
     reportBody: 'Fresh notes from your coach on how this week went.',
+
+    /* A streak worth more gets a louder warning. Losing a two day streak is a
+       shrug; losing a five week one is the thing that makes people quit. */
+    streakLongTitle: 'Do not lose {n} days',
+    streakLongBody: 'That is over a week of work. A few questions tonight keeps it alive.',
+    streakEpicTitle: '{n} days. Do not stop now',
+    streakEpicBody: 'You have built something most students never get near. Ten minutes protects it.',
+
+    /* Reaching one, rather than nearly losing one. */
+    streakMilestoneTitle: '{n} days in a row',
+    streakMilestoneBody: 'That is the habit doing the work now, not motivation. Keep going.',
+
+    /* Contextual, in priority order. Each names something the student actually
+       left unfinished, which is the difference between a nudge and a nag. */
+    resumeChapterTitle: 'You stopped halfway through {chapter}',
+    resumeChapterBody: 'Picking up where you left off takes about ten minutes.',
+    weakTopicTitle: '{topic} is your weakest topic',
+    weakTopicBody: 'You are at {pct}% there. Ten questions tonight would move it.',
+    planLeftTitle: '{n} left on today\u2019s plan',
+    planLeftBody: 'It was built to fit one sitting. There is still time.',
+
+    /* The general evening nudge, rotated so it does not read like a robot
+       saying the same sentence every night for a month. */
+    comeback1Title: 'Nothing studied today',
+    comeback1Body: 'A few questions now still counts. Even ten minutes keeps you moving.',
+    comeback2Title: 'Ten minutes before bed',
+    comeback2Body: 'One short set is worth more than an hour you keep postponing to the weekend.',
+    comeback3Title: 'The paper is not moving',
+    comeback3Body: 'Every day you practise is one less thing to cram in the last week.',
+    comeback4Title: 'Fifteen questions, that is all',
+    comeback4Body: 'Open the app, pick any chapter, and let us see where you stand.',
+
+    /* Win-back, escalating in tone but never scolding. Stops after a fortnight:
+       past that we are shouting at someone who has already gone. */
+    away3Title: 'Three days away',
+    away3Body: 'Nothing is lost. Your chapters and your progress are exactly where you left them.',
+    away7Title: 'It has been a week',
+    away7Body: 'The board paper has not moved, and neither has your syllabus. Start with one chapter.',
+    away14Title: 'Still here whenever you are',
+    away14Body: 'Two weeks off is not a failure. Come back with fifteen minutes and pick it up again.',
   },
 
   email: {
@@ -1242,6 +1282,37 @@ export const ur: typeof en = {
     streakBody: 'آج آپ نے کچھ نہیں پڑھا۔ رات بارہ بجے سے پہلے چند سوال کر لیں تو تسلسل بچ جائے گا۔',
     reportTitle: 'آپ کا رپورٹ کارڈ تیار ہے',
     reportBody: 'اس ہفتے کی کارکردگی پر آپ کے کوچ کی تازہ رائے۔',
+
+    streakLongTitle: '{n} دن ضائع نہ کریں',
+    streakLongBody: 'یہ ایک ہفتے سے زیادہ کی محنت ہے۔ آج رات چند سوال اسے بچا لیں گے۔',
+    streakEpicTitle: '{n} دن۔ اب نہ رکیں',
+    streakEpicBody: 'آپ نے وہ بنایا ہے جہاں تک اکثر طلبہ پہنچتے ہی نہیں۔ دس منٹ اسے محفوظ رکھیں گے۔',
+
+    streakMilestoneTitle: 'مسلسل {n} دن',
+    streakMilestoneBody: 'اب یہ عادت کام کر رہی ہے، جوش نہیں۔ اسی طرح جاری رکھیں۔',
+
+    resumeChapterTitle: '{chapter} آدھا رہ گیا تھا',
+    resumeChapterBody: 'جہاں چھوڑا تھا وہیں سے شروع کرنے میں دس منٹ لگیں گے۔',
+    weakTopicTitle: '{topic} آپ کا کمزور ترین موضوع ہے',
+    weakTopicBody: 'اس میں آپ {pct}% پر ہیں۔ آج رات دس سوال اسے بہتر کر دیں گے۔',
+    planLeftTitle: 'آج کے منصوبے میں {n} باقی',
+    planLeftBody: 'یہ ایک ہی نشست کے لیے بنایا گیا تھا۔ ابھی وقت ہے۔',
+
+    comeback1Title: 'آج کچھ نہیں پڑھا',
+    comeback1Body: 'ابھی چند سوال بھی شمار ہوتے ہیں۔ دس منٹ بھی آپ کو آگے رکھتے ہیں۔',
+    comeback2Title: 'سونے سے پہلے دس منٹ',
+    comeback2Body: 'ایک چھوٹا سا سیٹ اُس گھنٹے سے بہتر ہے جو آپ ہفتے کے آخر پر ٹالتے رہتے ہیں۔',
+    comeback3Title: 'پرچہ اپنی جگہ کھڑا نہیں رہے گا',
+    comeback3Body: 'آج کی ہر مشق آخری ہفتے کے رٹے میں سے ایک چیز کم کر دیتی ہے۔',
+    comeback4Title: 'صرف پندرہ سوال',
+    comeback4Body: 'ایپ کھولیں، کوئی سا باب چنیں، اور دیکھیں آپ کہاں کھڑے ہیں۔',
+
+    away3Title: 'تین دن سے غیر حاضر',
+    away3Body: 'کچھ ضائع نہیں ہوا۔ آپ کے ابواب اور پیش رفت بالکل وہیں محفوظ ہیں۔',
+    away7Title: 'ایک ہفتہ ہو گیا',
+    away7Body: 'بورڈ کا پرچہ اپنی جگہ ہے اور نصاب بھی۔ ایک باب سے شروع کریں۔',
+    away14Title: 'ہم یہیں ہیں، جب آپ تیار ہوں',
+    away14Body: 'دو ہفتے کا وقفہ ناکامی نہیں۔ پندرہ منٹ لے کر واپس آئیں اور دوبارہ شروع کریں۔',
   },
 
   email: {
