@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chapterById, weakTopics } from '@matricmate/core';
-import type { Attempt } from '@matricmate/core';
+import type { Attempt, Language } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   awayFor,
@@ -149,7 +149,9 @@ export async function GET(req: NextRequest) {
   ]);
 
   const already = new Set(((sentRecently ?? []) as { user_id: string }[]).map((r) => r.user_id));
-  const byId = new Map(((profiles ?? []) as { id: string; settings: unknown }[]).map((p) => [p.id, p]));
+  const byId = new Map(
+    ((profiles ?? []) as { id: string; settings: unknown; onboarding: { medium?: string } | null }[]).map((p) => [p.id, p]),
+  );
 
   type Row = { user_id: string; chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string };
   const attemptsByUser = new Map<string, Row[]>();
@@ -169,7 +171,15 @@ export async function GET(req: NextRequest) {
   for (const [userId, days] of everyone) {
     if (already.has(userId)) continue;
 
-    const settings = ((byId.get(userId)?.settings ?? {}) as Record<string, unknown>) ?? {};
+    const profile = byId.get(userId);
+    const settings = ((profile?.settings ?? {}) as Record<string, unknown>) ?? {};
+    /*
+     * The student's language, taken from the profile rows already loaded above
+     * rather than by asking again per student. The dispatcher translates every
+     * sentence itself; this is only for the values interpolated INTO one, which
+     * it cannot translate because they are content, not copy.
+     */
+    const lang: Language = profile?.onboarding?.medium === 'ur' ? 'ur' : 'en';
     // Absent means never touched, and both default to on. Only an explicit
     // false is a student saying no.
     const wantsReminder = settings.reminders !== false;
@@ -187,6 +197,7 @@ export async function GET(req: NextRequest) {
       wantsReminder,
       wantsStreak,
       dayIndex,
+      lang,
     });
     if (!notice) continue;
 
@@ -215,6 +226,7 @@ type Signals = {
   wantsReminder: boolean;
   wantsStreak: boolean;
   dayIndex: number;
+  lang: Language;
 };
 
 /**
@@ -250,7 +262,11 @@ function pick(s: Signals): Notice | null {
   const last = s.attempts.length ? s.attempts[s.attempts.length - 1] : null;
   if (last) {
     const chapter = chapterById(last.chapter_id);
-    if (chapter) return resumeChapter(chapter.title);
+    // The chapter's own Urdu name, not the English one dropped into an Urdu
+    // sentence. Topics below stay Latin on purpose: FBISE Urdu-medium
+    // textbooks keep technical terms in English, and so does the rest of this
+    // app (see the `.latin` rule in globals.css).
+    if (chapter) return resumeChapter((s.lang === 'ur' && chapter.urduTitle) || chapter.title);
   }
 
   // 5. Their genuinely worst topic, named, with the number.
