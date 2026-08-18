@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
-import { Sheet } from '@/components/ui/sheet';
+import { Confirm } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
 import { session } from '@/lib/session';
@@ -205,13 +205,17 @@ export function ExamScreen() {
         </Rail>
       </Split>
 
-      <Sheet open={confirm} onClose={() => setConfirm(false)} title={t('session.submitTitle')}>
-        <p className="text-[13.5px] leading-[1.6] text-ink2">
-          {unanswered ? t('session.unanswered', { n: unanswered }) : t('session.allAnswered')} {t('session.noChangeAfter')}
-        </p>
-        <Btn title={t('session.submitNow')} variant="orange" onClick={submit} loading={leaving} className="mt-5 w-full" />
-        <Btn title={t('session.keepWorking')} variant="ghost" onClick={() => setConfirm(false)} className="mt-2 w-full" />
-      </Sheet>
+      <Confirm
+        open={confirm}
+        onClose={() => setConfirm(false)}
+        title={t('session.submitTitle')}
+        body={`${unanswered ? t('session.unanswered', { n: unanswered }) : t('session.allAnswered')} ${t('session.noChangeAfter')}`}
+        confirmLabel={t('session.submitNow')}
+        cancelLabel={t('session.keepWorking')}
+        tone="orange"
+        loading={leaving}
+        onConfirm={submit}
+      />
     </Page>
   );
 }

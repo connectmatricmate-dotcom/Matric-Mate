@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../src/components/LanguageToggle';
+import { markWelcomeSeen } from '../src/lib/first-run';
 import { Body, Btn, H1, Screen, Tap } from '../src/components/ui';
 import { useT } from '../src/i18n';
 import type { StringKey } from '../src/i18n';
@@ -15,6 +16,12 @@ const SLIDES: { emoji: string; title: StringKey; body: StringKey }[] = [
 
 export default function Welcome() {
   const t = useT();
+  // Seen once is seen. Marked on the way out rather than on mount, so
+  // backgrounding the app mid-carousel still shows the rest of it next time.
+  const leave = (to: '/onboarding/class' | '/login') => {
+    markWelcomeSeen();
+    router.push(to);
+  };
   const [i, setI] = useState(0);
   const slide = SLIDES[i];
   const last = i === SLIDES.length - 1;
@@ -25,11 +32,11 @@ export default function Welcome() {
       footer={
         <View style={{ gap: S.sm }}>
           {last ? (
-            <Btn title={t('welcome.getStarted')} variant="orange" onPress={() => router.push('/onboarding/class')} />
+            <Btn title={t('welcome.getStarted')} variant="orange" onPress={() => leave('/onboarding/class')} />
           ) : (
             <Btn title={t('common.next')} onPress={() => setI(i + 1)} />
           )}
-          <Btn title={t('welcome.haveAccount')} variant="ghost" onPress={() => router.push('/login')} />
+          <Btn title={t('welcome.haveAccount')} variant="ghost" onPress={() => leave('/login')} />
         </View>
       }
     >

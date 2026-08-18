@@ -1,3 +1,4 @@
+import { ActivityIndicator, View } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { IconName } from '../../src/components/Icon';
 import { TabBar } from '../../src/components/TabBar';
@@ -7,6 +8,20 @@ import { useOnline } from '../../src/core/connectivity';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { C } from '../../src/theme';
+
+/**
+ * The gap between "signed in" and "we know what they paid for".
+ *
+ * Deliberately plain: a second of the brand's own paper and a spinner, rather
+ * than a skeleton of a dashboard we may be about to redirect away from.
+ */
+function Waiting() {
+  return (
+    <View style={{ flex: 1, backgroundColor: C.paper, alignItems: 'center', justifyContent: 'center' }}>
+      <ActivityIndicator color={C.teal} />
+    </View>
+  );
+}
 
 const TABS: { name: string; label: StringKey; icon: IconName }[] = [
   { name: 'index', label: 'tabs.home', icon: 'home' },
@@ -57,7 +72,19 @@ export default function TabLayout() {
    * on a slow connection gets thrown at the paywall for the second or two
    * before their plan loads, and nothing on the paywall sends them back.
    */
-  if (hydrated && state.user && entitlementReady && !state.premium.active) return <Redirect href="/upgrade" />;
+  /*
+   * And until it IS ready, hold rather than render.
+   *
+   * Waiting to redirect was only half of it. The tabs still painted in the
+   * meantime, with entitlement at its "none" default, so a student who had
+   * just signed up watched a dashboard full of locks and a "free plan" badge
+   * and then got thrown at the paywall a moment later. Neither screen was a
+   * lie on its own; the sequence was. A brief hold is honest: we do not yet
+   * know what they have.
+   */
+  if (hydrated && state.user && !entitlementReady) return <Waiting />;
+
+  if (hydrated && state.user && !state.premium.active) return <Redirect href="/upgrade" />;
 
   return (
     <Tabs

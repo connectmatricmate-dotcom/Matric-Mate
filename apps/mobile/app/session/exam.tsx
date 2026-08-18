@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Btn, Card, H3, IconButton, Pill, Row, Screen, ScriptText, Sheet, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { Btn, Card, Confirm, H3, IconButton, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { isUrduScript } from '@matricmate/core';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { useT } from '../../src/i18n';
@@ -199,15 +199,16 @@ export default function Exam() {
         <Small style={{ textAlign: 'center' }}>{t('session.jumpHint')}</Small>
       </Screen>
 
-      <Sheet visible={confirm} onClose={() => setConfirm(false)} title={t('session.submitTitle')}>
-        <Small>
-          {unanswered ? t('session.unanswered', { n: unanswered }) : t('session.allAnswered')} {t('session.noChangeAfter')}
-        </Small>
-        <Spacer h={S.lg} />
-        <Btn title={t('session.submitNow')} variant="orange" onPress={submit} />
-        <Spacer h={S.sm} />
-        <Btn title={t('session.keepWorking')} variant="ghost" onPress={() => setConfirm(false)} />
-      </Sheet>
+      <Confirm
+        visible={confirm}
+        onClose={() => setConfirm(false)}
+        title={t('session.submitTitle')}
+        body={`${unanswered ? t('session.unanswered', { n: unanswered }) : t('session.allAnswered')} ${t('session.noChangeAfter')}`}
+        confirmLabel={t('session.submitNow')}
+        cancelLabel={t('session.keepWorking')}
+        tone="orange"
+        onConfirm={submit}
+      />
     </>
   );
 }

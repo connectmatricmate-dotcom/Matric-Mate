@@ -4,8 +4,8 @@ import { Linking, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   Bar,
-  Btn,
   Card,
+  Confirm,
   Header,
   IconButton,
   Item,
@@ -14,7 +14,6 @@ import {
   Screen,
   SectionTitle,
   Seg,
-  Sheet,
   Small,
   Spacer,
   Toggle,
@@ -278,70 +277,66 @@ export default function Account() {
         <Spacer h={S.lg} />
       </Screen>
 
-      <Sheet visible={confirmOut} onClose={() => setConfirmOut(false)} title={t('auth.logOutConfirm')}>
-        <Small>{t('auth.logOutBody')}</Small>
-        <Spacer h={S.lg} />
-        <Btn
-          title={t('auth.logOut')}
-          variant="danger"
-          onPress={async () => {
-            setConfirmOut(false);
-            // Ends the Supabase session and clears the cached entitlement, so
-            // the next person to open this phone starts from nothing.
-            await signOut();
-            router.replace('/welcome');
-          }}
-        />
-        <Spacer h={S.sm} />
-        <Btn title={t('auth.stayLoggedIn')} variant="ghost" onPress={() => setConfirmOut(false)} />
-      </Sheet>
+      <Confirm
+        visible={confirmOut}
+        onClose={() => setConfirmOut(false)}
+        title={t('auth.logOutConfirm')}
+        body={t('auth.logOutBody')}
+        confirmLabel={t('auth.logOut')}
+        cancelLabel={t('auth.stayLoggedIn')}
+        onConfirm={async () => {
+          setConfirmOut(false);
+          // Ends the Supabase session and clears the cached entitlement, so
+          // the next person to open this phone starts from nothing.
+          await signOut();
+          // The login form, not the welcome carousel. Somebody signing out has
+          // already been introduced to the app; pitching it again and making
+          // them swipe through three slides to reach a password field is the
+          // wrong end of the funnel.
+          router.replace('/login');
+        }}
+      />
 
       {/* One tap used to do it, no questions asked: local state, downloaded
           files AND server history, gone. That is the most destructive action
           in the app and the only one that had no confirm. */}
-      <Sheet visible={confirmReset} onClose={() => setConfirmReset(false)} title={t('account.resetDemo')}>
-        <Small>{t('account.resetDemoSub')}</Small>
-        <Spacer h={S.md} />
-        <Row gap={S.sm}>
-          <Btn title={t('common.cancel')} variant="line" sm onPress={() => setConfirmReset(false)} />
-          <Btn
-            title={t('account.resetDemo')}
-            variant="danger"
-            sm
-            onPress={() => {
-              setConfirmReset(false);
-              actions.resetDemo();
-              toast(t('account.resetDone'));
-            }}
-          />
-        </Row>
-      </Sheet>
+      <Confirm
+        visible={confirmReset}
+        onClose={() => setConfirmReset(false)}
+        title={t('account.resetDemo')}
+        body={t('account.resetDemoSub')}
+        confirmLabel={t('account.resetDemo')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={() => {
+          setConfirmReset(false);
+          actions.resetDemo();
+          toast(t('account.resetDone'));
+        }}
+      />
 
-      <Sheet visible={confirmClass !== null} onClose={() => setConfirmClass(null)} title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}>
-        <Small>{t('tutor.classWarnBody')}</Small>
-        <Spacer h={S.md} />
-        <Btn
-          title={t('tutor.classWarnCta')}
-          variant="danger"
-          loading={switching}
-          onPress={() => {
-            if (confirmClass === null || switching) return;
-            setSwitching(true);
-            void actions.switchClass(confirmClass).then((r) => {
-              setSwitching(false);
-              setConfirmClass(null);
-              if (r === 'ok') {
-                toast(t('tutor.classChanged', { n: confirmClass }));
-                router.replace('/(tabs)');
-              } else {
-                toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
-              }
-            });
-          }}
-        />
-        <Spacer h={S.sm} />
-        <Btn title={t('common.cancel')} variant="line" onPress={() => setConfirmClass(null)} />
-      </Sheet>
+      <Confirm
+        visible={confirmClass !== null}
+        onClose={() => setConfirmClass(null)}
+        title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}
+        body={t('tutor.classWarnBody')}
+        confirmLabel={t('tutor.classWarnCta')}
+        cancelLabel={t('common.cancel')}
+        loading={switching}
+        onConfirm={() => {
+          if (confirmClass === null || switching) return;
+          setSwitching(true);
+          void actions.switchClass(confirmClass).then((r) => {
+            setSwitching(false);
+            setConfirmClass(null);
+            if (r === 'ok') {
+              toast(t('tutor.classChanged', { n: confirmClass }));
+              router.replace('/(tabs)');
+            } else {
+              toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+            }
+          });
+        }}
+      />
     </>
   );
 }

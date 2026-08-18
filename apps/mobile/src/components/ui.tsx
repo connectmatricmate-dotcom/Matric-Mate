@@ -870,6 +870,51 @@ export function Chevron({ size = 18, color = C.ink3 }: { size?: number; color?: 
 
 /* ------------------------------------------------------------ feedback */
 
+/**
+ * Ask before doing something that cannot be undone.
+ *
+ * Every confirmation in the app was the same six lines written out again:
+ * a Sheet, a title, a sentence, the action, a spacer, and a ghost "no". Six
+ * copies meant six chances for the spacing, the button order or the tone to
+ * drift, and two of them already had. One component means the answer button is
+ * always in the same place and the way out is always the same word.
+ *
+ * The cancel is a ghost button AND the backdrop, so there are two ways out and
+ * neither is the destructive one. `tone` colours only the confirm.
+ */
+export function Confirm({
+  visible,
+  onClose,
+  title,
+  body,
+  confirmLabel,
+  onConfirm,
+  cancelLabel,
+  tone = 'danger',
+  loading,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  title: string;
+  /** A string, or your own nodes when the sentence needs more than one style. */
+  body: string | React.ReactNode;
+  confirmLabel: string;
+  onConfirm: () => void;
+  cancelLabel: string;
+  tone?: 'danger' | 'orange' | 'primary';
+  loading?: boolean;
+}) {
+  return (
+    <Sheet visible={visible} onClose={onClose} title={title}>
+      {typeof body === 'string' ? <Small>{body}</Small> : body}
+      <Spacer h={S.lg} />
+      <Btn title={confirmLabel} variant={tone} onPress={onConfirm} loading={loading} />
+      <Spacer h={S.sm} />
+      <Btn title={cancelLabel} variant="ghost" onPress={onClose} disabled={loading} />
+    </Sheet>
+  );
+}
+
 export function Skeleton({ w = '100%', h = 14, style }: { w?: number | `${number}%`; h?: number; style?: ViewStyle }) {
   /**
    * `useState` with a lazy initialiser, not `useRef(new Animated.Value(…)).current`.

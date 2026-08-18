@@ -38,6 +38,15 @@ const NONE: Entitlement = { active: false, validTill: null, plan: null };
  */
 const OFFLINE_GRACE_MS = 30 * 24 * 60 * 60 * 1000;
 
+/**
+ * How long the entitlement read may hang before we stop waiting on it.
+ *
+ * Same reasoning and the same number as hydrateStudyState in core: the moment
+ * a request like this stalls is exactly the moment somebody is staring at a
+ * screen that cannot decide what it is.
+ */
+const ENTITLEMENT_TIMEOUT_MS = 8000;
+
 type CachedEntitlement = Entitlement & { cachedAt?: number };
 
 /**
@@ -162,11 +171,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loadEntitlement = useCallback(async (userId: string) => {
     setChecking(true);
     try {
-      const { data, error } = await supabase
-        .from('entitlements')
-        .select('active, plan, valid_till')
-        .eq('user_id', userId)
-        .maybeSingle();
+      /*
+       * Raced against a timeout. Nothing here used to bound this request, and
+       * postgrest does not reject on a stalled connection, so on a bad network
+       * the promise simply never settled: entitlementReady stayed false, and
+       * the student sat looking at a dashboard in its no-plan state for
+       * minutes before it finally resolved and threw them at the paywall.
+       * Giving up after eight seconds falls through to the cached value, which
+       * is the same path an outright error takes.
+       */
+      const { data, error } = await Promise.race([
+        supabase.from('entitlements').select('active, plan, valid_till').eq('user_id', userId).maybeSingle(),
+        new Promise<{ data: null; error: { message: string } }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), ENTITLEMENT_TIMEOUT_MS),
+        ),
+      ]);
 
       if (currentUserId.current !== userId) return;
 

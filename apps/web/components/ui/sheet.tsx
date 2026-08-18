@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef } from 'react';
 import { Icon } from './primitives';
+import { Btn } from './controls';
 
 export function Sheet({
   open,
@@ -90,5 +91,51 @@ export function Sheet({
         {children}
       </div>
     </div>
+  );
+}
+
+/**
+ * Ask before doing something that cannot be undone.
+ *
+ * Every confirmation was the same handful of lines written out again: a sheet,
+ * a title, a sentence, the action, a cancel. Repeated, they drift, and they
+ * had: one dialog put cancel on the left as a small outline button while the
+ * others put it underneath as a ghost. One component means the answer is
+ * always in the same place and the way out is always the same word, on both
+ * apps, because the Android side has the twin of this.
+ *
+ * The cancel is a button AND the backdrop, so there are two ways out and
+ * neither of them is the destructive one. `tone` colours only the confirm.
+ */
+export function Confirm({
+  open,
+  onClose,
+  title,
+  body,
+  confirmLabel,
+  onConfirm,
+  cancelLabel,
+  tone = 'danger',
+  loading,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  /** A string, or your own nodes when the sentence needs more than one style. */
+  body: React.ReactNode;
+  confirmLabel: string;
+  onConfirm: () => void;
+  cancelLabel: string;
+  tone?: 'danger' | 'orange' | 'primary';
+  loading?: boolean;
+}) {
+  return (
+    <Sheet open={open} onClose={onClose} title={title}>
+      {typeof body === 'string' ? <p className="text-[13.5px] leading-[1.6] text-ink2">{body}</p> : body}
+      <div className="mt-5 flex flex-col gap-2.5">
+        <Btn title={confirmLabel} variant={tone} onClick={onConfirm} loading={loading} />
+        <Btn title={cancelLabel} variant="ghost" onClick={onClose} disabled={loading} />
+      </div>
+    </Sheet>
   );
 }

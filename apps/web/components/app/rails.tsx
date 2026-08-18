@@ -9,7 +9,7 @@ import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
 import { accuracy, chapterById, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
 import type { CoachReport } from '@matricmate/core';
-import { Bar, Card, Icon, Label, Pill, Ring, ScriptText } from '@/components/ui/primitives';
+import { Bar, Card, Icon, Label, Pill, Ring, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { ScriptNumbers } from '@/components/ui/ScriptList';
 import { useApp, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
@@ -242,20 +242,60 @@ export function UpgradeRail() {
 export function CoachRail() {
   const { state, derived } = useApp();
   const t = useT();
-  const [report, setReport] = useState<CoachReport | null>(null);
+  /**
+   * The settled result, tagged with who it belongs to.
+   *
+   * One piece of state rather than a report plus a loading flag, because
+   * "loading" is then derived: a result for a different student, or none at
+   * all, is a load in progress. That also keeps the effect from calling
+   * setState synchronously to reset the flag when the student changes, which
+   * is a cascading render and a lint error.
+   */
+  const [settled, setSettled] = useState<{ userId: string; report: CoachReport | null } | null>(null);
   const userId = state.user?.id ?? '';
+  const loading = settled?.userId !== userId;
+  const report = settled?.userId === userId ? settled.report : null;
+
   useEffect(() => {
     if (!userId) return;
     let alive = true;
     // A read. Reports are written by the nightly job, so opening the dashboard
     // never waits on a model call and never spends a question.
-    void fetchLatestCoachReport().then((r) => {
-      if (alive) setReport(r);
-    });
+    void fetchLatestCoachReport()
+      .then((r) => {
+        if (alive) setSettled({ userId, report: r });
+      })
+      .catch(() => {
+        // A failed read is still settled: show the welcome card rather than
+        // spinning a skeleton forever.
+        if (alive) setSettled({ userId, report: null });
+      });
     return () => {
       alive = false;
     };
   }, [userId]);
+
+  /**
+   * A skeleton while the report is in flight, not the welcome card.
+   *
+   * Every student who has a report saw "welcome, here are three first steps"
+   * for as long as the fetch took, then watched it swap to their actual week.
+   * Two different pieces of writing in the same box, one of them wrong, on
+   * every dashboard open. Shape-matched so nothing jumps when it arrives.
+   */
+  if (loading) {
+    return (
+      <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
+        <Label className="text-teal">{t('tutor.coachTitle')}</Label>
+        <Skeleton className="h-3.5 w-full" />
+        <Skeleton className="h-3.5 w-[88%]" />
+        <Skeleton className="mb-1 h-3.5 w-[94%]" />
+        <Skeleton className="h-3 w-2/5" />
+        <Skeleton className="h-3 w-4/5" />
+        <Skeleton className="h-3 w-3/4" />
+      </Card>
+    );
+  }
 
   if (!report) {
     /*

@@ -13,7 +13,7 @@ import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
 import { useToast } from '@/components/ui/toast';
 import { Bar, Card, Icon, Item, Label, LinkBtn, Pill } from '@/components/ui/primitives';
-import { Sheet } from '@/components/ui/sheet';
+import { Confirm } from '@/components/ui/sheet';
 import { useApp, useLang, useT } from '@/lib/store';
 
 /** A titled group of rows, so a toggle never floats away from its label. */
@@ -303,63 +303,60 @@ export function AccountView() {
         </Rail>
       </Split>
 
-      <Sheet open={confirmClass !== null} onClose={() => setConfirmClass(null)} title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}>
-        <p className="text-[13.5px] leading-[1.6] text-ink2">{t('tutor.classWarnBody')}</p>
-        <Btn
-          title={t('tutor.classWarnCta')}
-          variant="danger"
-          className="mt-5 w-full"
-          loading={switching}
-          onClick={() => {
-            if (confirmClass === null || switching) return;
-            setSwitching(true);
-            void actions.switchClass(confirmClass).then((r) => {
-              setSwitching(false);
-              setConfirmClass(null);
-              if (r === 'ok') toast(t('tutor.classChanged', { n: confirmClass }));
-              else toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
-            });
-          }}
-        />
-        <Btn title={t('common.cancel')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmClass(null)} />
-      </Sheet>
+      <Confirm
+        open={confirmClass !== null}
+        onClose={() => setConfirmClass(null)}
+        title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}
+        body={t('tutor.classWarnBody')}
+        confirmLabel={t('tutor.classWarnCta')}
+        cancelLabel={t('common.cancel')}
+        loading={switching}
+        onConfirm={() => {
+          if (confirmClass === null || switching) return;
+          setSwitching(true);
+          void actions.switchClass(confirmClass).then((r) => {
+            setSwitching(false);
+            setConfirmClass(null);
+            if (r === 'ok') toast(t('tutor.classChanged', { n: confirmClass }));
+            else toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+          });
+        }}
+      />
 
-      <Sheet open={confirmReset} onClose={() => setConfirmReset(false)} title={t('account.resetDemo')}>
-        <p className="text-[13.5px] leading-[1.6] text-ink2">{t('account.resetDemoSub')}</p>
-        <Btn
-          title={t('account.resetDemo')}
-          variant="danger"
-          className="mt-5 w-full"
-          onClick={() => {
-            actions.resetDemo();
-            setConfirmReset(false);
-            toast(t('account.resetDone'));
-          }}
-        />
-        <Btn title={t('common.cancel')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmReset(false)} />
-      </Sheet>
+      <Confirm
+        open={confirmReset}
+        onClose={() => setConfirmReset(false)}
+        title={t('account.resetDemo')}
+        body={t('account.resetDemoSub')}
+        confirmLabel={t('account.resetDemo')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={() => {
+          actions.resetDemo();
+          setConfirmReset(false);
+          toast(t('account.resetDone'));
+        }}
+      />
 
-      <Sheet open={confirmOut} onClose={() => setConfirmOut(false)} title={t('auth.logOutConfirm')}>
-        <p className="text-[13.5px] text-ink2">{t('auth.logOutBody')}</p>
-        <Btn
-          title={t('auth.logOut')}
-          variant="danger"
-          className="mt-5 w-full"
-          loading={signingOut}
-          onClick={async () => {
-            // The sheet stays open and the button spins until the server action
-            // redirects; closing first left a signed-out shell with no feedback.
-            setSigningOut(true);
-            actions.signOut();
-            try {
-              await signOutAction();
-            } catch {
-              setSigningOut(false);
-            }
-          }}
-        />
-        <Btn title={t('auth.stayLoggedIn')} variant="ghost" className="mt-2 w-full" onClick={() => setConfirmOut(false)} />
-      </Sheet>
+      <Confirm
+        open={confirmOut}
+        onClose={() => setConfirmOut(false)}
+        title={t('auth.logOutConfirm')}
+        body={t('auth.logOutBody')}
+        confirmLabel={t('auth.logOut')}
+        cancelLabel={t('auth.stayLoggedIn')}
+        loading={signingOut}
+        onConfirm={async () => {
+          // The sheet stays open and the button spins until the server action
+          // redirects; closing first left a signed-out shell with no feedback.
+          setSigningOut(true);
+          actions.signOut();
+          try {
+            await signOutAction();
+          } catch {
+            setSigningOut(false);
+          }
+        }}
+      />
     </Page>
   );
 }
