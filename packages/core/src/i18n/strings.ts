@@ -823,6 +823,9 @@ export const en = {
     activeDays: '{n} active days',
     share: 'Share',
     savePdf: 'Save PDF',
+    /* Said before the tap, not discovered after it. A standard PDF font
+       covers Latin only, so the file is English whatever the app is set to. */
+    pdfEnglishNote: 'The PDF is in English.',
     reportFootnote: 'Grades come from your accuracy this month.',
     gradesBySubject: 'Grades by subject',
     reportOverall: 'Overall',
@@ -1756,6 +1759,7 @@ export const ur: typeof en = {
     activeDays: '{n} دن پڑھا',
     share: 'بانٹیں',
     savePdf: 'PDF محفوظ کریں',
+    pdfEnglishNote: 'پی ڈی ایف انگریزی میں ہوگی۔',
     reportFootnote: 'گریڈ اس مہینے کی درستگی سے بنتے ہیں۔',
     gradesBySubject: 'مضمون کے حساب سے گریڈ',
     reportOverall: 'مجموعی',

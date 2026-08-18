@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Image, Share, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -91,22 +91,10 @@ export default function Report() {
    * and hands the file to the share sheet, so a parent gets a document with
    * the student's name and school on it rather than a screenshot.
    */
-  async function shareReport(kind: 'text' | 'pdf') {
+  async function shareReport() {
     if (busy) return;
     setBusy(true);
     try {
-      if (kind === 'text') {
-        const summary =
-          `${state.user?.name ?? t('common.student')} · MatricMate · ${month}\n` +
-          `${t('dash.accuracy')}: ${overallAcc}% · ${state.attempts.length} ${t('common.questions')}\n` +
-          rows
-            .filter((r) => r.attempted)
-            .map((r) => `${subjectById(r.sid)?.name}: ${grade(r.acc)}`)
-            .join(' · ');
-        await Share.share({ message: summary });
-        return;
-      }
-
       const { uri } = await Print.printToFileAsync({ html: printable() });
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: t('progress.reportTitle') });
@@ -187,14 +175,11 @@ export default function Report() {
       </Card>
 
       <Spacer h={S.lg} />
-      <Row gap={S.sm}>
-        <View style={{ flex: 1 }}>
-          <Btn title={t('progress.share')} variant="whatsapp" icon="whatsapp" loading={busy} onPress={() => void shareReport('text')} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Btn title={t('progress.savePdf')} variant="line" icon="download" loading={busy} onPress={() => void shareReport('pdf')} />
-        </View>
-      </Row>
+      {/* One action. The other button shared a text summary, which is not the
+          report: a parent got a paragraph instead of the sheet. This makes the
+          PDF and hands it to Android's own share sheet, so the student sends
+          it wherever they like, WhatsApp included. */}
+      <Btn title={t('progress.savePdf')} icon="download" loading={busy} onPress={() => void shareReport()} />
       <Spacer h={S.md} />
       <Small>{t('progress.reportFootnote')}</Small>
     </Screen>

@@ -2,25 +2,21 @@
 
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { WORDMARK_DATA_URI, accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
+import { accuracy, boardName, formatDate, grade, mediumName, subjectById } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Btn } from '@/components/ui/controls';
-import { Card, Label, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Label, Pill } from '@/components/ui/primitives';
+import { buttonClasses } from '@/components/ui/styles';
 import { useNow } from '@/lib/now';
-import { useToast } from '@/components/ui/toast';
-import { printSheet } from '@/lib/print-sheet';
 import { useApp, useLang, useT } from '@/lib/store';
 
 export function ReportCard() {
   const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const toast = useToast();
 
   const now = useNow();
   const month = now ? formatDate(now, lang, { month: 'long', year: 'numeric' }) : '';
   const overallAcc = accuracy(state.attempts);
-  const printedOn = now ? formatDate(now, lang, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
   const rows = useMemo(
     () =>
@@ -43,45 +39,6 @@ export function ReportCard() {
 
   const activeDays = state.activeDays.filter((d) => d.slice(0, 7) === new Date().toISOString().slice(0, 7)).length;
 
-  /** The printable sheet, shared with the Android PDF. */
-  function printableReport(): string {
-    return reportHtml({
-      studentName: state.user?.name ?? t('common.student'),
-      classLine: t('account.classLine', {
-        class: state.onboarding?.classLevel ?? 9,
-        board: boardName(state.onboarding?.board, lang),
-        medium: mediumName(state.onboarding?.medium, lang),
-      }),
-      month,
-      overallGrade: grade(overallAcc),
-      overallAccuracy: overallAcc,
-      questions: state.attempts.length,
-      activeDays,
-      rtl: lang === 'ur',
-      logoDataUri: WORDMARK_DATA_URI,
-      rows: rows.map((r) => ({
-        subject: subjectById(r.sid)?.name ?? r.sid,
-        grade: r.attempted ? grade(r.acc) : 'n/a',
-        accuracy: r.acc,
-        attempted: r.attempted,
-        trend: r.trend,
-      })),
-      labels: {
-        title: t('progress.reportTitle'),
-        month: t('progress.month'),
-        overall: t('progress.reportOverall'),
-        questions: t('dash.questions'),
-        activeDays: t('dash.activeDays'),
-        subject: t('session.subject'),
-        grade: t('session.grade', { g: '' }).trim(),
-        accuracy: t('dash.accuracy'),
-        attempted: t('progress.reportAttempted'),
-        footnote: t('progress.reportFootnote'),
-        generated: t('progress.reportGenerated', { date: printedOn }),
-        trend: t('progress.reportTrend'),
-      },
-    });
-  }
 
   return (
     <Page width="focus">
@@ -138,45 +95,17 @@ export function ReportCard() {
         </div>
       </Card>
 
-      <div className="no-print mt-6 flex gap-2.5">
-        {/* Both actions are real. Share opens WhatsApp's own share flow with a
-            text summary; Save opens the print dialog, where every phone and
-            desktop browser offers "Save as PDF". */}
-        <Btn
-          title={t('progress.share')}
-          variant="whatsapp"
-          icon="whatsapp"
-          className="flex-1"
-          onClick={() => {
-            const summary =
-              `${state.user?.name ?? t('common.student')} · MatricMate report card, ${month}\n` +
-              `Overall grade: ${grade(overallAcc)} · ${state.attempts.length} questions this month\n` +
-              rows
-                .filter((r) => r.attempted)
-                .map((r) => `${subjectById(r.sid)?.name}: ${grade(r.acc)}`)
-                .join(' · ');
-            window.open(`https://wa.me/?text=${encodeURIComponent(summary)}`, '_blank', 'noopener');
-          }}
-        />
-        <Btn
-          title={t('progress.savePdf')}
-          variant="line"
-          icon="download"
-          className="flex-1"
-          onClick={() => {
-            /*
-             * A purpose-built sheet, not the page.
-             *
-             * window.print() on the live page produced whatever the browser
-             * decided to include: the app chrome, the rails, the nav. What a
-             * parent should get is one branded page with the student's name,
-             * class and board on it, which is what reportHtml builds. The same
-             * generator feeds the Android PDF, so the two are the same
-             * document.
-             */
-            printSheet(printableReport(), () => toast(t('progress.shareFailed')));
-          }}
-        />
+      <div className="no-print mt-6">
+        {/* One action, and it is a real file. This used to be a WhatsApp share
+            that sent a text summary, and a "Save as PDF" that opened the print
+            dialog. Neither was a download: one sent a paragraph instead of the
+            report, and the other handed the student a menu. The link below is
+            a request that returns a PDF. */}
+        <a href="/api/report/pdf" className={buttonClasses({ className: 'w-full sm:w-auto' })} download>
+          <Icon name="download" size={18} />
+          {t('progress.savePdf')}
+        </a>
+        <p className="mt-2 text-[12.5px] text-ink2">{t('progress.pdfEnglishNote')}</p>
       </div>
 
       <p className="mt-4 text-[13px] text-ink2">{t('progress.reportFootnote')}</p>
