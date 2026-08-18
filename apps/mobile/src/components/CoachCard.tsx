@@ -42,12 +42,14 @@ export function CoachCard() {
     return (
       <Card flat tint={C.tealTint} border={C.teal} style={{ gap: 8 }}>
         <Label style={{ color: C.teal }}>{t('tutor.coachTitle')}</Label>
-        <Skeleton h={13} />
-        <Skeleton h={13} w="88%" />
-        <Skeleton h={13} w="94%" style={{ marginBottom: 4 }} />
-        <Skeleton h={11} w="40%" />
-        <Skeleton h={12} w="80%" />
-        <Skeleton h={12} w="72%" />
+        {/* Each bar carries the colour of the line it stands in for: the
+            summary is ink, the label and the actions below it are ink2. */}
+        <Skeleton h={13} tone="ink" />
+        <Skeleton h={13} w="88%" tone="ink" />
+        <Skeleton h={13} w="94%" tone="ink" style={{ marginBottom: 4 }} />
+        <Skeleton h={11} w="40%" tone="ink2" />
+        <Skeleton h={12} w="80%" tone="ink2" />
+        <Skeleton h={12} w="72%" tone="ink2" />
       </Card>
     );
   }

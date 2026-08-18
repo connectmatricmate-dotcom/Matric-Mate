@@ -34,6 +34,14 @@
      dark mode. */
   --color-onbrand: #ffffff;
 
+  /* A skeleton bar in the colour of the text it stands in for.
+     Real tokens rather than `bg-ink/15`, because Tailwind resolves an opacity
+     modifier on a theme colour at build time and writes the light hex into the
+     stylesheet. That is invisible on a dark card: the whole point of the dark
+     block below is that these have to move with the theme. */
+  --color-inkghost: rgba(15, 61, 76, 0.15);
+  --color-ink2ghost: rgba(62, 100, 115, 0.15);
+
   /* Shadow colours, so depth can change with the theme. A 7% ink drop reads as
      lift on paper and as nothing at all on a dark ground, where the surfaces
      themselves carry the hierarchy and the shadow only has to stop a card
@@ -150,6 +158,8 @@ body {
   --color-redtint: #3a1e1d;
   --color-grey: #143a48;
   --color-onbrand: #04222f;
+  --color-inkghost: rgba(234, 244, 247, 0.15);
+  --color-ink2ghost: rgba(169, 198, 209, 0.15);
   /* `night` and `whatsapp` are deliberately absent: one is already the dark
      end of the brand and still the hero's ground, the other is not ours. */
 

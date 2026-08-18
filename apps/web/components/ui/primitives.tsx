@@ -566,8 +566,29 @@ export function Item(
 
 /* -------------------------------------------------------------- feedback */
 
-export function Skeleton({ className = 'h-4 w-full' }: { className?: string }) {
-  return <div className={`animate-pulse rounded-[12px] bg-track ${className}`} />;
+/**
+ * A placeholder shaped like the thing that is coming.
+ *
+ * `tone` tints the bar with the colour of the text it stands in for, rather
+ * than the neutral track. It matters on a tinted card: a grey bar on the
+ * coach card's teal wash reads as a foreign object, where a faint ink bar
+ * reads as the sentence arriving. Low alpha on purpose, so it suggests text
+ * without looking like a redaction. They are their own tokens, not `bg-ink/15`:
+ * Tailwind resolves an opacity modifier on a theme colour at build time and
+ * bakes in the light value, which then stays dark navy on a dark card.
+ *
+ * The default stays neutral, which is right for the many skeletons standing in
+ * for something other than a line of prose.
+ */
+export function Skeleton({
+  className = 'h-4 w-full',
+  tone = 'default',
+}: {
+  className?: string;
+  tone?: 'default' | 'ink' | 'ink2';
+}) {
+  const fill = tone === 'ink' ? 'bg-inkghost' : tone === 'ink2' ? 'bg-ink2ghost' : 'bg-track';
+  return <div className={`animate-pulse rounded-[12px] ${fill} ${className}`} />;
 }
 
 /**

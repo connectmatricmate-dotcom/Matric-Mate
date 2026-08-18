@@ -915,7 +915,24 @@ export function Confirm({
   );
 }
 
-export function Skeleton({ w = '100%', h = 14, style }: { w?: number | `${number}%`; h?: number; style?: ViewStyle }) {
+export function Skeleton({
+  w = '100%',
+  h = 14,
+  tone = 'default',
+  style,
+}: {
+  w?: number | `${number}%`;
+  h?: number;
+  /**
+   * Tints the bar with the colour of the text it stands in for, instead of the
+   * neutral track. Worth it on a tinted card, where a grey bar reads as a
+   * foreign object and a faint ink one reads as the sentence arriving. The
+   * default stays neutral for the skeletons that stand in for something other
+   * than prose.
+   */
+  tone?: 'default' | 'ink' | 'ink2';
+  style?: ViewStyle;
+}) {
   /**
    * `useState` with a lazy initialiser, not `useRef(new Animated.Value(…)).current`.
    *
@@ -936,7 +953,10 @@ export function Skeleton({ w = '100%', h = 14, style }: { w?: number | `${number
     loop.start();
     return () => loop.stop();
   }, [a]);
-  return <Animated.View style={[{ width: w, height: h, borderRadius: R.md, backgroundColor: C.track, opacity: a }, style]} />;
+  // Eight-digit hex, so the tint composes with the pulse rather than replacing
+  // it. 1F is 12%, which the 0.5 to 1 pulse renders as roughly 6% to 12%.
+  const fill = tone === 'ink' ? `${C.ink}1F` : tone === 'ink2' ? `${C.ink2}1F` : C.track;
+  return <Animated.View style={[{ width: w, height: h, borderRadius: R.md, backgroundColor: fill, opacity: a }, style]} />;
 }
 
 /**

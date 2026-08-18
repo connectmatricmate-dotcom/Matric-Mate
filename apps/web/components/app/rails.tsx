@@ -287,12 +287,14 @@ export function CoachRail() {
     return (
       <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
         <Label className="text-teal">{t('tutor.coachTitle')}</Label>
-        <Skeleton className="h-3.5 w-full" />
-        <Skeleton className="h-3.5 w-[88%]" />
-        <Skeleton className="mb-1 h-3.5 w-[94%]" />
-        <Skeleton className="h-3 w-2/5" />
-        <Skeleton className="h-3 w-4/5" />
-        <Skeleton className="h-3 w-3/4" />
+        {/* Each bar carries the colour of the line it stands in for: the
+            summary is ink, the label and the actions below it are ink2. */}
+        <Skeleton className="h-3.5 w-full" tone="ink" />
+        <Skeleton className="h-3.5 w-[88%]" tone="ink" />
+        <Skeleton className="mb-1 h-3.5 w-[94%]" tone="ink" />
+        <Skeleton className="h-3 w-2/5" tone="ink2" />
+        <Skeleton className="h-3 w-4/5" tone="ink2" />
+        <Skeleton className="h-3 w-3/4" tone="ink2" />
       </Card>
     );
   }
