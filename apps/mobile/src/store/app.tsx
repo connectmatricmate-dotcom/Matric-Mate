@@ -241,6 +241,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    */
   const syncedForRef = useRef<string | null>(null);
 
+  /**
+   * The last day this session has queued an "I studied" row for.
+   *
+   * Not derived from state.activeDays, which is what it used to be, and that
+   * was wrong in a way that only showed up on an upgrade. The old build marked
+   * days active locally without queueing the write, so an upgrading student
+   * arrives with today already in their stored activeDays and every check of
+   * "is this a new day" answers no. The row is then never written, for that
+   * day or any other, and their streak reads zero forever while they study
+   * daily. Four sections read on a fresh 0.4.0 install produced no active_day
+   * row at all, which is how this was found.
+   *
+   * A ref, reset by definition on every app start, so the first study action
+   * of each session queues one op. The queue collapses duplicates by day and
+   * the write is an idempotent upsert, so the worst case is one redundant
+   * upsert per session.
+   */
+  const activeDaySyncedRef = useRef<string | null>(null);
+
   useEffect(() => {
     (async () => {
       try {
@@ -443,6 +462,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => sub.remove();
   }, [flush]);
 
+  /**
+   * Records today as studied, locally and on the server, exactly once per
+   * session. Replaces four copies of an `isNewDay` check that all trusted
+   * local state to tell them whether the server already knew.
+   */
+  const markDayActive = useCallback(() => {
+    const day = todayKey();
+    if (activeDaySyncedRef.current === day) return;
+    activeDaySyncedRef.current = day;
+    queueAndFlush(syncActiveDay(day));
+  }, [queueAndFlush]);
+
   const touchToday = (s: State): State => {
     const t = todayKey();
     return s.activeDays.includes(t) ? s : { ...s, activeDays: [...s.activeDays, t] };
@@ -566,7 +597,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       },
       recordAttempt: (a) => {
         const full: Attempt = { ...a, id: `a-${Date.now()}-${Math.round(Math.random() * 1e4)}`, at: Date.now() };
-        const isNewDay = !stateRef.current.activeDays.includes(todayKey());
         setState((s) =>
           touchToday({
             ...s,
@@ -581,20 +611,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // never (see applySyncOp's drop path) cannot be allowed to hold up
         // the next question.
         queueAndFlush(syncAttempt(full));
-        if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
+        markDayActive();
         return full;
       },
       addResult: (r) => {
         const full: TestResult = { ...r, id: `r-${Date.now()}`, at: Date.now() };
-        const isNewDay = !stateRef.current.activeDays.includes(todayKey());
         setState((s) => touchToday({ ...s, results: [full, ...s.results] }));
         queueAndFlush(syncResult(full));
-        if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
+        markDayActive();
         return full;
       },
       markSectionRead: (sectionId, chapterId, index) => {
         const isNewSection = !stateRef.current.readSections.includes(sectionId);
-        const isNewDay = !stateRef.current.activeDays.includes(todayKey());
         setState((s) =>
           touchToday({
             ...s,
@@ -608,13 +636,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // also means "resume reading" restores to the newest section a
         // student reached, not wherever they last happened to be re-reading.
         if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
-        if (isNewDay) queueAndFlush(syncActiveDay(todayKey()));
+        markDayActive();
       },
       markStudied: () => {
         const day = todayKey();
-        if (stateRef.current.activeDays.includes(day)) return;
+        // No early return on local state: see markDayActive. Bailing out
+        // because the device already believes today is active is exactly what
+        // stopped the row ever being written for an upgrading student.
         setState((st) => (st.activeDays.includes(day) ? st : { ...st, activeDays: [...st.activeDays, day] }));
-        queueAndFlush(syncActiveDay(day));
+        markDayActive();
       },
       togglePlanTask: (id) => {
         const nowDone = !stateRef.current.planDone.includes(id);
@@ -663,7 +693,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         let allowed = false;
         const day = todayKey();
         // Read before the update, like every other action that can start a day.
-        const isNewDay = !stateRef.current.activeDays.includes(day);
+
         setState((s) => {
           const used = s.ai.day === day ? s.ai.used : 0;
           const limit = s.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
@@ -677,7 +707,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // Asking the tutor is studying, so it counts, but it has to be written
         // through like the rest. Marking the day locally and never syncing it
         // is what left the streak disagreeing between the phone and laptop.
-        if (allowed && isNewDay) queueAndFlush(syncActiveDay(day));
+        if (allowed) markDayActive();
         return allowed;
       },
       saveThread: (t) =>
@@ -778,7 +808,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setState((s) => ({ ...EMPTY, user: s.user, onboarding: s.onboarding, settings: s.settings }));
       },
     }),
-    [queueAndFlush, authUser?.id],
+    [queueAndFlush, markDayActive, authUser?.id],
   );
 
   /**

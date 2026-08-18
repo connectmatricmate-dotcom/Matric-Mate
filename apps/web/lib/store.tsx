@@ -85,6 +85,27 @@ type Ctx = {
 
 const AppCtx = createContext<Ctx | null>(null);
 
+/**
+ * The last day this browser has queued an "I studied" row for.
+ *
+ * Not derived from state.activeDays, which is what every caller used to do,
+ * and that was wrong in a way only an upgrade exposed. An older build marked
+ * days active locally without queueing the write, so the stored state arrives
+ * already containing today, every "is this a new day" check answers no, and
+ * the row is never written: the student studies daily and their streak reads
+ * zero. Reset on load, so the first study action of each session queues one
+ * op; the queue collapses duplicates by day and the write is an idempotent
+ * upsert, so the cost is at most one redundant upsert per session.
+ */
+let activeDaySynced: string | null = null;
+
+function markDayActive(): void {
+  const day = todayKey();
+  if (activeDaySynced === day) return;
+  activeDaySynced = day;
+  queueAndFlush(syncActiveDay(day));
+}
+
 const actions: Actions = {
   setName: (name) => update((s) => (s.user ? { ...s, user: { ...s.user, name } } : s)),
   signOut: () => update((s) => ({ ...s, user: null, premium: { active: false, validTill: null } })),
@@ -135,8 +156,6 @@ const actions: Actions = {
     return 'ok';
   },
   recordAttempt: (a) => {
-    const day = todayKey();
-    const isNewDay = !getSnapshot().activeDays.includes(day);
     const full: Attempt = { ...a, id: `a-${Date.now()}-${getSnapshot().attempts.length}`, at: Date.now() };
     // Exam answers earn the doubled XP the result screen advertises. It was
     // shown there and credited here at single rate, so the total never
@@ -152,12 +171,10 @@ const actions: Actions = {
     // moved on. See queueAndFlush below for what happens to this in the
     // background.
     queueAndFlush(syncAttempt(full));
-    if (isNewDay) queueAndFlush(syncActiveDay(day));
+    markDayActive();
   },
   recordAttempts: (list) => {
     if (!list.length) return;
-    const day = todayKey();
-    const isNewDay = !getSnapshot().activeDays.includes(day);
     const at = Date.now();
     const base = getSnapshot().attempts.length;
     const full = list.map((a, n) => ({ ...a, id: `a-${at}-${base + n}`, at }));
@@ -173,21 +190,17 @@ const actions: Actions = {
     // Each answer in the paper is still its own row server-side (attempts is
     // an append-only log); only the store notification was batched.
     full.forEach((a) => queueAndFlush(syncAttempt(a)));
-    if (isNewDay) queueAndFlush(syncActiveDay(day));
+    markDayActive();
   },
   addResult: (r) => {
     const full: TestResult = { ...r, id: `r-${Date.now()}`, at: Date.now() };
-    const day = todayKey();
-    const isNewDay = !getSnapshot().activeDays.includes(day);
     update((s) => touchToday({ ...s, results: [full, ...s.results] }));
     queueAndFlush(syncResult(full));
-    if (isNewDay) queueAndFlush(syncActiveDay(day));
+    markDayActive();
     return full;
   },
   markSectionRead: (sectionId, chapterId, index) => {
     const isNewSection = !getSnapshot().readSections.includes(sectionId);
-    const day = todayKey();
-    const isNewDay = !getSnapshot().activeDays.includes(day);
     update((s) =>
       touchToday({
         ...s,
@@ -201,13 +214,13 @@ const actions: Actions = {
     // reading" restores to the newest section reached, not wherever a
     // student last happened to be re-reading.
     if (isNewSection) queueAndFlush(syncReadSection(sectionId, chapterId, index));
-    if (isNewDay) queueAndFlush(syncActiveDay(day));
+    markDayActive();
   },
   markStudied: () => {
     const day = todayKey();
-    if (getSnapshot().activeDays.includes(day)) return;
+    // No early return on local state: see markDayActive above.
     update((s) => (s.activeDays.includes(day) ? s : { ...s, activeDays: [...s.activeDays, day] }));
-    queueAndFlush(syncActiveDay(day));
+    markDayActive();
   },
   togglePlanTask: (id) => {
     const nowDone = !getSnapshot().planDone.includes(id);
@@ -241,7 +254,6 @@ const actions: Actions = {
     let allowed = false;
     const day = todayKey();
     // Read before the update, like every other action that can start a day.
-    const isNewDay = !getSnapshot().activeDays.includes(day);
     update((s) => {
       const used = s.ai.day === day ? s.ai.used : 0;
       const limit = aiLimitFor(s.premium.active);
@@ -252,7 +264,7 @@ const actions: Actions = {
     // Asking the tutor is studying, so it counts, but it has to be written
     // through like the rest. Marking the day locally and never syncing it is
     // what left the streak disagreeing between the phone and the laptop.
-    if (allowed && isNewDay) queueAndFlush(syncActiveDay(day));
+    if (allowed) markDayActive();
     return allowed;
   },
   saveThread: (t) => update((s) => ({ ...s, threads: [t, ...s.threads.filter((x) => x.id !== t.id)].slice(0, 20) })),
