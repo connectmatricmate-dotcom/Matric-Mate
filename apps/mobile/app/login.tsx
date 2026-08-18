@@ -76,6 +76,13 @@ export default function Login() {
       <Btn title={t('auth.logIn')} onPress={submit} loading={busy} disabled={!valid} />
       <Spacer h={S.sm} />
       <Btn title={t('auth.forgotPassword')} variant="ghost" onPress={() => router.push('/forgot')} />
+      {/* Signing out now lands here rather than on the welcome carousel, and
+          this screen had no way to reach sign-up: the carousel was carrying
+          that link. Without it, anyone who signed out, or who was handed the
+          phone by someone who had, was stuck on a password form for an account
+          they do not have. */}
+      <Spacer h={S.sm} />
+      <Btn title={t('auth.createAccount')} variant="line" onPress={() => router.push('/signup')} />
       <Small style={{ textAlign: 'center', marginTop: S.sm }}>{t('auth.accountNote')}</Small>
     </Screen>
   );

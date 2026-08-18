@@ -26,6 +26,25 @@
  * nothing. core only exposes the connectLocalContent hook; every actual
  * filesystem call is here.
  */
+/**
+ * NO STORAGE PERMISSION IS ASKED FOR, AND NONE SHOULD BE ADDED.
+ *
+ * Everything below writes under `Paths.document`, which is the app's own
+ * private directory. Android has never required a permission to write there,
+ * on any version, and Play treats a declared storage permission an app does
+ * not need as grounds for rejection. READ_/WRITE_EXTERNAL_STORAGE are also
+ * largely inert since Android 11's scoped storage.
+ *
+ * A permission prompt would therefore be a dialog that asks for something we
+ * do not use, cannot justify at review, and that a student can refuse, which
+ * would leave us handling a failure that cannot actually happen. The download
+ * button just downloads.
+ *
+ * Two consequences worth knowing, both correct. The files do not appear in the
+ * phone's Downloads folder or gallery, because they are ours, not the user's
+ * media. And "Clear storage" in Android settings removes them along with
+ * everything else, which is the same reset that signs the student out.
+ */
 import { Directory, File, Paths } from 'expo-file-system';
 import {
   AudioTrack,
