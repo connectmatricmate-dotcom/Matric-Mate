@@ -19,7 +19,6 @@ import {
   TileGrid,
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
-import { LockedNotice } from '../../src/components/LockedNotice';
 import { SUBJECT_COLORS, accuracy, chapterById, chapterPct, formatDate, subjectById, todayKey } from '@matricmate/core';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
@@ -118,15 +117,6 @@ export default function Dashboard() {
       </Small>
       <Spacer h={S.sm} />
       {milestoneToday ? <Confetti /> : null}
-
-      {!state.premium.active ? (
-        <>
-          {/* Leading with the pitch, not burying it: for an unpaid account
-              this screen's job is to show what a plan opens. */}
-          <LockedNotice variant="free" />
-          <Spacer h={S.md} />
-        </>
-      ) : null}
 
       {/* The streak lives in the header pill alone. A second chip here said
           the same thing twice, and its entrance slide dragged the row in

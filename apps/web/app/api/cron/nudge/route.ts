@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { chapterById, weakTopics } from '@matricmate/core';
+import { chapterById, reminderHour, weakTopics } from '@matricmate/core';
 import type { Attempt, Language } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
@@ -21,10 +21,14 @@ import type { Notice } from '@/lib/notify';
  * from the beginning with nothing reading either one. They are read here, from
  * profiles.settings, which is why those preferences moved onto the account.
  *
- * Runs at 14:00 UTC, which is 19:00 in Karachi: late enough that "you have not
- * studied today" is true rather than premature, early enough that there is
- * still an evening left to act on it. That is also why the default reminder
- * time reads 7:00 PM.
+ * Runs on the hour from 16:00 to 21:00 in Karachi, and each run only writes to
+ * the students who chose that hour. The time on the settings screen used to be
+ * a label with nothing behind it: everybody was nudged at 19:00 whatever it
+ * said. Those are the hours because those are the options, and the two lists
+ * come from the same constant (REMINDER_TIMES in core).
+ *
+ * Evening only, by design. "You have not studied today" is premature at noon,
+ * and after nine there is no evening left to act on it.
  *
  * It picks ONE message per student per night, and picks it on purpose. A
  * reminder that says the same sentence every evening for a month is one the
@@ -62,6 +66,8 @@ const MAX_PER_RUN = 500;
 /** Streaks worth congratulating rather than passing over in silence. */
 const MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
 
+type ProfileRow = { id: string; settings: unknown; onboarding: { medium?: string } | null };
+
 const karachiDay = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(d);
 
 /** Consecutive days up to and including `upto`, counted the way the apps count them. */
@@ -97,11 +103,41 @@ export async function GET(req: NextRequest) {
   const yesterday = new Date(now.getTime() - 864e5);
   /** Rotates the general nudge, so it is a different sentence each night. */
   const dayIndex = Math.floor(now.getTime() / 864e5);
+  const hourNow = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Karachi', hour: '2-digit', hour12: false }).format(now));
+
+  /*
+   * Whose hour is it, asked before anything else.
+   *
+   * This used to read every active_days row for the past year and filter
+   * afterwards. That was affordable once a night and is not six times, and it
+   * is the wrong way round anyway: the cheap, small table decides who is even
+   * eligible this hour, and only then do we look up their history. Paginated
+   * because select() silently stops at a thousand rows.
+   */
+  const profiles: ProfileRow[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await admin.from('profiles').select('id,settings,onboarding').range(from, from + 999);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    profiles.push(...((data ?? []) as ProfileRow[]));
+    if ((data ?? []).length < 1000) break;
+  }
+
+  const dueNow = profiles.filter((p) => {
+    const settings = (p.settings ?? {}) as Record<string, unknown>;
+    // Absent means never touched, and both default to on. Only an explicit
+    // false is a student saying no.
+    if (settings.reminders === false && settings.streakAlerts === false) return false;
+    return reminderHour(settings.reminderTime as string | undefined) === hourNow;
+  });
+  if (!dueNow.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+
+  const dueIds = dueNow.map((p) => p.id).slice(0, MAX_PER_RUN);
 
   const historyStart = karachiDay(new Date(now.getTime() - HISTORY_DAYS * 864e5));
   const { data: dayRows, error } = await admin
     .from('active_days')
     .select('user_id,day')
+    .in('user_id', dueIds)
     .gte('day', historyStart)
     .limit(100000);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -114,23 +150,15 @@ export async function GET(req: NextRequest) {
   }
 
   /*
-   * Candidates are the recently active, even though the read above went back a
-   * year. Someone whose last day was in March is not owed a nightly reminder;
-   * their history is here only so that a streak is counted correctly.
+   * Of those due this hour, the ones still recently active. Someone whose last
+   * day was in March is not owed a reminder; the year of history is read only
+   * so that a long streak is counted at its real length.
    */
-  const everyone = [...daysByUser.entries()]
-    .filter(([, days]) => daysSinceLast(days, now) <= WINDOW_DAYS)
-    .slice(0, MAX_PER_RUN);
-  if (!everyone.length) return NextResponse.json({ considered: 0, sent: 0 });
+  const everyone = [...daysByUser.entries()].filter(([, days]) => daysSinceLast(days, now) <= WINDOW_DAYS);
+  if (!everyone.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
   const ids = everyone.map(([id]) => id);
 
-  /*
-   * Everything the picker needs, in four reads rather than four per student.
-   * At 500 students these are small: active_days and plan_done are one row per
-   * student per day, and attempts is capped below.
-   */
-  const [{ data: profiles }, { data: sentRecently }, { data: attemptRows }, { data: planRows }] = await Promise.all([
-    admin.from('profiles').select('id,settings,onboarding').in('id', ids),
+  const [{ data: sentRecently }, { data: attemptRows }, { data: planRows }] = await Promise.all([
     // Already nudged this evening, so a retried or double-fired cron cannot
     // put a second sentence in the same inbox.
     admin
@@ -149,9 +177,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   const already = new Set(((sentRecently ?? []) as { user_id: string }[]).map((r) => r.user_id));
-  const byId = new Map(
-    ((profiles ?? []) as { id: string; settings: unknown; onboarding: { medium?: string } | null }[]).map((p) => [p.id, p]),
-  );
+  const byId = new Map(dueNow.map((p) => [p.id, p]));
 
   type Row = { user_id: string; chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string };
   const attemptsByUser = new Map<string, Row[]>();
@@ -213,7 +239,7 @@ export async function GET(req: NextRequest) {
 
   // The breakdown is the point of the logging: if every student is getting the
   // same generic nudge, the picker is not doing its job and that shows here.
-  return NextResponse.json({ considered: everyone.length, sent, picked });
+  return NextResponse.json({ hour: hourNow, considered: everyone.length, sent, picked });
 }
 
 type Signals = {

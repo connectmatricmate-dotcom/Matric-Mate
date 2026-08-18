@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { Language } from '@matricmate/core';
-import { GRADE_10_READY, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
+import { GRADE_10_READY, REMINDER_TIMES, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
 import { planName } from '@/lib/plans';
 import { APP_VERSION } from '@/lib/site';
@@ -13,7 +13,7 @@ import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
 import { useToast } from '@/components/ui/toast';
 import { Bar, Card, Icon, Item, Label, LinkBtn, Pill } from '@/components/ui/primitives';
-import { Confirm } from '@/components/ui/sheet';
+import { Confirm, Sheet } from '@/components/ui/sheet';
 import { useApp, useLang, useT } from '@/lib/store';
 
 /** A titled group of rows, so a toggle never floats away from its label. */
@@ -44,6 +44,7 @@ export function AccountView() {
   const [confirmOut, setConfirmOut] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
+  const [pickTime, setPickTime] = useState(false);
   const [switching, setSwitching] = useState(false);
   const toast = useToast();
   const classLevel = state.onboarding?.classLevel ?? 9;
@@ -181,10 +182,15 @@ export function AccountView() {
             </Group>
 
             <Group title={t('account.notificationsSection')}>
-              <Item
+              {/* The row opens the picker, the switch turns it off. The time
+                  was displayed and unchangeable, so it read as a promise the
+                  app had made to itself: every student saw 7:00 PM whatever
+                  suited them. */}
+              <ItemButton
                 title={t('account.studyReminder')}
                 sub={t('account.studyReminderSub', { time: s.reminderTime })}
                 icon="bell"
+                onClick={() => setPickTime(true)}
                 right={
                   <Toggle
                     on={s.reminders}
@@ -302,6 +308,24 @@ export function AccountView() {
           <StreakRail />
         </Rail>
       </Split>
+
+      <Sheet open={pickTime} onClose={() => setPickTime(false)} title={t('account.reminderTimeTitle')}>
+        <Card flat className="py-0">
+          {REMINDER_TIMES.map((time, i) => (
+            <ItemButton
+              key={time}
+              title={time}
+              icon={time === s.reminderTime ? 'check' : 'clock'}
+              tone={time === s.reminderTime ? 'green' : 'grey'}
+              last={i === REMINDER_TIMES.length - 1}
+              onClick={() => {
+                actions.setSettings({ reminderTime: time });
+                setPickTime(false);
+              }}
+            />
+          ))}
+        </Card>
+      </Sheet>
 
       <Confirm
         open={confirmClass !== null}

@@ -14,12 +14,13 @@ import {
   Screen,
   SectionTitle,
   Seg,
+  Sheet,
   Small,
   Spacer,
   Toggle,
   useToast,
 } from '../../src/components/ui';
-import { GRADE_10_READY, Language, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
+import { GRADE_10_READY, Language, REMINDER_TIMES, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { useApp } from '../../src/store/app';
@@ -44,6 +45,7 @@ export default function Account() {
   const [confirmOut, setConfirmOut] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
+  const [pickTime, setPickTime] = useState(false);
   const [switching, setSwitching] = useState(false);
   const setup = state.onboarding;
   const classLevel = setup?.classLevel ?? 9;
@@ -179,10 +181,14 @@ export default function Account() {
 
         <SectionTitle>{t('account.notificationsSection')}</SectionTitle>
         <Card flat style={{ paddingVertical: 0 }}>
+          {/* The row opens the picker, the switch turns it off. The time was
+              displayed and unchangeable, so it read as a promise the app had
+              made to itself: every student saw 7:00 PM whatever suited them. */}
           <Item
             title={t('account.studyReminder')}
             sub={t('account.studyReminderSub', { time: s.reminderTime })}
             icon="bell"
+            onPress={s.reminders ? () => setPickTime(true) : undefined}
             right={<Toggle on={s.reminders} onPress={() => actions.setSettings({ reminders: !s.reminders })} />}
           />
           <Item
@@ -276,6 +282,24 @@ export default function Account() {
 
         <Spacer h={S.lg} />
       </Screen>
+
+      <Sheet visible={pickTime} onClose={() => setPickTime(false)} title={t('account.reminderTimeTitle')}>
+        <Card flat style={{ paddingVertical: 0 }}>
+          {REMINDER_TIMES.map((time, i) => (
+            <Item
+              key={time}
+              title={time}
+              icon={time === s.reminderTime ? 'check' : 'clock'}
+              tone={time === s.reminderTime ? 'green' : 'grey'}
+              last={i === REMINDER_TIMES.length - 1}
+              onPress={() => {
+                actions.setSettings({ reminderTime: time });
+                setPickTime(false);
+              }}
+            />
+          ))}
+        </Card>
+      </Sheet>
 
       <Confirm
         visible={confirmOut}

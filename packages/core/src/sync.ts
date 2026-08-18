@@ -433,6 +433,34 @@ export type HydratedStudyState = {
  * server cares about it, but a student who turns the lights off on their phone
  * should not have to do it again on the laptop.
  */
+/**
+ * The evening slots a student may pick for their reminder.
+ *
+ * Evening only, and deliberately few. A reminder at 3am helps nobody, and a
+ * free-form clock invites a choice the delivery side cannot honour: the job
+ * that sends these runs on the hour, so every option here has to be one of the
+ * hours it runs at. See the cron in apps/web/vercel.json.
+ *
+ * Stored as the label rather than a number because it is also what the
+ * settings row displays, and one representation cannot drift from the other.
+ */
+export const REMINDER_TIMES = ['4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM'] as const;
+
+export const DEFAULT_REMINDER_TIME = '7:00 PM';
+
+/**
+ * The hour, 0 to 23, that a stored reminder time means in Karachi.
+ *
+ * Falls back to the default rather than throwing: a value written by an older
+ * build, or by hand, should send at a sensible hour instead of never sending.
+ */
+export function reminderHour(value: string | undefined): number {
+  const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec((value ?? '').trim());
+  if (!m) return 19;
+  const raw = Number(m[1]) % 12;
+  return m[3].toUpperCase() === 'PM' ? raw + 12 : raw;
+}
+
 export type AccountPrefs = {
   reminders: boolean;
   streakAlerts: boolean;
