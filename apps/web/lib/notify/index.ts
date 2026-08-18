@@ -71,8 +71,11 @@ export async function notify(to: Recipient | string, notice: Notice): Promise<No
 
   const report: NotifyReport = {};
 
+  // The free pair always, plus whatever this notice adds. See Notice.also.
+  const channels: Channel[] = ['inbox', 'push', ...(notice.also ?? [])];
+
   await Promise.all(
-    notice.channels.map(async (name) => {
+    channels.map(async (name) => {
       const adapter = ADAPTERS[name];
       if (!adapter) return;
       try {

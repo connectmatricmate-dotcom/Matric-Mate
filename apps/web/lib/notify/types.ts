@@ -43,11 +43,22 @@ export type Notice = {
   params?: Record<string, string | number>;
   target?: NotificationTarget;
   /**
-   * Channels this notice is allowed on, before the student's own preferences
-   * narrow it further. A payment receipt belongs in an email; a streak nudge
-   * does not, because nobody wants four of those a week in their inbox.
+   * Channels BEYOND the two every notice gets.
+   *
+   * Inbox and push are not listed because they are not a choice: anything
+   * worth putting in the app's notification screen is worth the student's
+   * phone telling them about, and the two lists drifting apart is precisely
+   * the bug this shape prevents. They were spelled out on all ten notices and
+   * happened to agree; nothing stopped the eleventh from being inbox only.
+   *
+   * Email is the one real decision. A payment receipt belongs in an inbox a
+   * student can search next year; a streak nudge does not, because four of
+   * those a week is how an address stops being read.
+   *
+   * The student's own preferences narrow all of this afterwards, in the
+   * adapters.
    */
-  channels: Channel[];
+  also?: Exclude<Channel, 'inbox' | 'push'>[];
 };
 
 /** Everything a channel needs to know about who it is writing to. */

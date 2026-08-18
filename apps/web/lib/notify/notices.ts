@@ -9,10 +9,12 @@ import type { Notice } from './types';
  * address we later need for a receipt, and a payment receipt that only reaches
  * a push notification leaves them with no record of what they paid for.
  *
- * The rule of thumb behind the lists below:
- *   · inbox  always, it is free and it is the record inside the app
- *   · push   anything timely, it is free and unlimited
- *   · email  anything worth keeping, and nothing routine
+ * Every notice reaches the in-app inbox and the student's phone. That pair is
+ * not configurable per notice, so the notification screen and the phone can
+ * never disagree about what happened. See Notice.also.
+ *
+ * The only decision left here is email, and the rule is: anything worth
+ * keeping, nothing routine.
  */
 
 export const streakAtRisk = (days: number): Notice => ({
@@ -23,7 +25,6 @@ export const streakAtRisk = (days: number): Notice => ({
   target: 'session-setup',
   // Timely and worthless a day later, so push only. Nobody wants this in
   // their inbox, and nobody would pay to send it.
-  channels: ['inbox', 'push'],
 });
 
 export const nothingStudiedToday = (): Notice => ({
@@ -31,7 +32,6 @@ export const nothingStudiedToday = (): Notice => ({
   title: 'notifications.reminderTitle',
   body: 'notifications.reminderBody',
   target: 'home',
-  channels: ['inbox', 'push'],
 });
 
 export const reportReady = (): Notice => ({
@@ -41,7 +41,7 @@ export const reportReady = (): Notice => ({
   target: 'report',
   // Email too: a report card is the thing a student shows a parent, and it
   // reads better on a bigger screen than a notification shade.
-  channels: ['inbox', 'push', 'email'],
+  also: ['email'],
 });
 
 export const paymentReceived = (date: string): Notice => ({
@@ -50,8 +50,8 @@ export const paymentReceived = (date: string): Notice => ({
   body: 'notifications.paymentBody',
   params: { date },
   target: 'payments',
-  // Every channel there is. This is money, and the student wants a record.
-  channels: ['inbox', 'push', 'email'],
+  // Email too. This is money, and the student wants something to keep.
+  also: ['email'],
 });
 
 /* ------------------------------------------------------- the evening nudge */
@@ -76,7 +76,6 @@ export const streakMilestone = (days: number): Notice => ({
   body: 'notifications.streakMilestoneBody',
   params: { n: days },
   target: 'home',
-  channels: ['inbox', 'push'],
 });
 
 /** They stopped partway through a chapter and never came back to it. */
@@ -86,7 +85,6 @@ export const resumeChapter = (chapter: string): Notice => ({
   body: 'notifications.resumeChapterBody',
   params: { chapter },
   target: 'study',
-  channels: ['inbox', 'push'],
 });
 
 /** Their actual worst topic, named. Vague encouragement is easy to ignore. */
@@ -96,7 +94,6 @@ export const weakTopicNudge = (topic: string, pct: number): Notice => ({
   body: 'notifications.weakTopicBody',
   params: { topic, pct },
   target: 'practice',
-  channels: ['inbox', 'push'],
 });
 
 /** Today's plan, still with tasks on it, while there is still an evening left. */
@@ -106,7 +103,6 @@ export const planUnfinished = (left: number): Notice => ({
   body: 'notifications.planLeftBody',
   params: { n: left },
   target: 'home',
-  channels: ['inbox', 'push'],
 });
 
 /**
@@ -125,7 +121,6 @@ export const comeBack = (dayIndex: number): Notice => {
     title: `notifications.${pick}Title` as Notice['title'],
     body: `notifications.${pick}Body` as Notice['body'],
     target: 'home',
-    channels: ['inbox', 'push'],
   };
 };
 
@@ -146,6 +141,5 @@ export const awayFor = (days: number): Notice | null => {
     title: `notifications.${stage}Title` as Notice['title'],
     body: `notifications.${stage}Body` as Notice['body'],
     target: 'home',
-    channels: ['inbox', 'push'],
   };
 };

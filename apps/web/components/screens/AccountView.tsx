@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Language } from '@matricmate/core';
 import { GRADE_10_READY, REMINDER_TIMES, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
@@ -14,6 +14,7 @@ import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
 import { useToast } from '@/components/ui/toast';
 import { Bar, Card, Icon, Item, Label, LinkBtn, Pill } from '@/components/ui/primitives';
 import { Confirm, Sheet } from '@/components/ui/sheet';
+import { pushPermission, registerWebPush } from '@/lib/web-push';
 import { useApp, useLang, useT } from '@/lib/store';
 
 /** A titled group of rows, so a toggle never floats away from its label. */
@@ -45,6 +46,12 @@ export function AccountView() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
   const [pickTime, setPickTime] = useState(false);
+  /** null where the browser cannot do push at all, so the row shows the switch. */
+  const [pushState, setPushState] = useState<NotificationPermission | null>(null);
+  const [enabling, setEnabling] = useState(false);
+  useEffect(() => {
+    void pushPermission().then(setPushState);
+  }, []);
   const [switching, setSwitching] = useState(false);
   const toast = useToast();
   const classLevel = state.onboarding?.classLevel ?? 9;
@@ -217,16 +224,38 @@ export function AccountView() {
               {/* Which notifications exist is above. This is how they reach
                   the student, which is a different question: someone can want
                   a streak nudge on their phone and not in their inbox. */}
+              {/* Two different things share this row, and only one of them is
+                  ours. The switch is the student's preference, which the
+                  server honours. Permission belongs to the browser, is asked
+                  for once, and a refusal is close to permanent, so it is asked
+                  from here where the row says what it is for, and never on
+                  page load. */}
               <Item
                 title={t('account.channelPush')}
                 sub={t('account.channelPushSub')}
                 icon="bell"
                 right={
-                  <Toggle
-                    on={s.channelPush}
-                    label={t('account.channelPush')}
-                    onClick={() => actions.setSettings({ channelPush: !s.channelPush })}
-                  />
+                  pushState === 'default' ? (
+                    <Btn
+                      title={t('account.channelPushEnable')}
+                      variant="line"
+                      sm
+                      loading={enabling}
+                      onClick={async () => {
+                        if (!state.user) return;
+                        setEnabling(true);
+                        const r = await registerWebPush(state.user.id, true);
+                        setPushState(r === 'registered' ? 'granted' : r === 'denied' ? 'denied' : null);
+                        setEnabling(false);
+                      }}
+                    />
+                  ) : (
+                    <Toggle
+                      on={s.channelPush}
+                      label={t('account.channelPush')}
+                      onClick={() => actions.setSettings({ channelPush: !s.channelPush })}
+                    />
+                  )
                 }
               />
               <Item

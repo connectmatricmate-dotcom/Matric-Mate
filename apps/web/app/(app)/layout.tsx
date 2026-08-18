@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { Localized } from '@/components/app/Localized';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import { Shell } from '@/components/app/Shell';
+import { PushLive } from '@/components/app/PushLive';
 // Side-effect import: connects the shared content layer to Supabase.
 import '@/lib/content';
 import { hasActivePlan, isOpenWithoutPlan } from '@/lib/entitlement';
@@ -45,6 +46,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <Localized lang={lang}>
       <AppProvider initialLanguage={lang}>
+        <PushLive />
         <Shell>{children}</Shell>
       </AppProvider>
     </Localized>
