@@ -30,7 +30,7 @@ import { useT } from '../../../src/i18n';
 import type { StringKey } from '../../../src/i18n';
 import { localChapter } from '../../../src/core/downloads';
 import { useApp } from '../../../src/store/app';
-import { C, F, S, isWeb } from '../../../src/theme';
+import { C, F, S, isRTL, isWeb } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
 import { useQuota } from '../../../src/core/useQuota';
 
@@ -309,7 +309,8 @@ export default function Reader() {
 
         {/* The tutor is the one thing on this screen that cannot work from disk. */}
         {online ? (
-          <View style={{ position: 'absolute', right: S.lg, bottom: 92 + insets.bottom }}>
+          // The far edge from where the text starts, which swaps in Urdu.
+          <View style={{ position: 'absolute', ...(isRTL() ? { left: S.lg } : { right: S.lg }), bottom: 92 + insets.bottom }}>
             <Btn title={t('reader.askAi')} icon="spark" sm onPress={() => setAskOpen(true)} style={{ borderRadius: 99 }} />
           </View>
         ) : null}

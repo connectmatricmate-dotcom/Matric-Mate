@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { Body, Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
 import { session } from '../../src/store/session';
-import { C, S } from '../../src/theme';
+import { C, S, isRTL } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 type Filter = 'all' | 'wrong' | 'flagged';
@@ -71,7 +71,15 @@ export default function Review() {
               <Card
                 key={mcq.id}
                 flat
-                style={{ borderLeftWidth: 4, borderLeftColor: wrong ? C.red : C.green, opacity: wrong ? 1 : 0.85 }}
+                /* The accent bar belongs on the side the line starts from, as
+                   the reader's definition callout and Markdown's quote block
+                   both already do. */
+                style={{
+                  ...(isRTL()
+                    ? { borderRightWidth: 4, borderRightColor: wrong ? C.red : C.green }
+                    : { borderLeftWidth: 4, borderLeftColor: wrong ? C.red : C.green }),
+                  opacity: wrong ? 1 : 0.85,
+                }}
                 onPress={() => setOpen(isOpen ? null : mcq.id)}
               >
                 <ScriptText text={mcq.q} face="bodyBold" size={13.5} />

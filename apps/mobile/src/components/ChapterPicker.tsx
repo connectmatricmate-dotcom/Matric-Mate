@@ -13,7 +13,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useLang, useT } from '../i18n';
 import { useApp } from '../store/app';
-import { C, F, R, S, isRTL, isWeb, rowDir, textStart, urdu } from '../theme';
+import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../theme';
 import { Icon } from './Icon';
 import { Sheet, Small, Tap } from './ui';
 
@@ -98,9 +98,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
       {level.kind !== 'subjects' && !searching ? (
         <Tap onPress={back}>
           <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: 6, paddingBottom: S.sm }}>
-            <View style={isRTL() ? { transform: [{ scaleX: -1 }] } : undefined}>
-              <Icon name="back" size={16} color={C.teal} />
-            </View>
+            <Icon name="back" size={16} color={C.teal} />
             <Small style={{ fontFamily: F.bodyBold, color: C.teal }}>
               {level.kind === 'topics'
                 ? subjectName(subjectById(level.chapter.subjectId), lang)
@@ -288,9 +286,7 @@ function RowItem({
             )
           ) : null}
         </View>
-        <View style={isRTL() ? { transform: [{ scaleX: -1 }] } : undefined}>
-          <Icon name="chevron" size={16} color={C.ink3} />
-        </View>
+        <Icon name="chevron" size={16} color={C.ink3} />
       </View>
     </Tap>
   );

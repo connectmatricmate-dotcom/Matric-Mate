@@ -70,8 +70,9 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react-native';
+import { View } from 'react-native';
 import { IconName } from '@matricmate/core';
-import { C } from '../theme';
+import { C, isRTL } from '../theme';
 
 export type { IconName };
 export { SUBJECT_ICON } from '@matricmate/core';
@@ -157,6 +158,17 @@ const GLYPHS: Record<IconName, LucideIcon> = {
   cs: Monitor,
 };
 
+/**
+ * Glyphs that point somewhere, and so have to turn round in Urdu.
+ *
+ * `Chevron` in the UI kit already mirrors itself and says why: an arrow is a
+ * direction, not a decoration, and one pointing right in a right-to-left app
+ * points back the way the student came. `back` was rendered raw, so every
+ * header's back arrow pointed left in Urdu, and in the reader's footer both
+ * the previous and the next control ended up pointing the same way.
+ */
+const DIRECTIONAL: ReadonlySet<IconName> = new Set<IconName>(['back', 'chevron', 'arrowRight', 'send']);
+
 export function Icon({
   name,
   size = 20,
@@ -172,5 +184,10 @@ export function Icon({
   strokeWidth?: number;
 }) {
   const Glyph = GLYPHS[name];
-  return <Glyph size={size} color={color} strokeWidth={strokeWidth} fill={fill} />;
+  const glyph = <Glyph size={size} color={color} strokeWidth={strokeWidth} fill={fill} />;
+  return isRTL() && DIRECTIONAL.has(name) ? (
+    <View style={{ transform: [{ scaleX: -1 }] }}>{glyph}</View>
+  ) : (
+    glyph
+  );
 }

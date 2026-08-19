@@ -1036,11 +1036,9 @@ export function Item({
  * student came.
  */
 export function Chevron({ size = 18, color = C.ink3 }: { size?: number; color?: string }) {
-  return (
-    <View style={isRTL() ? { transform: [{ scaleX: -1 }] } : undefined}>
-      <Icon name="chevron" size={size} color={color} />
-    </View>
-  );
+  // Icon mirrors the directional glyphs itself now, so there is nothing left
+  // for this to do but name the role.
+  return <Icon name="chevron" size={size} color={color} />;
 }
 
 /* ------------------------------------------------------------ feedback */
