@@ -10,7 +10,7 @@ import { cheer } from '../../../src/core/haptics';
 import { useAsync } from '../../../src/core/useAsync';
 import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
-import { C, F, S } from '../../../src/theme';
+import { C, F, S, alpha } from '../../../src/theme';
 
 export default function ChapterHub() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -86,9 +86,9 @@ export default function ChapterHub() {
             <H2 style={{ color: C.onBrand }}>{chapter.title}</H2>
           )}
           {isUrduScript(chapter.blurb) ? (
-            <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter.blurb}</Ur>
+            <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{chapter.blurb}</Ur>
           ) : (
-            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
               {chapter.blurb}
             </Text>
           )}
@@ -119,9 +119,9 @@ export default function ChapterHub() {
             <H2 style={{ color: C.onBrand }}>{chapter.title}</H2>
           )}
           {isUrduScript(chapter.blurb) ? (
-            <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter.blurb}</Ur>
+            <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{chapter.blurb}</Ur>
           ) : (
-            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
               {chapter.blurb}
             </Text>
           )}
@@ -201,14 +201,14 @@ export default function ChapterHub() {
           </Text>
         ) : null}
         {isUrduScript(chapter?.blurb ?? '') ? (
-          <Ur size={13} style={{ color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>{chapter?.blurb}</Ur>
+          <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{chapter?.blurb}</Ur>
         ) : (
-          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: 'rgba(255,255,255,0.92)', marginTop: 4 }}>
+          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
             {chapter?.blurb}
           </Text>
         )}
         <Row gap={S.md} style={{ marginTop: S.md }}>
-          <View style={{ flex: 1, height: 7, backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 99, overflow: 'hidden' }}>
+          <View style={{ flex: 1, height: 7, backgroundColor: alpha(C.onBrand, 0.25), borderRadius: 99, overflow: 'hidden' }}>
             <View style={{ width: `${pct}%`, height: '100%', backgroundColor: C.orange, borderRadius: 99 }} />
           </View>
           <Text style={{ fontFamily: F.display, fontSize: 15, color: C.onBrand }}>{pct}%</Text>

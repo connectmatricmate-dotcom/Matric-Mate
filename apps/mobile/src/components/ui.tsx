@@ -519,7 +519,9 @@ export function Check({
         height: size,
         borderRadius: round ? size / 2 : 9,
         borderWidth: on ? 0 : 2,
-        borderColor: '#CBD8D3',
+        // The unchecked box, from the palette rather than a literal: the old
+        // hex was a light grey-green that stayed light after dark.
+        borderColor: C.mute,
         backgroundColor: on ? C.teal : 'transparent',
         alignItems: 'center',
         justifyContent: 'center',
@@ -812,8 +814,11 @@ export function Toggle({ on, onPress }: { on: boolean; onPress?: () => void }) {
   // The track is 26px tall; `hit` pads the touchable to a real target.
   return (
     <Tap onPress={onPress} hit>
-      <View style={[st.toggle, { backgroundColor: on ? C.teal : '#D7E0DB' }]}>
-        <View style={[st.knob, (on ? !isRTL() : isRTL()) ? { right: 3 } : { left: 3 }]} />
+      {/* The off track and the knob are tokens now. Written as literals they
+          kept their light values after dark, so a settings screen at night had
+          a row of bright grey-green pills on it. */}
+      <View style={[st.toggle, { backgroundColor: on ? C.teal : C.mute }]}>
+        <View style={[st.knob, { backgroundColor: C.card }, (on ? !isRTL() : isRTL()) ? { right: 3 } : { left: 3 }]} />
       </View>
     </Tap>
   );
@@ -1283,7 +1288,7 @@ const st = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 14 : 12,
   },
   toggle: { width: 44, height: 26, borderRadius: R.pill, justifyContent: 'center' },
-  knob: { position: 'absolute', width: 20, height: 20, borderRadius: R.pill, backgroundColor: '#fff' },
+  knob: { position: 'absolute', width: 20, height: 20, borderRadius: R.pill },
   kpi: {
     flex: 1,
     justifyContent: 'center',

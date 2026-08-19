@@ -94,12 +94,14 @@ export function DashboardView() {
           <Card tint="bg-teal" border="border-teal">
             <div className="flex items-center gap-3">
               <h2 className="flex-1 font-display text-[18px] text-onbrand">{t('dash.todayPlan')}</h2>
-              <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11.5px] font-extrabold text-onbrand tabular">
+              {/* onbrand-hair, not white: the fill under it brightens after
+                  dark and a white wash on it stops reading. */}
+              <span className="rounded-full bg-onbrand-hair px-2.5 py-1 text-[11.5px] font-extrabold text-onbrand tabular">
                 {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
               </span>
             </div>
 
-            <div className="my-3 h-[7px] overflow-hidden rounded-full bg-white/25">
+            <div className="my-3 h-[7px] overflow-hidden rounded-full bg-onbrand-hair">
               <div
                 className="h-full rounded-full bg-orange transition-[width] duration-200 ease-out"
                 style={{ width: `${(planDone / Math.max(1, derived.plan.length)) * 100}%` }}

@@ -27,7 +27,7 @@ import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { useAsync } from '../../src/core/useAsync';
 import { supabase } from '../../src/lib/supabase';
-import { C, F, S, rowDir } from '../../src/theme';
+import { C, F, S, alpha, rowDir } from '../../src/theme';
 
 const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
   { label: 'dash.quickMcq', icon: 'target', href: '/session/setup' },
@@ -126,14 +126,14 @@ export default function Dashboard() {
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         <Row>
           <H3 style={{ color: C.onBrand, flex: 1 }}>{t('dash.todayPlan')}</H3>
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.18)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 }}>
+          <View style={{ backgroundColor: alpha(C.onBrand, 0.18), paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 }}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: C.onBrand }}>
               {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
             </Text>
           </View>
         </Row>
 
-        <View style={{ marginVertical: S.md, height: 7, backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 99, overflow: 'hidden' }}>
+        <View style={{ marginVertical: S.md, height: 7, backgroundColor: alpha(C.onBrand, 0.25), borderRadius: 99, overflow: 'hidden' }}>
           <View
             style={{
               width: `${(planDone / Math.max(1, derived.plan.length)) * 100}%`,
@@ -153,7 +153,7 @@ export default function Dashboard() {
               gap: S.md,
               paddingVertical: 10,
               borderTopWidth: 1,
-              borderTopColor: 'rgba(255,255,255,0.14)',
+              borderTopColor: alpha(C.onBrand, 0.14),
             }}
           >
             <Tap onPress={() => actions.togglePlanTask(task.id)} hit>
@@ -163,7 +163,7 @@ export default function Dashboard() {
                   height: 24,
                   borderRadius: 8,
                   borderWidth: 2,
-                  borderColor: task.done ? C.orange : 'rgba(255,255,255,0.55)',
+                  borderColor: task.done ? C.orange : alpha(C.onBrand, 0.55),
                   backgroundColor: task.done ? C.orange : 'transparent',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -210,7 +210,7 @@ export default function Dashboard() {
               />
             </Tap>
 
-            <Chevron size={18} color="rgba(255,255,255,0.8)" />
+            <Chevron size={18} color={alpha(C.onBrand, 0.8)} />
           </View>
         ))}
       </Card>

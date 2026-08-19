@@ -9,7 +9,7 @@ import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S, isWeb } from '../../src/theme';
+import { C, F, S, alpha, isWeb } from '../../src/theme';
 
 export default function Flashcards() {
   const { chapter, ai } = useLocalSearchParams<{ chapter?: string; ai?: string }>();
@@ -187,12 +187,12 @@ export default function Flashcards() {
               gap: S.md,
             }}
           >
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: 'rgba(255,255,255,0.7)' }}>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.8, color: alpha(C.onBrand, 0.7) }}>
               {t('session.cardDefinition')}
             </Text>
             <ScriptText text={card?.back ?? ''} size={16} color={C.onBrand} center />
             {card?.urduBack ? (
-              <Ur size={14} style={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
+              <Ur size={14} style={{ color: alpha(C.onBrand, 0.85), textAlign: 'center' }}>
                 {card.urduBack}
               </Ur>
             ) : null}

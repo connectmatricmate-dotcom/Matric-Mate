@@ -186,6 +186,24 @@ export const shadow = Platform.select({
   },
 }) as object;
 
+/**
+ * A token colour at partial strength.
+ *
+ * For the washes and secondary text that sit ON a brand fill: a 25% track
+ * inside the teal plan card, the blurb over a chapter hero. These were written
+ * as `rgba(255,255,255,0.92)` and friends, which is correct on paper and wrong
+ * after dark, because a dark theme brightens the fill underneath and white
+ * then sits on it at about 2.4:1. Composing from `C.onBrand` instead means the
+ * foreground flips with the palette exactly as the solid one already does.
+ *
+ * Not the same hazard as a Tailwind opacity modifier on the web: this runs at
+ * render time against the getter, so it follows the theme rather than freezing
+ * one palette's hex into the build. The web has the same three roles as real
+ * CSS variables (--color-onbrand-soft and friends in globals.css).
+ */
+export const alpha = (hex: string, a: number): string =>
+  `${hex}${Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0')}`;
+
 /** Urdu needs extra leading and RTL; helper keeps it consistent. */
 export const urdu = (size = 16): TextStyle => ({
   fontFamily: F.urdu,
