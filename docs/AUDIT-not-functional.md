@@ -157,9 +157,9 @@ Not defects. Recording them so they are not rediscovered as bugs.
 
 ## Suggested order
 
-Last checked 18 Aug 2026, against the database and the code rather than from
+Last checked 19 Aug 2026, against the database and the code rather than from
 memory. Items 2 to 6 of the numbered sections above are done, and phone push
-shipped the same day.
+shipped on 18 Aug.
 
 ### Ours to finish
 
@@ -167,17 +167,32 @@ shipped the same day.
    Government Model School, Islamabad". Fabricated content in front of every
    student. Production data, so it is the client's call whether to delete the
    row or replace it with a real reviewer.
-2. **Web push.** Android registers, receives and routes taps. The browser half
-   needs a service worker, which this app does not have yet. The
-   `NEXT_PUBLIC_FIREBASE_*` variables are already set for it.
-3. **A picker for the reminder time.** Stored, synced, displayed, and the
-   evening job really does run at the hour it names, but nothing can change it,
-   so every student reads 7:00 PM.
-4. **Tidy-up.** The mobile dashboard still branches on `!state.premium.active`
-   for a notice an unpaid account can no longer reach. The orphaned strings are
-   gone, removed with the WhatsApp channel.
+2. **Nothing else.** Items 2 to 4 here (web push, the reminder-time picker, the
+   dead paywall branch) were finished on 18 Aug and re-checked in the code on
+   19 Aug: `app/firebase-messaging-sw.js/route.ts` serves the worker,
+   `REMINDER_TIMES` drives a picker in both account screens, and the mobile
+   dashboard no longer branches on `!state.premium.active`.
 
-### Blocked on the client
+### Found on 19 Aug and fixed the same day
+
+Six pieces of feedback from a real session on the phone, plus two bugs the
+database gave up when asked which tables have a writer and which have a reader.
+
+- **A device was owned by whoever registered it first.** `push_tokens` is keyed
+  on the FCM token, which survives signing out, so the second account on a
+  phone was refused by RLS with 42501 and the app never looked at the result.
+  The new account got no push at all, and the old account's notifications kept
+  arriving on a phone they had left. Migration 0025 adds `claim_push_token`.
+- **`tutor_feedback` had 0 rows against 31 answers.** The thumbs latched and
+  wrote nothing, because a freshly streamed answer only carried a client-side
+  id and the guard against dangling rows rejected it. The route now returns
+  the saved row's id.
+- Keyboard covering every input on Android, tutor answers appearing in lumps
+  after five seconds of nothing, no full-screen state for the half-minute AI
+  builds, the manifest offering to install a second copy of the app, and
+  Account being unreachable on a phone browser.
+
+### Blocked on the client (Adnan)
 
 5. **Verify `matricmate.com.pk` in Resend.** Until then the test sender only
    reaches the Resend account owner, so email to real students goes nowhere.
