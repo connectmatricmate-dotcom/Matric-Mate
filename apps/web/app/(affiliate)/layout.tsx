@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole } from '@/lib/roles';
 import { signOutAction } from '@/app/(auth)/actions';
+import { Wordmark } from '@/components/ui/primitives';
 
 export const metadata: Metadata = { title: 'Referrals', robots: { index: false, follow: false } };
 
@@ -25,29 +25,25 @@ export default async function AffiliateLayout({ children }: { children: React.Re
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect('/login');
 
-  const role = await currentRole();
-  // An administrator is allowed to look, which is how Adnan checks what a
-  // teacher is actually seeing without knowing their password.
-  if (role !== 'affiliate' && role !== 'admin') notFound();
+  /* Teachers only. An administrator sees the same numbers on
+     /admin/teachers/[id], so there is nothing here they need and one fewer
+     way for the two areas to bleed into each other. */
+  if ((await currentRole()) !== 'affiliate') notFound();
 
   return (
     <div className="min-h-screen bg-paper">
       <header className="sticky top-0 z-30 border-b border-line bg-glass backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-[980px] items-center gap-4 px-4 md:px-8">
-          <span className="font-display text-[16px] text-ink">
-            MatricMate <span className="text-ink3">referrals</span>
+          <span className="flex items-center gap-2">
+            <Wordmark width={104} height={21} />
+            <span className="text-[12.5px] font-extrabold text-ink3">referrals</span>
           </span>
-          {role === 'admin' ? (
-            <Link href="/admin" className="text-[12.5px] font-extrabold text-teal">
-              admin view
-            </Link>
-          ) : null}
           <form action={signOutAction} className="ms-auto">
             <button
               type="submit"
               className="text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
             >
-              Sign out
+              Log out
             </button>
           </form>
         </div>

@@ -26,18 +26,31 @@ export async function POST(req: NextRequest) {
   // Cookies for the website, a bearer token for the app. Same pattern as the
   // AI routes, see lib/ai/guard.ts.
   let email: string | null = null;
+  let userId: string | null = null;
   const bearer = req.headers.get('authorization');
   if (bearer?.startsWith('Bearer ')) {
     const { data, error } = await admin.auth.getUser(bearer.slice(7));
     email = !error ? (data.user?.email ?? null) : null;
+    userId = !error ? (data.user?.id ?? null) : null;
   } else {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     email = data.user?.email ?? null;
+    userId = data.user?.id ?? null;
   }
 
-  if (!email) {
+  if (!email || !userId) {
     return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
+  }
+
+  /*
+   * Students only. This mints a single-use link that signs the holder in, so
+   * it is the last endpoint that should hand one to an account which has no
+   * business on the upgrade page in the first place.
+   */
+  const { data: prof } = await admin.from('profiles').select('role').eq('id', userId).maybeSingle();
+  if (prof?.role && prof.role !== 'student') {
+    return NextResponse.json({ error: 'not_a_student' }, { status: 403 });
   }
 
   const { data, error } = await admin.auth.admin.generateLink({ type: 'magiclink', email });

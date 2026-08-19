@@ -39,10 +39,17 @@ export async function GET() {
 
   const admin = createAdminClient();
   const [{ data: profile }, { data: attemptRows }, { data: dayRows }] = await Promise.all([
-    admin.from('profiles').select('name,grade,onboarding').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('name,grade,onboarding,role').eq('id', userId).maybeSingle(),
     admin.from('attempts').select('subject_id,correct,confidence,at').eq('user_id', userId).order('at').limit(5000),
     admin.from('active_days').select('day').eq('user_id', userId).limit(400),
   ]);
+
+  // A report card is a student's own progress. Staff accounts have none, so
+  // this would have produced an empty PDF rather than an error, which is a
+  // worse answer than saying no.
+  if (profile?.role && profile.role !== 'student') {
+    return NextResponse.json({ error: 'not_a_student' }, { status: 403 });
+  }
 
   const onboarding = (profile?.onboarding ?? {}) as { medium?: string; board?: string; subjects?: string[] };
   /**

@@ -45,7 +45,17 @@ export async function POST(request: Request) {
    * for their mobile to no purpose is a field that only loses conversions.
    */
   const admin = createAdminClient();
-  const { data: profile } = await admin.from('profiles').select('name').eq('id', user.id).maybeSingle();
+  const { data: profile } = await admin.from('profiles').select('name,role').eq('id', user.id).maybeSingle();
+
+  /*
+   * Students only. A subscription buys chapters and a tutor, and neither a
+   * teacher on the referral programme nor an administrator has any use for
+   * one. Checked here as well as on the page, because this endpoint starts a
+   * real payment and is reachable without ever loading the page.
+   */
+  if (profile?.role && profile.role !== 'student') {
+    return NextResponse.json({ error: 'not_a_student' }, { status: 403 });
+  }
 
   // Unique per attempt, so a retry after a failure is its own order rather than
   // a duplicate of the last one.

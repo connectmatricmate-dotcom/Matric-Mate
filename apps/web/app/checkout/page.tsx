@@ -6,6 +6,7 @@ import { CheckoutForm } from '@/components/commerce/CheckoutForm';
 import { THE_PLAN, planById } from '@/lib/plans';
 import { gateway } from '@/lib/gateway';
 import { getUser } from '@/lib/supabase/server';
+import { keepStaffOut } from '@/lib/roles';
 
 export const metadata: Metadata = {
   title: 'Checkout',
@@ -20,6 +21,10 @@ export default async function CheckoutPage({
 }) {
   const { plan, cancelled } = await searchParams;
 
+  // A subscription buys chapters and an AI tutor. Neither a teacher on the
+  // referral programme nor an administrator has any use for one, and a staff
+  // account wandering into checkout is a wrong turn, not a sale.
+  await keepStaffOut();
   const user = await getUser();
 
   return (

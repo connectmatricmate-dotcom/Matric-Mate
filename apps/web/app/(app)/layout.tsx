@@ -7,6 +7,7 @@ import { PushLive } from '@/components/app/PushLive';
 // Side-effect import: connects the shared content layer to Supabase.
 import '@/lib/content';
 import { hasActivePlan, isOpenWithoutPlan } from '@/lib/entitlement';
+import { keepStaffOut } from '@/lib/roles';
 import { AppProvider } from '@/lib/store';
 
 /** Renders once; child pages slot into it without rebuilding the nav. */
@@ -27,6 +28,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
    * would multiply one database round trip by twenty for a single visit.
    */
   const pathname = (await headers()).get('x-pathname') ?? '';
+
+  /*
+   * Staff are not students and never see a student screen.
+   *
+   * This has to come before the paywall or the paywall answers first and gets
+   * it wrong: neither a teacher nor an administrator has a subscription, so
+   * "Leave admin" sent Adnan to the dashboard, the dashboard found no plan,
+   * and he landed on a price list for a product he owns. Sending them to their
+   * own area instead is both correct and the only answer that is not absurd.
+   */
+  await keepStaffOut();
+
   const paid = await hasActivePlan();
 
   if (!paid && !isOpenWithoutPlan(pathname)) redirect('/upgrade');

@@ -93,16 +93,6 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
         <Text name="institution" label="School or academy" placeholder="Government Model School" />
       </Group>
 
-      <Group title="How you will pay them" note="All optional. Nothing here is validated, so any format works.">
-        <Text name="payoutMethod" label="Method" placeholder="JazzCash, Easypaisa, bank transfer" />
-        <Text name="payoutAccount" label="Account or IBAN" placeholder="0300 1234567" />
-        <Text name="payoutName" label="Account title" placeholder="Sana Iqbal" />
-      </Group>
-
-      <Group title="Notes">
-        <Text name="note" label="Anything worth remembering" placeholder="Met at the Rawalpindi teachers' meet, teaches Class 10 physics" />
-      </Group>
-
       <div className="mt-6 flex items-center gap-3">
         <SubmitButton title="Create the account" pendingTitle="Creating…" />
         <Link href="/admin/teachers" className="text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-ink">
@@ -146,7 +136,9 @@ function Text({
         {label}
         {required ? <span className="text-red"> *</span> : null}
       </span>
-      <span className="flex items-center gap-2 rounded-[12px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 focus-within:border-teal">
+      {/* .field-shell owns the focus ring, see globals.css. Without it the
+          box draws a border and the browser draws its own inside it. */}
+      <span className="field-shell flex items-center gap-2 rounded-[12px] border-[1.5px] border-line bg-card px-3.5 py-2.5 transition-[border-color,box-shadow] duration-200">
         <input
           name={name}
           type={type}

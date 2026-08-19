@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
    */
   const [{ data: ent }, { data: prof }, usage, { count: lastMinute }, owned] = await Promise.all([
     admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade,role').eq('id', userId).maybeSingle(),
     admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
     // The abuse wall: a human student cannot ask five thoughtful questions in
     // a minute; a script can. Counted from persisted messages, so it cannot be
@@ -228,6 +228,13 @@ export async function POST(req: NextRequest) {
       ? admin.from('chat_threads').select('id').eq('id', body.threadId).eq('user_id', userId).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
+
+  // Students only. This route does its own authentication rather than going
+  // through guardAi, so it needs its own copy of the rule: a teacher's token
+  // is a valid token, and a route handler has no page guard in front of it.
+  if (prof?.role && prof.role !== 'student') {
+    return NextResponse.json({ error: 'not_a_student' }, { status: 403 });
+  }
 
   // Paid-only: the same wall RLS enforces on content, applied to the tutor.
   const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { keepStaffOut } from '@/lib/roles';
 import Link from 'next/link';
 import { AI_QUOTA } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
@@ -50,7 +51,11 @@ const QUESTIONS = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  // Public to a visitor, but a signed-in teacher or administrator has taken a
+  // wrong turn: there is nothing here for them to buy.
+  await keepStaffOut();
+
   return (
     <>
       <Nav />

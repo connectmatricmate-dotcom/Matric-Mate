@@ -55,7 +55,7 @@ function Secret({
   return (
     <label className="block">
       <span className="mb-1 block text-[12.5px] font-extrabold text-ink2">{label}</span>
-      <span className="flex rounded-[12px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 focus-within:border-teal">
+      <span className="field-shell flex rounded-[12px] border-[1.5px] border-line bg-card px-3.5 py-2.5 transition-[border-color,box-shadow] duration-200">
         <input
           name={name}
           type="password"

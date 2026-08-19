@@ -1,5 +1,6 @@
 import 'server-only';
 import { cache } from 'react';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -48,4 +49,21 @@ export function emailAllowedAsAdmin(email: string | null | undefined): boolean {
   if (!raw) return true;
   const allowed = raw.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
   return !!email && allowed.includes(email.toLowerCase());
+}
+
+/**
+ * Turn staff away from a student screen, and send them to their own.
+ *
+ * Called from every layout that fronts a student route. An administrator
+ * reaching /dashboard was not a hypothetical: the header used to link there,
+ * and Adnan landed on a price list for the product he owns, because the
+ * paywall answered before anybody asked whose account it was.
+ *
+ * A redirect rather than a 404, because unlike the staff areas there is no
+ * secret being kept here. These addresses are the app; the point is only that
+ * they are not for these accounts.
+ */
+export async function keepStaffOut(): Promise<void> {
+  const role = await currentRole();
+  if (role !== 'student') redirect(homeFor(role));
 }

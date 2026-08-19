@@ -79,8 +79,24 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
 
   const [{ data: ent }, { data: prof }] = await Promise.all([
     admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade,role').eq('id', userId).maybeSingle(),
   ]);
+
+  /*
+   * Students only, checked before the plan.
+   *
+   * Every AI route in the app comes through here, so this is the one place it
+   * needs saying. A page guard does not protect a route handler: these are
+   * public HTTP endpoints, and a teacher's or an administrator's token is a
+   * perfectly valid token. Today the plan check below would stop them anyway,
+   * because staff accounts have no subscription, but that is a coincidence of
+   * how things are rather than a rule, and it would stop being true the moment
+   * anybody comped a staff account.
+   */
+  if (prof?.role && prof.role !== 'student') {
+    return NextResponse.json({ error: 'not_a_student' }, { status: 403 });
+  }
+
   const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
   if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
   const grade: 9 | 10 = prof?.grade === 10 ? 10 : 9;

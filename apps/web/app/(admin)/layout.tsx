@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole, emailAllowedAsAdmin } from '@/lib/roles';
+import { signOutAction } from '@/app/(auth)/actions';
+import { Wordmark } from '@/components/ui/primitives';
 
 export const metadata: Metadata = { title: 'Admin', robots: { index: false, follow: false } };
 
@@ -34,20 +36,26 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-paper">
       <header className="sticky top-0 z-30 border-b border-line bg-glass backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-[1100px] items-center gap-4 px-4 md:px-8">
-          <Link href="/admin" className="font-display text-[16px] text-ink">
-            MatricMate <span className="text-ink3">admin</span>
+          <Link href="/admin" className="flex items-center gap-2">
+            <Wordmark width={104} height={21} />
+            <span className="text-[12.5px] font-extrabold text-ink3">admin</span>
           </Link>
           <nav className="flex items-center gap-1">
             <Tab href="/admin">Overview</Tab>
             <Tab href="/admin/teachers">Teachers</Tab>
             <Tab href="/admin/account">Account</Tab>
           </nav>
-          <Link
-            href="/dashboard"
-            className="ms-auto text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
-          >
-            Leave admin
-          </Link>
+          {/* Log out, not a way into the student app. An administrator has no
+              subscription, so "go to the dashboard" meant "go to the paywall",
+              and there is nothing for them there anyway. */}
+          <form action={signOutAction} className="ms-auto">
+            <button
+              type="submit"
+              className="text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
+            >
+              Log out
+            </button>
+          </form>
         </div>
       </header>
       <main className="mx-auto w-full max-w-[1100px] px-4 py-7 md:px-8">{children}</main>

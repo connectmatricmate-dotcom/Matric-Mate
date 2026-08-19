@@ -38,7 +38,7 @@ export function RecordPayout({ affiliateId, outstanding }: { affiliateId: string
       <div className="mt-3.5 grid gap-3 sm:grid-cols-[160px_1fr_auto] sm:items-end">
         <label className="block">
           <span className="mb-1 block text-[12.5px] font-extrabold text-ink2">Amount</span>
-          <span className="flex items-center gap-1.5 rounded-[12px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 focus-within:border-teal">
+          <span className="field-shell flex items-center gap-1.5 rounded-[12px] border-[1.5px] border-line bg-card px-3.5 py-2.5 transition-[border-color,box-shadow] duration-200">
             <span className="text-[13px] font-extrabold text-ink3">Rs</span>
             <input
               name="amount"
@@ -54,7 +54,7 @@ export function RecordPayout({ affiliateId, outstanding }: { affiliateId: string
         </label>
         <label className="block">
           <span className="mb-1 block text-[12.5px] font-extrabold text-ink2">Note</span>
-          <span className="flex rounded-[12px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 focus-within:border-teal">
+          <span className="field-shell flex rounded-[12px] border-[1.5px] border-line bg-card px-3.5 py-2.5 transition-[border-color,box-shadow] duration-200">
             <input
               name="note"
               type="text"
