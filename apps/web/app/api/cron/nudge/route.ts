@@ -66,7 +66,7 @@ const MAX_PER_RUN = 500;
 /** Streaks worth congratulating rather than passing over in silence. */
 const MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
 
-type ProfileRow = { id: string; settings: unknown; onboarding: { medium?: string } | null };
+type ProfileRow = { id: string; settings: unknown; onboarding: { medium?: string } | null; created_at: string };
 
 const karachiDay = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(d);
 
@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
    */
   const profiles: ProfileRow[] = [];
   for (let from = 0; ; from += 1000) {
-    const { data, error } = await admin.from('profiles').select('id,settings,onboarding').range(from, from + 999);
+    const { data, error } = await admin.from('profiles').select('id,settings,onboarding,created_at').range(from, from + 999);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     profiles.push(...((data ?? []) as ProfileRow[]));
     if ((data ?? []).length < 1000) break;
@@ -155,6 +155,30 @@ export async function GET(req: NextRequest) {
    * so that a long streak is counted at its real length.
    */
   const everyone = [...daysByUser.entries()].filter(([, days]) => daysSinceLast(days, now) <= WINDOW_DAYS);
+
+  /*
+   * And the students who have never studied at all.
+   *
+   * They were invisible here, because this list was built from active_days and
+   * a student with no activity has no rows in it. So the one person most in
+   * need of "come and study" was the only one who could never receive it: you
+   * could install the app, leave it two days, and nothing would ever arrive.
+   *
+   * They join on the same terms as everybody else, with an empty day set, and
+   * are dropped once their account is older than the window. Past that, a
+   * nightly tap on the shoulder is noise to somebody who never started.
+   */
+  const started = new Set(everyone.map(([id]) => id));
+  const neverStarted = new Set<string>();
+  for (const p of dueNow) {
+    if (started.has(p.id)) continue;
+    const age = Math.floor((now.getTime() - Date.parse(p.created_at)) / 864e5);
+    if (Number.isFinite(age) && age <= WINDOW_DAYS) {
+      neverStarted.add(p.id);
+      everyone.push([p.id, new Set<string>()]);
+    }
+  }
+
   if (!everyone.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
   const ids = everyone.map(([id]) => id);
 
@@ -224,6 +248,7 @@ export async function GET(req: NextRequest) {
       wantsStreak,
       dayIndex,
       lang,
+      neverStarted: neverStarted.has(userId),
     });
     if (!notice) continue;
 
@@ -253,6 +278,8 @@ type Signals = {
   wantsStreak: boolean;
   dayIndex: number;
   lang: Language;
+  /** Signed up, never studied. Every history signal below is empty for them. */
+  neverStarted: boolean;
 };
 
 /**
@@ -276,6 +303,14 @@ function pick(s: Signals): Notice | null {
   if (s.wantsStreak && s.streakYesterday >= 2) return streakAtRiskTiered(s.streakYesterday);
 
   if (!s.wantsReminder) return null;
+
+  /*
+   * Never studied. Straight to the rotating general nudge, before the ladder
+   * below: "away for 21 days" is measured from a last visit they never made,
+   * so the win-back rungs would either say something false or, once past the
+   * top rung, say nothing at all.
+   */
+  if (s.neverStarted) return comeBack(s.dayIndex);
 
   // 2. Gone for days. The win-back ladder, which runs out after a fortnight.
   if (s.awayDays >= 3) return awayFor(s.awayDays);
