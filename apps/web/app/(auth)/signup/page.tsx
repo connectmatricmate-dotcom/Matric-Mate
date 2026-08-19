@@ -6,9 +6,10 @@ export const metadata: Metadata = {
   description: 'Create a free MatricMate account and start preparing for FBISE Class 9 today.',
 };
 
-export default async function SignUpPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+export default async function SignUpPage({ searchParams }: { searchParams: Promise<{ next?: string; ref?: string }> }) {
   // proxy.ts adds ?next= when it turns away an unauthenticated request, so the
   // student lands where they were going instead of on a generic home screen.
-  const { next } = await searchParams;
-  return <SignUpForm next={next} />;
+  // ?ref= is added by /r/CODE, a teacher's referral link.
+  const { next, ref } = await searchParams;
+  return <SignUpForm next={next} ref={ref} />;
 }

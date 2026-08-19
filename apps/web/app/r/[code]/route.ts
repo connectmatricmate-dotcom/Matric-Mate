@@ -57,7 +57,10 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ code: strin
   if (known) {
     res.cookies.set('mm_ref', code, {
       maxAge: THIRTY_DAYS,
-      httpOnly: false, // read by the signup form on the client as a fallback
+      // Read only by the signup server action, so the browser has no reason
+      // to see it. httpOnly costs nothing here and keeps a referral code out
+      // of reach of anything running on the page.
+      httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       path: '/',

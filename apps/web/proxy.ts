@@ -35,6 +35,16 @@ export const config = {
     '/checkout/:path*',
     '/certificates/:path*',
     '/onboarding/:path*',
+    /*
+     * The two staff areas. Here as much for the session refresh as for the
+     * guard: their own layouts already turn away the wrong role, but without
+     * middleware on the path the auth cookie is never renewed, so a teacher
+     * reading their dashboard would eventually be signed out mid-page.
+     */
+    '/admin/:path*',
+    '/admin',
+    '/affiliate/:path*',
+    '/affiliate',
     '/login',
     '/signup',
   ],
