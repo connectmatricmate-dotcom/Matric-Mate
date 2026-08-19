@@ -3,18 +3,19 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { Chapter, Subject } from '@matricmate/core';
-import { chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
+import { chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
 import { LockedNotice } from '@/components/app/LockedNotice';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Btn } from '@/components/ui/controls';
-import { Bar, Card, Icon, LinkBtn, Pill, Ring, Ur } from '@/components/ui/primitives';
+import { Bar, Card, Icon, LinkBtn, Pill, Ring, ScriptText, Ur } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function ChapterList({ subject, chapters }: { subject: Subject; chapters: Chapter[] }) {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [locked, setLocked] = useState<Chapter | null>(null);
 
   // One pass over the chapters per data change. The render below used to call
@@ -72,11 +73,7 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
                 {done ? <Icon name="check" size={19} strokeWidth={2.6} /> : c.number}
               </span>
               <span className="min-w-0 flex-1">
-                {state.settings.language === 'ur' && c.urduTitle ? (
-                  <Ur block className="text-[14.5px] text-ink">{c.urduTitle}</Ur>
-                ) : (
-                  <span className="block text-[14px] font-extrabold text-ink">{c.title}</span>
-                )}
+                <ScriptText text={chapterName(c, lang)} className="text-[14px] font-extrabold text-ink" />
                 {empty ? null : (
                   <span className="block truncate text-[13px] text-ink2">
                     {/* Section count, not audio length, and the same three

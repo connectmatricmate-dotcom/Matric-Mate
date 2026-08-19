@@ -7,11 +7,11 @@
 import Link from 'next/link';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
-import { accuracy, chapterById, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import { accuracy, chapterById, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
 import type { CoachReport } from '@matricmate/core';
 import { Bar, Card, Icon, Label, Pill, Ring, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { ScriptNumbers } from '@/components/ui/ScriptList';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
 import { Markdown } from '@/components/ui/Markdown';
 
@@ -95,6 +95,7 @@ export function StreakRail() {
 export function SyllabusRail({ limit = 5 }: { limit?: number }) {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const rows = useMemo(
     () =>
       derived.subjects
@@ -111,7 +112,10 @@ export function SyllabusRail({ limit = 5 }: { limit?: number }) {
           return (
             <Link key={sid} href={`/learn/subject/${sid}`} className="block">
               <span className="flex items-baseline justify-between gap-2">
-                <span className="truncate text-[12.5px] font-extrabold text-ink">{subjectById(sid)?.name}</span>
+                <ScriptText
+                  text={subjectName(subjectById(sid), lang)}
+                  className="truncate text-[12.5px] font-extrabold text-ink"
+                />
                 <span className="text-[11.5px] font-extrabold text-ink2 tabular">{pct}%</span>
               </span>
               <span className="mt-1 block">

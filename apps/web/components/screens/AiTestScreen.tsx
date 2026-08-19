@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  chapterName,
   chaptersFor,
   fetchAiSession,
   fetchAiSessions,
   generateAiSession,
   normalizeAiMcqs,
   subjectById,
+  subjectName,
   weakTopics,
 } from '@matricmate/core';
 import type { AiSessionKind, AiSessionRow } from '@matricmate/core';
@@ -19,7 +21,7 @@ import { Btn, ItemButton, PillButton, Seg } from '@/components/ui/controls';
 import { Card, Check, ScriptText, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 const KIND_LABEL = { mcq: 'tutor.kindMcq', flashcards: 'tutor.kindCards', blanks: 'tutor.kindBlanks', shortq: 'tutor.kindShortq' } as const;
 
@@ -31,6 +33,7 @@ const KIND_LABEL = { mcq: 'tutor.kindMcq', flashcards: 'tutor.kindCards', blanks
 export function AiTestScreen() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const router = useRouter();
 
@@ -117,7 +120,7 @@ export function AiTestScreen() {
       <div className="flex flex-wrap gap-2">
         {derived.subjects.map((sid) => (
           <PillButton key={sid} tone={sid === subjectId ? 'teal' : 'grey'} onClick={() => setSubjectId(sid)}>
-            {subjectById(sid)?.name ?? sid}
+            {subjectName(subjectById(sid), lang) || sid}
           </PillButton>
         ))}
       </div>
@@ -127,7 +130,7 @@ export function AiTestScreen() {
         {chapters.map((c, i) => (
           <ItemButton
             key={c.id}
-            title={`${c.number}. ${c.title}`}
+            title={`${c.number}. ${chapterName(c, lang)}`}
             icon="book"
             last={i === chapters.length - 1}
             onClick={() => setChapterTouched(c.id)}

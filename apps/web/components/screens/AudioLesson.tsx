@@ -81,7 +81,7 @@ export function AudioLesson({
     <Page width="focus">
       <PageHead
         back={`/learn/chapter/${id}`}
-        backLabel={chapter.title}
+        backLabel={chapterName(chapter, state.settings.language)}
         title={t('audio.title')}
       />
 

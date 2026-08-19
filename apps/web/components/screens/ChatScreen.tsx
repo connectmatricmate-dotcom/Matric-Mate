@@ -2,26 +2,12 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  TUTOR_ACTION_LABEL,
-  TUTOR_ACTION_ROUTE,
-  api,
-  chapterById,
-  isUrduScript,
-  parseTutorActions,
-  rateTutorAnswer,
-  subjectById,
-  weakTopics,
-  type ChatMessage,
-  type StringKey,
-  type TutorAction,
-  type TutorImage,
-} from '@matricmate/core';
+import { TUTOR_ACTION_LABEL, TUTOR_ACTION_ROUTE, api, chapterById, chapterName, isUrduScript, parseTutorActions, rateTutorAnswer, subjectById, subjectName, type ChatMessage, type StringKey, type TutorAction, type TutorImage, weakTopics } from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
 import { Icon, Pill, ScriptText } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { Markdown } from '@/components/ui/Markdown';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 import { quotaClock, useTutorQuota } from '@/lib/use-tutor-quota';
 import { ChapterPicker } from '@/components/ui/ChapterPicker';
@@ -70,20 +56,21 @@ function AnswerActions({ actions }: { actions: TutorAction[] }) {
  */
 function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const t = useT();
+  const { lang } = useLang();
   const { state, derived } = useApp();
 
   const starters = useMemo(() => {
     const out: string[] = [];
     const weak = weakTopics(state.attempts)[0]?.topic;
+    const lastChapter = state.lastChapterId ? chapterName(chapterById(state.lastChapterId), lang) : undefined;
     if (weak) out.push(t('tutor.starterWeak', { topic: weak }));
-    const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId)?.title : undefined;
     if (lastChapter) out.push(t('tutor.starterChapter', { chapter: lastChapter }));
-    const subject = subjectById(derived.subjects[0] ?? '')?.name;
+    const subject = subjectName(subjectById(derived.subjects[0] ?? ''), lang);
     if (subject) out.push(t('tutor.starterExam', { subject }));
     if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
     out.push(t('tutor.starterMarks'));
     return out.slice(0, 4);
-  }, [state.attempts, state.lastChapterId, derived.subjects, t]);
+  }, [state.attempts, state.lastChapterId, derived.subjects, lang, t]);
 
   return (
     <div className="flex min-h-full flex-col justify-between gap-8 py-4">

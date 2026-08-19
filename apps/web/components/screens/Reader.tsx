@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { api, isUrduScript } from '@matricmate/core';
+import { api, chapterName, isUrduScript } from '@matricmate/core';
 import type { Block, Chapter, ChapterContent, StringKey } from '@matricmate/core';
 import { Btn, IconButton } from '@/components/ui/controls';
 import { Card, Label, Pill, Skeleton } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { Page } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Markdown } from '@/components/ui/Markdown';
@@ -123,6 +123,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
   const [quota] = useTutorQuota();
   const aiLeft = quota?.remaining ?? derived.aiLeft;
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const [idx, setIdx] = useState(0);
   const [askOpen, setAskOpen] = useState(false);
@@ -188,7 +189,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
         backHref={`/learn/chapter/${id}`}
         backLabel={t('session.backToChapter')}
         pct={((idx + 1) / total) * 100}
-        label={`${chapter.title} · ${t('reader.section', { a: idx + 1, b: total })}`}
+        label={`${chapterName(chapter, lang)} · ${t('reader.section', { a: idx + 1, b: total })}`}
         right={
           <button
             type="button"
@@ -265,7 +266,7 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
 
       <Sheet open={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>
         <div className="mb-4 flex flex-wrap gap-2">
-          <Pill tone="teal">{chapter.title}</Pill>
+          <Pill tone="teal">{chapterName(chapter, lang)}</Pill>
           <Pill tone={aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: aiLeft })}</Pill>
         </div>
 
