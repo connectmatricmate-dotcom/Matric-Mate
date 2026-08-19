@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { api, chapterById, subjectById, weakTopics } from '@matricmate/core';
+import { api, chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 
 const COUNT = 20;
@@ -28,6 +28,7 @@ export function ExamIntro({
 }) {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -42,8 +43,8 @@ export function ExamIntro({
     : paper
       ? `FBISE ${paper}`
       : chapter
-        ? (chapterById(chapter)?.title ?? '')
-        : (subjectById(subjectId)?.name ?? '');
+        ? chapterName(chapterById(chapter), lang)
+        : subjectName(subjectById(subjectId), lang);
 
   async function start() {
     setBusy(true);

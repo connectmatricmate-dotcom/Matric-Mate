@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Check, Icon, Pill, Ur } from '@/components/ui/primitives';
+import { useT } from '@/lib/store';
 
 export function Steps({ step, total = 4 }: { step: number; total?: number }) {
   return (
@@ -94,6 +95,7 @@ export function StepScreen({
   back?: boolean;
 }) {
   const router = useRouter();
+  const t = useT();
   // Every step's forward action is a state write plus a route push. The button
   // spins until the next step paints, otherwise a slow transition reads as a
   // dead tap and invites a second click.
@@ -108,7 +110,7 @@ export function StepScreen({
           className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-[13.5px] font-extrabold text-ink2 hover:text-teal"
         >
           <Icon name="chevron" size={18} className="rotate-180" />
-          Back
+          {t('common.back')}
         </button>
       ) : null}
 

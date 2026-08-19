@@ -1,14 +1,15 @@
 'use client';
 
 import { useMemo } from 'react';
-import { subjectById, weakTopics } from '@matricmate/core';
+import { subjectById, subjectName, weakTopics } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Card, Empty, LinkBtn, ScriptText, SectionTitle } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function WeakTopicsScreen() {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const rows = useMemo(() => weakTopics(state.attempts), [state.attempts]);
 
   const bySubject = rows.reduce<Record<string, typeof rows>>((acc, r) => {
@@ -35,7 +36,7 @@ export function WeakTopicsScreen() {
       ) : (
         Object.entries(bySubject).map(([sid, list]) => (
           <div key={sid}>
-            <SectionTitle>{subjectById(sid)?.name}</SectionTitle>
+            <SectionTitle>{subjectName(subjectById(sid), lang)}</SectionTitle>
             <div className="grid gap-2.5 lg:grid-cols-2">
               {list.map((w) => (
                 <Card key={w.topic} flat>

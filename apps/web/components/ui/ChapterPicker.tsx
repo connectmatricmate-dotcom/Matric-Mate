@@ -3,15 +3,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   chapterChoices,
+  chapterName,
   fetchChapterTopics,
   matchChapters,
   subjectById,
+  subjectName,
   type ChapterChoice,
 } from '@matricmate/core';
 import { Icon } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { createClient } from '@/lib/supabase/client';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 /**
  * Choosing what the tutor should answer from: subject, then chapter, then the
@@ -60,6 +62,7 @@ export function ChapterPicker({
 function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
   const { derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [level, setLevel] = useState<Level>({ kind: 'subjects' });
   const [query, setQuery] = useState('');
   /** Keyed by chapter, so "still loading" is a comparison rather than a
@@ -99,7 +102,9 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
           className="-ms-1 inline-flex min-h-11 items-center gap-1 self-start text-[13px] font-extrabold text-teal transition-colors duration-200 hover:brightness-90"
         >
           <Icon name="chevron" size={16} className="rotate-180" />
-          {level.kind === 'topics' ? (subjectById(level.chapter.subjectId)?.name ?? '') : t('tutor.pickSubjectTitle')}
+          {level.kind === 'topics'
+            ? subjectName(subjectById(level.chapter.subjectId), lang)
+            : t('tutor.pickSubjectTitle')}
         </button>
       ) : null}
 
@@ -130,8 +135,8 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
               <RowItem
                 key={c.id}
                 badge={String(c.number)}
-                title={c.title}
-                sub={c.subjectName}
+                title={chapterName(c, lang)}
+                sub={lang === 'ur' ? (c.subjectUrduName ?? c.subjectName) : c.subjectName}
                 last={i === hits.length - 1}
                 onClick={() => setLevel({ kind: 'topics', chapter: c })}
               />
@@ -144,7 +149,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
               <RowItem
                 key={sid}
                 badge={String(count)}
-                title={subjectById(sid)?.name ?? sid}
+                title={subjectName(subjectById(sid), lang) || sid}
                 sub={t('tutor.chapterCount', { n: count })}
                 last={i === derived.subjects.length - 1}
                 onClick={() => setLevel({ kind: 'chapters', subjectId: sid })}
@@ -158,7 +163,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
               <RowItem
                 key={c.id}
                 badge={String(c.number)}
-                title={c.title}
+                title={chapterName(c, lang)}
                 last={i === all.length - 1}
                 onClick={() => setLevel({ kind: 'topics', chapter: c })}
               />
@@ -169,7 +174,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
             <RowItem
               badge="★"
               title={t('tutor.wholeChapter')}
-              sub={level.chapter.title}
+              sub={chapterName(level.chapter, lang)}
               last={false}
               onClick={() => onPick({ chapter: level.chapter })}
             />

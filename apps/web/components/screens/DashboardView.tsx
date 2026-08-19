@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { SUBJECT_ICON, accuracy, chapterById, chapterPct, formatDate, subjectById, type IconName, type StringKey } from '@matricmate/core';
+import { SUBJECT_ICON, accuracy, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, type IconName, type StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoachRail, ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
@@ -133,7 +133,7 @@ export function DashboardView() {
                         urduClassName={`text-[13.5px] text-onbrand ${task.done ? 'line-through opacity-70' : ''}`}
                       />
                       <span className="block text-[11.5px] font-extrabold text-onbrand-soft">
-                        {subjectById(task.subjectId)?.name}
+                        {subjectName(subjectById(task.subjectId), lang)}
                       </span>
                     </span>
                     <Icon name="chevron" size={17} className="shrink-0 text-onbrand-soft" />
@@ -169,9 +169,12 @@ export function DashboardView() {
                 </span>
                 <span className="min-w-0 flex-1">
                   <Label>{t('dash.continueLearning')}</Label>
-                  <span className="mt-0.5 block truncate text-[15.5px] font-extrabold text-ink">{lastChapter.title}</span>
+                  <ScriptText
+                    text={chapterName(lastChapter, lang)}
+                    className="mt-0.5 truncate text-[15.5px] font-extrabold text-ink"
+                  />
                   <span className="block text-[13px] text-ink2">
-                    {subjectById(lastChapter.subjectId)?.name} ·{' '}
+                    {subjectName(subjectById(lastChapter.subjectId), lang)} ·{' '}
                     {t('dash.sectionOf', {
                       a: Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount),
                       b: lastChapter.sectionCount,

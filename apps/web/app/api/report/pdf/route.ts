@@ -6,6 +6,7 @@ import {
   grade,
   mediumName,
   subjectById,
+  subjectName,
   translate,
   type Attempt,
   type ReportData,
@@ -85,7 +86,7 @@ export async function GET() {
       const half = Math.floor(set.length / 2);
       const delta = half && set.length - half ? accuracy(set.slice(half)) - accuracy(set.slice(0, half)) : 0;
       return {
-        subject: subjectById(sid)?.name ?? sid,
+        subject: subjectName(subjectById(sid), lang) || sid,
         grade: set.length ? grade(acc) : 'n/a',
         accuracy: acc,
         attempted: set.length,

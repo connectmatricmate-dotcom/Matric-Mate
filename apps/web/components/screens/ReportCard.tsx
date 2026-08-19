@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { accuracy, boardName, formatDate, grade, mediumName, subjectById } from '@matricmate/core';
+import { accuracy, boardName, formatDate, grade, mediumName, subjectById, subjectName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Icon, Label, Pill } from '@/components/ui/primitives';
+import { Card, Icon, Label, Pill, ScriptText } from '@/components/ui/primitives';
 import { buttonClasses } from '@/components/ui/styles';
 import { useNow } from '@/lib/now';
 import { useApp, useLang, useT } from '@/lib/store';
@@ -71,7 +71,9 @@ export function ReportCard() {
           <tbody>
             {rows.map((r) => (
               <tr key={r.sid} className="border-b border-line">
-                <td className="py-2.5 text-[13.5px] text-ink">{subjectById(r.sid)?.name}</td>
+                <td className="py-2.5 text-[13.5px] text-ink">
+                  <ScriptText text={subjectName(subjectById(r.sid), lang)} />
+                </td>
                 <td className="w-11 py-2.5 text-end font-display text-[15px] text-ink">
                   {r.attempted ? grade(r.acc) : 'n/a'}
                 </td>

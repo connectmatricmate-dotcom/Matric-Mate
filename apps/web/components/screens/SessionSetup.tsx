@@ -2,12 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { type Chapter, api, chapterById, subjectById } from '@matricmate/core';
+import { type Chapter, api, chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, Seg } from '@/components/ui/controls';
 import { Card, Check, Item, SectionTitle, Skeleton } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 
 export function SessionSetupSkeleton() {
@@ -57,6 +57,7 @@ export function SessionSetup({
   const router = useRouter();
   const { derived, state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
 
   const initialChapter = initialChapterId ? chapterById(initialChapterId) : undefined;
@@ -109,7 +110,7 @@ export function SessionSetup({
       label:
         chapterIds.length === 1
           ? (chapterById(chapterIds[0])?.title ?? '')
-          : `${subjectById(subjectId)?.name} · ${t('session.mixed')}`,
+          : `${subjectName(subjectById(subjectId), lang)} · ${t('session.mixed')}`,
       subjectId,
       chapterId: chapterIds.length === 1 ? chapterIds[0] : null,
       mcqs,
@@ -138,7 +139,7 @@ export function SessionSetup({
               sid === subjectId ? 'bg-tealtint text-teal' : 'bg-grey text-ink2 hover:brightness-95'
             }`}
           >
-            {subjectById(sid)?.name ?? sid}
+            {subjectName(subjectById(sid), lang) || sid}
           </button>
         ))}
       </div>
@@ -166,7 +167,7 @@ export function SessionSetup({
           return (
             <ItemButton
               key={c.id}
-              title={c.title}
+              title={chapterName(c, lang)}
               sub={t('study.mcqsSub', { n: c.mcqCount })}
               icon="book"
               tone={on ? 'teal' : 'grey'}

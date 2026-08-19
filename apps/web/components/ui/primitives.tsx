@@ -259,7 +259,12 @@ export function Label({ children, className = '' }: { children: React.ReactNode;
 export function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="mt-6 mb-2 flex items-baseline justify-between gap-3">
-      <h2 className="font-display text-[17px] text-ink">{children}</h2>
+      {/* Section headings are often a subject name, which is Urdu for an Urdu
+          student. Detected here rather than at every call site, the same way
+          Item and Pill already do it. */}
+      <h2 className="font-display text-[17px] text-ink">
+        {typeof children === 'string' && isUrduScript(children) ? <Ur>{children}</Ur> : children}
+      </h2>
       {action}
     </div>
   );

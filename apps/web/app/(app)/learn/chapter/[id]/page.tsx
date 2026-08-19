@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { subjectById } from '@matricmate/core';
 import { ChapterHub } from '@/components/screens/ChapterHub';
 import { getAudioTracks, getChapter, getChapterContent } from '@/lib/content-readers';
 
@@ -20,11 +19,6 @@ export default async function ChapterPage({ params }: Props) {
   if (!chapter) notFound();
 
   return (
-    <ChapterHub
-      chapter={chapter}
-      content={content}
-      subjectName={subjectById(chapter.subjectId)?.name ?? ''}
-      tracks={tracks}
-    />
+    <ChapterHub chapter={chapter} content={content} tracks={tracks} />
   );
 }

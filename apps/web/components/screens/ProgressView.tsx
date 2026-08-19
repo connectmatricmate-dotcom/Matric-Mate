@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useNow } from '@/lib/now';
 import { useMemo } from 'react';
-import { accuracy, formatDate, grade, overallPct, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import { accuracy, formatDate, grade, overallPct, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { ConfidenceRail, StreakRail } from '@/components/app/rails';
-import { Bar, Card, Icon, Item, Kpi, LinkBtn, Pill, Ring } from '@/components/ui/primitives';
+import { Bar, Card, Icon, Item, Kpi, LinkBtn, Pill, Ring, ScriptText } from '@/components/ui/primitives';
 import { useApp, useLang, useT } from '@/lib/store';
 
 export function ProgressView() {
@@ -73,7 +73,10 @@ export function ProgressView() {
                 return (
                   <Link key={sid} href={`/learn/subject/${sid}`} className="block">
                     <span className="flex items-baseline justify-between gap-2">
-                      <span className="truncate text-[13px] font-extrabold text-ink">{subjectById(sid)?.name}</span>
+                      <ScriptText
+                        text={subjectName(subjectById(sid), lang)}
+                        className="truncate text-[13px] font-extrabold text-ink"
+                      />
                       <span className="text-[12.5px] font-extrabold text-ink2 tabular">{pct}%</span>
                     </span>
                     <span className="mt-1 block">
@@ -103,7 +106,7 @@ export function ProgressView() {
                     key={w.topic}
                     href={`/session/setup?chapter=${w.chapterId}`}
                     title={w.topic}
-                    sub={subjectById(w.subjectId)?.name}
+                    sub={subjectName(subjectById(w.subjectId), lang)}
                     icon="alert"
                     tone={w.accuracy < 50 ? 'red' : 'orange'}
                     last={i === weak.length - 1}

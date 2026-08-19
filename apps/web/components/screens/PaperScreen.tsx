@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { checkAnswerLive, generateMockPaper, readAiSession, subjectById } from '@matricmate/core';
+import { checkAnswerLive, generateMockPaper, readAiSession, subjectById, subjectName } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, AiSessionRead, ShortQ } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/client';
 import { AiWorking } from '@/components/ui/AiWorking';
@@ -12,7 +12,7 @@ import { Card, Label, Pill, ScriptText, SectionTitle, Skeleton } from '@/compone
 import { ScriptBullets } from '@/components/ui/ScriptList';
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
 
 /**
@@ -24,6 +24,7 @@ import { Markdown } from '@/components/ui/Markdown';
 export function PaperScreen({ paperId }: { paperId?: string }) {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -84,7 +85,7 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
         <div className="flex flex-wrap gap-2">
           {derived.subjects.map((sid) => (
             <PillButton key={sid} tone={sid === subjectId ? 'teal' : 'grey'} onClick={() => setSubjectId(sid)}>
-              {subjectById(sid)?.name ?? sid}
+              {subjectName(subjectById(sid), lang) || sid}
             </PillButton>
           ))}
         </div>

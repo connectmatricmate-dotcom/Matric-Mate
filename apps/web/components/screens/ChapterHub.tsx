@@ -1,25 +1,29 @@
 'use client';
 
 import type { Chapter, ChapterContent, PlayableTrack } from '@matricmate/core';
-import { chapterPct, hasStudyMaterial, isUrduScript, pickAudioTrack } from '@matricmate/core';
+import { chapterName, chapterPct, hasStudyMaterial, isUrduScript, pickAudioTrack, subjectById, subjectName } from '@matricmate/core';
 import { Actions, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { Card, Empty, Item, Label, LinkBtn, Ring } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function ChapterHub({
   chapter,
   content,
-  subjectName,
   tracks,
 }: {
   chapter: Chapter;
   content: ChapterContent;
-  subjectName: string;
   /** Empty until this chapter has really been recorded, and then the row hides. */
   tracks: PlayableTrack[];
 }) {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
+  /* Both names in the student's language. The subject used to arrive from the
+     server as an English prop and "Chapter 7" was built here in English, so an
+     Urdu student read a Latin eyebrow above a Nastaliq title. */
+  const subject = subjectName(subjectById(chapter.subjectId), lang);
+  const eyebrow = `${subject} · ${t('study.chapterN', { n: chapter.number })}`;
 
   const id = chapter.id;
 
@@ -31,10 +35,10 @@ export function ChapterHub({
       <Page width="focus">
         <PageHead
           back={`/learn/subject/${chapter.subjectId}`}
-          backLabel={subjectName}
-          eyebrow={`${subjectName} · Chapter ${chapter.number}`}
-          title={state.settings.language === 'ur' && chapter.urduTitle ? chapter.urduTitle : chapter.title}
-          titleUrdu={state.settings.language === 'ur' && !!chapter.urduTitle}
+          backLabel={subject}
+          eyebrow={eyebrow}
+          title={chapterName(chapter, lang)}
+          titleUrdu={isUrduScript(chapterName(chapter, lang))}
           sub={chapter.blurb}
         subUrdu={isUrduScript(chapter.blurb)}
         />
@@ -54,10 +58,10 @@ export function ChapterHub({
     <Page>
       <PageHead
         back={`/learn/subject/${chapter.subjectId}`}
-        backLabel={subjectName}
-        eyebrow={`${subjectName} · Chapter ${chapter.number}`}
-        title={state.settings.language === 'ur' && chapter.urduTitle ? chapter.urduTitle : chapter.title}
-        titleUrdu={state.settings.language === 'ur' && !!chapter.urduTitle}
+        backLabel={subject}
+        eyebrow={eyebrow}
+        title={chapterName(chapter, lang)}
+        titleUrdu={isUrduScript(chapterName(chapter, lang))}
         sub={chapter.blurb}
         subUrdu={isUrduScript(chapter.blurb)}
         actions={
