@@ -4,7 +4,7 @@
  */
 import Image from 'next/image';
 import Link from 'next/link';
-import { SUPPORT_EMAIL } from '@matricmate/core';
+import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 
 const PRODUCT = [
   { href: '#inside', label: 'What’s inside' },
@@ -23,6 +23,17 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
           <p className="mt-3 text-mk-small text-ink2">
             Exam preparation for FBISE Class 9, in English and Urdu medium. Built in Pakistan.
           </p>
+          {/* The registered office. Rendered only when it is filled in: a blank
+              line reads as an oversight, an invented address is worse. */}
+          {BUSINESS.address ? (
+            <address className="mt-3 not-italic text-mk-small leading-[1.7] text-ink3">
+              {BUSINESS.name}
+              <br />
+              {BUSINESS.address}
+              <br />
+              {[BUSINESS.city, BUSINESS.country].filter(Boolean).join(', ')}
+            </address>
+          ) : null}
         </div>
         <div className="flex gap-12">
           <div>
@@ -46,8 +57,18 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
                 </Link>
               </li>
               <li>
+                <Link className="hover:text-teal" href="/services">
+                  What a plan includes
+                </Link>
+              </li>
+              <li>
                 <Link className="hover:text-teal" href="/terms">
-                  Terms and privacy
+                  Terms and conditions
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-teal" href="/privacy">
+                  Privacy policy
                 </Link>
               </li>
               <li>
@@ -65,9 +86,14 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
                   {SUPPORT_EMAIL}
                 </a>
               </li>
-              {/* Plain text on purpose: there is no WhatsApp number to link yet,
-                  and ink3 keeps it from reading as a dead link. */}
-              <li className="text-ink3">WhatsApp · 10am to 10pm</li>
+              {BUSINESS.phone ? (
+                <li>
+                  <a className="hover:text-teal" href={`tel:${BUSINESS.phone.replace(/[^+\d]/g, '')}`}>
+                    {BUSINESS.phone}
+                  </a>
+                </li>
+              ) : null}
+              <li className="text-ink3">{BUSINESS.hours}</li>
             </ul>
           </div>
         </div>

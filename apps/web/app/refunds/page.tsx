@@ -37,14 +37,14 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     heading: 'How to ask for one',
     paragraphs: [
       `Message us on WhatsApp or email ${SUPPORT_EMAIL} with the mobile number on the account and the date of the payment. That is all we need to find it.`,
-      'We reply within two working days. Approved refunds are sent back through Safepay to the same method you paid with, which is the only place they can go. JazzCash and Easypaisa usually take two to three working days, and cards five to ten working days, depending on the bank.',
+      'We reply within two working days. Approved refunds go back through the payment gateway to the same method you paid with, which is the only place they can go. Wallets usually take two to three working days, and cards five to ten working days, depending on the bank.',
     ],
   },
   {
     heading: 'Failed and pending payments',
     paragraphs: [
       'If money left your account but the plan did not activate, do not pay again. Send us the transaction ID and we will either activate the plan or return the payment.',
-      'A payment that Safepay declines is never taken. If you see it held on your statement it is an authorisation, and your bank releases it, usually within a few working days.',
+      'A payment the gateway declines is never taken. If you see it held on your statement it is an authorisation, and your bank releases it, usually within a few working days.',
     ],
   },
 ];

@@ -37,3 +37,34 @@ export const BILLING_SITE = 'matricmate.pk';
  * receiving mail.
  */
 export const SUPPORT_EMAIL = 'connect.matricmate@gmail.com';
+
+/**
+ * Who is behind the site, in the words a payment gateway checks for.
+ *
+ * PayFast will not review a merchant whose website does not name a local
+ * office and a phone number, and a student deciding whether to send money is
+ * asking the same question the reviewer is. One place, both apps, so the
+ * answer cannot drift the way SUPPORT_EMAIL once did.
+ *
+ * Empty strings render nothing rather than a placeholder: a wrong address on
+ * a payments page is worse than a missing one, and this file is not the place
+ * to invent a business's details.
+ */
+export const BUSINESS: {
+  name: string;
+  address: string;
+  city: string;
+  country: string;
+  phone: string;
+  hours: string;
+} = {
+  /** Legal or trading name of the merchant, as it will read on a bank statement. */
+  name: 'MatricMate',
+  /** Street address of the office, one line. */
+  address: '',
+  city: 'Islamabad',
+  country: 'Pakistan',
+  /** Reachable during support hours, in local format. */
+  phone: '',
+  hours: '10am to 10pm, Monday to Saturday',
+};

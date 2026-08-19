@@ -5,8 +5,8 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { SUPPORT_EMAIL } from '@matricmate/core';
 
 export const metadata: Metadata = {
-  title: 'Terms and privacy',
-  description: 'How MatricMate works, what we store, and what happens to your data.',
+  title: 'Terms and conditions',
+  description: 'How MatricMate works, what you are buying, and the rules both sides agree to.',
 };
 
 const SECTIONS: { heading: string; paragraphs: string[] }[] = [
@@ -14,7 +14,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     heading: 'What MatricMate is',
     paragraphs: [
       'MatricMate is exam-preparation software for FBISE Class 9 and Class 10. It gives you notes, audio lessons, practice questions, past papers and an AI tutor. It is a study aid. It does not set, mark or influence any board examination, and it is not affiliated with the Federal Board of Intermediate and Secondary Education.',
-      'Study content follows the FBISE syllabus and model papers. Payments are processed by Safepay, a Pakistani payment gateway, which handles cards and mobile wallets on our behalf.',
+      'Study content follows the FBISE syllabus and model papers. Payments are handled by a State Bank licensed Pakistani payment gateway, which processes cards, wallets and bank transfers on our behalf.',
     ],
   },
   {
@@ -29,7 +29,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     paragraphs: [
       'Premium is sold on this website only. A plan is a single payment for a fixed stretch of time. Nothing renews automatically, no card is kept for a later charge, and the end date is shown on your account from the day you pay.',
       'There is no cancel button because there is no recurring charge to stop. If you do nothing, the plan ends on its last paid day. Access continues to that date, and your progress stays on the account whether or not you pay again.',
-      'Payments are processed by Safepay. Card and mobile-wallet details go to them, not to us, and we store only the reference number shown on your receipt.',
+      'Card, wallet and account details are typed on the payment gateway’s own page. They go to the gateway, never to us, and we store only the reference number shown on your receipt.',
     ],
   },
   {
@@ -63,7 +63,7 @@ export default function TermsPage() {
       <Nav />
 
       <main className="mx-auto max-w-[720px] px-5 py-14">
-        <h1 className="font-display text-mk-h1 text-ink">Terms and privacy</h1>
+        <h1 className="font-display text-mk-h1 text-ink">Terms and conditions</h1>
         <p className="mt-3 text-mk-lead text-ink2">
           Written to be read. If anything here is unclear, ask us and we will explain it, and fix the wording.
         </p>

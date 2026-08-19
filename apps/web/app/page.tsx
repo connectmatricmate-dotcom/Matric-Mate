@@ -81,7 +81,7 @@ const FAQ = [
   },
   {
     q: 'How do I pay from Pakistan?',
-    a: 'JazzCash, Easypaisa or any debit/credit card, through Safepay. You can also renew from a link we send on WhatsApp.',
+    a: 'Mobile wallets, bank accounts or any debit and credit card, through a State Bank licensed payment gateway. You can also renew from a link we send on WhatsApp.',
   },
   {
     q: 'Can I use it on both phone and computer?',

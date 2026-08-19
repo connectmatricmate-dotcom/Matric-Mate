@@ -35,7 +35,7 @@ const QUESTIONS = [
   },
   {
     q: 'Can I pay from a mobile account?',
-    a: 'Yes. JazzCash and Easypaisa both work, as does any debit or credit card. Payments are handled by Safepay, so your details never touch our servers.',
+    a: 'Yes. Mobile wallets and bank accounts both work, as does any debit or credit card. Payments are handled by a State Bank licensed payment gateway, so your details never touch our servers.',
   },
   {
     q: 'Does one payment cover the phone and the website?',
@@ -124,7 +124,7 @@ export default async function PricingPage() {
             ))}
           </div>
           <p className="mt-4 text-mk-small text-ink2">
-            Handled by Safepay. We never see or store your card or wallet details, and nothing renews on its own. Your
+            Handled by a licensed Pakistani payment gateway. We never see or store your card or wallet details, and nothing renews on its own. Your
             plan runs to the end date shown on your account, and paying again is always your move.
           </p>
         </section>
