@@ -2,9 +2,9 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Bar, Btn, Card, Empty, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
-import { chapterById, subjectById } from '@matricmate/core';
+import { chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localChapter, totalDownloadBytes } from '../../src/core/downloads';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
 
@@ -13,6 +13,7 @@ const CAP_MB = 512;
 export default function Downloads() {
   const { state, actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   // The saved row first, so a chapter is still named with no connection. See
   // localChapter: the bundled catalogue is Class 9 only.
@@ -65,12 +66,12 @@ export default function Downloads() {
       ) : (
         Object.entries(bySubject).map(([subjectId, list]) => (
           <View key={subjectId}>
-            <SectionTitle>{subjectById(subjectId)?.name}</SectionTitle>
+            <SectionTitle>{subjectName(subjectById(subjectId), lang)}</SectionTitle>
             <Card flat style={{ paddingVertical: 0 }}>
               {list.map((c, i) => (
                 <Item
                   key={c!.id}
-                  title={c!.title}
+                  title={chapterName(c, lang)}
                   sub={t('downloads.perChapter', { n: formatBytes(chapterDownloadBytes(c!.id)) })}
                   icon="check"
                   tone="green"

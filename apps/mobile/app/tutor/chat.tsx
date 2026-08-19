@@ -14,17 +14,19 @@ import {
   TUTOR_ACTION_ROUTE,
   api,
   chapterById,
+  chapterName,
   isUrduScript,
   parseTutorActions,
   rateTutorAnswer,
   subjectById,
+  subjectName,
   weakTopics,
   type TutorAction,
   type TutorImage,
 } from '@matricmate/core';
 import type { StringKey } from '../../src/i18n';
 import { supabase } from '../../src/lib/supabase';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
@@ -117,6 +119,7 @@ function AnswerActions({ actions }: { actions: TutorAction[] }) {
  */
 function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const t = useT();
+  const { lang } = useLang();
   const { state, derived } = useApp();
 
   /**
@@ -135,14 +138,14 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
     const out: string[] = [];
     const weak = weakTopics(state.attempts)[0]?.topic;
     if (weak) out.push(t('tutor.starterWeak', { topic: weak }));
-    const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId)?.title : undefined;
+    const lastChapter = state.lastChapterId ? chapterName(chapterById(state.lastChapterId), lang) : undefined;
     if (lastChapter) out.push(t('tutor.starterChapter', { chapter: lastChapter }));
-    const subject = subjectById(derived.subjects[0] ?? '')?.name;
+    const subject = subjectName(subjectById(derived.subjects[0] ?? ''), lang);
     if (subject) out.push(t('tutor.starterExam', { subject }));
     if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
     out.push(t('tutor.starterMarks'));
     return out.slice(0, 4);
-  }, [state.attempts, state.lastChapterId, derived.subjects, t]);
+  }, [state.attempts, state.lastChapterId, derived.subjects, lang, t]);
 
   /*
    * Two blocks, pushed apart, rather than one column of everything.
@@ -233,6 +236,7 @@ export default function Chat() {
   }>();
   const { state, actions, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const insets = useSafeAreaInsets();
   const keyboard = useKeyboardOverlap();
@@ -278,7 +282,7 @@ export default function Chat() {
     void rateTutorAnswer(supabase, { messageId, userId: uid, rating });
   };
   const [contextLabel, setContextLabel] = useState<string | undefined>(
-    chapter ? chapterById(chapter)?.title : undefined
+    chapter ? chapterName(chapterById(chapter), lang) || undefined : undefined
   );
   /**
    * The chapter this thread is answering from, which the student can change.
@@ -672,7 +676,7 @@ export default function Chat() {
           >
             <Icon name="book" size={13} color={C.teal} />
             <Text numberOfLines={1} style={{ flexShrink: 1, fontFamily: F.bodyBold, fontSize: 11.5, color: C.teal }}>
-              {t('tutor.chapterAttached', { chapter: contextLabel ?? chapterById(groundedId)?.title ?? '' })}
+              {t('tutor.chapterAttached', { chapter: contextLabel ?? chapterName(chapterById(groundedId), lang) })}
             </Text>
             <Tap
               onPress={() => {

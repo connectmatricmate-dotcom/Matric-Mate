@@ -45,6 +45,9 @@ export const en = {
   },
 
   welcome: {
+    /* The line under the wordmark on the splash, which was English in both
+       languages because it was written straight into the screen. */
+    tagline: 'Your Class 9 and 10 study mate',
     slide1Title: 'Everything in one app',
     slide1Body: 'Chapter-wise notes, audio lessons and examples for FBISE Class 9 and Class 10.',
     slide2Title: 'Practice until it sticks',
@@ -374,6 +377,9 @@ export const en = {
     searchPlaceholder: 'Search subject or chapter',
     setupLine: 'Class {class} · {board} · {medium} medium',
     chapterCount: '{n} chapters',
+    /* The chapter hub's header, which used to build "Chapter 7" in English by
+       hand and put it above an Urdu title. */
+    chapterN: 'Chapter {n}',
     percentComplete: '{n}% complete',
     subjectsOnList: '{n} subjects on your list',
     thisChapter: 'This chapter',
@@ -1060,6 +1066,7 @@ export const ur: typeof en = {
   },
 
   welcome: {
+    tagline: 'کلاس 9 اور 10 کا آپ کا ساتھی',
     slide1Title: 'سب کچھ ایک ایپ میں',
     slide1Body: 'FBISE کلاس 9 اور کلاس 10 کے ہر باب کے نوٹس، آڈیو اسباق اور مثالیں۔',
     slide2Title: 'اتنی مشق کہ پکا یاد ہو جائے',
@@ -1375,6 +1382,7 @@ export const ur: typeof en = {
     searchPlaceholder: 'مضمون یا باب ڈھونڈیں',
     setupLine: 'کلاس {class} · {board} · {medium} میڈیم',
     chapterCount: '{n} ابواب',
+    chapterN: 'باب {n}',
     percentComplete: '{n}% مکمل',
     subjectsOnList: 'آپ کی فہرست میں {n} مضامین',
     thisChapter: 'یہ باب',

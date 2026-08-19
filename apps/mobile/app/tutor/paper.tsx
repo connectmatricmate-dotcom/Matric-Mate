@@ -3,10 +3,10 @@ import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { AiWorking } from '../../src/components/AiWorking';
-import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById } from '@matricmate/core';
+import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById, subjectName } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, ShortQ } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S, isWeb, textStart } from '../../src/theme';
@@ -22,6 +22,7 @@ export default function MockPaper() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [subjectId, setSubjectId] = useState(derived.subjects[0] ?? 'phy');
@@ -59,7 +60,7 @@ export default function MockPaper() {
         <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
           {derived.subjects.map((sid) => (
             <Pill key={sid} tone={sid === subjectId ? 'teal' : 'grey'} onPress={() => setSubjectId(sid)}>
-              {subjectById(sid)?.name ?? sid}
+              {subjectName(subjectById(sid), lang) || sid}
             </Pill>
           ))}
         </Row>

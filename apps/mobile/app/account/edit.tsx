@@ -74,7 +74,7 @@ export default function EditProfile() {
       <Card flat style={{ paddingVertical: 0 }}>
         <Item
           title={t('account.classAndBoard')}
-          sub={`Class ${setup?.classLevel ?? 9} · ${boardName(setup?.board, lang)}`}
+          sub={`${t('tutor.classRowValue', { n: setup?.classLevel ?? 9 })} · ${boardName(setup?.board, lang)}`}
           icon="book"
           onPress={() => router.push('/onboarding/class')}
         />

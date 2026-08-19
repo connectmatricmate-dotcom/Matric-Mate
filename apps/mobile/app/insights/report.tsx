@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Image, Text, View } from 'react-native';
-import { Btn, Card, Header, Label, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, useToast } from '../../src/components/ui';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { WORDMARK_DATA_URI, accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById } from '@matricmate/core';
+import { WORDMARK_DATA_URI, accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById, subjectName } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, textEnd } from '../../src/theme';
@@ -58,7 +58,7 @@ export default function Report() {
       rtl: lang === 'ur',
       logoDataUri: WORDMARK_DATA_URI,
       rows: rows.map((r) => ({
-        subject: subjectById(r.sid)?.name ?? r.sid,
+        subject: subjectName(subjectById(r.sid), lang) || r.sid,
         grade: r.attempted ? grade(r.acc) : 'n/a',
         accuracy: r.acc,
         attempted: r.attempted,
@@ -147,7 +147,7 @@ export default function Report() {
               key={r.sid}
               style={{ paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: C.line, justifyContent: 'space-between' }}
             >
-              <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, color: C.ink }}>{subjectById(r.sid)?.name}</Text>
+              <ScriptText text={subjectName(subjectById(r.sid), lang)} size={13.5} style={{ flex: 1 }} />
               <Text style={{ fontFamily: F.display, fontSize: 15, color: C.ink, width: 44, textAlign: textEnd() }}>
                 {r.attempted ? grade(r.acc) : 'n/a'}
               </Text>

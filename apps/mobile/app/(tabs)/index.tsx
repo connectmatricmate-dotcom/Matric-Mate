@@ -19,7 +19,7 @@ import {
   TileGrid,
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
-import { SUBJECT_COLORS, accuracy, chapterById, chapterPct, formatDate, subjectById, todayKey } from '@matricmate/core';
+import { SUBJECT_COLORS, accuracy, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, todayKey } from '@matricmate/core';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { useLang, useT } from '../../src/i18n';
@@ -201,9 +201,13 @@ export default function Dashboard() {
                   opacity: task.done ? 0.7 : 1,
                 }}
               />
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: 'rgba(255,255,255,0.92)' }}>
-                {subjectById(task.subjectId)?.name}
-              </Text>
+              <ScriptText
+                text={subjectName(subjectById(task.subjectId), lang)}
+                face="bodyBold"
+                size={11}
+                color={C.onBrand}
+                style={{ opacity: 0.92 }}
+              />
             </Tap>
 
             <Chevron size={18} color="rgba(255,255,255,0.8)" />
@@ -261,16 +265,15 @@ export default function Dashboard() {
                 </View>
               </View>
               <View style={{ flex: 1, minWidth: 0 }}>
-                <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }} numberOfLines={1}>
-                  {lastChapter.title}
-                </Text>
-                <Small>
-                  {subjectById(lastChapter.subjectId)?.name} ·{' '}
-                  {t('dash.sectionOf', {
+                <ScriptText text={chapterName(lastChapter, lang)} face="bodyBold" size={14.5} lines={1} />
+                <ScriptText
+                  text={`${subjectName(subjectById(lastChapter.subjectId), lang)} · ${t('dash.sectionOf', {
                     a: Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount),
                     b: lastChapter.sectionCount,
-                  })}
-                </Small>
+                  })}`}
+                  size={13}
+                  color={C.ink2}
+                />
                 <View style={{ marginTop: 8 }}>
                   <Bar pct={lastPct} />
                 </View>

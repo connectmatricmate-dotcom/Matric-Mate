@@ -12,6 +12,7 @@ import {
   Pill,
   Row,
   Screen,
+  ScriptText,
   Sheet,
   Skeleton,
   Small,
@@ -19,9 +20,9 @@ import {
   Ur,
 } from '../../../src/components/ui';
 import { LockedNotice } from '../../../src/components/LockedNotice';
-import { api , chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
+import { api , chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
-import { useT } from '../../../src/i18n';
+import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
 
@@ -29,6 +30,7 @@ export default function Chapters() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const { data: subject } = useAsync(() => api.getSubject(id), [id]);
   const { data: chapters, loading, error, reload } = useAsync(() => api.getChapters(id), [id]);
   const [showLocked, setShowLocked] = useState(false);
@@ -108,11 +110,7 @@ export default function Chapters() {
                   <View style={{ flex: 1, minWidth: 0 }}>
                     {/* One language at a time: the app language picks the
                         title, both never stack. */}
-                    {state.settings.language === 'ur' && c.urduTitle ? (
-                      <Ur size={15}>{c.urduTitle}</Ur>
-                    ) : (
-                      <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{c.title}</Text>
-                    )}
+                    <ScriptText text={chapterName(c, lang)} face="bodyBold" size={14} />
                     {empty ? null : (
                       <Small numberOfLines={1}>
                         {/* Only what the row actually knows. audioMinutes is

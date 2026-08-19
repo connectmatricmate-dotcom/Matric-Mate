@@ -2,14 +2,15 @@ import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Btn, Card, Empty, Header, Row, Screen, ScriptText, SectionTitle, Small, Spacer } from '../../src/components/ui';
-import { subjectById , weakTopics } from '@matricmate/core';
-import { useT } from '../../src/i18n';
+import { subjectById, subjectName, weakTopics } from '@matricmate/core';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function Weak() {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const rows = useMemo(() => weakTopics(state.attempts), [state.attempts]);
 
   const bySubject = rows.reduce<Record<string, typeof rows>>((acc, r) => {
@@ -31,7 +32,7 @@ export default function Weak() {
       ) : (
         Object.entries(bySubject).map(([sid, list]) => (
           <View key={sid}>
-            <SectionTitle>{subjectById(sid)?.name}</SectionTitle>
+            <SectionTitle>{subjectName(subjectById(sid), lang)}</SectionTitle>
             <View style={{ gap: S.sm }}>
               {list.map((w) => (
                 <Card key={w.topic} flat>

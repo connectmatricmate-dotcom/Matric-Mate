@@ -408,9 +408,14 @@ export function TileGrid({ tiles }: { tiles: { key: string; full?: boolean; node
 }
 
 export function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+  /* Section headings are often a subject name, which is Urdu for an Urdu
+     student, and Nunito has no Urdu glyphs. Detected here rather than at every
+     call site, the same way Header, Item and Pill already do it. */
+  const heading =
+    typeof children === 'string' && isUrduScript(children) ? <Ur size={17}>{children}</Ur> : <H3>{children}</H3>;
   return (
     <View style={[st.sectionTitle, { flexDirection: rowDir() }]}>
-      <H3>{children}</H3>
+      {heading}
       {action}
     </View>
   );

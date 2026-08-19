@@ -769,7 +769,16 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
  * Urdu-medium student typing in Nastaliq finds the same chapter an
  * English-medium student finds by typing "motion".
  */
-export type ChapterChoice = { id: string; title: string; urduTitle?: string; subjectId: string; subjectName: string; number: number };
+export type ChapterChoice = {
+  id: string;
+  title: string;
+  urduTitle?: string;
+  subjectId: string;
+  subjectName: string;
+  /** So a student searching in Nastaliq finds their own subject. */
+  subjectUrduName?: string;
+  number: number;
+};
 
 export function chapterChoices(subjectIds: string[]): ChapterChoice[] {
   const out: ChapterChoice[] = [];
@@ -777,7 +786,15 @@ export function chapterChoices(subjectIds: string[]): ChapterChoice[] {
     const subject = subjectById(sid);
     if (!subject) continue;
     for (const c of chaptersFor(sid)) {
-      out.push({ id: c.id, title: c.title, urduTitle: c.urduTitle, subjectId: sid, subjectName: subject.name, number: c.number });
+      out.push({
+        id: c.id,
+        title: c.title,
+        urduTitle: c.urduTitle,
+        subjectId: sid,
+        subjectName: subject.name,
+        subjectUrduName: subject.urduName,
+        number: c.number,
+      });
     }
   }
   return out;
@@ -792,7 +809,8 @@ export function matchChapters(choices: ChapterChoice[], query: string, limit = 8
     (c) =>
       c.title.toLowerCase().includes(q) ||
       c.subjectName.toLowerCase().includes(q) ||
-      (c.urduTitle ?? '').includes(query.trim()),
+      (c.urduTitle ?? '').includes(query.trim()) ||
+      (c.subjectUrduName ?? '').includes(query.trim()),
   );
   return hits.slice(0, limit);
 }

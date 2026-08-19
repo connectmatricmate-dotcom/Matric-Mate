@@ -2,14 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextInput, View } from 'react-native';
 import {
   chapterChoices,
+  chapterName,
   fetchChapterTopics,
   isUrduScript,
   matchChapters,
   subjectById,
+  subjectName,
   type ChapterChoice,
 } from '@matricmate/core';
 import { supabase } from '../lib/supabase';
-import { useT } from '../i18n';
+import { useLang, useT } from '../i18n';
 import { useApp } from '../store/app';
 import { C, F, R, S, isRTL, isWeb, rowDir, textStart, urdu } from '../theme';
 import { Icon } from './Icon';
@@ -57,6 +59,7 @@ export function ChapterPicker(props: { visible: boolean; onClose: () => void; on
 function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
   const { derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [level, setLevel] = useState<Level>({ kind: 'subjects' });
   const [query, setQuery] = useState('');
   /** Keyed by chapter, so "still loading" is a comparison rather than a
@@ -99,7 +102,9 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
               <Icon name="back" size={16} color={C.teal} />
             </View>
             <Small style={{ fontFamily: F.bodyBold, color: C.teal }}>
-              {level.kind === 'topics' ? (subjectById(level.chapter.subjectId)?.name ?? '') : t('tutor.pickSubjectTitle')}
+              {level.kind === 'topics'
+                ? subjectName(subjectById(level.chapter.subjectId), lang)
+                : t('tutor.pickSubjectTitle')}
             </Small>
           </View>
         </Tap>
@@ -149,8 +154,8 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
               <RowItem
                 key={c.id}
                 badge={String(c.number)}
-                title={c.title}
-                sub={c.subjectName}
+                title={chapterName(c, lang)}
+                sub={lang === 'ur' ? (c.subjectUrduName ?? c.subjectName) : c.subjectName}
                 last={i === hits.length - 1}
                 onPress={() => setLevel({ kind: 'topics', chapter: c })}
               />
@@ -164,7 +169,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
               <RowItem
                 key={sid}
                 badge={String(count)}
-                title={subject?.name ?? sid}
+                title={subjectName(subject, lang) || sid}
                 sub={t('tutor.chapterCount', { n: count })}
                 last={i === derived.subjects.length - 1}
                 onPress={() => setLevel({ kind: 'chapters', subjectId: sid })}
@@ -178,7 +183,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
               <RowItem
                 key={c.id}
                 badge={String(c.number)}
-                title={c.title}
+                title={chapterName(c, lang)}
                 last={i === all.length - 1}
                 onPress={() => setLevel({ kind: 'topics', chapter: c })}
               />
@@ -189,7 +194,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
             <RowItem
               badge="★"
               title={t('tutor.wholeChapter')}
-              sub={level.chapter.title}
+              sub={chapterName(level.chapter, lang)}
               last={false}
               onPress={() => onPick({ chapter: level.chapter })}
             />
@@ -272,9 +277,15 @@ function RowItem({
             </Text>
           )}
           {sub ? (
-            <Small numberOfLines={1} style={{ fontSize: 11.5 }}>
-              {sub}
-            </Small>
+            isUrduScript(sub) ? (
+              <Text numberOfLines={1} style={{ ...urdu(11.5), color: C.ink2 }}>
+                {sub}
+              </Text>
+            ) : (
+              <Small numberOfLines={1} style={{ fontSize: 11.5 }}>
+                {sub}
+              </Small>
+            )
           ) : null}
         </View>
         <View style={isRTL() ? { transform: [{ scaleX: -1 }] } : undefined}>

@@ -1,8 +1,8 @@
 import { View } from 'react-native';
-import { chapterById, chaptersFor, fetchLatestCoachReport, isUrduScript } from '@matricmate/core';
+import { chapterById, chapterName, chaptersFor, fetchLatestCoachReport, isUrduScript } from '@matricmate/core';
 import { Card, Label, ScriptText, Skeleton, Small } from './ui';
 import { useAsync } from '../core/useAsync';
-import { useT } from '../i18n';
+import { useLang, useT } from '../i18n';
 import { useApp } from '../store/app';
 import { C, rowDir } from '../theme';
 import { Markdown } from './Markdown';
@@ -25,6 +25,7 @@ import { Markdown } from './Markdown';
 export function CoachCard() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
 
   const { data, loading } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '']);
 
@@ -65,7 +66,7 @@ export function CoachCard() {
         <ScriptText text={t('tutor.coachWelcome', { name: firstName })} size={13.5} />
         <Label style={{ color: C.ink2, marginTop: 2 }}>{t('tutor.coachFirstSteps')}</Label>
         <View style={{ gap: 4 }}>
-          {[t('tutor.coachStep1', { chapter: first?.title ?? '' }), t('tutor.coachStep2'), t('tutor.coachStep3')].map(
+          {[t('tutor.coachStep1', { chapter: chapterName(first, lang) }), t('tutor.coachStep2'), t('tutor.coachStep3')].map(
             (step, i) => (
               <View key={i} style={{ flexDirection: rowDir(), alignItems: 'flex-start', gap: 6 }}>
                 <Small>{i + 1}.</Small>

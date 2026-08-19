@@ -13,12 +13,12 @@
  */
 import { View } from 'react-native';
 import { Redirect, router } from 'expo-router';
-import { chapterById, subjectById } from '@matricmate/core';
+import { chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
 import { Card, Empty, Header, Item, Screen, SectionTitle, Small, Spacer, Tap } from '../src/components/ui';
 import { useOnline } from '../src/core/connectivity';
 import { chapterDownloadBytes, formatBytes, localChapter } from '../src/core/downloads';
-import { useT } from '../src/i18n';
+import { useLang, useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { C, S } from '../src/theme';
 
@@ -26,6 +26,7 @@ export default function Offline() {
   const { state, actions, hydrated } = useApp();
   const online = useOnline();
   const t = useT();
+  const { lang } = useLang();
 
   // Signal is back, so there is no reason to keep the student in a reduced app.
   if (online) return <Redirect href="/(tabs)" />;
@@ -59,12 +60,12 @@ export default function Offline() {
           }, {}),
         ).map(([subjectId, list]) => (
           <View key={subjectId}>
-            <SectionTitle>{subjectById(subjectId)?.name}</SectionTitle>
+            <SectionTitle>{subjectName(subjectById(subjectId), lang)}</SectionTitle>
             <Card flat style={{ paddingVertical: 0 }}>
               {list.map((c, i) => (
                 <Item
                   key={c!.id}
-                  title={c!.title}
+                  title={chapterName(c, lang)}
                   sub={t('downloads.perChapter', { n: formatBytes(chapterDownloadBytes(c!.id)) })}
                   icon="check"
                   tone="green"

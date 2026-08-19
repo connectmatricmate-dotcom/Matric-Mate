@@ -3,17 +3,19 @@ import { router } from 'expo-router';
 import { Btn, Card, Check, Header, Item, Pill, Row, Screen, SectionTitle, Seg, Small, Spacer, useToast } from '../../src/components/ui';
 import { AiWorking } from '../../src/components/AiWorking';
 import {
+  chapterName,
   chaptersFor,
   fetchAiSession,
   fetchAiSessions,
   generateAiSession,
   normalizeAiMcqs,
   subjectById,
+  subjectName,
   weakTopics,
 } from '@matricmate/core';
 import type { AiSessionKind } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -34,6 +36,7 @@ const KINDS: { value: AiSessionKind; label: StringKey }[] = [
 export default function AiBuilder() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
 
   const [kind, setKind] = useState<AiSessionKind>('mcq');
@@ -118,7 +121,7 @@ export default function AiBuilder() {
       <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
         {derived.subjects.map((sid) => (
           <Pill key={sid} tone={sid === subjectId ? 'teal' : 'grey'} onPress={() => setSubjectId(sid)}>
-            {subjectById(sid)?.name ?? sid}
+            {subjectName(subjectById(sid), lang) || sid}
           </Pill>
         ))}
       </Row>
@@ -128,7 +131,7 @@ export default function AiBuilder() {
         {chapters.map((c, i) => (
           <Item
             key={c.id}
-            title={`${c.number}. ${c.title}`}
+            title={`${c.number}. ${chapterName(c, lang)}`}
             icon="book"
             last={i === chapters.length - 1}
             onPress={() => setChapterTouched(c.id)}

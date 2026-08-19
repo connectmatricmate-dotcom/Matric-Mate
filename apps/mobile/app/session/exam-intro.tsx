@@ -3,8 +3,8 @@ import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, H2, Header, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
-import { api , chapterById, subjectById, weakTopics } from '@matricmate/core';
-import { useT } from '../../src/i18n';
+import { api , chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S } from '../../src/theme';
@@ -20,6 +20,7 @@ export default function ExamIntro() {
   }>();
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const [busy, setBusy] = useState(false);
   const toast = useToast();
 
@@ -39,8 +40,8 @@ export default function ExamIntro() {
     : paper
       ? `FBISE ${paper}`
       : chapter
-        ? (chapterById(chapter)?.title ?? '')
-        : (subjectById(subjectId)?.name ?? '');
+        ? chapterName(chapterById(chapter), lang)
+        : subjectName(subjectById(subjectId), lang);
 
   async function start() {
     setBusy(true);

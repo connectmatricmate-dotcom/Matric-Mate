@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
-import { api , chapterPct, hasStudyMaterial , isUrduScript, pickAudioTrack, subjectById } from '@matricmate/core';
+import { api , chapterPct, hasStudyMaterial , isUrduScript, pickAudioTrack, subjectById, subjectName } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack, localChapter } from '../../../src/core/downloads';
 import { Confetti, Pop } from '../../../src/components/celebration';
 import { LockedNotice } from '../../../src/components/LockedNotice';
 import { cheer } from '../../../src/core/haptics';
 import { useAsync } from '../../../src/core/useAsync';
-import { useT } from '../../../src/i18n';
+import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
 
@@ -16,6 +16,7 @@ export default function ChapterHub() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const { data: fetchedChapter, loading: chapterLoading } = useAsync(() => api.getChapter(id), [id]);
@@ -77,7 +78,7 @@ export default function ChapterHub() {
   if (locked) {
     return (
       <Screen>
-        <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
+        <Header title={t('study.chapterN', { n: chapter.number })} sub={subjectName(subjectById(chapter.subjectId), lang)} back />
         <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
           {state.settings.language === 'ur' && chapter.urduTitle ? (
             <Ur size={20} style={{ color: C.onBrand }}>{chapter.urduTitle}</Ur>
@@ -110,7 +111,7 @@ export default function ChapterHub() {
   if (chapter && !hasStudyMaterial(chapter)) {
     return (
       <Screen>
-        <Header title={`Chapter ${chapter.number}`} sub={subjectById(chapter.subjectId)?.name} back />
+        <Header title={t('study.chapterN', { n: chapter.number })} sub={subjectName(subjectById(chapter.subjectId), lang)} back />
         <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
           {state.settings.language === 'ur' && chapter.urduTitle ? (
             <Ur size={20} style={{ color: C.onBrand }}>{chapter.urduTitle}</Ur>
@@ -165,8 +166,8 @@ export default function ChapterHub() {
         </Pop>
       ) : null}
       <Header
-        title={`Chapter ${chapter?.number ?? ''}`}
-        sub={chapter ? subjectById(chapter.subjectId)?.name : ' '}
+        title={chapter ? t('study.chapterN', { n: chapter.number }) : ' '}
+        sub={chapter ? subjectName(subjectById(chapter.subjectId), lang) : ' '}
         back
         right={
           busy ? (

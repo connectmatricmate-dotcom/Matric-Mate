@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
-import { api , chapterById, subjectById } from '@matricmate/core';
+import { api , chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
-import { useT } from '../../src/i18n';
+import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, S, rowDir } from '../../src/theme';
@@ -13,6 +13,7 @@ export default function SessionSetup() {
   const { chapter: chapterParam } = useLocalSearchParams<{ chapter?: string }>();
   const { derived, state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
 
   const initialChapter = chapterParam ? chapterById(chapterParam) : undefined;
@@ -68,8 +69,8 @@ export default function SessionSetup() {
       mode: 'practice',
       label:
         chapterIds.length === 1
-          ? `${chapterById(chapterIds[0])?.title}`
-          : `${subjectById(subjectId)?.name} · ${t('session.mixed')}`,
+          ? chapterName(chapterById(chapterIds[0]), lang)
+          : `${subjectName(subjectById(subjectId), lang)} · ${t('session.mixed')}`,
       subjectId,
       chapterId: chapterIds.length === 1 ? chapterIds[0] : null,
       mcqs,
@@ -90,7 +91,7 @@ export default function SessionSetup() {
             onPress={() => setSubjectId(sid)}
             style={{ paddingVertical: 9, paddingHorizontal: 14 }}
           >
-            {subjectById(sid)?.name ?? sid}
+            {subjectName(subjectById(sid), lang) || sid}
           </Pill>
         ))}
       </View>
@@ -137,7 +138,7 @@ export default function SessionSetup() {
           return (
             <Item
               key={c.id}
-              title={c.title}
+              title={chapterName(c, lang)}
               sub={t('study.mcqsSub', { n: c.mcqCount })}
               icon="book"
               tone={on ? 'teal' : 'grey'}

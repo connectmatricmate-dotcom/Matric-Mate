@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
-import { Bar, Card, Item, Kpi, Pill, Ring, Row, Screen, SectionTitle, Small, Spacer, Tap } from '../../src/components/ui';
-import { accuracy, formatDate, grade, last14, overallPct, subjectById, subjectPct, weakTopics } from '@matricmate/core';
+import { Bar, Card, Item, Kpi, Pill, Ring, Row, Screen, ScriptText, SectionTitle, Small, Spacer, Tap } from '../../src/components/ui';
+import { accuracy, formatDate, grade, last14, overallPct, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
@@ -79,7 +79,7 @@ export default function Progress() {
           return (
             <Tap key={sid} onPress={() => router.push('/insights/performance')}>
               <Row style={{ justifyContent: 'space-between' }}>
-                <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>{subjectById(sid)?.name}</Text>
+                <ScriptText text={subjectName(subjectById(sid), lang)} face="bodyBold" size={13} style={{ flex: 1 }} />
                 <Small style={{ fontFamily: F.bodyBold }}>{pct}%</Small>
               </Row>
               <View style={{ marginTop: 5 }}>
@@ -101,7 +101,7 @@ export default function Progress() {
             <Item
               key={w.topic}
               title={w.topic}
-              sub={subjectById(w.subjectId)?.name}
+              sub={subjectName(subjectById(w.subjectId), lang)}
               icon="alert"
               tone={w.accuracy < 50 ? 'red' : 'orange'}
               last={i === weak.length - 1}

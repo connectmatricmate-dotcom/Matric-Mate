@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
@@ -14,9 +14,8 @@ import {
   ScriptText,
   Skeleton,
   Small,
-  Ur,
 } from '../../src/components/ui';
-import { SUBJECT_COLORS, api, boardName, hasStudyMaterial, mediumName, subjectPct } from '@matricmate/core';
+import { SUBJECT_COLORS, api, boardName, chapterName, hasStudyMaterial, mediumName, subjectName, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -135,19 +134,13 @@ export default function Study() {
                 </Ring>
                 <View style={{ flex: 1, minWidth: 0 }}>
                   {/* One language at a time: the app language picks the name. */}
-                  {state.settings.language === 'ur' && s.urduName ? (
-                    <Ur size={15}>{s.urduName}</Ur>
-                  ) : (
-                    <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{s.name}</Text>
-                  )}
+                  <ScriptText text={subjectName(s, lang)} face="bodyBold" size={15} />
                   <Small>
                     {t('study.chapterCount', { n: chapters.length })} · {t('study.percentComplete', { n: pct })}
                   </Small>
                   {next ? (
                     <ScriptText
-                      text={t('study.continueChapter', {
-                        chapter: (state.settings.language === 'ur' && next.urduTitle) || next.title,
-                      })}
+                      text={t('study.continueChapter', { chapter: chapterName(next, lang) })}
                       face="bodyBold"
                       size={12}
                       color={C.teal}

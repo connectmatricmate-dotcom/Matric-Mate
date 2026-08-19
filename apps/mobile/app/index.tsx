@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Image, View } from 'react-native';
 import { router } from 'expo-router';
 import { hasSeenWelcome } from '../src/lib/first-run';
+import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { useAuth } from '../src/store/auth';
 import { C, F, S } from '../src/theme';
@@ -27,6 +28,7 @@ import { Label } from '../src/components/ui';
  */
 export default function Splash() {
   const { state, hydrated } = useApp();
+  const t = useT();
   const { loading } = useAuth();
   const [seen, setSeen] = useState<boolean | null>(null);
 
@@ -61,7 +63,7 @@ export default function Splash() {
         style={{ width: 210, height: 40 }}
         resizeMode="contain"
       />
-      <Label style={{ marginTop: S.sm, fontFamily: F.bodyBold }}>Your 9th &amp; 10th study mate</Label>
+      <Label style={{ marginTop: S.sm, fontFamily: F.bodyBold }}>{t('welcome.tagline')}</Label>
     </View>
   );
 }
