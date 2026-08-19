@@ -869,7 +869,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // rows that the next reset will catch rather than anything broken.
         const uid = authUser?.id;
         if (uid) void wipeStudyHistory(supabase, uid);
-        setState((s) => ({ ...EMPTY, user: s.user, onboarding: s.onboarding, settings: s.settings }));
+        /* Notifications survive. They belong to the account, nothing here can
+           delete them, and blanking them locally only made the inbox look
+           cleared until the next hydration read every one of them back. */
+        setState((s) => ({
+          ...EMPTY,
+          user: s.user,
+          onboarding: s.onboarding,
+          settings: s.settings,
+          notifications: s.notifications,
+        }));
       },
     }),
     [queueAndFlush, markDayActive, authUser?.id],

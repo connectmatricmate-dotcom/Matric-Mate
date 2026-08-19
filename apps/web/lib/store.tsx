@@ -370,7 +370,17 @@ const actions: Actions = {
       // awaited because the screen should respond at once.
       const uid = s.user?.id;
       if (uid) void wipeStudyHistory(createClient(), uid);
-      return { ...EMPTY, hydrated: true, user: s.user, onboarding: s.onboarding, settings: s.settings };
+      /* Notifications survive. They belong to the account, nothing here can
+         delete them, and blanking them locally only made the inbox look
+         cleared until the next hydration read every one of them back. */
+      return {
+        ...EMPTY,
+        hydrated: true,
+        user: s.user,
+        onboarding: s.onboarding,
+        settings: s.settings,
+        notifications: s.notifications,
+      };
     }),
   refreshPremium: () => refreshPremium(),
 };

@@ -985,7 +985,11 @@ export const en = {
     manageDownloads: 'Manage downloads',
     chaptersCount: '{n} chapters',
     resetDemo: 'Reset app data',
-    resetDemoSub: 'Clears progress, answers and receipts',
+    /* Not receipts. wipeStudyHistory covers attempts, results, read sections,
+       known cards, active days and plan ticks; payments and the inbox are not
+       in that list and should not be, because a receipt is not the student's
+       to delete. The line promised something the button could not do. */
+    resetDemoSub: 'Clears progress and answers on every device',
     resetDone: 'App data cleared',
     about: 'About',
     terms: 'Terms and privacy',
@@ -1967,7 +1971,7 @@ export const ur: typeof en = {
     manageDownloads: 'ڈاؤن لوڈ منظم کریں',
     chaptersCount: '{n} ابواب',
     resetDemo: 'ایپ کا ڈیٹا ری سیٹ کریں',
-    resetDemoSub: 'پیش رفت، جواب اور رسیدیں صاف ہو جائیں گی',
+    resetDemoSub: 'ہر آلے سے پیش رفت اور جواب صاف ہو جائیں گے',
     resetDone: 'ایپ کا ڈیٹا صاف ہو گیا',
     about: 'ایپ کے بارے میں',
     terms: 'شرائط اور پرائیویسی',
