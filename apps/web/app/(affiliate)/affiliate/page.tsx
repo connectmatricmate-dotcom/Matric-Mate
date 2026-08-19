@@ -4,6 +4,7 @@ import { affiliateByUserId, payouts, referredStudents, totalsFor } from '@/lib/a
 import { SITE_URL } from '@/lib/site';
 import { Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
 import { ShareLink } from '@/components/affiliate/ShareLink';
+import { ChangePassword } from '@/components/admin/ChangePassword';
 
 export const dynamic = 'force-dynamic';
 
@@ -114,6 +115,13 @@ export default async function AffiliateDashboard() {
           </Table>
         )}
       </Panel>
+
+      {/* Their first password was typed by Adnan on the onboarding form, which
+          is unavoidable while email is unverified. This is how they stop him
+          knowing it. */}
+      <div className="mt-7">
+        <ChangePassword hint="Your first password was set for you. Change it to something only you know." />
+      </div>
 
       <p className="mt-6 text-[12px] text-ink3">
         Earnings are worked out from payments that actually went through, and a refunded payment comes back off. If a
