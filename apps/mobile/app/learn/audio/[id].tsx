@@ -99,7 +99,7 @@ function PlayerChrome({
 
       <Row style={{ justifyContent: 'center', marginTop: S.lg }} gap={S.xl}>
         <Tap onPress={() => onSeek(-15)} disabled={disabled}>
-          <View style={[ctl, disabled && { opacity: 0.4 }]}>
+          <View style={[ctl(), disabled && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>−15</Text>
           </View>
         </Tap>
@@ -121,7 +121,7 @@ function PlayerChrome({
           </View>
         </Tap>
         <Tap onPress={() => onSeek(15)} disabled={disabled}>
-          <View style={[ctl, disabled && { opacity: 0.4 }]}>
+          <View style={[ctl(), disabled && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>+15</Text>
           </View>
         </Tap>
@@ -336,7 +336,12 @@ export default function AudioLesson() {
   );
 }
 
-const ctl = {
+/**
+ * A function, not a constant, for the same reason as SessionHeader's segment
+ * colours: read at module load it froze the seek buttons on the launch
+ * palette, so a student in dark mode got two white discs with a pale border.
+ */
+const ctl = () => ({
   width: 54,
   height: 54,
   borderRadius: 99,
@@ -345,4 +350,4 @@ const ctl = {
   backgroundColor: C.card,
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
-};
+});

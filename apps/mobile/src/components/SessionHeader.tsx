@@ -18,12 +18,18 @@ const MAX_SEGMENTS = 16;
 
 export type SegmentMark = 'ok' | 'bad' | 'done' | 'todo' | 'current';
 
-const SEGMENT_COLOR: Record<Exclude<SegmentMark, 'current'>, string> = {
-  ok: C.green,
-  bad: C.red,
-  done: C.teal,
-  todo: C.track,
-};
+/**
+ * A function, not a constant.
+ *
+ * `C` is a getter object so a theme change re-reads it, which only works if
+ * the read happens during render. As a plain object literal this was evaluated
+ * once at module load and froze the strip on whichever palette the app
+ * launched with: a pale mint track and light-mode segments sitting on a dark
+ * card. Same trap, same fix, as TabGlyph's ACTIVE() and celebration's
+ * pieceColors().
+ */
+const segmentColor = (mark: Exclude<SegmentMark, 'current'>): string =>
+  ({ ok: C.green, bad: C.red, done: C.teal, todo: C.track })[mark];
 
 /**
  * The bare segment strip, for screens whose header has its own layout.
@@ -44,7 +50,7 @@ export function SegmentTrack({ segments }: { segments: SegmentMark[] }) {
             style={{ flex: 1, height: 7, borderRadius: 99, backgroundColor: C.card, borderWidth: 2, borderColor: C.teal }}
           />
         ) : (
-          <View key={i} style={{ flex: 1, height: 7, borderRadius: 99, backgroundColor: SEGMENT_COLOR[m] }} />
+          <View key={i} style={{ flex: 1, height: 7, borderRadius: 99, backgroundColor: segmentColor(m) }} />
         ),
       )}
     </View>
