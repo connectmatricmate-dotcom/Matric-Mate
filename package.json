@@ -28,7 +28,8 @@
     "mobile:tunnel": "npm run start --workspace apps/mobile -- --go --tunnel",
     "android:log": "bash scripts/android-crashlog.sh",
     "apk": "node scripts/build-apk.mjs",
-    "grant": "node scripts/grant-plan.mjs"
+    "grant": "node scripts/grant-plan.mjs",
+    "admin": "node scripts/make-admin.mjs"
   },
   "engines": {
     "node": ">=22"
