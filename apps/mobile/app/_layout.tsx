@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Text, View } from 'react-native';
+import { Stack, router, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
@@ -12,10 +13,58 @@ import { AuthProvider } from '../src/store/auth';
 import { AppProvider, useApp } from '../src/store/app';
 import { useQuotaRealtime } from '../src/core/useQuota';
 import { usePush } from '../src/core/usePush';
-import { ToastHost } from '../src/components/ui';
-import { C } from '../src/theme';
+import { Btn, ToastHost } from '../src/components/ui';
+import { C, F, isRTL } from '../src/theme';
+import { en, ur } from '@matricmate/core';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+/**
+ * The screen a student gets instead of a white one.
+ *
+ * expo-router renders a layout's exported ErrorBoundary in place of the routes
+ * beneath it, and neither layout exported one, so any uncaught render error
+ * anywhere in the app left a production build on a blank screen with no
+ * message and nothing to press. If the fault was on the screen they land on,
+ * reopening did not help either.
+ *
+ * Deliberately plain, and deliberately not using the app's own hooks: this
+ * runs when something in the tree has already failed, and a provider that is
+ * part of the failure would take the recovery screen down with it. Retry first,
+ * because most of these are transient, and a way home for when it is not.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  /* The language without a hook. isRTL() reads the same module flag the store
+     sets on every render, so this speaks the student's language without
+     depending on a provider that may be part of what just failed. Exactly the
+     trick the web's RouteError uses to read the store outside React. */
+  const s = isRTL() ? ur : en;
+  return (
+    <View style={{ flex: 1, backgroundColor: C.paper, alignItems: 'center', justifyContent: 'center', padding: 28, gap: 12 }}>
+      <Text style={{ fontFamily: F.display, fontSize: 21, lineHeight: isRTL() ? 40 : 28, color: C.ink, textAlign: 'center' }}>
+        {s.states.crashTitle}
+      </Text>
+      <Text style={{ fontFamily: F.body, fontSize: 14, lineHeight: isRTL() ? 32 : 22, color: C.ink2, textAlign: 'center' }}>
+        {s.states.crashBody}
+      </Text>
+      <View style={{ height: 8 }} />
+      <Btn title={s.common.retry} onPress={() => void retry()} />
+      <Btn
+        title={s.states.goHome}
+        variant="ghost"
+        onPress={() => {
+          router.replace('/');
+          void retry();
+        }}
+      />
+      {/* The message itself, small and last: it is for the person reading a
+          bug report, not for the student. */}
+      <Text style={{ fontFamily: F.body, fontSize: 11, color: C.ink3, textAlign: 'center' }} numberOfLines={2}>
+        {error.message}
+      </Text>
+    </View>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
