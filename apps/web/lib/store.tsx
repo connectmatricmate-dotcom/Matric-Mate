@@ -9,7 +9,7 @@
  * without rewiring.
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
-import { Attempt, Language, PlanTask, StringKey, SyncOp, TestResult, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
+import { Attempt, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
 import {
   EMPTY,
   Onboarding,
@@ -245,17 +245,30 @@ const actions: Actions = {
   },
   markCard: (cardId, known) => {
     const wasKnown = getSnapshot().cardsKnown.includes(cardId);
-    update((s) => ({
-      ...s,
-      cardsKnown: known
-        ? s.cardsKnown.includes(cardId)
-          ? s.cardsKnown
-          : [...s.cardsKnown, cardId]
-        : s.cardsKnown.filter((x) => x !== cardId),
-      xp: known && !s.cardsKnown.includes(cardId) ? s.xp + 2 : s.xp,
-    }));
+    update((s) =>
+      touchToday({
+        ...s,
+        cardsKnown: known
+          ? s.cardsKnown.includes(cardId)
+            ? s.cardsKnown
+            : [...s.cardsKnown, cardId]
+          : s.cardsKnown.filter((x) => x !== cardId),
+        // XP.card, not a literal 2: the Android app reads the constant and a
+        // second copy of the number is a second thing to keep in step.
+        xp: known && !s.cardsKnown.includes(cardId) ? s.xp + XP.card : s.xp,
+      })
+    );
     if (known && !wasKnown) queueAndFlush(syncCardKnown(cardId));
     else if (!known && wasKnown) queueAndFlush(syncCardUnknown(cardId));
+    /**
+     * An hour of flashcards is an hour of studying.
+     *
+     * This was the one study action that recorded no active day, so a student
+     * who revises by card ended the day with an unmoved streak and could be
+     * sent a "your streak is at risk" nudge on a day they had worked. Either
+     * direction counts: saying "repeat" is reviewing the card, not skipping it.
+     */
+    markDayActive();
   },
   consumeAi: () => {
     let allowed = false;
