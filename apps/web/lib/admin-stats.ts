@@ -131,17 +131,28 @@ export async function dailyStats(days = 14): Promise<DailyPoint[]> {
   const { data, error } = await supabase.rpc('admin_daily_stats', { days });
 
   if (error) {
-    // The chart is the least important thing on the page. An empty series
-    // renders as a flat run, which is honest, rather than taking the overview
-    // down with it.
+    /*
+     * Loud, and rethrown rather than swallowed.
+     *
+     * Returning an empty series here is what hid a broken function: the three
+     * charts rendered as empty boxes, which reads as "nothing happened in a
+     * fortnight" rather than "this query does not work". A Suspense boundary
+     * with an error boundary above it can say so; a silent zero cannot.
+     */
     console.error('admin-stats: daily failed', error.message);
-    return [];
+    throw new Error('Could not load the last two weeks.');
   }
 
+  /*
+   * The column names are deliberately not `day`, `signups`… In a plpgsql
+   * function the RETURNS TABLE names become variables for the whole body, and
+   * `day` collided with `active_days.day`, so every call threw 42702 and the
+   * chart drew an empty box. See migration 0032.
+   */
   return (data ?? []).map((r: Record<string, unknown>) => ({
-    day: String(r.day),
-    signups: Number(r.signups ?? 0),
-    revenue: Number(r.revenue ?? 0),
-    studied: Number(r.studied ?? 0),
+    day: String(r.bucket),
+    signups: Number(r.signup_count ?? 0),
+    revenue: Number(r.revenue_total ?? 0),
+    studied: Number(r.studied_count ?? 0),
   }));
 }
