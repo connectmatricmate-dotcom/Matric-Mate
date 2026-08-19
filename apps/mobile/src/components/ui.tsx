@@ -356,9 +356,19 @@ export function Header({
   right?: React.ReactNode;
   onBack?: () => void;
 }) {
+  /**
+   * A chevron only when there is somewhere to go.
+   *
+   * `router.back()` dispatches GO_BACK, which react-navigation drops when the
+   * stack has one entry. The splash arrives at login and at the onboarding
+   * class step with `replace`, so on the two screens most students start from,
+   * the app drew a back button that did nothing at all when pressed. An
+   * explicit `onBack` always shows, because the caller has said where it goes.
+   */
+  const showBack = back && (!!onBack || router.canGoBack());
   return (
     <View style={[st.header, { flexDirection: rowDir() }]}>
-      {back ? (
+      {showBack ? (
         <View style={isRTL() ? { marginRight: -10 } : { marginLeft: -10 }}>
           <IconButton icon="back" onPress={onBack ?? (() => router.back())} />
         </View>
