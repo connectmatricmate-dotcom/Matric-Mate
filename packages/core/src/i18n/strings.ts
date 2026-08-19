@@ -657,6 +657,9 @@ export const en = {
     toppersScript: 'Script {n}',
     toppersCount: '{n} scripts',
     toppersFootnote: 'These open on the board’s own site in a new tab.',
+    /* The scripts carry no class. Naming the examination and the year is what
+       the catalogue can actually support: see topperYears. */
+    toppersSource: 'From the board’s SSC {year} topper copies.',
   },
 
   tutor: {
@@ -1670,6 +1673,7 @@ export const ur: typeof en = {
     toppersScript: 'کاپی {n}',
     toppersCount: '{n} کاپیاں',
     toppersFootnote: 'یہ بورڈ کی اپنی ویب سائٹ پر نئے ٹیب میں کھلتے ہیں۔',
+    toppersSource: 'بورڈ کی SSC {year} ٹاپر کاپیوں سے۔',
   },
 
   tutor: {

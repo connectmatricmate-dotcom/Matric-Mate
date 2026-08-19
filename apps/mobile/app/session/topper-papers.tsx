@@ -1,15 +1,14 @@
-import { Linking, Text, View } from 'react-native';
-import { fbiseToppersFor, fbiseTopperSubjectIds, subjectById } from '@matricmate/core';
+import { Linking, View } from 'react-native';
+import { fbiseToppersFor, fbiseTopperSubjectIds, subjectById, subjectName, topperYears } from '@matricmate/core';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
-import { Btn, Card, Empty, Header, Row, Screen, Small, Spacer, Ur, useToast } from '../../src/components/ui';
-import { useT } from '../../src/i18n';
-import { useApp } from '../../src/store/app';
-import { C, F, S } from '../../src/theme';
+import { Btn, Card, Empty, Header, Row, Screen, ScriptText, Small, Spacer, useToast } from '../../src/components/ui';
+import { useLang, useT } from '../../src/i18n';
+import { C, S } from '../../src/theme';
 
 export default function TopperPapers() {
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
-  const { state } = useApp();
   const groups = fbiseTopperSubjectIds().map((subjectId) => ({
     subjectId,
     scripts: fbiseToppersFor(subjectId),
@@ -70,11 +69,7 @@ export default function TopperPapers() {
                     <Icon name={SUBJECT_ICON[subjectId] ?? 'book'} size={22} color={C.teal} />
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    {state.settings.language === 'ur' && subject.urduName ? (
-                      <Ur size={15.5}>{subject.urduName}</Ur>
-                    ) : (
-                      <Text style={{ fontFamily: F.bodyBold, fontSize: 15.5, color: C.ink }}>{subject.name}</Text>
-                    )}
+                    <ScriptText text={subjectName(subject, lang)} face="bodyBold" size={15.5} />
                     <Small>{t('session.toppersCount', { n: scripts.length })}</Small>
                   </View>
                 </Row>
@@ -96,7 +91,10 @@ export default function TopperPapers() {
       )}
 
       <Spacer h={S.md} />
-      <Small>{t('session.toppersFootnote')}</Small>
+      {/* Which examination these are from. Without it a Class 10 student reads
+          a list of scripts with no year or level on it as their own. */}
+      <Small>{t('session.toppersSource', { year: topperYears()[0] ?? '' })}</Small>
+      <Small style={{ marginTop: 2 }}>{t('session.toppersFootnote')}</Small>
     </Screen>
   );
 }

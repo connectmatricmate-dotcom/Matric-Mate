@@ -1,10 +1,10 @@
 'use client';
 
 import type { FbiseTopperPaper } from '@matricmate/core';
-import { SUBJECT_ICON, subjectById } from '@matricmate/core';
+import { SUBJECT_ICON, subjectById, subjectName, topperYears } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Empty, ExternalLinkBtn, Icon, Ur } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { Card, Empty, ExternalLinkBtn, Icon, ScriptText } from '@/components/ui/primitives';
+import { useLang, useT } from '@/lib/store';
 
 export function TopperPapersScreen({
   groups,
@@ -12,7 +12,7 @@ export function TopperPapersScreen({
   groups: { subjectId: string; scripts: FbiseTopperPaper[] }[];
 }) {
   const t = useT();
-  const { state } = useApp();
+  const { lang } = useLang();
 
   return (
     <Page width="page">
@@ -46,11 +46,10 @@ export function TopperPapersScreen({
                     <Icon name={SUBJECT_ICON[subjectId] ?? 'book'} size={22} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    {state.settings.language === 'ur' && subject.urduName ? (
-                      <Ur block className="text-[15.5px] text-ink">{subject.urduName}</Ur>
-                    ) : (
-                      <span className="block text-[15.5px] font-extrabold text-ink">{subject.name}</span>
-                    )}
+                    <ScriptText
+                      text={subjectName(subject, lang)}
+                      className="text-[15.5px] font-extrabold text-ink"
+                    />
                     <span className="block text-[12.5px] text-ink2">{t('session.toppersCount', { n: scripts.length })}</span>
                   </span>
                 </span>
@@ -71,7 +70,10 @@ export function TopperPapersScreen({
         </div>
       )}
 
-      <p className="mt-4 text-[13px] text-ink2">{t('session.toppersFootnote')}</p>
+      {/* Which examination these are from. Without it a Class 10 student reads
+          a list of scripts with no year or level on it as their own. */}
+      <p className="mt-4 text-[13px] text-ink2">{t('session.toppersSource', { year: topperYears()[0] ?? '' })}</p>
+      <p className="mt-1 text-[13px] text-ink2">{t('session.toppersFootnote')}</p>
     </Page>
   );
 }

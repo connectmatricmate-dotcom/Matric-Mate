@@ -93,6 +93,19 @@ export function fbiseToppersFor(subjectId: string): FbiseTopperPaper[] {
     .sort((a, b) => a.n - b.n);
 }
 
+/**
+ * The years the topper scripts come from.
+ *
+ * They carry no class, and that is not an omission we can fill in: the board
+ * publishes them in one folder per year under Topper_Copies/SSC_<year>, with
+ * no part number anywhere in the path or the file name. So the screen names
+ * the examination and the year rather than implying the scripts belong to the
+ * student's own class, which is what it was doing by saying nothing.
+ */
+export function topperYears(): number[] {
+  return [...new Set(catalogue.toppers.map((t) => t.year))].sort((a, b) => b - a);
+}
+
 /** Subject ids that have at least one topper script, in the app's usual subject order. */
 export function fbiseTopperSubjectIds(): string[] {
   const present = new Set(catalogue.toppers.map((t) => t.subject));
