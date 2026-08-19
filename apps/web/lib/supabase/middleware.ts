@@ -2,7 +2,9 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /** Signed-in students only. Everything else is public or handles its own state. */
-const PROTECTED = ['/dashboard', '/upgrade', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout', '/certificates', '/onboarding'];
+// '/r' is deliberately absent: a teacher's referral link has to work for
+// somebody who has never signed in, which is the entire point of it.
+const PROTECTED = ['/dashboard', '/upgrade', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout', '/certificates', '/onboarding', '/admin', '/affiliate'];
 
 /** Already signed in? These two have nothing left to offer you. */
 const AUTH_ONLY = ['/login', '/signup'];

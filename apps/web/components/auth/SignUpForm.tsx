@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { isFormValid, validateEmail, validateName, validatePassword } from '@/lib/validation';
 
-export function SignUpForm({ next }: { next?: string }) {
+export function SignUpForm({ next, ref }: { next?: string; ref?: string }) {
   const t = useT();
   const [state, action] = useActionState<AuthState, FormData>(signUpAction, {});
   const [resent, resendAction] = useActionState<AuthState, FormData>(resendConfirmationAction, {});
@@ -68,6 +68,9 @@ export function SignUpForm({ next }: { next?: string }) {
 
       <form action={action} onSubmit={() => setTouched(true)} noValidate>
         <input type="hidden" name="next" value={next ?? '/onboarding/class'} />
+        {/* The teacher whose link brought them here. Also kept in a cookie by
+            /r/CODE, so this being absent is not the end of the attribution. */}
+        {ref ? <input type="hidden" name="ref" value={ref} /> : null}
         <Field
           label={t('auth.fullName')}
           name="name"

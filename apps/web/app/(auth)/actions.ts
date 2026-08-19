@@ -1,11 +1,13 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { type StringKey, translate } from '@matricmate/core';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import { z } from 'zod';
 import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
+import { currentRole, homeFor } from '@/lib/roles';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -45,6 +47,26 @@ const SignIn = z.object({ email, password });
 
 const first = (err: z.ZodError) => (err.issues[0]?.message ?? 'auth.errForm') as StringKey;
 
+/**
+ * The referral code this signup should be attributed to, if any.
+ *
+ * Two places to look, because a student does not always sign up in the same
+ * minute they clicked. The form field carries it when they came straight from
+ * `/r/CODE`; the cookie carries it when they clicked, read the pricing page,
+ * thought about it, and came back. The form wins: it is the more recent
+ * intent, and a stale cookie on a shared laptop should not outrank the link
+ * somebody just followed.
+ *
+ * Returns nothing at all when there is no code, so the trigger sees no `ref`
+ * key rather than an empty one.
+ */
+async function referralCode(formData: FormData): Promise<{ ref?: string }> {
+  const fromForm = String(formData.get('ref') ?? '').trim();
+  const fromCookie = (await cookies()).get('mm_ref')?.value?.trim() ?? '';
+  const code = (fromForm || fromCookie).toUpperCase().slice(0, 16);
+  return /^[A-Z0-9]{4,16}$/.test(code) ? { ref: code } : {};
+}
+
 export async function signUpAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = SignUp.safeParse({
     name: formData.get('name'),
@@ -58,8 +80,15 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      // Read by the on_auth_user_created trigger to seed the profile row.
-      data: { name: parsed.data.name },
+      /*
+       * Read by the on_auth_user_created trigger to seed the profile row, and
+       * `ref` with it: the trigger looks the code up and ties this student to
+       * the teacher whose link they came through, inside the same transaction
+       * that creates the account. Attribution written here rather than by a
+       * follow-up call is attribution that cannot be lost by somebody closing
+       * the tab on the confirmation screen.
+       */
+      data: { name: parsed.data.name, ...(await referralCode(formData)) },
       /*
        * Where the confirmation link lands. Without this Supabase falls back to
        * the project's Site URL, which on a preview deployment is the wrong
@@ -132,7 +161,15 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
     return { error: translate(await readUiLanguage(), 'auth.errCredentials') };
   }
 
-  redirect(safePath(formData.get('next')));
+  /*
+   * One form, three destinations. A teacher on the referral programme and an
+   * administrator both have accounts in the same auth system as the students,
+   * and both would hit the paywall if they were sent to /dashboard, because
+   * neither has a subscription. An explicit `next` still wins, so a link into
+   * a particular page keeps working.
+   */
+  const asked = safePath(formData.get('next'), '');
+  redirect(asked || homeFor(await currentRole()));
 }
 
 export async function resetPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
