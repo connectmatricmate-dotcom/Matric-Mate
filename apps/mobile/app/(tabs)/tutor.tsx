@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { AppHeader } from '../../src/components/AppHeader';
 import { ChapterPicker } from '../../src/components/ChapterPicker';
 import { Icon, IconName } from '../../src/components/Icon';
 import {
@@ -11,7 +12,6 @@ import {
   Item,
   Pill,
   Ring,
-  Row,
   Screen,
   SectionTitle,
   Small,
@@ -87,23 +87,28 @@ export default function Tutor() {
 
   return (
     <Screen tabbed>
-      <Row style={{ paddingTop: S.sm, paddingBottom: S.md }} gap={S.sm}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontFamily: F.display, fontSize: 21, color: C.ink }}>{t('tutor.title')}</Text>
-          <Small style={{ fontFamily: F.bodyBold }}>{t('tutor.sub')}</Small>
-        </View>
-        {/* An account with no plan has no allowance to draw a ring around.
-            "0/0" read as a used-up plan, which is the opposite of the truth. */}
-        {limit === 0 ? (
-          <Pill tone="grey">{t('billing.statusFree')}</Pill>
-        ) : (
-          <Ring pct={usedPct} size={46} stroke={6} color={low ? C.orange : C.teal}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: C.ink }}>
-              {left}/{limit}
-            </Text>
-          </Ring>
-        )}
-      </Row>
+      {/* The same header as the other four tab roots. This screen used to draw
+          its own so the quota ring had somewhere to sit, and lost the settings
+          gear and the notification bell with it: on one of five tabs there was
+          no way to reach either. The ring is a right-hand slot now. */}
+      <AppHeader
+        title={t('tutor.title')}
+        eyebrow={t('tutor.sub')}
+        showStreak={false}
+        right={
+          /* An account with no plan has no allowance to draw a ring around.
+             "0/0" read as a used-up plan, which is the opposite of the truth. */
+          limit === 0 ? (
+            <Pill tone="grey">{t('billing.statusFree')}</Pill>
+          ) : (
+            <Ring pct={usedPct} size={46} stroke={6} color={low ? C.orange : C.teal}>
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: C.ink }}>
+                {left}/{limit}
+              </Text>
+            </Ring>
+          )
+        }
+      />
 
       <TileGrid
         tiles={ENTRIES.map((e) => ({

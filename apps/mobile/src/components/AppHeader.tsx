@@ -1,3 +1,4 @@
+import React from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AvatarBadge } from './AvatarBadge';
@@ -11,10 +12,17 @@ export function AppHeader({
   eyebrow,
   title,
   showStreak = true,
+  right,
 }: {
   eyebrow?: string;
   title: string;
   showStreak?: boolean;
+  /**
+   * One thing that belongs to this tab, sitting before the shared controls.
+   * The tutor tab has the quota ring, which is why it used to draw a header of
+   * its own and lose the gear and the bell with it.
+   */
+  right?: React.ReactNode;
 }) {
   const { state, derived } = useApp();
   const unread = state.notifications.some((n) => !n.read);
@@ -33,6 +41,8 @@ export function AppHeader({
         ) : null}
         <H2 numberOfLines={1}>{title}</H2>
       </View>
+
+      {right}
 
       {showStreak && derived.streak > 0 ? (
         <Tap onPress={() => router.push('/(tabs)/progress')}>
