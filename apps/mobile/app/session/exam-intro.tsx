@@ -98,7 +98,7 @@ export default function ExamIntro() {
           )}
           {/* No pause pill: the exam has no pause mechanism, and promising
               one here cost students who believed it their timer. */}
-          {isAi ? <Pill tone="teal">{t('session.aiGenerated')}</Pill> : null}
+          {isAi ? <Pill tone="teal">{t('session.weakFocus')}</Pill> : null}
         </Row>
       </Card>
 

@@ -87,7 +87,7 @@ export function ExamIntro({
             <Pill tone="grey">{t('session.firstAttempt')}</Pill>
           )}
           <Pill tone="orange">{t('session.pauseOnce')}</Pill>
-          {ai ? <Pill tone="teal">{t('session.aiGenerated')}</Pill> : null}
+          {ai ? <Pill tone="teal">{t('session.weakFocus')}</Pill> : null}
         </div>
       </Card>
 

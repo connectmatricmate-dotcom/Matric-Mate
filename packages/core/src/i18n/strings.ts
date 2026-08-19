@@ -560,7 +560,11 @@ export const en = {
     best: 'Best: {n}%',
     firstAttempt: 'First attempt',
     pauseOnce: 'Finish in one sitting',
-    aiGenerated: 'AI-generated',
+    /* What this set really is. It was "AI-generated", which api.generateTest
+       cannot promise: it draws approved AI drafts first and pads from the
+       curated bank, and generated_mcqs is empty in production, so every
+       question in it was written by a person. The focus is the true part. */
+    weakFocus: 'Your weak topics',
     beforeStart: 'Before you start',
     beforeStart1: 'Put your phone on silent for {min} minutes of focus.',
     beforeStart2: 'You can flag questions and come back to them.',
@@ -817,7 +821,7 @@ export const en = {
     photoSoon: 'Photo questions arrive with the live tutor',
     reExplainUrdu: 'Explain this again in simple Urdu',
 
-    aiTestTitle: 'AI test',
+    aiTestTitle: 'Weak topic test',
     aiTestSub: 'Built from your weak topics',
     focusOn: 'Focus on',
     difficulty: 'Difficulty',
@@ -1565,7 +1569,7 @@ export const ur: typeof en = {
     best: 'بہترین: {n}%',
     firstAttempt: 'پہلی کوشش',
     pauseOnce: 'ایک ہی نشست میں مکمل کریں',
-    aiGenerated: 'AI نے بنایا',
+    weakFocus: 'آپ کے کمزور موضوعات',
     beforeStart: 'شروع کرنے سے پہلے',
     beforeStart1: 'فون خاموش کر لیں، {min} منٹ کی توجہ۔',
     beforeStart2: 'سوال نشان زد کر کے بعد میں واپس آ سکتے ہیں۔',
@@ -1805,7 +1809,7 @@ export const ur: typeof en = {
     photoSoon: 'تصویر سے سوال پوچھنا براہِ راست ٹیوٹر کے ساتھ آئے گا',
     reExplainUrdu: 'یہی بات آسان الفاظ میں سمجھائیں',
 
-    aiTestTitle: 'AI ٹیسٹ',
+    aiTestTitle: 'کمزور موضوعات کا ٹیسٹ',
     aiTestSub: 'آپ کے کمزور موضوعات سے بنا',
     focusOn: 'کس پر توجہ دینی ہے',
     difficulty: 'مشکل کا درجہ',
