@@ -140,13 +140,13 @@ export default function AiBuilder() {
         ))}
       </Card>
 
-      <SectionTitle>{t('common.questions')}</SectionTitle>
+      <SectionTitle>{t('tutor.pickKind')}</SectionTitle>
       <Seg
         value={kind}
         onChange={setKind}
         options={KINDS.map((k) => ({ value: k.value, label: t(k.label) }))}
       />
-      <Spacer h={S.sm} />
+      <SectionTitle>{t('tutor.pickCount')}</SectionTitle>
       <Seg
         value={count}
         onChange={setCount}

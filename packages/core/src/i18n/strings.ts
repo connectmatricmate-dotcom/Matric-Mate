@@ -715,6 +715,10 @@ export const en = {
     kindShortq: 'Short Qs',
     pickSubject: 'Subject',
     pickChapter: 'Chapter',
+    /* One label per control. The type picker was headed "Questions", which is
+       the other control's job, and the count picker had no heading at all. */
+    pickKind: 'Practice type',
+    pickCount: 'How many',
     building: 'Writing your set…',
     buildIt: 'Make my set',
     aiMade: 'AI-made for you',
@@ -1719,6 +1723,8 @@ export const ur: typeof en = {
     kindShortq: 'مختصر سوال',
     pickSubject: 'مضمون',
     pickChapter: 'باب',
+    pickKind: 'مشق کی قسم',
+    pickCount: 'کتنے',
     building: 'آپ کا سیٹ بن رہا ہے…',
     buildIt: 'میرا سیٹ بنائیں',
     aiMade: 'AI نے آپ کے لیے بنایا',

@@ -136,12 +136,13 @@ export function AiTestScreen() {
         ))}
       </Card>
 
-      <div className="mt-5"><SectionTitle>{t('common.questions')}</SectionTitle></div>
+      <div className="mt-5"><SectionTitle>{t('tutor.pickKind')}</SectionTitle></div>
       <Seg
         value={kind}
         onChange={setKind}
         options={(Object.keys(KIND_LABEL) as AiSessionKind[]).map((k) => ({ value: k, label: t(KIND_LABEL[k]) }))}
       />
+      <SectionTitle>{t('tutor.pickCount')}</SectionTitle>
       <div className="mt-2">
         <Seg
           value={count}
