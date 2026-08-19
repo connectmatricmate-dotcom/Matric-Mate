@@ -17,7 +17,7 @@ import { chapterById, subjectById } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
 import { Card, Empty, Header, Item, Screen, SectionTitle, Small, Spacer, Tap } from '../src/components/ui';
 import { useOnline } from '../src/core/connectivity';
-import { chapterDownloadBytes, formatBytes } from '../src/core/downloads';
+import { chapterDownloadBytes, formatBytes, localChapter } from '../src/core/downloads';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { C, S } from '../src/theme';
@@ -31,9 +31,15 @@ export default function Offline() {
   if (online) return <Redirect href="/(tabs)" />;
   if (!hydrated) return null;
 
-  // chapterById falls back to the chapter list bundled in core when there is no
-  // connection, which is the real FBISE structure, so titles render offline.
-  const chapters = state.downloads.map(chapterById).filter(Boolean);
+  /**
+   * The saved row first, the catalogue second.
+   *
+   * This used to be `map(chapterById)`, whose offline fallback is the bundled
+   * catalogue: Class 9 only, by design. A Class 10 student with no signal was
+   * therefore told they had no downloads, on the screen that exists for exactly
+   * that moment. The row saved beside each download answers without a network.
+   */
+  const chapters = state.downloads.map((id) => localChapter(id) ?? chapterById(id)).filter(Boolean);
 
   return (
     <Screen>

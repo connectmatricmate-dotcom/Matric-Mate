@@ -3,7 +3,7 @@ import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
 import { api , chapterPct, hasStudyMaterial , isUrduScript, pickAudioTrack, subjectById } from '@matricmate/core';
-import { chapterDownloadBytes, formatBytes, localAudioTrack } from '../../../src/core/downloads';
+import { chapterDownloadBytes, formatBytes, localAudioTrack, localChapter } from '../../../src/core/downloads';
 import { Confetti, Pop } from '../../../src/components/celebration';
 import { LockedNotice } from '../../../src/components/LockedNotice';
 import { cheer } from '../../../src/core/haptics';
@@ -18,7 +18,11 @@ export default function ChapterHub() {
   const t = useT();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
-  const { data: chapter, loading: chapterLoading } = useAsync(() => api.getChapter(id), [id]);
+  const { data: fetchedChapter, loading: chapterLoading } = useAsync(() => api.getChapter(id), [id]);
+  /* With no signal the catalogue cannot answer for a Class 10 chapter, because
+     the bundle is Class 9. The row saved with the download can, which is what
+     keeps a downloaded chapter openable on a bus. */
+  const chapter = fetchedChapter ?? localChapter(id) ?? undefined;
   const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
   const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
   // No row, no row in the grid: a chapter offers an audio lesson only once one

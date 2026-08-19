@@ -28,6 +28,7 @@ import { useAsync } from '../../../src/core/useAsync';
 import { useOnline } from '../../../src/core/connectivity';
 import { useT } from '../../../src/i18n';
 import type { StringKey } from '../../../src/i18n';
+import { localChapter } from '../../../src/core/downloads';
 import { useApp } from '../../../src/store/app';
 import { C, F, S, isWeb } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
@@ -154,7 +155,10 @@ export default function Reader() {
   const online = useOnline();
   const toast = useToast();
   const insets = useSafeAreaInsets();
-  const { data: chapter } = useAsync(() => api.getChapter(id), [id]);
+  const { data: fetchedChapter } = useAsync(() => api.getChapter(id), [id]);
+  /* Offline the catalogue has no Class 10 chapter to give, so the sticky header
+     would have no name. The row saved with the download has one. */
+  const chapter = fetchedChapter ?? localChapter(id) ?? undefined;
   const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(id), [id]);
   const [idx, setIdx] = useState(0);
   const [askOpen, setAskOpen] = useState(false);

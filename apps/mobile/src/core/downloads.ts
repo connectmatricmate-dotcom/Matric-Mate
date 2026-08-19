@@ -48,6 +48,7 @@
 import { Directory, File, Paths } from 'expo-file-system';
 import {
   AudioTrack,
+  Chapter,
   ChapterContent,
   Medium,
   api,
@@ -101,6 +102,11 @@ const audioMetaFile = (chapterId: string, medium: Medium): File | null => {
   const dir = chapterDir(chapterId);
   return dir ? new File(dir, `${medium}.audio.json`) : null;
 };
+/** One per chapter, not per medium: the row carries both titles. */
+const chapterFile = (chapterId: string): File | null => {
+  const dir = chapterDir(chapterId);
+  return dir ? new File(dir, 'chapter.json') : null;
+};
 
 /**
  * The saved track row for a downloaded lesson.
@@ -115,6 +121,30 @@ export function localAudioTrack(chapterId: string, medium: Medium): AudioTrack |
     const file = audioMetaFile(chapterId, medium);
     if (!file?.exists) return null;
     return JSON.parse(file.textSync()) as AudioTrack;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The saved chapter row, for naming a download with no connection.
+ *
+ * Same reasoning as the track row above, and it was the missing half of it.
+ * The downloads and offline screens named their rows through `chapterById`,
+ * whose offline fallback is the bundled catalogue, and the bundle is Class 9
+ * by design. So a Class 10 student who opened the app with no signal was told
+ * they had no downloads, over files that were sitting on the phone, on the one
+ * screen the whole download feature exists for.
+ *
+ * A download already proves there was a connection, so the row is saved at
+ * that moment and read back from disk afterwards. Chapters downloaded before
+ * this existed have no file and still fall back to the catalogue.
+ */
+export function localChapter(chapterId: string): Chapter | null {
+  try {
+    const file = chapterFile(chapterId);
+    if (!file?.exists) return null;
+    return JSON.parse(file.textSync()) as Chapter;
   } catch {
     return null;
   }
@@ -235,6 +265,10 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
   const tracks = await api.getAudioTracks(chapterId, supabase);
   const track = pickAudioTrack(tracks, medium);
   const url = audioUrl(track);
+  /* The row that names this chapter offline. Fetched here, where a connection
+     is already proven, because the bundled catalogue cannot answer for Class
+     10 and the offline library has nothing else to read a title from. */
+  const row = await api.getChapter(chapterId, supabase);
 
   const scratch: File[] = [];
   const sweep = () => {
@@ -264,12 +298,21 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
     scratch.push(temp);
     temp.write(JSON.stringify(content));
 
+    let rowTemp: File | null = null;
+    if (row) {
+      rowTemp = new File(dir, `.chapter.tmp-${stamp}`);
+      scratch.push(rowTemp);
+      rowTemp.write(JSON.stringify(row));
+    }
+
     // Both files move into place only once both exist, so a chapter is never
     // half-downloaded from a reader's point of view.
     const audioDest = audioFile(chapterId, medium);
     const metaDest = audioMetaFile(chapterId, medium);
+    const rowDest = chapterFile(chapterId);
     if (audioTemp && audioDest) audioTemp.moveSync(audioDest, { overwrite: true });
     if (metaTemp && metaDest) metaTemp.moveSync(metaDest, { overwrite: true });
+    if (rowTemp && rowDest) rowTemp.moveSync(rowDest, { overwrite: true });
     temp.moveSync(dest, { overwrite: true });
   } catch (e) {
     sweep();

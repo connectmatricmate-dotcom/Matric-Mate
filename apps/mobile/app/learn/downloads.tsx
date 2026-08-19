@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Bar, Btn, Card, Empty, Header, Item, Row, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../../src/components/ui';
 import { chapterById, subjectById } from '@matricmate/core';
-import { chapterDownloadBytes, formatBytes, totalDownloadBytes } from '../../src/core/downloads';
+import { chapterDownloadBytes, formatBytes, localChapter, totalDownloadBytes } from '../../src/core/downloads';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
@@ -14,7 +14,9 @@ export default function Downloads() {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
-  const chapters = state.downloads.map(chapterById).filter(Boolean);
+  // The saved row first, so a chapter is still named with no connection. See
+  // localChapter: the bundled catalogue is Class 9 only.
+  const chapters = state.downloads.map((id) => localChapter(id) ?? chapterById(id)).filter(Boolean);
   // Read straight off the filesystem, not from an estimate: this is what a
   // "true size on disk" figure means. Both calls are fast, synchronous local
   // reads, so doing them at render time (recomputed whenever state.downloads
