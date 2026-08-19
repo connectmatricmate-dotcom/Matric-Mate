@@ -87,7 +87,8 @@ export async function POST(request: Request) {
    */
   const phone = (parsed.success ? (parsed.data.phone ?? '') : '').trim() || (profile?.phone ?? '');
   if (phone && phone !== profile?.phone) {
-    void admin.from('profiles').update({ phone }).eq('id', user.id);
+    // Awaited: a void write on serverless freezes with the lambda and is lost.
+    await admin.from('profiles').update({ phone }).eq('id', user.id);
   }
 
   try {
@@ -105,10 +106,12 @@ export async function POST(request: Request) {
       amountRupees: plan.price,
       orderId,
       existingCustomer: profile?.safepay_customer_id ?? undefined,
-      onCustomer: (token: string) => {
+      onCustomer: async (token: string) => {
         // Reused forever after: Safepay's docs warn against minting a second
-        // record for somebody who already has one.
-        void admin.from('profiles').update({ safepay_customer_id: token }).eq('id', user.id);
+        // record for somebody who already has one. Awaited, or the write dies
+        // with the lambda and every attempt mints a new record, which is
+        // exactly what the profiles table showed: checkouts made, id null.
+        await admin.from('profiles').update({ safepay_customer_id: token }).eq('id', user.id);
       },
       redirectUrl: `${SITE_URL}/checkout/return`,
       cancelUrl: `${SITE_URL}/checkout?cancelled=1&plan=${plan.id}`,

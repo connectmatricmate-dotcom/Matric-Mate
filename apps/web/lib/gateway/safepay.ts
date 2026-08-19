@@ -128,7 +128,7 @@ export const safepayProvider: PaymentProvider = {
     let customer = req.existingCustomer ?? null;
     if (!customer && req.payer.phone) {
       customer = await createCustomer({ email: req.payer.email, name: req.payer.name, phone: req.payer.phone });
-      if (customer) req.onCustomer?.(customer);
+      if (customer) await req.onCustomer?.(customer);
     }
     const [tracker, tbt] = await Promise.all([
       // Paisa. v3 takes the lowest denomination and v1 took whole rupees, so

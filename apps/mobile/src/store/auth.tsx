@@ -88,6 +88,10 @@ type Ctx = {
   entitlementReady: boolean;
   /** Student, or one of the two staff kinds whose screens live on the website. */
   role: 'student' | 'affiliate' | 'admin';
+  /** The role above has actually been read for this session. Routing that treats
+   *  staff differently must wait for it, or the 'student' default routes an
+   *  administrator into onboarding. */
+  roleReady: boolean;
   session: Session | null;
   user: AuthUser | null;
   entitlement: Entitlement;
@@ -177,6 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Their own screens are on the website; here they only need telling.
    */
   const [role, setRole] = useState<'student' | 'affiliate' | 'admin'>('student');
+  const [roleReady, setRoleReady] = useState(false);
 
   /** Guards against a slow response from a previous user overwriting the current one. */
   const currentUserId = useRef<string | null>(null);
@@ -235,6 +240,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfileName(data?.name ?? null);
       const r = data?.role;
       setRole(r === 'affiliate' || r === 'admin' ? r : 'student');
+      // Even on a failed read: the answer is then "student", the old behaviour,
+      // and holding the splash forever would be worse than that default.
+      setRoleReady(true);
     }
   }, []);
 
@@ -250,8 +258,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setEntitlementReady(true);
         setProfileName(null);
         setRole('student');
+        setRoleReady(false);
         return;
       }
+      setRoleReady(false);
       setEntitlementReady(false);
       // Cached value first so the UI is right immediately, server second. Goes
       // through the same grace check, so a stale cache cannot outlive the
@@ -318,14 +328,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       entitlementReady,
       role,
+      roleReady,
       session,
       user: authUser,
       entitlement,
       checking,
 
       async signIn(email, password) {
-        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (error) throw new Error(readable(error.message));
+        /*
+         * Staff are turned away at the door, not after it.
+         *
+         * A teacher or an administrator has every screen on the website and
+         * none in here, and letting the sign-in stand walked them into a
+         * student's onboarding. The password was right, so the session is
+         * closed again and the message says which door to use instead.
+         */
+        const uid = data.session?.user.id;
+        if (uid) {
+          const { data: prof } = await supabase.from('profiles').select('role').eq('id', uid).maybeSingle();
+          if (prof?.role === 'affiliate' || prof?.role === 'admin') {
+            await supabase.auth.signOut();
+            throw new Error('auth.errStaffApp');
+          }
+        }
       },
 
       async signUp(name, email, password, mobile) {
@@ -411,7 +438,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfileName(clean);
       },
     };
-  }, [loading, entitlementReady, role, session, entitlement, checking, profileName, adopt, loadEntitlement]);
+  }, [loading, entitlementReady, role, roleReady, session, entitlement, checking, profileName, adopt, loadEntitlement]);
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

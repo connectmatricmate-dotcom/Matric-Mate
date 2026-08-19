@@ -156,6 +156,11 @@ export const en = {
        account" from "wrong password": the difference tells a stranger which
        email addresses are registered here. */
     errCredentials: 'Wrong email or password.',
+    /* A teacher or an administrator signing in here. The password was right,
+       so this is not a failure on their part; it is the wrong door. Said on the
+       login screen rather than after, because everything past this point, the
+       onboarding, the plan gate, is built for a student and would only mislead. */
+    errStaffApp: 'This is a teacher or admin account. Sign in at matricmate.pk in a browser to reach your dashboard.',
     errNotConfirmed: 'Confirm your email first. Check your inbox for the link.',
     errRegistered: 'That email already has an account. Log in instead.',
     errWeakPassword: 'Passwords need at least 6 characters.',
@@ -1205,6 +1210,7 @@ export const ur: typeof en = {
     stayLoggedIn: 'لاگ اِن رہنے دیں',
 
     errCredentials: 'ای میل یا پاس ورڈ غلط ہے۔',
+    errStaffApp: 'یہ اُستاد یا ایڈمن کا اکاؤنٹ ہے۔ اپنے ڈیش بورڈ کے لیے براؤزر میں matricmate.pk پر سائن اِن کریں۔',
     errNotConfirmed: 'پہلے اپنا ای میل تصدیق کریں۔ اِن باکس میں لنک دیکھیں۔',
     errRegistered: 'اس ای میل کا اکاؤنٹ پہلے سے موجود ہے۔ لاگ اِن کریں۔',
     errWeakPassword: 'پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔',

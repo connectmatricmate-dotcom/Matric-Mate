@@ -30,7 +30,7 @@ import { Label, Wordmark } from '../src/components/ui';
 export default function Splash() {
   const { state, hydrated } = useApp();
   const t = useT();
-  const { loading } = useAuth();
+  const { loading, role, roleReady } = useAuth();
   const [seen, setSeen] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -39,13 +39,23 @@ export default function Splash() {
 
   useEffect(() => {
     if (!hydrated || loading || seen === null) return;
+    /*
+     * A signed-in account also waits for its role. Routing on the 'student'
+     * default sent an administrator into "Which class are you in?", because
+     * staff have no subjects and the onboarding branch caught them first.
+     */
+    if (state.user && !roleReady) return;
     const to = !state.user
       ? seen
         ? '/login'
         : '/welcome'
-      : !state.onboarding?.subjects?.length
-        ? '/onboarding/class'
-        : '/(tabs)';
+      : role !== 'student'
+        ? // Straight to the tabs gate, which shows staff the website signpost.
+          // They have no onboarding to do; onboarding builds a study plan.
+          '/(tabs)'
+        : !state.onboarding?.subjects?.length
+          ? '/onboarding/class'
+          : '/(tabs)';
     /**
      * A notification that opened the app decides where it opens.
      *
@@ -63,7 +73,7 @@ export default function Splash() {
       if (opened) router.push(opened as never);
     }, 300);
     return () => clearTimeout(t);
-  }, [hydrated, loading, seen, state.user, state.onboarding]);
+  }, [hydrated, loading, seen, state.user, state.onboarding, role, roleReady]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.paper, alignItems: 'center', justifyContent: 'center', gap: S.lg }}>

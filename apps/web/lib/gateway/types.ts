@@ -33,8 +33,10 @@ export type CheckoutRequest = {
   /** The provider's own id for this payer, if we have minted one before. */
   existingCustomer?: string;
   /** Called when the provider mints a payer record, so it can be stored and
-   *  reused instead of a new one being created on every attempt. */
-  onCustomer?: (token: string) => void;
+   *  reused instead of a new one being created on every attempt. Awaited: on
+   *  serverless a fire-and-forget write freezes with the lambda and never
+   *  lands, which is how every checkout minted a fresh customer. */
+  onCustomer?: (token: string) => void | Promise<void>;
 };
 
 export type CheckoutStart = {
