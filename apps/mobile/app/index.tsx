@@ -6,7 +6,7 @@ import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { useAuth } from '../src/store/auth';
 import { C, F, S } from '../src/theme';
-import { Label } from '../src/components/ui';
+import { Label, Wordmark } from '../src/components/ui';
 
 /**
  * Splash + route gate. Decides where a student lands on opening the app:
@@ -58,11 +58,7 @@ export default function Splash() {
         style={{ width: 180, height: 140 }}
         resizeMode="contain"
       />
-      <Image
-        source={require('../assets/wordmark.png')}
-        style={{ width: 210, height: 40 }}
-        resizeMode="contain"
-      />
+      <Wordmark />
       <Label style={{ marginTop: S.sm, fontFamily: F.bodyBold }}>{t('welcome.tagline')}</Label>
     </View>
   );

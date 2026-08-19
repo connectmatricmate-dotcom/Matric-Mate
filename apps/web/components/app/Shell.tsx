@@ -6,12 +6,11 @@
  * left, notifications. Rendered once by app/(app)/layout.tsx and preserved
  * across navigation; pages render only their own content.
  */
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { IconName, StringKey } from '@matricmate/core';
 import { levelProgress } from '@matricmate/core';
-import { Bar, Icon } from '@/components/ui/primitives';
+import { Bar, Icon, Wordmark } from '@/components/ui/primitives';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { TabGlyph } from '@/components/app/TabGlyph';
 import { useQuotaRealtime, useTutorQuota } from '@/lib/use-tutor-quota';
@@ -56,7 +55,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-e border-line bg-card px-3 py-5 md:flex">
         <Link href="/dashboard" className="mb-7 px-2">
-          <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} priority />
+          <Wordmark priority />
         </Link>
 
         <nav className="flex flex-col gap-1">
@@ -131,7 +130,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <AvatarBadge index={state.settings.avatar ?? 0} size={34} />
           </span>
           <Link href="/dashboard" className="md:hidden">
-            <Image src="/brand/wordmark.png" alt="MatricMate" width={104} height={21} />
+            <Wordmark width={104} height={21} />
           </Link>
 
           <div className="ms-auto flex items-center gap-2">

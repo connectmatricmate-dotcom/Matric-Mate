@@ -6,6 +6,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import {
   ActivityIndicator,
   Animated,
+  Image,
   Modal,
   Platform,
   Pressable,
@@ -24,8 +25,8 @@ import { useReducedMotion } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
 import { useKeyboardOverlap } from '../core/keyboard';
-import { C, F, R, S, T, WEB_MAX, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
-import { isUrduScript } from '@matricmate/core';
+import { C, F, R, S, T, WEB_MAX, isDark, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
+import { colors, isUrduScript } from '@matricmate/core';
 import { Icon, IconName } from './Icon';
 
 /* ------------------------------------------------------------------ text */
@@ -95,6 +96,34 @@ export function ScriptText({
     >
       {text}
     </Text>
+  );
+}
+
+/**
+ * The wordmark, on a ground it can be read on.
+ *
+ * The mark is two-tone, a mid-dark teal and an orange, and the teal half sits
+ * at roughly 2.4:1 on the dark theme's paper: half the logo disappears, which
+ * is the splash screen, the welcome carousel and the top of the report card.
+ * Recolouring it was tried on the web and rejected by the client (handoff,
+ * section 6), so this is the answer the web settled on instead: keep the mark
+ * on a light ground. In the light theme the plate is the same colour as the
+ * page behind it and cannot be seen at all.
+ *
+ * `colors.paper`, the light palette, deliberately and not `C.paper`: the plate
+ * exists precisely because the artwork does not follow the theme.
+ */
+export function Wordmark({ width = 210, height = 40 }: { width?: number; height?: number }) {
+  return (
+    <View
+      style={
+        isDark()
+          ? { backgroundColor: colors.paper, borderRadius: R.md, paddingHorizontal: 12, paddingVertical: 7 }
+          : null
+      }
+    >
+      <Image source={require('../../assets/wordmark.png')} style={{ width, height }} resizeMode="contain" />
+    </View>
   );
 }
 

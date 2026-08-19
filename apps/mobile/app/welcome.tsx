@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../src/components/LanguageToggle';
 import { markWelcomeSeen } from '../src/lib/first-run';
-import { Body, Btn, H1, Screen, Tap } from '../src/components/ui';
+import { Body, Btn, H1, Screen, Tap, Wordmark } from '../src/components/ui';
 import { useT } from '../src/i18n';
 import type { StringKey } from '../src/i18n';
 import { C, S, rowDir } from '../src/theme';
@@ -42,11 +42,7 @@ export default function Welcome() {
     >
       <View style={{ flex: 1, paddingHorizontal: S.lg }}>
         <View style={{ flexDirection: rowDir(), alignItems: 'center', marginTop: S.sm }}>
-          <Image
-            source={require('../assets/wordmark.png')}
-            style={{ width: 132, height: 26 }}
-            resizeMode="contain"
-          />
+          <Wordmark width={132} height={26} />
           <View style={{ flex: 1 }} />
           <LanguageToggle compact />
         </View>

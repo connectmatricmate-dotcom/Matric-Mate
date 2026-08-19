@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Image, Text, View } from 'react-native';
-import { Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, useToast } from '../../src/components/ui';
+import { Text, View } from 'react-native';
+import { Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Wordmark, useToast } from '../../src/components/ui';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { WORDMARK_DATA_URI, accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById, subjectName } from '@matricmate/core';
@@ -115,7 +115,7 @@ export default function Report() {
       <Card border={C.teal} style={{ borderWidth: 2 }}>
         <Row>
           <View style={{ flex: 1 }}>
-            <Image source={require('../../assets/wordmark.png')} style={{ width: 120, height: 24 }} resizeMode="contain" />
+            <Wordmark width={120} height={24} />
             <Label style={{ marginTop: 6 }}>{t('progress.monthlyReport', { month })}</Label>
           </View>
           <View

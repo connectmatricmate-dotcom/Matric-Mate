@@ -7,6 +7,7 @@
  *
  * These mirror apps/mobile/src/components/ui.tsx by name and behaviour.
  */
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { IconName, isUrduScript } from '@matricmate/core';
@@ -621,5 +622,33 @@ export function Empty({
       {sub ? <p className="mt-1 max-w-sm text-[13px] text-ink2">{sub}</p> : null}
       {cta ? <div className="mt-3">{cta}</div> : null}
     </Card>
+  );
+}
+
+/**
+ * The wordmark, on a ground it can be read on.
+ *
+ * The artwork is two-tone, a mid-dark teal and an orange, and the teal half
+ * sits at roughly 2.4:1 on the dark theme's card: half the logo disappears
+ * from the nav, the onboarding header and the top of the report card.
+ * Recolouring it was tried and rejected by the client (handoff, section 6), so
+ * it keeps a light plate of its own instead. On paper that plate is the card
+ * colour it is already sitting on, so nothing shows and no layout moves.
+ */
+export function Wordmark({
+  width = 136,
+  height = 27,
+  priority,
+  className = '',
+}: {
+  width?: number;
+  height?: number;
+  priority?: boolean;
+  className?: string;
+}) {
+  return (
+    <span className={`inline-flex rounded-[10px] bg-brandplate p-1 ${className}`}>
+      <Image src="/brand/wordmark.png" alt="MatricMate" width={width} height={height} priority={priority} />
+    </span>
   );
 }

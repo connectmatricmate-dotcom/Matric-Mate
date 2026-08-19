@@ -1,7 +1,7 @@
 import { Localized } from '@/components/app/Localized';
 import { readUiLanguage } from '@/lib/ui-language.server';
-import Image from 'next/image';
 import Link from 'next/link';
+import { Wordmark } from '@/components/ui/primitives';
 import { AppProvider } from '@/lib/store';
 
 export default async function OnboardingLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +12,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
       <div className="min-h-screen">
         <header className="flex justify-center border-b border-line bg-card py-3">
           <Link href="/">
-            <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} priority />
+            <Wordmark priority />
           </Link>
         </header>
         {children}

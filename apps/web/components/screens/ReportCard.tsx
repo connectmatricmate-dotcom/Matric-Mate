@@ -1,10 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import { useMemo } from 'react';
 import { accuracy, boardName, formatDate, grade, mediumName, subjectById, subjectName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Icon, Label, Pill, ScriptText } from '@/components/ui/primitives';
+import { Card, Icon, Label, Pill, ScriptText, Wordmark } from '@/components/ui/primitives';
 import { buttonClasses } from '@/components/ui/styles';
 import { useNow } from '@/lib/now';
 import { useApp, useLang, useT } from '@/lib/store';
@@ -47,7 +46,7 @@ export function ReportCard() {
       <Card border="border-teal" className="border-2">
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <Image src="/brand/wordmark.png" alt="MatricMate" width={120} height={24} />
+            <Wordmark width={120} height={24} />
             <div className="mt-1.5">
               <Label>{t('progress.monthlyReport', { month })}</Label>
             </div>
