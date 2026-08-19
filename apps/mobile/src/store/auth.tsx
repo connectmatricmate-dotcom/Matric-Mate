@@ -1,3 +1,4 @@
+import { normaliseMobile } from '@matricmate/core';
 import type { StringKey } from '@matricmate/core';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
@@ -91,7 +92,7 @@ type Ctx = {
   /** True while an entitlement refresh is in flight, for pull-to-refresh affordances. */
   checking: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (name: string, email: string, password: string) => Promise<SignUpResult>;
+  signUp: (name: string, email: string, password: string, mobile?: string) => Promise<SignUpResult>;
   /** Sends the confirmation email again, for one that never arrived. */
   resendConfirmation: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -310,14 +311,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw new Error(readable(error.message));
       },
 
-      async signUp(name, email, password) {
+      async signUp(name, email, password, mobile) {
+        const phone = mobile ? normaliseMobile(mobile) : null;
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
             // Read by the on_auth_user_created trigger to seed the profile row,
             // exactly as the website does, so one account looks the same in both.
-            data: { name: name.trim() },
+            // The number is normalised to +92 and ten digits here because that
+            // is what the column takes; an unrecognised one is left out rather
+            // than failing the signup.
+            data: { name: name.trim(), ...(phone ? { phone } : {}) },
             // The link is opened in a phone browser, not in the app, so it has
             // to land on the website. They confirm there and come back to sign
             // in, which is what the "back to sign in" button here expects.

@@ -7,7 +7,8 @@ import { readUiLanguage } from '@/lib/ui-language.server';
 import { z } from 'zod';
 import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
-import { normaliseMobile } from '@/lib/validation';
+import { normaliseMobile } from '@matricmate/core';
+
 import { currentRole, landingFor } from '@/lib/roles';
 import { createClient } from '@/lib/supabase/server';
 

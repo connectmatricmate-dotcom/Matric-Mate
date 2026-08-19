@@ -5,6 +5,7 @@ import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { isAuthErrorKey, useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer, useToast } from '../src/components/ui';
+import { normaliseMobile } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
 import { C, S } from '../src/theme';
 
@@ -26,20 +27,22 @@ export default function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmSent, setConfirmSent] = useState(false);
   const [resending, setResending] = useState(false);
   const toast = useToast();
 
-  const valid = name.trim().length >= 2 && email.trim().includes('@') && password.length >= 6;
+  const valid =
+    name.trim().length >= 2 && email.trim().includes('@') && password.length >= 6 && !!normaliseMobile(mobile);
 
   async function submit() {
     if (!valid || busy) return;
     setBusy(true);
     setError(null);
     try {
-      const { needsConfirmation } = await signUp(name, email, password);
+      const { needsConfirmation } = await signUp(name, email, password, mobile);
       // With confirmation on there is no session yet, so there is nowhere to go.
       // Saying so is the only honest option; routing into the app would land on
       // a locked screen and read as a failure.
@@ -115,6 +118,20 @@ export default function SignUp() {
         placeholder={t('auth.contactPlaceholder')}
         icon="mail"
         keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      {/* Asked here so it is never asked at checkout. Safepay will not create
+          the payer record that fills its own form in without a number, and a
+          new field in front of somebody deciding whether to pay is a reason to
+          stop. The website asks for it in the same place, so one account looks
+          the same whichever app made it. */}
+      <Field
+        label={t('auth.mobile')}
+        value={mobile}
+        onChangeText={setMobile}
+        placeholder={t('auth.mobilePlaceholder')}
+        icon="phone"
+        keyboardType="phone-pad"
         autoCapitalize="none"
       />
       <Field

@@ -594,3 +594,21 @@ export function nextStep(action: NextAction, lang: Language): { label: string; h
       return named(action.chapterId, 'dash.nextStart', `/learn/reader/${action.chapterId}`);
   }
 }
+
+/**
+ * A Pakistani mobile in the shape the database takes: +92 then ten digits.
+ *
+ * Students type 03001234567, `profiles.phone` has required '^\+92\d{10}$'
+ * since migration 0003, and Safepay needs something it can parse to create the
+ * payer record that fills its checkout form in. One conversion, shared by both
+ * apps, rather than three opinions about what a phone number is.
+ *
+ * Returns null for anything that is not a number we recognise. Callers drop it
+ * rather than refusing the signup: a mistyped mobile should cost a prefill, not
+ * an account.
+ */
+export function normaliseMobile(v: string): string | null {
+  const digits = v.replace(/\D/g, '');
+  const local = digits.replace(/^92/, '').replace(/^0/, '');
+  return /^3\d{9}$/.test(local) ? `+92${local}` : null;
+}
