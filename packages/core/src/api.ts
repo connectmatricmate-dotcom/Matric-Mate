@@ -104,6 +104,8 @@ export const api = {
     text: string;
     steps?: string[];
     threadId?: string;
+    /** The row the server saved this answer as, so it can be rated. */
+    messageId?: string;
     quota?: TutorQuota;
     reason?: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error';
   }> {
@@ -119,7 +121,8 @@ export const api = {
         },
         onDelta,
       );
-      if (res.ok) return { live: true, text: res.text, threadId: res.threadId, quota: res.quota };
+      if (res.ok)
+        return { live: true, text: res.text, threadId: res.threadId, messageId: res.messageId ?? undefined, quota: res.quota };
       return { live: true, text: '', reason: res.reason, quota: res.quota };
     }
     const mock = await mockTutor(question, opts?.context);

@@ -28,7 +28,10 @@ export type TutorProfile = {
 export type TutorImage = { data: string; mediaType: 'image/jpeg' | 'image/png' | 'image/webp' };
 
 export type TutorReply =
-  | { ok: true; text: string; threadId: string; quota: TutorQuota }
+  /** `messageId` is the row the server saved the answer as. Null on the
+   *  non-streaming path. It is what makes an answer ratable: see the note in
+   *  the tutor route about tutor_feedback sitting empty. */
+  | { ok: true; text: string; threadId: string; messageId: string | null; quota: TutorQuota }
   | { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error'; quota?: TutorQuota };
 
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
@@ -116,7 +119,7 @@ export async function askTutorLive(
       };
       if (body.text && body.threadId && body.quota) {
         setQuota(body.quota);
-        return { ok: true, text: body.text, threadId: body.threadId, quota: body.quota };
+        return { ok: true, text: body.text, threadId: body.threadId, messageId: null, quota: body.quota };
       }
       return failFrom(res.status, body);
     }
@@ -125,7 +128,7 @@ export async function askTutorLive(
     let finale: TutorReply | null = null;
     const handleLine = (line: string) => {
       if (!line.trim()) return;
-      let msg: { t?: string; text?: string; threadId?: string; quota?: TutorQuota; reason?: string };
+      let msg: { t?: string; text?: string; threadId?: string; messageId?: string | null; quota?: TutorQuota; reason?: string };
       try {
         msg = JSON.parse(line);
       } catch {
@@ -136,7 +139,7 @@ export async function askTutorLive(
         onDelta?.(text);
       } else if (msg.t === 'done' && msg.threadId && msg.quota) {
         setQuota(msg.quota);
-        finale = { ok: true, text: text.trim(), threadId: msg.threadId, quota: msg.quota };
+        finale = { ok: true, text: text.trim(), threadId: msg.threadId, messageId: msg.messageId ?? null, quota: msg.quota };
       } else if (msg.t === 'err') {
         finale = { ok: false, reason: (msg.reason as 'refused' | 'error') ?? 'error', quota: msg.quota };
       }

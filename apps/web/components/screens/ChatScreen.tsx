@@ -156,7 +156,16 @@ export function ChatScreen({
       return;
     }
 
-    const reply: ChatMessage = { id: `m-${Date.now()}-ai`, role: 'ai', text: res.text, steps: res.steps, at: Date.now() };
+    /* The server's own row id when we have it, so the thumbs on this answer
+       can actually be recorded. A local id falls back to unratable, which is
+       what every answer used to be. */
+    const reply: ChatMessage = {
+      id: res.messageId ?? `m-${Date.now()}-ai`,
+      role: 'ai',
+      text: res.text,
+      steps: res.steps,
+      at: Date.now(),
+    };
     setMessages((m) => [...m, reply]);
     if (res.threadId) setThreadId(res.threadId);
     if (res.quota) setQuota(res.quota);

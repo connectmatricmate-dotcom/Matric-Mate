@@ -363,10 +363,25 @@ export async function POST(req: NextRequest) {
         // Persist both sides, bump the thread, charge the quota. Charged
         // only after a delivered answer: a failed request must not cost a
         // question.
-        await admin.from('chat_messages').insert([
-          { thread_id: thread, user_id: userId, role: 'user', content: savedUserText },
-          { thread_id: thread, user_id: userId, role: 'assistant', content: answer },
-        ]);
+        /*
+         * The assistant row's id comes back, and it matters.
+         *
+         * Both apps let a student rate an answer, and both refuse to write a
+         * rating for a message id the server never minted, which is right: the
+         * table has a foreign key. But a freshly streamed answer only had the
+         * client's own local id, so the thumbs latched, the toast said noted,
+         * and tutor_feedback stayed empty across every account. The only
+         * ratable answers were ones reopened from history, which is not how
+         * anybody rates anything.
+         */
+        const { data: saved } = await admin
+          .from('chat_messages')
+          .insert([
+            { thread_id: thread, user_id: userId, role: 'user', content: savedUserText },
+            { thread_id: thread, user_id: userId, role: 'assistant', content: answer },
+          ])
+          .select('id,role');
+        const messageId = saved?.find((m) => m.role === 'assistant')?.id ?? null;
         await admin.from('chat_threads').update({ updated_at: new Date().toISOString() }).eq('id', thread);
         await admin.from('ai_usage').upsert(
           { user_id: userId, day: dayKey(), used: quota.used + 1 },
@@ -376,6 +391,7 @@ export async function POST(req: NextRequest) {
         emit({
           t: 'done',
           threadId: thread,
+          messageId,
           quota: { ...quota, used: quota.used + 1, remaining: quota.remaining - 1 },
         });
         controller.close();
