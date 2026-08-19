@@ -181,7 +181,18 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
    * a particular page keeps working.
    */
   const asked = safePath(formData.get('next'), '');
-  redirect(asked || (await landingFor(await currentRole())));
+  const landing = await landingFor(await currentRole());
+
+  /*
+   * An explicit `next` wins, unless it is somewhere this account cannot go.
+   *
+   * The middleware writes ?next= when it turns an unauthenticated request
+   * away, so the commonest value by far is /dashboard: a student follows a
+   * link, gets bounced to log in, and is then sent back to a page the paywall
+   * will bounce again. Honouring that blindly is how signing in ended on a
+   * blank screen. When the landing decision says /upgrade, it wins.
+   */
+  redirect(landing === '/upgrade' ? landing : asked || landing);
 }
 
 export async function resetPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {

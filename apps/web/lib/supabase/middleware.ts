@@ -10,6 +10,17 @@ const PROTECTED = ['/dashboard', '/upgrade', '/study', '/practice', '/tutor', '/
 const AUTH_ONLY = ['/login', '/signup'];
 
 /**
+ * Reachable without a plan. Mirrors OPEN_WITHOUT_PLAN in lib/entitlement, and
+ * has to: the layout keeps the authoritative copy, this one exists so the
+ * redirect can be issued as a real 307 before any render happens.
+ *
+ * `/onboarding` is here because a student picks their class and subjects
+ * before they are asked for money, and `/checkout` because being sent to the
+ * upgrade page while trying to pay is a closed loop.
+ */
+const OPEN_WITHOUT_PLAN = ['/upgrade', '/account', '/onboarding', '/checkout'];
+
+/**
  * Inside a protected branch, but public anyway.
  *
  * The payment gateway sends the payer here from its own domain, and a
@@ -135,8 +146,49 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(login);
   }
 
+  /**
+   * The paywall, as a redirect the router can actually follow.
+   *
+   * It is enforced in the app layout too, and that copy is the one that fails
+   * closed. The reason it is ALSO here is a Next router behaviour that cost
+   * this project days: when a client-side navigation lands on a route whose
+   * layout calls redirect(), the router is handed a payload it does not
+   * follow, and the screen goes blank at the new URL until the student
+   * reloads by hand. Finishing onboarding pushed to /dashboard, and logging
+   * in with ?next=/dashboard did the same, so an unpaid student met a blank
+   * page on the two most common paths in the product.
+   *
+   * A 307 from here is followed correctly on both soft and hard navigation,
+   * so the bounce happens before any of that machinery is involved.
+   *
+   * Prefetches are skipped on purpose. A dashboard prefetches around twenty
+   * links, and paying for this query on each of them is exactly the cost the
+   * layout comment warned about; a prefetch renders nothing a student sees.
+   */
+  const isPrefetch = request.headers.get('next-router-prefetch') === '1';
+  const needsPlan = isProtected && !starts(OPEN_WITHOUT_PLAN) && !starts(['/admin', '/affiliate']);
+
+  if (user && needsPlan && !isPrefetch) {
+    const { data: ent } = await supabase.from('entitlements').select('active, valid_till').maybeSingle();
+    const paid = Boolean(ent?.active && ent.valid_till && new Date(ent.valid_till).getTime() > Date.now());
+    if (!paid) {
+      // Staff have no plan and no business here either, but they are turned
+      // away by role in their own layouts; sending them to a price list is
+      // the absurdity keepStaffOut() exists to prevent. Let the render decide.
+      const { data: profile } = await supabase.from('profiles').select('role').maybeSingle();
+      if (!profile?.role || profile.role === 'student') {
+        const upgrade = request.nextUrl.clone();
+        upgrade.pathname = '/upgrade';
+        upgrade.search = '';
+        return NextResponse.redirect(upgrade);
+      }
+    }
+  }
+
   if (user && isAuthOnly) {
     const home = request.nextUrl.clone();
+    // Not always /dashboard: an unpaid student sent there only bounces again,
+    // which is the blank-page bug arriving by a third route.
     home.pathname = '/dashboard';
     home.search = '';
     return NextResponse.redirect(home);

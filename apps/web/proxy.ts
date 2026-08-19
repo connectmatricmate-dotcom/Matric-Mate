@@ -21,20 +21,33 @@ export const config = {
      * in lib/supabase/middleware.ts.
      */
     '/dashboard/:path*',
+    '/dashboard',
     '/upgrade/:path*',
     '/upgrade',
     '/study/:path*',
+    '/study',
     '/practice/:path*',
+    '/practice',
     '/tutor/:path*',
+    '/tutor',
     '/progress/:path*',
+    '/progress',
     '/learn/:path*',
+    '/learn',
     '/session/:path*',
+    '/session',
     '/insights/:path*',
+    '/insights',
     '/account/:path*',
+    '/account',
     '/notifications/:path*',
+    '/notifications',
     '/checkout/:path*',
+    '/checkout',
     '/certificates/:path*',
+    '/certificates',
     '/onboarding/:path*',
+    '/onboarding',
     /*
      * The two staff areas. Here as much for the session refresh as for the
      * guard: their own layouts already turn away the wrong role, but without
