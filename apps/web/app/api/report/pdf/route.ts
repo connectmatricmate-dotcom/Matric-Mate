@@ -45,7 +45,21 @@ export async function GET() {
   ]);
 
   const onboarding = (profile?.onboarding ?? {}) as { medium?: string; board?: string; subjects?: string[] };
-  const lang = onboarding.medium === 'ur' ? 'ur' : 'en';
+  /**
+   * This sheet is English, whichever language the student reads in.
+   *
+   * pdf-lib embeds a standard font and a standard font can only encode
+   * Latin-1, so every Urdu character is dropped before it is drawn: see
+   * latin1() in lib/report-pdf.ts. Passing Urdu in did not produce an Urdu
+   * PDF, it produced a half-empty one, with blank table headers and, once the
+   * subject names went through the same path, a blank subject column.
+   *
+   * The student's own language is not lost: the report card on screen is in
+   * it, and both apps' Save as PDF goes through reportHtml and a real
+   * rendering engine, which can shape Nastaliq. This route is the fallback
+   * that has to work everywhere, so it stays in the one script the font has.
+   */
+  const lang = 'en';
   const t = (k: Parameters<typeof translate>[1], p?: Record<string, string | number>) => translate(lang, k, p);
 
   const rows = (attemptRows ?? []) as { subject_id: string; correct: boolean; confidence: number; at: string }[];
