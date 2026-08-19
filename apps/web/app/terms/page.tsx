@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { AI_QUOTA } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
-import { SUPPORT_EMAIL } from '@matricmate/core';
+import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 
 export const metadata: Metadata = {
   title: 'Terms and conditions',
@@ -53,7 +53,10 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   },
   {
     heading: 'Getting in touch',
-    paragraphs: [`${SUPPORT_EMAIL} · WhatsApp support, 10am to 10pm.`],
+    paragraphs: [
+      `${BUSINESS.name}, ${BUSINESS.address}, ${BUSINESS.city}, ${BUSINESS.country}.`,
+      `${BUSINESS.phone} · ${SUPPORT_EMAIL} · ${BUSINESS.hours}.`,
+    ],
   },
 ];
 

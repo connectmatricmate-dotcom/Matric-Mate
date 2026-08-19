@@ -61,10 +61,10 @@ export const BUSINESS: {
   /** Legal or trading name of the merchant, as it will read on a bank statement. */
   name: 'MatricMate',
   /** Street address of the office, one line. */
-  address: '',
+  address: 'Office No 4, Friends Arcade, Street 87, G-13/1',
   city: 'Islamabad',
   country: 'Pakistan',
   /** Reachable during support hours, in local format. */
-  phone: '',
+  phone: '051 8778600',
   hours: '10am to 10pm, Monday to Saturday',
 };
