@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { TutorBudgetRail, WeakRail } from '@/components/app/rails';
+import { Btn } from '@/components/ui/controls';
 import { Card, Empty, Icon, Item } from '@/components/ui/primitives';
 import { ChapterPicker } from '@/components/ui/ChapterPicker';
 import { useApp, useLang, useT } from '@/lib/store';
@@ -52,6 +53,9 @@ export function TutorView() {
    * returns the signed-in student's own threads.
    */
   const [threads, setThreads] = useState<ThreadRow[]>([]);
+  /** A failed read is not an empty history: see the branch below. */
+  const [threadsFailed, setThreadsFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let alive = true;
     createClient()
@@ -59,13 +63,15 @@ export function TutorView() {
       .select('id,title,context_label,updated_at')
       .order('updated_at', { ascending: false })
       .limit(8)
-      .then(({ data }) => {
-        if (alive && data) setThreads(data as ThreadRow[]);
+      .then(({ data, error }) => {
+        if (!alive) return;
+        setThreadsFailed(!!error);
+        if (data) setThreads(data as ThreadRow[]);
       });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [attempt]);
 
   return (
     <Page>
@@ -147,7 +153,17 @@ export function TutorView() {
 
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('tutor.recentChats')}</h2>
-            {threads.length === 0 ? (
+            {threadsFailed && threads.length === 0 ? (
+              /* Telling a student with a month of conversations that they have
+                 none, and giving them nothing to press, is the wrong half of
+                 this pair. */
+              <Empty
+                icon="alert"
+                title={t('states.errorTitle')}
+                sub={t('states.errorBody')}
+                cta={<Btn title={t('common.retry')} sm variant="line" onClick={() => setAttempt((n) => n + 1)} />}
+              />
+            ) : threads.length === 0 ? (
               /* Was the WhatsApp glyph, left behind when that channel was
                  removed. Nothing here has been about WhatsApp for a while. */
               <Empty icon="spark" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />

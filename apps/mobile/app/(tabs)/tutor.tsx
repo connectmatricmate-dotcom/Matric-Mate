@@ -9,6 +9,7 @@ import {
   Card,
   Chevron,
   Empty,
+  ErrorState,
   Item,
   Pill,
   Ring,
@@ -202,7 +203,17 @@ export default function Tutor() {
       ) : null}
 
       <SectionTitle>{t('tutor.recentChats')}</SectionTitle>
-      {!threads.data?.length ? (
+      {/* A failed read is not an empty history. It used to render the "no chats
+          yet" card to a student with a month of them, which tells the wrong
+          person to start a conversation and gives them nothing to retry. */}
+      {threads.error && !threads.data?.length ? (
+        <ErrorState
+          title={t('states.errorTitle')}
+          sub={t('states.errorBody')}
+          retry={t('common.retry')}
+          onRetry={threads.reload}
+        />
+      ) : !threads.data?.length ? (
         <Empty emoji="💬" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />
       ) : (
         <>

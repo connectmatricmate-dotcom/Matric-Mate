@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Text , View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
 import { api , chapterPct, hasStudyMaterial , isUrduScript, pickAudioTrack, subjectById, subjectName } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack, localChapter } from '../../../src/core/downloads';
 import { Confetti, Pop } from '../../../src/components/celebration';
@@ -24,7 +24,7 @@ export default function ChapterHub() {
      the bundle is Class 9. The row saved with the download can, which is what
      keeps a downloaded chapter openable on a bus. */
   const chapter = fetchedChapter ?? localChapter(id) ?? undefined;
-  const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
+  const { data: content, reload: reloadContent } = useAsync(() => api.getChapterContent(id), [id]);
   const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
   // No row, no row in the grid: a chapter offers an audio lesson only once one
   // has really been recorded and published. Offline the fetch returns nothing,
@@ -101,6 +101,35 @@ export default function ChapterHub() {
         </Card>
         <Spacer h={S.md} />
         <LockedNotice variant="locked" />
+      </Screen>
+    );
+  }
+
+  /**
+   * The chapter row says there is material and the content read came back with
+   * none of it, so the read failed.
+   *
+   * The fetch layer never throws: an error, a null and an empty array all
+   * return the bundled sample, which is empty content for all but three
+   * chapters. So the hub rendered "0 sections, 0 cards, 0 questions" beside
+   * rows that were still tappable, contradicting the "8 MCQs" the student had
+   * just seen on the subject list. The counts on the row are the second
+   * opinion that catches it.
+   */
+  const contentFailed =
+    !!chapter && !!content && hasStudyMaterial(chapter) &&
+    !content.sections.length && !content.mcqs.length && !content.flashcards.length;
+  if (contentFailed) {
+    return (
+      <Screen>
+        <Header title={t('study.chapterN', { n: chapter.number })} sub={subjectName(subjectById(chapter.subjectId), lang)} back />
+        <Spacer h={S.lg} />
+        <ErrorState
+          title={t('states.errorTitle')}
+          sub={t('states.errorBody')}
+          retry={t('common.retry')}
+          onRetry={reloadContent}
+        />
       </Screen>
     );
   }
