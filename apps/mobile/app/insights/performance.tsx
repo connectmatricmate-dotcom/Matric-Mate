@@ -62,6 +62,17 @@ export default function Performance() {
   // on the dashboard. The range picker above governs the trend chart.
   const conf = useMemo(() => confidenceBreakdown(state.attempts), [state.attempts]);
   const maxCount = Math.max(1, ...trend.map((x) => x.count));
+  /**
+   * The right-hand end of the chart is today, so the label under it has to be
+   * today's accuracy. It was fed the whole selected range, 7, 30 or 3650 days,
+   * so a student who had answered nothing today still read "today · 62%". The
+   * last bucket is already computed for the line; when it is empty there is no
+   * figure to give and the label says so.
+   */
+  const todaysBucket = trend[trend.length - 1];
+  const todayLabel =
+    todaysBucket?.acc != null ? t('progress.today', { n: todaysBucket.acc }) : t('progress.todayNone');
+
   const confLabels = [t('session.conf0'), t('session.conf1'), t('session.conf2')];
 
   return (
@@ -104,7 +115,7 @@ export default function Performance() {
               <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>
                 {t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}
               </Small>
-              <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>{t('progress.today', { n: accuracy(attempts) })}</Small>
+              <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>{todayLabel}</Small>
             </Row>
           </>
         ) : (
