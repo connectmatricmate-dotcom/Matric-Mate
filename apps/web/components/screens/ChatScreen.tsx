@@ -132,6 +132,7 @@ export function ChatScreen({
 }) {
   const { state, actions, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const toast = useToast();
   const bottom = useRef<HTMLDivElement>(null);
 
@@ -535,7 +536,7 @@ export function ChatScreen({
           onPick={({ chapter, topic }) => {
             setPicking(false);
             setGroundedId(chapter.id);
-            setGroundedLabel(chapter.title);
+            setGroundedLabel(chapterName(chapter, lang));
             // A topic is a starting question; a whole chapter is only context,
             // because "explain the whole of unit 4" is not a question anybody
             // wants answered in one go.

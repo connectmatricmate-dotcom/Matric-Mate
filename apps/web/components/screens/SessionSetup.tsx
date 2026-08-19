@@ -103,14 +103,14 @@ export function SessionSetup({
       toast(t('session.noQuestions'));
       return;
     }
+    // The label a student sees on the session header: one chapter's own name,
+    // in their language, or the subject and "mixed" when it spans several.
+    const single = chapterIds.length === 1 ? chapterById(chapterIds[0]) : undefined;
     // busy stays true through router.replace: re-enabling the button while the
     // route transition runs is the double-click window.
     session.start({
       mode: 'practice',
-      label:
-        chapterIds.length === 1
-          ? (chapterById(chapterIds[0])?.title ?? '')
-          : `${subjectName(subjectById(subjectId), lang)} · ${t('session.mixed')}`,
+      label: single ? chapterName(single, lang) : `${subjectName(subjectById(subjectId), lang)} · ${t('session.mixed')}`,
       subjectId,
       chapterId: chapterIds.length === 1 ? chapterIds[0] : null,
       mcqs,

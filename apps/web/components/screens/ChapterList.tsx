@@ -158,7 +158,7 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
 
       {/* The shared Sheet, not a hand-rolled overlay: it brings Escape, the
           focus trap, the scroll lock and the closable backdrop with it. */}
-      <Sheet open={locked !== null} onClose={() => setLocked(null)} title={locked?.title ?? ''}>
+      <Sheet open={locked !== null} onClose={() => setLocked(null)} title={locked ? chapterName(locked, lang) : ''}>
         <LockedNotice body={t('billing.lockedBody')} cta={t('states.unlock')} />
         <Btn title={t('common.close')} variant="line" onClick={() => setLocked(null)} className="mt-3 w-full" />
       </Sheet>

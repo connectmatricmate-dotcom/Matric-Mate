@@ -1,9 +1,9 @@
 
 import { useLocalSearchParams } from 'expo-router';
 import { Card, ErrorState, Header, Screen, Skeleton, Small, Spacer } from '../../../src/components/ui';
-import { chapterById, fetchCheatSheet } from '@matricmate/core';
+import { chapterById, chapterName, fetchCheatSheet } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
-import { useT } from '../../../src/i18n';
+import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { S } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
@@ -18,6 +18,7 @@ export default function RevisionSheet() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const chapter = chapterById(id);
 
   const sheet = useAsync(async () => {
@@ -28,7 +29,7 @@ export default function RevisionSheet() {
 
   return (
     <Screen>
-      <Header title={t('tutor.sheetTitle')} sub={chapter?.title ?? ''} back />
+      <Header title={t('tutor.sheetTitle')} sub={chapter ? chapterName(chapter, lang) : ''} back />
       {sheet.loading ? (
         <>
           <Small>{t('tutor.sheetBusy')}</Small>

@@ -20,7 +20,7 @@ import {
   TileGrid,
   Tiny,
 } from '../../src/components/ui';
-import { BILLING_SITE, formatDate } from '@matricmate/core';
+import { BILLING_SITE, chapterName, formatDate } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
@@ -144,7 +144,7 @@ export default function Tutor() {
           // The topic when they picked one, the chapter when they stopped
           // there. Either way the chapter id rides along, so the answer is
           // grounded in that chapter's own notes.
-          const draft = t('tutor.explainDraft', { chapter: topic ?? chapter.title });
+          const draft = t('tutor.explainDraft', { chapter: topic ?? chapterName(chapter, lang) });
           router.push(`/tutor/chat?chapter=${chapter.id}&draft=${encodeURIComponent(draft)}`);
         }}
       />

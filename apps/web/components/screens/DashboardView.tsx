@@ -62,7 +62,8 @@ export function DashboardView() {
 
   /** Plan labels are composed here so they follow the app language. */
   function planLabel(task: (typeof derived.plan)[number]) {
-    const name = chapterById(task.chapterId)?.title ?? '';
+    const chapter = chapterById(task.chapterId);
+    const name = chapter ? chapterName(chapter, lang) : '';
     if (task.kind === 'read') return t('dash.taskRead', { chapter: name });
     if (task.kind === 'mcq') return t('dash.taskMcq', { chapter: name });
     if (task.weakTopic) return t('dash.taskWeak', { topic: task.weakTopic, n: task.weakAccuracy ?? 0 });

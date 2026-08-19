@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { checkAnswerLive } from '@matricmate/core';
+import { chapterById, chapterName, checkAnswerLive } from '@matricmate/core';
 import type { AiCheckVerdict, ShortQ } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
@@ -10,7 +10,7 @@ import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/pr
 import { ScriptBullets } from '@/components/ui/ScriptList';
 import { useToast } from '@/components/ui/toast';
 import { fireConfetti } from '@/lib/confetti';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
 
 type Mark = 'got' | 'partial' | 'missed';
@@ -26,6 +26,13 @@ export function ShortQScreen({
 }) {
   const { state, actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
+  /* The name a student reads, which is not the name an attempt is filed
+     under. `chapterTitle` comes from the server in English and keeps feeding
+     `topic` so weak-topic stats do not split in two when somebody switches
+     language; the heading and the pill follow the app's language instead. */
+  const chapter = chapterById(chapterId);
+  const name = chapter ? chapterName(chapter, lang) : chapterTitle;
   const toast = useToast();
   const [i, setI] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -98,7 +105,7 @@ export function ShortQScreen({
     const got = marks.filter((m) => m === 'got').length;
     return (
       <Page width="focus">
-        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={chapterTitle} title={t('practice.shortQ')} />
+        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={name} title={t('practice.shortQ')} />
         <Card className="flex flex-col items-center gap-2 py-7 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-tealtint text-teal">
             <Icon name="quill" size={26} />
@@ -115,7 +122,7 @@ export function ShortQScreen({
     <Page width="focus">
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
-        backLabel={chapterTitle}
+        backLabel={name}
         pct={(i / Math.max(1, items.length)) * 100}
         label={`${t('practice.shortQ')} · ${t('session.shortQOf', { a: i + 1, b: items.length })}`}
         segments={items.map((_, j) =>

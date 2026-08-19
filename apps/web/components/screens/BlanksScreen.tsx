@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import type { Blank } from '@matricmate/core';
-import { blankHalves, isUrduScript } from '@matricmate/core';
+import { blankHalves, chapterById, chapterName, isUrduScript } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function BlanksScreen({
   chapterId,
@@ -21,6 +21,13 @@ export function BlanksScreen({
 }) {
   const { actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
+  /* The name a student reads, which is not the name an attempt is filed
+     under. `chapterTitle` comes from the server in English and keeps feeding
+     `topic` so weak-topic stats do not split in two when somebody switches
+     language; the heading and the pill follow the app's language instead. */
+  const chapter = chapterById(chapterId);
+  const name = chapter ? chapterName(chapter, lang) : chapterTitle;
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -61,7 +68,7 @@ export function BlanksScreen({
   if (done) {
     return (
       <Page width="focus">
-        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={chapterTitle} title={t('practice.blanks')} />
+        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={name} title={t('practice.blanks')} />
         <Card className="flex flex-col items-center gap-2 py-7 text-center">
           <span
             className={`flex h-14 w-14 items-center justify-center rounded-full ${
@@ -84,11 +91,11 @@ export function BlanksScreen({
     <Page width="focus">
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
-        backLabel={chapterTitle}
+        backLabel={name}
         pct={(i / Math.max(1, items.length)) * 100}
         label={`${t('practice.blanks')} · ${t('session.blanksItem', { a: i + 1, b: items.length })}`}
         segments={items.map((_, j) => marks[j] ?? (j === i && !checked ? 'current' : 'todo'))}
-        right={<Pill tone="grey">{chapterTitle}</Pill>}
+        right={<Pill tone="grey">{name}</Pill>}
       />
 
       {/* Same task frame as the MCQ and exam screens */}

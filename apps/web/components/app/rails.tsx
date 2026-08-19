@@ -7,7 +7,7 @@
 import Link from 'next/link';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
-import { accuracy, chapterById, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
+import { accuracy, chapterById, chapterName, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
 import type { CoachReport } from '@matricmate/core';
 import { Bar, Card, Icon, Label, Pill, Ring, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { ScriptNumbers } from '@/components/ui/ScriptList';
@@ -246,6 +246,7 @@ export function UpgradeRail() {
 export function CoachRail() {
   const { state, derived } = useApp();
   const t = useT();
+  const { lang } = useLang();
   /**
    * The settled result, tagged with who it belongs to.
    *
@@ -324,7 +325,7 @@ export function CoachRail() {
         />
         <Label>{t('tutor.coachFirstSteps')}</Label>
         <ScriptNumbers
-          items={[t('tutor.coachStep1', { chapter: first?.title ?? '' }), t('tutor.coachStep2'), t('tutor.coachStep3')]}
+          items={[t('tutor.coachStep1', { chapter: first ? chapterName(first, lang) : '' }), t('tutor.coachStep2'), t('tutor.coachStep3')]}
           className="text-[12.5px] leading-[1.5] text-ink2"
           listClassName="flex flex-col gap-1"
         />

@@ -15,6 +15,7 @@ import {
   Pill,
   Row,
   Screen,
+  ScriptText,
   Sheet,
   Skeleton,
   Small,
@@ -23,10 +24,10 @@ import {
   Ur,
   useToast,
 } from '../../../src/components/ui';
-import { api , Block, isUrduScript } from '@matricmate/core';
+import { api , Block, chapterName, isUrduScript } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
 import { useOnline } from '../../../src/core/connectivity';
-import { useT } from '../../../src/i18n';
+import { useLang, useT } from '../../../src/i18n';
 import type { StringKey } from '../../../src/i18n';
 import { localChapter } from '../../../src/core/downloads';
 import { useApp } from '../../../src/store/app';
@@ -152,6 +153,7 @@ export default function Reader() {
   const quota = useQuota();
   const aiLeft = quota?.remaining ?? derived.aiLeft;
   const t = useT();
+  const { lang } = useLang();
   const online = useOnline();
   const toast = useToast();
   const insets = useSafeAreaInsets();
@@ -237,9 +239,9 @@ export default function Reader() {
         <Row style={{ paddingHorizontal: S.md, paddingBottom: S.sm, borderBottomWidth: 1, borderBottomColor: C.line }} gap={S.sm}>
           <IconButton icon="back" onPress={() => router.back()} />
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.ink }} numberOfLines={1}>
-              {chapter?.title ?? ''}
-            </Text>
+            {/* The chapter name in the student's own language, in the face
+                that script needs: this is the reader's only title. */}
+            <ScriptText text={chapter ? chapterName(chapter, lang) : ''} face="bodyBold" size={13.5} lines={1} />
             <View style={{ marginTop: 6 }}>
               <Bar pct={readPct} tone="teal" h={4} />
             </View>
@@ -354,7 +356,7 @@ export default function Reader() {
 
       <Sheet visible={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>
         <Row gap={S.sm} style={{ marginBottom: S.md, flexWrap: 'wrap' }}>
-          {chapter ? <Pill tone="teal">{chapter.title}</Pill> : null}
+          {chapter ? <Pill tone="teal">{chapterName(chapter, lang)}</Pill> : null}
           <Pill tone={aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: aiLeft })}</Pill>
         </Row>
         <View style={{ gap: S.sm }}>

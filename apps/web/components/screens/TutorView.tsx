@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDate } from '@matricmate/core';
+import { chapterName, formatDate } from '@matricmate/core';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -115,7 +115,7 @@ export function TutorView() {
             onClose={() => setPicking(false)}
             onPick={({ chapter, topic }) => {
               setPicking(false);
-              const draft = t('tutor.explainDraft', { chapter: topic ?? chapter.title });
+              const draft = t('tutor.explainDraft', { chapter: topic ?? chapterName(chapter, lang) });
               router.push(`/tutor/chat?chapter=${chapter.id}&draft=${encodeURIComponent(draft)}`);
             }}
           />

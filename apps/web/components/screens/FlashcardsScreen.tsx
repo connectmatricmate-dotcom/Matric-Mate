@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import type { Flashcard } from '@matricmate/core';
+import { chapterById, chapterName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill, ScriptText, Ur } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 
 export function FlashcardsScreen({
   chapterId,
@@ -20,6 +21,13 @@ export function FlashcardsScreen({
 }) {
   const { actions } = useApp();
   const t = useT();
+  const { lang } = useLang();
+  /* The name a student reads, which is not the name an attempt is filed
+     under. `chapterTitle` comes from the server in English and keeps feeding
+     `topic` so weak-topic stats do not split in two when somebody switches
+     language; the heading and the pill follow the app's language instead. */
+  const chapter = chapterById(chapterId);
+  const name = chapter ? chapterName(chapter, lang) : chapterTitle;
   const [i, setI] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [repeats, setRepeats] = useState<string[]>([]);
@@ -45,7 +53,7 @@ export function FlashcardsScreen({
   if (done) {
     return (
       <Page width="focus">
-        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={chapterTitle} title={t('study.flashcards')} />
+        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={name} title={t('study.flashcards')} />
         <Card className="flex flex-col items-center gap-2 py-7 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-greentint text-green">
             <Icon name="party" size={26} />
@@ -76,11 +84,11 @@ export function FlashcardsScreen({
     <Page width="focus">
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
-        backLabel={chapterTitle}
+        backLabel={name}
         pct={(i / Math.max(1, cards.length)) * 100}
         label={`${t('study.flashcards')} · ${t('session.cardOf', { a: i + 1, b: cards.length })}`}
         segments={cards.map((_, j) => (j < i ? 'done' : j === i ? 'current' : 'todo'))}
-        right={<Pill tone="grey">{chapterTitle}</Pill>}
+        right={<Pill tone="grey">{name}</Pill>}
       />
 
       <button

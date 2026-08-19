@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { chapterById, fetchCheatSheet } from '@matricmate/core';
+import { chapterById, chapterName, fetchCheatSheet } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Skeleton } from '@/components/ui/primitives';
-import { useApp, useT } from '@/lib/store';
+import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
 
 /**
@@ -17,7 +17,9 @@ import { Markdown } from '@/components/ui/Markdown';
 export function SheetScreen({ chapterId }: { chapterId: string }) {
   const { state } = useApp();
   const t = useT();
+  const { lang } = useLang();
   const chapter = chapterById(chapterId);
+  const name = chapter ? chapterName(chapter, lang) : '';
 
   const medium = state.settings.contentMedium;
   // Keyed by request, so switching chapter or medium shows the loading state
@@ -41,7 +43,7 @@ export function SheetScreen({ chapterId }: { chapterId: string }) {
 
   return (
     <Page width="read">
-      <PageHead back={`/learn/chapter/${chapterId}`} backLabel={chapter?.title ?? ''} title={t('tutor.sheetTitle')} sub={chapter?.title} />
+      <PageHead back={`/learn/chapter/${chapterId}`} backLabel={name} title={t('tutor.sheetTitle')} sub={name} />
       {failed ? (
         <Card flat tint="bg-redtint" border="border-red">
           <p className="text-[13.5px] font-extrabold text-red">{t('states.errorTitle')}</p>
