@@ -69,6 +69,22 @@ export function fbisePastPapersByYear(grade: number = 9): { year: number; papers
   return years.map((year) => ({ year, papers: papers.filter((p) => p.year === year) }));
 }
 
+/**
+ * The span of past papers we actually link to, or null when there are none.
+ *
+ * The practice tile advertised "FBISE 2019 to 2025" as a literal in both
+ * language tables while the catalogue held nine papers across 2023, 2024 and
+ * 2025, all Class 9. A Class 10 student got the same promise over the honest
+ * empty state behind it. The tile reads this instead, so it can only ever
+ * claim what the catalogue has.
+ */
+export function pastPaperYears(grade: number = 9): { from: number; to: number; count: number } | null {
+  const papers = fbisePastPapers(grade);
+  if (!papers.length) return null;
+  const years = papers.map((p) => p.year);
+  return { from: Math.min(...years), to: Math.max(...years), count: papers.length };
+}
+
 /** A subject's topper scripts, script 1 first. */
 export function fbiseToppersFor(subjectId: string): FbiseTopperPaper[] {
   return catalogue.toppers

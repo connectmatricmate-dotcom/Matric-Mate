@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDate } from '@matricmate/core';
+import { formatDate, pastPaperYears } from '@matricmate/core';
 import Link from 'next/link';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
@@ -23,6 +23,20 @@ export function PracticeView() {
   const t = useT();
   const { lang } = useLang();
   const recent = state.results.slice(0, 5);
+
+  /**
+   * The past papers tile says what the catalogue actually holds.
+   *
+   * It used to read "FBISE 2019 to 2025" from a literal in both language
+   * tables, over nine papers across 2023, 2024 and 2025, all Class 9. A Class
+   * 10 student got the same promise above the honest empty state behind it.
+   */
+  const classLevel = state.onboarding?.classLevel ?? 9;
+  const years = pastPaperYears(classLevel);
+  const papersSub = years
+    ? t('practice.papersSub', { years: years.from === years.to ? years.from : `${years.from} to ${years.to}` })
+    : t('practice.papersSubNone', { n: classLevel });
+  const subFor = (m: (typeof MODES)[number]) => (m.href === '/session/papers' ? papersSub : t(m.sub));
 
   return (
     <Page>
@@ -49,7 +63,7 @@ export function PracticeView() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[14.5px] font-extrabold text-ink">{t(m.label)}</span>
-                      <span className="block text-[12.5px] leading-[1.5] text-ink2">{t(m.sub)}</span>
+                      <span className="block text-[12.5px] leading-[1.5] text-ink2">{subFor(m)}</span>
                     </span>
                     <Icon name="chevron" size={18} className="text-ink3" />
                   </Card>
@@ -61,7 +75,7 @@ export function PracticeView() {
                       <Icon name={m.icon} size={20} />
                     </span>
                     <span className="mt-0.5 text-[14.5px] font-extrabold text-ink">{t(m.label)}</span>
-                    <span className="text-[12.5px] leading-[1.5] text-ink2">{t(m.sub)}</span>
+                    <span className="text-[12.5px] leading-[1.5] text-ink2">{subFor(m)}</span>
                   </Card>
                 </Link>
               ),

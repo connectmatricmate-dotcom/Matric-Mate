@@ -1,4 +1,4 @@
-import { formatDate } from '@matricmate/core';
+import { formatDate, pastPaperYears } from '@matricmate/core';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
@@ -50,6 +50,20 @@ export default function Practice() {
   // A dimmed tile that swallows the tap teaches nothing: the student cannot
   // tell the app from a dead one. Same sheet the study shelf opens.
   const [showLocked, setShowLocked] = useState(false);
+  /**
+   * The past papers tile says what the catalogue actually holds.
+   *
+   * It used to read "FBISE 2019 to 2025" from a literal in both language
+   * tables, over nine papers across 2023, 2024 and 2025, all Class 9. A Class
+   * 10 student got the same promise above the honest empty state behind it.
+   */
+  const classLevel = state.onboarding?.classLevel ?? 9;
+  const years = pastPaperYears(classLevel);
+  const papersSub = years
+    ? t('practice.papersSub', { years: years.from === years.to ? years.from : `${years.from} to ${years.to}` })
+    : t('practice.papersSubNone', { n: classLevel });
+  const subFor = (m: (typeof MODES)[number]) => (m.href === '/session/papers' ? papersSub : t(m.sub));
+
 
   return (
     <Screen tabbed>
@@ -79,7 +93,7 @@ export default function Practice() {
                 <Icon name={open ? m.icon : 'lock'} color={C.orangeDark} />
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t(m.label)}</Text>
-                  <Small style={{ fontSize: 11.5 }}>{t(m.sub)}</Small>
+                  <Small style={{ fontSize: 11.5 }}>{subFor(m)}</Small>
                 </View>
                 <Chevron size={18} color={C.ink3} />
               </Card>
@@ -91,7 +105,7 @@ export default function Practice() {
                 <Icon name={open ? m.icon : 'lock'} color={C.teal} />
                 <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t(m.label)}</Text>
                 <Small style={{ fontSize: 11.5 }} numberOfLines={2}>
-                  {t(m.sub)}
+                  {subFor(m)}
                 </Small>
               </Card>
             ),
