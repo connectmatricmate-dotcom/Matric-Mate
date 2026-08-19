@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { adminStats } from '@/lib/admin-stats';
 import { Panel, Stat, StatGrid, rupees } from '@/components/admin/bits';
+import { GrantPremium } from '@/components/admin/GrantPremium';
+import { PLANS, THE_PLAN } from '@/lib/plans';
 
 /**
  * The admin overview. Five questions, answered.
@@ -43,6 +45,12 @@ export default async function AdminOverview() {
           />
         </StatGrid>
       </div>
+
+      <Panel title="Give a student Premium">
+        <div className="px-4 py-4">
+          <GrantPremium plans={PLANS.map((p) => ({ id: p.id, name: p.name }))} defaultPrice={THE_PLAN.price} />
+        </div>
+      </Panel>
 
       <Panel
         title="Teachers"

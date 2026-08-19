@@ -5,9 +5,11 @@ import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole, emailAllowedAsAdmin } from '@/lib/roles';
+import { markPaidAndGrant, recordPendingPayment } from '@/lib/payments';
+import { PLANS, planById } from '@/lib/plans';
 
 /**
- * Everything the admin panel can do. Three actions, all of them privileged.
+ * Everything the admin panel can do. Four actions, all of them privileged.
  *
  * Each one re-checks who is calling. The layout guard is what stops the page
  * rendering, and a server action is a public HTTP endpoint that does not go
@@ -145,6 +147,88 @@ export async function recordPayoutAction(_prev: AdminState, formData: FormData):
   revalidatePath(`/admin/teachers/${parsed.data.affiliateId}`);
   revalidatePath('/admin/teachers');
   return { ok: `Recorded Rs ${parsed.data.amount.toLocaleString('en-PK')}.` };
+}
+
+const Grant = z.object({
+  email: z.string().trim().toLowerCase().email('Enter the student’s email address.'),
+  planId: z.enum(PLANS.map((p) => p.id) as [string, ...string[]]),
+  amount: z.coerce.number().int('Enter whole rupees.').min(0).max(10_000_000),
+  note: z.string().trim().max(300).optional().or(z.literal('')),
+});
+
+/**
+ * Give a student Premium for money taken outside the app.
+ *
+ * This exists because the gateway cannot yet complete a payment, so the only
+ * way anybody buys is a bank transfer, a wallet or cash in the office, and
+ * Adnan needs to act on that without waiting for a developer to run SQL. It
+ * stays useful afterwards: comped accounts, a support fix, a refund settled
+ * as extra time.
+ *
+ * It writes a PAYMENT, not just an entitlement, and that is the whole point.
+ * Revenue on the overview and every teacher's commission are computed from
+ * `payments` where status is paid, so granting access on its own would show
+ * Rs 0 collected and quietly pay a teacher nothing for a student who really
+ * did pay. Same path as a real payment for exactly that reason: the row, then
+ * markPaidAndGrant, which extends from whichever is later and sends the
+ * receipt the student would have got anyway.
+ */
+export async function grantPremiumAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  const who = await requireAdmin();
+  if ('error' in who) return { error: who.error };
+
+  const parsed = Grant.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Check the form.' };
+
+  const admin = createAdminClient();
+  const plan = planById(parsed.data.planId);
+
+  /*
+   * Find the account by email. There is no email column on `profiles`, so this
+   * has to go through the auth admin API, which is paged: reading page one and
+   * calling it a search works until the 201st student signs up and then fails
+   * silently, telling Adnan an account does not exist while he is looking at
+   * the person who owns it. Page until found.
+   */
+  let user: { id: string } | undefined;
+  for (let page = 1; page <= 50 && !user; page++) {
+    const { data: found, error: lookupError } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+    if (lookupError) return { error: `Could not look that account up: ${lookupError.message}` };
+    user = found.users.find((u) => u.email?.toLowerCase() === parsed.data.email);
+    if (found.users.length < 200) break;
+  }
+  if (!user) return { error: 'No account with that email. They need to sign up first.' };
+
+  const { data: profile } = await admin.from('profiles').select('role, name').eq('id', user.id).maybeSingle();
+  if (profile?.role && profile.role !== 'student') {
+    // A plan buys chapters and a tutor. Staff have neither screen.
+    return { error: 'That account is a teacher or an administrator, not a student.' };
+  }
+
+  const amount = parsed.data.amount || plan.price;
+  const stamp = Date.now().toString(36);
+  const tracker = `MANUAL-${stamp}`;
+
+  await recordPendingPayment({
+    userId: user.id,
+    tracker,
+    orderId: `MM-manual-${stamp}`,
+    planId: plan.id,
+    amountRupees: amount,
+  });
+
+  const result = await markPaidAndGrant({
+    tracker,
+    reference: `manual by admin`,
+    raw: { source: 'admin-grant', by: who.id, note: parsed.data.note || null, amount },
+  });
+
+  if (!result.handled) return { error: 'Could not record that. Nothing was changed.' };
+
+  revalidatePath('/admin');
+  return {
+    ok: `${profile?.name || parsed.data.email} now has ${plan.name} Premium. Rs ${amount.toLocaleString('en-PK')} recorded.`,
+  };
 }
 
 /**
