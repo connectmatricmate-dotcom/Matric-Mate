@@ -43,25 +43,34 @@ export default function Progress() {
           <View style={{ flex: 1 }}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{t('progress.syllabusCovered')}</Text>
             <Small>{derived.streak > 0 ? t('progress.streakAlive', { n: derived.streak }) : t('progress.noStreak')}</Small>
-            <Row gap={4} style={{ marginTop: S.sm }}>
-              {days.map((on, i) => (
-                <View
-                  key={i}
-                  style={{
-                    width: 14,
-                    height: 22,
-                    borderRadius: 5,
-                    backgroundColor: on ? C.orangeTint : C.grey,
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                  }}
-                >
-                  {on ? <Text style={{ fontSize: 8 }}>🔥</Text> : null}
-                </View>
-              ))}
-            </Row>
           </View>
         </Row>
+
+        {/*
+          Its own full-width row, and chips that share the width.
+          Fourteen fixed 14px chips with a 4px gap need 248px and had 196
+          beside the ring on a 360dp phone, which is the screen this app is
+          designed for, so the last few fell outside the card. flex: 1 makes
+          the strip fit whatever it is given, the way the web rail already did.
+        */}
+        <Row gap={3} style={{ marginTop: S.md }}>
+          {days.map((on, i) => (
+            <View
+              key={i}
+              style={{
+                flex: 1,
+                height: 22,
+                borderRadius: 5,
+                backgroundColor: on ? C.orangeTint : C.grey,
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}
+            >
+              {on ? <Text style={{ fontSize: 8 }}>🔥</Text> : null}
+            </View>
+          ))}
+        </Row>
+        <Small style={{ marginTop: 6, fontSize: 11.5 }}>{t('progress.last14')}</Small>
       </Card>
 
       <Spacer h={S.md} />
