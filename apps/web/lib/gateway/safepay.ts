@@ -96,39 +96,29 @@ export const safepayProvider: PaymentProvider = {
   },
 
   async startCheckout(req: CheckoutRequest): Promise<CheckoutStart> {
-    /**
-     * Just the tracker.
-     *
-     * A Safepay customer record used to be minted here too, but there is no
-     * parameter on the hosted checkout URL that attaches one to a payment, so
-     * every record was an orphan: it cost a round trip, needed a phone number,
-     * and never appeared against the transaction it was meant to explain. It
-     * becomes worth having again with a custom checkout that can use saved
-     * cards.
-     */
     /*
-     * Three calls, two round trips deep: the payer record and the credential
-     * are independent, and only the session needs the customer token.
+     * The customer record is not decoration. Without one on the session,
+     * Safepay's page tries to mint a guest payer when the student presses
+     * Pay, using a token its own boot already spent, and the student gets
+     * "Unauthorized access, Please sign up or login first" after typing a
+     * full card form. Observed on 19 August 2026, network tab: the page's
+     * POST /user/v2/guest/ answers 401 with the page's own Bearer token,
+     * while a fresh token passes. So: with a phone we insist on the record,
+     * one retry for a blip, and refuse the checkout rather than hand the
+     * student a form that cannot be submitted. Reused when we already have
+     * one: their docs warn against minting a second for somebody who exists.
      *
-     * The customer record is what lets Safepay fill the payer's email in for
-     * them. It is best-effort by design: `createCustomer` answers null rather
-     * than throwing, so a checkout still works when that call does not.
-     */
-    /*
-     * The payer record is what prefills their email, name and phone on
-     * Safepay's page, and it is attached through the session's `user` field
-     * rather than the URL. Reused when we already have one: their docs warn
-     * against minting a second for somebody who exists.
-     *
-     * It needs a phone number. Their docs say otherwise and their API answers
-     * 400 without one, so no phone means no record and the payer types their
-     * own email. That is a worse checkout, not a broken one, which is why
-     * nothing here throws.
+     * The record needs a phone number, whatever their docs say: omitted,
+     * empty and null all answer 400. Signup collects one on both apps, so a
+     * missing phone is a legacy account; that checkout is allowed through on
+     * the old best-effort terms rather than locked out entirely.
      */
     let customer = req.existingCustomer ?? null;
     if (!customer && req.payer.phone) {
-      customer = await createCustomer({ email: req.payer.email, name: req.payer.name, phone: req.payer.phone });
-      if (customer) await req.onCustomer?.(customer);
+      const payer = { email: req.payer.email, name: req.payer.name, phone: req.payer.phone };
+      customer = (await createCustomer(payer)) ?? (await createCustomer(payer));
+      if (!customer) throw new Error('safepay: customer record failed twice; a checkout without one cannot be paid');
+      await req.onCustomer?.(customer);
     }
     const [tracker, tbt] = await Promise.all([
       // Paisa. v3 takes the lowest denomination and v1 took whole rupees, so

@@ -39,14 +39,12 @@ export async function POST(request: Request) {
   const plan = planById(parsed.success ? (parsed.data.plan ?? THE_PLAN.id) : THE_PLAN.id);
 
   /**
-   * No phone number is asked for any more.
+   * The phone comes from signup, not from a checkout field.
    *
-   * It was collected because Safepay refuses to mint a guest session without
-   * one, and that session was supposed to pin the payer's email at checkout. It
-   * does not: the hosted page reads `auth_token` only when there is no tracker,
-   * which is the subscribe flow, so on this route it was ignored. With the
-   * session gone the number had no remaining job, and asking a fifteen year old
-   * for their mobile to no purpose is a field that only loses conversions.
+   * Both apps collect a mobile at signup, and the gateway needs one to mint
+   * the payer record that a payment cannot proceed without. The optional
+   * `phone` in the body exists for legacy accounts that predate the signup
+   * field, so a client that has one to offer can heal the profile here.
    */
   const admin = createAdminClient();
   const { data: profile } = await admin
@@ -98,9 +96,8 @@ export async function POST(request: Request) {
      * URL. This route's job is deciding who is paying and for what, which is
      * the part that stays true whoever processes the money.
      *
-     * The payer types their own email on the provider's page and we cannot
-     * prefill it. The payment is tied to the account by the pending row below,
-     * keyed on the reference, never by what they type.
+     * The payment is tied to the account by the pending row below, keyed on
+     * the reference, never by what the payer types on the provider's page.
      */
     const { url, reference } = await gateway.startCheckout({
       amountRupees: plan.price,

@@ -164,15 +164,26 @@ export async function createPassportToken(): Promise<string> {
  */
 export async function createCustomer(payer: { email: string; name?: string; phone: string }): Promise<string | null> {
   if (!SECRET_KEY) return null;
-  const [first, ...rest] = (payer.name ?? '').trim().split(/\s+/);
+  /*
+   * Safepay demands both names be 2 to 40 characters. Half our students have
+   * a single-word name, and the old '-' filler was one character, so every
+   * one of them got a 400 here, silently lost the customer record, and then
+   * met "Unauthorized access" on Safepay's page at the moment of paying: the
+   * page falls back to POST /user/v2/guest/, whose token their own page has
+   * already spent. A mononym goes in both fields; the payer can edit it.
+   */
+  const fit = (s: string) => (s.length < 2 ? `${s}.`.slice(0, 2) : s.slice(0, 40));
+  const words = (payer.name ?? '').trim().split(/\s+/).filter(Boolean);
+  const first = fit(words[0] || 'Student');
+  const rest = words.slice(1).join(' ');
   try {
     const res = await fetch(`${HOST}/user/customers/v1/`, {
       method: 'POST',
       headers: secretHeaders(),
       cache: 'no-store',
       body: JSON.stringify({
-        first_name: first || 'Student',
-        last_name: rest.join(' ') || '-',
+        first_name: first,
+        last_name: rest ? fit(rest) : first,
         email: payer.email,
         // Required, whatever the docs say. Omitted, empty and null all answer
         // 400 "phone_number: the phone number supplied is not a number".
