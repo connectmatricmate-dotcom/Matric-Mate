@@ -521,12 +521,45 @@ export async function syncAccountPrefs(client: SyncClient, userId: string, prefs
 /** How long a hydration attempt is allowed to hang before giving up on it. */
 const HYDRATE_TIMEOUT_MS = 8000;
 
+/**
+ * Every row of a table that can outgrow a page, not the first thousand.
+ *
+ * PostgREST answers at most a thousand rows and does not say that it
+ * truncated, which is the trap the content audit script was written around and
+ * the same one this file had: read_sections and cards_known were read with no
+ * limit at all, and a student who finishes a subject can pass a thousand known
+ * cards. One request for anyone normal, because a short page ends the loop.
+ */
+const PAGE = 1000;
+const PAGE_LIMIT = 10;
+
+async function pageAll<T>(
+  page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
+): Promise<{ data: T[]; error: unknown }> {
+  const rows: T[] = [];
+  for (let i = 0; i < PAGE_LIMIT; i += 1) {
+    const { data, error } = await page(i * PAGE, (i + 1) * PAGE - 1);
+    if (error) return { data: rows, error };
+    const batch = data ?? [];
+    rows.push(...batch);
+    if (batch.length < PAGE) break;
+  }
+  return { data: rows, error: null };
+}
+
 async function fetchStudyState(client: SyncClient, userId: string): Promise<HydratedStudyState> {
   const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, planRes, profileRes, notifsRes] = await Promise.all([
-    client.from('attempts').select('id,mcq_id,chapter_id,subject_id,topic,correct,confidence,mode,at').eq('user_id', userId).order('at', { ascending: true }).limit(1000),
+    /* Newest first, then capped. It was oldest first, so a student past a
+       thousand answers rebuilt their history on a new device from their first
+       thousand: months-old work, and the recent months missing entirely. */
+    client.from('attempts').select('id,mcq_id,chapter_id,subject_id,topic,correct,confidence,mode,at').eq('user_id', userId).order('at', { ascending: false }).limit(1000),
     client.from('results').select('id,subject_id,chapter_id,label,score,total,xp,mode,at').eq('user_id', userId).order('at', { ascending: false }).limit(100),
-    client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: true }),
-    client.from('cards_known').select('card_id').eq('user_id', userId),
+    pageAll<{ section_id: string; chapter_id: string; section_index: number; at: string }>((from, to) =>
+      client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: false }).range(from, to),
+    ),
+    pageAll<{ card_id: string }>((from, to) =>
+      client.from('cards_known').select('card_id').eq('user_id', userId).order('at', { ascending: false }).range(from, to),
+    ),
     client.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: true }).limit(400),
     // Today only: yesterday's ticks belong to yesterday's plan, and the task
     // ids carry the date anyway.
@@ -541,11 +574,11 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     attemptsRes.error ?? resultsRes.error ?? sectionsRes.error ?? cardsRes.error ?? daysRes.error ?? planRes.error ?? profileRes.error ?? notifsRes.error;
   if (error) throw error;
 
-  // Ordered ascending by `at`, so the last row is the most recently read
-  // section: exactly the reading position a reinstall or a second device
-  // needs to pick up from. No separate "last position" table needed for that.
-  const sections = (sectionsRes.data ?? []) as { section_id: string; chapter_id: string; section_index: number; at: string }[];
-  const last = sections[sections.length - 1];
+  // Ordered newest first, so the first row is the most recently read section:
+  // exactly the reading position a reinstall or a second device needs to pick
+  // up from. No separate "last position" table needed for that.
+  const sections = sectionsRes.data;
+  const last = sections[0];
 
   return {
     onboarding: ((profileRes.data as { onboarding?: Record<string, unknown> | null } | null)?.onboarding) ?? null,
