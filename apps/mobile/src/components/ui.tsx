@@ -23,7 +23,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useReducedMotion } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
-import { useKeyboardHeight } from '../core/keyboard';
+import { useKeyboardOverlap } from '../core/keyboard';
 import { C, F, R, S, T, WEB_MAX, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
 import { isUrduScript } from '@matricmate/core';
 import { Icon, IconName } from './Icon';
@@ -129,7 +129,7 @@ export function Screen({
   tabbed?: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  const keyboard = useKeyboardHeight();
+  const keyboard = useKeyboardOverlap();
   const scroller = useRef<ScrollView | null>(null);
   /** A plain View wrapped around the scroll area purely so there is something
    *  we can measure in window coordinates. Comparing an input's position

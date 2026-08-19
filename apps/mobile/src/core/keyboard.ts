@@ -3,27 +3,30 @@ import { Keyboard, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
- * How much of the screen the keyboard is covering, above the safe-area inset
- * the layout already reserves. Zero when it is down.
+ * How much of the bottom of the window the keyboard is covering. Zero when it
+ * is down. Pad a full-height container by exactly this and its content ends at
+ * the top of the keys.
  *
- * Why this is hand-rolled rather than `KeyboardAvoidingView`: that component
- * does nothing on Android unless you give it a `behavior`, and the app passed
- * `undefined` there, so on the one platform we actually ship, the four screens
- * that opted in were no better off than the ones that did not. Every input in
- * the app sat under the keyboard.
+ * The arithmetic is the whole point, and getting it wrong by one term is what
+ * left the chat composer half behind the keyboard on the first attempt.
  *
- * The numbers can be trusted. React Native 0.86 reads the Android keyboard
- * from `WindowInsetsCompat.Type.ime()` and reports its height with the system
- * bars already subtracted (see ReactRootView.checkForKeyboardEvents), which is
- * exactly the extra padding a layout that already reserves `insets.bottom`
- * needs. iOS measures from the bottom of the screen instead, so the home
- * indicator has to come off there.
+ * React Native reports the Android keyboard as `imeInsets.bottom -
+ * systemBars.bottom` (ReactRootView.checkForKeyboardEvents): the keys, with the
+ * navigation bar taken off. react-native-safe-area-context deliberately leaves
+ * the IME out of its own insets (SafeAreaUtils.kt asks for statusBars,
+ * displayCutout, navigationBars and captionBar, and the older code path says in
+ * as many words that the keyboard is not wanted there). So `insets.bottom` is
+ * the navigation bar and nothing else, whether or not the keyboard is up, and
+ * the two add back up to the real overlap. Padding by the keyboard alone left
+ * content sitting a navigation bar too low.
+ *
+ * iOS measures its keyboard from the bottom of the screen already, home
+ * indicator included, so there is nothing to add there.
  *
  * Android has no `will` events, only `did`. Subscribing to both pairs would
- * double-fire on iOS, so each platform gets the earliest pair it has: iOS can
- * animate with the keyboard, Android learns a frame later.
+ * double-fire on iOS, so each platform gets the earliest pair it has.
  */
-export function useKeyboardHeight(): number {
+export function useKeyboardOverlap(): number {
   const insets = useSafeAreaInsets();
   const [raw, setRaw] = useState(0);
 
@@ -40,5 +43,5 @@ export function useKeyboardHeight(): number {
   }, []);
 
   if (raw <= 0) return 0;
-  return Platform.OS === 'ios' ? Math.max(0, raw - insets.bottom) : raw;
+  return Platform.OS === 'ios' ? raw : raw + insets.bottom;
 }

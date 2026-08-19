@@ -798,3 +798,34 @@ export async function fetchFlashcards(
 ): Promise<Flashcard[]> {
   return (await fetchChapterContent(chapterId, client, want)).flashcards;
 }
+
+/**
+ * Just the section headings of one chapter, for the tutor's chapter picker.
+ *
+ * The third level of subject, chapter, topic. `queryChapterContent` above
+ * would answer the same question, but it drags every MCQ, flashcard, short
+ * question and blank for the chapter down the wire with it, which is a lot of
+ * a student's data allowance to spend on a list of headings. This reads the
+ * titles and nothing else.
+ *
+ * Same medium fallback as everywhere: the student's own medium if the chapter
+ * has been translated, English if it has not, per resource rather than per
+ * chapter.
+ */
+export async function fetchChapterTopics(chapterId: string, client?: ContentClient): Promise<string[]> {
+  const at = client ?? db;
+  if (!at) return [];
+  try {
+    const { data, error } = await table('chapter_sections', at)
+      .select('medium,position,title')
+      .eq('chapter_id', chapterId)
+      .order('position');
+    if (error || !data) return [];
+    const rows = data as { medium: string; title: string }[];
+    const wanted = rows.filter((r) => r.medium === medium);
+    const use = wanted.length ? wanted : rows.filter((r) => r.medium === 'en');
+    return use.map((r) => r.title).filter((title): title is string => !!title);
+  } catch {
+    return [];
+  }
+}

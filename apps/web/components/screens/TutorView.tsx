@@ -2,31 +2,42 @@
 
 import { formatDate } from '@matricmate/core';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { TutorBudgetRail, WeakRail } from '@/components/app/rails';
 import { Card, Empty, Icon, Item } from '@/components/ui/primitives';
+import { ChapterPicker } from '@/components/ui/ChapterPicker';
 import { useApp, useLang, useT } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
 
 type ThreadRow = { id: string; title: string; context_label: string | null; updated_at: string };
 
-const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: string }[] = [
-  { label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark', prompt: '' },
-  { label: 'tutor.explainTopic', sub: 'tutor.explainTopicSub', icon: 'book', prompt: 'Explain Newton’s second law simply' },
-  {
-    label: 'tutor.solveQuestion',
-    sub: 'tutor.solveQuestionSub',
-    icon: 'calc',
-    prompt: 'A 5 kg body is pushed with 20 N. Find its acceleration.',
-  },
-  { label: 'tutor.conceptClarity', sub: 'tutor.conceptClaritySub', icon: 'help', prompt: 'What is inertia? Give an example.' },
+/**
+ * Three ways in, and not one of them spends a question.
+ *
+ * There were four, and three carried a hardcoded prompt that was sent the
+ * instant you clicked the tile: "Explain a topic" asked about Newton's second
+ * law, whoever you were. A Class 10 biology student clicking it got a physics
+ * answer to a question they had not asked, in English however they had set the
+ * app, and it cost them one of their fifty for the day. The fourth, "Make it
+ * simple", opened the same chat as the first: four doors into one room.
+ *
+ * Now each tile opens the composer in a different state and the student
+ * presses send. Same three as the Android app, deliberately.
+ */
+const ENTRIES: { key: 'ask' | 'explain' | 'photo'; label: StringKey; sub: StringKey; icon: IconName }[] = [
+  { key: 'ask', label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark' },
+  { key: 'explain', label: 'tutor.explainTopic', sub: 'tutor.explainTopicSub', icon: 'book' },
+  { key: 'photo', label: 'tutor.solveQuestion', sub: 'tutor.solveQuestionSub', icon: 'camera' },
 ];
 
 export function TutorView() {
   const { derived } = useApp();
+  const router = useRouter();
+  const [picking, setPicking] = useState(false);
   const t = useT();
   const { lang } = useLang();
 
@@ -63,9 +74,9 @@ export function TutorView() {
       <Split>
         <Work className="flex flex-col gap-6">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {ENTRIES.map((e) => (
-              <Link key={e.label} href={e.prompt ? `/tutor/chat?q=${encodeURIComponent(e.prompt)}` : '/tutor/chat'}>
-                <Card className="flex h-full items-start gap-3 transition-colors duration-200 hover:border-teal">
+            {ENTRIES.map((e) => {
+              const body = (
+                <Card className="flex h-full items-start gap-3 text-start transition-colors duration-200 hover:border-teal">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-tealtint text-teal">
                     <Icon name={e.icon} size={20} />
                   </span>
@@ -74,9 +85,34 @@ export function TutorView() {
                     <span className="block text-[12.5px] leading-[1.5] text-ink2">{t(e.sub)}</span>
                   </span>
                 </Card>
-              </Link>
-            ))}
+              );
+              // The chapter one opens a dialog rather than navigating, so it is
+              // a button. The other two are real destinations and stay links,
+              // which keeps middle-click and open-in-new-tab working.
+              return e.key === 'explain' ? (
+                <button key={e.key} type="button" onClick={() => setPicking(true)} className="block h-full w-full">
+                  {body}
+                </button>
+              ) : (
+                <Link key={e.key} href={e.key === 'photo' ? '/tutor/chat?photo=1' : '/tutor/chat'} className="block h-full">
+                  {body}
+                </Link>
+              );
+            })}
           </div>
+
+          {/* Picking a chapter prefills the box and stops. Nothing is sent
+              until the student sends it, and the chapter rides along as
+              context so the answer comes out of their own notes. */}
+          <ChapterPicker
+            open={picking}
+            onClose={() => setPicking(false)}
+            onPick={({ chapter, topic }) => {
+              setPicking(false);
+              const draft = t('tutor.explainDraft', { chapter: topic ?? chapter.title });
+              router.push(`/tutor/chat?chapter=${chapter.id}&draft=${encodeURIComponent(draft)}`);
+            }}
+          />
 
           <Link href="/tutor/ai-test" className="block">
             <Card border="border-orange" className="flex items-center gap-3 transition-colors duration-200 hover:brightness-[0.99]">

@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { ChapterPicker } from '../../src/components/ChapterPicker';
 import { Icon, IconName } from '../../src/components/Icon';
 import {
   Card,
@@ -25,17 +27,32 @@ import { useApp } from '../../src/store/app';
 import { C, F, S, rowDir } from '../../src/theme';
 import { useQuota } from '../../src/core/useQuota';
 
-const ENTRIES: { label: StringKey; sub: StringKey; icon: IconName; prompt: string }[] = [
-  { label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark', prompt: '' },
-  { label: 'tutor.explainTopic', sub: 'tutor.explainTopicSub', icon: 'book', prompt: 'Explain Newton’s second law simply' },
-  { label: 'tutor.solveQuestion', sub: 'tutor.solveQuestionSub', icon: 'calc', prompt: 'A 5 kg body is pushed with 20 N. Find its acceleration.' },
-  { label: 'tutor.conceptClarity', sub: 'tutor.conceptClaritySub', icon: 'help', prompt: 'What is inertia? Give an example.' },
+/**
+ * Three ways in, and not one of them spends a question.
+ *
+ * There were four, and three carried a hardcoded prompt that was sent the
+ * instant you tapped the tile: "Explain a topic" asked about Newton's second
+ * law, whoever you were. A Class 10 biology student tapping it got a physics
+ * answer to a question they had not asked, in English however they had set the
+ * app, and it cost them one of their fifty for the day. The fourth, "Make it
+ * simple", opened the same chat as the first: four doors into one room.
+ *
+ * Now each tile opens the composer in a different state and the student
+ * presses send. `ask` is an empty box. `explain` picks one of their own
+ * chapters first and prefills a question they can edit. `photo` opens the
+ * camera, which is the one genuinely different thing you can do here.
+ */
+const ENTRIES: { key: 'ask' | 'explain' | 'photo'; label: StringKey; sub: StringKey; icon: IconName; full?: boolean }[] = [
+  { key: 'ask', label: 'tutor.askDoubt', sub: 'tutor.askDoubtSub', icon: 'spark', full: true },
+  { key: 'explain', label: 'tutor.explainTopic', sub: 'tutor.explainTopicSub', icon: 'book' },
+  { key: 'photo', label: 'tutor.solveQuestion', sub: 'tutor.solveQuestionSub', icon: 'camera' },
 ];
 
 type ThreadRow = { id: string; title: string; context_label: string | null; updated_at: string };
 
 export default function Tutor() {
   const { state, derived } = useApp();
+  const [picking, setPicking] = useState(false);
   const t = useT();
   const { lang } = useLang();
 
@@ -87,11 +104,15 @@ export default function Tutor() {
 
       <TileGrid
         tiles={ENTRIES.map((e) => ({
-          key: e.label,
+          key: e.key,
+          full: e.full,
           node: (
             <Card
-              onPress={() => router.push(e.prompt ? `/tutor/chat?q=${encodeURIComponent(e.prompt)}` : '/tutor/chat')}
-              style={{ flex: 1, gap: 6, minHeight: 106 }}
+              onPress={() => {
+                if (e.key === 'explain') setPicking(true);
+                else router.push(e.key === 'photo' ? '/tutor/chat?photo=1' : '/tutor/chat');
+              }}
+              style={{ flex: 1, gap: 6, minHeight: e.full ? 88 : 106 }}
             >
               <Icon name={e.icon} color={C.teal} />
               <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(e.label)}</Text>
@@ -101,6 +122,22 @@ export default function Tutor() {
             </Card>
           ),
         }))}
+      />
+
+      {/* Picking a chapter prefills the box and stops. Nothing is sent until
+          the student sends it, and the chapter rides along as context so the
+          answer comes out of their own notes. */}
+      <ChapterPicker
+        visible={picking}
+        onClose={() => setPicking(false)}
+        onPick={({ chapter, topic }) => {
+          setPicking(false);
+          // The topic when they picked one, the chapter when they stopped
+          // there. Either way the chapter id rides along, so the answer is
+          // grounded in that chapter's own notes.
+          const draft = t('tutor.explainDraft', { chapter: topic ?? chapter.title });
+          router.push(`/tutor/chat?chapter=${chapter.id}&draft=${encodeURIComponent(draft)}`);
+        }}
       />
 
       <Spacer h={S.md} />

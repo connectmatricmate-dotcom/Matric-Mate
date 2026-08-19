@@ -2,22 +2,75 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { api, isUrduScript, rateTutorAnswer, type ChatMessage, type TutorImage, weakTopics } from '@matricmate/core';
+import { api, isUrduScript, rateTutorAnswer, type ChatMessage, type IconName, type StringKey, type TutorImage, weakTopics } from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
-import { Card, Icon, Pill, ScriptText } from '@/components/ui/primitives';
+import { Icon, Pill, ScriptText } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { Markdown } from '@/components/ui/Markdown';
 import { useApp, useT } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 import { quotaClock, useTutorQuota } from '@/lib/use-tutor-quota';
+import { ChapterPicker } from '@/components/ui/ChapterPicker';
+
+/**
+ * The chat before there is a chat.
+ *
+ * This was a tinted card holding one sentence, "Ask anything: a concept, a
+ * question, or explain this simply", floating at the top of an otherwise blank
+ * column. It read as a message the tutor had sent, which it is not, and it sat
+ * a long way from the box it was talking about. An empty state should look
+ * like an empty state and teach the three things worth knowing here.
+ */
+function EmptyChat() {
+  const t = useT();
+  const tips: { icon: IconName; key: StringKey }[] = [
+    { icon: 'globe', key: 'tutor.emptyTip1' },
+    { icon: 'camera', key: 'tutor.emptyTip2' },
+    { icon: 'book', key: 'tutor.emptyTip3' },
+  ];
+  return (
+    <div className="flex flex-col items-center gap-4 px-4 pt-10 text-center">
+      <span className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-tealtint text-teal">
+        <Icon name="spark" size={30} />
+      </span>
+      <div className="space-y-1.5">
+        <h2 className="font-display text-[21px] text-ink">{t('tutor.emptyTitle')}</h2>
+        <p className="mx-auto max-w-[420px] text-[13.5px] leading-[1.6] text-ink2">{t('tutor.emptyBody')}</p>
+      </div>
+      <ul className="mt-1 w-full max-w-[420px] space-y-2 text-start">
+        {tips.map((tip) => (
+          <li key={tip.key} className="flex items-center gap-2.5">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px] border border-line bg-card text-ink2">
+              <Icon name={tip.icon} size={15} />
+            </span>
+            <span className="text-[12.5px] text-ink2">{t(tip.key)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function ChatScreen({
   initialQuestion,
+  initialDraft,
+  openPhoto,
   chapterId,
   chapterLabel,
   threadId: threadParam,
 }: {
   initialQuestion?: string;
+  /**
+   * Prefilled into the box and left there.
+   *
+   * The difference between this and `initialQuestion` is the whole point: a
+   * question the student typed somewhere else and meant to ask sends itself,
+   * while a draft we composed for them waits to be read, changed and sent.
+   * Nothing we write should spend one of their fifty on its own.
+   */
+  initialDraft?: string;
+  /** Open the file picker on arrival, for the "Solve from a photo" tile. */
+  openPhoto?: boolean;
   /** Set when the question came from a chapter: the tutor then answers
    *  from that chapter's own notes rather than from memory. */
   chapterId?: string;
@@ -30,7 +83,14 @@ export function ChatScreen({
   const bottom = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialDraft ?? '');
+  /**
+   * The chapter this thread answers from, which the student can change. It
+   * starts as whatever they arrived by and is set again by the picker.
+   */
+  const [groundedId, setGroundedId] = useState<string | undefined>(chapterId);
+  const [groundedLabel, setGroundedLabel] = useState<string | undefined>(chapterLabel);
+  const [picking, setPicking] = useState(false);
   const [thinking, setThinking] = useState(false);
   /** The answer growing live while the tutor writes. Cleared on completion. */
   const [liveText, setLiveText] = useState('');
@@ -119,7 +179,7 @@ export function ChatScreen({
       {
         threadId,
         context: contextLabel,
-        chapterId,
+        chapterId: groundedId,
         image: image ? { data: image.data, mediaType: image.mediaType } : undefined,
         profile: {
           name: state.user?.name,
@@ -206,6 +266,14 @@ export function ChatScreen({
     bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages.length, thinking]);
 
+  /* Arriving from the "Solve from a photo" tile opens the picker for them.
+     A click, not a navigation, so it has to be triggered once on arrival. */
+  useEffect(() => {
+    if (!openPhoto) return;
+    const timer = setTimeout(() => fileInput.current?.click(), 200);
+    return () => clearTimeout(timer);
+  }, [openPhoto]);
+
   return (
     /**
      * A chat owns its viewport: a full-height column with the header on top,
@@ -242,11 +310,7 @@ export function ChatScreen({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-8">
         <div className="mx-auto flex w-full max-w-[820px] flex-col gap-4 py-5">
-        {messages.length === 0 && !thinking ? (
-          <Card flat tint="bg-tealtint" border="border-tealtint2">
-            <p className="text-[14.5px] text-ink">{t('tutor.starter')}</p>
-          </Card>
-        ) : null}
+        {messages.length === 0 && !thinking ? <EmptyChat /> : null}
 
         {messages.map((m) =>
           m.role === 'user' ? (
@@ -381,6 +445,41 @@ export function ChatScreen({
         }}
         className="border-t border-line bg-card px-4 py-3 md:px-8"
       >
+        <div className="mx-auto w-full max-w-[820px]">
+          {/* What the answer will be drawn from, said out loud and removable.
+              The chapter used to be invisible: arriving from a chapter's Ask
+              AI button silently grounded the thread and nothing said so. */}
+          {groundedId ? (
+            <span className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-tealtint py-1.5 ps-2.5 pe-1.5 text-[11.5px] font-extrabold text-teal">
+              <Icon name="book" size={13} className="shrink-0" />
+              <span className="truncate">{t('tutor.chapterAttached', { chapter: groundedLabel ?? '' })}</span>
+              <button
+                type="button"
+                aria-label={t('tutor.chapterClear')}
+                onClick={() => {
+                  setGroundedId(undefined);
+                  setGroundedLabel(undefined);
+                }}
+                className="shrink-0"
+              >
+                <Icon name="close" size={13} />
+              </button>
+            </span>
+          ) : null}
+        </div>
+        <ChapterPicker
+          open={picking}
+          onClose={() => setPicking(false)}
+          onPick={({ chapter, topic }) => {
+            setPicking(false);
+            setGroundedId(chapter.id);
+            setGroundedLabel(chapter.title);
+            // A topic is a starting question; a whole chapter is only context,
+            // because "explain the whole of unit 4" is not a question anybody
+            // wants answered in one go.
+            if (topic) setInput((current) => (current.trim() ? current : t('tutor.explainDraft', { chapter: topic })));
+          }}
+        />
         <div className="mx-auto flex w-full max-w-[820px] items-center gap-2.5">
         <input
           ref={fileInput}
@@ -414,6 +513,19 @@ export function ChatScreen({
             <Icon name="camera" size={19} />
           </button>
         )}
+        {/* The discoverable half of the chapter picker. Typing @ does the
+            same thing, but nothing teaches you to type @. */}
+        <button
+          type="button"
+          aria-label={t('tutor.pickChapterTitle')}
+          title={t('tutor.pickChapterTitle')}
+          onClick={() => setPicking(true)}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
+            groundedId ? 'bg-tealtint text-teal' : 'bg-grey text-ink2 hover:text-ink'
+          }`}
+        >
+          <Icon name="book" size={19} />
+        </button>
         {/* .field-shell owns the focus ring; a bare outline-none input erased it */}
         <div
           className={`field-shell flex min-w-0 flex-1 items-center rounded-full border-[1.5px] border-line px-4 py-2.5 transition-[border-color,box-shadow] duration-200 ${
@@ -422,7 +534,22 @@ export function ChatScreen({
         >
           <input
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              /*
+               * Typing @ opens the chapter picker, the way it does in every
+               * chat app a student already uses. The @ itself is dropped: it
+               * is a gesture, not something they meant to write. Only at the
+               * start of a word, so an email address typed into the tutor
+               * does not hijack the screen.
+               */
+              const next = e.target.value;
+              if (next.length > input.length && /(^|\s)@$/.test(next)) {
+                setInput(next.slice(0, -1));
+                setPicking(true);
+                return;
+              }
+              setInput(next);
+            }}
             disabled={outOfQuestions}
             placeholder={
               outOfQuestions && quota

@@ -4,15 +4,16 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon } from '../../src/components/Icon';
-import { Body, Card, IconButton, Pill, Row, Screen, ScriptText, Small, Tap, TypingDots, useRevealed, useToast } from '../../src/components/ui';
-import { useKeyboardHeight } from '../../src/core/keyboard';
+import { Icon, IconName } from '../../src/components/Icon';
+import { IconButton, Pill, Row, Screen, ScriptText, Small, Tap, TypingDots, useRevealed, useToast } from '../../src/components/ui';
+import { useKeyboardOverlap } from '../../src/core/keyboard';
+import { ChapterPicker } from '../../src/components/ChapterPicker';
 import { ChatMessage, api, chapterById, isUrduScript, rateTutorAnswer, weakTopics } from '@matricmate/core';
 import type { TutorImage } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S, isWeb, textStart, urdu } from '../../src/theme';
+import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 import { useQuota } from '../../src/core/useQuota';
 
@@ -47,17 +48,96 @@ function LiveAnswer({ text }: { text: string }) {
   );
 }
 
+/**
+ * The chat before there is a chat.
+ *
+ * This was a tinted card holding one sentence, "Ask anything: a concept, a
+ * question, or explain this simply", floating at the top of an otherwise blank
+ * screen. It read as a message the tutor had sent, which it is not, and it sat
+ * a long way from the box it was talking about. An empty state should look
+ * like an empty state and should teach the three things worth knowing here.
+ */
+function EmptyChat() {
+  const t = useT();
+  const tips: { icon: IconName; key: 'tutor.emptyTip1' | 'tutor.emptyTip2' | 'tutor.emptyTip3' }[] = [
+    { icon: 'globe', key: 'tutor.emptyTip1' },
+    { icon: 'camera', key: 'tutor.emptyTip2' },
+    { icon: 'book', key: 'tutor.emptyTip3' },
+  ];
+  return (
+    <View style={{ alignItems: 'center', paddingTop: S.xl, paddingHorizontal: S.md, gap: S.md }}>
+      <View
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 22,
+          backgroundColor: C.tealTint,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon name="spark" size={30} color={C.teal} />
+      </View>
+      <View style={{ gap: 6, alignItems: 'center' }}>
+        <Text style={{ fontFamily: F.display, fontSize: 20, color: C.ink, textAlign: 'center' }}>
+          {t('tutor.emptyTitle')}
+        </Text>
+        <Small style={{ textAlign: 'center', lineHeight: 20 }}>{t('tutor.emptyBody')}</Small>
+      </View>
+      <View style={{ gap: S.sm, alignSelf: 'stretch', marginTop: S.sm }}>
+        {tips.map((tip) => (
+          <Row key={tip.key} gap={S.sm} style={{ alignItems: 'center' }}>
+            <View
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 9,
+                backgroundColor: C.card,
+                borderWidth: 1,
+                borderColor: C.line,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon name={tip.icon} size={15} color={C.ink2} />
+            </View>
+            <Small style={{ flex: 1, fontSize: 12.5 }}>{t(tip.key)}</Small>
+          </Row>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 export default function Chat() {
-  const { q, chapter, thread } = useLocalSearchParams<{ q?: string; chapter?: string; thread?: string }>();
+  const { q, chapter, thread, draft, photo: wantPhoto } = useLocalSearchParams<{
+    q?: string;
+    chapter?: string;
+    thread?: string;
+    /** Prefilled into the box and left there. Never sent for them: see the
+     *  note on ENTRIES in the tutor tab about questions spent on a tap. */
+    draft?: string;
+    /** Open the camera on arrival, for the "Solve from a photo" tile. */
+    photo?: string;
+  }>();
   const { state, actions, derived } = useApp();
   const t = useT();
   const toast = useToast();
   const insets = useSafeAreaInsets();
-  const keyboard = useKeyboardHeight();
+  const keyboard = useKeyboardOverlap();
   const scroller = useRef<ScrollView | null>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  /**
+   * A draft arrives in the box and is left alone.
+   *
+   * The difference between this and `?q=` is the whole point of the change:
+   * `q` is a question the student typed somewhere else and meant to ask, so it
+   * sends itself. A draft is a starting point we wrote for them, so it waits
+   * to be read, changed, and sent by them. Nothing we compose should ever
+   * spend one of their fifty questions on its own.
+   */
+  const [input, setInput] = useState(draft ? String(draft) : '');
   const [thinking, setThinking] = useState(false);
   /** The answer growing live while the tutor writes. Cleared on completion. */
   const [liveText, setLiveText] = useState('');
@@ -89,6 +169,14 @@ export default function Chat() {
   const [contextLabel, setContextLabel] = useState<string | undefined>(
     chapter ? chapterById(chapter)?.title : undefined
   );
+  /**
+   * The chapter this thread is answering from, which the student can change.
+   * It starts as whatever route they arrived by and is set again by the
+   * picker, so the tutor reads that chapter's published notes rather than
+   * reciting the syllabus in general.
+   */
+  const [groundedId, setGroundedId] = useState<string | undefined>(chapter);
+  const [picking, setPicking] = useState(false);
   /** The server's count, not a local guess. Null until the first fetch lands. */
   const quota = useQuota();
 
@@ -149,7 +237,7 @@ export default function Chat() {
       {
         threadId,
         context: contextLabel,
-        chapterId: chapter,
+        chapterId: groundedId,
         image: image ? { data: image.data, mediaType: image.mediaType } : undefined,
         profile: {
           name: state.user?.name,
@@ -250,6 +338,14 @@ export default function Chat() {
   }, [q]);
 
   useEffect(() => {
+    if (wantPhoto !== '1') return;
+    const timer = setTimeout(() => pickPhotoSource(), 250);
+    return () => clearTimeout(timer);
+    // Once, on arrival, and never again on a re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wantPhoto]);
+
+  useEffect(() => {
     const timer = setTimeout(() => scroller.current?.scrollToEnd({ animated: true }), 80);
     return () => clearTimeout(timer);
   }, [messages.length, thinking]);
@@ -298,11 +394,7 @@ export default function Chat() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {messages.length === 0 && !thinking ? (
-          <Card flat tint={C.tealTint}>
-            <Body>{t('tutor.starter')}</Body>
-          </Card>
-        ) : null}
+        {messages.length === 0 && !thinking ? <EmptyChat /> : null}
 
         {messages.map((m) =>
           m.role === 'user' ? (
@@ -444,6 +536,55 @@ export default function Chat() {
           <IconButton icon="close" onPress={() => setPhoto(null)} />
         </Row>
       ) : null}
+
+      {/* What the answer will be drawn from, said out loud and removable. The
+          chapter used to be invisible: arriving from a chapter's Ask AI button
+          silently grounded the whole thread and nothing on screen said so. */}
+      {groundedId ? (
+        <Row style={{ paddingHorizontal: S.md, paddingBottom: 6 }} gap={S.sm}>
+          <View
+            style={{
+              flexDirection: rowDir(),
+              alignItems: 'center',
+              gap: 6,
+              backgroundColor: C.tealTint,
+              borderRadius: R.pill,
+              paddingVertical: 6,
+              paddingStart: 10,
+              paddingEnd: 6,
+              maxWidth: '100%',
+            }}
+          >
+            <Icon name="book" size={13} color={C.teal} />
+            <Text numberOfLines={1} style={{ flexShrink: 1, fontFamily: F.bodyBold, fontSize: 11.5, color: C.teal }}>
+              {t('tutor.chapterAttached', { chapter: contextLabel ?? chapterById(groundedId)?.title ?? '' })}
+            </Text>
+            <Tap
+              onPress={() => {
+                setGroundedId(undefined);
+                setContextLabel(undefined);
+              }}
+              hit
+            >
+              <Icon name="close" size={13} color={C.teal} />
+            </Tap>
+          </View>
+        </Row>
+      ) : null}
+
+      <ChapterPicker
+        visible={picking}
+        onClose={() => setPicking(false)}
+        onPick={({ chapter: picked, topic }) => {
+          setPicking(false);
+          setGroundedId(picked.id);
+          setContextLabel(picked.title);
+          // A topic is a starting question; a whole chapter is only context,
+          // because "explain the whole of Chemistry unit 4" is not a question
+          // anybody wants answered in one go.
+          if (topic) setInput((current) => (current.trim() ? current : t('tutor.explainDraft', { chapter: topic })));
+        }}
+      />
       <Row
         style={{
           paddingHorizontal: S.md,
@@ -458,6 +599,9 @@ export default function Chat() {
         gap={S.sm}
       >
         <IconButton icon="camera" onPress={pickPhotoSource} />
+        {/* The discoverable half of the chapter picker. Typing @ does the
+            same thing, but nothing on a phone teaches you to type @. */}
+        <IconButton icon="book" onPress={() => setPicking(true)} />
         <View
           style={{
             flex: 1,
@@ -471,7 +615,22 @@ export default function Chat() {
         >
           <TextInput
             value={input}
-            onChangeText={setInput}
+            onChangeText={(next) => {
+              /*
+               * Typing @ opens the chapter picker, the way it does in every
+               * chat app a fourteen-year-old already uses. The @ itself is
+               * dropped: it is a gesture, not something they meant to write,
+               * and it would otherwise reach the model as a stray character.
+               * Only at the start of a word, so an email address typed into
+               * the tutor does not hijack the screen.
+               */
+              if (next.length > input.length && /(^|\s)@$/.test(next)) {
+                setInput(next.slice(0, -1));
+                setPicking(true);
+                return;
+              }
+              setInput(next);
+            }}
             editable={!outOfQuestions}
             placeholder={
               outOfQuestions && quota

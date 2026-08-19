@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconName } from './Icon';
 import { TabGlyph } from './TabGlyph';
 import { Tap } from './ui';
-import { useKeyboardHeight } from '../core/keyboard';
+import { useKeyboardOverlap } from '../core/keyboard';
 import { C, F, R, isRTL, isWeb, rowDir } from '../theme';
 
 /**
@@ -96,7 +96,7 @@ export function TabBar({ state, descriptors, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const sidebar = isWeb && width >= 900;
-  const keyboard = useKeyboardHeight();
+  const keyboard = useKeyboardOverlap();
 
   const items = state.routes.map((route, index) => {
     const { options } = descriptors[route.key];

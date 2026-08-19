@@ -35,6 +35,7 @@ export {
   fetchAiSessions,
   fetchAudioTracks,
   fetchChapterContentLive,
+  fetchChapterTopics,
   primeAllContent,
 } from './db';
 export type { AiSessionRow, ContentClient, LocalContentProvider, Slo } from './db';

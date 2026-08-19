@@ -727,3 +727,45 @@ export const PAPER_CONTENT: Record<string, PaperSection[]> = {
     },
   ],
 };
+
+/**
+ * Every chapter a student is actually studying, flattened, for pointing the
+ * tutor at one.
+ *
+ * The tutor tab used to offer "Explain a topic · From your chapters" and then
+ * send a hardcoded question about Newton's second law, whoever you were and
+ * whatever you were studying. That spent one of the student's fifty daily
+ * questions on a question they had not asked. The list below is what that
+ * promise needs: their own subjects, their own class, named so they can pick.
+ *
+ * Search is on the chapter title, the Urdu title and the subject name, so an
+ * Urdu-medium student typing in Nastaliq finds the same chapter an
+ * English-medium student finds by typing "motion".
+ */
+export type ChapterChoice = { id: string; title: string; urduTitle?: string; subjectId: string; subjectName: string; number: number };
+
+export function chapterChoices(subjectIds: string[]): ChapterChoice[] {
+  const out: ChapterChoice[] = [];
+  for (const sid of subjectIds) {
+    const subject = subjectById(sid);
+    if (!subject) continue;
+    for (const c of chaptersFor(sid)) {
+      out.push({ id: c.id, title: c.title, urduTitle: c.urduTitle, subjectId: sid, subjectName: subject.name, number: c.number });
+    }
+  }
+  return out;
+}
+
+/** Chapters matching what has been typed after an `@`. Empty query returns the
+ *  first few of each subject rather than nothing, so the list is never blank. */
+export function matchChapters(choices: ChapterChoice[], query: string, limit = 8): ChapterChoice[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return choices.slice(0, limit);
+  const hits = choices.filter(
+    (c) =>
+      c.title.toLowerCase().includes(q) ||
+      c.subjectName.toLowerCase().includes(q) ||
+      (c.urduTitle ?? '').includes(query.trim()),
+  );
+  return hits.slice(0, limit);
+}
