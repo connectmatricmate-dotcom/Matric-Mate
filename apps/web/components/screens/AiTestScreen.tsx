@@ -12,6 +12,7 @@ import {
   weakTopics,
 } from '@matricmate/core';
 import type { AiSessionKind, AiSessionRow } from '@matricmate/core';
+import { createClient } from '@/lib/supabase/client';
 import { AiWorking } from '@/components/ui/AiWorking';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, PillButton, Seg } from '@/components/ui/controls';
@@ -47,7 +48,7 @@ export function AiTestScreen() {
   const [sets, setSets] = useState<AiSessionRow[]>([]);
   useEffect(() => {
     let alive = true;
-    fetchAiSessions().then((rows) => {
+    fetchAiSessions(createClient()).then((rows) => {
       if (alive) setSets(rows.filter((r) => r.kind !== 'paper'));
     });
     return () => {
@@ -94,7 +95,7 @@ export function AiTestScreen() {
   async function reopen(row: AiSessionRow) {
     if (row.kind === 'paper') return;
     if (row.kind === 'mcq') {
-      const s = await fetchAiSession(row.id);
+      const s = await fetchAiSession(row.id, createClient());
       if (!s) {
         toast(t('states.errorTitle'));
         return;

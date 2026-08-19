@@ -5,7 +5,7 @@ import { Btn, Card, H2, Pill, Ring, Row, Screen, ScriptText, Small, Spacer } fro
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { Icon } from '../../src/components/Icon';
-import { XP, accuracy, grade , chapterById, level } from '@matricmate/core';
+import { accuracy, grade , chapterById, level, xpForAttempt } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -23,10 +23,12 @@ export default function Result() {
   const total = s?.mcqs.length ?? 0;
   const pct = total ? Math.round((score / total) * 100) : 0;
 
-  const xp = useMemo(() => {
-    const base = answers.reduce((n, a) => n + XP.forAnswer(a.correct, a.confidence), 0);
-    return s?.mode === 'exam' ? base * XP.examMultiplier : base;
-  }, [answers, s?.mode]);
+  /* Through core's own rule, so the figure shown here is exactly what the
+     store credits and what a later recompute rebuilds. */
+  const xp = useMemo(
+    () => answers.reduce((n, a) => n + xpForAttempt({ ...a, mode: s?.mode ?? 'practice' }), 0),
+    [answers, s?.mode],
+  );
 
   useEffect(() => {
     if (!s || saved.current) return;

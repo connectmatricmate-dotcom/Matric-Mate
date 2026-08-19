@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById } from '@matricmate/core';
-import type { AiCheckVerdict, AiPaperItems, AiSessionRow, ShortQ } from '@matricmate/core';
+import { checkAnswerLive, generateMockPaper, readAiSession, subjectById } from '@matricmate/core';
+import type { AiCheckVerdict, AiPaperItems, AiSessionRead, ShortQ } from '@matricmate/core';
+import { createClient } from '@/lib/supabase/client';
 import { AiWorking } from '@/components/ui/AiWorking';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
@@ -30,15 +31,18 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
 
   // Keyed by the paper id, so navigating between papers shows the loading
   // state again without a synchronous reset inside the effect.
-  const [settled, setSettled] = useState<{ key: string; row: AiSessionRow | null } | null>(null);
+  const [settled, setSettled] = useState<{ key: string; read: AiSessionRead } | null>(null);
   // A nonce, so asking for the same paper again counts as a new request.
   const [attempt, setAttempt] = useState(0);
   const loadKey = paperId ? `${paperId}:${attempt}` : '';
   useEffect(() => {
     if (!paperId) return;
     let alive = true;
-    fetchAiSession(paperId).then((row) => {
-      if (alive) setSettled({ key: loadKey, row });
+    /* The browser client, passed rather than relied on: the shared one is
+       connected by a module side effect in the layout, and a read that depends
+       on import order is a read that fails in a way nobody can reproduce. */
+    readAiSession(paperId, createClient()).then((read) => {
+      if (alive) setSettled({ key: loadKey, read });
     });
     return () => {
       alive = false;
@@ -46,7 +50,8 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadKey]);
   const loading = !!paperId && settled?.key !== loadKey;
-  const paper = loading || !paperId ? null : settled?.row ?? null;
+  const read = loading || !paperId ? null : (settled?.read ?? null);
+  const paper = read?.ok ? read.row : null;
 
   async function build() {
     if (busy) return;
@@ -110,15 +115,34 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
 
   const items = paper?.items as AiPaperItems | undefined;
   if (!paper || !items) {
+    /*
+     * Two failures, told apart.
+     *
+     * A paper that is genuinely gone and a read that did not come back both
+     * used to render "Couldn't load this", which is why a real report of a
+     * broken mock paper could not be diagnosed from the screenshot: the row
+     * was in the database, complete, the whole time. Retrying helps with
+     * exactly one of these, so only one of them offers it.
+     */
+    const gone = read?.ok === false && read.reason === 'missing';
     return (
       <Page width="focus">
         <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.paperTitle')} />
-        <Card flat tint="bg-redtint" border="border-red">
-          <p className="text-[13.5px] font-extrabold text-red">{t('states.errorTitle')}</p>
-          <p className="mt-0.5 text-[13px] text-ink2">{t('states.errorBody')}</p>
-          {/* Android offered a retry here and the website did not, so a paper
-              that failed to load was a dead end short of reloading by hand. */}
-          <Btn title={t('common.retry')} variant="line" sm className="mt-3" onClick={() => setAttempt((n) => n + 1)} />
+        <Card flat tint={gone ? 'bg-orangetint' : 'bg-redtint'} border={gone ? 'border-orange' : 'border-red'}>
+          <p className={`text-[13.5px] font-extrabold ${gone ? 'text-orangedark' : 'text-red'}`}>
+            {t(gone ? 'tutor.paperGoneTitle' : 'tutor.paperLoadFailed')}
+          </p>
+          <p className="mt-0.5 text-[13px] text-ink2">{t(gone ? 'tutor.paperGoneBody' : 'tutor.paperLoadFailedBody')}</p>
+          {gone ? (
+            <Btn title={t('tutor.buildIt')} variant="orange" sm className="mt-3" onClick={() => router.push('/tutor/paper')} />
+          ) : (
+            <Btn title={t('common.retry')} variant="line" sm className="mt-3" onClick={() => setAttempt((n) => n + 1)} />
+          )}
+          {/* The reason, quietly, for the next bug report. Not a stack trace,
+              one short line, and only when there is something to say. */}
+          {read?.ok === false && read.detail ? (
+            <p className="mt-2 text-[11px] text-ink3">{read.detail}</p>
+          ) : null}
         </Card>
       </Page>
     );

@@ -33,12 +33,13 @@ export {
   isLive,
   fetchSlos,
   fetchAiSession,
+  readAiSession,
   fetchAiSessions,
   fetchAudioTracks,
   fetchChapterContentLive,
   fetchChapterTopics,
   primeAllContent,
 } from './db';
-export type { AiSessionRow, ContentClient, LocalContentProvider, Slo } from './db';
+export type { AiSessionRead, AiSessionRow, ContentClient, LocalContentProvider, Slo } from './db';
 export * from './i18n';
 export * from './sync';

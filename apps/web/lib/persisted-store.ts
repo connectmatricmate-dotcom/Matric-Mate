@@ -11,7 +11,7 @@
  * The state shape matches the Android app's store deliberately, see
  * apps/mobile/src/store/app.tsx.
  */
-import { AI_QUOTA, Attempt, Language, Medium, Group, Notification, SyncOp, TestResult, XP, enqueueOp, todayKey } from '@matricmate/core';
+import { AI_QUOTA, Attempt, Language, Medium, Group, Notification, SyncOp, TestResult, enqueueOp, todayKey } from '@matricmate/core';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
@@ -238,7 +238,6 @@ export function touchToday(s: State): State {
 }
 
 export const aiLimitFor = (premium: boolean) => (premium ? AI_QUOTA.premium : AI_QUOTA.free);
-export const xpFor = XP.forAnswer;
 
 /* --------------------------------------------------------------- sync queue */
 

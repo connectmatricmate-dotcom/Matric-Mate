@@ -12,7 +12,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, Attempt, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory } from '@matricmate/core';
+import { AI_QUOTA, Attempt, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
 import { useAuth } from './auth';
 import { supabase } from '../lib/supabase';
 import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
@@ -658,9 +658,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           touchToday({
             ...s,
             attempts: [...s.attempts, full],
-            // Exam answers really earn the doubled XP the result screen
-            // advertises. It used to be shown there and credited nowhere.
-            xp: s.xp + XP.forAnswer(a.correct, a.confidence) * (a.mode === 'exam' ? XP.examMultiplier : 1),
+            // One rule for what an answer is worth, in core, so the increment
+            // here and the recompute after a sync cannot disagree. They did:
+            // the exam bonus was credited here and dropped there.
+            xp: s.xp + xpForAttempt(full),
           })
         );
         // Queued, not awaited: the answer is already on screen and in state.

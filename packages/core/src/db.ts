@@ -714,30 +714,62 @@ export type AiSessionRow = {
   createdAt: string;
 };
 
-export async function fetchAiSession(id: string, client?: ContentClient): Promise<AiSessionRow | null> {
+/** Row to AiSessionRow. One mapper, so the two readers cannot drift. */
+function toAiSessionRow(r: Row): AiSessionRow {
+  return {
+    id: r.id,
+    kind: r.kind,
+    title: r.title,
+    subjectId: r.subject_id,
+    chapterId: r.chapter_id,
+    topic: r.topic,
+    medium: r.medium,
+    items: r.items,
+    createdAt: r.created_at,
+  } as AiSessionRow;
+}
+
+/**
+ * One saved AI set, and whether the read worked.
+ *
+ * `fetchAiSession` below collapses four different outcomes into `null`: no
+ * such row, a refusal, a network failure, and no client connected. The screens
+ * then render all four as "Couldn't load this", which is what made a real
+ * report of a broken mock paper impossible to diagnose. Every layer knew
+ * something and none of them said it.
+ *
+ * `missing` is a paper that is genuinely not there, which retrying will not
+ * fix. `failed` is anything else, which retrying might.
+ */
+export type AiSessionRead =
+  | { ok: true; row: AiSessionRow }
+  | { ok: false; reason: 'missing' | 'failed'; detail?: string };
+
+export async function readAiSession(id: string, client?: ContentClient): Promise<AiSessionRead> {
   const at = client ?? db;
-  if (!at) return null;
+  if (!at) return { ok: false, reason: 'failed', detail: 'no content client' };
   try {
     const { data, error } = await table('ai_sessions', at)
       .select('id,kind,title,subject_id,chapter_id,topic,medium,items,created_at')
       .eq('id', id)
       .maybeSingle();
-    if (error || !data) return null;
-    const r = data as Row;
-    return {
-      id: r.id,
-      kind: r.kind,
-      title: r.title,
-      subjectId: r.subject_id,
-      chapterId: r.chapter_id,
-      topic: r.topic,
-      medium: r.medium,
-      items: r.items,
-      createdAt: r.created_at,
-    } as AiSessionRow;
-  } catch {
-    return null;
+    if (error) return { ok: false, reason: 'failed', detail: String((error as { message?: string }).message ?? error) };
+    if (!data) return { ok: false, reason: 'missing' };
+    const row = toAiSessionRow(data as Row);
+    // A paper with no items is a row that was written wrong, not a row that is
+    // absent. Worth retrying, and worth being able to tell apart in a report.
+    if (!row.items) return { ok: false, reason: 'failed', detail: 'row has no items' };
+    return { ok: true, row };
+  } catch (e) {
+    return { ok: false, reason: 'failed', detail: e instanceof Error ? e.message : String(e) };
   }
+}
+
+/** The older shape, kept because several screens still read it. Prefer
+ *  `readAiSession`, which can say why it failed. */
+export async function fetchAiSession(id: string, client?: ContentClient): Promise<AiSessionRow | null> {
+  const res = await readAiSession(id, client);
+  return res.ok ? res.row : null;
 }
 
 /** The student's saved AI sets, newest first, for the builder's shelf. */

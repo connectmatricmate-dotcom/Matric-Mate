@@ -81,7 +81,21 @@ export const xpToNextLevel = (xp: number) => XP.perLevel - (xp % XP.perLevel);
  * cost more than it is worth.
  */
 export function totalXp(attempts: Attempt[], cardsKnown: string[]): number {
-  return attempts.reduce((sum, a) => sum + XP.forAnswer(a.correct, a.confidence), 0) + cardsKnown.length * XP.card;
+  return attempts.reduce((sum, a) => sum + xpForAttempt(a), 0) + cardsKnown.length * XP.card;
+}
+
+/**
+ * What one recorded answer is worth, doubling for an exam.
+ *
+ * The multiplier lives here rather than at the two places that award XP,
+ * because it used to live at only one of them. The result screen credited an
+ * exam answer twice, as advertised, and then the next hydration recomputed the
+ * total with a formula that had never heard of `mode` and quietly took the
+ * bonus back. Any sync, any foreground, any cold start: the doubled XP a
+ * student was shown never survived the minute.
+ */
+export function xpForAttempt(a: Pick<Attempt, 'correct' | 'confidence' | 'mode'>): number {
+  return XP.forAnswer(a.correct, a.confidence) * (a.mode === 'exam' ? XP.examMultiplier : 1);
 }
 
 /**

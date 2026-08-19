@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { XP, accuracy, chapterById, grade } from '@matricmate/core';
+import { accuracy, chapterById, grade, xpForAttempt } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
 import { Card, Pill, Ring, ScriptText } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
@@ -25,10 +25,12 @@ export function ResultScreen() {
   const total = s?.mcqs.length ?? 0;
   const pct = total ? Math.round((score / total) * 100) : 0;
 
-  const xp = useMemo(() => {
-    const base = answers.reduce((n, a) => n + XP.forAnswer(a.correct, a.confidence), 0);
-    return s?.mode === 'exam' ? base * XP.examMultiplier : base;
-  }, [answers, s?.mode]);
+  /* Through core's own rule, so the figure shown here is exactly what the
+     store credits and what a later recompute rebuilds. */
+  const xp = useMemo(
+    () => answers.reduce((n, a) => n + xpForAttempt({ ...a, mode: s?.mode ?? 'practice' }), 0),
+    [answers, s?.mode],
+  );
 
   // The result is written once, on arrival, re-rendering must not double-count it.
   useEffect(() => {

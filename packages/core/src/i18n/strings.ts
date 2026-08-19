@@ -711,6 +711,13 @@ export const en = {
     paperTitle: 'Board mock paper',
     paperSub: 'A full FBISE-pattern paper, weighted like the real one',
     paperBuilding: 'Setting your paper…',
+    /* Two different failures wearing one face before this: a paper that is
+       genuinely gone, and a read that did not come back. Retrying helps with
+       exactly one of them, so they say different things. */
+    paperGoneTitle: 'This paper is no longer saved',
+    paperGoneBody: 'AI sets are kept for a while and then cleared. Build a fresh one, it takes about half a minute.',
+    paperLoadFailed: 'Could not load the paper',
+    paperLoadFailedBody: 'The paper is saved, the request to fetch it did not come back. Try again.',
     paperSectionA: 'Section A · MCQs',
     paperSectionB: 'Section B · Short questions',
     paperSectionC: 'Section C · Long questions',
@@ -1700,6 +1707,10 @@ export const ur: typeof en = {
     paperTitle: 'بورڈ کا نمونہ پرچہ',
     paperSub: 'پورا FBISE طرز کا پرچہ، اصلی جیسے وزن کے ساتھ',
     paperBuilding: 'پرچہ بن رہا ہے…',
+    paperGoneTitle: 'یہ پرچہ اب محفوظ نہیں',
+    paperGoneBody: 'اے آئی سیٹ کچھ عرصے بعد ہٹا دیے جاتے ہیں۔ نیا بنا لیں، تقریباً آدھا منٹ لگے گا۔',
+    paperLoadFailed: 'پرچہ کھل نہیں سکا',
+    paperLoadFailedBody: 'پرچہ محفوظ ہے، بس درخواست واپس نہیں آئی۔ دوبارہ کوشش کریں۔',
     paperSectionA: 'حصہ الف · MCQs',
     paperSectionB: 'حصہ ب · مختصر سوالات',
     paperSectionC: 'حصہ ج · تفصیلی سوالات',

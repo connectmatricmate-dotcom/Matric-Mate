@@ -9,7 +9,7 @@
  * without rewiring.
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
-import { Attempt, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory } from '@matricmate/core';
+import { Attempt, Language, PlanTask, StringKey, SyncOp, TestResult, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
 import {
   EMPTY,
   Onboarding,
@@ -27,7 +27,6 @@ import {
   subscribe,
   touchToday,
   update,
-  xpFor,
 } from './persisted-store';
 import { createClient } from './supabase/client';
 import { writeLanguageCookie, writeThemeCookie } from './ui-language';
@@ -167,14 +166,14 @@ const actions: Actions = {
   },
   recordAttempt: (a) => {
     const full: Attempt = { ...a, id: `a-${Date.now()}-${getSnapshot().attempts.length}`, at: Date.now() };
-    // Exam answers earn the doubled XP the result screen advertises. It was
-    // shown there and credited here at single rate, so the total never
-    // matched the number the student had just been congratulated with.
+    // One rule for what an answer is worth, in core, so the increment here and
+    // the recompute after a sync cannot disagree. They did: the exam bonus was
+    // credited here and dropped there.
     update((s) =>
       touchToday({
         ...s,
         attempts: [...s.attempts, full],
-        xp: s.xp + xpFor(a.correct, a.confidence) * (a.mode === 'exam' ? XP.examMultiplier : 1),
+        xp: s.xp + xpForAttempt(full),
       }),
     );
     // Queued, not awaited: the store already updated and the screen already
@@ -192,9 +191,7 @@ const actions: Actions = {
       touchToday({
         ...s,
         attempts: [...s.attempts, ...full],
-        xp:
-          s.xp +
-          list.reduce((sum, a) => sum + xpFor(a.correct, a.confidence) * (a.mode === 'exam' ? XP.examMultiplier : 1), 0),
+        xp: s.xp + full.reduce((sum, a) => sum + xpForAttempt(a), 0),
       })
     );
     // Each answer in the paper is still its own row server-side (attempts is
