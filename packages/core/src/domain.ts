@@ -204,12 +204,47 @@ export function overallPct(subjectIds: string[], readSections: string[], attempt
 }
 
 /**
+ * The chapter today's plan is about.
+ *
+ * Where they left off, and failing that the first chapter of their own class
+ * that has something in it. It used to be composed as `${subjectIds[0]}-1`,
+ * which is the Class 9 id shape: a Class 10 student's plan opened on Class 9
+ * chapter one, wore its real Class 9 title because the bundled catalogue could
+ * answer for it, and dead-ended the moment it was tapped, because the server
+ * serves that account only its own class.
+ *
+ * So nothing is composed here. Every candidate comes from the catalogue and has
+ * to say it belongs to this student's class. Returning nothing is a valid
+ * answer: no plan is better than a plan pointing at another class's syllabus.
+ *
+ * A stored `lastChapterId` is trusted unless the catalogue knows the chapter
+ * and says it is the wrong class. Not knowing it is normal offline, where the
+ * live index has not primed, and is not evidence of anything.
+ */
+export function planChapterId(subjectIds: string[], grade: number, lastChapterId?: string): string | undefined {
+  if (lastChapterId) {
+    const known = chapterById(lastChapterId);
+    if (!known || known.grade === grade) return lastChapterId;
+  }
+  for (const subjectId of subjectIds) {
+    const chapters = chaptersFor(subjectId).filter((c) => c.grade === grade);
+    // Something to study wins, but a chapter whose counts have not loaded yet
+    // still beats no plan at all: the bundle carries zeroes by design.
+    const pick = chapters.find(hasStudyMaterial) ?? chapters[0];
+    if (pick) return pick.id;
+  }
+  return undefined;
+}
+
+/**
  * "Today's plan", three tasks: finish the chapter you're on, practise it,
  * and revise your weakest topic. Deterministic per day so it doesn't reshuffle.
  * M9 replaces this with the AI planner; the shape stays identical.
  */
 export function buildPlan(opts: {
   subjectIds: string[];
+  /** The student's class. Required: see planChapterId. */
+  grade: number;
   lastChapterId?: string;
   attempts: Attempt[];
   /** Ticked by hand, from any device. */
@@ -217,8 +252,13 @@ export function buildPlan(opts: {
   readSections: string[];
   cardsKnown: string[];
 }): PlanTask[] {
-  const chId = opts.lastChapterId ?? (opts.subjectIds.length ? `${opts.subjectIds[0]}-1` : 'phy-1');
+  const chId = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId);
+  if (!chId) return [];
   const ch = chapterById(chId);
+  /* The id carries its own subject, which matters offline: the catalogue may not
+     know a Class 10 chapter yet, and defaulting the chip to Physics would put
+     the wrong subject on a Chemistry task. */
+  const subjectId = ch?.subjectId ?? chId.split('-')[0];
   const weak = weakTopics(opts.attempts)[0];
   const weakCh = weak ? chapterById(weak.chapterId) : undefined;
   /**
@@ -228,8 +268,8 @@ export function buildPlan(opts: {
    */
   const day = todayKey();
   const tasks: Omit<PlanTask, 'done'>[] = [
-    { id: `plan-read-${chId}-${day}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'read' },
-    { id: `plan-mcq-${chId}-${day}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'mcq' },
+    { id: `plan-read-${chId}-${day}`, subjectId, chapterId: chId, kind: 'read' },
+    { id: `plan-mcq-${chId}-${day}`, subjectId, chapterId: chId, kind: 'mcq' },
     weak && weakCh
       ? {
           id: `plan-weak-${weak.topic}-${day}`,
@@ -239,7 +279,7 @@ export function buildPlan(opts: {
           weakTopic: weak.topic,
           weakAccuracy: weak.accuracy,
         }
-      : { id: `plan-cards-default-${day}`, subjectId: ch?.subjectId ?? 'phy', chapterId: chId, kind: 'cards' },
+      : { id: `plan-cards-default-${day}`, subjectId, chapterId: chId, kind: 'cards' },
   ];
   /*
    * Done means done, whether the student said so or simply did it.

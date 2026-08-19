@@ -19,6 +19,17 @@ export type Chapter = {
   subjectId: string;
   number: number;
   /**
+   * Which class this chapter belongs to, 9 or 10.
+   *
+   * The column has existed since migration 0011 and this type dropped it, so
+   * every synchronous lookup answered without it. That is how the daily plan
+   * came to offer a Class 10 student Class 9 chapter one: it composed an id as
+   * `${subject}-1`, the grade 9 id shape, and nothing downstream could tell
+   * that the chapter it got back was the wrong class. Anything choosing a
+   * chapter on a student's behalf has to be able to check.
+   */
+  grade: number;
+  /**
    * The board's own unit number, where it differs from our position in the
    * list. Mathematics Class 9 is FBISE units 1-7, 14, 15, 17-23 and 29, the
    * gaps being Class 10's, so a student looking for "unit 22" needs this.

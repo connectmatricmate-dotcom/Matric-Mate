@@ -248,6 +248,7 @@ type ChapterRow = {
   id: string;
   subject_id: string;
   number: number;
+  grade: number;
   board_unit: number | null;
   exam_marks: number | null;
   exam_share: number | null;
@@ -272,6 +273,10 @@ const toChapter = (r: ChapterRow, counts?: { mcqs: number; cards: number; sectio
   id: r.id,
   subjectId: r.subject_id,
   number: r.number,
+  /* Row level security already serves each account only its own class, so this
+     is not a filter. It is what lets a synchronous lookup say which class the
+     chapter it just handed back belongs to. */
+  grade: Number(r.grade) || 9,
   boardUnit: r.board_unit ?? undefined,
   examMarks: r.exam_marks ?? undefined,
   examShare: r.exam_share ?? undefined,
@@ -340,7 +345,7 @@ export async function primeAllContent(client?: ContentClient): Promise<void> {
     // and the whole app tells a paying student there is nothing to study.
     const { data, error } = await table('chapters', at)
       .select(
-        'id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+        'id,subject_id,number,grade,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
           'mcqs(count),flashcards(count),chapter_sections(count)',
       )
       .eq('mcqs.medium', medium)
@@ -385,7 +390,7 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
       // every count doubles.
       const { data, error } = await table('chapters', at!)
         .select(
-          'id,subject_id,number,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+          'id,subject_id,number,grade,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
             'mcqs(count),flashcards(count),chapter_sections(count)',
         )
         .eq('subject_id', subjectId)

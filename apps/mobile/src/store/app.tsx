@@ -905,6 +905,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       subjects,
       plan: buildPlan({
         subjectIds: subjects,
+        // The student's own class, so the plan can never point at the other
+        // one's syllabus. See planChapterId.
+        grade: view.onboarding?.classLevel ?? 9,
         lastChapterId: view.lastChapterId,
         attempts: view.attempts,
         doneIds: view.planDone,

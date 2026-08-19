@@ -193,6 +193,10 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       id: `${subjectId}-${i + 1}`,
       subjectId,
       number: i + 1,
+      // The bundle is Class 9 and only Class 9: grade 10 is database-first, so
+      // saying so here is what stops a Class 10 student's plan falling back
+      // onto a Class 9 chapter when the live index has not primed yet.
+      grade: 9,
       title: subjectId === 'urd' || subjectId === 'isl' ? (r[2] as string) : r[0],
       // Urdu and Islamiat carry their Urdu title in the row itself, because
       // that is the name the chapter is actually known by. Everything else

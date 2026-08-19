@@ -635,6 +635,9 @@ export function AppProvider({
       subjects,
       plan: buildPlan({
         subjectIds: subjects,
+        // The student's own class, so the plan can never point at the other
+        // one's syllabus. See planChapterId.
+        grade: state.onboarding?.classLevel ?? 9,
         lastChapterId: state.lastChapterId,
         attempts: state.attempts,
         doneIds: state.planDone,
