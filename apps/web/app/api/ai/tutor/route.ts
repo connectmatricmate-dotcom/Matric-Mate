@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { chapterGrounding } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
+import { TUTOR_TOOLS, runTutorTool } from '@/lib/ai/tutor-tools';
 
 /**
  * The tutor, for real. One route serves both apps: the website calls it with
@@ -141,6 +142,13 @@ How you teach:
 - Never invent board policies, dates or marks distributions. If unsure, say so and suggest checking fbise.edu.pk.
 - Write in plain text: short paragraphs and numbered lists only. No markdown headings, no asterisks or bold markers, no tables, no LaTeX. Write fractions with / and powers with ^, the way they are typed in class notes.
 - Never use an em dash. Use a comma, a colon, or a new sentence instead.
+
+What you can look up about them:
+- You can see this student's real progress with the tools you have been given: get_progress, get_weak_topics, get_recent_results, get_chapter_progress and get_today. They read the same database the app does.
+- Use one when the answer depends on how they are actually doing, and when they ask about themselves. "What should I revise?", "how did I do?", "am I ready for the test?", "what should I do now?" all deserve a look rather than a guess.
+- Do not use one for a plain question about the syllabus. "What is inertia" needs no lookup, and adding one only makes them wait.
+- Never say that you are checking, or narrate the lookup. Answer as a teacher who already knows them.
+- The numbers are theirs and are often small. Say what they mean plainly and never invent a figure you were not given. If a tool says they have barely practised, that IS the answer to "what should I revise": start.
 
 Sending them to the right part of the app:
 - The student is inside an app that holds, for every chapter below, the notes, an audio lesson, flashcards, a one-page revision sheet, and practice in four formats. When one of those is the honest next step, end your answer with an action tag on its own line and the app turns it into a button:
@@ -314,7 +322,11 @@ export async function POST(req: NextRequest) {
     `- Study medium: ${profile.medium === 'ur' ? 'Urdu' : 'English'}`,
     `- Answer them in this language: ${languageRule(profile.language)}`,
     profile.subjects?.length ? `- Their subjects: ${profile.subjects.join(', ')}` : null,
-    profile.weakTopics?.length ? `- Topics they have been getting wrong lately: ${profile.weakTopics.join(', ')}` : null,
+    /* Their weak topics used to be listed here, three of them, chosen by the
+       client and pushed into every question whether it needed them or not.
+       get_weak_topics answers the same thing on demand, from the whole record
+       rather than the top three, and freshly rather than from whatever the app
+       had computed when the screen last rendered. */
     body.context ? `- They are asking from: ${body.context.slice(0, 300)}` : null,
   ]
     .filter(Boolean)
@@ -346,11 +358,18 @@ export async function POST(req: NextRequest) {
       const emit = (line: object) => controller.enqueue(encoder.encode(`${JSON.stringify(line)}\n`));
       try {
         let text = '';
-        // A server-side web search can pause the turn; resending with the
-        // paused assistant content resumes it. Bounded, so a stuck search
-        // cannot spin the route forever.
+        /*
+         * The turn can come back unfinished for two reasons, and both resume
+         * the same way: by appending what the model produced and asking again.
+         *
+         * A server-side web search pauses it. A tool call ends it with
+         * stop_reason 'tool_use', and the answer only continues once the
+         * results go back as a user turn. Bounded at five rounds so a model
+         * that keeps calling tools cannot spin the route forever; in practice
+         * an answer needs none or one.
+         */
         let stopReason: string | null = null;
-        for (let round = 0; round < 3; round++) {
+        for (let round = 0; round < 5; round++) {
           const s = anthropic.messages.stream({
             model: TUTOR_MODEL,
             max_tokens: MAX_ANSWER_TOKENS,
@@ -362,7 +381,7 @@ export async function POST(req: NextRequest) {
               { type: 'text', text: personaFor(grade) + standing, cache_control: { type: 'ephemeral' } },
               { type: 'text', text: studentBlock + groundingBlock },
             ],
-            tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }],
+            tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }, ...TUTOR_TOOLS],
             messages: turns,
           });
           s.on('text', (delta) => {
@@ -371,6 +390,28 @@ export async function POST(req: NextRequest) {
           });
           const final = await s.finalMessage();
           stopReason = final.stop_reason;
+
+          if (stopReason === 'tool_use') {
+            /*
+             * Run every tool the model asked for, in parallel: they are
+             * independent reads and a student is waiting. The user id comes
+             * from the session this route already authenticated and is never
+             * taken from the model's arguments, which is the whole security of
+             * these tools.
+             */
+            const calls = final.content.filter((c): c is Anthropic.ToolUseBlock => c.type === 'tool_use');
+            const results = await Promise.all(
+              calls.map(async (c) => ({
+                type: 'tool_result' as const,
+                tool_use_id: c.id,
+                content: JSON.stringify(await runTutorTool(c.name, c.input, userId)),
+              })),
+            );
+            turns.push({ role: 'assistant', content: final.content });
+            turns.push({ role: 'user', content: results });
+            continue;
+          }
+
           if (stopReason !== 'pause_turn') break;
           turns.push({ role: 'assistant', content: final.content });
         }
