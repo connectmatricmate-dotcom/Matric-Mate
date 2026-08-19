@@ -7,9 +7,9 @@
 import Link from 'next/link';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
-import { accuracy, chapterById, chapterName, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
+import { accuracy, chapterById, chapterName, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, nextAction, nextStep, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
 import type { CoachReport } from '@matricmate/core';
-import { Bar, Card, Icon, Label, Pill, Ring, ScriptText, Skeleton } from '@/components/ui/primitives';
+import { Bar, Card, Icon, Label, LinkBtn, Pill, Ring, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { ScriptNumbers } from '@/components/ui/ScriptList';
 import { useApp, useLang, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
@@ -247,6 +247,25 @@ export function CoachRail() {
   const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
+  /* The one thing to do next, chosen in core so the phone picks the same thing
+     for the same student. Null when there is genuinely nothing left: a student
+     who has studied today and has no weak topic is allowed to be finished, and
+     a button insisting otherwise would be nagging. One button, never a row of
+     them: three choices is the same decision again, only with more steps. */
+  const step = nextStep(
+    nextAction({
+      subjectIds: derived.subjects,
+      grade: state.onboarding?.classLevel ?? 9,
+      lastChapterId: state.lastChapterId,
+      lastSectionIndex: state.lastSectionIndex,
+      readSections: state.readSections,
+      attempts: state.attempts,
+      activeDays: state.activeDays,
+      plan: derived.plan,
+    }),
+    lang,
+  );
+  const cta = step ? <LinkBtn title={step.label} href={step.href} variant="orange" className="mt-1 w-full" /> : null;
   /**
    * The settled result, tagged with who it belongs to.
    *
@@ -329,6 +348,7 @@ export function CoachRail() {
           className="text-[12.5px] leading-[1.5] text-ink2"
           listClassName="flex flex-col gap-1"
         />
+        {cta}
       </Card>
     );
   }
@@ -350,6 +370,7 @@ export function CoachRail() {
         className="text-[12.5px] leading-[1.5] text-ink2"
         listClassName="flex flex-col gap-1"
       />
+      {cta}
     </Card>
   );
 }

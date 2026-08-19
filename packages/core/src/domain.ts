@@ -3,7 +3,8 @@
  * Pure functions so the same rules run on device, on web and (later) on the server.
  */
 import { Attempt, Chapter, Confidence, Medium, PlanTask, TestResult } from './types';
-import { chapterById, chaptersFor, contentFor } from './content';
+import { chapterById, chapterName, chaptersFor, contentFor } from './content';
+import { translate, type Language } from './i18n';
 
 /**
  * Whether a chapter has anything to actually study.
@@ -468,4 +469,128 @@ export const todayKey = () => dayKey(Date.now());
 export function testsThisMonth(results: TestResult[]) {
   const m = new Date().getMonth();
   return results.filter((r) => new Date(r.at).getMonth() === m);
+}
+
+/* ------------------------------------------------------------ next action */
+
+/**
+ * The one thing to do next, chosen from what the app already knows.
+ *
+ * The coach card describes the week and stops, which leaves the student to
+ * work out what to do about it. This picks the single obvious next step so the
+ * card can end in a button instead of a decision.
+ *
+ * One, deliberately. Three buttons put the decision back.
+ *
+ * Pure, and here rather than in either app, so the phone and the browser
+ * choose the same thing for the same student and it can be reasoned about
+ * without a device.
+ */
+export type NextAction =
+  /** Mid-chapter: pick up where the reading stopped. */
+  | { kind: 'continue'; chapterId: string; sectionIndex: number }
+  /** A topic they keep getting wrong, with enough answers to mean it. */
+  | { kind: 'fix'; topic: string; chapterId: string; accuracy: number }
+  /** Today's plan, when there is a reason to reach for it. */
+  | { kind: 'task'; task: PlanTask }
+  /** No history at all: begin. */
+  | { kind: 'start'; chapterId: string }
+  | null;
+
+export function nextAction(opts: {
+  subjectIds: string[];
+  grade: number;
+  lastChapterId?: string;
+  lastSectionIndex: number;
+  readSections: string[];
+  attempts: Attempt[];
+  activeDays: string[];
+  plan: PlanTask[];
+}): NextAction {
+  const forChapter = (id: string, chapterId: string) => id.startsWith(`${chapterId}-`);
+
+  /* 1. Half way through a chapter. The most concrete thing there is: they know
+        the chapter, they know where they were, and it is already open work. */
+  const current = opts.lastChapterId ? chapterById(opts.lastChapterId) : undefined;
+  if (opts.lastChapterId && current && current.sectionCount > 0) {
+    const read = opts.readSections.filter((id) => forChapter(id, current.id)).length;
+    if (read > 0 && read < current.sectionCount) {
+      return {
+        kind: 'continue',
+        chapterId: current.id,
+        sectionIndex: Math.min(Math.max(opts.lastSectionIndex, 0), current.sectionCount - 1),
+      };
+    }
+  }
+
+  /* 2. A weak topic. weakTopics already demands three answers and under 75%,
+        which is the "enough evidence" part: one bad guess is not a weakness. */
+  const weak = weakTopics(opts.attempts)[0];
+  if (weak) {
+    return { kind: 'fix', topic: weak.topic, chapterId: weak.chapterId, accuracy: weak.accuracy };
+  }
+
+  /* 3. Nothing behind them at all. Before the plan, because the plan would say
+        "Read chapter one, 15 min" and "Start Physical Quantities" is the same
+        instruction in the words a first morning deserves. */
+  if (!opts.readSections.length && !opts.attempts.length) {
+    const first = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId, opts.readSections);
+    if (first) return { kind: 'start', chapterId: first };
+  }
+
+  /* 4. Today's plan. Shortest first, because the student this is aimed at has
+        not started today and the point is to get them started at all: ten
+        cards is a smaller ask than a chapter. */
+  const undone = opts.plan.filter((task) => !task.done);
+  const shortest =
+    undone.find((task) => task.kind === 'cards') ??
+    undone.find((task) => task.kind === 'mcq') ??
+    undone.find((task) => task.kind === 'read');
+  const studiedToday = opts.activeDays.includes(todayKey());
+  if (shortest && !studiedToday) return { kind: 'task', task: shortest };
+
+  /* 5. Something from the plan, or nothing: a student who has studied today
+        and has no weak topic is allowed to be finished. */
+  return shortest ? { kind: 'task', task: shortest } : null;
+}
+
+/**
+ * The same choice, dressed for a button: what it says and where it goes.
+ *
+ * Here rather than in either dashboard because the two apps share their routes
+ * and their copy keys, and a CTA that says one thing on the phone and another
+ * in the browser is the kind of drift that makes a product feel like two
+ * products. `translate` rather than each app's hook: this is pure, so the
+ * language is an argument.
+ */
+export function nextStep(action: NextAction, lang: Language): { label: string; href: string } | null {
+  if (!action) return null;
+
+  /* A chapter we cannot name. Offline on a Class 10 account the catalogue may
+     not have been primed yet, and "Carry on with {chapter}" would show the
+     brace. The destination is still right, so keep the button and let it say
+     the plainer thing. */
+  const named = (id: string, key: 'dash.nextContinue' | 'dash.nextRead' | 'dash.nextPractise' | 'dash.nextStart', href: string) => {
+    const name = chapterName(chapterById(id), lang);
+    return { label: name ? translate(lang, key, { chapter: name }) : translate(lang, 'dash.continueLearning'), href };
+  };
+
+  switch (action.kind) {
+    case 'continue':
+      /* Straight back to the section they stopped at, not the top of the
+         chapter: "carry on" has to mean carry on. */
+      return named(action.chapterId, 'dash.nextContinue', `/learn/reader/${action.chapterId}?section=${action.sectionIndex}`);
+    case 'fix':
+      /* Practice from the chapter the topic belongs to, which is what the weak
+         topics screen already does with its Practise button. Deliberately not
+         the AI test: a dashboard button should not spend a student's questions
+         for them. */
+      return { label: translate(lang, 'dash.nextFix', { topic: action.topic }), href: `/session/setup?chapter=${action.chapterId}` };
+    case 'task':
+      if (action.task.kind === 'read') return named(action.task.chapterId, 'dash.nextRead', `/learn/reader/${action.task.chapterId}`);
+      if (action.task.kind === 'mcq') return named(action.task.chapterId, 'dash.nextPractise', `/session/setup?chapter=${action.task.chapterId}`);
+      return { label: translate(lang, 'dash.taskCards'), href: `/session/flashcards?chapter=${action.task.chapterId}` };
+    case 'start':
+      return named(action.chapterId, 'dash.nextStart', `/learn/reader/${action.chapterId}`);
+  }
 }

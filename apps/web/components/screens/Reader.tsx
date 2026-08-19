@@ -118,14 +118,14 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
 
 const SUGGESTIONS: StringKey[] = ['reader.suggest1', 'reader.suggest2', 'reader.suggest3'];
 
-export function Reader({ chapter, content }: { chapter: Chapter; content: ChapterContent }) {
+export function Reader({ chapter, content, startSection = 0 }: { chapter: Chapter; content: ChapterContent; startSection?: number }) {
   const { state, actions, derived } = useApp();
   const [quota] = useTutorQuota();
   const aiLeft = quota?.remaining ?? derived.aiLeft;
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
-  const [idx, setIdx] = useState(0);
+  const [rawIdx, setIdx] = useState(startSection);
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
@@ -146,6 +146,9 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
    * showed on every translated chapter in the database.
    */
   const sectionsAreUrdu = sections.some((s) => isUrduScript(s.title));
+  /* Clamped against what the chapter actually has: a link can name a section
+     that is not there, and the number came off a query string. */
+  const idx = Math.min(rawIdx, Math.max(0, sections.length - 1));
   const section = sections[idx];
   const scale = [0.92, 1, 1.12][state.settings.fontScale];
   const total = sections.length || 1;
@@ -153,7 +156,10 @@ export function Reader({ chapter, content }: { chapter: Chapter; content: Chapte
   function advance(dir: 1 | -1) {
     const next = idx + dir;
     if (next < 0 || next >= sections.length) return;
-    if (section) actions.markSectionRead(section.id, id, next);
+    // Only forward movement records progress, the same rule the Android reader
+    // follows. Recording on the way back rewound the dashboard's "carry on
+    // from" pointer to wherever the student happened to re-read.
+    if (section && dir === 1) actions.markSectionRead(section.id, id, next);
     setIdx(next);
     window.scrollTo({ top: 0 });
   }

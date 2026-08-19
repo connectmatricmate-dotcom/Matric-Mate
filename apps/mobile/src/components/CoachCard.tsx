@@ -1,6 +1,7 @@
 import { View } from 'react-native';
-import { chapterById, chapterName, chaptersFor, fetchLatestCoachReport, isUrduScript } from '@matricmate/core';
-import { Card, Label, ScriptText, Skeleton, Small } from './ui';
+import { router } from 'expo-router';
+import { chapterById, chapterName, chaptersFor, fetchLatestCoachReport, isUrduScript, nextAction, nextStep } from '@matricmate/core';
+import { Btn, Card, Label, ScriptText, Skeleton, Small } from './ui';
 import { useAsync } from '../core/useAsync';
 import { useLang, useT } from '../i18n';
 import { useApp } from '../store/app';
@@ -21,6 +22,11 @@ import { Markdown } from './Markdown';
  * least guidance. They now get a welcome and three concrete first steps,
  * written locally: there is nothing to report on yet, and a coach inventing a
  * week they have not had would be worse than saying so plainly.
+ *
+ * It ends in a button. Describing the week and stopping leaves the student to
+ * work out what to do about it, which is the decision the card was supposed to
+ * take off them. One button, never a row of them: three choices is the same
+ * decision again, only with more steps.
  */
 export function CoachCard() {
   const { state, derived } = useApp();
@@ -28,6 +34,25 @@ export function CoachCard() {
   const { lang } = useLang();
 
   const { data, loading } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '']);
+
+  /* The one thing to do next, chosen in core so the browser picks the same
+     thing for the same student. Null when there is genuinely nothing: a
+     student who has studied today and has no weak topic is allowed to be
+     finished, and a button insisting otherwise would be nagging. */
+  const step = nextStep(
+    nextAction({
+      subjectIds: derived.subjects,
+      grade: state.onboarding?.classLevel ?? 9,
+      lastChapterId: state.lastChapterId,
+      lastSectionIndex: state.lastSectionIndex,
+      readSections: state.readSections,
+      attempts: state.attempts,
+      activeDays: state.activeDays,
+      plan: derived.plan,
+    }),
+    lang,
+  );
+  const cta = step ? <Btn title={step.label} variant="orange" onPress={() => router.push(step.href as never)} /> : null;
 
   /**
    * A skeleton while the report is in flight, not the welcome card.
@@ -77,6 +102,7 @@ export function CoachCard() {
             ),
           )}
         </View>
+        {cta}
       </Card>
     );
   }
@@ -108,6 +134,7 @@ export function CoachCard() {
           );
         })}
       </View>
+      {cta}
     </Card>
   );
 }

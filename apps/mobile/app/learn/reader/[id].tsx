@@ -147,7 +147,7 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
 const SUGGESTIONS: StringKey[] = ['reader.suggest1', 'reader.suggest2', 'reader.suggest3'];
 
 export default function Reader() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, section: startAt } = useLocalSearchParams<{ id: string; section?: string }>();
   const { state, actions, derived } = useApp();
   // One number app-wide; the local counter under-counts a paper by two.
   const quota = useQuota();
@@ -162,7 +162,15 @@ export default function Reader() {
      would have no name. The row saved with the download has one. */
   const chapter = fetchedChapter ?? localChapter(id) ?? undefined;
   const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(id), [id]);
-  const [idx, setIdx] = useState(0);
+  /**
+   * Where the reader opens.
+   *
+   * Straight to the top of the chapter unless somebody said otherwise:
+   * `?section=` is how the dashboard's "Carry on with {chapter}" button means
+   * carry on rather than start again. Read once, on mount, so it cannot fight
+   * the student's own paging afterwards.
+   */
+  const [rawIdx, setIdx] = useState(() => Math.max(0, Math.trunc(Number(startAt)) || 0));
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
@@ -188,6 +196,9 @@ export default function Reader() {
    * every translated chapter in the database.
    */
   const sectionsAreUrdu = sections.some((s) => isUrduScript(s.title));
+  /* Clamped against what actually loaded: a link can name a section this
+     chapter does not have, and the content arrives after the first render. */
+  const idx = Math.min(rawIdx, Math.max(0, sections.length - 1));
   const section = sections[idx];
   const scale = [0.92, 1, 1.12][state.settings.fontScale];
   const total = sections.length || 1;
