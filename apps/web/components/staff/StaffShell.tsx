@@ -29,8 +29,28 @@ export type StaffNavItem = {
   owns?: string[];
 };
 
-function isActive(pathname: string, item: StaffNavItem) {
-  return [item.href, ...(item.owns ?? [])].some((base) => pathname === base || pathname.startsWith(`${base}/`));
+/**
+ * Which single tab is lit.
+ *
+ * Longest match wins, and that is the point rather than a nicety. The first
+ * tab is the area root, `/admin`, and every other page sits underneath it, so
+ * a plain prefix test lit Overview on top of Teachers and two tabs looked
+ * selected at once. Comparing lengths means `/admin/teachers` beats `/admin`,
+ * while `/admin` still wins on its own page.
+ */
+function activeHref(pathname: string, nav: StaffNavItem[]): string | null {
+  let best: string | null = null;
+  let bestLen = -1;
+  for (const item of nav) {
+    for (const base of [item.href, ...(item.owns ?? [])]) {
+      const hit = pathname === base || pathname.startsWith(`${base}/`);
+      if (hit && base.length > bestLen) {
+        best = item.href;
+        bestLen = base.length;
+      }
+    }
+  }
+  return best;
 }
 
 export function StaffShell({
@@ -50,6 +70,7 @@ export function StaffShell({
 }) {
   const pathname = usePathname();
   const home = nav[0]?.href ?? '/';
+  const active = activeHref(pathname, nav);
 
   return (
     <div className="min-h-screen md:flex">
@@ -62,7 +83,7 @@ export function StaffShell({
 
         <nav className="flex flex-col gap-1">
           {nav.map((item) => {
-            const on = isActive(pathname, item);
+            const on = active === item.href;
             return (
               <Link
                 key={item.href}
@@ -114,7 +135,7 @@ export function StaffShell({
       {/* phone bottom bar */}
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
         {nav.map((item) => {
-          const on = isActive(pathname, item);
+          const on = active === item.href;
           return (
             <Link
               key={item.href}

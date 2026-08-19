@@ -114,3 +114,34 @@ export async function adminStats(): Promise<AdminStats> {
     referredPaid,
   };
 }
+
+/**
+ * Fourteen days of signups, money and study activity, for the overview chart.
+ *
+ * Grouped by the database, through `admin_daily_stats`, and read with the
+ * caller's own session so the function's admin gate applies. Doing the
+ * bucketing here instead would mean paging three growing tables in full to
+ * draw fourteen bars.
+ */
+export type DailyPoint = { day: string; signups: number; revenue: number; studied: number };
+
+export async function dailyStats(days = 14): Promise<DailyPoint[]> {
+  const { createClient } = await import('@/lib/supabase/server');
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('admin_daily_stats', { days });
+
+  if (error) {
+    // The chart is the least important thing on the page. An empty series
+    // renders as a flat run, which is honest, rather than taking the overview
+    // down with it.
+    console.error('admin-stats: daily failed', error.message);
+    return [];
+  }
+
+  return (data ?? []).map((r: Record<string, unknown>) => ({
+    day: String(r.day),
+    signups: Number(r.signups ?? 0),
+    revenue: Number(r.revenue ?? 0),
+    studied: Number(r.studied ?? 0),
+  }));
+}

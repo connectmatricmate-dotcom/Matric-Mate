@@ -22,7 +22,10 @@ function Button({ active }: { active: boolean }) {
     <button
       type="submit"
       disabled={pending}
-      className={`min-h-9 w-[104px] cursor-pointer rounded-full px-3 text-[12.5px] font-extrabold transition-[filter,background-color,color] duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
+      /* Fixed height and one line, both states. Sized to the longer label so
+         the column does not jump width when a row flips, and nowrap because
+         "Give Premium" wrapped into two lines inside a pill. */
+      className={`inline-flex h-9 w-[124px] shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-full px-3 text-[12.5px] font-extrabold transition-[filter,background-color,color] duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
         active
           ? 'border border-line bg-card text-ink2 hover:border-red hover:text-red'
           : 'bg-teal text-onbrand hover:brightness-110'

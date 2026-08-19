@@ -1,6 +1,7 @@
-import Link from 'next/link';
-import { adminStats } from '@/lib/admin-stats';
-import { Panel, Stat, StatGrid, rupees } from '@/components/admin/bits';
+import { Suspense } from 'react';
+import { adminStats, dailyStats } from '@/lib/admin-stats';
+import { TrendChart } from '@/components/admin/TrendChart';
+import { Stat, StatGrid, rupees } from '@/components/admin/bits';
 
 /**
  * The admin overview. Five questions, answered.
@@ -44,41 +45,45 @@ export default async function AdminOverview() {
         </StatGrid>
       </div>
 
-      <Panel
-        title="Students"
-        action={
-          <Link
-            href="/admin/students"
-            className="rounded-full bg-teal px-4 py-2 text-[13px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110"
-          >
-            Open students
-          </Link>
-        }
-      >
-        <p className="px-4 py-4 text-[13px] text-ink2">
-          {s.students
-            ? 'Every account, with a button to give or take away Premium for anybody who paid outside the app.'
-            : 'Nobody has signed up yet. Students appear here the moment they create an account.'}
-        </p>
-      </Panel>
+      {/* These two panels were a heading, a button and a sentence that
+          repeated the sidebar. Nobody navigates from a paragraph when the same
+          link sits two inches to the left, so the space now carries the one
+          thing the overview could not say: which way the numbers are going. */}
+      <Suspense fallback={<ChartSkeleton />}>
+        <Charts />
+      </Suspense>
 
-      <Panel
-        title="Teachers"
-        action={
-          <Link
-            href="/admin/teachers/new"
-            className="rounded-full bg-teal px-4 py-2 text-[13px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110"
-          >
-            Add a teacher
-          </Link>
-        }
-      >
-        <p className="px-4 py-4 text-[13px] text-ink2">
-          {s.teachers
-            ? 'Open Teachers to see each one’s students, commission and what they are owed.'
-            : 'No teachers yet. Add one and the system will mint their referral link.'}
-        </p>
-      </Panel>
     </>
+  );
+}
+
+async function Charts() {
+  const days = await dailyStats(14);
+
+  return (
+    <div className="mt-7 grid gap-3 md:grid-cols-3">
+      <TrendChart title="Signups · 14 days" points={days.map((d) => ({ day: d.day, value: d.signups }))} />
+      <TrendChart
+        title="Collected · 14 days"
+        points={days.map((d) => ({ day: d.day, value: d.revenue }))}
+        tone="green"
+        money
+      />
+      <TrendChart
+        title="Studied · 14 days"
+        points={days.map((d) => ({ day: d.day, value: d.studied }))}
+        tone="orange"
+      />
+    </div>
+  );
+}
+
+function ChartSkeleton() {
+  return (
+    <div className="mt-7 grid gap-3 md:grid-cols-3">
+      {['a', 'b', 'c'].map((k) => (
+        <div key={k} className="h-[176px] animate-pulse rounded-[16px] border border-line bg-card" />
+      ))}
+    </div>
   );
 }
