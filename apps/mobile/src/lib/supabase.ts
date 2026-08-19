@@ -135,11 +135,32 @@ configureTutor({
     }
   },
   /**
-   * expo/fetch, not React Native's built-in fetch, and only here: it exposes
-   * a readable response body, which is what lets tutor answers stream in
-   * word by word instead of landing all at once.
+   * expo/fetch, not React Native's built-in fetch, and only here: it exposes a
+   * readable response body, which is what lets a tutor answer stream in as it
+   * is written instead of landing all at once.
+   *
+   * And `accept-encoding: identity`, which is the other half of that and took
+   * far too long to find. expo/fetch quietly adds `zstd, br, gzip` to every
+   * request it makes (TransparentCompressionInterceptor), Vercel answers our
+   * NDJSON with Brotli, and expo decodes it through `BrotliInputStream`: a
+   * blocking decoder that hands back nothing until it has a whole meta-block.
+   * A tutor answer compresses to well under a kilobyte, which is one block, so
+   * the entire stream arrived as a single chunk. Everything upstream was
+   * streaming correctly and the last decoder in the chain undid all of it.
+   *
+   * The interceptor leaves the header alone when the caller has set one, and
+   * skips decompression entirely when the response comes back uncompressed, so
+   * asking for identity takes the decoder out of the path. It costs a kilobyte
+   * or two of extra transfer per answer. Time to first token measured lower
+   * without compression anyway.
    */
-  fetchImpl: (url, init) => expoFetch(url, init as Parameters<typeof expoFetch>[1]) as unknown as Promise<Response>,
+  fetchImpl: (url, init) =>
+    expoFetch(url, {
+      ...init,
+      // A plain object, not a Headers instance: every caller here builds one
+      // already, and it keeps this independent of how expo normalises them.
+      headers: { ...((init?.headers ?? {}) as Record<string, string>), 'accept-encoding': 'identity' },
+    } as Parameters<typeof expoFetch>[1]) as unknown as Promise<Response>,
 });
 
 /**

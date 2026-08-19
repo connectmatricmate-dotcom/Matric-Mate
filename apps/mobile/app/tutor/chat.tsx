@@ -1,15 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Image, ScrollView, Text, TextInput, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon, IconName } from '../../src/components/Icon';
+import { Icon } from '../../src/components/Icon';
 import { IconButton, Pill, Row, Screen, ScriptText, Small, Tap, TypingDots, useRevealed, useToast } from '../../src/components/ui';
 import { useKeyboardOverlap } from '../../src/core/keyboard';
 import { ChapterPicker } from '../../src/components/ChapterPicker';
-import { ChatMessage, api, chapterById, isUrduScript, rateTutorAnswer, weakTopics } from '@matricmate/core';
-import type { TutorImage } from '@matricmate/core';
+import {
+  ChatMessage,
+  TUTOR_ACTION_LABEL,
+  TUTOR_ACTION_ROUTE,
+  api,
+  chapterById,
+  isUrduScript,
+  parseTutorActions,
+  rateTutorAnswer,
+  subjectById,
+  weakTopics,
+  type TutorAction,
+  type TutorImage,
+} from '@matricmate/core';
+import type { StringKey } from '../../src/i18n';
 import { supabase } from '../../src/lib/supabase';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -30,6 +43,9 @@ const clock = (iso: string) =>
  */
 function LiveAnswer({ text }: { text: string }) {
   const shown = useRevealed(text);
+  // `true`: a tag half-written by the model must not flash as raw brackets in
+  // the middle of the answer before it turns into a button.
+  const { text: prose } = parseTutorActions(shown, true);
   return (
     <View
       style={{
@@ -43,8 +59,50 @@ function LiveAnswer({ text }: { text: string }) {
         borderBottomLeftRadius: 6,
       }}
     >
-      <Markdown text={shown} size={13.5} />
+      <Markdown text={prose} size={13.5} />
     </View>
+  );
+}
+
+/**
+ * The buttons the tutor can put under an answer.
+ *
+ * "You should revise Kinematics" used to be the end of it, and the student had
+ * to go and find Kinematics. The model names a chapter and a verb, core turns
+ * that into a route, and this draws it. Labels come from our own strings, so
+ * an Urdu-medium student gets Urdu buttons under an Urdu answer whatever the
+ * model happened to write in.
+ */
+function AnswerActions({ actions }: { actions: TutorAction[] }) {
+  const t = useT();
+  if (!actions.length) return null;
+  return (
+    <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
+      {actions.map((a) => (
+        <Tap key={`${a.kind}-${a.chapterId}`} onPress={() => router.push(TUTOR_ACTION_ROUTE[a.kind](a.chapterId) as never)}>
+          <View
+            style={{
+              flexDirection: rowDir(),
+              alignItems: 'center',
+              gap: 6,
+              backgroundColor: C.teal,
+              borderRadius: R.pill,
+              paddingVertical: 9,
+              paddingHorizontal: 14,
+              maxWidth: 260,
+            }}
+          >
+            <Icon name="spark" size={13} color={C.onBrand} />
+            <Text numberOfLines={1} style={{ flexShrink: 1, fontFamily: F.bodyBold, fontSize: 12.5, color: C.onBrand }}>
+              {t(TUTOR_ACTION_LABEL[a.kind] as StringKey)}
+            </Text>
+            <Text numberOfLines={1} style={{ flexShrink: 1, fontFamily: F.body, fontSize: 11.5, color: C.onBrand, opacity: 0.85 }}>
+              · {a.chapterTitle}
+            </Text>
+          </View>
+        </Tap>
+      ))}
+    </Row>
   );
 }
 
@@ -57,54 +115,107 @@ function LiveAnswer({ text }: { text: string }) {
  * a long way from the box it was talking about. An empty state should look
  * like an empty state and should teach the three things worth knowing here.
  */
-function EmptyChat() {
+function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const t = useT();
-  const tips: { icon: IconName; key: 'tutor.emptyTip1' | 'tutor.emptyTip2' | 'tutor.emptyTip3' }[] = [
-    { icon: 'globe', key: 'tutor.emptyTip1' },
-    { icon: 'camera', key: 'tutor.emptyTip2' },
-    { icon: 'book', key: 'tutor.emptyTip3' },
-  ];
+  const { state, derived } = useApp();
+
+  /**
+   * The questions a student does not think to ask.
+   *
+   * Built from what we already know about them rather than from a fixed list:
+   * the topic they keep getting wrong, the chapter they had open last, the
+   * subject they are carrying. A generic "ask me anything" teaches nothing;
+   * "Help me fix Momentum, where do I keep going wrong" is the question that
+   * turns a tutor into a tutor.
+   *
+   * Tapping one fills the box. It does not send. Same rule as everywhere else
+   * on this screen: nothing we compose spends one of their fifty by itself.
+   */
+  const starters = useMemo(() => {
+    const out: string[] = [];
+    const weak = weakTopics(state.attempts)[0]?.topic;
+    if (weak) out.push(t('tutor.starterWeak', { topic: weak }));
+    const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId)?.title : undefined;
+    if (lastChapter) out.push(t('tutor.starterChapter', { chapter: lastChapter }));
+    const subject = subjectById(derived.subjects[0] ?? '')?.name;
+    if (subject) out.push(t('tutor.starterExam', { subject }));
+    if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
+    out.push(t('tutor.starterMarks'));
+    return out.slice(0, 4);
+  }, [state.attempts, state.lastChapterId, derived.subjects, t]);
+
+  /*
+   * Two blocks, pushed apart, rather than one column of everything.
+   *
+   * The first version stacked a centred heading, centred body copy and then a
+   * left-aligned list, which read as broken: two alignments in one block with
+   * nothing between them, and then half a screen of nothing above the
+   * composer. The greeting belongs in the space at the top. The things you can
+   * tap belong at the bottom, next to the thumb and next to the box they fill
+   * in. The three tips that used to sit in the middle are gone: the body copy
+   * already said all three, so they were the same sentence twice.
+   */
   return (
-    <View style={{ alignItems: 'center', paddingTop: S.xl, paddingHorizontal: S.md, gap: S.md }}>
-      <View
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: 22,
-          backgroundColor: C.tealTint,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Icon name="spark" size={30} color={C.teal} />
+    <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: S.lg }}>
+      <View style={{ alignItems: 'center', gap: S.md, paddingHorizontal: S.md, paddingTop: S.xl }}>
+        <View
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 22,
+            backgroundColor: C.tealTint,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon name="spark" size={30} color={C.teal} />
+        </View>
+        <View style={{ gap: 6, alignItems: 'center' }}>
+          <Text style={{ fontFamily: F.display, fontSize: 20, color: C.ink, textAlign: 'center' }}>
+            {t('tutor.emptyTitle')}
+          </Text>
+          <Small style={{ textAlign: 'center', lineHeight: 20 }}>{t('tutor.emptyBody')}</Small>
+        </View>
       </View>
-      <View style={{ gap: 6, alignItems: 'center' }}>
-        <Text style={{ fontFamily: F.display, fontSize: 20, color: C.ink, textAlign: 'center' }}>
-          {t('tutor.emptyTitle')}
-        </Text>
-        <Small style={{ textAlign: 'center', lineHeight: 20 }}>{t('tutor.emptyBody')}</Small>
-      </View>
-      <View style={{ gap: S.sm, alignSelf: 'stretch', marginTop: S.sm }}>
-        {tips.map((tip) => (
-          <Row key={tip.key} gap={S.sm} style={{ alignItems: 'center' }}>
-            <View
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 9,
-                backgroundColor: C.card,
-                borderWidth: 1,
-                borderColor: C.line,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon name={tip.icon} size={15} color={C.ink2} />
-            </View>
-            <Small style={{ flex: 1, fontSize: 12.5 }}>{t(tip.key)}</Small>
-          </Row>
-        ))}
-      </View>
+
+      {starters.length ? (
+        <View style={{ gap: S.sm, marginTop: S.xl }}>
+          <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, letterSpacing: 0.7, color: C.ink3, textAlign: textStart() }}>
+            {t('tutor.startersTitle').toUpperCase()}
+          </Text>
+          {starters.map((line) => (
+            <Tap key={line} onPress={() => onStarter(line)}>
+              <View
+                style={{
+                  flexDirection: rowDir(),
+                  alignItems: 'center',
+                  gap: S.sm,
+                  backgroundColor: C.card,
+                  borderWidth: 1,
+                  borderColor: C.line,
+                  borderRadius: 14,
+                  paddingVertical: 12,
+                  paddingHorizontal: 13,
+                }}
+              >
+                <Text
+                  style={{
+                    flex: 1,
+                    fontFamily: F.body,
+                    fontSize: 13,
+                    lineHeight: 19,
+                    color: C.ink,
+                    textAlign: textStart(),
+                  }}
+                >
+                  {line}
+                </Text>
+                <Icon name="chevron" size={15} color={C.ink3} />
+              </View>
+            </Tap>
+          ))}
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -389,12 +500,15 @@ export default function Chat() {
         ref={scroller}
         contentContainerStyle={[
           { padding: S.lg, gap: S.md },
+          // An empty chat has to fill the viewport, or there is nothing for
+          // the greeting and the starters to be pushed apart within.
+          messages.length === 0 && !thinking && { flexGrow: 1 },
           isWeb && { maxWidth: 760, width: '100%', alignSelf: 'center' },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {messages.length === 0 && !thinking ? <EmptyChat /> : null}
+        {messages.length === 0 && !thinking ? <EmptyChat onStarter={setInput} /> : null}
 
         {messages.map((m) =>
           m.role === 'user' ? (
@@ -435,7 +549,8 @@ export default function Chat() {
             >
               {/* Markdown-aware: the model sometimes marks up its answer,
                   and students should read headings and lists, not asterisks. */}
-              <Markdown text={m.text} size={13.5} />
+              <Markdown text={parseTutorActions(m.text).text} size={13.5} />
+              <AnswerActions actions={parseTutorActions(m.text).actions} />
               {m.steps?.map((step, i) => (
                 <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                   <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>

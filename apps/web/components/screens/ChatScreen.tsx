@@ -1,8 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { api, isUrduScript, rateTutorAnswer, type ChatMessage, type IconName, type StringKey, type TutorImage, weakTopics } from '@matricmate/core';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  TUTOR_ACTION_LABEL,
+  TUTOR_ACTION_ROUTE,
+  api,
+  chapterById,
+  isUrduScript,
+  parseTutorActions,
+  rateTutorAnswer,
+  subjectById,
+  weakTopics,
+  type ChatMessage,
+  type StringKey,
+  type TutorAction,
+  type TutorImage,
+} from '@matricmate/core';
 import { PillButton } from '@/components/ui/controls';
 import { Icon, Pill, ScriptText } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
@@ -13,40 +27,92 @@ import { quotaClock, useTutorQuota } from '@/lib/use-tutor-quota';
 import { ChapterPicker } from '@/components/ui/ChapterPicker';
 
 /**
+ * The buttons the tutor can put under an answer.
+ *
+ * "You should revise Kinematics" used to be the end of it, and the student had
+ * to go and find Kinematics. The model names a chapter and a verb, core turns
+ * that into a route, and this draws it. Labels come from our own strings, so
+ * an Urdu-medium student gets Urdu buttons under an Urdu answer whatever the
+ * model happened to write in.
+ */
+function AnswerActions({ actions }: { actions: TutorAction[] }) {
+  const t = useT();
+  if (!actions.length) return null;
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {actions.map((a) => (
+        <Link
+          key={`${a.kind}-${a.chapterId}`}
+          href={TUTOR_ACTION_ROUTE[a.kind](a.chapterId)}
+          className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-teal px-3.5 py-2 text-[12.5px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110"
+        >
+          <Icon name="spark" size={13} className="shrink-0" />
+          <span className="truncate">{t(TUTOR_ACTION_LABEL[a.kind] as StringKey)}</span>
+          <span className="truncate font-normal opacity-85">· {a.chapterTitle}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/**
  * The chat before there is a chat.
  *
- * This was a tinted card holding one sentence, "Ask anything: a concept, a
- * question, or explain this simply", floating at the top of an otherwise blank
- * column. It read as a message the tutor had sent, which it is not, and it sat
- * a long way from the box it was talking about. An empty state should look
- * like an empty state and teach the three things worth knowing here.
+ * Two blocks pushed apart, not one column of everything: the greeting takes
+ * the space at the top, and the things you can tap sit at the bottom next to
+ * the box they fill in. The first version stacked a centred heading, centred
+ * body copy and then a left-aligned list of tips, which read as broken, and
+ * the tips repeated what the body copy already said.
+ *
+ * The starters are built from what we know about this student: the topic they
+ * keep getting wrong, the chapter they had open last. Tapping one fills the
+ * box and stops. Nothing we compose spends one of their fifty by itself.
  */
-function EmptyChat() {
+function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const t = useT();
-  const tips: { icon: IconName; key: StringKey }[] = [
-    { icon: 'globe', key: 'tutor.emptyTip1' },
-    { icon: 'camera', key: 'tutor.emptyTip2' },
-    { icon: 'book', key: 'tutor.emptyTip3' },
-  ];
+  const { state, derived } = useApp();
+
+  const starters = useMemo(() => {
+    const out: string[] = [];
+    const weak = weakTopics(state.attempts)[0]?.topic;
+    if (weak) out.push(t('tutor.starterWeak', { topic: weak }));
+    const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId)?.title : undefined;
+    if (lastChapter) out.push(t('tutor.starterChapter', { chapter: lastChapter }));
+    const subject = subjectById(derived.subjects[0] ?? '')?.name;
+    if (subject) out.push(t('tutor.starterExam', { subject }));
+    if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
+    out.push(t('tutor.starterMarks'));
+    return out.slice(0, 4);
+  }, [state.attempts, state.lastChapterId, derived.subjects, t]);
+
   return (
-    <div className="flex flex-col items-center gap-4 px-4 pt-10 text-center">
-      <span className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-tealtint text-teal">
-        <Icon name="spark" size={30} />
-      </span>
-      <div className="space-y-1.5">
-        <h2 className="font-display text-[21px] text-ink">{t('tutor.emptyTitle')}</h2>
-        <p className="mx-auto max-w-[420px] text-[13.5px] leading-[1.6] text-ink2">{t('tutor.emptyBody')}</p>
+    <div className="flex min-h-full flex-col justify-between gap-8 py-4">
+      <div className="flex flex-col items-center gap-4 px-4 pt-8 text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-tealtint text-teal">
+          <Icon name="spark" size={30} />
+        </span>
+        <div className="space-y-1.5">
+          <h2 className="font-display text-[21px] text-ink">{t('tutor.emptyTitle')}</h2>
+          <p className="mx-auto max-w-[440px] text-[13.5px] leading-[1.6] text-ink2">{t('tutor.emptyBody')}</p>
+        </div>
       </div>
-      <ul className="mt-1 w-full max-w-[420px] space-y-2 text-start">
-        {tips.map((tip) => (
-          <li key={tip.key} className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px] border border-line bg-card text-ink2">
-              <Icon name={tip.icon} size={15} />
-            </span>
-            <span className="text-[12.5px] text-ink2">{t(tip.key)}</span>
-          </li>
-        ))}
-      </ul>
+
+      {starters.length ? (
+        <div className="space-y-2">
+          <p className="text-[11.5px] font-extrabold uppercase tracking-[0.07em] text-ink3">{t('tutor.startersTitle')}</p>
+          {starters.map((line) => (
+            <button
+              key={line}
+              type="button"
+              onClick={() => onStarter(line)}
+              className="flex w-full items-center gap-3 rounded-[14px] border border-line bg-card px-3.5 py-3 text-start transition-colors duration-200 hover:border-tealtint2 hover:bg-paper"
+            >
+              <span className="min-w-0 flex-1 text-[13px] leading-[1.5] text-ink">{line}</span>
+              <Icon name="chevron" size={15} className="shrink-0 text-ink3" />
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -309,8 +375,14 @@ export function ChatScreen({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-8">
-        <div className="mx-auto flex w-full max-w-[820px] flex-col gap-4 py-5">
-        {messages.length === 0 && !thinking ? <EmptyChat /> : null}
+        <div
+          className={`mx-auto flex w-full max-w-[820px] flex-col gap-4 py-5 ${
+            /* An empty chat has to fill the column, or there is nothing for
+               the greeting and the starters to be pushed apart within. */
+            messages.length === 0 && !thinking ? 'min-h-full' : ''
+          }`}
+        >
+        {messages.length === 0 && !thinking ? <EmptyChat onStarter={setInput} /> : null}
 
         {messages.map((m) =>
           m.role === 'user' ? (
@@ -333,7 +405,8 @@ export function ChatScreen({
             >
               {/* Markdown-aware: the model sometimes marks up its answer,
                   and students should read headings and lists, not asterisks. */}
-              <Markdown text={m.text} className="text-[13.5px] leading-[1.65] text-ink" />
+              <Markdown text={parseTutorActions(m.text).text} className="text-[13.5px] leading-[1.65] text-ink" />
+            <AnswerActions actions={parseTutorActions(m.text).actions} />
               {m.steps?.length ? (
                 <ol className="mt-2 flex flex-col gap-2">
                   {m.steps.map((step, i) => (
@@ -419,7 +492,9 @@ export function ChatScreen({
 
         {thinking && liveText ? (
           <div className="max-w-[92%] self-start rounded-[18px] rounded-es-[6px] border border-line bg-card p-4">
-            <Markdown text={liveText} className="text-[13.5px] leading-[1.65] text-ink" />
+            {/* `true`: a tag half-written by the model must not flash as raw
+                brackets before it turns into a button. */}
+            <Markdown text={parseTutorActions(liveText, true).text} className="text-[13.5px] leading-[1.65] text-ink" />
           </div>
         ) : thinking ? (
           <div

@@ -148,20 +148,35 @@ export function TutorView() {
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('tutor.recentChats')}</h2>
             {threads.length === 0 ? (
-              <Empty icon="whatsapp" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />
+              /* Was the WhatsApp glyph, left behind when that channel was
+                 removed. Nothing here has been about WhatsApp for a while. */
+              <Empty icon="spark" title={t('tutor.noChatsTitle')} sub={t('tutor.noChatsBody')} />
             ) : (
-              <Card flat className="py-0">
-                {threads.map((thread, i) => (
-                  <Item
-                    key={thread.id}
-                    href={`/tutor/chat?thread=${thread.id}`}
-                    title={thread.title}
-                    sub={`${thread.context_label ?? ''} ${formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })}`.trim()}
-                    icon="spark"
-                    last={i === threads.length - 1}
-                  />
-                ))}
-              </Card>
+              <>
+                <Card flat className="py-0">
+                  {threads.slice(0, 5).map((thread, i, shown) => (
+                    <Item
+                      key={thread.id}
+                      href={`/tutor/chat?thread=${thread.id}`}
+                      title={thread.title}
+                      sub={`${thread.context_label ?? ''} ${formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })}`.trim()}
+                      icon="spark"
+                      last={i === shown.length - 1}
+                    />
+                  ))}
+                </Card>
+                {/* Only when there is more to see. A link to a list of the
+                    same five you are already looking at is a small lie. */}
+                {threads.length > 5 ? (
+                  <Link
+                    href="/tutor/chats"
+                    className="mt-2.5 inline-flex min-h-11 items-center gap-1 text-[13px] font-extrabold text-teal transition-colors duration-200 hover:brightness-90"
+                  >
+                    {t('tutor.viewAllChats')}
+                    <Icon name="chevron" size={16} />
+                  </Link>
+                ) : null}
+              </>
             )}
           </div>
 

@@ -105,7 +105,14 @@ async function buildStandingContext(admin: ReturnType<typeof createAdminClient>,
     .order('number');
   const bySubject = new Map<string, string[]>();
   for (const c of data ?? []) {
-    const line = `${c.number}. ${c.title}${c.exam_share ? ` (${c.exam_share}% of the paper${c.exam_marks ? `, ~${c.exam_marks} marks` : ''})` : ''}`;
+    /*
+     * The id goes in, not just the number and title. It is what lets an answer
+     * end with a button that opens the chapter: see parseTutorActions in core.
+     * The model can only cite ids it has seen, and the client throws away any
+     * it does not recognise, so the two together make a wrong link unlikely
+     * rather than merely rare.
+     */
+    const line = `${c.id} · ${c.number}. ${c.title}${c.exam_share ? ` (${c.exam_share}% of the paper${c.exam_marks ? `, ~${c.exam_marks} marks` : ''})` : ''}`;
     const list = bySubject.get(c.subject_id) ?? [];
     list.push(line);
     bySubject.set(c.subject_id, list);
@@ -135,7 +142,20 @@ How you teach:
 - Write in plain text: short paragraphs and numbered lists only. No markdown headings, no asterisks or bold markers, no tables, no LaTeX. Write fractions with / and powers with ^, the way they are typed in class notes.
 - Never use an em dash. Use a comma, a colon, or a new sentence instead.
 
-Chapter weightage from the board's assessment frameworks (share of the annual paper):
+Sending them to the right part of the app:
+- The student is inside an app that holds, for every chapter below, the notes, an audio lesson, flashcards, a one-page revision sheet, and practice in four formats. When one of those is the honest next step, end your answer with an action tag on its own line and the app turns it into a button:
+    [[read:<id>]]        the chapter notes
+    [[audio:<id>]]       the audio lesson
+    [[sheet:<id>]]       the one-page revision sheet
+    [[flashcards:<id>]]  the flashcards
+    [[practice:<id>]]    a practice set
+    [[shortq:<id>]]      short questions
+    [[blanks:<id>]]      fill in the blanks
+- Use only an id that appears in the list below, exactly as written. Never invent one, and never guess at one for a chapter you cannot find: an answer with no tag is completely fine.
+- At most two, and only when they genuinely help. Most answers need none. A tag on every answer is nagging.
+- Never mention the tag, describe it, or write "click below". It becomes a button they can see.
+
+Chapter weightage from the board's assessment frameworks (share of the annual paper), each line starting with the chapter id:
 
 `;
 
