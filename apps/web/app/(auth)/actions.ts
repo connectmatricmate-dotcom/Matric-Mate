@@ -7,7 +7,7 @@ import { readUiLanguage } from '@/lib/ui-language.server';
 import { z } from 'zod';
 import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
-import { currentRole, homeFor } from '@/lib/roles';
+import { currentRole, landingFor } from '@/lib/roles';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -169,7 +169,7 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
    * a particular page keeps working.
    */
   const asked = safePath(formData.get('next'), '');
-  redirect(asked || homeFor(await currentRole()));
+  redirect(asked || (await landingFor(await currentRole())));
 }
 
 export async function resetPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {

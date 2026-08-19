@@ -1,3 +1,4 @@
+import { LanguageRefresh } from '@/components/app/LanguageRefresh';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Localized } from '@/components/app/Localized';
@@ -59,6 +60,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <Localized lang={lang}>
       <AppProvider initialLanguage={lang}>
+        <LanguageRefresh />
         <PushLive />
         <Shell>{children}</Shell>
       </AppProvider>

@@ -350,9 +350,27 @@ const actions: Actions = {
      * does not re-render.
      */
     writeLanguageCookie(next);
-    if (typeof window !== 'undefined' && document.documentElement.lang !== next) {
-      document.documentElement.lang = next;
-      document.documentElement.dir = next === 'ur' ? 'rtl' : 'ltr';
+    if (typeof window !== 'undefined') {
+      if (document.documentElement.lang !== next) {
+        document.documentElement.lang = next;
+        document.documentElement.dir = next === 'ur' ? 'rtl' : 'ltr';
+      }
+      /*
+       * And re-render the server tree, which the cookie alone does not do.
+       *
+       * Half this app's chrome is decided on the server from that cookie: the
+       * `Localized` wrapper, the direction classes, and anything a server
+       * component rendered through `t()`. Writing the cookie changes what the
+       * NEXT request would produce and nothing about the page already on
+       * screen, so the sidebar stayed on the left in Urdu until the student
+       * reloaded by hand. The comment above claimed a reload; there was none.
+       *
+       * An event rather than a call, because this is a plain module and
+       * `useRouter` is a hook. `LanguageRefresh` in the app shell listens and
+       * calls `router.refresh()`, which re-fetches the server tree in place
+       * instead of throwing the whole page away.
+       */
+      window.dispatchEvent(new CustomEvent('mm:language'));
     }
     const onboarding = getSnapshot().onboarding;
     if (onboarding) {

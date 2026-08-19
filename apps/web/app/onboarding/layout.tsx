@@ -1,3 +1,4 @@
+import { LanguageRefresh } from '@/components/app/LanguageRefresh';
 import { Localized } from '@/components/app/Localized';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import Link from 'next/link';
@@ -19,6 +20,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
             <Wordmark priority />
           </Link>
         </header>
+        <LanguageRefresh />
         {children}
       </div>
       </AppProvider>

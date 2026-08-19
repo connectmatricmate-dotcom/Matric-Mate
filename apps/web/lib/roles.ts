@@ -32,6 +32,25 @@ export function homeFor(role: Role): string {
 }
 
 /**
+ * Where to send somebody who has just signed in, in ONE hop.
+ *
+ * Sending an unpaid student to `/dashboard` and letting the app layout bounce
+ * them to `/upgrade` looks equivalent and is not. A `redirect()` from a server
+ * action is finished by the router on the client, and when the page it lands
+ * on redirects again the router is handed a payload it does not follow: the
+ * screen goes blank and stays blank until the student reloads by hand. A plain
+ * refresh of the same URL answers 307 and works, which is exactly the shape of
+ * the bug that was reported.
+ *
+ * So the decision is made once, here, before the redirect happens.
+ */
+export async function landingFor(role: Role): Promise<string> {
+  if (role !== 'student') return homeFor(role);
+  const { hasActivePlan } = await import('@/lib/entitlement');
+  return (await hasActivePlan()) ? '/dashboard' : '/upgrade';
+}
+
+/**
  * A second lock on the admin door, independent of the database.
  *
  * `ADMIN_EMAILS` is a comma-separated allowlist in the environment. An account
