@@ -86,6 +86,8 @@ type Ctx = {
   loading: boolean;
   /** Entitlement has been settled at least once; gates on "no plan" must wait for it. */
   entitlementReady: boolean;
+  /** Student, or one of the two staff kinds whose screens live on the website. */
+  role: 'student' | 'affiliate' | 'admin';
   session: Session | null;
   user: AuthUser | null;
   entitlement: Entitlement;
@@ -166,6 +168,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [entitlementReady, setEntitlementReady] = useState(false);
   const [checking, setChecking] = useState(false);
   const [profileName, setProfileName] = useState<string | null>(null);
+  /**
+   * Which of the three kinds of account this is.
+   *
+   * The app is for students. Teachers on the referral programme and
+   * administrators exist in the same auth system, have no subscription, and
+   * were therefore being shown the paywall: asked to buy the product they run.
+   * Their own screens are on the website; here they only need telling.
+   */
+  const [role, setRole] = useState<'student' | 'affiliate' | 'admin'>('student');
 
   /** Guards against a slow response from a previous user overwriting the current one. */
   const currentUserId = useRef<string | null>(null);
@@ -219,8 +230,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase.from('profiles').select('name').eq('id', userId).maybeSingle();
-    if (currentUserId.current === userId) setProfileName(data?.name ?? null);
+    const { data } = await supabase.from('profiles').select('name,role').eq('id', userId).maybeSingle();
+    if (currentUserId.current === userId) {
+      setProfileName(data?.name ?? null);
+      const r = data?.role;
+      setRole(r === 'affiliate' || r === 'admin' ? r : 'student');
+    }
   }, []);
 
   /** Applies a session change: remember who it is, then fetch what they own. */
@@ -234,6 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setEntitlement(NONE);
         setEntitlementReady(true);
         setProfileName(null);
+        setRole('student');
         return;
       }
       setEntitlementReady(false);
@@ -301,6 +317,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return {
       loading,
       entitlementReady,
+      role,
       session,
       user: authUser,
       entitlement,
@@ -394,7 +411,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfileName(clean);
       },
     };
-  }, [loading, entitlementReady, session, entitlement, checking, profileName, adopt, loadEntitlement]);
+  }, [loading, entitlementReady, role, session, entitlement, checking, profileName, adopt, loadEntitlement]);
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

@@ -1,6 +1,7 @@
 import { ActivityIndicator, View } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { IconName } from '../../src/components/Icon';
+import { StaffAccount } from '../../src/components/StaffAccount';
 import { TabBar } from '../../src/components/TabBar';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
@@ -37,7 +38,7 @@ const TABS: { name: string; label: StringKey; icon: IconName }[] = [
  */
 export default function TabLayout() {
   const { state, hydrated } = useApp();
-  const { entitlementReady } = useAuth();
+  const { entitlementReady, role } = useAuth();
   const online = useOnline();
   const t = useT();
 
@@ -53,6 +54,17 @@ export default function TabLayout() {
    * working; they meet this the next time they come back to a tab.
    */
   if (hydrated && state.user && !online) return <Redirect href="/offline" />;
+
+  /*
+   * Staff are not students.
+   *
+   * A teacher on the referral programme and an administrator both live in the
+   * same auth system and neither has a subscription, so without this they fell
+   * through to the paywall and were asked to buy the product they help run.
+   * Before the plan check for exactly that reason, and after entitlementReady
+   * so the role has been read.
+   */
+  if (hydrated && state.user && entitlementReady && role !== 'student') return <StaffAccount />;
 
   /**
    * No plan, no tabs.

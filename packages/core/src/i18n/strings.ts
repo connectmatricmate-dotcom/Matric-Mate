@@ -107,6 +107,12 @@ export const en = {
     contactPlaceholder: 'hassan.ali@gmail.com',
     mobile: 'Mobile number',
     mobilePlaceholder: '0300 1234567',
+    /* Shown when a teacher or an administrator signs in to the app. Their
+       screens are on the website, and without this they met the paywall and
+       were asked to buy the product they run. */
+    staffTitle: 'This account is managed on the website',
+    staffBody: 'Your dashboard, your students and your earnings are all there. Sign in at {site} on a browser.',
+    staffStudentNote: 'Studying on this app needs a student account.',
     password: 'Password',
     passwordPlaceholder: 'At least 6 characters',
     terms: 'By continuing you agree to the Terms and Privacy Policy.',
@@ -1156,6 +1162,9 @@ export const ur: typeof en = {
     contactPlaceholder: 'hassan.ali@gmail.com',
     mobile: 'موبائل نمبر',
     mobilePlaceholder: '0300 1234567',
+    staffTitle: 'یہ اکاؤنٹ ویب سائٹ سے چلتا ہے',
+    staffBody: 'آپ کا ڈیش بورڈ، آپ کے طلبہ اور آپ کی کمائی، سب وہیں ہیں۔ براؤزر میں {site} پر سائن اِن کریں۔',
+    staffStudentNote: 'اس ایپ پر پڑھنے کے لیے طالبِ علم کا اکاؤنٹ چاہیے۔',
     password: 'پاس ورڈ',
     passwordPlaceholder: 'کم از کم 6 حروف',
     terms: 'آگے بڑھنے کا مطلب ہے کہ آپ شرائط اور پرائیویسی پالیسی مانتے ہیں۔',
