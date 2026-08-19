@@ -27,6 +27,23 @@ export const streakAtRisk = (days: number): Notice => ({
   // their inbox, and nobody would pay to send it.
 });
 
+/**
+ * The first thing a new install says.
+ *
+ * Sent by hand rather than on a trigger, because "installed the app" is not
+ * an event this system can see: there is no install hook, only a device
+ * registering a push token, and firing on that would greet the same person
+ * again every time they reinstalled or switched phone.
+ *
+ * Inbox and push, no email. It is a hello, not a record.
+ */
+export const welcome = (): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.welcomeTitle',
+  body: 'notifications.welcomeBody',
+  target: 'home',
+});
+
 export const nothingStudiedToday = (): Notice => ({
   kind: 'reminder',
   title: 'notifications.reminderTitle',

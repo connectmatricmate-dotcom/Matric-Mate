@@ -340,6 +340,8 @@ export const en = {
        are stored already translated rather than translated on the way out. */
     paymentTitle: 'Payment received',
     paymentBody: 'Premium is active until {date}.',
+    welcomeTitle: 'Welcome to MatricMate',
+    welcomeBody: 'Your notes, past papers and the AI tutor are ready. Open a chapter and start where you like.',
     reminderTitle: 'Nothing studied today',
     reminderBody: 'A few questions now still counts. Even ten minutes keeps you moving.',
     streakTitle: '{n} day streak at risk',
@@ -1386,6 +1388,8 @@ export const ur: typeof en = {
     emptyBody: 'پلان، تسلسل اور رپورٹ کارڈ کے بارے میں ہم یہاں یاد دلائیں گے۔',
     paymentTitle: 'ادائیگی موصول ہوئی',
     paymentBody: 'پریمیم {date} تک فعال ہے۔',
+    welcomeTitle: 'MatricMate میں خوش آمدید',
+    welcomeBody: 'آپ کے نوٹس، پرانے پرچے اور اے آئی ٹیوٹر تیار ہیں۔ کوئی بھی باب کھولیں اور شروع کریں۔',
     reminderTitle: 'آج کچھ نہیں پڑھا',
     reminderBody: 'ابھی چند سوال بھی شمار ہوتے ہیں۔ دس منٹ بھی آپ کو آگے رکھتے ہیں۔',
     streakTitle: '{n} دن کا تسلسل خطرے میں',
