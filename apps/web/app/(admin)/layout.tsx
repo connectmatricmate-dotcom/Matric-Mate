@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole, emailAllowedAsAdmin } from '@/lib/roles';
 import { signOutAction } from '@/app/(auth)/actions';
-import { Wordmark } from '@/components/ui/primitives';
+import { SignOutButton, StaffShell, type StaffNavItem } from '@/components/staff/StaffShell';
 
 export const metadata: Metadata = { title: 'Admin', robots: { index: false, follow: false } };
 
@@ -24,6 +23,14 @@ export const metadata: Metadata = { title: 'Admin', robots: { index: false, foll
  * A wrong role gets `notFound`, not a redirect. There is no reason for a
  * student who guesses the URL to learn that this address means anything.
  */
+
+const NAV: StaffNavItem[] = [
+  { href: '/admin', label: 'Overview', icon: 'home' },
+  { href: '/admin/students', label: 'Students', icon: 'user' },
+  { href: '/admin/teachers', label: 'Teachers', icon: 'share' },
+  { href: '/admin/settings', label: 'Settings', icon: 'gear' },
+];
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
@@ -32,44 +39,29 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const role = await currentRole();
   if (role !== 'admin' || !emailAllowedAsAdmin(data.user.email)) notFound();
 
-  return (
-    <div className="min-h-screen bg-paper">
-      <header className="sticky top-0 z-30 border-b border-line bg-glass backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-[1100px] items-center gap-4 px-4 md:px-8">
-          <Link href="/admin" className="flex items-center gap-2">
-            <Wordmark width={104} height={21} />
-            <span className="text-[12.5px] font-extrabold text-ink3">admin</span>
-          </Link>
-          <nav className="flex items-center gap-1">
-            <Tab href="/admin">Overview</Tab>
-            <Tab href="/admin/teachers">Teachers</Tab>
-            <Tab href="/admin/account">Account</Tab>
-          </nav>
-          {/* Log out, not a way into the student app. An administrator has no
-              subscription, so "go to the dashboard" meant "go to the paywall",
-              and there is nothing for them there anyway. */}
-          <form action={signOutAction} className="ms-auto">
-            <button
-              type="submit"
-              className="text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
-            >
-              Log out
-            </button>
-          </form>
-        </div>
-      </header>
-      <main className="mx-auto w-full max-w-[1100px] px-4 py-7 md:px-8">{children}</main>
-    </div>
-  );
-}
+  const { data: profile } = await supabase.from('profiles').select('name').eq('id', data.user.id).maybeSingle();
+  const name = profile?.name?.trim() || data.user.email?.split('@')[0] || 'Admin';
 
-function Tab({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link
-      href={href}
-      className="rounded-[10px] px-3 py-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-card hover:text-ink"
+    <StaffShell
+      nav={NAV}
+      area="admin"
+      name={name}
+      // Log out, not a way into the student app. An administrator has no
+      // subscription, so "go to the dashboard" meant "go to the paywall", and
+      // there is nothing for them there anyway.
+      signOut={
+        <>
+          <form action={signOutAction} className="hidden md:block">
+            <SignOutButton />
+          </form>
+          <form action={signOutAction} className="md:hidden">
+            <SignOutButton compact />
+          </form>
+        </>
+      }
     >
       {children}
-    </Link>
+    </StaffShell>
   );
 }

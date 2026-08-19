@@ -1,10 +1,9 @@
-import { notFound, redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { affiliateByUserId, payouts, referredStudents, totalsFor } from '@/lib/affiliates';
+import { Suspense } from 'react';
+import { payouts, totalsFor } from '@/lib/affiliates';
+import { currentAffiliate } from '@/lib/affiliate-session';
 import { SITE_URL } from '@/lib/site';
-import { Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { Panel, Row, Stat, StatGrid, Table, Td, rupees } from '@/components/admin/bits';
 import { ShareLink } from '@/components/affiliate/ShareLink';
-import { ChangePassword } from '@/components/admin/ChangePassword';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,30 +11,81 @@ const when = (iso: string) =>
   iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 
 /**
- * What a teacher sees.
+ * What a teacher sees first: their link, and their money.
  *
- * Their own students, by name, and their own money. This is the whole point of
- * the programme: somebody who cannot see what they earned will not believe
- * they earned it, and will not send the next student.
- *
- * They see what their students paid us and their share of it. Not the
- * students' progress, chapters, results or streaks: those belong to the
- * student, and a teacher is not a parent.
+ * The students themselves moved to their own tab when this area gained a
+ * sidebar. What stays here is the pair of things they came to check, and the
+ * link they came to copy.
  */
+async function Money() {
+  const row = await currentAffiliate();
+  const [totals, history] = await Promise.all([totalsFor(row.userId, row.commissionPct), payouts(row.userId)]);
+
+  return (
+    <>
+      {/* "Not paid yet" is the number a teacher can act on: those are the
+          people worth a reminder, and leaving it to be worked out by
+          subtraction hides the only lever they have. */}
+      <StatGrid>
+        <Stat value={String(totals.students)} label="Students joined" />
+        <Stat value={String(totals.paidStudents)} label="Paying" tone="green" />
+        <Stat value={String(totals.students - totals.paidStudents)} label="Not paid yet" tone="orange" />
+        <Stat value={rupees(totals.earned)} label="Earned in total" tone="teal" />
+      </StatGrid>
+      <div className="mt-3">
+        <StatGrid>
+          <Stat value={rupees(totals.paidOut)} label="Paid to you so far" />
+          <Stat
+            value={rupees(Math.max(0, totals.outstanding))}
+            label={totals.outstanding > 0 ? 'Due to you' : 'All paid up'}
+            tone="orange"
+          />
+        </StatGrid>
+      </div>
+
+      <Panel title="Payments to you">
+        {history.length === 0 ? (
+          <p className="px-4 py-5 text-[13.5px] text-ink2">
+            Nothing paid out yet. Every transfer will be listed here with its date.
+          </p>
+        ) : (
+          <Table head={['Date', 'Amount', 'Note']}>
+            {history.map((p) => (
+              <Row key={p.id}>
+                <Td>{when(p.at)}</Td>
+                <Td className="font-extrabold">{rupees(p.amount)}</Td>
+                <Td>{p.note ?? ''}</Td>
+              </Row>
+            ))}
+          </Table>
+        )}
+      </Panel>
+
+      <p className="mt-6 text-[12px] text-ink3">
+        Earnings are worked out from payments that actually went through, and a refunded payment comes back off. If a
+        number here looks wrong, say so and it can be checked against the payment records.
+      </p>
+    </>
+  );
+}
+
+function MoneySkeleton() {
+  return (
+    <>
+      <StatGrid>
+        {['a', 'b', 'c', 'd'].map((k) => (
+          <div key={k} className="h-[86px] animate-pulse rounded-[16px] border border-line bg-card" />
+        ))}
+      </StatGrid>
+      <div className="mt-7 h-[200px] animate-pulse rounded-[16px] border border-line bg-card" />
+    </>
+  );
+}
+
 export default async function AffiliateDashboard() {
-  const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) redirect('/login');
-
-  const row = await affiliateByUserId(auth.user.id);
-  // An administrator reaching this page has no affiliate row of their own.
-  if (!row) notFound();
-
-  const [totals, students, history] = await Promise.all([
-    totalsFor(row.userId, row.commissionPct),
-    referredStudents(row.userId),
-    payouts(row.userId),
-  ]);
+  // Awaited rather than streamed: the greeting and the link are the page, and
+  // both come from one row that is already cached for the panels below.
+  const row = await currentAffiliate();
 
   return (
     <>
@@ -57,85 +107,10 @@ export default async function AffiliateDashboard() {
       <ShareLink link={`${SITE_URL}/r/${row.code}`} code={row.code} name={row.fullName} />
 
       <div className="mt-4">
-        {/* "Not paid yet" is the number a teacher can act on: those are the
-            people worth a reminder, and leaving it to be worked out by
-            subtraction hides the only lever they have. */}
-        <StatGrid>
-          <Stat value={String(totals.students)} label="Students joined" />
-          <Stat value={String(totals.paidStudents)} label="Paying" tone="green" />
-          <Stat value={String(totals.students - totals.paidStudents)} label="Not paid yet" tone="orange" />
-          <Stat value={rupees(totals.earned)} label="Earned in total" tone="teal" />
-        </StatGrid>
-        <div className="mt-3">
-          <StatGrid>
-            <Stat value={rupees(totals.paidOut)} label="Paid to you so far" />
-            <Stat
-              value={rupees(Math.max(0, totals.outstanding))}
-              label={totals.outstanding > 0 ? 'Due to you' : 'All paid up'}
-              tone="orange"
-            />
-          </StatGrid>
-        </div>
+        <Suspense fallback={<MoneySkeleton />}>
+          <Money />
+        </Suspense>
       </div>
-
-      <Panel title={students.length ? `Your students (${students.length})` : 'Your students'}>
-        {students.length === 0 ? (
-          <div className="px-4 py-6">
-            <p className="text-[14px] font-extrabold text-ink">Nobody has joined yet.</p>
-            <p className="mt-1 max-w-[520px] text-[13px] text-ink2">
-              Send your link to a class group. When somebody signs up through it their name appears here, and once they
-              subscribe your share starts adding up.
-            </p>
-          </div>
-        ) : (
-          <Table head={['Student', 'Class', 'Joined', 'Status', 'Your share']}>
-            {students.map((s) => (
-              <Row key={s.id}>
-                <Td>
-                  {s.name}
-                  <span className="block text-[11.5px] text-ink3">{s.email}</span>
-                </Td>
-                <Td>{s.grade ? `Class ${s.grade}` : ''}</Td>
-                <Td>{when(s.joinedAt)}</Td>
-                <Td>{s.paid ? <Tag tone="green">paying</Tag> : <Tag tone="grey">not yet</Tag>}</Td>
-                <Td className="font-extrabold">
-                  {s.spend ? rupees(Math.round((s.spend * row.commissionPct) / 100)) : <span className="text-ink3">Rs 0</span>}
-                </Td>
-              </Row>
-            ))}
-          </Table>
-        )}
-      </Panel>
-
-      <Panel title="Payments to you">
-        {history.length === 0 ? (
-          <p className="px-4 py-5 text-[13.5px] text-ink2">
-            Nothing paid out yet. Every transfer will be listed here with its date.
-          </p>
-        ) : (
-          <Table head={['Date', 'Amount', 'Note']}>
-            {history.map((p) => (
-              <Row key={p.id}>
-                <Td>{when(p.at)}</Td>
-                <Td className="font-extrabold">{rupees(p.amount)}</Td>
-                <Td>{p.note ?? ''}</Td>
-              </Row>
-            ))}
-          </Table>
-        )}
-      </Panel>
-
-      {/* Their first password was typed by Adnan on the onboarding form, which
-          is unavoidable while email is unverified. This is how they stop him
-          knowing it. */}
-      <div className="mt-7">
-        <ChangePassword hint="Your first password was set for you. Change it to something only you know." />
-      </div>
-
-      <p className="mt-6 text-[12px] text-ink3">
-        Earnings are worked out from payments that actually went through, and a refunded payment comes back off. If a
-        number here looks wrong, say so and it can be checked against the payment records.
-      </p>
     </>
   );
 }

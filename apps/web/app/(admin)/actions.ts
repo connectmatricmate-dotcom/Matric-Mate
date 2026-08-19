@@ -6,10 +6,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole, emailAllowedAsAdmin } from '@/lib/roles';
 import { markPaidAndGrant, recordPendingPayment } from '@/lib/payments';
-import { PLANS, planById } from '@/lib/plans';
+import { PLANS, THE_PLAN, planById } from '@/lib/plans';
 
 /**
- * Everything the admin panel can do. Four actions, all of them privileged.
+ * Everything the admin panel can do. Five actions, all of them privileged.
  *
  * Each one re-checks who is calling. The layout guard is what stops the page
  * rendering, and a server action is a public HTTP endpoint that does not go
@@ -150,11 +150,21 @@ export async function recordPayoutAction(_prev: AdminState, formData: FormData):
 }
 
 const Grant = z.object({
-  email: z.string().trim().toLowerCase().email('Enter the student’s email address.'),
-  planId: z.enum(PLANS.map((p) => p.id) as [string, ...string[]]),
-  amount: z.coerce.number().int('Enter whole rupees.').min(0).max(10_000_000),
-  note: z.string().trim().max(300).optional().or(z.literal('')),
+  userId: z.string().uuid('Unknown student.'),
+  planId: z.enum(PLANS.map((p) => p.id) as [string, ...string[]]).optional(),
 });
+
+/** The student exists, is a student, and is not staff wearing a student's URL. */
+async function studentOrError(userId: string) {
+  const admin = createAdminClient();
+  const { data: profile } = await admin.from('profiles').select('role, name').eq('id', userId).maybeSingle();
+  if (!profile) return { error: 'No such account.' };
+  if (profile.role && profile.role !== 'student') {
+    // A plan buys chapters and a tutor. Staff have neither screen.
+    return { error: 'That account is a teacher or an administrator, not a student.' };
+  }
+  return { name: profile.name ?? 'They' };
+}
 
 /**
  * Give a student Premium for money taken outside the app.
@@ -178,57 +188,74 @@ export async function grantPremiumAction(_prev: AdminState, formData: FormData):
   if ('error' in who) return { error: who.error };
 
   const parsed = Grant.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Check the form.' };
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Unknown student.' };
 
-  const admin = createAdminClient();
-  const plan = planById(parsed.data.planId);
+  const check = await studentOrError(parsed.data.userId);
+  if ('error' in check) return { error: check.error };
 
-  /*
-   * Find the account by email. There is no email column on `profiles`, so this
-   * has to go through the auth admin API, which is paged: reading page one and
-   * calling it a search works until the 201st student signs up and then fails
-   * silently, telling Adnan an account does not exist while he is looking at
-   * the person who owns it. Page until found.
-   */
-  let user: { id: string } | undefined;
-  for (let page = 1; page <= 50 && !user; page++) {
-    const { data: found, error: lookupError } = await admin.auth.admin.listUsers({ page, perPage: 200 });
-    if (lookupError) return { error: `Could not look that account up: ${lookupError.message}` };
-    user = found.users.find((u) => u.email?.toLowerCase() === parsed.data.email);
-    if (found.users.length < 200) break;
-  }
-  if (!user) return { error: 'No account with that email. They need to sign up first.' };
-
-  const { data: profile } = await admin.from('profiles').select('role, name').eq('id', user.id).maybeSingle();
-  if (profile?.role && profile.role !== 'student') {
-    // A plan buys chapters and a tutor. Staff have neither screen.
-    return { error: 'That account is a teacher or an administrator, not a student.' };
-  }
-
-  const amount = parsed.data.amount || plan.price;
+  const plan = planById(parsed.data.planId ?? THE_PLAN.id);
   const stamp = Date.now().toString(36);
   const tracker = `MANUAL-${stamp}`;
 
   await recordPendingPayment({
-    userId: user.id,
+    userId: parsed.data.userId,
     tracker,
     orderId: `MM-manual-${stamp}`,
     planId: plan.id,
-    amountRupees: amount,
+    amountRupees: plan.price,
   });
 
   const result = await markPaidAndGrant({
     tracker,
-    reference: `manual by admin`,
-    raw: { source: 'admin-grant', by: who.id, note: parsed.data.note || null, amount },
+    reference: 'manual',
+    raw: { source: 'admin-grant', by: who.id, amount: plan.price },
   });
-
   if (!result.handled) return { error: 'Could not record that. Nothing was changed.' };
 
+  revalidatePath('/admin/students');
   revalidatePath('/admin');
-  return {
-    ok: `${profile?.name || parsed.data.email} now has ${plan.name} Premium. Rs ${amount.toLocaleString('en-PK')} recorded.`,
-  };
+  return { ok: `${check.name} now has Premium.` };
+}
+
+/**
+ * Take it away again.
+ *
+ * Access stops now: the entitlement is switched off rather than deleted, so
+ * the row still says which plan they had and when it would have run out.
+ *
+ * Manual grants are also marked refunded, because those rows are our own
+ * bookkeeping and a mistaken grant should not sit in the revenue total or earn
+ * a teacher commission forever. A real gateway payment is left exactly as it
+ * is: money genuinely arrived, and rewriting that history to switch off access
+ * would make the books disagree with the bank.
+ */
+export async function revokePremiumAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  const who = await requireAdmin();
+  if ('error' in who) return { error: who.error };
+
+  const parsed = Grant.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Unknown student.' };
+
+  const check = await studentOrError(parsed.data.userId);
+  if ('error' in check) return { error: check.error };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from('entitlements')
+    .update({ active: false, updated_at: new Date().toISOString() })
+    .eq('user_id', parsed.data.userId);
+  if (error) return { error: `Could not switch it off: ${error.message}` };
+
+  await admin
+    .from('payments')
+    .update({ status: 'refunded' })
+    .eq('user_id', parsed.data.userId)
+    .eq('status', 'paid')
+    .like('tracker', 'MANUAL-%');
+
+  revalidatePath('/admin/students');
+  revalidatePath('/admin');
+  return { ok: `${check.name} no longer has Premium.` };
 }
 
 /**
