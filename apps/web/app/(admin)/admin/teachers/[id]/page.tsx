@@ -54,7 +54,8 @@ export default async function TeacherPage({ params }: { params: Promise<{ id: st
       <div className="mt-3">
         <StatGrid>
           <Stat value={String(totals.students)} label="Students joined" />
-          <Stat value={String(totals.paidStudents)} label="Of those, paying" tone="green" />
+          <Stat value={String(totals.paidStudents)} label="Paying" tone="green" />
+          <Stat value={String(totals.students - totals.paidStudents)} label="Not paid yet" tone="orange" />
           <Stat value={rupees(totals.earned)} label={`Earned · ${row.commissionPct}% of ${rupees(totals.gross)}`} tone="teal" />
           <Stat
             value={rupees(totals.outstanding)}

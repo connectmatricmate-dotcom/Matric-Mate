@@ -57,16 +57,25 @@ export default async function AffiliateDashboard() {
       <ShareLink link={`${SITE_URL}/r/${row.code}`} code={row.code} name={row.fullName} />
 
       <div className="mt-4">
+        {/* "Not paid yet" is the number a teacher can act on: those are the
+            people worth a reminder, and leaving it to be worked out by
+            subtraction hides the only lever they have. */}
         <StatGrid>
           <Stat value={String(totals.students)} label="Students joined" />
-          <Stat value={String(totals.paidStudents)} label="Of those, paying" tone="green" />
+          <Stat value={String(totals.paidStudents)} label="Paying" tone="green" />
+          <Stat value={String(totals.students - totals.paidStudents)} label="Not paid yet" tone="orange" />
           <Stat value={rupees(totals.earned)} label="Earned in total" tone="teal" />
-          <Stat
-            value={rupees(Math.max(0, totals.outstanding))}
-            label={totals.outstanding > 0 ? 'Due to you' : 'All paid up'}
-            tone="orange"
-          />
         </StatGrid>
+        <div className="mt-3">
+          <StatGrid>
+            <Stat value={rupees(totals.paidOut)} label="Paid to you so far" />
+            <Stat
+              value={rupees(Math.max(0, totals.outstanding))}
+              label={totals.outstanding > 0 ? 'Due to you' : 'All paid up'}
+              tone="orange"
+            />
+          </StatGrid>
+        </div>
       </div>
 
       <Panel title={students.length ? `Your students (${students.length})` : 'Your students'}>

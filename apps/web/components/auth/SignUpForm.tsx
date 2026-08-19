@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 import { isFormValid, validateEmail, validateName, validatePassword } from '@/lib/validation';
 
-export function SignUpForm({ next, ref }: { next?: string; ref?: string }) {
+export function SignUpForm({ next, referral }: { next?: string; referral?: string }) {
   const t = useT();
   const [state, action] = useActionState<AuthState, FormData>(signUpAction, {});
   const [resent, resendAction] = useActionState<AuthState, FormData>(resendConfirmationAction, {});
@@ -69,8 +69,14 @@ export function SignUpForm({ next, ref }: { next?: string; ref?: string }) {
       <form action={action} onSubmit={() => setTouched(true)} noValidate>
         <input type="hidden" name="next" value={next ?? '/onboarding/class'} />
         {/* The teacher whose link brought them here. Also kept in a cookie by
-            /r/CODE, so this being absent is not the end of the attribution. */}
-        {ref ? <input type="hidden" name="ref" value={ref} /> : null}
+            /r/CODE, so this being absent is not the end of the attribution.
+
+            Called `referral`, not `ref`. React reserves `ref`, and handing a
+            prop by that name across the server-to-client boundary threw before
+            the form rendered at all: every referral link led to "This screen
+            could not load" instead of a signup page. The form field keeps the
+            name `ref` because that is what the server action reads. */}
+        {referral ? <input type="hidden" name="ref" value={referral} /> : null}
         <Field
           label={t('auth.fullName')}
           name="name"

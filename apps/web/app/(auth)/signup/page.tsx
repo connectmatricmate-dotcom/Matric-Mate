@@ -11,5 +11,5 @@ export default async function SignUpPage({ searchParams }: { searchParams: Promi
   // student lands where they were going instead of on a generic home screen.
   // ?ref= is added by /r/CODE, a teacher's referral link.
   const { next, ref } = await searchParams;
-  return <SignUpForm next={next} ref={ref} />;
+  return <SignUpForm next={next} referral={ref} />;
 }

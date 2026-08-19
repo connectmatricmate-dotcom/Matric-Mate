@@ -39,7 +39,7 @@ export default async function TeachersPage() {
         </Panel>
       ) : (
         <Panel title="On the programme">
-          <Table head={['Teacher', 'Code', 'Share', 'Students', 'Paying', 'Earned', 'Paid out', 'Outstanding']}>
+          <Table head={['Teacher', 'Code', 'Share', 'Students', 'Paying', 'Not yet', 'Earned', 'Paid out', 'Outstanding']}>
             {rows.map(({ row, totals }) => (
               <Row key={row.userId}>
                 <Td>
@@ -57,6 +57,7 @@ export default async function TeachersPage() {
                 <Td>{row.commissionPct}%</Td>
                 <Td>{totals.students}</Td>
                 <Td>{totals.paidStudents}</Td>
+                <Td>{totals.students - totals.paidStudents}</Td>
                 <Td>{rupees(totals.earned)}</Td>
                 <Td>{rupees(totals.paidOut)}</Td>
                 <Td className="font-extrabold">
