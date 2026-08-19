@@ -162,7 +162,7 @@ export async function createPassportToken(): Promise<string> {
  * than no checkout, so a failure here returns null and the payment goes on
  * without it.
  */
-export async function createCustomer(payer: { email: string; name?: string }): Promise<string | null> {
+export async function createCustomer(payer: { email: string; name?: string; phone: string }): Promise<string | null> {
   if (!SECRET_KEY) return null;
   const [first, ...rest] = (payer.name ?? '').trim().split(/\s+/);
   try {
@@ -174,6 +174,10 @@ export async function createCustomer(payer: { email: string; name?: string }): P
         first_name: first || 'Student',
         last_name: rest.join(' ') || '-',
         email: payer.email,
+        // Required, whatever the docs say. Omitted, empty and null all answer
+        // 400 "phone_number: the phone number supplied is not a number".
+        // Local format is accepted, so 03001234567 is fine as typed.
+        phone_number: payer.phone,
         country: 'PK',
         is_guest: true,
       }),

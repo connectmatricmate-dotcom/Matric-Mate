@@ -19,6 +19,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 const Body = z.object({
   plan: z.enum(PLANS.map((p) => p.id) as [string, ...string[]]).optional(),
+  /** Only sent when we do not already have one on the profile. Loosely typed
+   *  here and validated properly on the client; the worst a bad one does is
+   *  cost the prefill, which is why it never blocks a payment. */
+  phone: z.string().trim().max(24).optional(),
 });
 
 export async function POST(request: Request) {
@@ -45,7 +49,11 @@ export async function POST(request: Request) {
    * for their mobile to no purpose is a field that only loses conversions.
    */
   const admin = createAdminClient();
-  const { data: profile } = await admin.from('profiles').select('name,role').eq('id', user.id).maybeSingle();
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('name,role,phone,safepay_customer_id')
+    .eq('id', user.id)
+    .maybeSingle();
 
   /*
    * Students only. A subscription buys chapters and a tutor, and neither a
@@ -64,6 +72,24 @@ export async function POST(request: Request) {
   const email = user.email ?? '';
   const name = profile?.name?.trim() || (user.user_metadata?.name as string | undefined)?.trim() || email.split('@')[0] || 'Student';
 
+  /*
+   * A phone number, once, and then never again.
+   *
+   * Safepay will not create the payer record without one. Their docs say it is
+   * optional and their API disagrees: omitted, empty and null all answer 400
+   * "phone_number: the phone number supplied is not a number". That record is
+   * what prefills the email, name and phone on their page, so the choice is a
+   * field here or a payer typing their own email out on a phone keyboard in
+   * the middle of deciding whether to buy.
+   *
+   * So it is asked for only when we do not already have it, and stored, which
+   * means a student sees it at most once and a returning one never does.
+   */
+  const phone = (parsed.success ? (parsed.data.phone ?? '') : '').trim() || (profile?.phone ?? '');
+  if (phone && phone !== profile?.phone) {
+    void admin.from('profiles').update({ phone }).eq('id', user.id);
+  }
+
   try {
     /**
      * Everything gateway-shaped happens behind this one call: reserving the
@@ -78,9 +104,15 @@ export async function POST(request: Request) {
     const { url, reference } = await gateway.startCheckout({
       amountRupees: plan.price,
       orderId,
+      existingCustomer: profile?.safepay_customer_id ?? undefined,
+      onCustomer: (token: string) => {
+        // Reused forever after: Safepay's docs warn against minting a second
+        // record for somebody who already has one.
+        void admin.from('profiles').update({ safepay_customer_id: token }).eq('id', user.id);
+      },
       redirectUrl: `${SITE_URL}/checkout/return`,
       cancelUrl: `${SITE_URL}/checkout?cancelled=1&plan=${plan.id}`,
-      payer: { userId: user.id, email, name },
+      payer: { userId: user.id, email, name, phone: phone || undefined },
     });
 
     // Written before the student leaves, because nothing in the payment itself

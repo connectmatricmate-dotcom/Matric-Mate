@@ -6,7 +6,7 @@ import { type AuthState, resendConfirmationAction, signUpAction } from '@/app/(a
 import { ErrorBanner, Field, SubmitButton } from '@/components/ui/controls';
 import { Card } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
-import { isFormValid, validateEmail, validateName, validatePassword } from '@/lib/validation';
+import { isFormValid, validateEmail, validateMobile, validateName, validatePassword } from '@/lib/validation';
 
 export function SignUpForm({ next, referral }: { next?: string; referral?: string }) {
   const t = useT();
@@ -16,12 +16,14 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
   const [touched, setTouched] = useState(false);
 
   const nameError = validateName(name);
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
-  const canSubmit = isFormValid(nameError, emailError, passwordError);
+  const mobileError = validateMobile(mobile);
+  const canSubmit = isFormValid(nameError, emailError, passwordError, mobileError);
 
   /**
    * The account exists but needs its address confirmed, so there is no session
@@ -99,6 +101,22 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
           autoComplete="email"
           required
           error={touched ? (emailError ?? undefined) : undefined}
+        />
+        {/* Asked here so it is never asked at checkout. Safepay will not
+            create the payer record that fills their form in without a number,
+            so without this a student types their email out again on a phone
+            keyboard at the moment they are deciding whether to buy. */}
+        <Field
+          label={t('auth.mobile')}
+          name="mobile"
+          value={mobile}
+          onChange={setMobile}
+          placeholder={t('auth.mobilePlaceholder')}
+          icon="phone"
+          type="tel"
+          autoComplete="tel"
+          required
+          error={touched ? (mobileError ?? undefined) : undefined}
         />
         <Field
           label={t('auth.password')}

@@ -114,7 +114,22 @@ export const safepayProvider: PaymentProvider = {
      * them. It is best-effort by design: `createCustomer` answers null rather
      * than throwing, so a checkout still works when that call does not.
      */
-    const customer = await createCustomer({ email: req.payer.email, name: req.payer.name });
+    /*
+     * The payer record is what prefills their email, name and phone on
+     * Safepay's page, and it is attached through the session's `user` field
+     * rather than the URL. Reused when we already have one: their docs warn
+     * against minting a second for somebody who exists.
+     *
+     * It needs a phone number. Their docs say otherwise and their API answers
+     * 400 without one, so no phone means no record and the payer types their
+     * own email. That is a worse checkout, not a broken one, which is why
+     * nothing here throws.
+     */
+    let customer = req.existingCustomer ?? null;
+    if (!customer && req.payer.phone) {
+      customer = await createCustomer({ email: req.payer.email, name: req.payer.name, phone: req.payer.phone });
+      if (customer) req.onCustomer?.(customer);
+    }
     const [tracker, tbt] = await Promise.all([
       // Paisa. v3 takes the lowest denomination and v1 took whole rupees, so
       // this multiplication is the difference between charging Rs 1,000 and

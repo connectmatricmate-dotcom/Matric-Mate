@@ -26,7 +26,15 @@ export type CheckoutRequest = {
     userId: string;
     email: string;
     name: string;
+    /** Optional. A provider that can prefill its own form usually wants one,
+     *  and Safepay will not create a payer record without it. */
+    phone?: string;
   };
+  /** The provider's own id for this payer, if we have minted one before. */
+  existingCustomer?: string;
+  /** Called when the provider mints a payer record, so it can be stored and
+   *  reused instead of a new one being created on every attempt. */
+  onCustomer?: (token: string) => void;
 };
 
 export type CheckoutStart = {

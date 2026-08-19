@@ -7,6 +7,7 @@ import { readUiLanguage } from '@/lib/ui-language.server';
 import { z } from 'zod';
 import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
+import { normaliseMobile } from '@/lib/validation';
 import { currentRole, landingFor } from '@/lib/roles';
 import { createClient } from '@/lib/supabase/server';
 
@@ -75,6 +76,8 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
   });
   if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
 
+  const mobile = normaliseMobile(String(formData.get('mobile') ?? ''));
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
@@ -88,7 +91,15 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
        * follow-up call is attribution that cannot be lost by somebody closing
        * the tab on the confirmation screen.
        */
-      data: { name: parsed.data.name, ...(await referralCode(formData)) },
+      data: {
+        name: parsed.data.name,
+        // Normalised to +92 and ten digits, which is what the column takes and
+        // what Safepay can parse. A number we do not recognise is dropped
+        // rather than rejected: a mistyped mobile should not cost somebody
+        // their account, and the trigger drops it again on its own side.
+        ...(mobile ? { phone: mobile } : {}),
+        ...(await referralCode(formData)),
+      },
       /*
        * Where the confirmation link lands. Without this Supabase falls back to
        * the project's Site URL, which on a preview deployment is the wrong

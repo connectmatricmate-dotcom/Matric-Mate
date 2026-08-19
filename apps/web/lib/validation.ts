@@ -18,6 +18,20 @@ export function validatePassword(v: string) {
   return v.length >= 6 ? null : 'At least 6 characters.';
 }
 
+/**
+ * A Pakistani mobile in the shape the database takes: +92 then ten digits.
+ *
+ * Students type 03001234567, the column has required '^\+92\d{10}$' since
+ * migration 0003, and Safepay wants something it can parse. One conversion,
+ * in one place, rather than three opinions about what a phone number is.
+ * Returns null when it is not a number we recognise.
+ */
+export function normaliseMobile(v: string): string | null {
+  const digits = v.replace(/\D/g, '');
+  const local = digits.replace(/^92/, '').replace(/^0/, '');
+  return /^3\d{9}$/.test(local) ? `+92${local}` : null;
+}
+
 export function validateMobile(v: string) {
   const digits = v.replace(/\D/g, '');
   return /^(92)?0?3\d{9}$/.test(digits) ? null : 'Enter an 11-digit number, like 03001234567.';
