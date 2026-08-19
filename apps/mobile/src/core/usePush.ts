@@ -125,6 +125,38 @@ export async function releasePushToken(): Promise<void> {
   }
 }
 
+/**
+ * The response that opened the app, once, as a route.
+ *
+ * A tap on a notification while the app is closed does not arrive as an event
+ * anyone is listening for yet, which is why expo keeps the last one and
+ * documents this as the way to read it. The app only had the listener, and
+ * even when that did fire, the splash was already holding a timer to replace
+ * whatever was on screen with the dashboard 300ms after hydration: two
+ * navigations racing, and the notification's the one that lost.
+ *
+ * So the splash asks for it and decides once. Cleared on read, or every cold
+ * start from now until the student taps another one would reopen the same
+ * screen. The id is kept so the live listener below can tell that this
+ * response has already been dealt with.
+ */
+let consumedResponseId: string | null = null;
+
+export function takePendingNotificationRoute(): string | null {
+  try {
+    const response = Notifications.getLastNotificationResponse();
+    if (!response) return null;
+    consumedResponseId = response.notification.request.identifier;
+    Notifications.clearLastNotificationResponse();
+    const target = response.notification.request.content.data?.target;
+    return (typeof target === 'string' ? ROUTE[target as NotificationTarget] : undefined) ?? null;
+  } catch {
+    // An older binary without the API, or no notification at all. Launching
+    // normally is the right answer either way.
+    return null;
+  }
+}
+
 export function usePush(userId: string | null) {
   const registeredFor = useRef<string | null>(null);
 
@@ -140,9 +172,12 @@ export function usePush(userId: string | null) {
     void register(userId).catch(() => {});
   }, [userId]);
 
-  /** A tap on a notification opens the screen it is about. */
+  /** A tap on a notification opens the screen it is about, while the app runs. */
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      // The launch tap belongs to the splash, which has already routed for it.
+      // Without this the target would be pushed twice on a cold start.
+      if (response.notification.request.identifier === consumedResponseId) return;
       const target = response.notification.request.content.data?.target;
       const route = typeof target === 'string' ? ROUTE[target as NotificationTarget] : undefined;
       if (route) router.push(route as never);

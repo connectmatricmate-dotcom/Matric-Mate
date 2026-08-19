@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Image, View } from 'react-native';
 import { router } from 'expo-router';
 import { hasSeenWelcome } from '../src/lib/first-run';
+import { takePendingNotificationRoute } from '../src/core/usePush';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { useAuth } from '../src/store/auth';
@@ -45,9 +46,22 @@ export default function Splash() {
       : !state.onboarding?.subjects?.length
         ? '/onboarding/class'
         : '/(tabs)';
+    /**
+     * A notification that opened the app decides where it opens.
+     *
+     * The tap used to be handled only by the push listener, which navigated
+     * while this timer was still pending, and then this replaced whatever it
+     * had opened with the dashboard. Two decisions racing on one launch. Read
+     * here instead, so there is one, and pushed on top of the tabs rather than
+     * replacing them, so back goes home instead of nowhere.
+     */
+    const opened = to === '/(tabs)' ? takePendingNotificationRoute() : null;
     // Long enough to register the brand, short enough not to read as delay.
     // Was 550ms on top of hydration, and the whole cold start read as slow.
-    const t = setTimeout(() => router.replace(to), 300);
+    const t = setTimeout(() => {
+      router.replace(to);
+      if (opened) router.push(opened as never);
+    }, 300);
     return () => clearTimeout(t);
   }, [hydrated, loading, seen, state.user, state.onboarding]);
 
