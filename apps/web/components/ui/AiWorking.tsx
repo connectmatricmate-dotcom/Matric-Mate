@@ -27,14 +27,27 @@ const STAGES: StringKey[] = [
 
 const STAGE_MS = 6500;
 
-export function AiWorking({ open, title }: { open: boolean; title: string }) {
+export function AiWorking({
+  open,
+  title,
+  onCancel,
+}: {
+  open: boolean;
+  title: string;
+  /**
+   * A way out. This covered the whole viewport with no control on it and
+   * nothing behind it timed out, so a student on bad signal could be held here
+   * with only the browser's back button, which leaves the request running.
+   */
+  onCancel?: () => void;
+}) {
   // Mounted only while it is wanted, so the stage counter starts at the first
   // line every time rather than wherever the last run left it.
   if (!open) return null;
-  return <Working title={title} />;
+  return <Working title={title} onCancel={onCancel} />;
 }
 
-function Working({ title }: { title: string }) {
+function Working({ title, onCancel }: { title: string; onCancel?: () => void }) {
   const t = useT();
   const [stage, setStage] = useState(0);
 
@@ -42,6 +55,17 @@ function Working({ title }: { title: string }) {
     const id = setInterval(() => setStage((n) => Math.min(n + 1, STAGES.length - 1)), STAGE_MS);
     return () => clearInterval(id);
   }, []);
+
+  /* Escape is the key people press to get out of something covering the page,
+     and it should do what the button does. */
+  useEffect(() => {
+    if (!onCancel) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancel]);
 
   /*
    * The page underneath must not scroll behind this, and a student pressing
@@ -77,6 +101,18 @@ function Working({ title }: { title: string }) {
       <p className="max-w-[320px] rounded-full bg-tealtint px-4 py-2.5 text-[13px] font-extrabold text-teal">
         {t('states.workStay')}
       </p>
+
+      {/* Quiet, and below the reassurance, because leaving is not the thing to
+          do here. It just has to be possible. */}
+      {onCancel ? (
+        <button
+          type="button"
+          onClick={onCancel}
+          className="min-h-11 cursor-pointer px-4 text-[13.5px] font-extrabold text-ink2 underline-offset-4 hover:text-teal hover:underline"
+        >
+          {t('common.cancel')}
+        </button>
+      ) : null}
     </div>
   );
 }

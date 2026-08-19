@@ -723,6 +723,9 @@ export const en = {
     pickKind: 'Practice type',
     pickCount: 'How many',
     building: 'Writing your set…',
+    /* Cancelling stops the waiting, not the writing: the route finishes and
+       saves either way, so the honest line points at where it will be. */
+    buildStopped: 'Stopped waiting. If it finished, it is in your sets.',
     buildIt: 'Make my set',
     aiMade: 'AI-made for you',
     recentSets: 'Your AI sets',
@@ -1730,6 +1733,7 @@ export const ur: typeof en = {
     pickKind: 'مشق کی قسم',
     pickCount: 'کتنے',
     building: 'آپ کا سیٹ بن رہا ہے…',
+    buildStopped: 'انتظار روک دیا۔ اگر بن گیا تو آپ کے سیٹس میں ہو گا۔',
     buildIt: 'میرا سیٹ بنائیں',
     aiMade: 'AI نے آپ کے لیے بنایا',
     recentSets: 'آپ کے AI سیٹ',

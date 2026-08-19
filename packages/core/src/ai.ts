@@ -72,14 +72,19 @@ export function normalizeAiShortQs(items: RawShortQ[], chapterId: string): Short
 
 /* ----------------------------------------------------------------- routes */
 
-export async function generateAiSession(input: {
-  kind: AiSessionKind;
-  chapterId: string;
-  topic?: string;
-  count: number;
-  medium: string;
-}): Promise<{ ok: true; sessionId: string; items: unknown[]; quota: TutorQuota } | AiFail> {
-  const res = await aiPost<{ sessionId: string; items: unknown[]; quota: TutorQuota }>('/api/ai/generate-session', input);
+export async function generateAiSession(
+  input: {
+    kind: AiSessionKind;
+    chapterId: string;
+    topic?: string;
+    count: number;
+    medium: string;
+  },
+  /** Lets the wait screen stop waiting. The server finishes either way and the
+   *  set is saved, so a cancelled build is on the sets shelf, not lost. */
+  signal?: AbortSignal,
+): Promise<{ ok: true; sessionId: string; items: unknown[]; quota: TutorQuota } | AiFail> {
+  const res = await aiPost<{ sessionId: string; items: unknown[]; quota: TutorQuota }>('/api/ai/generate-session', input, signal);
   return res.ok ? { ok: true, ...res.data } : res;
 }
 
@@ -95,11 +100,12 @@ export async function checkAnswerLive(input: {
   return res.ok ? { ok: true, verdict: res.data } : res;
 }
 
-export async function generateMockPaper(input: {
-  subjectId: string;
-  medium: string;
-}): Promise<{ ok: true; sessionId: string; items: AiPaperItems; quota: TutorQuota } | AiFail> {
-  const res = await aiPost<{ sessionId: string; items: AiPaperItems; quota: TutorQuota }>('/api/ai/mock-paper', input);
+export async function generateMockPaper(
+  input: { subjectId: string; medium: string },
+  /** See generateAiSession: the paper is saved even if nobody waited for it. */
+  signal?: AbortSignal,
+): Promise<{ ok: true; sessionId: string; items: AiPaperItems; quota: TutorQuota } | AiFail> {
+  const res = await aiPost<{ sessionId: string; items: AiPaperItems; quota: TutorQuota }>('/api/ai/mock-paper', input, signal);
   return res.ok ? { ok: true, ...res.data } : res;
 }
 

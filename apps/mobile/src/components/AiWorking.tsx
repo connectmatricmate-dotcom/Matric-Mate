@@ -12,7 +12,7 @@ import Animated, {
 import type { StringKey } from '../i18n';
 import { useT } from '../i18n';
 import { C, F, R, S } from '../theme';
-import { Body, H2, Small } from './ui';
+import { Body, Btn, H2, Small } from './ui';
 
 /**
  * The screen a student looks at while the AI writes something.
@@ -79,18 +79,37 @@ function Bar({ progress, color }: { progress: { value: number }; color: string }
   return <Animated.View style={[{ width: 12, borderRadius: 6, backgroundColor: color }, style]} />;
 }
 
-export function AiWorking({ visible, title }: { visible: boolean; title: string }) {
+export function AiWorking({
+  visible,
+  title,
+  onCancel,
+}: {
+  visible: boolean;
+  title: string;
+  /**
+   * A way out. This screen used to swallow the hardware back press and offer
+   * no button, and nothing behind it timed out, so a student on bad signal
+   * could be held here until they force-stopped the app.
+   */
+  onCancel?: () => void;
+}) {
   // Mounted only while it is wanted, so the stage counter starts at the first
   // line every time rather than wherever the last run left it.
   if (!visible) return null;
   return (
-    <Modal visible animationType="fade" transparent={false} statusBarTranslucent onRequestClose={() => {}}>
-      <Working title={title} />
+    <Modal
+      visible
+      animationType="fade"
+      transparent={false}
+      statusBarTranslucent
+      onRequestClose={() => onCancel?.()}
+    >
+      <Working title={title} onCancel={onCancel} />
     </Modal>
   );
 }
 
-function Working({ title }: { title: string }) {
+function Working({ title, onCancel }: { title: string; onCancel?: () => void }) {
   const t = useT();
   const reduced = useReducedMotion();
   const [stage, setStage] = useState(0);
@@ -125,6 +144,14 @@ function Working({ title }: { title: string }) {
       >
         <Small style={{ textAlign: 'center', color: C.teal, fontFamily: F.bodyBold }}>{t('states.workStay')}</Small>
       </View>
+
+      {/* Quiet, and below the reassurance, because leaving is not the thing to
+          do here. It just has to be possible. */}
+      {onCancel ? (
+        <View style={{ marginTop: S.lg }}>
+          <Btn title={t('common.cancel')} variant="ghost" onPress={onCancel} />
+        </View>
+      ) : null}
     </View>
   );
 }

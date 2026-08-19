@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   chapterName,
@@ -31,6 +31,8 @@ const KIND_LABEL = { mcq: 'tutor.kindMcq', flashcards: 'tutor.kindCards', blanks
  * student's account so it opens on the phone too.
  */
 export function AiTestScreen() {
+  /** Held while a build is in flight so the wait screen can call it off. */
+  const cancel = useRef<AbortController | null>(null);
   const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
@@ -78,8 +80,17 @@ export function AiTestScreen() {
   async function build() {
     if (!chapterId || busy) return;
     setBusy(true);
-    const res = await generateAiSession({ kind, chapterId, count: Number(count), medium: state.settings.contentMedium });
+    const controller = new AbortController();
+    cancel.current = controller;
+    const res = await generateAiSession(
+      { kind, chapterId, count: Number(count), medium: state.settings.contentMedium },
+      controller.signal,
+    );
+    cancel.current = null;
     setBusy(false);
+    // Stopped on purpose: the toast already said so, and the route finishes
+    // and saves either way, so there is nothing to report as a failure.
+    if (controller.signal.aborted) return;
     if (!res.ok) {
       const note = {
         offline: t('tutor.offline'),
@@ -113,7 +124,15 @@ export function AiTestScreen() {
     <Page width="focus">
       {/* Writing a fresh set is twenty seconds of real work, so it gets the
           whole viewport rather than a button that dims. See AiWorking. */}
-      <AiWorking open={busy} title={t('tutor.building')} />
+      <AiWorking
+        open={busy}
+        title={t('tutor.building')}
+        onCancel={() => {
+          cancel.current?.abort();
+          setBusy(false);
+          toast(t('tutor.buildStopped'));
+        }}
+      />
       <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.builderTitle')} sub={t('tutor.builderSub')} />
 
       <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>

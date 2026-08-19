@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { checkAnswerLive, generateMockPaper, readAiSession, subjectById, subjectName } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, AiSessionRead, ShortQ } from '@matricmate/core';
@@ -22,6 +22,8 @@ import { Markdown } from '@/components/ui/Markdown';
  * examiner against each question's marking points.
  */
 export function PaperScreen({ paperId }: { paperId?: string }) {
+  /** Held while a build is in flight so the wait screen can call it off. */
+  const cancel = useRef<AbortController | null>(null);
   const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
@@ -57,8 +59,13 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
   async function build() {
     if (busy) return;
     setBusy(true);
-    const res = await generateMockPaper({ subjectId, medium: state.settings.contentMedium });
+    const controller = new AbortController();
+    cancel.current = controller;
+    const res = await generateMockPaper({ subjectId, medium: state.settings.contentMedium }, controller.signal);
+    cancel.current = null;
     setBusy(false);
+    // Stopped on purpose: see the note in the AI builder.
+    if (controller.signal.aborted) return;
     if (!res.ok) {
       const note = {
         offline: t('tutor.offline'),
@@ -79,7 +86,15 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
       <Page width="focus">
         {/* Half a minute of real work, so it gets the whole viewport rather
             than a button that dims. See components/ui/AiWorking. */}
-        <AiWorking open={busy} title={t('tutor.paperBuilding')} />
+        <AiWorking
+          open={busy}
+          title={t('tutor.paperBuilding')}
+          onCancel={() => {
+            cancel.current?.abort();
+            setBusy(false);
+            toast(t('tutor.buildStopped'));
+          }}
+        />
         <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.paperTitle')} sub={t('tutor.paperSub')} />
         <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
         <div className="flex flex-wrap gap-2">

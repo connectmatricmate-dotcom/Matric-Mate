@@ -187,19 +187,62 @@ export async function fetchTutorQuota(): Promise<TutorQuota | null> {
 export type AiFail = { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error'; quota?: TutorQuota };
 
 /**
+ * How long one of these may hang before the client stops waiting.
+ *
+ * Nothing bounded these. The routes allow themselves five minutes and a
+ * dropped connection on a phone can leave a fetch pending for longer than
+ * that, so a student who tapped "Make my set" on bad signal met a full screen
+ * with no cancel, no timeout and no way back: force-stopping the app was the
+ * only way out. A set takes twenty to forty seconds of real work, so ninety is
+ * generous enough not to cut off an honest answer and short enough that
+ * nobody is stuck.
+ *
+ * Aborting here does not stop the server, which is the right trade: it
+ * finishes and saves the set, so the work is waiting on the sets shelf rather
+ * than lost.
+ */
+const AI_DEADLINE_MS = 90_000;
+
+/**
+ * Runs a request with that deadline, and with whatever the caller wants to
+ * cancel it early (a back press, a Cancel button).
+ */
+async function withDeadline(url: string, init: RequestInit, signal?: AbortSignal): Promise<Response> {
+  const controller = new AbortController();
+  const stop = () => controller.abort();
+  const timer = setTimeout(stop, AI_DEADLINE_MS);
+  signal?.addEventListener('abort', stop);
+  try {
+    return await doFetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', stop);
+  }
+}
+
+/**
  * Shared POST for the non-chat AI routes (session builder, answer checker,
  * mock paper, coach, cheat sheet). They all answer plain JSON and share the
  * same failure vocabulary as the tutor.
  */
-export async function aiPost<T>(path: string, payload: object): Promise<{ ok: true; data: T } | AiFail> {
+export async function aiPost<T>(
+  path: string,
+  payload: object,
+  /** Aborts the wait early. The screen's cancel, not the server's. */
+  signal?: AbortSignal,
+): Promise<{ ok: true; data: T } | AiFail> {
   if (!config) return { ok: false, reason: 'offline' };
   try {
-    const res = await doFetch(`${config.siteUrl}${path}`, {
-      method: 'POST',
-      headers: await headers(),
-      credentials: 'include',
-      body: JSON.stringify(payload),
-    });
+    const res = await withDeadline(
+      `${config.siteUrl}${path}`,
+      {
+        method: 'POST',
+        headers: await headers(),
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      },
+      signal,
+    );
     const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
     if (res.ok) return { ok: true, data: body };
     setQuota(body.quota);
@@ -215,7 +258,7 @@ export async function aiPost<T>(path: string, payload: object): Promise<{ ok: tr
 export async function aiGet<T>(path: string): Promise<{ ok: true; data: T } | AiFail> {
   if (!config) return { ok: false, reason: 'offline' };
   try {
-    const res = await doFetch(`${config.siteUrl}${path}`, { headers: await headers(), credentials: 'include' });
+    const res = await withDeadline(`${config.siteUrl}${path}`, { headers: await headers(), credentials: 'include' });
     const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
     setQuota(body.quota);
     if (!res.ok) return { ok: false, reason: failFrom(res.status, body).ok ? 'error' : 'error' };

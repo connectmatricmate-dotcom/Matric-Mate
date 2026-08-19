@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
@@ -25,6 +25,8 @@ export default function MockPaper() {
   const { lang } = useLang();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
+  /** Held while a build is in flight so the wait screen can call it off. */
+  const cancel = useRef<AbortController | null>(null);
   const [subjectId, setSubjectId] = useState(derived.subjects[0] ?? 'phy');
 
   const paper = useAsync(async () => (id ? fetchAiSession(id) : null), [id ?? '']);
@@ -32,8 +34,13 @@ export default function MockPaper() {
   async function build() {
     if (busy) return;
     setBusy(true);
-    const res = await generateMockPaper({ subjectId, medium: state.settings.contentMedium });
+    const controller = new AbortController();
+    cancel.current = controller;
+    const res = await generateMockPaper({ subjectId, medium: state.settings.contentMedium }, controller.signal);
+    cancel.current = null;
     setBusy(false);
+    // Stopped on purpose: see the note in the AI builder.
+    if (controller.signal.aborted) return;
     if (!res.ok) {
       const note = {
         offline: t('tutor.offline'),
@@ -54,7 +61,15 @@ export default function MockPaper() {
       <Screen footer={<Btn title={t('tutor.buildIt')} variant="orange" icon="spark" loading={busy} onPress={build} />}>
         {/* Half a minute of real work, so it gets the whole screen rather
             than a button that dims. See components/AiWorking. */}
-        <AiWorking visible={busy} title={t('tutor.paperBuilding')} />
+        <AiWorking
+          visible={busy}
+          title={t('tutor.paperBuilding')}
+          onCancel={() => {
+            cancel.current?.abort();
+            setBusy(false);
+            toast(t('tutor.buildStopped'));
+          }}
+        />
         <Header title={t('tutor.paperTitle')} sub={t('tutor.paperSub')} back />
         <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
         <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>

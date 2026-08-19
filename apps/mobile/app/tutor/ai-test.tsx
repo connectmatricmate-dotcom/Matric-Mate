@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { Btn, Card, Check, Header, Item, Pill, Row, Screen, SectionTitle, Seg, Small, Spacer, useToast } from '../../src/components/ui';
 import { AiWorking } from '../../src/components/AiWorking';
@@ -47,19 +47,30 @@ export default function AiBuilder() {
   const chapterInSubject = chapters.some((c) => c.id === chapterId) ? chapterId : (chapters[0]?.id ?? '');
   const [count, setCount] = useState<'5' | '8' | '12'>('8');
   const [busy, setBusy] = useState(false);
+  /** Held while a build is in flight so the wait screen can call it off. */
+  const cancel = useRef<AbortController | null>(null);
 
   const weak = useMemo(() => weakTopics(state.attempts).slice(0, 3), [state.attempts]);
 
   async function build() {
     if (!chapterInSubject || busy) return;
     setBusy(true);
-    const res = await generateAiSession({
-      kind,
-      chapterId: chapterInSubject,
-      count: Number(count),
-      medium: state.settings.contentMedium,
-    });
+    const controller = new AbortController();
+    cancel.current = controller;
+    const res = await generateAiSession(
+      {
+        kind,
+        chapterId: chapterInSubject,
+        count: Number(count),
+        medium: state.settings.contentMedium,
+      },
+      controller.signal,
+    );
+    cancel.current = null;
     setBusy(false);
+    // Stopped on purpose: the toast already said so, and the route finishes
+    // and saves either way, so there is nothing to report as a failure.
+    if (controller.signal.aborted) return;
     if (!res.ok) {
       const note = {
         offline: t('tutor.offline'),
@@ -114,7 +125,15 @@ export default function AiBuilder() {
     <Screen footer={<Btn title={t('tutor.buildIt')} variant="orange" icon="spark" loading={busy} onPress={build} />}>
       {/* Writing a fresh set is twenty seconds of real work, so it gets the
           whole screen rather than a button that dims. See AiWorking. */}
-      <AiWorking visible={busy} title={t('tutor.building')} />
+      <AiWorking
+        visible={busy}
+        title={t('tutor.building')}
+        onCancel={() => {
+          cancel.current?.abort();
+          setBusy(false);
+          toast(t('tutor.buildStopped'));
+        }}
+      />
       <Header title={t('tutor.builderTitle')} sub={t('tutor.builderSub')} back />
 
       <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
