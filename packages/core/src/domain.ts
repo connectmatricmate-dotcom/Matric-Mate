@@ -235,19 +235,38 @@ export function overallPct(subjectIds: string[], readSections: string[], attempt
  * and says it is the wrong class. Not knowing it is normal offline, where the
  * live index has not primed, and is not evidence of anything.
  */
-export function planChapterId(subjectIds: string[], grade: number, lastChapterId?: string): string | undefined {
+export function planChapterId(
+  subjectIds: string[],
+  grade: number,
+  lastChapterId?: string,
+  readSections: string[] = [],
+): string | undefined {
+  /**
+   * Whether every section of a chapter has been read.
+   *
+   * Needs the counts, so it is false for the bundled catalogue, which carries
+   * zeroes. That is the right answer there: without counts we cannot say a
+   * chapter is finished, and guessing would move the plan off a chapter the
+   * student is still working through.
+   */
+  const finished = (c: Chapter) =>
+    c.sectionCount > 0 && readSections.filter((id) => id.startsWith(`${c.id}-`)).length >= c.sectionCount;
+
   if (lastChapterId) {
     const known = chapterById(lastChapterId);
-    if (!known || known.grade === grade) return lastChapterId;
+    // Unknown means offline, not wrong: trust it. Known and the other class,
+    // or known and finished, and the plan should move on.
+    if (!known) return lastChapterId;
+    if (known.grade === grade && !finished(known)) return lastChapterId;
   }
   for (const subjectId of subjectIds) {
     const chapters = chaptersFor(subjectId).filter((c) => c.grade === grade);
-    // Something to study wins, but a chapter whose counts have not loaded yet
-    // still beats no plan at all: the bundle carries zeroes by design.
-    const pick = chapters.find(hasStudyMaterial) ?? chapters[0];
+    // Something to study, and something still to do in it. A chapter whose
+    // counts have not loaded yet still beats no plan at all.
+    const pick = chapters.find((c) => hasStudyMaterial(c) && !finished(c)) ?? chapters.find(hasStudyMaterial) ?? chapters[0];
     if (pick) return pick.id;
   }
-  return undefined;
+  return lastChapterId;
 }
 
 /**
@@ -266,7 +285,7 @@ export function buildPlan(opts: {
   readSections: string[];
   cardsKnown: string[];
 }): PlanTask[] {
-  const chId = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId);
+  const chId = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId, opts.readSections);
   if (!chId) return [];
   const ch = chapterById(chId);
   /* The id carries its own subject, which matters offline: the catalogue may not
@@ -314,6 +333,13 @@ export function buildPlan(opts: {
 
 /**
  * Which of today's tasks the student's actual work has already finished.
+ *
+ * Reading and cards are counted over all time, not just today, and that is
+ * deliberate now that the plan moves on: a chapter the student finished last
+ * week is not offered again, so a ticked read task means they finished it,
+ * and it can only be today's chapter if there was still work in it this
+ * morning. Answering is scoped to today because "practise ten questions" is a
+ * thing you do again, not a thing you finish.
  *
  * The plan used to be three checkboxes you ticked yourself, which made it a
  * to-do list the app wrote and then took your word for. A student could read
