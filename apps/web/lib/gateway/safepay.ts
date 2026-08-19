@@ -1,7 +1,9 @@
 import 'server-only';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
-import { checkoutUrl, createTracker, fetchTracker, isSafepayConfigured, isSafepayLive, verifySignature } from './safepay-api';
+import { checkoutUrl, createCustomer,
+  createPassportToken,
+  createSession, fetchTracker, isSafepayConfigured, isSafepayLive, verifySignature } from './safepay-api';
 import type {
   CheckoutRequest,
   CheckoutStart,
@@ -18,14 +20,12 @@ import type {
  * sessions, the customer directory, their event names, their two signature
  * algorithms. Nothing above this file knows any of it.
  *
- * On the official SDK, since it comes up: @sfpy/node-core exists and it is not
- * a fit here. It exposes /order/payments/v3 only, and hosted checkout requires
- * a tracker from /order/v1/init, which the SDK does not have. Handing it a v3
- * tracker is what produces "Tracker is in an invalid state". The SDK also has
- * no webhook signature verification at all, which is the one piece where a
- * mistake is a security bug rather than a bad afternoon. It would be the right
- * tool the day we build a custom Payments 2.0 checkout with our own card form
- * and payer-auth step; it is the wrong one for a hosted page.
+ * On the official SDK, since it comes up: @sfpy/node-core does the same three
+ * calls this file now makes, and was read as documentation while writing them.
+ * It is still not a dependency, for one reason: it has no webhook signature
+ * verification at all, and that is the single piece here where a mistake is a
+ * security bug rather than a bad afternoon. Three fetches we can read beat a
+ * package that leaves out the part that matters.
  */
 
 /** Permissive on purpose: Safepay adds fields, and an unknown one is not an error. */
@@ -45,14 +45,42 @@ const Payload = z.object({
     .passthrough(),
 });
 
-/** HMAC-SHA512 of the raw body, hex, in X-SFPY-SIGNATURE. */
-function verifyBody(rawBody: string, signature: string | null, secret: string) {
-  if (!signature) return false;
-  const expected = createHmac('sha512', secret).update(rawBody).digest('hex');
+const hmacMatches = (candidate: string, signature: string, secret: string) => {
+  const expected = createHmac('sha512', secret).update(candidate).digest('hex');
   const a = Buffer.from(expected, 'utf8');
-  const b = Buffer.from(signature.trim().toLowerCase(), 'utf8');
+  const b = Buffer.from(signature, 'utf8');
   // Constant time: a plain === leaks how much of a forged signature was right.
   return a.length === b.length && timingSafeEqual(a, b);
+};
+
+/**
+ * HMAC-SHA512, hex, in X-SFPY-SIGNATURE. Two things are accepted as the signed
+ * payload and both are checked.
+ *
+ * We signed the raw body. Safepay's own WooCommerce plugin, which is the
+ * maintained integration and therefore the better evidence, signs
+ * `json_encode($data)`: the `data` object on its own, not the envelope around
+ * it. No webhook has ever been accepted on this account, and a verifier
+ * checking the wrong half of the payload is a good explanation for that.
+ *
+ * Accepting either costs nothing. Both are a full HMAC with the shared secret,
+ * so forging one is exactly as hard as forging the other, and being wrong
+ * about which Safepay signs would otherwise mean silently discarding real
+ * payments.
+ */
+function verifyBody(rawBody: string, signature: string | null, secret: string) {
+  if (!signature) return false;
+  const given = signature.trim().toLowerCase();
+  if (hmacMatches(rawBody, given, secret)) return true;
+
+  try {
+    const data = (JSON.parse(rawBody) as { data?: unknown }).data;
+    if (data !== undefined && hmacMatches(JSON.stringify(data), given, secret)) return true;
+  } catch {
+    // Not JSON, so there is no inner object to try. The raw-body check above
+    // was the only candidate and it failed.
+  }
+  return false;
 }
 
 export const safepayProvider: PaymentProvider = {
@@ -78,15 +106,32 @@ export const safepayProvider: PaymentProvider = {
      * becomes worth having again with a custom checkout that can use saved
      * cards.
      */
-    const tracker = await createTracker({ amountRupees: req.amountRupees, orderId: req.orderId });
+    /*
+     * Three calls, two round trips deep: the payer record and the credential
+     * are independent, and only the session needs the customer token.
+     *
+     * The customer record is what lets Safepay fill the payer's email in for
+     * them. It is best-effort by design: `createCustomer` answers null rather
+     * than throwing, so a checkout still works when that call does not.
+     */
+    const customer = await createCustomer({ email: req.payer.email, name: req.payer.name });
+    const [tracker, tbt] = await Promise.all([
+      // Paisa. v3 takes the lowest denomination and v1 took whole rupees, so
+      // this multiplication is the difference between charging Rs 1,000 and
+      // charging Rs 100,000.
+      createSession({ amountPaisa: Math.round(req.amountRupees * 100), orderId: req.orderId, customer }),
+      createPassportToken(),
+    ]);
 
     return {
       reference: tracker,
       url: checkoutUrl({
         tracker,
+        tbt,
         orderId: req.orderId,
         redirectUrl: req.redirectUrl,
         cancelUrl: req.cancelUrl,
+        customer,
       }),
     };
   },
@@ -153,8 +198,11 @@ export const safepayProvider: PaymentProvider = {
      */
     const txn = data.transaction;
     if (data.state === 'TRACKER_ENDED' && txn && typeof txn.amount === 'number' && txn.amount > 0) {
-      // v1 speaks whole rupees, the same unit the tracker was created in.
-      return { kind: 'paid', receipt: txn.reference, amountRupees: txn.amount };
+      // The reporter API speaks paisa and the old one spoke rupees, so the
+      // reader says which it read. Getting this backwards records a thousand
+      // rupee payment as a hundred thousand, on a receipt a student can see.
+      const amountRupees = data.unit === 'paisa' ? Math.round(txn.amount / 100) : txn.amount;
+      return { kind: 'paid', receipt: txn.reference, amountRupees };
     }
     if (data.state === 'TRACKER_STARTED') return { kind: 'pending' };
     return { kind: 'unknown' };
