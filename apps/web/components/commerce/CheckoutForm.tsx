@@ -80,9 +80,30 @@ export function CheckoutForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: plan.id }),
       });
-      const body = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !body.url) throw new Error(body.error ?? t('checkout.startFailed'));
-      window.location.href = body.url;
+      const body = (await res.json()) as {
+        url?: string;
+        form?: { action: string; fields: Record<string, string> };
+        error?: string;
+      };
+      if (!res.ok || (!body.url && !body.form)) throw new Error(body.error ?? t('checkout.startFailed'));
+      if (body.form) {
+        // PayFast is entered by POSTing a form, not by following a URL. Built
+        // off-DOM and submitted synchronously; the student never sees it.
+        const f = document.createElement('form');
+        f.method = 'POST';
+        f.action = body.form.action;
+        for (const [name, value] of Object.entries(body.form.fields)) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = value;
+          f.appendChild(input);
+        }
+        document.body.appendChild(f);
+        f.submit();
+        return;
+      }
+      window.location.href = body.url as string;
     } catch (err) {
       setError(err instanceof Error ? err.message : t('checkout.startFailed'));
       setBusy(false);

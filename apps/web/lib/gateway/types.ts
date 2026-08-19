@@ -40,8 +40,14 @@ export type CheckoutRequest = {
 };
 
 export type CheckoutStart = {
-  /** Where to send the browser. */
-  url: string;
+  /** Where to send the browser. Absent when the provider needs a form post instead. */
+  url?: string;
+  /**
+   * Some rails (PayFast) are entered by the browser POSTing a form, not by
+   * following a URL. The client builds a hidden form from this and submits
+   * it. Exactly one of `url` and `form` is set.
+   */
+  form?: { action: string; fields: Record<string, string> };
   /**
    * The gateway's own id for this attempt.
    *

@@ -176,6 +176,27 @@ export async function markPaymentStatus(input: {
  *   · the gateway's amount must match what the plan actually costs, so a paid
  *     100-rupee tracker cannot be redeemed against a 9,000-rupee plan
  */
+/**
+ * The same settlement, initiated by the server rather than a returning payer.
+ *
+ * PayFast's notification is a doorbell without a checkable signature, so the
+ * route that receives it cannot pass a userId it never had. The payment row
+ * itself says whose it is; everything else, existence, amount, single
+ * settlement, is checked exactly as in confirmWithGateway below.
+ */
+export async function reconcilePayment(tracker: string) {
+  const admin = createAdminClient();
+  const { data: payment } = await admin
+    .from('payments')
+    .select('user_id, status')
+    .eq('tracker', tracker)
+    .maybeSingle();
+  if (!payment?.user_id || payment.status === 'paid') return;
+  await confirmWithGateway({ tracker, userId: payment.user_id }).catch((err) => {
+    console.error('payments: reconcile failed', tracker, err);
+  });
+}
+
 export async function confirmWithGateway(input: { tracker: string; userId: string }) {
   const admin = createAdminClient();
 

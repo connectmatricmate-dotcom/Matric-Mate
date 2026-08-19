@@ -99,7 +99,7 @@ export async function POST(request: Request) {
      * The payment is tied to the account by the pending row below, keyed on
      * the reference, never by what the payer types on the provider's page.
      */
-    const { url, reference } = await gateway.startCheckout({
+    const { url, form, reference } = await gateway.startCheckout({
       amountRupees: plan.price,
       orderId,
       existingCustomer: profile?.safepay_customer_id ?? undefined,
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
       amountRupees: plan.price,
     });
 
-    return NextResponse.json({ url, orderId });
+    return NextResponse.json({ url, form, orderId });
   } catch (err) {
     console.error('checkout: could not start payment', err);
     return NextResponse.json({ error: 'Could not reach the payment gateway. Try again in a moment.' }, { status: 502 });
