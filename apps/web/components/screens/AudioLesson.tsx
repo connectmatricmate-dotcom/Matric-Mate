@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 import type { Chapter, PlayableTrack } from '@matricmate/core';
-import { pickAudioTrack } from '@matricmate/core';
+import { chapterName, pickAudioTrack } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Bar, Card, Icon } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
@@ -19,11 +19,9 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
 
 export function AudioLesson({
   chapter,
-  audioTitle,
   tracks,
 }: {
   chapter: Chapter;
-  audioTitle: string;
   /** Published recordings for this chapter, straight from Supabase Storage. */
   tracks: PlayableTrack[];
 }) {
@@ -117,7 +115,13 @@ export function AudioLesson({
         <div className="flex h-[210px] w-[210px] items-center justify-center rounded-[24px] bg-teal">
           <Image src="/brand/monogram.png" alt="" width={130} height={100} className="h-auto w-[130px] object-contain" />
         </div>
-        <h2 className="mt-4 text-center font-display text-[22px] text-ink">{audioTitle}</h2>
+        {/* The chapter's own name. This was content.audioTitle, which the live
+            query fills from the bundled catalogue: three chapters have one and
+            the other 154 are an empty string, so the player had no title at
+            all. audio_tracks.title is a machine slug, not student copy. */}
+        <h2 className="mt-4 text-center font-display text-[22px] text-ink">
+          {chapterName(chapter, state.settings.language)}
+        </h2>
         <p className="text-center text-[13px] text-ink2">
           {medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
         </p>

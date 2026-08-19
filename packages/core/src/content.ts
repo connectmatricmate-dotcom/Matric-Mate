@@ -276,6 +276,29 @@ export const chapterById = (id: string): Chapter | undefined =>
 export const subjectById = (id: string): Subject | undefined =>
   liveSubjects?.find((s) => s.id === id) ?? SUBJECTS.find((s) => s.id === id);
 
+/**
+ * A chapter's name, and a subject's, in the language the student reads in.
+ *
+ * Both columns are populated for every row we have: 157 of 157 chapters carry
+ * an Urdu title and all nine subjects an Urdu name. The screens that got this
+ * right wrote the same conditional by hand, and the ones that did not simply
+ * read `.title`, so an Urdu student met English chapter names on the practice
+ * setup, the AI builder, the downloads list, the offline library, weak topics
+ * and their report card. One helper each, so a screen cannot forget.
+ *
+ * English is the fallback rather than an error: a chapter added before its
+ * translation should still have a name.
+ */
+export const chapterName = (
+  chapter: Pick<Chapter, 'title' | 'urduTitle'> | undefined,
+  lang: string,
+): string => (lang === 'ur' && chapter?.urduTitle) || chapter?.title || '';
+
+export const subjectName = (
+  subject: Pick<Subject, 'name' | 'urduName'> | undefined,
+  lang: string,
+): string => (lang === 'ur' && subject?.urduName) || subject?.name || '';
+
 /* ------------------------------------------------------- authored content */
 
 /*

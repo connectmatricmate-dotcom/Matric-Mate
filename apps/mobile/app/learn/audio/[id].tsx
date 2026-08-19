@@ -5,16 +5,32 @@ import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-au
 import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
-import { api, pickAudioTrack } from '@matricmate/core';
+import { api, chapterById, chapterName, pickAudioTrack } from '@matricmate/core';
 import { Equalizer } from '../../../src/components/celebration';
 import { audioSource } from '../../../src/core/audio';
-import { localAudioTrack, localAudioUri } from '../../../src/core/downloads';
+import { localAudioTrack, localAudioUri, localChapter } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
 
 const SPEEDS = [1, 1.25, 1.5] as const;
+
+/**
+ * What the player is playing.
+ *
+ * This was `content.audioTitle`, which the live query fills from the bundled
+ * catalogue: three chapters have one and the other 154 have an empty string.
+ * So the player showed its artwork, two equalizers and nothing between them,
+ * and a student could not tell which lesson was open. The chapter's own name
+ * is the honest title, and `audio_tracks.title` is a machine slug
+ * ("math-9 audio lesson") rather than anything to show a student.
+ *
+ * Synchronous: the hub is the only way in and has already primed the lookup,
+ * and offline the row saved with the download answers.
+ */
+const lessonTitle = (chapterId: string, lang: string): string =>
+  chapterName(chapterById(chapterId) ?? localChapter(chapterId) ?? undefined, lang);
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 /** Everything visual. Both the real player and the fallback render through this. */
@@ -148,7 +164,6 @@ function RealPlayer({ id }: { id: string }) {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
-  const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
   const medium = state.settings.contentMedium;
   const { data: tracks, loading: tracksLoading, error: tracksError } = useAsync(() => api.getAudioTracks(id), [id]);
@@ -222,7 +237,7 @@ function RealPlayer({ id }: { id: string }) {
 
   return (
     <PlayerChrome
-      title={content?.audioTitle ?? ''}
+      title={lessonTitle(id, state.settings.language)}
       subtitle={medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
       position={position}
       duration={duration}
@@ -280,7 +295,6 @@ function PreviewPlayer({ id }: { id: string }) {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
-  const { data: content } = useAsync(() => api.getChapterContent(id), [id]);
 
   // This boundary only exists for binaries that predate expo-audio, and it
   // cannot play anything. A made-up "14 minutes" was worse than saying so.
@@ -302,7 +316,7 @@ function PreviewPlayer({ id }: { id: string }) {
 
   return (
     <PlayerChrome
-      title={content?.audioTitle ?? ''}
+      title={lessonTitle(id, state.settings.language)}
       subtitle={state.settings.contentMedium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
       position={position}
       duration={duration}
