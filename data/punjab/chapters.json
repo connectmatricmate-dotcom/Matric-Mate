@@ -1,0 +1,4928 @@
+{
+  "source": "elearn.gov.pk",
+  "fetchedAt": "2026-09-08",
+  "subjects": [
+    {
+      "subject": "bio",
+      "grade": 9,
+      "subjectId": 3,
+      "chapters": [
+        {
+          "number": 1,
+          "impliedChapter": 1,
+          "matches": true,
+          "topicCount": 8,
+          "topics": [
+            {
+              "number": "1.1",
+              "title": "Introduction to Biology",
+              "depth": 1
+            },
+            {
+              "number": "1.1.1",
+              "title": "Divisions Of Biology",
+              "depth": 2
+            },
+            {
+              "number": "1.1.2",
+              "title": "Relationship of Biology to Other Sciences",
+              "depth": 2
+            },
+            {
+              "number": "1.1.3",
+              "title": "Careers in Biology",
+              "depth": 2
+            },
+            {
+              "number": "1.1.4",
+              "title": "Quran and Biology",
+              "depth": 2
+            },
+            {
+              "number": "1.2",
+              "title": "Muslim Scientists",
+              "depth": 1
+            },
+            {
+              "number": "1.3",
+              "title": "The Levels of Organization",
+              "depth": 1
+            },
+            {
+              "number": "1.3.1",
+              "title": "Cellular Organization",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "impliedChapter": 2,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "2.1",
+              "title": "Biological Method",
+              "depth": 1
+            },
+            {
+              "number": "2.1.1",
+              "title": "Biological Problem, Hypothesis, Deductions and Experiments",
+              "depth": 2
+            },
+            {
+              "number": "2.1.2",
+              "title": "Theory, Law and Principle",
+              "depth": 2
+            },
+            {
+              "number": "2.2",
+              "title": "Data Organization and Data Analysis",
+              "depth": 1
+            },
+            {
+              "number": "2.3",
+              "title": "Mathematics: As an Integral Part of Scientific Process",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "impliedChapter": 3,
+          "matches": true,
+          "topicCount": 13,
+          "topics": [
+            {
+              "number": "3.1",
+              "title": "Biodiversity",
+              "depth": 1
+            },
+            {
+              "number": "3.2",
+              "title": "Classification - AIMS and Principles",
+              "depth": 1
+            },
+            {
+              "number": "3.3",
+              "title": "History of Classification Systems",
+              "depth": 1
+            },
+            {
+              "number": "3.3.1",
+              "title": "Two Kingdom Classification",
+              "depth": 2
+            },
+            {
+              "number": "3.3.2",
+              "title": "Three Kingdom Classification",
+              "depth": 2
+            },
+            {
+              "number": "3.3.3",
+              "title": "Five Kingdom Classification System",
+              "depth": 2
+            },
+            {
+              "number": "3.4",
+              "title": "The Five Kingdoms",
+              "depth": 1
+            },
+            {
+              "number": "3.5",
+              "title": "Binomial Nomenclature",
+              "depth": 1
+            },
+            {
+              "number": "3.6",
+              "title": "Conservation of Biodiversity",
+              "depth": 1
+            },
+            {
+              "number": "3.6.1",
+              "title": "Impact of Human Beings on Biodiversty",
+              "depth": 2
+            },
+            {
+              "number": "3.6.2",
+              "title": "Deforestation and Over-Hunting",
+              "depth": 2
+            },
+            {
+              "number": "3.6.3",
+              "title": "Steps For the Conservation of Biodiversty",
+              "depth": 2
+            },
+            {
+              "number": "3.6.4",
+              "title": "Endangered Species in Pakistan",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "impliedChapter": 4,
+          "matches": true,
+          "topicCount": 15,
+          "topics": [
+            {
+              "number": "4.1",
+              "title": "Microscopy and the Emergence of Cell Theory",
+              "depth": 1
+            },
+            {
+              "number": "4.1.1",
+              "title": "Light Microscope and Electron Microscopy",
+              "depth": 2
+            },
+            {
+              "number": "4.1.2",
+              "title": "History of the Formulation of Cell Theory",
+              "depth": 2
+            },
+            {
+              "number": "4.2",
+              "title": "Cellular Structures and Functions",
+              "depth": 1
+            },
+            {
+              "number": "4.2.1",
+              "title": "Cell Wall",
+              "depth": 2
+            },
+            {
+              "number": "4.2.2",
+              "title": "Cell Membrane",
+              "depth": 2
+            },
+            {
+              "number": "4.2.3",
+              "title": "Cytoplasm",
+              "depth": 2
+            },
+            {
+              "number": "4.2.4",
+              "title": "Cell Organelles",
+              "depth": 2
+            },
+            {
+              "number": "4.2.5",
+              "title": "Difference between Prokaryotic and Eukaryotic Cells",
+              "depth": 2
+            },
+            {
+              "number": "4.2.6",
+              "title": "Relationship between Cell Function and Cell Structure",
+              "depth": 2
+            },
+            {
+              "number": "4.3",
+              "title": "Cell Size and Surface Area to Volume Ratio",
+              "depth": 1
+            },
+            {
+              "number": "4.4",
+              "title": "Passage of Molecules Into and Out of Cells",
+              "depth": 1
+            },
+            {
+              "number": "4.5",
+              "title": "Animal and Plant Tissues",
+              "depth": 1
+            },
+            {
+              "number": "4.5.1",
+              "title": "Animal Tissues",
+              "depth": 2
+            },
+            {
+              "number": "4.5.2",
+              "title": "Plant Tissues",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "impliedChapter": 5,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "5.1",
+              "title": "Cell Cycle",
+              "depth": 1
+            },
+            {
+              "number": "5.2",
+              "title": "Mitosis",
+              "depth": 1
+            },
+            {
+              "number": "5.2.1",
+              "title": "Phases of Mitosis",
+              "depth": 2
+            },
+            {
+              "number": "5.2.2",
+              "title": "Significance of Mitosis",
+              "depth": 2
+            },
+            {
+              "number": "5.3",
+              "title": "Meiosis",
+              "depth": 1
+            },
+            {
+              "number": "5.3.1",
+              "title": "Phases of Meiosis",
+              "depth": 2
+            },
+            {
+              "number": "5.3.2",
+              "title": "Significance of Meiosis",
+              "depth": 2
+            },
+            {
+              "number": "5.3.3",
+              "title": "Comparision between Mitosis and Meiosis",
+              "depth": 2
+            },
+            {
+              "number": "5.4",
+              "title": "Apoptosis and Necrosis",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "impliedChapter": 6,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "6",
+              "title": "Enzymes",
+              "depth": 0
+            },
+            {
+              "number": "6.1",
+              "title": "Characteristics of Enzymes",
+              "depth": 1
+            },
+            {
+              "number": "6.1.1",
+              "title": "Factors Affecting The Rate Of Enzyme Action",
+              "depth": 2
+            },
+            {
+              "number": "6.2",
+              "title": "Mechanism of Enzyme Action",
+              "depth": 1
+            },
+            {
+              "number": "6.3",
+              "title": "Specificity of Enzymes",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "impliedChapter": 7,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "7.1",
+              "title": "Bioenergetics and the role of ATP",
+              "depth": 1
+            },
+            {
+              "number": "7.2",
+              "title": "Photosynthesis",
+              "depth": 1
+            },
+            {
+              "number": "7.2.1",
+              "title": "Mechanism of Photosynthesis",
+              "depth": 2
+            },
+            {
+              "number": "7.2.2",
+              "title": "Role Of Light and Chlorophyll",
+              "depth": 2
+            },
+            {
+              "number": "7.2.3",
+              "title": "Limiting Factors in Photosyntesis",
+              "depth": 2
+            },
+            {
+              "number": "7.3",
+              "title": "Respiration",
+              "depth": 1
+            },
+            {
+              "number": "7.3.1",
+              "title": "Aerobic and Anarobic Respiration",
+              "depth": 2
+            },
+            {
+              "number": "7.3.2",
+              "title": "Mechanism of Respiration",
+              "depth": 2
+            },
+            {
+              "number": "7.3.3",
+              "title": "The Energy Budget of Respiration",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "impliedChapter": 8,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "8.1",
+              "title": "Mineral Nutrition in Plants",
+              "depth": 1
+            },
+            {
+              "number": "8.2",
+              "title": "Components of Human Food",
+              "depth": 1
+            },
+            {
+              "number": "8.2.1",
+              "title": "Effect of Water and Dietary Fibre",
+              "depth": 2
+            },
+            {
+              "number": "8.2.2",
+              "title": "A Balanced Diet",
+              "depth": 2
+            },
+            {
+              "number": "8.2.3",
+              "title": "Problem Related to Nutrition (Malnutrition)",
+              "depth": 2
+            },
+            {
+              "number": "8.3",
+              "title": "Digestion in Human",
+              "depth": 1
+            },
+            {
+              "number": "8.3.1",
+              "title": "Human Alimentary Canal",
+              "depth": 2
+            },
+            {
+              "number": "8.3.2",
+              "title": "Role of Liver",
+              "depth": 2
+            },
+            {
+              "number": "8.4",
+              "title": "Disorders of Gut",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "impliedChapter": 9,
+          "matches": true,
+          "topicCount": 13,
+          "topics": [
+            {
+              "number": "9.1",
+              "title": "Transport in Plants",
+              "depth": 1
+            },
+            {
+              "number": "9.1.1",
+              "title": "Water and Ion Uptake",
+              "depth": 2
+            },
+            {
+              "number": "9.1.2",
+              "title": "Transpiration",
+              "depth": 2
+            },
+            {
+              "number": "9.1.3",
+              "title": "Transport of Water",
+              "depth": 2
+            },
+            {
+              "number": "9.1.4",
+              "title": "Transport of Food",
+              "depth": 2
+            },
+            {
+              "number": "9.2",
+              "title": "Transport in human",
+              "depth": 1
+            },
+            {
+              "number": "9.2.1",
+              "title": "Blood",
+              "depth": 2
+            },
+            {
+              "number": "9.2.2",
+              "title": "Human Heart",
+              "depth": 2
+            },
+            {
+              "number": "9.2.3",
+              "title": "Blood Vessels",
+              "depth": 2
+            },
+            {
+              "number": "9.2.4",
+              "title": "General Plan of Human Blood Circulatory System",
+              "depth": 2
+            },
+            {
+              "number": "9.3",
+              "title": "Cardiovascular Disorders",
+              "depth": 1
+            },
+            {
+              "number": "9.3.1",
+              "title": "ATHEROSCLEROSIS AND ARTERIOSCLEROSIS",
+              "depth": 2
+            },
+            {
+              "number": "9.3.2",
+              "title": "Myocardial Infarction",
+              "depth": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subject": "math",
+      "grade": 9,
+      "subjectId": 7,
+      "chapters": [
+        {
+          "number": 1,
+          "impliedChapter": 1,
+          "matches": true,
+          "topicCount": 26,
+          "topics": [
+            {
+              "number": "1.1",
+              "title": "Matrix",
+              "depth": 1
+            },
+            {
+              "number": "1.1.1",
+              "title": "Rows and Columns of a Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.1.2",
+              "title": "Order of a Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.1.3",
+              "title": "Equal Matrices",
+              "depth": 2
+            },
+            {
+              "number": "1.2",
+              "title": "Types of Matrices",
+              "depth": 1
+            },
+            {
+              "number": "1.3",
+              "title": "Addition and Subtraction of Matrices",
+              "depth": 1
+            },
+            {
+              "number": "1.3.1",
+              "title": "Addition of Matrices",
+              "depth": 2
+            },
+            {
+              "number": "1.3.2",
+              "title": "Subtraction of Matrices",
+              "depth": 2
+            },
+            {
+              "number": "1.3.3",
+              "title": "Multiplication of a Matrix by a Real Number",
+              "depth": 2
+            },
+            {
+              "number": "1.3.4",
+              "title": "Commutative and Associative Laws of Addition of Matrices",
+              "depth": 2
+            },
+            {
+              "number": "1.3.5",
+              "title": "Additive Identity of a Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.3.6",
+              "title": "Additive Inverse of a Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.4",
+              "title": "Multiplication of Matrices",
+              "depth": 1
+            },
+            {
+              "number": "1.4.1",
+              "title": "Associative Law under Multiplication",
+              "depth": 2
+            },
+            {
+              "number": "1.4.2",
+              "title": "Distributive Laws of Multiplication over Addition and Subtraction",
+              "depth": 2
+            },
+            {
+              "number": "1.4.3",
+              "title": "Commutative Law of Multiplication of Matrices",
+              "depth": 2
+            },
+            {
+              "number": "1.4.4",
+              "title": "Multiplicative Identity of a Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.4.5",
+              "title": "Verification of\\[ (AB)^t = B^t A^t\\]",
+              "depth": 2
+            },
+            {
+              "number": "1.5",
+              "title": "Multiplicative Inverse of a Matrix",
+              "depth": 1
+            },
+            {
+              "number": "1.5.1",
+              "title": "Determinant of a 2-by-2 Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.5.2",
+              "title": "Singular and Non-Singular Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.5.3",
+              "title": "Adjoint of a Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.5.4",
+              "title": "Multiplicative Inverse of a Non-singular Matrix",
+              "depth": 2
+            },
+            {
+              "number": "1.5.5",
+              "title": "Inverse of a Matrix using Adjoint",
+              "depth": 2
+            },
+            {
+              "number": "1.5.6",
+              "title": "Verification of \\[(AB)^{-1} = B^{-1} A^{-1}\\]",
+              "depth": 2
+            },
+            {
+              "number": "1.6",
+              "title": "Solution of Simultaneous Linear Equations",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "impliedChapter": 2,
+          "matches": true,
+          "topicCount": 19,
+          "topics": [
+            {
+              "number": "2.1",
+              "title": "Real Numbers",
+              "depth": 1
+            },
+            {
+              "number": "2.1.1",
+              "title": "Set of Real Numbers",
+              "depth": 2
+            },
+            {
+              "number": "2.1.2",
+              "title": "Depiction of Real Numbers on Number Line",
+              "depth": 2
+            },
+            {
+              "number": "2.1.3",
+              "title": "Demonstration of a Number with Terminating and Non-Terminating decimals on the Number Line",
+              "depth": 2
+            },
+            {
+              "number": "2.1.4",
+              "title": "Representation of Rational and Irrational Numbers on Number Line",
+              "depth": 2
+            },
+            {
+              "number": "2.2",
+              "title": "Properties of Real Numbers",
+              "depth": 1
+            },
+            {
+              "number": "2.3",
+              "title": "Radicals and Radicands",
+              "depth": 1
+            },
+            {
+              "number": "2.3.1",
+              "title": "Concept of Radicals and Radicands",
+              "depth": 2
+            },
+            {
+              "number": "2.3.2",
+              "title": "Difference between Radical form and Exponential form",
+              "depth": 2
+            },
+            {
+              "number": "2.3.3",
+              "title": "Transformation of an Expression given in Radical form to Exponential form and vice versa",
+              "depth": 2
+            },
+            {
+              "number": "2.4",
+              "title": "Laws of Exponents / Indices",
+              "depth": 1
+            },
+            {
+              "number": "2.4.1",
+              "title": "Base and Exponent",
+              "depth": 2
+            },
+            {
+              "number": "2.4.2",
+              "title": "Applications of Laws of Exponents",
+              "depth": 2
+            },
+            {
+              "number": "2.5",
+              "title": "Complex Numbers",
+              "depth": 1
+            },
+            {
+              "number": "2.5.1",
+              "title": "Definition of a Complex Number",
+              "depth": 2
+            },
+            {
+              "number": "2.5.2",
+              "title": "Set of Complex Numbers",
+              "depth": 2
+            },
+            {
+              "number": "2.5.3",
+              "title": "Conjugate of a Complex Number",
+              "depth": 2
+            },
+            {
+              "number": "2.5.4",
+              "title": "Equality of Complex Numbers and its Properties",
+              "depth": 2
+            },
+            {
+              "number": "2.6",
+              "title": "Basic Operations on Complex Numbers",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "impliedChapter": 3,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "3.1",
+              "title": "Scientific Notation",
+              "depth": 1
+            },
+            {
+              "number": "3.2",
+              "title": "Logarithm",
+              "depth": 1
+            },
+            {
+              "number": "3.2.1",
+              "title": "Logarithm of a Real Number",
+              "depth": 2
+            },
+            {
+              "number": "3.2.2",
+              "title": "Definitions of Common Logarithm, Characteristic and Mantissa Definition of Common Logarithm",
+              "depth": 2
+            },
+            {
+              "number": "3.2.3",
+              "title": "Using Tables to find log of a Number",
+              "depth": 2
+            },
+            {
+              "number": "3.2.4",
+              "title": "The Concept of Antilogarithm and Use of Antilog Tables",
+              "depth": 2
+            },
+            {
+              "number": "3.3",
+              "title": "Common Logarithm and Natural Logarithm",
+              "depth": 1
+            },
+            {
+              "number": "3.4",
+              "title": "Laws of Logarithm",
+              "depth": 1
+            },
+            {
+              "number": "3.5",
+              "title": "Application of Laws of Logarithm in Numerical Calculations",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "impliedChapter": 4,
+          "matches": true,
+          "topicCount": 16,
+          "topics": [
+            {
+              "number": "4.1",
+              "title": "Algebraic Expressions",
+              "depth": 1
+            },
+            {
+              "number": "4.1.1",
+              "title": "Rational Expressions Behave like Rational Numbers",
+              "depth": 2
+            },
+            {
+              "number": "4.1.2",
+              "title": "Rational Expression",
+              "depth": 2
+            },
+            {
+              "number": "4.1.3",
+              "title": "Properties of Rational Expressions",
+              "depth": 2
+            },
+            {
+              "number": "4.1.4",
+              "title": "Rational Expression in its Lowest form",
+              "depth": 2
+            },
+            {
+              "number": "4.1.5",
+              "title": "To examine whether a rational expression is in lowest form or not",
+              "depth": 2
+            },
+            {
+              "number": "4.1.6",
+              "title": "Working Rule to reduce a rational expression to its lowest terms",
+              "depth": 2
+            },
+            {
+              "number": "4.1.7",
+              "title": "Sum, Difference and Product of Rational Expressions",
+              "depth": 2
+            },
+            {
+              "number": "4.1.8",
+              "title": "Dividing a Rational Expression with another Rational Expression",
+              "depth": 2
+            },
+            {
+              "number": "4.1.9",
+              "title": "Evaluation of Algebraic Expression at some particular Real Number Definition",
+              "depth": 2
+            },
+            {
+              "number": "4.2",
+              "title": "Algebraic Formulae",
+              "depth": 1
+            },
+            {
+              "number": "4.2.1",
+              "title": "Using the formulas",
+              "depth": 2
+            },
+            {
+              "number": "4.3",
+              "title": "Surds and their Application",
+              "depth": 1
+            },
+            {
+              "number": "4.3.1",
+              "title": "Definition",
+              "depth": 2
+            },
+            {
+              "number": "4.3.2",
+              "title": "Operations on surds",
+              "depth": 2
+            },
+            {
+              "number": "4.4",
+              "title": "Rationalization of Surds",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "impliedChapter": 5,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "5.1",
+              "title": "Factorization",
+              "depth": 1
+            },
+            {
+              "number": "5.2",
+              "title": "Remainder Theorem and Factor Theorem",
+              "depth": 1
+            },
+            {
+              "number": "5.2.1",
+              "title": "Remainder Theorem",
+              "depth": 2
+            },
+            {
+              "number": "5.2.2",
+              "title": "To find Remainder (without dividing) when a polynomial is divided by a Linear Polynomial",
+              "depth": 2
+            },
+            {
+              "number": "5.2.3",
+              "title": "Zero of a Polynomial",
+              "depth": 2
+            },
+            {
+              "number": "5.2.4",
+              "title": "Factor Theorem",
+              "depth": 2
+            },
+            {
+              "number": "5.3",
+              "title": "Factorization of a Cubic Polynomial",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "impliedChapter": 6,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "6.1",
+              "title": "Highest Common Factor (H.C.F.) and Least Common Multiple (L.C.M.) of Algebraic Expressions",
+              "depth": 1
+            },
+            {
+              "number": "6.1.1",
+              "title": "(a) Highest Common Factor (H.C.F.)",
+              "depth": 2
+            },
+            {
+              "number": "6.1.2",
+              "title": "(a) Finding H.C.F.",
+              "depth": 2
+            },
+            {
+              "number": "6.1.3",
+              "title": "Relation between H.C.F. and L.C.M.",
+              "depth": 2
+            },
+            {
+              "number": "6.1.4",
+              "title": "Application of H.C.F. and L.C.M.",
+              "depth": 2
+            },
+            {
+              "number": "6.2",
+              "title": "Basic Operations on Algebraic Fractions",
+              "depth": 1
+            },
+            {
+              "number": "6.3",
+              "title": "Square Root of Algebraic Expression",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "impliedChapter": 7,
+          "matches": true,
+          "topicCount": 11,
+          "topics": [
+            {
+              "number": "7.1",
+              "title": "Linear Equations",
+              "depth": 1
+            },
+            {
+              "number": "7.1.1",
+              "title": "Definition",
+              "depth": 2
+            },
+            {
+              "number": "7.1.2",
+              "title": "Solving a Linear Equation in One Variable",
+              "depth": 2
+            },
+            {
+              "number": "7.1.3",
+              "title": "Equations Involving Radicals but Reducible to Linear Form",
+              "depth": 2
+            },
+            {
+              "number": "7.2",
+              "title": "Equation Involving Absolute Value",
+              "depth": 1
+            },
+            {
+              "number": "7.2.1",
+              "title": "Absolute Value",
+              "depth": 2
+            },
+            {
+              "number": "7.2.2",
+              "title": "Solving Linear Equations Involving Absolute Value",
+              "depth": 2
+            },
+            {
+              "number": "7.3",
+              "title": "Linear Inequalities",
+              "depth": 1
+            },
+            {
+              "number": "7.3.1",
+              "title": "Defining Inequalities",
+              "depth": 2
+            },
+            {
+              "number": "7.3.2",
+              "title": "Properties of Inequalitie",
+              "depth": 2
+            },
+            {
+              "number": "7.4",
+              "title": "Solving Linear Inequalities",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "impliedChapter": 8,
+          "matches": true,
+          "topicCount": 18,
+          "topics": [
+            {
+              "number": "8.1",
+              "title": "Cartesian Plane and Linear Graphs",
+              "depth": 1
+            },
+            {
+              "number": "8.1.1",
+              "title": "An Ordered Pair of Real Numbers",
+              "depth": 2
+            },
+            {
+              "number": "8.1.2",
+              "title": "Recognizing an Ordered Pair",
+              "depth": 2
+            },
+            {
+              "number": "8.1.3",
+              "title": "Cartesian Plane",
+              "depth": 2
+            },
+            {
+              "number": "8.1.4",
+              "title": "Identification of Origin and Coordiante Axes",
+              "depth": 2
+            },
+            {
+              "number": "8.1.5",
+              "title": "Location of the Point P(a, b) in the Plane Corresponding to the Ordered Pair (a,b)",
+              "depth": 2
+            },
+            {
+              "number": "8.1.6",
+              "title": "Drawing different Geometrical Shapes of Cartesian Plane",
+              "depth": 2
+            },
+            {
+              "number": "8.1.7",
+              "title": "Construction of a Table for Pairs of Values Satisfying a Linear Equation in Two Variables.",
+              "depth": 2
+            },
+            {
+              "number": "8.1.8",
+              "title": "Plotting the points to get the graph",
+              "depth": 2
+            },
+            {
+              "number": "8.1.9",
+              "title": "Scale of Graph",
+              "depth": 2
+            },
+            {
+              "number": "8.1.10",
+              "title": "Drawing Graphs of the following Equations",
+              "depth": 2
+            },
+            {
+              "number": "8.1.11",
+              "title": "Drawing Graph from a given Table of Discrete Values",
+              "depth": 2
+            },
+            {
+              "number": "8.1.12",
+              "title": "Solving Real Life Problems",
+              "depth": 2
+            },
+            {
+              "number": "8.2",
+              "title": "Conversion Graphs",
+              "depth": 1
+            },
+            {
+              "number": "8.2.1",
+              "title": "To Interpret Conversion Graph",
+              "depth": 2
+            },
+            {
+              "number": "8.2.2",
+              "title": "Reading a Given Graph",
+              "depth": 2
+            },
+            {
+              "number": "8.2.3",
+              "title": "Reading the Graphs of Conversion",
+              "depth": 2
+            },
+            {
+              "number": "8.3",
+              "title": "Graphical Solution of Linear Equations in two Variables",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "impliedChapter": 9,
+          "matches": true,
+          "topicCount": 12,
+          "topics": [
+            {
+              "number": "9.1",
+              "title": "Distance Formula",
+              "depth": 1
+            },
+            {
+              "number": "9.1.1",
+              "title": "Coordinate Geometry",
+              "depth": 2
+            },
+            {
+              "number": "9.1.2",
+              "title": "Finding Distance between two points",
+              "depth": 2
+            },
+            {
+              "number": "9.1.3",
+              "title": "Use of Distance Formula",
+              "depth": 2
+            },
+            {
+              "number": "9.2",
+              "title": "Collinear Points",
+              "depth": 1
+            },
+            {
+              "number": "9.2.1",
+              "title": "Collinear or Non-collinear Points in the Plane",
+              "depth": 2
+            },
+            {
+              "number": "9.2.2",
+              "title": "Use of Distance Formula to show the Collinearity of Three or more Points in the Plane",
+              "depth": 2
+            },
+            {
+              "number": "9.2.3",
+              "title": "Use of Distance Formula to Different Shapes of a Triangle",
+              "depth": 2
+            },
+            {
+              "number": "9.2.4",
+              "title": "Use of distance formula to show that four non-collinear points form a square, a rectangle and a parallelogram points form a square, a rectangle and a parallelogram",
+              "depth": 2
+            },
+            {
+              "number": "9.3",
+              "title": "Mid-Point Formula",
+              "depth": 1
+            },
+            {
+              "number": "9.3.1",
+              "title": "Recognition of the Mid-Point",
+              "depth": 2
+            },
+            {
+              "number": "9.3.2",
+              "title": "Verification of the Mid-PointFormula",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 10,
+          "impliedChapter": 10,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "10.1",
+              "title": "Congruent Triangles",
+              "depth": 1
+            },
+            {
+              "number": "10.1.1",
+              "title": "Theorem 10.1.1",
+              "depth": 2
+            },
+            {
+              "number": "10.1.2",
+              "title": "Theorem 10.1.2",
+              "depth": 2
+            },
+            {
+              "number": "10.1.3",
+              "title": "Theorem 10.1.3",
+              "depth": 2
+            },
+            {
+              "number": "10.1.4",
+              "title": "Theorem 10.1.4",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 11,
+          "impliedChapter": 11,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "11.1.1",
+              "title": "Theorem 11.1.1",
+              "depth": 2
+            },
+            {
+              "number": "11.1.2",
+              "title": "Theorem 11.1.2",
+              "depth": 2
+            },
+            {
+              "number": "11.1.3",
+              "title": "Theorem 11.1.3",
+              "depth": 2
+            },
+            {
+              "number": "11.1.4",
+              "title": "Theorem 11.1.4",
+              "depth": 2
+            },
+            {
+              "number": "11.1.5",
+              "title": "Theorem 11.1.5",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 12,
+          "impliedChapter": 12,
+          "matches": true,
+          "topicCount": 6,
+          "topics": [
+            {
+              "number": "12.1.1",
+              "title": "Theorem 12.1.1",
+              "depth": 2
+            },
+            {
+              "number": "12.1.2",
+              "title": "Theorem 12.1.2",
+              "depth": 2
+            },
+            {
+              "number": "12.1.3",
+              "title": "Theorem 12.1.3",
+              "depth": 2
+            },
+            {
+              "number": "12.1.4",
+              "title": "Theorem 12.1.4",
+              "depth": 2
+            },
+            {
+              "number": "12.1.5",
+              "title": "Theorem 12.1.5",
+              "depth": 2
+            },
+            {
+              "number": "12.1.6",
+              "title": "Theorem 12.1.6",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 13,
+          "impliedChapter": 13,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "13.1.1",
+              "title": "Theorem 13.1.1",
+              "depth": 2
+            },
+            {
+              "number": "13.1.2",
+              "title": "Theorem 13.1.2",
+              "depth": 2
+            },
+            {
+              "number": "13.1.3",
+              "title": "Theorem 13.1.3",
+              "depth": 2
+            },
+            {
+              "number": "13.1.4",
+              "title": "Theorem 13.1.4",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 14,
+          "impliedChapter": 14,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "14.1.1",
+              "title": "Theorem 14.1.1",
+              "depth": 2
+            },
+            {
+              "number": "14.1.2",
+              "title": "Theorem 14.1.2",
+              "depth": 2
+            },
+            {
+              "number": "14.1.3",
+              "title": "Theorem 14.1.3",
+              "depth": 2
+            },
+            {
+              "number": "14.1.4",
+              "title": "Theorem 14.1.4",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 15,
+          "impliedChapter": 15,
+          "matches": true,
+          "topicCount": 2,
+          "topics": [
+            {
+              "number": "15.1.1",
+              "title": "Pythagoras Theorem 15.1.1",
+              "depth": 2
+            },
+            {
+              "number": "15.1.2",
+              "title": "Theorem 15.1.2",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 16,
+          "impliedChapter": 16,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "16.1.1",
+              "title": "Theorem 16.1.1",
+              "depth": 2
+            },
+            {
+              "number": "16.1.2",
+              "title": "Theorem 16.1.2",
+              "depth": 2
+            },
+            {
+              "number": "16.1.3",
+              "title": "Theorem 16.1.3",
+              "depth": 2
+            },
+            {
+              "number": "16.1.4",
+              "title": "Theorem 16.1.4",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 17,
+          "impliedChapter": 17,
+          "matches": true,
+          "topicCount": 2,
+          "topics": [
+            {
+              "number": "17.1",
+              "title": "Construction of Triangles",
+              "depth": 1
+            },
+            {
+              "number": "17.2",
+              "title": "Figures with Equal Areas",
+              "depth": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subject": "chem",
+      "grade": 9,
+      "subjectId": 8,
+      "chapters": [
+        {
+          "number": 1,
+          "impliedChapter": 1,
+          "matches": true,
+          "topicCount": 36,
+          "topics": [
+            {
+              "number": "1",
+              "title": "Introduction",
+              "depth": 0
+            },
+            {
+              "number": "1.1",
+              "title": "Branches of Chemistry",
+              "depth": 1
+            },
+            {
+              "number": "1.1.1",
+              "title": "Physical Chemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.1.2",
+              "title": "Organic Chemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.1.3",
+              "title": "Inorganic Chemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.1.4",
+              "title": "Biochemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.1.5",
+              "title": "Industrial Chemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.1.6",
+              "title": "Nuclear Chemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.1.7",
+              "title": "Environmental Chemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.1.8",
+              "title": "Analytical Chemistry",
+              "depth": 2
+            },
+            {
+              "number": "1.2",
+              "title": "Basic Definitions",
+              "depth": 1
+            },
+            {
+              "number": "1.2.1",
+              "title": "Elements, Compounds and Mixtures",
+              "depth": 2
+            },
+            {
+              "number": "1.2.1.1",
+              "title": "Elements",
+              "depth": 3
+            },
+            {
+              "number": "1.2.1.2",
+              "title": "Compounds",
+              "depth": 3
+            },
+            {
+              "number": "1.2.1.3",
+              "title": "Mixture",
+              "depth": 3
+            },
+            {
+              "number": "1.2.2",
+              "title": "Atomic Number and Mass Number",
+              "depth": 2
+            },
+            {
+              "number": "1.2.3",
+              "title": "Relative Atomic Mass and Atomic Mass Unit",
+              "depth": 2
+            },
+            {
+              "number": "1.2.4",
+              "title": "How to write a Chemical Formula",
+              "depth": 2
+            },
+            {
+              "number": "1.2.4.1",
+              "title": "Emperical Formula",
+              "depth": 3
+            },
+            {
+              "number": "1.2.4.2",
+              "title": "Molecular Formula",
+              "depth": 3
+            },
+            {
+              "number": "1.2.5",
+              "title": "Molecular Mass and Formula Mass",
+              "depth": 2
+            },
+            {
+              "number": "1.3",
+              "title": "Chemical Species",
+              "depth": 1
+            },
+            {
+              "number": "1.3.1",
+              "title": "Ions (Cations and Anions), Molecular Ions and Free Radicals",
+              "depth": 2
+            },
+            {
+              "number": "1.3.1.1",
+              "title": "Molecular Ion",
+              "depth": 3
+            },
+            {
+              "number": "1.3.1.2",
+              "title": "Free Radicals",
+              "depth": 3
+            },
+            {
+              "number": "1.3.2",
+              "title": "Types of Molecules",
+              "depth": 2
+            },
+            {
+              "number": "1.4",
+              "title": "Gram Atomic Mass, Gram Molecular Mass and Gram Formula Mass",
+              "depth": 1
+            },
+            {
+              "number": "1.4.1",
+              "title": "Gram Atomic Mass",
+              "depth": 2
+            },
+            {
+              "number": "1.4.2",
+              "title": "Gram Molecular Mass",
+              "depth": 2
+            },
+            {
+              "number": "1.4.3",
+              "title": "Gram Formula Mass",
+              "depth": 2
+            },
+            {
+              "number": "1.5",
+              "title": "Avogrados Number and Mole",
+              "depth": 1
+            },
+            {
+              "number": "1.5.1",
+              "title": "Avogrados Number",
+              "depth": 2
+            },
+            {
+              "number": "1.5.2",
+              "title": "Mole (chemist secret unit)",
+              "depth": 2
+            },
+            {
+              "number": "1.6",
+              "title": "Chemical Calculations",
+              "depth": 1
+            },
+            {
+              "number": "1.6.1",
+              "title": "Mole-Mass Calculations",
+              "depth": 2
+            },
+            {
+              "number": "1.6.2",
+              "title": "Mole-Particle Calculations",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "impliedChapter": 2,
+          "matches": true,
+          "topicCount": 15,
+          "topics": [
+            {
+              "number": "2",
+              "title": "Introduction",
+              "depth": 0
+            },
+            {
+              "number": "2.1",
+              "title": "Theories and Experiments Related to Structure of Atom",
+              "depth": 1
+            },
+            {
+              "number": "2.0.1",
+              "title": "Cathode Rays and Discovery of Electron",
+              "depth": 2
+            },
+            {
+              "number": "2.0.2",
+              "title": "Discovery of Proton",
+              "depth": 2
+            },
+            {
+              "number": "2.0.3",
+              "title": "Discovery of Neutron",
+              "depth": 2
+            },
+            {
+              "number": "2.1.1",
+              "title": "Rutherfords Atomic Model",
+              "depth": 2
+            },
+            {
+              "number": "2.1.1.1",
+              "title": "Results of the Experiment",
+              "depth": 3
+            },
+            {
+              "number": "2.1.1.2",
+              "title": "Defects in Rutherfords Model",
+              "depth": 3
+            },
+            {
+              "number": "2.1.2",
+              "title": "Bohrs Atomic Theory",
+              "depth": 2
+            },
+            {
+              "number": "2.2",
+              "title": "Electronic Configuration",
+              "depth": 1
+            },
+            {
+              "number": "2.2.1",
+              "title": "The Electronic Configuration of First 18 Elements",
+              "depth": 2
+            },
+            {
+              "number": "2.3",
+              "title": "Isotopes",
+              "depth": 1
+            },
+            {
+              "number": "2.3.1",
+              "title": "Definitions",
+              "depth": 2
+            },
+            {
+              "number": "2.3.2",
+              "title": "Examples",
+              "depth": 2
+            },
+            {
+              "number": "2.3.4",
+              "title": "Uses",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "impliedChapter": 3,
+          "matches": true,
+          "topicCount": 17,
+          "topics": [
+            {
+              "number": "3",
+              "title": "Introduction",
+              "depth": 0
+            },
+            {
+              "number": "3.1",
+              "title": "Periodic Table",
+              "depth": 1
+            },
+            {
+              "number": "3.0.1",
+              "title": "Dobereiners Triads",
+              "depth": 2
+            },
+            {
+              "number": "3.0.2",
+              "title": "Newlands Octaves",
+              "depth": 2
+            },
+            {
+              "number": "3.0.3",
+              "title": "Mendeleevs Periodic Table",
+              "depth": 2
+            },
+            {
+              "number": "3.0.4",
+              "title": "Periodic Law",
+              "depth": 2
+            },
+            {
+              "number": "3.0.5",
+              "title": "Modern Periodic Table",
+              "depth": 2
+            },
+            {
+              "number": "3.0.6",
+              "title": "Long form of Periodic Table",
+              "depth": 2
+            },
+            {
+              "number": "3.0.7",
+              "title": "Salient Features of Long Form of Periodic Table:",
+              "depth": 2
+            },
+            {
+              "number": "3.1.1",
+              "title": "Periods",
+              "depth": 2
+            },
+            {
+              "number": "3.1.2",
+              "title": "Groups",
+              "depth": 2
+            },
+            {
+              "number": "3.2",
+              "title": "Periodicity of Properties",
+              "depth": 1
+            },
+            {
+              "number": "3.2.1",
+              "title": "Atomic Size and Atomic Radius",
+              "depth": 2
+            },
+            {
+              "number": "3.2.2",
+              "title": "Shielding Effect",
+              "depth": 2
+            },
+            {
+              "number": "3.2.3",
+              "title": "Ionization Energy",
+              "depth": 2
+            },
+            {
+              "number": "3.2.4",
+              "title": "Electron Affinit",
+              "depth": 2
+            },
+            {
+              "number": "3.2.5",
+              "title": "Electronegativity",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "impliedChapter": 4,
+          "matches": true,
+          "topicCount": 20,
+          "topics": [
+            {
+              "number": "4.1",
+              "title": "Why do Atoms Form Chemical Bonds",
+              "depth": 1
+            },
+            {
+              "number": "4.2",
+              "title": "Chemical Bond",
+              "depth": 1
+            },
+            {
+              "number": "4.3",
+              "title": "Types of Chemical Bond",
+              "depth": 1
+            },
+            {
+              "number": "4.3.1",
+              "title": "Ionic Bond",
+              "depth": 2
+            },
+            {
+              "number": "4.3.2",
+              "title": "Covalent Bond",
+              "depth": 2
+            },
+            {
+              "number": "4.3.2.1",
+              "title": "Types of covalent bonds",
+              "depth": 3
+            },
+            {
+              "number": "4.3.2.2",
+              "title": "Single Covalent bond",
+              "depth": 3
+            },
+            {
+              "number": "4.3.2.3",
+              "title": "double Covalent bond",
+              "depth": 3
+            },
+            {
+              "number": "4.3.2.4",
+              "title": "Triple Covalent bond",
+              "depth": 3
+            },
+            {
+              "number": "4.3.3",
+              "title": "Dative Covalent or Coordinate Covalent Bond",
+              "depth": 2
+            },
+            {
+              "number": "4.3.4",
+              "title": "Polar and Non-polar Covalent Bond",
+              "depth": 2
+            },
+            {
+              "number": "4.3.5",
+              "title": "Metallic Bond",
+              "depth": 2
+            },
+            {
+              "number": "4.4",
+              "title": "Intermolecular Forces",
+              "depth": 1
+            },
+            {
+              "number": "4.4.1",
+              "title": "Dipole-Dipole Interactions",
+              "depth": 2
+            },
+            {
+              "number": "4.4.2",
+              "title": "Hydrogen Bonding",
+              "depth": 2
+            },
+            {
+              "number": "4.5",
+              "title": "Nature of Bonding and Properties",
+              "depth": 1
+            },
+            {
+              "number": "4.5.1",
+              "title": "Ionic Compounds",
+              "depth": 2
+            },
+            {
+              "number": "4.5.2",
+              "title": "Covalent Compounds",
+              "depth": 2
+            },
+            {
+              "number": "4.5.3",
+              "title": "Coordinate Covalent Compounds",
+              "depth": 2
+            },
+            {
+              "number": "4.5.4",
+              "title": "Metals",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "impliedChapter": 5,
+          "matches": true,
+          "topicCount": 31,
+          "topics": [
+            {
+              "number": "5",
+              "title": "Introduction",
+              "depth": 0
+            },
+            {
+              "number": "5.1",
+              "title": "Gaseous State:Typical Properties",
+              "depth": 1
+            },
+            {
+              "number": "5.1.1",
+              "title": "Diffusion",
+              "depth": 2
+            },
+            {
+              "number": "5.1.2",
+              "title": "Effusion",
+              "depth": 2
+            },
+            {
+              "number": "5.1.3",
+              "title": "Pressure",
+              "depth": 2
+            },
+            {
+              "number": "5.1.4",
+              "title": "Compressibility",
+              "depth": 2
+            },
+            {
+              "number": "5.1.6",
+              "title": "Mobility",
+              "depth": 2
+            },
+            {
+              "number": "5.1.7",
+              "title": "Density of Gases",
+              "depth": 2
+            },
+            {
+              "number": "5.2",
+              "title": "Laws Related to Gases",
+              "depth": 1
+            },
+            {
+              "number": "5.2.1",
+              "title": "Boyles Law",
+              "depth": 2
+            },
+            {
+              "number": "5.2.1.0",
+              "title": "Experimental Verification of Boyles law",
+              "depth": 3
+            },
+            {
+              "number": "5.2.1.1",
+              "title": "Absolute Temperature Scale",
+              "depth": 3
+            },
+            {
+              "number": "5.2.2",
+              "title": "Charles Law",
+              "depth": 2
+            },
+            {
+              "number": "5.2.2.0",
+              "title": "Experimental Verification of Charles Law",
+              "depth": 3
+            },
+            {
+              "number": "5.2.2.1",
+              "title": "Physical States of Matter and Role of Intermolecular Forces",
+              "depth": 3
+            },
+            {
+              "number": "5.3",
+              "title": "Typical Properties",
+              "depth": 1
+            },
+            {
+              "number": "5.3.1",
+              "title": "Evaporation",
+              "depth": 2
+            },
+            {
+              "number": "5.3.2",
+              "title": "Vapour Pressure",
+              "depth": 2
+            },
+            {
+              "number": "5.3.3",
+              "title": "Boiling Point",
+              "depth": 2
+            },
+            {
+              "number": "5.3.4",
+              "title": "Freezing Point",
+              "depth": 2
+            },
+            {
+              "number": "5.3.5",
+              "title": "Diffusion",
+              "depth": 2
+            },
+            {
+              "number": "5.3.6",
+              "title": "Density",
+              "depth": 2
+            },
+            {
+              "number": "5.3.6.0",
+              "title": "SOLID STATE",
+              "depth": 3
+            },
+            {
+              "number": "5.4",
+              "title": "Typical Properties",
+              "depth": 1
+            },
+            {
+              "number": "5.4.1",
+              "title": "Melting point",
+              "depth": 2
+            },
+            {
+              "number": "5.4.2",
+              "title": "Rigidity",
+              "depth": 2
+            },
+            {
+              "number": "5.4.3",
+              "title": "Density",
+              "depth": 2
+            },
+            {
+              "number": "5.5",
+              "title": "Types of Solids",
+              "depth": 1
+            },
+            {
+              "number": "5.5.1",
+              "title": "Amorphous Solids",
+              "depth": 2
+            },
+            {
+              "number": "5.5.2",
+              "title": "Crystalline Solids",
+              "depth": 2
+            },
+            {
+              "number": "5.6",
+              "title": "Allotropy",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "impliedChapter": 6,
+          "matches": true,
+          "topicCount": 19,
+          "topics": [
+            {
+              "number": "6",
+              "title": "Introduction",
+              "depth": 0
+            },
+            {
+              "number": "6.1",
+              "title": "Solution",
+              "depth": 1
+            },
+            {
+              "number": "6.1.1",
+              "title": "Aqueous Solutions",
+              "depth": 2
+            },
+            {
+              "number": "6.1.2",
+              "title": "Solute",
+              "depth": 2
+            },
+            {
+              "number": "6.1.3",
+              "title": "Solvent",
+              "depth": 2
+            },
+            {
+              "number": "6.2.1",
+              "title": "Unsaturated Solution",
+              "depth": 2
+            },
+            {
+              "number": "6.2.2",
+              "title": "Supersaturated Solution",
+              "depth": 2
+            },
+            {
+              "number": "6.2.3",
+              "title": "Dilution of Solution",
+              "depth": 2
+            },
+            {
+              "number": "6.4.1",
+              "title": "Percentage",
+              "depth": 2
+            },
+            {
+              "number": "6.4.1.1",
+              "title": "Percentage -mass/mass (%m/m)",
+              "depth": 3
+            },
+            {
+              "number": "6.4.1.3",
+              "title": "Percentage - volume/mass (%v/m)",
+              "depth": 3
+            },
+            {
+              "number": "6.4.1.4",
+              "title": "Percentage - volume /volume (% v/v)",
+              "depth": 3
+            },
+            {
+              "number": "6.4.2.1",
+              "title": "Preparation of Molar Solution",
+              "depth": 3
+            },
+            {
+              "number": "6.4.3",
+              "title": "Problems involving the molarity of a solution",
+              "depth": 2
+            },
+            {
+              "number": "6.4.3.1",
+              "title": "Dilution of Solution",
+              "depth": 3
+            },
+            {
+              "number": "6.5.2",
+              "title": "Effect of Temperature on solubility",
+              "depth": 2
+            },
+            {
+              "number": "6.6.1",
+              "title": "Solution",
+              "depth": 2
+            },
+            {
+              "number": "6.6.2",
+              "title": "Colloid",
+              "depth": 2
+            },
+            {
+              "number": "6.6.3",
+              "title": "Suspension",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "impliedChapter": 7,
+          "matches": true,
+          "topicCount": 28,
+          "topics": [
+            {
+              "number": "7",
+              "title": "Introduction",
+              "depth": 0
+            },
+            {
+              "number": "7.1",
+              "title": "OXIDATION AND REDUCTION REACTIONS",
+              "depth": 1
+            },
+            {
+              "number": "7.1.1",
+              "title": "Oxidationand Reduction in Terms of Loss or Gain of Electron",
+              "depth": 2
+            },
+            {
+              "number": "7.2",
+              "title": "OXIDATION STATE AND RULES FOR ASSIGNING OXIDATION STATE",
+              "depth": 1
+            },
+            {
+              "number": "7.2.1",
+              "title": "Rules for Assigning Oxidation Numbers (O.N.)",
+              "depth": 2
+            },
+            {
+              "number": "7.3",
+              "title": "OXIDIZING AND REDUCING AGENTS",
+              "depth": 1
+            },
+            {
+              "number": "7.4",
+              "title": "OXIDATION -REDUCTION REACTIONS",
+              "depth": 1
+            },
+            {
+              "number": "7.5",
+              "title": "ELECTROCHEMICAL CELLS",
+              "depth": 1
+            },
+            {
+              "number": "7.5.1",
+              "title": "Concept of Electrolytes",
+              "depth": 2
+            },
+            {
+              "number": "7.5.2",
+              "title": "Electrolytic cells",
+              "depth": 2
+            },
+            {
+              "number": "7.5.2.3",
+              "title": "Electrolysis of Water",
+              "depth": 3
+            },
+            {
+              "number": "7.5.3.2",
+              "title": "Working of the Cell",
+              "depth": 3
+            },
+            {
+              "number": "7.6",
+              "title": "ELECTROCHEMICAL INDUSTRIES",
+              "depth": 1
+            },
+            {
+              "number": "7.6.1",
+              "title": "Manufacture of Sodium Metal from Fused NaCl",
+              "depth": 2
+            },
+            {
+              "number": "7.6.2",
+              "title": "Manufacture of NaOH from Brine",
+              "depth": 2
+            },
+            {
+              "number": "7.7",
+              "title": "CORROSION AND ITS PREVENTION",
+              "depth": 1
+            },
+            {
+              "number": "7.7.1",
+              "title": "Rusting of Iron",
+              "depth": 2
+            },
+            {
+              "number": "7.7.2",
+              "title": "Prevention of Corrosion",
+              "depth": 2
+            },
+            {
+              "number": "7.7.2.1",
+              "title": "Removal of stains",
+              "depth": 3
+            },
+            {
+              "number": "7.7.2.2",
+              "title": "Paints and greasing",
+              "depth": 3
+            },
+            {
+              "number": "7.7.2.3",
+              "title": "Alloying",
+              "depth": 3
+            },
+            {
+              "number": "7.7.3.1",
+              "title": "Zinc coating or Galvanizing",
+              "depth": 3
+            },
+            {
+              "number": "7.7.3.2",
+              "title": "Tin Coating",
+              "depth": 3
+            },
+            {
+              "number": "7.7.4.1",
+              "title": "Electroplating of Silver",
+              "depth": 3
+            },
+            {
+              "number": "7.7.4.2",
+              "title": "Electroplating of Chromium",
+              "depth": 3
+            },
+            {
+              "number": "7.7.4.3",
+              "title": "Electroplating of zinc",
+              "depth": 3
+            },
+            {
+              "number": "7.7.4.4",
+              "title": "Electroplating of tin",
+              "depth": 3
+            },
+            {
+              "number": "7.7.4.5",
+              "title": "Electrolytic refining of copper",
+              "depth": 3
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "impliedChapter": 8,
+          "matches": true,
+          "topicCount": 18,
+          "topics": [
+            {
+              "number": "8",
+              "title": "Introduction",
+              "depth": 0
+            },
+            {
+              "number": "8.1",
+              "title": "Metals",
+              "depth": 1
+            },
+            {
+              "number": "8.1.1",
+              "title": "Electropositive Character",
+              "depth": 2
+            },
+            {
+              "number": "8.1.1.1",
+              "title": "Electropositivity and ionization energy",
+              "depth": 3
+            },
+            {
+              "number": "8.1.2",
+              "title": "Comparison of Reactivities of Alkali and Alkaline Earth Metals",
+              "depth": 2
+            },
+            {
+              "number": "8.1.2.1",
+              "title": "Uses of sodium",
+              "depth": 3
+            },
+            {
+              "number": "8.1.2.2",
+              "title": "Uses of magnesium",
+              "depth": 3
+            },
+            {
+              "number": "8.1.2.3",
+              "title": "Inertness of Noble Metals",
+              "depth": 3
+            },
+            {
+              "number": "8.2",
+              "title": "Non-Metals",
+              "depth": 1
+            },
+            {
+              "number": "8.2.0",
+              "title": "Important chemical properties of non-metals are as follows",
+              "depth": 2
+            },
+            {
+              "number": "8.2.1",
+              "title": "Comparison of Reactivity of the Halogens",
+              "depth": 2
+            },
+            {
+              "number": "8.2.2",
+              "title": "Important Reactions of Halogens",
+              "depth": 2
+            },
+            {
+              "number": "8.2.2.0",
+              "title": "Oxidizing properties",
+              "depth": 3
+            },
+            {
+              "number": "8.2.2.1",
+              "title": "Reaction with hydrogen",
+              "depth": 3
+            },
+            {
+              "number": "8.2.2.2",
+              "title": "Reaction with water",
+              "depth": 3
+            },
+            {
+              "number": "8.2.2.3",
+              "title": "Reaction with methane",
+              "depth": 3
+            },
+            {
+              "number": "8.2.2.4",
+              "title": "Reaction with Sodium hydroxide",
+              "depth": 3
+            },
+            {
+              "number": "8.2.2.5",
+              "title": "Significance of Non-metals",
+              "depth": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subject": "phy",
+      "grade": 9,
+      "subjectId": 15,
+      "chapters": [
+        {
+          "number": 1,
+          "impliedChapter": 1,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "1.1",
+              "title": "Introduction to Physics",
+              "depth": 1
+            },
+            {
+              "number": "1.2",
+              "title": "Physical Quantities",
+              "depth": 1
+            },
+            {
+              "number": "1.3",
+              "title": "International System of Units",
+              "depth": 1
+            },
+            {
+              "number": "1.4",
+              "title": "Prefixes",
+              "depth": 1
+            },
+            {
+              "number": "1.5",
+              "title": "Scientific Notation",
+              "depth": 1
+            },
+            {
+              "number": "1.6",
+              "title": "Measuring Instruments",
+              "depth": 1
+            },
+            {
+              "number": "1.7",
+              "title": "Significant Figures",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "impliedChapter": 2,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "2.1",
+              "title": "Rest and Motion",
+              "depth": 1
+            },
+            {
+              "number": "2.2",
+              "title": "Types of Motion",
+              "depth": 1
+            },
+            {
+              "number": "2.3",
+              "title": "Scalars and Vectors",
+              "depth": 1
+            },
+            {
+              "number": "2.4",
+              "title": "Terms Associated with Motion",
+              "depth": 1
+            },
+            {
+              "number": "2.5",
+              "title": "Graphical Analysis of Motion",
+              "depth": 1
+            },
+            {
+              "number": "2.6",
+              "title": "Equations of Motion",
+              "depth": 1
+            },
+            {
+              "number": "2.7",
+              "title": "Motion of Freely Falling Bodies",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "impliedChapter": 3,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "3.1",
+              "title": "Force, Inertia and momentum",
+              "depth": 1
+            },
+            {
+              "number": "3.2",
+              "title": "Newtons Law of Motion",
+              "depth": 1
+            },
+            {
+              "number": "3.3",
+              "title": "Friction",
+              "depth": 1
+            },
+            {
+              "number": "3.4",
+              "title": "Uniform Circular Motion",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "impliedChapter": 4,
+          "matches": true,
+          "topicCount": 10,
+          "topics": [
+            {
+              "number": "4.1",
+              "title": "Like and Unlike Parallel Forces",
+              "depth": 1
+            },
+            {
+              "number": "4.2",
+              "title": "Addition of Forces",
+              "depth": 1
+            },
+            {
+              "number": "4.3",
+              "title": "Resolution of Forces",
+              "depth": 1
+            },
+            {
+              "number": "4.4",
+              "title": "Torque Or Moment of a Force",
+              "depth": 1
+            },
+            {
+              "number": "4.5",
+              "title": "Principle of moments",
+              "depth": 1
+            },
+            {
+              "number": "4.6",
+              "title": "Centre of Mass",
+              "depth": 1
+            },
+            {
+              "number": "4.7",
+              "title": "Centre of Gravity",
+              "depth": 1
+            },
+            {
+              "number": "4.8",
+              "title": "Couple",
+              "depth": 1
+            },
+            {
+              "number": "4.9",
+              "title": "Equilibrium",
+              "depth": 1
+            },
+            {
+              "number": "4.10",
+              "title": "Stability and Position of Centre of Mass",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "impliedChapter": 5,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "5.1",
+              "title": "The Force of Gravitation",
+              "depth": 1
+            },
+            {
+              "number": "5.2",
+              "title": "Mass of the Earth",
+              "depth": 1
+            },
+            {
+              "number": "5.3",
+              "title": "Variation of g with Altitude",
+              "depth": 1
+            },
+            {
+              "number": "5.4",
+              "title": "Artifical Satellites",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "impliedChapter": 6,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "6.1",
+              "title": "Work",
+              "depth": 1
+            },
+            {
+              "number": "6.2",
+              "title": "Energy",
+              "depth": 1
+            },
+            {
+              "number": "6.3",
+              "title": "Kinetic Energy",
+              "depth": 1
+            },
+            {
+              "number": "6.4",
+              "title": "Potential Energy",
+              "depth": 1
+            },
+            {
+              "number": "6.5",
+              "title": "Forms of Energy",
+              "depth": 1
+            },
+            {
+              "number": "6.6",
+              "title": "Interconversion of Energy",
+              "depth": 1
+            },
+            {
+              "number": "6.7",
+              "title": "Major sources of Energy",
+              "depth": 1
+            },
+            {
+              "number": "6.8",
+              "title": "Efficiency",
+              "depth": 1
+            },
+            {
+              "number": "6.9",
+              "title": "Power",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "impliedChapter": 7,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "7.1",
+              "title": "Kinetic Molecular Model of Matter",
+              "depth": 1
+            },
+            {
+              "number": "7.2",
+              "title": "Density",
+              "depth": 1
+            },
+            {
+              "number": "7.3",
+              "title": "Pressure",
+              "depth": 1
+            },
+            {
+              "number": "7.4",
+              "title": "Atmospheric Pressure",
+              "depth": 1
+            },
+            {
+              "number": "7.5",
+              "title": "Pressure in Liquids",
+              "depth": 1
+            },
+            {
+              "number": "7.6",
+              "title": "Archimedes Principle",
+              "depth": 1
+            },
+            {
+              "number": "7.7",
+              "title": "Principle of Floatation",
+              "depth": 1
+            },
+            {
+              "number": "7.8",
+              "title": "Elasticity",
+              "depth": 1
+            },
+            {
+              "number": "7.9",
+              "title": "Hookes Law",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "impliedChapter": 8,
+          "matches": true,
+          "topicCount": 8,
+          "topics": [
+            {
+              "number": "8.1",
+              "title": "Temperature and Heat",
+              "depth": 1
+            },
+            {
+              "number": "8.2",
+              "title": "Thermometer",
+              "depth": 1
+            },
+            {
+              "number": "8.3",
+              "title": "Specific Heat Capacity",
+              "depth": 1
+            },
+            {
+              "number": "8.4",
+              "title": "Change of State",
+              "depth": 1
+            },
+            {
+              "number": "8.5",
+              "title": "Latent Heat of Fusion",
+              "depth": 1
+            },
+            {
+              "number": "8.6",
+              "title": "Latent Heat of Vaporization",
+              "depth": 1
+            },
+            {
+              "number": "8.7",
+              "title": "The Evaporation",
+              "depth": 1
+            },
+            {
+              "number": "8.8",
+              "title": "Thermal Expansion",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "impliedChapter": 9,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "9.1",
+              "title": "Transfer of Heat",
+              "depth": 1
+            },
+            {
+              "number": "9.2",
+              "title": "Conduction",
+              "depth": 1
+            },
+            {
+              "number": "9.3",
+              "title": "Convection",
+              "depth": 1
+            },
+            {
+              "number": "9.4",
+              "title": "Radiation",
+              "depth": 1
+            },
+            {
+              "number": "9.5",
+              "title": "Application and Consquences of Radiation",
+              "depth": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subject": "bio",
+      "grade": 10,
+      "subjectId": 1,
+      "chapters": [
+        {
+          "number": 10,
+          "impliedChapter": 10,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "10.1",
+              "title": "Gaseous Exchange in Plants",
+              "depth": 1
+            },
+            {
+              "number": "10.2",
+              "title": "Gaseous Exchange in Humans",
+              "depth": 1
+            },
+            {
+              "number": "10.2.1",
+              "title": "The Air passageway",
+              "depth": 2
+            },
+            {
+              "number": "10.2.2",
+              "title": "The Lungs",
+              "depth": 2
+            },
+            {
+              "number": "10.2.3",
+              "title": "The Mechanism of Breathing",
+              "depth": 2
+            },
+            {
+              "number": "10.3",
+              "title": "Respiratory Disorder",
+              "depth": 1
+            },
+            {
+              "number": "10.3.1",
+              "title": "Bad Effects of Smoking",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 11,
+          "impliedChapter": 11,
+          "matches": true,
+          "topicCount": 14,
+          "topics": [
+            {
+              "number": "11.1",
+              "title": "Homeostasis in Plants",
+              "depth": 1
+            },
+            {
+              "number": "11.1.1",
+              "title": "Removal of Extra Carbon dioxide and Oxygen",
+              "depth": 2
+            },
+            {
+              "number": "11.1.2",
+              "title": "Removal of Extra Water",
+              "depth": 2
+            },
+            {
+              "number": "11.1.3",
+              "title": "Removal of Other Metabolic Wastes",
+              "depth": 2
+            },
+            {
+              "number": "11.1.4",
+              "title": "Osmotic Adjustments in Plants",
+              "depth": 2
+            },
+            {
+              "number": "11.2",
+              "title": "Homeostasis in Humans",
+              "depth": 1
+            },
+            {
+              "number": "11.2.1",
+              "title": "Skin",
+              "depth": 2
+            },
+            {
+              "number": "11.2.2",
+              "title": "Lungs",
+              "depth": 2
+            },
+            {
+              "number": "11.3",
+              "title": "The Urinary System of Humans",
+              "depth": 1
+            },
+            {
+              "number": "11.3.1",
+              "title": "Structure of Kidney",
+              "depth": 2
+            },
+            {
+              "number": "11.3.2",
+              "title": "Functioning of Kidney",
+              "depth": 2
+            },
+            {
+              "number": "11.4",
+              "title": "Disorders of Kidney",
+              "depth": 1
+            },
+            {
+              "number": "11.4.1",
+              "title": "Kidney Stones",
+              "depth": 2
+            },
+            {
+              "number": "11.4.2",
+              "title": "Kidney(Renal) Failure",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 12,
+          "impliedChapter": 12,
+          "matches": true,
+          "topicCount": 12,
+          "topics": [
+            {
+              "number": "12.1",
+              "title": "Types of Coordination",
+              "depth": 1
+            },
+            {
+              "number": "12.1.1",
+              "title": "Coordinated Action",
+              "depth": 2
+            },
+            {
+              "number": "12.2",
+              "title": "Human Nervous system",
+              "depth": 1
+            },
+            {
+              "number": "12.2.1",
+              "title": "Nerve Cell or Neuron",
+              "depth": 2
+            },
+            {
+              "number": "12.2.2",
+              "title": "Divisions of the Nervous system",
+              "depth": 2
+            },
+            {
+              "number": "12.2.3",
+              "title": "Reflex Action",
+              "depth": 2
+            },
+            {
+              "number": "12.3",
+              "title": "Receptors in Humans",
+              "depth": 1
+            },
+            {
+              "number": "12.3.1",
+              "title": "Eye",
+              "depth": 2
+            },
+            {
+              "number": "12.3.2",
+              "title": "Ear",
+              "depth": 2
+            },
+            {
+              "number": "12.4",
+              "title": "Endocrine System",
+              "depth": 1
+            },
+            {
+              "number": "12.4.1",
+              "title": "Important Endocrine System",
+              "depth": 2
+            },
+            {
+              "number": "12.5",
+              "title": "Disorders of Nervous system",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 13,
+          "impliedChapter": 13,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "13.1",
+              "title": "Human Skeleton",
+              "depth": 1
+            },
+            {
+              "number": "13.1.1",
+              "title": "Role of Skeletal system",
+              "depth": 2
+            },
+            {
+              "number": "13.1.2",
+              "title": "Bone and cartilage",
+              "depth": 2
+            },
+            {
+              "number": "13.1.3",
+              "title": "Components of Human Skeleton",
+              "depth": 2
+            },
+            {
+              "number": "13.2",
+              "title": "Types of Joints",
+              "depth": 1
+            },
+            {
+              "number": "13.3",
+              "title": "Muscles and Movement",
+              "depth": 1
+            },
+            {
+              "number": "13.4",
+              "title": "Disorders of Skeletal system",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 14,
+          "impliedChapter": 14,
+          "matches": true,
+          "topicCount": 14,
+          "topics": [
+            {
+              "number": "14.1",
+              "title": "Reproduction",
+              "depth": 1
+            },
+            {
+              "number": "14.2",
+              "title": "Method of Asexual Reproduction",
+              "depth": 1
+            },
+            {
+              "number": "14.2.1",
+              "title": "Binary Fission",
+              "depth": 2
+            },
+            {
+              "number": "14.2.2",
+              "title": "Fragmentation",
+              "depth": 2
+            },
+            {
+              "number": "14.2.3",
+              "title": "Budding",
+              "depth": 2
+            },
+            {
+              "number": "14.2.4",
+              "title": "Vegetative propagation",
+              "depth": 2
+            },
+            {
+              "number": "14.3",
+              "title": "Sexual Reproduction in Plants",
+              "depth": 1
+            },
+            {
+              "number": "14.3.1",
+              "title": "Development and Structure of Seed",
+              "depth": 2
+            },
+            {
+              "number": "14.3.2",
+              "title": "Germination of seed",
+              "depth": 2
+            },
+            {
+              "number": "14.4",
+              "title": "Sexual Reproduction in Animals",
+              "depth": 1
+            },
+            {
+              "number": "14.4.1",
+              "title": "Formation of Gametes(Gametogenesis)",
+              "depth": 2
+            },
+            {
+              "number": "14.4.2",
+              "title": "Fertilization",
+              "depth": 2
+            },
+            {
+              "number": "14.4.3",
+              "title": "Reproduction in Rabbit",
+              "depth": 2
+            },
+            {
+              "number": "14.4.5",
+              "title": "AIDS: A Sexually Transmitted Disease",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 15,
+          "impliedChapter": 15,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "15.1",
+              "title": "Introduction to Genetics",
+              "depth": 1
+            },
+            {
+              "number": "15.2",
+              "title": "Chromosomes and Genes",
+              "depth": 1
+            },
+            {
+              "number": "15.3",
+              "title": "Mendel,s Laws of inheritance",
+              "depth": 1
+            },
+            {
+              "number": "15.4",
+              "title": "Co-dominance and Incomplete Dominance",
+              "depth": 1
+            },
+            {
+              "number": "15.5",
+              "title": "Variations and Evolution",
+              "depth": 1
+            },
+            {
+              "number": "15.5.1",
+              "title": "Variations lead to Evolution",
+              "depth": 2
+            },
+            {
+              "number": "15.5.2",
+              "title": "Artificial Selection",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 16,
+          "impliedChapter": 16,
+          "matches": true,
+          "topicCount": 14,
+          "topics": [
+            {
+              "number": "16.1",
+              "title": "Levels of Ecological Organization",
+              "depth": 1
+            },
+            {
+              "number": "16.1.1",
+              "title": "Components of Ecosystem",
+              "depth": 2
+            },
+            {
+              "number": "16.2",
+              "title": "Flow of Materials and Energy in Ecosystem",
+              "depth": 1
+            },
+            {
+              "number": "16.2.1",
+              "title": "Flow of Energy",
+              "depth": 2
+            },
+            {
+              "number": "16.2.2",
+              "title": "Flow of Materials",
+              "depth": 2
+            },
+            {
+              "number": "16.2.3",
+              "title": "Ecological Pyramids",
+              "depth": 2
+            },
+            {
+              "number": "16.2.4",
+              "title": "Biogeochemical Cycles",
+              "depth": 2
+            },
+            {
+              "number": "16.3",
+              "title": "Interactions in Ecosystems",
+              "depth": 1
+            },
+            {
+              "number": "16.3.1",
+              "title": "Competition",
+              "depth": 2
+            },
+            {
+              "number": "16.3.2",
+              "title": "Predation",
+              "depth": 2
+            },
+            {
+              "number": "16.3.3",
+              "title": "Symbiosis",
+              "depth": 2
+            },
+            {
+              "number": "16.4",
+              "title": "Ecosystem Balance and human Impact",
+              "depth": 1
+            },
+            {
+              "number": "16.5",
+              "title": "Pollution: Consequences and control",
+              "depth": 1
+            },
+            {
+              "number": "16.6",
+              "title": "Conservation of Nature",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 17,
+          "impliedChapter": 17,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "17.1",
+              "title": "Introduction of Biotechnology",
+              "depth": 1
+            },
+            {
+              "number": "17.1.1",
+              "title": "Scope and Importance of Biotechnology",
+              "depth": 2
+            },
+            {
+              "number": "17.2",
+              "title": "Fermentation",
+              "depth": 1
+            },
+            {
+              "number": "17.2.1",
+              "title": "fermentation in Biotechnology",
+              "depth": 2
+            },
+            {
+              "number": "17.2.2",
+              "title": "Fermenter",
+              "depth": 2
+            },
+            {
+              "number": "17.3",
+              "title": "Genetic Engineering",
+              "depth": 1
+            },
+            {
+              "number": "17.3.1",
+              "title": "Objectives of Genetic Engineering",
+              "depth": 2
+            },
+            {
+              "number": "17.3.2",
+              "title": "Achievements of Genetic Engineering",
+              "depth": 2
+            },
+            {
+              "number": "17.4",
+              "title": "Single-Cell Protein",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 18,
+          "impliedChapter": 18,
+          "matches": true,
+          "topicCount": 7,
+          "topics": [
+            {
+              "number": "18.1",
+              "title": "Medicinal Drugs",
+              "depth": 1
+            },
+            {
+              "number": "18.1.1",
+              "title": "Principal usage of Important Medicinal Drugs",
+              "depth": 2
+            },
+            {
+              "number": "18.2",
+              "title": "Addictive Drugs",
+              "depth": 1
+            },
+            {
+              "number": "18.2.1",
+              "title": "Drug Addiction and Associated problems",
+              "depth": 2
+            },
+            {
+              "number": "18.3",
+              "title": "Antibiotics And Vaccines",
+              "depth": 1
+            },
+            {
+              "number": "18.3.1",
+              "title": "Antibiotics",
+              "depth": 2
+            },
+            {
+              "number": "18.3.2",
+              "title": "Vaccines",
+              "depth": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subject": "math",
+      "grade": 10,
+      "subjectId": 5,
+      "chapters": [
+        {
+          "number": 1,
+          "impliedChapter": 1,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "1.1",
+              "title": "Quadratic Equation",
+              "depth": 1
+            },
+            {
+              "number": "1.2",
+              "title": "Solution of quadratic equations",
+              "depth": 1
+            },
+            {
+              "number": "1.3",
+              "title": "Quadratic Formula",
+              "depth": 1
+            },
+            {
+              "number": "1.4",
+              "title": "Equations reducible to quadratic form",
+              "depth": 1
+            },
+            {
+              "number": "1.5",
+              "title": "Radical equations",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "impliedChapter": 2,
+          "matches": true,
+          "topicCount": 23,
+          "topics": [
+            {
+              "number": "2.1",
+              "title": "Nature of the roots of a quadratic equation",
+              "depth": 1
+            },
+            {
+              "number": "2.1.1",
+              "title": "Discriminant \\[b^2 - 4ac\\] of the quadratic expression \\[ax^2 + bx + c\\]",
+              "depth": 2
+            },
+            {
+              "number": "2.1.2",
+              "title": "To find the discriminant of a given quadratic equation.",
+              "depth": 2
+            },
+            {
+              "number": "2.1.3",
+              "title": "Nature of the roots of a quadratic equation through discriminant.",
+              "depth": 2
+            },
+            {
+              "number": "2.1.4",
+              "title": "Determine the nature of the roots of a given quadratic equation and verify the result by solving the equation",
+              "depth": 2
+            },
+            {
+              "number": "2.1.5",
+              "title": "To determine the value of an unknown involved in a given quadratic equation when nature of its roots is given.",
+              "depth": 2
+            },
+            {
+              "number": "2.2",
+              "title": "Cube Roots of Unity and Their Properties",
+              "depth": 1
+            },
+            {
+              "number": "2.2.1",
+              "title": "The cube roots of unity.",
+              "depth": 2
+            },
+            {
+              "number": "2.2.2",
+              "title": "Recognise complex cube roots of unity as w and w&lt;sup&gt;2&lt;/sup&gt;.",
+              "depth": 2
+            },
+            {
+              "number": "2.2.3",
+              "title": "Properties of cube roots of unity.",
+              "depth": 2
+            },
+            {
+              "number": "2.3",
+              "title": "Roots and co-efficients of a quadratic equation",
+              "depth": 1
+            },
+            {
+              "number": "2.3.1",
+              "title": "Relation between roots and co-efficients of a quadratic equation.",
+              "depth": 2
+            },
+            {
+              "number": "2.3.2",
+              "title": "The sum and the product of the roots of a given quadratic equation without solving it",
+              "depth": 2
+            },
+            {
+              "number": "2.3.3",
+              "title": "To find unknown values involved in a given quadratic equation.",
+              "depth": 2
+            },
+            {
+              "number": "2.4",
+              "title": "Symmetric functions of the roots of a quadratic equation",
+              "depth": 1
+            },
+            {
+              "number": "2.4.1",
+              "title": "Define symmetric functions of the roots of a quadratic equation",
+              "depth": 2
+            },
+            {
+              "number": "2.5",
+              "title": "Formation of a quadratic equation",
+              "depth": 1
+            },
+            {
+              "number": "2.5.1",
+              "title": "Find a quadratic equation from given roots and establish the formula",
+              "depth": 2
+            },
+            {
+              "number": "2.5.2",
+              "title": "Form quadratic equations whose roots are of the type",
+              "depth": 2
+            },
+            {
+              "number": "2.6",
+              "title": "Synthetic Division",
+              "depth": 1
+            },
+            {
+              "number": "2.6.1",
+              "title": "Describe the synthetic division method",
+              "depth": 2
+            },
+            {
+              "number": "2.6.2",
+              "title": "Use synthetic division to",
+              "depth": 2
+            },
+            {
+              "number": "2.7",
+              "title": "Simultaneous equations",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "impliedChapter": 3,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "3.1",
+              "title": "Ratio, Proportions and Variations",
+              "depth": 1
+            },
+            {
+              "number": "3.2",
+              "title": "Theorems on Proportions",
+              "depth": 1
+            },
+            {
+              "number": "3.3",
+              "title": "Joint Variation",
+              "depth": 1
+            },
+            {
+              "number": "3.4",
+              "title": "K-method",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "impliedChapter": 4,
+          "matches": true,
+          "topicCount": 6,
+          "topics": [
+            {
+              "number": "4.1",
+              "title": "Fraction",
+              "depth": 1
+            },
+            {
+              "number": "4.2",
+              "title": "Resolution of Fraction into Partial Fractions",
+              "depth": 1
+            },
+            {
+              "number": "4.2.1",
+              "title": "Resolution of an algebraic fraction into partial fractions, when D(x) consists of non-repeated linear factors.",
+              "depth": 2
+            },
+            {
+              "number": "4.2.2",
+              "title": "Resolution of a fraction when D(x) consists of repeated linear factors.",
+              "depth": 2
+            },
+            {
+              "number": "4.2.3",
+              "title": "Resolution of fraction when D(x) consists of non-repeated irreducible quadratic factors.",
+              "depth": 2
+            },
+            {
+              "number": "4.2.4",
+              "title": "Resolution of fraction when D(x) has repeated irreducible quadratic factors.",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "impliedChapter": 5,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "5.1",
+              "title": "SETS",
+              "depth": 1
+            },
+            {
+              "number": "5.1.1",
+              "title": "(ii) Recognize operations on sets (j, k, l, ... ):",
+              "depth": 2
+            },
+            {
+              "number": "5.1.3",
+              "title": "VENN DIAGRAM",
+              "depth": 2
+            },
+            {
+              "number": "5.2",
+              "title": "Binary Relation",
+              "depth": 1
+            },
+            {
+              "number": "5.3",
+              "title": "Function or Mapping",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "impliedChapter": 6,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "6.1",
+              "title": "Frequency Distribution",
+              "depth": 1
+            },
+            {
+              "number": "6.2",
+              "title": "Cumulative Frequency Distribution",
+              "depth": 1
+            },
+            {
+              "number": "6.3",
+              "title": "Measures of Central Tendency",
+              "depth": 1
+            },
+            {
+              "number": "6.4",
+              "title": "Measures of Dispersion",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "impliedChapter": 7,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "7.1",
+              "title": "Measurement of an Angle",
+              "depth": 1
+            },
+            {
+              "number": "7.2",
+              "title": "Sector of a Circle",
+              "depth": 1
+            },
+            {
+              "number": "7.3",
+              "title": "Trigonometric Ratios",
+              "depth": 1
+            },
+            {
+              "number": "7.4",
+              "title": "Trigonometric Identities",
+              "depth": 1
+            },
+            {
+              "number": "7.5",
+              "title": "Angle of Elevation and Angle of Depression",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "impliedChapter": 8,
+          "matches": true,
+          "topicCount": 3,
+          "topics": [
+            {
+              "number": "1",
+              "title": "Theorem 1",
+              "depth": 0
+            },
+            {
+              "number": "2",
+              "title": "Theorem 2",
+              "depth": 0
+            },
+            {
+              "number": "3",
+              "title": "THEOREM 3 (APOLLONIUS THEOREM)",
+              "depth": 0
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "impliedChapter": 9,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "1",
+              "title": "Theorem 1",
+              "depth": 0
+            },
+            {
+              "number": "2",
+              "title": "Theorem 2",
+              "depth": 0
+            },
+            {
+              "number": "3",
+              "title": "Theorem 3",
+              "depth": 0
+            },
+            {
+              "number": "4",
+              "title": "Theorem 4",
+              "depth": 0
+            },
+            {
+              "number": "5",
+              "title": "Theorem 5",
+              "depth": 0
+            }
+          ]
+        },
+        {
+          "number": 10,
+          "impliedChapter": 10,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "1",
+              "title": "Theorem 1",
+              "depth": 0
+            },
+            {
+              "number": "2",
+              "title": "Theorem 2",
+              "depth": 0
+            },
+            {
+              "number": "3",
+              "title": "Theorem 3",
+              "depth": 0
+            },
+            {
+              "number": "4",
+              "title": "Theorem 4(A)",
+              "depth": 0
+            }
+          ]
+        },
+        {
+          "number": 11,
+          "impliedChapter": 11,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "1",
+              "title": "Theorem 1",
+              "depth": 0
+            },
+            {
+              "number": "2",
+              "title": "Theorem 2",
+              "depth": 0
+            },
+            {
+              "number": "3",
+              "title": "Theorem 3",
+              "depth": 0
+            },
+            {
+              "number": "4",
+              "title": "Theorem 4",
+              "depth": 0
+            }
+          ]
+        },
+        {
+          "number": 12,
+          "impliedChapter": 12,
+          "matches": true,
+          "topicCount": 4,
+          "topics": [
+            {
+              "number": "1",
+              "title": "Theorem 1",
+              "depth": 0
+            },
+            {
+              "number": "2",
+              "title": "Theorem 2",
+              "depth": 0
+            },
+            {
+              "number": "3",
+              "title": "Theorem 3",
+              "depth": 0
+            },
+            {
+              "number": "4",
+              "title": "Theorem 4",
+              "depth": 0
+            }
+          ]
+        },
+        {
+          "number": 13,
+          "impliedChapter": 13,
+          "matches": true,
+          "topicCount": 3,
+          "topics": [
+            {
+              "number": "13.1",
+              "title": "Construction of a Circle",
+              "depth": 1
+            },
+            {
+              "number": "13.2",
+              "title": "CIRCLES ATTACHED TO POLYGONS",
+              "depth": 1
+            },
+            {
+              "number": "13.3",
+              "title": "TANGENT TO THE CIRCLE",
+              "depth": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subject": "chem",
+      "grade": 10,
+      "subjectId": 6,
+      "chapters": [
+        {
+          "number": 9,
+          "impliedChapter": 9,
+          "matches": true,
+          "topicCount": 6,
+          "topics": [
+            {
+              "number": "9.1",
+              "title": "REVERSIBLE REACTION AND DYNAMIC EQUILIBRIUM",
+              "depth": 1
+            },
+            {
+              "number": "9.2",
+              "title": "LAW OF MASS ACTION",
+              "depth": 1
+            },
+            {
+              "number": "9.3",
+              "title": "EQUILIBRIUM CONSTANT AND ITS UNITS",
+              "depth": 1
+            },
+            {
+              "number": "9.4",
+              "title": "IMPORTANCE OF EQUILIBRIUM CONSTANT",
+              "depth": 1
+            },
+            {
+              "number": "1",
+              "title": "Predicting Direction of a Reaction",
+              "depth": 0
+            },
+            {
+              "number": "2",
+              "title": "Predicting Extent of a Reaction",
+              "depth": 0
+            }
+          ]
+        },
+        {
+          "number": 10,
+          "impliedChapter": 10,
+          "matches": true,
+          "topicCount": 12,
+          "topics": [
+            {
+              "number": "10.1",
+              "title": "CONCEPTS OF ACIDS AND BASES",
+              "depth": 1
+            },
+            {
+              "number": "10.1.1",
+              "title": "Arrhenius Concept of Acids and Bases",
+              "depth": 2
+            },
+            {
+              "number": "10.1.2",
+              "title": "Bronsted-Lowrv Concept",
+              "depth": 2
+            },
+            {
+              "number": "10.1.3",
+              "title": "Lewis Concept of Acids and Bases",
+              "depth": 2
+            },
+            {
+              "number": "10.1.4",
+              "title": "General Properties of Acids",
+              "depth": 2
+            },
+            {
+              "number": "10.1.5",
+              "title": "General Properties of Bases",
+              "depth": 2
+            },
+            {
+              "number": "10.2",
+              "title": "pH SCALE",
+              "depth": 1
+            },
+            {
+              "number": "10.2.1",
+              "title": "Indicators",
+              "depth": 2
+            },
+            {
+              "number": "10.3",
+              "title": "SALTS",
+              "depth": 1
+            },
+            {
+              "number": "10.3.1",
+              "title": "Preparation",
+              "depth": 2
+            },
+            {
+              "number": "10.3.2",
+              "title": "Types of Salts",
+              "depth": 2
+            },
+            {
+              "number": "10.3.3",
+              "title": "Uses of Salts",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 11,
+          "impliedChapter": 11,
+          "matches": true,
+          "topicCount": 25,
+          "topics": [
+            {
+              "number": "11.1",
+              "title": "ORGANIC COMPOUNDS",
+              "depth": 1
+            },
+            {
+              "number": "11.1.1",
+              "title": "Classification of Organic Compounds",
+              "depth": 2
+            },
+            {
+              "number": "11.1.2",
+              "title": "Diversity and Magnitude of Organic Compounds",
+              "depth": 2
+            },
+            {
+              "number": "11.1.3",
+              "title": "General Characteristics of Organic Compounds",
+              "depth": 2
+            },
+            {
+              "number": "11.2",
+              "title": "SOURCES OF ORGANIC COMPOUNDS",
+              "depth": 1
+            },
+            {
+              "number": "11.2.1",
+              "title": "Coal",
+              "depth": 2
+            },
+            {
+              "number": "11.2.2",
+              "title": "Petroleum",
+              "depth": 2
+            },
+            {
+              "number": "11.2.3",
+              "title": "Natural Gas",
+              "depth": 2
+            },
+            {
+              "number": "11.2.4",
+              "title": "Plants",
+              "depth": 2
+            },
+            {
+              "number": "11.2.5",
+              "title": "Synthesis in Laboratory",
+              "depth": 2
+            },
+            {
+              "number": "11.3",
+              "title": "USES OF ORGANIC COMPOUNDS",
+              "depth": 1
+            },
+            {
+              "number": "11.4",
+              "title": "ALKANES AND ALKYLRADICALS",
+              "depth": 1
+            },
+            {
+              "number": "11.5",
+              "title": "FUNCTIONAL GROUPS",
+              "depth": 1
+            },
+            {
+              "number": "11.5.1",
+              "title": "Functional Groups Containing Carbon, Hydrogen and Oxygen",
+              "depth": 2
+            },
+            {
+              "number": "11.5.2",
+              "title": "Functional Group Containing Carbon, Hydrogen and Nitrogen",
+              "depth": 2
+            },
+            {
+              "number": "11.5.3",
+              "title": "Functional Group Containing Carbon, Hydrogen and Halogens",
+              "depth": 2
+            },
+            {
+              "number": "11.5.4",
+              "title": "Double and Triple Bond",
+              "depth": 2
+            },
+            {
+              "number": "11.6",
+              "title": "TESTS OF FUNCTIONAL GROUPS",
+              "depth": 1
+            },
+            {
+              "number": "11.6.1",
+              "title": "Test for Unsaturation",
+              "depth": 2
+            },
+            {
+              "number": "11.6.2",
+              "title": "Test for Alcoholic Group",
+              "depth": 2
+            },
+            {
+              "number": "11.6.3",
+              "title": "Test for Carboxyl Group",
+              "depth": 2
+            },
+            {
+              "number": "11.6.4",
+              "title": "Detection of Aldehydic Group",
+              "depth": 2
+            },
+            {
+              "number": "11.6.5",
+              "title": "Test for Ketonic Group",
+              "depth": 2
+            },
+            {
+              "number": "11.6.6",
+              "title": "Test for Primary Amino Group (-NH2)",
+              "depth": 2
+            },
+            {
+              "number": "11.6.7",
+              "title": "Test for Ester",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 12,
+          "impliedChapter": 12,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "12.1",
+              "title": "ALKANES",
+              "depth": 1
+            },
+            {
+              "number": "12.1.1",
+              "title": "Preparation of Alkanes",
+              "depth": 2
+            },
+            {
+              "number": "12.1.2",
+              "title": "Chemical Reactions",
+              "depth": 2
+            },
+            {
+              "number": "12.2",
+              "title": "ALKENES",
+              "depth": 1
+            },
+            {
+              "number": "12.2.1",
+              "title": "Preparation of Alkenes",
+              "depth": 2
+            },
+            {
+              "number": "12.2.2",
+              "title": "Chemical Reactions",
+              "depth": 2
+            },
+            {
+              "number": "12.3",
+              "title": "ALKYNES",
+              "depth": 1
+            },
+            {
+              "number": "12.3.1",
+              "title": "Preparation of Alkynes",
+              "depth": 2
+            },
+            {
+              "number": "12.3.2",
+              "title": "Chemical Reactions",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 13,
+          "impliedChapter": 13,
+          "matches": true,
+          "topicCount": 17,
+          "topics": [
+            {
+              "number": "13.1",
+              "title": "CARBOHYDRATES",
+              "depth": 1
+            },
+            {
+              "number": "13.1.1",
+              "title": "Monosaccharides",
+              "depth": 2
+            },
+            {
+              "number": "13.1.2",
+              "title": "Oligosaccharides",
+              "depth": 2
+            },
+            {
+              "number": "13.1.3",
+              "title": "Polysaccharides",
+              "depth": 2
+            },
+            {
+              "number": "13.1.4",
+              "title": "Sources and Uses of Carbohydrates",
+              "depth": 2
+            },
+            {
+              "number": "13.2",
+              "title": "PROTEIN",
+              "depth": 1
+            },
+            {
+              "number": "13.2.1",
+              "title": "Amino acids are Building Blocks of Proteins",
+              "depth": 2
+            },
+            {
+              "number": "13.2.2",
+              "title": "Sources and Uses of Proteins:",
+              "depth": 2
+            },
+            {
+              "number": "13.3",
+              "title": "LIPIDS",
+              "depth": 1
+            },
+            {
+              "number": "13.3.1",
+              "title": "Fatty Acids",
+              "depth": 2
+            },
+            {
+              "number": "13.3.2",
+              "title": "Sources and Uses of Lipids",
+              "depth": 2
+            },
+            {
+              "number": "13.4",
+              "title": "NUCLEIC ACIDS",
+              "depth": 1
+            },
+            {
+              "number": "13.4.1",
+              "title": "Deoxyribonucleic Acid (DNA)",
+              "depth": 2
+            },
+            {
+              "number": "13.4.2",
+              "title": "Ribonucleic acid (RNA)",
+              "depth": 2
+            },
+            {
+              "number": "13.5",
+              "title": "VITAMINS",
+              "depth": 1
+            },
+            {
+              "number": "13.5.1",
+              "title": "Types of Vitamins",
+              "depth": 2
+            },
+            {
+              "number": "13.5.2",
+              "title": "Importance of Vitamins",
+              "depth": 2
+            }
+          ]
+        },
+        {
+          "number": 14,
+          "impliedChapter": 14,
+          "matches": true,
+          "topicCount": 8,
+          "topics": [
+            {
+              "number": "14.1",
+              "title": "COMPOSITION OF ATMOSPHERE",
+              "depth": 1
+            },
+            {
+              "number": "14.2",
+              "title": "LAYERS OF ATMOSPHERE",
+              "depth": 1
+            },
+            {
+              "number": "14.2.1",
+              "title": "Troposphere",
+              "depth": 2
+            },
+            {
+              "number": "14.3",
+              "title": "POLLUTANTS",
+              "depth": 1
+            },
+            {
+              "number": "14.3.1",
+              "title": "Types of Pollutants",
+              "depth": 2
+            },
+            {
+              "number": "14.3.2",
+              "title": "Sources of Air Pollutants",
+              "depth": 2
+            },
+            {
+              "number": "14.4",
+              "title": "ACID RAIN AND ITS EFFECTS",
+              "depth": 1
+            },
+            {
+              "number": "14.5",
+              "title": "OZONE DEPLETION AND ITS EFFECTS",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 15,
+          "impliedChapter": 15,
+          "matches": true,
+          "topicCount": 6,
+          "topics": [
+            {
+              "number": "15.2",
+              "title": "WATER AS SOLVENT",
+              "depth": 1
+            },
+            {
+              "number": "15.3",
+              "title": "SOFT AND HARD WATER",
+              "depth": 1
+            },
+            {
+              "number": "15.3.1",
+              "title": "Types of Hardness of Water",
+              "depth": 2
+            },
+            {
+              "number": "15.3.2",
+              "title": "Method of Removing Hardness",
+              "depth": 2
+            },
+            {
+              "number": "15.4",
+              "title": "WATER POLLUTION",
+              "depth": 1
+            },
+            {
+              "number": "15.5",
+              "title": "WATERBORNE INFECTIOUS DISEASES",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 16,
+          "impliedChapter": 16,
+          "matches": true,
+          "topicCount": 10,
+          "topics": [
+            {
+              "number": "16.1",
+              "title": "BASIC METALLURGICAL OPERATIONS",
+              "depth": 1
+            },
+            {
+              "number": "16.2",
+              "title": "MANUFACTURE OF SODIUM CARBONATE BY SOLVAY?S PROCESS",
+              "depth": 1
+            },
+            {
+              "number": "16.2.1",
+              "title": "Raw Materials",
+              "depth": 2
+            },
+            {
+              "number": "16.3",
+              "title": "Manufacture of Urea",
+              "depth": 1
+            },
+            {
+              "number": "16.3.1",
+              "title": "Raw Materials",
+              "depth": 2
+            },
+            {
+              "number": "16.3.2",
+              "title": "Process",
+              "depth": 2
+            },
+            {
+              "number": "16.4",
+              "title": "PETROLEUM INDUSTRY",
+              "depth": 1
+            },
+            {
+              "number": "16.4.1",
+              "title": "Petroleum",
+              "depth": 2
+            },
+            {
+              "number": "16.4.2",
+              "title": "Origin of Petroleum",
+              "depth": 2
+            },
+            {
+              "number": "16.4.3",
+              "title": "Important Fractions of Petroleum",
+              "depth": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subject": "phy",
+      "grade": 10,
+      "subjectId": 13,
+      "chapters": [
+        {
+          "number": 10,
+          "impliedChapter": 10,
+          "matches": true,
+          "topicCount": 5,
+          "topics": [
+            {
+              "number": "10.1",
+              "title": "Simple Harmonic Motion (SHM)",
+              "depth": 1
+            },
+            {
+              "number": "10.2",
+              "title": "Damped Oscillations",
+              "depth": 1
+            },
+            {
+              "number": "10.3",
+              "title": "Wave Motion",
+              "depth": 1
+            },
+            {
+              "number": "10.4",
+              "title": "Types of Mechanical Waves",
+              "depth": 1
+            },
+            {
+              "number": "10.5",
+              "title": "Ripple Tank",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 11,
+          "impliedChapter": 11,
+          "matches": true,
+          "topicCount": 8,
+          "topics": [
+            {
+              "number": "11.1",
+              "title": "Sound Waves",
+              "depth": 1
+            },
+            {
+              "number": "11.2",
+              "title": "Characteristics of Sound",
+              "depth": 1
+            },
+            {
+              "number": "11.3",
+              "title": "Reflection (Echo) of Sound",
+              "depth": 1
+            },
+            {
+              "number": "11.4",
+              "title": "Speed of Sound",
+              "depth": 1
+            },
+            {
+              "number": "11.5",
+              "title": "Noise Pollution",
+              "depth": 1
+            },
+            {
+              "number": "11.6",
+              "title": "Importance of Acoustics",
+              "depth": 1
+            },
+            {
+              "number": "11.7",
+              "title": "Audible Frequency Range",
+              "depth": 1
+            },
+            {
+              "number": "11.8",
+              "title": "Ultrasound",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 12,
+          "impliedChapter": 12,
+          "matches": true,
+          "topicCount": 16,
+          "topics": [
+            {
+              "number": "12.1",
+              "title": "Reflection of Light",
+              "depth": 1
+            },
+            {
+              "number": "12.2",
+              "title": "Spherical Mirrors",
+              "depth": 1
+            },
+            {
+              "number": "12.3",
+              "title": "Image Location by Spherical Mirror Formula",
+              "depth": 1
+            },
+            {
+              "number": "12.4",
+              "title": "Refraction of Light",
+              "depth": 1
+            },
+            {
+              "number": "12.5",
+              "title": "Total Internal Reflection",
+              "depth": 1
+            },
+            {
+              "number": "12.6",
+              "title": "Applications of Total Internal Reflection",
+              "depth": 1
+            },
+            {
+              "number": "12.7",
+              "title": "Refraction Through Prism",
+              "depth": 1
+            },
+            {
+              "number": "12.8",
+              "title": "Lenses",
+              "depth": 1
+            },
+            {
+              "number": "12.9",
+              "title": "Image Formation by Lenses",
+              "depth": 1
+            },
+            {
+              "number": "12.10",
+              "title": "Image Location by Lens Equation",
+              "depth": 1
+            },
+            {
+              "number": "12.11",
+              "title": "Applications of Lenses",
+              "depth": 1
+            },
+            {
+              "number": "12.12",
+              "title": "Simple Microscope",
+              "depth": 1
+            },
+            {
+              "number": "12.13",
+              "title": "Compound Microscope",
+              "depth": 1
+            },
+            {
+              "number": "12.14",
+              "title": "Telescope",
+              "depth": 1
+            },
+            {
+              "number": "12.15",
+              "title": "The Human Eye",
+              "depth": 1
+            },
+            {
+              "number": "12.16",
+              "title": "Defects of Vision",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 13,
+          "impliedChapter": 13,
+          "matches": true,
+          "topicCount": 10,
+          "topics": [
+            {
+              "number": "13.1",
+              "title": "Production of Electric Charges",
+              "depth": 1
+            },
+            {
+              "number": "13.2",
+              "title": "Electrostatic Induction",
+              "depth": 1
+            },
+            {
+              "number": "13.3",
+              "title": "Electroscope",
+              "depth": 1
+            },
+            {
+              "number": "13",
+              "title": "4 Coulomb,s Law",
+              "depth": 0
+            },
+            {
+              "number": "13.5",
+              "title": "Electric Field and Electric Field Intensity",
+              "depth": 1
+            },
+            {
+              "number": "13.6",
+              "title": "Electrostatic Potential",
+              "depth": 1
+            },
+            {
+              "number": "13.7",
+              "title": "Capacitors and Capacitance",
+              "depth": 1
+            },
+            {
+              "number": "13.8",
+              "title": "Different Types of Capacitors",
+              "depth": 1
+            },
+            {
+              "number": "13.9",
+              "title": "Applications of Electrostatics",
+              "depth": 1
+            },
+            {
+              "number": "13.10",
+              "title": "Some Hazards of Static Electricity",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 14,
+          "impliedChapter": 14,
+          "matches": true,
+          "topicCount": 14,
+          "topics": [
+            {
+              "number": "14.1",
+              "title": "Electric Current",
+              "depth": 1
+            },
+            {
+              "number": "14.2",
+              "title": "Potential Difference",
+              "depth": 1
+            },
+            {
+              "number": "14.3",
+              "title": "Electromotive Force (E.M.F)",
+              "depth": 1
+            },
+            {
+              "number": "14.4",
+              "title": "Ohm,s Law",
+              "depth": 1
+            },
+            {
+              "number": "14.5",
+              "title": "V-I Characteristics of Ohmic And Non Ohmic Conductors",
+              "depth": 1
+            },
+            {
+              "number": "14.6",
+              "title": "Factors Affecting Resistance",
+              "depth": 1
+            },
+            {
+              "number": "14.7",
+              "title": "Conductors",
+              "depth": 1
+            },
+            {
+              "number": "14.8",
+              "title": "Insulators",
+              "depth": 1
+            },
+            {
+              "number": "14.9",
+              "title": "Combination of Resistors",
+              "depth": 1
+            },
+            {
+              "number": "14.10",
+              "title": "Electrical Energy and Joule,s Law",
+              "depth": 1
+            },
+            {
+              "number": "14.11",
+              "title": "Electric Power",
+              "depth": 1
+            },
+            {
+              "number": "14.12",
+              "title": "Direct Current And Alternating Current",
+              "depth": 1
+            },
+            {
+              "number": "14.13",
+              "title": "Hazards of Electricity",
+              "depth": 1
+            },
+            {
+              "number": "14.14",
+              "title": "Safe use of Electricity in Homes",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 15,
+          "impliedChapter": 15,
+          "matches": true,
+          "topicCount": 10,
+          "topics": [
+            {
+              "number": "15.1",
+              "title": "Magnetic Effects of a Steady Current",
+              "depth": 1
+            },
+            {
+              "number": "15.2",
+              "title": "Force on a Current-Carrying Conductor Placed in a Magnetic Field",
+              "depth": 1
+            },
+            {
+              "number": "15.3",
+              "title": "Turning Effect on a Current-Carrying Coil in a Magnetic Field",
+              "depth": 1
+            },
+            {
+              "number": "15.4",
+              "title": "D.C. Motor",
+              "depth": 1
+            },
+            {
+              "number": "15.5",
+              "title": "Electromagnetic Induction",
+              "depth": 1
+            },
+            {
+              "number": "15.6",
+              "title": "Direction of induced e.m.f. Lenz,s Law",
+              "depth": 1
+            },
+            {
+              "number": "15.7",
+              "title": "A.C. Generator",
+              "depth": 1
+            },
+            {
+              "number": "15.8",
+              "title": "Mutual Induction",
+              "depth": 1
+            },
+            {
+              "number": "15.9",
+              "title": "Transformer",
+              "depth": 1
+            },
+            {
+              "number": "15.10",
+              "title": "High Voltage Transmission",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 16,
+          "impliedChapter": 16,
+          "matches": true,
+          "topicCount": 11,
+          "topics": [
+            {
+              "number": "16.1",
+              "title": "Thermionic Emission",
+              "depth": 1
+            },
+            {
+              "number": "16.2",
+              "title": "Investigating the Properties of Electrons",
+              "depth": 1
+            },
+            {
+              "number": "16.3",
+              "title": "Cathode-Ray Oscilloscope (C.R.O)",
+              "depth": 1
+            },
+            {
+              "number": "16.4",
+              "title": "Analogue and Digital Electronics",
+              "depth": 1
+            },
+            {
+              "number": "16.5",
+              "title": "Basic Operations of Digital Electronics-Logic Gates",
+              "depth": 1
+            },
+            {
+              "number": "16.6",
+              "title": "AND Operation",
+              "depth": 1
+            },
+            {
+              "number": "16.7",
+              "title": "OR Operation",
+              "depth": 1
+            },
+            {
+              "number": "16.8",
+              "title": "NOT Operation",
+              "depth": 1
+            },
+            {
+              "number": "16.9",
+              "title": "NAND Gate",
+              "depth": 1
+            },
+            {
+              "number": "16.10",
+              "title": "NOR Gate",
+              "depth": 1
+            },
+            {
+              "number": "16.11",
+              "title": "Uses of Logic Gates",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 17,
+          "impliedChapter": 17,
+          "matches": true,
+          "topicCount": 10,
+          "topics": [
+            {
+              "number": "17.1",
+              "title": "Information and Communication Technology",
+              "depth": 1
+            },
+            {
+              "number": "17.2",
+              "title": "Components of Computer Based Information System (CBIS)",
+              "depth": 1
+            },
+            {
+              "number": "17.3",
+              "title": "Flow of Information",
+              "depth": 1
+            },
+            {
+              "number": "17.4",
+              "title": "Transmission of Electric Signal Through Wire",
+              "depth": 1
+            },
+            {
+              "number": "17.5",
+              "title": "Transmission of Radiowaves Through Space",
+              "depth": 1
+            },
+            {
+              "number": "17.6",
+              "title": "Transmission of Light Signals Through Optical Fibres",
+              "depth": 1
+            },
+            {
+              "number": "17.7",
+              "title": "Information Storage Devices",
+              "depth": 1
+            },
+            {
+              "number": "17.8",
+              "title": "Application of Computer",
+              "depth": 1
+            },
+            {
+              "number": "17.9",
+              "title": "Internet",
+              "depth": 1
+            },
+            {
+              "number": "17.10",
+              "title": "Risks of ICT to Society and the Environment",
+              "depth": 1
+            }
+          ]
+        },
+        {
+          "number": 18,
+          "impliedChapter": 18,
+          "matches": true,
+          "topicCount": 9,
+          "topics": [
+            {
+              "number": "18.1",
+              "title": "Atom and Atomic Nucleus",
+              "depth": 1
+            },
+            {
+              "number": "18.2",
+              "title": "Natural Radioactivity",
+              "depth": 1
+            },
+            {
+              "number": "18.3",
+              "title": "Background Radiations",
+              "depth": 1
+            },
+            {
+              "number": "18.4",
+              "title": "Nuclear Transmutations",
+              "depth": 1
+            },
+            {
+              "number": "18.5",
+              "title": "Half-Life and its Measurement",
+              "depth": 1
+            },
+            {
+              "number": "18.6",
+              "title": "Radioisotopes and their Uses",
+              "depth": 1
+            },
+            {
+              "number": "18.7",
+              "title": "Fission Reaction",
+              "depth": 1
+            },
+            {
+              "number": "18.8",
+              "title": "Nuclear Fusion",
+              "depth": 1
+            },
+            {
+              "number": "18.9",
+              "title": "Hazards of Radiations and Safety Measures",
+              "depth": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
