@@ -15,7 +15,7 @@ import type { ChannelAdapter } from '../types';
  *
  * Environment:
  *   RESEND_API_KEY   a send-only key is correct and is what we use
- *   EMAIL_FROM       "MatricMate <no-reply@matricmate.com.pk>"
+ *   EMAIL_FROM       "MatricMate <no-reply@matricmate.co>"
  *
  * The from-address must be on a domain verified in Resend, which means SPF,
  * DKIM and DMARC records. In Cloudflare each must be "DNS only" rather than

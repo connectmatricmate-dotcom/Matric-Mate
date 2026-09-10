@@ -4,7 +4,7 @@
  * Login, sign-up and the email-link callback all take a destination from the
  * request, and all three have to be paranoid about it. An open redirect makes
  * our login page a convincing launchpad for someone else's: the URL really is
- * matricmate.pk, the padlock really is ours, and the student lands on a copy of
+ * matricmate.co, the padlock really is ours, and the student lands on a copy of
  * this site that keeps their password.
  *
  * A leading slash is not enough of a check. Browsers treat `//evil.com` as a

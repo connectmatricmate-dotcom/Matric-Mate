@@ -160,7 +160,7 @@ export const en = {
        so this is not a failure on their part; it is the wrong door. Said on the
        login screen rather than after, because everything past this point, the
        onboarding, the plan gate, is built for a student and would only mislead. */
-    errStaffApp: 'This is a teacher or admin account. Sign in at matricmate.pk in a browser to reach your dashboard.',
+    errStaffApp: 'This is a teacher or admin account. Sign in at matricmate.co in a browser to reach your dashboard.',
     errNotConfirmed: 'Confirm your email first. Check your inbox for the link.',
     errRegistered: 'That email already has an account. Log in instead.',
     errWeakPassword: 'Passwords need at least 6 characters.',
@@ -1033,7 +1033,7 @@ export const en = {
     commonQuestions: 'Common questions',
     faq1Q: 'How do I renew Premium?',
     faq1A:
-      'Plans are managed on our website, matricmate.pk, never inside the app. Renew there with the same account you use here, then open Profile → Subscription and tap Check again.',
+      'Plans are managed on our website, matricmate.co, never inside the app. Renew there with the same account you use here, then open Profile → Subscription and tap Check again.',
     faq2Q: 'Does it work without internet?',
     faq2A: 'Downloaded chapters, audio and MCQs work offline. The AI tutor and timed tests need a connection.',
     faq3Q: 'Why is the AI limited each day?',
@@ -1212,7 +1212,7 @@ export const ur: typeof en = {
     stayLoggedIn: 'لاگ اِن رہنے دیں',
 
     errCredentials: 'ای میل یا پاس ورڈ غلط ہے۔',
-    errStaffApp: 'یہ اُستاد یا ایڈمن کا اکاؤنٹ ہے۔ اپنے ڈیش بورڈ کے لیے براؤزر میں matricmate.pk پر سائن اِن کریں۔',
+    errStaffApp: 'یہ اُستاد یا ایڈمن کا اکاؤنٹ ہے۔ اپنے ڈیش بورڈ کے لیے براؤزر میں matricmate.co پر سائن اِن کریں۔',
     errNotConfirmed: 'پہلے اپنا ای میل تصدیق کریں۔ اِن باکس میں لنک دیکھیں۔',
     errRegistered: 'اس ای میل کا اکاؤنٹ پہلے سے موجود ہے۔ لاگ اِن کریں۔',
     errWeakPassword: 'پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔',
@@ -2032,7 +2032,7 @@ export const ur: typeof en = {
     commonQuestions: 'عام سوالات',
     faq1Q: 'پریمیم کیسے تجدید کروں؟',
     faq1A:
-      'پلان ہماری ویب سائٹ matricmate.pk پر منظم ہوتے ہیں، ایپ میں کبھی نہیں۔ وہاں اسی اکاؤنٹ سے تجدید کریں جو یہاں استعمال کرتے ہیں، پھر پروفائل ← سبسکرپشن کھول کر ”دوبارہ چیک کریں“ دبائیں۔',
+      'پلان ہماری ویب سائٹ matricmate.co پر منظم ہوتے ہیں، ایپ میں کبھی نہیں۔ وہاں اسی اکاؤنٹ سے تجدید کریں جو یہاں استعمال کرتے ہیں، پھر پروفائل ← سبسکرپشن کھول کر ”دوبارہ چیک کریں“ دبائیں۔',
     faq2Q: 'کیا بغیر انٹرنیٹ چلتا ہے؟',
     faq2A: 'ڈاؤن لوڈ کیے ابواب، آڈیو اور MCQs آف لائن چلتے ہیں۔ AI ٹیوٹر اور وقت والے ٹیسٹ کے لیے انٹرنیٹ چاہیے۔',
     faq3Q: 'AI کی روز کی حد کیوں ہے؟',

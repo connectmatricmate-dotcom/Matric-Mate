@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
- * A teacher's referral link: matricmate.com.pk/r/MMG72UJ9
+ * A teacher's referral link: matricmate.co/r/MMG72UJ9
  *
  * A route handler rather than a page, because the honest answer to this URL is
  * a redirect, and a page that renders and then bounces shows a flash of
