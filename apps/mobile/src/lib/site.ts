@@ -9,4 +9,4 @@
  * Opening a page here is not the same as selling: see core/billing.ts. Only
  * pages with no price and no checkout on them may be opened from the app.
  */
-export const SITE_URL = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://matric-mate-web.vercel.app';
+export const SITE_URL = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://www.matricmate.co';
