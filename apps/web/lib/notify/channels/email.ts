@@ -1,5 +1,5 @@
 import 'server-only';
-import { colors, translate } from '@matricmate/core';
+import { SUPPORT_EMAIL, colors, translate } from '@matricmate/core';
 import type { Language } from '@matricmate/core';
 import type { ChannelAdapter } from '../types';
 
@@ -93,6 +93,12 @@ export const email: ChannelAdapter = {
         body: JSON.stringify({
           from: from(),
           to: [to.email],
+          /*
+           * Sent from no-reply@, but a student who hits Reply on a receipt or a
+           * report card is asking a real question about their money or their
+           * child, and no-reply@ is not read. Replies go to the support inbox.
+           */
+          reply_to: SUPPORT_EMAIL,
           subject,
           html: shell(to.lang, subject, body),
           // A plain-text part as well, so a client that refuses HTML still

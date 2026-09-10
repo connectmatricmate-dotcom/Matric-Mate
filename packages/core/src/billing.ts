@@ -29,14 +29,17 @@ export const BILLING_SITE = 'matricmate.co';
 /**
  * The one address a student is told to write to.
  *
- * It lived in two places and they disagreed: the website's help page offered
- * help@matricmate.co while the Android app opened a draft to the Gmail
- * account. A student who mailed the wrong one got silence, which is worse than
- * either address on its own. This is the mailbox that certainly exists. Point
- * it at help@matricmate.co here, in this one line, once that domain is
- * receiving mail.
+ * It lived in two places and they disagreed once, and a student who mailed the
+ * wrong one got silence, which is worse than either address on its own. So it
+ * is one line, here.
+ *
+ * matricmate.co receives mail through ImprovMX, which forwards connect@ (and a
+ * catch-all for anything else at the domain) into the Gmail inbox the client
+ * reads, and replies go back out as connect@ through Resend. Verified end to
+ * end with a real message before this changed: pointing students at an address
+ * that does not yet receive would have been worse than the Gmail one.
  */
-export const SUPPORT_EMAIL = 'connect.matricmate@gmail.com';
+export const SUPPORT_EMAIL = 'connect@matricmate.co';
 
 /**
  * Who is behind the site, in the words a payment gateway checks for.
