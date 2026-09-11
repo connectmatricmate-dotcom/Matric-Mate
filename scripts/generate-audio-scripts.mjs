@@ -7,6 +7,13 @@
  *   node scripts/generate-audio-scripts.mjs --chapter phy-1 one chapter
  *   node scripts/generate-audio-scripts.mjs --force         rewrite even if a file exists
  *   node scripts/generate-audio-scripts.mjs --board punjab  one board's chapters only
+ *   node scripts/generate-audio-scripts.mjs --briefs        write each missing lesson's exact prompt, no API call
+ *   node scripts/generate-audio-scripts.mjs --check         validate every lesson file already written
+ *
+ * --briefs is the seam for writing lessons somewhere other than the client's
+ * key (an agent on a subscription): the brief carries the same system prompt
+ * and notes the API call would, so the standard does not drop, and --check
+ * holds the result to the same speech and length rules before narration.
  *
  * One file per chapter and medium lands in content/generated/audio/
  * (<chapterId>-<en|ur>.txt, gitignored). generate-audio.mjs then validates,
@@ -41,6 +48,8 @@ const flag = (n) => {
   return i === -1 ? null : args[i + 1];
 };
 const FORCE = args.includes('--force');
+const BRIEFS = args.includes('--briefs');
+const CHECK = args.includes('--check');
 const ONLY_SUBJECT = flag('subject');
 const ONLY_CHAPTER = flag('chapter');
 const ONLY_BOARD = flag('board');
@@ -162,19 +171,27 @@ async function writeLesson(chapter, medium, subjectName) {
   // exactly like real schools; an English lecture about an Urdu comprehension
   // chapter helps nobody, and the narrator voice follows the script language.
   const writeUrdu = medium === 'ur' || chapter.id.startsWith('urd-');
+  const system = `You write spoken audio lesson scripts for MatricMate, ${chapter.board === 'punjab' ? 'a Punjab Board' : 'an FBISE'} Class ${chapter.grade ?? 9} (SSC-${chapter.grade === 10 ? 'II' : 'I'}, Pakistan) exam-prep app.\n\n${rulesFor(chapter.board)}\n\n${writeUrdu ? UR_RULES : EN_RULES}`;
+  const user = `Subject: ${subjectName}\nChapter ${chapter.number}: ${title}\n${shareLine}\n\nChapter notes:\n${grounding}\n\n---\nWrite the complete audio lesson script now. Output ONLY the script text, nothing else.`;
+  const minChars = writeUrdu ? 5200 : 4800;
+
+  if (BRIEFS) {
+    await mkdir(resolve(OUT, 'briefs'), { recursive: true });
+    await writeFile(
+      resolve(OUT, 'briefs', `${chapter.id}-${medium}.md`),
+      `# Audio lesson brief: ${chapter.id} (${medium})\n\nWrite the script to: ${file}\nThe file holds ONLY the script text. At least ${minChars} characters. Then run: node scripts/generate-audio-scripts.mjs --check --chapter ${chapter.id}\n\n## System\n\n${system}\n\n## User\n\n${user}\n`,
+      'utf8',
+    );
+    return { label, status: 'brief' };
+  }
 
   let feedback = '';
   for (let attempt = 0; attempt < 2; attempt++) {
     const response = await anthropic.messages.create({
       model: MODEL,
       max_tokens: 8000,
-      system: `You write spoken audio lesson scripts for MatricMate, ${chapter.board === 'punjab' ? 'a Punjab Board' : 'an FBISE'} Class ${chapter.grade ?? 9} (SSC-${chapter.grade === 10 ? 'II' : 'I'}, Pakistan) exam-prep app.\n\n${rulesFor(chapter.board)}\n\n${writeUrdu ? UR_RULES : EN_RULES}`,
-      messages: [
-        {
-          role: 'user',
-          content: `Subject: ${subjectName}\nChapter ${chapter.number}: ${title}\n${shareLine}\n\nChapter notes:\n${grounding}\n\n---\nWrite the complete audio lesson script now. Output ONLY the script text, nothing else.${feedback}`,
-        },
-      ],
+      system,
+      messages: [{ role: 'user', content: `${user}${feedback}` }],
     });
     spent.input += response.usage?.input_tokens ?? 0;
     spent.output += response.usage?.output_tokens ?? 0;
@@ -182,7 +199,7 @@ async function writeLesson(chapter, medium, subjectName) {
     const script = (response.content.find((b) => b.type === 'text')?.text ?? '').trim();
 
     const problems = unspeakable(script);
-    const tooShort = script.length < (writeUrdu ? 5200 : 4800);
+    const tooShort = script.length < minChars;
     if (!problems.length && !tooShort) {
       await writeFile(file, `${script}\n`, 'utf8');
       return { label, status: 'ok', chars: script.length };
@@ -224,11 +241,31 @@ async function main() {
   const jobs = chapters.flatMap((ch) => (oneLanguage(ch) ? [oneLanguage(ch)] : ['en', 'ur']).map((medium) => ({ ch, medium })));
   console.log(C.bold(`\n  ${jobs.length} lessons to write (${chapters.length} chapters)\n`));
 
+  if (CHECK) {
+    let bad = 0;
+    let checked = 0;
+    for (const { ch, medium } of jobs) {
+      const file = resolve(OUT, `${ch.id}-${medium}.txt`);
+      if (!existsSync(file)) continue;
+      const script = (await readFile(file, 'utf8')).trim();
+      const writeUrdu = medium === 'ur' || ch.id.startsWith('urd-');
+      const problems = [...unspeakable(script), script.length < (writeUrdu ? 5200 : 4800) ? `too short (${script.length} chars)` : null].filter(Boolean);
+      checked++;
+      if (problems.length) {
+        bad++;
+        console.log(`${C.red(' fail')} ${ch.id}/${medium} ${C.dim(problems.join('; '))}`);
+      }
+    }
+    console.log(bad ? C.red(`\n  ${bad} of ${checked} lessons fail the rules\n`) : C.green(`\n  all ${checked} lessons pass\n`));
+    process.exit(bad ? 1 : 0);
+  }
+
   const started = Date.now();
   let done = 0;
   let skipped = 0;
   let failed = 0;
   let capped = 0;
+  let briefed = 0;
   let i = 0;
 
   const worker = async () => {
@@ -246,6 +283,8 @@ async function main() {
           console.log(`${C.green('  ok ')} ${r.label.padEnd(12)} ${C.dim(`${r.chars} chars`)}`);
         } else if (r.status === 'exists') {
           skipped++;
+        } else if (r.status === 'brief') {
+          briefed++;
         } else {
           failed++;
           console.log(`${C.red(' fail')} ${r.label.padEnd(12)} ${C.dim(r.status)}`);
@@ -260,7 +299,7 @@ async function main() {
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
   const mins = ((Date.now() - started) / 60000).toFixed(1);
-  console.log(C.bold(`\n  written ${done} · already there ${skipped} · failed ${failed} · ${mins} min`));
+  console.log(C.bold(`\n  written ${done} · already there ${skipped}${briefed ? ` · briefs ${briefed}` : ''} · failed ${failed} · ${mins} min`));
   console.log(C.dim(`  ${spent.input.toLocaleString()} tokens in, ${spent.output.toLocaleString()} out, about $${costSoFar().toFixed(2)} at list price\n`));
   if (capped) console.log(`  ${capped} lessons not started: the $${MAX_SPEND} ceiling was reached\n`);
   if (failed) process.exit(1);
