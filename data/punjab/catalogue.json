@@ -926,7 +926,7 @@
    "grade": 9,
    "number": 3,
    "title": "The Cell",
-   "urduTitle": null,
+   "urduTitle": "سیل",
    "blurb": "Cell, Structure of Cell, Structural Advantages of Plant and Animal Cells, Cell Specialization and Stem Cells.",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
@@ -1036,7 +1036,7 @@
    "grade": 9,
    "number": 5,
    "title": "Tissues, Organs, and Organ Systems",
-   "urduTitle": null,
+   "urduTitle": "ٹشوز، اعضاء اور اعضائی نظام",
    "blurb": "Levels of Organization, Organs and Organ Systems in Plants, Organs and Organ Systems in Humans and Homeostasis.",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
@@ -1083,7 +1083,7 @@
    "grade": 9,
    "number": 6,
    "title": "Biomolecules",
-   "urduTitle": null,
+   "urduTitle": "بائیو مالیکیولز",
    "blurb": "Biomolecules, Carbohydrates, Proteins, Lipids, Nucleic Acids and The Working of DNA and RNA.",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
@@ -1270,7 +1270,7 @@
    "grade": 9,
    "number": 9,
    "title": "Plant Physiology",
-   "urduTitle": null,
+   "urduTitle": "پلانٹ فزیالوجی",
    "blurb": "Nutrition in Plants, Transport in Plants, Transpiration, Transport of Water in Plants, Translocation of Food in Plants, Gaseous Exchange in Plants and more.",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
@@ -1357,7 +1357,7 @@
    "grade": 9,
    "number": 10,
    "title": "Reproduction in Plants",
-   "urduTitle": null,
+   "urduTitle": "پودوں میں ری پروڈکشن",
    "blurb": "Types of Asexual Reproduction, Artificial Propagation and Sexual Reproduction in Plants.",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
@@ -1419,7 +1419,7 @@
    "grade": 9,
    "number": 11,
    "title": "Biostatistics",
-   "urduTitle": null,
+   "urduTitle": "بائیو سٹیٹسٹکس",
    "blurb": "Introduction of Biostatistics, Mean, Median, and Mode and Bar Chart.",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
@@ -2418,7 +2418,7 @@
    "grade": 9,
    "number": 1,
    "title": "States of Matter and Phase Changes",
-   "urduTitle": null,
+   "urduTitle": "مادہ کی حالتیں اور ان میں تبدیلیاں",
    "blurb": "What is Chemistry?, States of Matter, Element, Compound and Mixture, Allotropic Forms of Substances and more.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -2560,7 +2560,7 @@
    "grade": 9,
    "number": 3,
    "title": "Chemical Bonding",
-   "urduTitle": null,
+   "urduTitle": "کیمیائی بندش",
    "blurb": "Why do atoms form chemical bonds?, Chemical Bond, Metallic Bond, Electropositive Character of Metals, Electronegative character of Non-metals and more.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -2647,7 +2647,7 @@
    "grade": 9,
    "number": 4,
    "title": "Stoichiometry",
-   "urduTitle": null,
+   "urduTitle": "سٹائیکیومیٹری",
    "blurb": "Chemical formula, Empirical Formula, Chemical Formulas of Binary Ionic Compounds, Chemical Formulas of Compounds and more.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -2722,7 +2722,7 @@
    "grade": 9,
    "number": 5,
    "title": "Energetics",
-   "urduTitle": null,
+   "urduTitle": "اینرجیٹکس",
    "blurb": "System and Surounding, Enthalpy, Exothermic and Endothermic Reactions, How does a Reaction take place? and Aerobic and Anaerobic Respiration.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -2777,7 +2777,7 @@
    "grade": 9,
    "number": 6,
    "title": "Equilibria",
-   "urduTitle": null,
+   "urduTitle": "ایکوئلبریا",
    "blurb": "Reversible and Irreversible Changes, Dynamic Equilibrium and Changing the Physical Conditions of a Chemical Reaction.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -2815,7 +2815,7 @@
    "grade": 9,
    "number": 7,
    "title": "Acid Base Chemistry",
-   "urduTitle": null,
+   "urduTitle": "ایسڈ بیس کیمسٹری",
    "blurb": "Acids and Bases, Different Concepts of Acids and Bases, Bronsted – Lowry concepts of Acids and Bases, Properties of Acids and Bases and more.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -2922,7 +2922,7 @@
    "grade": 9,
    "number": 9,
    "title": "Group Properties and Elements",
-   "urduTitle": null,
+   "urduTitle": "گروپ خواص اور عناصر",
    "blurb": "Properties of Group 1 Elements, Properties of Group 17 Elements, Group Properties of Transition elements, Properties of Noble Gases and more.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -2980,7 +2980,7 @@
    "grade": 9,
    "number": 10,
    "title": "Environmental Chemistry",
-   "urduTitle": null,
+   "urduTitle": "ماحولیاتی کیمسٹری",
    "blurb": "Composition Of Atmosphere, Air Pollutants, Acid Rain, Global Warming (Greenhouse Effect) and Strategies to Reduce Environmental Issues.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -3048,7 +3048,7 @@
    "grade": 9,
    "number": 11,
    "title": "Hydrocarbons",
-   "urduTitle": null,
+   "urduTitle": "ہائیڈروکاربنز",
    "blurb": "Hyrocarbons, Alkanes, Preparation of Alkanes and Important Reactions.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -3092,7 +3092,7 @@
    "grade": 9,
    "number": 12,
    "title": "Empirical Data Collection and Analysis",
-   "urduTitle": null,
+   "urduTitle": "تجرباتی معلومات کا حصول اور تجزیہ",
    "blurb": "SI Units in Chemistry, Tools and Techniques to Manage Accuracy and Precision and Accuracy and Precision.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -3157,7 +3157,7 @@
    "grade": 9,
    "number": 13,
    "title": "Laboratory and Practical Skills",
-   "urduTitle": null,
+   "urduTitle": "لیبارٹری اور عملی مہارتیں",
    "blurb": "Chemical Hazards in the Laboratory, Hazard Signs, Personal Protective Equipment (PPE) in the Laboratory, Location of Fire Extinguisher and more.",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
@@ -4233,7 +4233,7 @@
    "grade": 9,
    "number": 1,
    "title": "Introduction to Systems",
-   "urduTitle": null,
+   "urduTitle": "سسٹمز کا تعارف",
    "blurb": "Theory of Systems, Types of Systems, System and Science, Computer as a System, The Architecture of von Neumann Computers and Computing Systems.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -4500,7 +4500,7 @@
    "grade": 9,
    "number": 2,
    "title": "Number Systems",
-   "urduTitle": null,
+   "urduTitle": "نمبر سسٹمز",
    "blurb": "Numbering Systems, Data Representation in Computing Systems, Storing Real Values in Computer Memory, Binary Arithmetic Operations and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -4717,7 +4717,7 @@
    "grade": 9,
    "number": 3,
    "title": "Digital Systems and Logic Design",
-   "urduTitle": null,
+   "urduTitle": "ڈیجیٹل سسٹمز اور لاجک ڈیزائن",
    "blurb": "Basics of Digital Systems, Boolean Algebra and Logic Gates, Simplification of Boolean Functions, Creating Logic Diagrams and Application of Digital Logic.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -4837,7 +4837,7 @@
    "grade": 9,
    "number": 4,
    "title": "System Troubleshooting",
-   "urduTitle": null,
+   "urduTitle": "سسٹم ٹربل شوٹنگ",
    "blurb": "System Troubleshooting and Troubleshooting Strategies.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -5057,7 +5057,7 @@
    "grade": 9,
    "number": 5,
    "title": "Software System",
-   "urduTitle": null,
+   "urduTitle": "سافٹ ویئر سسٹم",
    "blurb": "Software, Introduction to System Software and Application Software.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -5197,7 +5197,7 @@
    "grade": 9,
    "number": 6,
    "title": "Introduction to Computer Networks",
-   "urduTitle": null,
+   "urduTitle": "کمپیوٹر نیٹ ورکس کا تعارف",
    "blurb": "Network as a System, Fundamental Concepts in Data Communication, Networking Devices, Network Topologies, Transmission Modes, The OSI Networking Model and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -5457,7 +5457,7 @@
    "grade": 9,
    "number": 7,
    "title": "Computational Thinking",
-   "urduTitle": null,
+   "urduTitle": "کمپیوٹیشنل تھنکنگ",
    "blurb": "Definition of Computational Thinking, Principles of Computational Thinking, Algorithm Design Methods, Algorithmic Activities, Dry Run and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -5646,7 +5646,7 @@
    "grade": 9,
    "number": 8,
    "title": "Web Development with HTML, CSS and JavaScript",
-   "urduTitle": null,
+   "urduTitle": "ایچ ٹی ایم ایل، سی ایس ایس اور جاوا سکرپٹ کے ساتھ ویب ڈویلپمنٹ",
    "blurb": "Web Development, Basic Components of Web Development, Getting Started with HTML, HTML Basic Structure, Creating Content with HTML, Styling with CSS and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -5941,7 +5941,7 @@
    "grade": 9,
    "number": 9,
    "title": "Data Science and Data Gathering",
-   "urduTitle": null,
+   "urduTitle": "ڈیٹا سائنس اور ڈیٹا گیدرنگ",
    "blurb": "Data, Data Types, Organising and Analysing Data, Data Types, Data Storage Techniques, Data Visualization, Data Pre-Processing and Analysis and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -6188,7 +6188,7 @@
    "grade": 9,
    "number": 10,
    "title": "Emerging Technologies in Computer Science",
-   "urduTitle": null,
+   "urduTitle": "کمپیوٹر سائنس میں ابھرتی ہوئی ٹیکنالوجیز",
    "blurb": "Introduction to Artificial Intelligence (AI), AI Algorithms and Techniques, Introduction to Internet of Things (IoT) and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -6305,7 +6305,7 @@
    "grade": 9,
    "number": 11,
    "title": "Ethical, Social, and Legal Concerns in Computer Usage",
-   "urduTitle": null,
+   "urduTitle": "کمپیوٹر کے استعمال میں اخلاقی، سماجی اور قانونی مسائل",
    "blurb": "Responsible Computer Usage, Safe and Secure Operation of Digital Platforms, Best Practices in Online Behavior, Legal and Ethical Frameworks and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -6536,7 +6536,7 @@
    "grade": 9,
    "number": 12,
    "title": "Entrepreneurship in Digital Age",
-   "urduTitle": null,
+   "urduTitle": "ڈیجیٹل دور میں انٹرپرینیورشپ",
    "blurb": "Entrepreneurship, Entrepreneurship in the Digital Landscape, Digital Tools and Platforms, Business Idea Generation, Developing Business Plans and more.",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
@@ -6779,7 +6779,7 @@
    "grade": 10,
    "number": 1,
    "title": "Hazrat Muhammad's (صلی اللہ علیہ وآلہ وسلم) Social Reforms for the Rights of Women, Orphans and Slaves",
-   "urduTitle": null,
+   "urduTitle": "حضرت محمد (صلی اللہ علیہ وآلہ وسلم) کی خواتین، یتیموں اور غلاموں کے حقوق کے لیے سماجی اصلاحات",
    "blurb": "Ethics & Values/ Respecting self and others",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -6839,7 +6839,7 @@
    "grade": 10,
    "number": 2,
    "title": "My Beloved Pakistan (Poem)",
-   "urduTitle": null,
+   "urduTitle": "میرا پیارا پاکستان (نظم)",
    "blurb": "Patriotism/National Pride",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -6899,7 +6899,7 @@
    "grade": 10,
    "number": 3,
    "title": "Digital Globalisation Transforming the English Language",
-   "urduTitle": null,
+   "urduTitle": "ڈیجیٹل گلوبلائزیشن اور بدلتی ہوئی انگریزی زبان",
    "blurb": "Impact of digital globalisation on the English Language",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -6959,7 +6959,7 @@
    "grade": 10,
    "number": 4,
    "title": "The Earth: Act Now for Tomorrow",
-   "urduTitle": null,
+   "urduTitle": "زمین: کل کے لیے آج عمل کریں",
    "blurb": "SDG-Millenium Development Goals/ Climate action",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -7019,7 +7019,7 @@
    "grade": 10,
    "number": 5,
    "title": "The Happy Prince",
-   "urduTitle": null,
+   "urduTitle": "خوش باش شہزادہ",
    "blurb": "Innovation, Creativity and Success",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -7080,7 +7080,7 @@
    "grade": 10,
    "number": 6,
    "title": "Drug Abuse",
-   "urduTitle": null,
+   "urduTitle": "منشیات کا استعمال",
    "blurb": "Prevention of Drugs",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -7139,7 +7139,7 @@
    "grade": 10,
    "number": 7,
    "title": "Time (Poem)",
-   "urduTitle": null,
+   "urduTitle": "وقت (نظم)",
    "blurb": "Soft Skills/ Time Management",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -7199,7 +7199,7 @@
    "grade": 10,
    "number": 8,
    "title": "Pollution-Free Pakistan with Greenery All Around",
-   "urduTitle": null,
+   "urduTitle": "چاروں طرف سبزے کے ساتھ آلودگی سے پاک پاکستان",
    "blurb": "Nature and Natural Resources/ Environment Matters",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -7260,7 +7260,7 @@
    "grade": 10,
    "number": 9,
    "title": "The Road Not Taken (Poem)",
-   "urduTitle": null,
+   "urduTitle": "وہ راستہ جو نہ لیا گیا (نظم)",
    "blurb": "Literature & Poetry/ Bravery",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -7321,7 +7321,7 @@
    "grade": 10,
    "number": 10,
    "title": "The Three Questions",
-   "urduTitle": null,
+   "urduTitle": "تین سوالات",
    "blurb": "Literature & Poetry/ Spiritualism",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
@@ -7376,7 +7376,7 @@
    "grade": 9,
    "number": 1,
    "title": "The Saviour of Mankind",
-   "urduTitle": null,
+   "urduTitle": "انسانیت کا نجات دہندہ",
    "blurb": "Ethics and Values/ Justice, Handling of Trust/ Self-discipline",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7433,7 +7433,7 @@
    "grade": 9,
    "number": 2,
    "title": "Patriotism",
-   "urduTitle": null,
+   "urduTitle": "حب الوطنی",
    "blurb": "Patriotism/ Practising Patriotism",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7489,7 +7489,7 @@
    "grade": 9,
    "number": 3,
    "title": "Daffodils (Poem)",
-   "urduTitle": null,
+   "urduTitle": "ڈیفوڈلز (نظم)",
    "blurb": "Nature and Natural Resources/ Wonder Green",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7599,7 +7599,7 @@
    "grade": 9,
    "number": 5,
    "title": "Women Empowerment through Entrepreneurship",
-   "urduTitle": null,
+   "urduTitle": "انٹرپرینیورشپ کے ذریعے خواتین کو بااختیار بنانا",
    "blurb": "Entrepreneurship/ Success Stories of Entrepreneurs/ Women Empowerment",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7655,7 +7655,7 @@
    "grade": 9,
    "number": 6,
    "title": "The Value of Time",
-   "urduTitle": null,
+   "urduTitle": "وقت کی قدر",
    "blurb": "Soft Skills/ Time Management",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7714,7 +7714,7 @@
    "grade": 9,
    "number": 7,
    "title": "If (Poem)",
-   "urduTitle": null,
+   "urduTitle": "اگر (نظم)",
    "blurb": "Literature and Poetry/ Bravery/ Freedom/ Nature",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7770,7 +7770,7 @@
    "grade": 9,
    "number": 8,
    "title": "The Impact of Globalisation on Culture and Economy",
-   "urduTitle": null,
+   "urduTitle": "ثقافت اور معیشت پر گلوبلائزیشن کے اثرات",
    "blurb": "Digital Globalisation/ Impact on Culture and Economy",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7826,7 +7826,7 @@
    "grade": 9,
    "number": 9,
    "title": "Quality Education: A Key to Success",
-   "urduTitle": null,
+   "urduTitle": "معیاری تعلیم: کامیابی کی کنجی",
    "blurb": "SDG-Millenium Development Goals/ Quality Education",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7884,7 +7884,7 @@
    "grade": 9,
    "number": 10,
    "title": "The Silent Predator and the Majestic Prey– Snow Leopard and Markhor",
-   "urduTitle": null,
+   "urduTitle": "خاموش شکاری اور شاندار شکار: برفانی چیتا اور مارخور",
    "blurb": "Nature and Natural Resources/ Wildlife Vignette",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -7941,7 +7941,7 @@
    "grade": 9,
    "number": 11,
    "title": "The Dear Departed (one-act play)",
-   "urduTitle": null,
+   "urduTitle": "مرحوم عزیز (یک بابی ڈرامہ)",
    "blurb": "Literature & Poetry/ Human Relationships",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
@@ -11027,7 +11027,7 @@
    "grade": 10,
    "number": 10,
    "title": "Thermal Physics",
-   "urduTitle": null,
+   "urduTitle": "تھرمل فزکس",
    "blurb": "Thermal Expansion, Specific Heat Capacity, Change in State, Evaporation, Latent Heat and Superconductivity.",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
@@ -11112,7 +11112,7 @@
    "grade": 10,
    "number": 11,
    "title": "Transfer of Thermal Energy",
-   "urduTitle": null,
+   "urduTitle": "حرارتی توانائی کی منتقلی",
    "blurb": "Conduction, Convection in liquids and Gases, Heat Transfer through Radiation and Greenhouse Effect.",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
@@ -11162,7 +11162,7 @@
    "grade": 10,
    "number": 12,
    "title": "Waves",
-   "urduTitle": null,
+   "urduTitle": "ویوز",
    "blurb": "Waves and Nature of Waves, Types of Waves, Terms and Parameters of Waves, Properties of Waves and Seismic and Tsunami Waves.",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
@@ -11293,7 +11293,7 @@
    "grade": 10,
    "number": 14,
    "title": "Light",
-   "urduTitle": null,
+   "urduTitle": "روشنی",
    "blurb": "Reflection of Light, Refraction of Light, Optical Fibre, Thin lenses, Optical devices, Image Formation in a Normal Eye and more.",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
@@ -11639,7 +11639,7 @@
    "grade": 10,
    "number": 18,
    "title": "Electromagnetic Induction and Electromagnetic Waves",
-   "urduTitle": null,
+   "urduTitle": "الیکٹرومیگنیٹک انڈکشن اور الیکٹرومیگنیٹک ویوز",
    "blurb": "Electromagnetic Induction, A.C. Generator, Transformer, Deflection of Electron Beam in Electric and Magnetic Fields, Waveform on Oscilloscope and more.",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
@@ -11860,7 +11860,7 @@
    "grade": 10,
    "number": 21,
    "title": "Space and Environment",
-   "urduTitle": null,
+   "urduTitle": "خلا اور ماحول",
    "blurb": "Sun and Planetary Data, Global Warming and Geothermal Activity and Radiation Exposure.",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
@@ -12929,7 +12929,7 @@
    "grade": 10,
    "number": 3,
    "title": "History of Pakistan (1947-Uptill Now) and Constitutional Development in Pakistan",
-   "urduTitle": null,
+   "urduTitle": "تاریخ پاکستان (1947 تا حال) اور پاکستان میں آئینی ترقی",
    "blurb": "Initial Challenges Confronted by Pakistan, (i) Distribution of Factories and Banks, ii) Distribution of Military Assets, iii) River Water Dispute and more.",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
@@ -13795,7 +13795,7 @@
    "grade": 10,
    "number": 4,
    "title": "Geography of Pakistan",
-   "urduTitle": null,
+   "urduTitle": "جغرافیہ پاکستان",
    "blurb": "Introduction, Location of Pakistan, Significance of Pakistan's Geographical Location in Terms of Its Geo-Political and Economic Importance and more.",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
@@ -13977,7 +13977,7 @@
    "grade": 10,
    "number": 5,
    "title": "Pakistan and International Affairs",
-   "urduTitle": null,
+   "urduTitle": "پاکستان اور بین الاقوامی امور",
    "blurb": "Foreign Policy of Pakistan, Importance of Foreign Policy of Pakistan, Guiding Principles of Foreign Policy, Objectives of Pakistan's Foreign Policy and more.",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
@@ -14236,7 +14236,7 @@
    "grade": 10,
    "number": 7,
    "title": "Population, Society and Cultural Diversity in Pakistan",
-   "urduTitle": null,
+   "urduTitle": "پاکستان میں آبادی، معاشرہ اور ثقافتی تنوع",
    "blurb": "Growth and Distribution of Population in Pakistan, Population Growth Rate, Province-wise Density of Population and more.",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",

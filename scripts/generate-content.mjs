@@ -723,7 +723,9 @@ const rows = (out, { chapter, subject, medium, status }) => {
  * was safe on disk, but a run should not need rescuing from one.
  */
 async function replaceRows(db, chapter, medium, tables) {
-  const flaky = (message) => /fetch failed|network|ECONNRESET|ETIMEDOUT|EAI_AGAIN|socket|terminated/i.test(message);
+  // A dropped connection, or the database's gateway giving up under load:
+  // both pass, and both are worth waiting out.
+  const flaky = (message) => /fetch failed|network|ECONNRESET|ETIMEDOUT|EAI_AGAIN|socket|terminated|gateway|timeout|50[234]/i.test(message);
   for (let attempt = 1; ; attempt++) {
     try {
       for (const table of Object.keys(tables)) {

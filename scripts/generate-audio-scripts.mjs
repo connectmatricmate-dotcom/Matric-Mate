@@ -6,6 +6,7 @@
  *   node scripts/generate-audio-scripts.mjs --subject phy   one subject
  *   node scripts/generate-audio-scripts.mjs --chapter phy-1 one chapter
  *   node scripts/generate-audio-scripts.mjs --force         rewrite even if a file exists
+ *   node scripts/generate-audio-scripts.mjs --board punjab  one board's chapters only
  *
  * One file per chapter and medium lands in content/generated/audio/
  * (<chapterId>-<en|ur>.txt, gitignored). generate-audio.mjs then validates,
@@ -17,12 +18,19 @@
  * lesson teaches exactly what the student's notes and paper cover, in the
  * same voice and length as the three lessons the client already approved.
  */
+import dns from 'node:dns';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import net from 'node:net';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
+
+// This network advertises IPv6 it cannot route; a connection that tries it
+// first fails as a bare "fetch failed". IPv4 only.
+dns.setDefaultResultOrder('ipv4first');
+net.setDefaultAutoSelectFamily(false);
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'content/generated/audio');
@@ -35,6 +43,7 @@ const flag = (n) => {
 const FORCE = args.includes('--force');
 const ONLY_SUBJECT = flag('subject');
 const ONLY_CHAPTER = flag('chapter');
+const ONLY_BOARD = flag('board');
 const CONCURRENCY = Number(flag('concurrency')) || 4;
 
 /** Same model as the tutor route: good in both languages, fast, affordable. */
@@ -88,6 +97,13 @@ function flatten(sections, cap = 24000) {
   }
   return parts.join('\n').slice(0, cap);
 }
+
+/**
+ * The lesson rules, said about the student's own board. FBISE's wording is
+ * exactly what it was; a Punjab lesson names the Punjab boards' paper, which
+ * all nine set from the same textbook.
+ */
+const rulesFor = (board) => RULES.replace('the annual FBISE paper', board === 'punjab' ? 'the annual Punjab board paper' : 'the annual FBISE paper');
 
 const RULES = `The text you write is fed DIRECTLY to a text-to-speech voice, so it must be pure speakable prose:
 - Plain paragraphs separated by blank lines. No headings, bullets, numbered lists, markdown, quotes of symbols, or stage directions.
@@ -144,7 +160,7 @@ async function writeLesson(chapter, medium, subjectName) {
     const response = await anthropic.messages.create({
       model: MODEL,
       max_tokens: 8000,
-      system: `You write spoken audio lesson scripts for MatricMate, an FBISE Class ${chapter.grade ?? 9} (SSC-${chapter.grade === 10 ? 'II' : 'I'}, Pakistan) exam-prep app.\n\n${RULES}\n\n${writeUrdu ? UR_RULES : EN_RULES}`,
+      system: `You write spoken audio lesson scripts for MatricMate, ${chapter.board === 'punjab' ? 'a Punjab Board' : 'an FBISE'} Class ${chapter.grade ?? 9} (SSC-${chapter.grade === 10 ? 'II' : 'I'}, Pakistan) exam-prep app.\n\n${rulesFor(chapter.board)}\n\n${writeUrdu ? UR_RULES : EN_RULES}`,
       messages: [
         {
           role: 'user',
@@ -176,12 +192,13 @@ async function main() {
 
   let q = db
     .from('chapters')
-    .select('id,subject_id,number,title,urdu_title,exam_share,exam_marks,grade')
+    .select('id,subject_id,number,title,urdu_title,exam_share,exam_marks,grade,board')
     .eq('review_status', 'published')
     .order('subject_id')
     .order('number');
   if (ONLY_SUBJECT) q = q.eq('subject_id', ONLY_SUBJECT);
   if (ONLY_CHAPTER) q = q.eq('id', ONLY_CHAPTER);
+  if (ONLY_BOARD) q = q.eq('board', ONLY_BOARD);
   const { data: chapters, error } = await q;
   if (error || !chapters?.length) {
     console.error(C.red(`no chapters matched${error ? `: ${error.message}` : ''}`));

@@ -32,11 +32,18 @@
  */
 
 import { execFile } from 'node:child_process';
+import dns from 'node:dns';
 import { mkdir, readFile, readdir, stat, unlink } from 'node:fs/promises';
+import net from 'node:net';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { createClient } from '@supabase/supabase-js';
+
+// This network advertises IPv6 it cannot route; uploads that try it first
+// fail as a bare "fetch failed". IPv4 only.
+dns.setDefaultResultOrder('ipv4first');
+net.setDefaultAutoSelectFamily(false);
 
 const run = promisify(execFile);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -100,7 +107,7 @@ const UNSPEAKABLE = [
   { re: /\b\d+\s*\/\s*\d+\b/, why: 'bare fraction, write it in words' },
   { re: /\^|\bm\/s\b|\bkg\b(?!\s*\()/, why: 'bare unit or exponent, write it in words' },
   { re: /[*_#`]|\[[^\]]*\]\(/, why: 'markdown, speak plain prose' },
-  { re: /—/, why: 'em dash, repo rule' },
+  { re: /\u2014/, why: 'em dash, repo rule' },
 ];
 
 function unspeakable(text) {

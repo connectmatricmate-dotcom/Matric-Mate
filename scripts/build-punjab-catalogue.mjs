@@ -42,6 +42,8 @@ import { join, resolve } from 'node:path';
 import { C, ROOT, scrubDashes } from './pdf-vision.mjs';
 
 const CONTENTS = resolve(ROOT, 'data/punjab/contents');
+/** Translated Urdu names (scripts/translate-punjab-titles.mjs), the last resort after any book's. */
+const TRANSLATED = resolve(ROOT, 'data/punjab/urdu-titles.json');
 const OUTCOMES = resolve(ROOT, 'data/punjab/outcomes');
 const OUT = resolve(ROOT, 'data/punjab/catalogue.json');
 
@@ -303,6 +305,7 @@ async function main() {
   const slos = [];
   const problems = [];
   const bookList = [];
+  const translated = (await readJson(TRANSLATED))?.titles ?? {};
 
   for (const [, group] of [...groups].sort(([a], [b]) => a.localeCompare(b))) {
     const primary = group[0];
@@ -370,7 +373,10 @@ async function main() {
       const printedIsUrdu = (printed.match(/[\u0600-\u06FF]/g)?.length ?? 0) > (printed.match(/[A-Za-z]/g)?.length ?? 0);
       const lesson = subject === 'urd' ? splitAuthor(printed, english) : null;
       const title = lesson?.english ?? (printedIsUrdu ? (english ?? printed) : printed);
-      const urduTitle = lesson?.urdu ?? (printedIsUrdu ? printed.replace(/\s{2,}/g, ' ') : urduFromBook);
+      // A book's name first, printed or Urdu-medium; a translation only where
+      // no book gives one, so a book that arrives later wins by itself.
+      const urduTitle =
+        lesson?.urdu ?? (printedIsUrdu ? printed.replace(/\s{2,}/g, ' ') : urduFromBook) ?? translated[`${subject}-pj-${grade}-${ch.number}`] ?? null;
 
       const topics = read.headings?.length ? topicsFrom(ch, read) : contentsTopics(entry);
       const id = `${subject}-pj-${grade}-${ch.number}`;
