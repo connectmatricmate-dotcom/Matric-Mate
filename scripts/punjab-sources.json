@@ -36,7 +36,6 @@
     "which is gitignored, exactly as content/fbise/ is. What lives in git is the",
     "structured JSON we derive."
   ],
-
   "textbooks": {
     "_comment": [
       "The syllabus itself, and the thing everything else is grounded in. PCTB's own",
@@ -54,9 +53,23 @@
       "exactly that reason. Do not use it as a source of structure."
     ],
     "have": [
-      "bio-9", "bio-10", "chem-9", "chem-10", "cs-9", "cs-10", "eng-9", "eng-10",
-      "isl-9", "isl-10", "math-9", "math-10", "phy-10", "pst-9", "pst-10",
-      "urd-9", "urd-10",
+      "bio-9",
+      "bio-10",
+      "chem-9",
+      "chem-10",
+      "cs-9",
+      "cs-10",
+      "eng-9",
+      "eng-10",
+      "isl-9",
+      "isl-10",
+      "math-9",
+      "math-10",
+      "phy-10",
+      "pst-9",
+      "pst-10",
+      "urd-9",
+      "urd-10",
       "Urdu medium, same edition as the English: bio-10-ur, chem-10-ur, cs-10-ur, math-9-ur, math-10-ur, pst-9-ur"
     ],
     "olderEditions": {
@@ -74,7 +87,6 @@
     "cs-10": "The English copy in hand starts at Unit 1 with no contents page; its chapters were located from the unit openings.",
     "fetchByHand": true
   },
-
   "paperPattern": {
     "_comment": [
       "Model papers stand in for FBISE's Table of Specification: they show the",
@@ -89,18 +101,53 @@
     ],
     "base": "https://www.bisegrw.edu.pk/download/Model_Paper/Matric/",
     "files": [
-      { "id": "model-phy", "subject": "phy", "path": "Physics.pdf" },
-      { "id": "model-chem", "subject": "chem", "path": "Chemistry.pdf" },
-      { "id": "model-bio", "subject": "bio", "path": "Biology.pdf" },
-      { "id": "model-math", "subject": "math", "path": "Mathematics (Compulsory) Science Group.pdf" },
-      { "id": "model-eng", "subject": "eng", "path": "English (Compulsory).pdf" },
-      { "id": "model-urd", "subject": "urd", "path": "Urdu (Coompulsory).pdf" },
-      { "id": "model-isl", "subject": "isl", "path": "Islamiyat (Compulsory).pdf" },
-      { "id": "model-pst", "subject": "pst", "path": "Pakistan Studies (Compulsory).pdf" },
-      { "id": "model-cs", "subject": "cs", "path": "Computer Science.pdf" }
+      {
+        "id": "model-phy",
+        "subject": "phy",
+        "path": "Physics.pdf"
+      },
+      {
+        "id": "model-chem",
+        "subject": "chem",
+        "path": "Chemistry.pdf"
+      },
+      {
+        "id": "model-bio",
+        "subject": "bio",
+        "path": "Biology.pdf"
+      },
+      {
+        "id": "model-math",
+        "subject": "math",
+        "path": "Mathematics (Compulsory) Science Group.pdf"
+      },
+      {
+        "id": "model-eng",
+        "subject": "eng",
+        "path": "English (Compulsory).pdf"
+      },
+      {
+        "id": "model-urd",
+        "subject": "urd",
+        "path": "Urdu (Coompulsory).pdf"
+      },
+      {
+        "id": "model-isl",
+        "subject": "isl",
+        "path": "Islamiyat (Compulsory).pdf"
+      },
+      {
+        "id": "model-pst",
+        "subject": "pst",
+        "path": "Pakistan Studies (Compulsory).pdf"
+      },
+      {
+        "id": "model-cs",
+        "subject": "cs",
+        "path": "Computer Science.pdf"
+      }
     ]
   },
-
   "schemeOfStudies": {
     "_comment": [
       "Which subjects belong to which group, and the marks each carries. Nine pages,",
@@ -109,23 +156,65 @@
     "url": "https://bisesahiwal.edu.pk/downloads/NewGroups.pdf",
     "session": "2025-26"
   },
-
   "pastPapers": {
     "_comment": [
-      "The one thing that genuinely differs per board, and the richest signal we",
-      "have. Multan publishes real question papers WITH official answer keys going",
-      "back years, which is what lets us weight topics by how often the board has",
-      "actually examined them rather than by a declared specification.",
-      "",
-      "Lahore does not publish a searchable archive, so Multan is the default and",
-      "Sahiwal the cross-check."
+      "Researched board by board on 11 September 2026; the links students see are in data/punjab/papers.json.",
+      "Only official board sources, as with FBISE. Some boards post files on Google Drive from their official pages; those count as the board's own uploads.",
+      "Topper answer scripts: none of the nine boards publishes any, only position-holder name lists.",
+      "BISE Lahore notice 63-CE/P (24 March 2025) bars sharing old papers, guess papers and pairing schemes in social media groups. Linking to the boards' own files is not that, but the client knows."
     ],
     "boards": [
-      { "id": "multan", "name": "BISE Multan", "class9": "https://web.bisemultan.edu.pk/past-papers-9th/", "class10": "https://web.bisemultan.edu.pk/past-papers-10th/", "hasAnswerKeys": true },
-      { "id": "sahiwal", "name": "BISE Sahiwal", "answerKeys": "https://bisesahiwal.edu.pk/answerkeys.php", "hasAnswerKeys": true }
+      {
+        "id": "multan",
+        "name": "BISE Multan",
+        "class9": "https://web.bisemultan.edu.pk/past-papers-9th/",
+        "class10": "https://web.bisemultan.edu.pk/past-papers-10th/",
+        "publishes": "papers with official answer keys, 2016 to 2018 and 2025 to 2026; 2019 to 2024 are Drive files Google has blocked"
+      },
+      {
+        "id": "sargodha",
+        "name": "BISE Sargodha",
+        "keys": "https://bisesargodha.edu.pk/content/ViewThePaperKeys.aspx?ClassName=9th",
+        "publishes": "2025 papers as page images, with official MCQ keys and subjective marking schemes"
+      },
+      {
+        "id": "rawalpindi",
+        "name": "BISE Rawalpindi",
+        "publishes": "one PDF per subject compiling 2015 to 2019"
+      },
+      {
+        "id": "lahore",
+        "name": "BISE Lahore",
+        "publishes": "model papers only"
+      },
+      {
+        "id": "faisalabad",
+        "name": "BISE Faisalabad",
+        "publishes": "model papers only, on Google Drive"
+      },
+      {
+        "id": "gujranwala",
+        "name": "BISE Gujranwala",
+        "publishes": "model papers only"
+      },
+      {
+        "id": "bahawalpur",
+        "name": "BISE Bahawalpur",
+        "publishes": "model papers only"
+      },
+      {
+        "id": "sahiwal",
+        "name": "BISE Sahiwal",
+        "answerKeys": "https://bisesahiwal.edu.pk/answerkeys.php",
+        "publishes": "papers with keys, but only inside ZIP/RAR archives of 83 MB to 1.38 GB, so not linked"
+      },
+      {
+        "id": "dgkhan",
+        "name": "BISE DG Khan",
+        "publishes": "nothing"
+      }
     ]
   },
-
   "stillNeeded": {
     "_comment": [
       "Named here rather than guessed at, so the gap stays visible.",

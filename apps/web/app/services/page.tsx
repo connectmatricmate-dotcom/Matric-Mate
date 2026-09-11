@@ -39,7 +39,7 @@ const SERVICES: { name: string; what: string }[] = [
   },
   {
     name: 'Past papers',
-    what: 'A directory of FBISE past papers and topper scripts, linked to the board’s own published copies so you are always reading the original.',
+    what: 'A directory of past papers from FBISE and the Punjab boards, plus FBISE topper scripts, linked to each board’s own published copies so you are always reading the original.',
   },
   {
     name: 'AI tutor',
