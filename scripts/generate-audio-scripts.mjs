@@ -45,6 +45,14 @@ const ONLY_SUBJECT = flag('subject');
 const ONLY_CHAPTER = flag('chapter');
 const ONLY_BOARD = flag('board');
 const CONCURRENCY = Number(flag('concurrency')) || 4;
+/**
+ * A ceiling in US dollars for this run, at Sonnet's list price. No new lesson
+ * starts once it is reached. The key is the client's, and it also pays for
+ * every student's AI tutor; the client sets how low it may go.
+ */
+const MAX_SPEND = Number(flag('max-spend')) || 0;
+const spent = { input: 0, output: 0 };
+const costSoFar = () => (spent.input * 2 + spent.output * 10) / 1e6;
 
 /** Same model as the tutor route: good in both languages, fast, affordable. */
 const MODEL = 'claude-sonnet-5';
@@ -168,6 +176,8 @@ async function writeLesson(chapter, medium, subjectName) {
         },
       ],
     });
+    spent.input += response.usage?.input_tokens ?? 0;
+    spent.output += response.usage?.output_tokens ?? 0;
     if (response.stop_reason === 'refusal') return { label, status: 'refused' };
     const script = (response.content.find((b) => b.type === 'text')?.text ?? '').trim();
 
@@ -205,19 +215,30 @@ async function main() {
     process.exit(1);
   }
 
-  const jobs = chapters.flatMap((ch) => ['en', 'ur'].map((medium) => ({ ch, medium })));
+  // A language subject is taught in its own language whatever the student's
+  // medium: Urdu in Urdu, English in English, and Punjab's Islamiyat in Urdu,
+  // the only language its book exists in. So it gets one lesson, in that
+  // language. The player falls back to whatever track a chapter has
+  // (pickAudioTrack in core), so every student hears that one.
+  const oneLanguage = (ch) => ({ urd: 'ur', eng: 'en' })[ch.subject_id] ?? (ch.board === 'punjab' && ch.subject_id === 'isl' ? 'ur' : null);
+  const jobs = chapters.flatMap((ch) => (oneLanguage(ch) ? [oneLanguage(ch)] : ['en', 'ur']).map((medium) => ({ ch, medium })));
   console.log(C.bold(`\n  ${jobs.length} lessons to write (${chapters.length} chapters)\n`));
 
   const started = Date.now();
   let done = 0;
   let skipped = 0;
   let failed = 0;
+  let capped = 0;
   let i = 0;
 
   const worker = async () => {
     for (;;) {
       const job = jobs[i++];
       if (!job) return;
+      if (MAX_SPEND && costSoFar() >= MAX_SPEND && !existsSync(resolve(OUT, `${job.ch.id}-${job.medium}.txt`))) {
+        capped++;
+        continue;
+      }
       try {
         const r = await writeLesson(job.ch, job.medium, names.get(job.ch.subject_id) ?? job.ch.subject_id);
         if (r.status === 'ok') {
@@ -239,7 +260,9 @@ async function main() {
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
   const mins = ((Date.now() - started) / 60000).toFixed(1);
-  console.log(C.bold(`\n  written ${done} · already there ${skipped} · failed ${failed} · ${mins} min\n`));
+  console.log(C.bold(`\n  written ${done} · already there ${skipped} · failed ${failed} · ${mins} min`));
+  console.log(C.dim(`  ${spent.input.toLocaleString()} tokens in, ${spent.output.toLocaleString()} out, about $${costSoFar().toFixed(2)} at list price\n`));
+  if (capped) console.log(`  ${capped} lessons not started: the $${MAX_SPEND} ceiling was reached\n`);
   if (failed) process.exit(1);
 }
 

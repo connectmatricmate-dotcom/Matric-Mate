@@ -85,6 +85,17 @@ const BOARD = (() => {
 const PUNJAB = BOARD === 'punjab';
 const BOARD_LABEL = PUNJAB ? 'Punjab board' : 'FBISE';
 
+/**
+ * Subjects taught in one language whatever the student's medium: Urdu in
+ * Urdu, English in English, and Punjab's Islamiyat in Urdu, the only language
+ * its book exists in. English notes on an Urdu poem, or Urdu notes on an
+ * English essay, teach nobody. Such a subject is generated once, in its own
+ * language, and the same content is written under both mediums, so every
+ * screen and query that asks by medium finds it and none shows the wrong one.
+ */
+const oneLanguage = (subject) => ({ urd: 'ur', eng: 'en' })[subject] ?? (PUNJAB && subject === 'isl' ? 'ur' : null);
+const otherMedium = (medium) => (medium === 'en' ? 'ur' : 'en');
+
 const DATA = resolve(ROOT, GRADE === 10 ? 'data/fbise/ssc2' : 'data/fbise');
 const MAPDIR = resolve(DATA, 'mapping');
 const GENDIR = PUNJAB
@@ -810,6 +821,7 @@ async function insertFromDisk(db, doc, chapters, slos, mapping, STATUS) {
     if (!mine.length) continue;
 
     for (const medium of MEDIA) {
+      if (oneLanguage(doc.subject) && medium !== oneLanguage(doc.subject)) continue;
       const file = resolve(GENDIR, `${chapter.id}-${medium}.json`);
       const label = `${chapter.id}/${medium}`;
       let raw;
@@ -830,6 +842,10 @@ async function insertFromDisk(db, doc, chapters, slos, mapping, STATUS) {
       try {
         if (!DRY) {
           await replaceRows(db, chapter, medium, tables);
+          if (oneLanguage(doc.subject) === medium) {
+            const other = otherMedium(medium);
+            await replaceRows(db, chapter, other, rows(clean, { chapter, subject: doc, medium: other, status: STATUS }));
+          }
         }
         written++;
         const counts = Object.entries(tables).map(([t, r]) => `${r.length} ${t.replace('chapter_', '')}`);
@@ -977,7 +993,10 @@ async function main() {
         console.log(`${C.dim('  --  ')} ${chapter.id.padEnd(10)} ${C.dim('no outcomes mapped here')}`);
         continue;
       }
-      for (const medium of MEDIA) jobs.push({ doc, chapter, mine, medium });
+      for (const medium of MEDIA) {
+        if (oneLanguage(doc.subject) && medium !== oneLanguage(doc.subject)) continue;
+        jobs.push({ doc, chapter, mine, medium });
+      }
     }
   }
 
@@ -1036,6 +1055,10 @@ async function main() {
         // regeneration a clean replacement rather than two overlapping
         // sets of questions for the same chapter.
         await replaceRows(db, chapter, medium, tables);
+        if (oneLanguage(doc.subject) === medium) {
+          const other = otherMedium(medium);
+          await replaceRows(db, chapter, other, rows(clean, { chapter, subject: doc, medium: other, status: STATUS }));
+        }
       }
       written++;
       console.log(
