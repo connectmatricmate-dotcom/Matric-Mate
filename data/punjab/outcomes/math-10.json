@@ -1,0 +1,1158 @@
+{
+  "source": "content/punjab/textbooks/math-10.pdf",
+  "subject": "math",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 248,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    2
+  ],
+  "backMatterStart": 214,
+  "locateNotes": "Openers are shaded full-page banners with 'Students' Learning Outcomes' and 'Introduction'. PDF pages run 2 ahead of printed page numbers (printed 1 = pdf 3). Back matter: Answers start pdf 214, Glossary pdf 239, Symbols pdf 243, Pairing scheme/Model paper pdf 244 onward.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Complex Numbers",
+      "titleEn": null,
+      "pdfStart": 3,
+      "pdfEnd": 23,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Complex Numbers",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Identify complex numbers, complex conjugate, absolute value or modulus of a complex number.",
+          "Apply algebraic properties and perform basic operations on complex numbers.",
+          "Demonstrate additive identity and multiplicative identity for the set of complex numbers.",
+          "Find additive inverse and multiplicative inverse of a complex number z.",
+          "Demonstrate the following properties of a complex number z.",
+          "Apply the Geometric interpretation of a complex number, modulus of a complex number and algebraic operations of a complex number.",
+          "Find real and imaginary parts of complex numbers of the type (x + iy)^n and (x1 + iy1 / x2 + iy2)^n , x2 + iy2 ≠ 0, where n = ±1 and n = ±2.",
+          "Solve the simultaneous linear equations with complex coefficients."
+        ],
+        "headings": [
+          {
+            "number": "1.1",
+            "title": "Complex Numbers",
+            "pdfPage": 4
+          },
+          {
+            "number": "1.1.1",
+            "title": "Rectangular Form of a Complex Number",
+            "pdfPage": 5
+          },
+          {
+            "number": "1.1.2",
+            "title": "Equality of Complex Numbers",
+            "pdfPage": 5
+          },
+          {
+            "number": "1.2",
+            "title": "Algebraic Operations on Complex Numbers",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.2.1",
+            "title": "Scalar Multiplication of Complex Numbers",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.2.2",
+            "title": "Addition of Two Complex Numbers",
+            "pdfPage": 7
+          },
+          {
+            "number": "1.2.3",
+            "title": "Subtraction of Two Complex Numbers",
+            "pdfPage": 7
+          },
+          {
+            "number": "1.2.4",
+            "title": "Multiplication of Two Complex Numbers",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.2.5",
+            "title": "Division of Two Complex Numbers",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.2.6",
+            "title": "Properties of Complex Numbers",
+            "pdfPage": 9
+          },
+          {
+            "number": "1.3",
+            "title": "Complex or Argand Plane",
+            "pdfPage": 11
+          },
+          {
+            "number": "1.3.1",
+            "title": "Conjugate of a Complex Number",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.3.2",
+            "title": "Geometrical Representation of Conjugate of a Complex Number",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.3.3",
+            "title": "Properties of Complex Conjugate",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.4",
+            "title": "Modulus of a Complex Number",
+            "pdfPage": 16
+          },
+          {
+            "number": "1.4.1",
+            "title": "Properties of Modulus of a Complex Number",
+            "pdfPage": 16
+          },
+          {
+            "number": "1.5",
+            "title": "Finding Real and Imaginary Parts of Complex Number of (x + iy)^n and (x1 + iy1 / x2 + iy2)^n, where x2 + iy2 ≠ 0 and n = ±1 and n = ±2",
+            "pdfPage": 18
+          },
+          {
+            "number": "1.6",
+            "title": "Solution of Simultaneous Linear Equations with Complex Coefficients",
+            "pdfPage": 21
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 2,
+      "title": "Quadratic Equations and Inequalities",
+      "titleEn": null,
+      "pdfStart": 24,
+      "pdfEnd": 48,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Quadratic Equations and Inequalities",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Solve quadratic equations of the form ax²+bx+c=0, a(≠ 0), b, c are real numbers by factorization, quadratic formula, completing square and graphs.",
+          "Find the intersecting point graphically when intersection occurs between\n◦ a linear function and coordinate axes.  ◦ two linear functions.\n◦ a linear and a quadratic function.",
+          "Sketch and interpret the graphs of the quadratic function y = ax²+bx+c, a(≠ 0), b and c are real numbers.",
+          "Establish relationship between roots and coefficients of quadratic equations.",
+          "Form a quadratic equation when roots are given.",
+          "Find discriminant of a given quadratic equation.",
+          "Identify the nature of roots of a quadratic equation through discriminant.",
+          "Solve quadratic inequalities in one unknown.",
+          "Solve problems of \"changing the subject of formula\".",
+          "Solve fractional equations that can be reduced to quadratic equations.",
+          "Apply the concept of quadratic equations and quadratic inequalities, to real world problems (such as in physics, engineering and finance, i.e. calculating max and min heights in projectile motion, determining the maximum price on a company’s budget, stability of population, growth of business, the relationship between hours worked and amount earned etc.)."
+        ],
+        "headings": [
+          {
+            "number": "2.1",
+            "title": "Quadratic Equation",
+            "pdfPage": 25
+          },
+          {
+            "number": "2.1.1",
+            "title": "Solution of Quadratic Equation of the Form ax² + bx + c = 0, where a, b, c ∈ R and a ≠ 0",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Factorization Method",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Solution of a Quadratic Equation by Completing Square Method",
+            "pdfPage": 27
+          },
+          {
+            "number": null,
+            "title": "Solution of a Quadratic Equation by Quadratic Formula",
+            "pdfPage": 28
+          },
+          {
+            "number": null,
+            "title": "Derivation of Quadratic Formula by Completing Square Method",
+            "pdfPage": 28
+          },
+          {
+            "number": null,
+            "title": "Solution of Quadratic Equation by Graphs",
+            "pdfPage": 29
+          },
+          {
+            "number": "2.2",
+            "title": "Finding Intersection Point(s) Graphically",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.2.1",
+            "title": "Finding Points of Intersection of a Linear Function and Coordinate Axes Graphically",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.2.2",
+            "title": "Finding Point of Intersection of Two Linear Functions Graphically",
+            "pdfPage": 32
+          },
+          {
+            "number": "2.2.3",
+            "title": "Finding Points of Intersection of a Linear Function and a Quadratic Function Graphically",
+            "pdfPage": 33
+          },
+          {
+            "number": "2.3",
+            "title": "Relationship Between the Roots and Coefficients of a Quadratic Equation",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.3.1",
+            "title": "Form a Quadratic Equation When Roots are Given",
+            "pdfPage": 36
+          },
+          {
+            "number": "2.4",
+            "title": "Discriminant of a Quadratic Equation",
+            "pdfPage": 39
+          },
+          {
+            "number": "2.4.1",
+            "title": "Nature of the Roots of a Quadratic Equation",
+            "pdfPage": 39
+          },
+          {
+            "number": "2.5",
+            "title": "Solution of Quadratic Inequalities in One Unknown",
+            "pdfPage": 41
+          },
+          {
+            "number": "2.6",
+            "title": "Changing the Subject of Formula",
+            "pdfPage": 43
+          },
+          {
+            "number": "2.7",
+            "title": "Applications of Quadratic Equation in Real World",
+            "pdfPage": 45
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 3,
+      "title": "Matrices and Determinants",
+      "titleEn": null,
+      "pdfStart": 49,
+      "pdfEnd": 82,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Matrices and Determinants",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Display information in the form of matrix of order 2.",
+          "Solve situations involving sum, difference and product of two matrices.",
+          "Calculate the product of the scalar quantity and a matrix.",
+          "Evaluate the determinant and inverse of a matrix of order 2-by-2.",
+          "Solve the simultaneous linear equations in two variables using matrix inversion method and Cramer's rule.",
+          "Explain, with examples, how mathematics plays a key role in the development of new scientific theories and technologies. (e.g., Mathematical models and simulations are used to design and optimize new materials and drugs, and to understand the behaviours of complex systems such as the human brain).",
+          "Apply concepts of matrices to real world problems (such as engineering, economics, computer graphics and physics)."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 49
+          },
+          {
+            "number": "3.1",
+            "title": "Matrices",
+            "pdfPage": 49
+          },
+          {
+            "number": "3.1.1",
+            "title": "Rows and Columns of a Matrix",
+            "pdfPage": 50
+          },
+          {
+            "number": "3.1.2",
+            "title": "Elements or Entries",
+            "pdfPage": 50
+          },
+          {
+            "number": "3.1.3",
+            "title": "Order or Size of a Matrix",
+            "pdfPage": 50
+          },
+          {
+            "number": "3.1.4",
+            "title": "Equal Matrices",
+            "pdfPage": 51
+          },
+          {
+            "number": "3.2",
+            "title": "Types of Matrices",
+            "pdfPage": 52
+          },
+          {
+            "number": "3.3",
+            "title": "Algebraic Operations on Matrices",
+            "pdfPage": 55
+          },
+          {
+            "number": "3.3.1",
+            "title": "Multiplication of a Matrix by a Scalar",
+            "pdfPage": 55
+          },
+          {
+            "number": "3.3.2",
+            "title": "Addition of Matrices",
+            "pdfPage": 56
+          },
+          {
+            "number": "3.3.3",
+            "title": "Subtraction of Matrices",
+            "pdfPage": 56
+          },
+          {
+            "number": "3.3.4",
+            "title": "Commutative and Associative Laws of Addition of Matrices",
+            "pdfPage": 57
+          },
+          {
+            "number": "3.3.5",
+            "title": "Additive Identity of a Matrix",
+            "pdfPage": 58
+          },
+          {
+            "number": "3.3.6",
+            "title": "Additive Inverse of a Matrix",
+            "pdfPage": 59
+          },
+          {
+            "number": "3.4",
+            "title": "Multiplication of Matrices",
+            "pdfPage": 61
+          },
+          {
+            "number": "3.4.1",
+            "title": "Commutative Law of Multiplication of Matrices",
+            "pdfPage": 63
+          },
+          {
+            "number": "3.4.2",
+            "title": "Associative Law of Multiplication of Matrices",
+            "pdfPage": 64
+          },
+          {
+            "number": "3.4.3",
+            "title": "Distributive Laws of Multiplication Over Addition and Subtraction",
+            "pdfPage": 64
+          },
+          {
+            "number": "3.4.4",
+            "title": "Multiplicative Identity of a Matrix",
+            "pdfPage": 66
+          },
+          {
+            "number": "3.5",
+            "title": "Multiplicative Inverse of a Matrix",
+            "pdfPage": 67
+          },
+          {
+            "number": "3.5.1",
+            "title": "Determinant of a Matrix of Order 2",
+            "pdfPage": 67
+          },
+          {
+            "number": "3.5.2",
+            "title": "Singular and Non-Singular Matrices",
+            "pdfPage": 68
+          },
+          {
+            "number": "3.5.3",
+            "title": "Adjoint of a Matrix",
+            "pdfPage": 68
+          },
+          {
+            "number": "3.5.4",
+            "title": "Multiplicative Inverse of a Non-Singular Matrix",
+            "pdfPage": 68
+          },
+          {
+            "number": "3.5.5",
+            "title": "Adjoint Method to Find Inverse of a Square Matrix",
+            "pdfPage": 69
+          },
+          {
+            "number": "3.6",
+            "title": "Solution of Simultaneous Linear Equations",
+            "pdfPage": 72
+          },
+          {
+            "number": "3.6.1",
+            "title": "Matrix Inversion Method",
+            "pdfPage": 73
+          },
+          {
+            "number": "3.6.2",
+            "title": "Cramer's Rule",
+            "pdfPage": 75
+          },
+          {
+            "number": "3.7",
+            "title": "Applications of Matrices in Real World Problems",
+            "pdfPage": 77
+          },
+          {
+            "number": "3.8",
+            "title": "The Role of Mathematics in Scientific Theories and Technological Advancement",
+            "pdfPage": 79
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 4,
+      "title": "Functions and Graphs",
+      "titleEn": null,
+      "pdfStart": 83,
+      "pdfEnd": 98,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Functions and Graphs",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Explain operations on functions and compositions of functions.",
+          "Define inverse functions and demonstrate their domain and range with examples.",
+          "Formulate composite functions as defined by (f o g)(x) = f (g(x)).",
+          "Apply concepts from functions to real-world problems (such as finance, transportation and sales).",
+          "Plot graphs of absolute valued functions.",
+          "Solve absolute value linear equations and inequalities in one variable and express the solution as a range of values on a number line.",
+          "Apply concepts of absolute valued functions to real-world problems (such as to calculate energy wave, magnitude and distance)."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 83
+          },
+          {
+            "number": "4.1",
+            "title": "Function",
+            "pdfPage": 83
+          },
+          {
+            "number": "4.1.1",
+            "title": "Operations on Functions",
+            "pdfPage": 85
+          },
+          {
+            "number": "4.1.2",
+            "title": "Composition of Functions",
+            "pdfPage": 86
+          },
+          {
+            "number": "4.1.3",
+            "title": "Inverse Function",
+            "pdfPage": 87
+          },
+          {
+            "number": "4.1.4",
+            "title": "Vertical Line Test",
+            "pdfPage": 88
+          },
+          {
+            "number": "4.1.5",
+            "title": "Horizontal Line Test",
+            "pdfPage": 89
+          },
+          {
+            "number": "4.2",
+            "title": "Graphs of Absolute Valued Functions",
+            "pdfPage": 92
+          },
+          {
+            "number": "4.3",
+            "title": "Solution of Absolute Valued Linear Equation in One Variable",
+            "pdfPage": 93
+          },
+          {
+            "number": "4.4",
+            "title": "Solution of Absolute Value Linear Inequality in One Variable",
+            "pdfPage": 94
+          },
+          {
+            "number": "4.5",
+            "title": "Solving Real-Life Problems Involving Function",
+            "pdfPage": 95
+          },
+          {
+            "number": "4.6",
+            "title": "Solving Real-Life Problems Involving Absolute Valued Functions",
+            "pdfPage": 96
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 5,
+      "title": "Algebraic Fractions",
+      "titleEn": null,
+      "pdfStart": 99,
+      "pdfEnd": 112,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Algebraic Fractions",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Describe rational expressions.",
+          "Factorize and simplify rational expressions.",
+          "Demonstrate manipulation of algebraic fractions.",
+          "Perform operations on rational expressions (limited to numerators and denominators that are monomials, binomials or trinomials).",
+          "Solve different types of equations reducible to quadratic form of the type: Exponential Equation; Reciprocal Equation; ax^{2n} + bx^n + c = 0; a ≠ 0, n = 2; (x + a)(x + b)(x + c)(x + d) = k, where a + b = c + d",
+          "Apply the concept of rational equations (limited to numerators and denominators that are monomials, binomials or trinomials) to real-world problems (such as the amount of work a person can do in certain amount of time, rates and work)."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 99
+          },
+          {
+            "number": "5.1",
+            "title": "Algebraic Fraction",
+            "pdfPage": 99
+          },
+          {
+            "number": "5.1.1",
+            "title": "Rational Expression",
+            "pdfPage": 100
+          },
+          {
+            "number": "5.1.2",
+            "title": "Simplification of Rational Expressions",
+            "pdfPage": 100
+          },
+          {
+            "number": "5.2",
+            "title": "Manipulation of Rational Expressions",
+            "pdfPage": 101
+          },
+          {
+            "number": "5.2.1",
+            "title": "Addition and Subtraction of Rational Expressions with Unlike Denominators",
+            "pdfPage": 101
+          },
+          {
+            "number": "5.2.2",
+            "title": "Multiplication and Division of Rational Expressions",
+            "pdfPage": 103
+          },
+          {
+            "number": "5.3",
+            "title": "Solution of Equations Reducible to Quadratic Equations",
+            "pdfPage": 105
+          },
+          {
+            "number": "5.4",
+            "title": "Real World Problems",
+            "pdfPage": 109
+          }
+        ],
+        "notes": "In 5.2.2, sub-labels 'a Multiplication' and 'b Division' appear as small unnumbered sub-headings on image 5; these are not included as separate numbered headings. Example numbering and exercise numbering are excluded per instructions."
+      }
+    },
+    {
+      "number": 6,
+      "title": "Vectors in Plane",
+      "titleEn": null,
+      "pdfStart": 113,
+      "pdfEnd": 126,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Vectors in Plane",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Introduce a rectangular coordinate system in the plane.",
+          "Represent vectors as directed line segment.",
+          "Express a vector in terms of two non-zero and non-parallel coplanar vectors.",
+          "Express a vector in terms of a position vector.",
+          "Express translation by a vector.",
+          "Find the magnitude of a vector.",
+          "Add and subtract vectors.",
+          "Multiply a vector by a scalar.",
+          "Solve geometrical problems involving the use of vectors.",
+          "Apply concepts from geometrical problems involving the use of vectors (such as parallel and perpendicular lines in geometrical shapes, vector projectile motion, crosswinds aviation, military usage and designing roller coasters)."
+        ],
+        "headings": [
+          {
+            "number": "6.1",
+            "title": "Rectangular Coordinate Plane",
+            "pdfPage": 114
+          },
+          {
+            "number": "6.2",
+            "title": "Scalars and Vectors",
+            "pdfPage": 114
+          },
+          {
+            "number": "6.2.1",
+            "title": "Representation of a Vector as Directed Line Segment",
+            "pdfPage": 115
+          },
+          {
+            "number": "6.2.2",
+            "title": "Vectors and Coordinates",
+            "pdfPage": 115
+          },
+          {
+            "number": "6.2.3",
+            "title": "Position Vectors",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.2.4",
+            "title": "Magnitude of a Vector",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.2.5",
+            "title": "Scalar Multiplication of a Vector",
+            "pdfPage": 117
+          },
+          {
+            "number": "6.2.6",
+            "title": "Unit Vector",
+            "pdfPage": 117
+          },
+          {
+            "number": "6.3",
+            "title": "Addition of Vectors",
+            "pdfPage": 119
+          },
+          {
+            "number": "6.4",
+            "title": "Difference of Two Vectors",
+            "pdfPage": 120
+          },
+          {
+            "number": "6.5",
+            "title": "Vector in Terms of Two Non-Zero and Non-Parallel Coplanar Vectors",
+            "pdfPage": 120
+          },
+          {
+            "number": "6.6",
+            "title": "Translation by a Vector",
+            "pdfPage": 121
+          },
+          {
+            "number": "6.7",
+            "title": "Solution and Application of Geometric Problems Involving Vectors",
+            "pdfPage": 122
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 7,
+      "title": "Trigonometry",
+      "titleEn": null,
+      "pdfStart": 127,
+      "pdfEnd": 144,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Trigonometry",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Extend sine and cosine functions to angles between 90° and 180°.",
+          "Solve problems using the laws of sine, cosine and the area formulas for any triangle.",
+          "Solve simple trigonometric problems in three dimensions.",
+          "Apply concepts of trigonometry to real life world problems (such as video games, flight engineering, navigation and sound waves).",
+          "Interpret and use three figure bearings.",
+          "Solve real life problems involving bearing.",
+          "Apply the concepts of bearing to real world problems."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 127
+          },
+          {
+            "number": "7.1",
+            "title": "Trigonometric Ratios or Functions",
+            "pdfPage": 127
+          },
+          {
+            "number": "7.1.1",
+            "title": "Trigonometric Values for Special Angles",
+            "pdfPage": 128
+          },
+          {
+            "number": "7.1.2",
+            "title": "Signs of Trigonometric Functions",
+            "pdfPage": 128
+          },
+          {
+            "number": "7.1.3",
+            "title": "Trigonometric Ratios of 0°, 90° and 180°",
+            "pdfPage": 130
+          },
+          {
+            "number": "7.1.4",
+            "title": "Extending sine and cosine Functions to Angles Between 90° and 180°",
+            "pdfPage": 131
+          },
+          {
+            "number": "7.2",
+            "title": "Oblique Triangles",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.2.1",
+            "title": "The Law of sines",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.2.2",
+            "title": "The Law of cosines",
+            "pdfPage": 135
+          },
+          {
+            "number": "7.2.3",
+            "title": "Area of a Triangle",
+            "pdfPage": 135
+          },
+          {
+            "number": "7.3",
+            "title": "Solve Simple Trigonometric Problems in Three Dimensions",
+            "pdfPage": 137
+          },
+          {
+            "number": "7.4",
+            "title": "Concept of Trigonometry in Real Life",
+            "pdfPage": 138
+          },
+          {
+            "number": "7.5",
+            "title": "Three Figure Bearing and its Applications",
+            "pdfPage": 141
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 8,
+      "title": "Chords and Arcs of a Circle",
+      "titleEn": null,
+      "pdfStart": 145,
+      "pdfEnd": 156,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Chords and Arcs of a Circle",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Solve problems by using the properties of a circle:",
+          "One and only one circle can pass through three non- collinear points.",
+          "A straight line, drawn from the centre of a circle to bisect a chord (which is not a diameter) is perpendicular to the chord.",
+          "Perpendicular from the centre of a circle on a chord bisects it.",
+          "If two chords of a circle are congruent, then they will be equidistant from the centre.",
+          "Two chords of a circle which are equidistant from the centre are congruent.",
+          "If two arcs of a circle (or of congruent circles) are congruent, then the corresponding chords are equal.",
+          "If two chords of a circle (or of congruent circles) are equal, then their corresponding arcs (minor, major or semi-circular) are congruent.",
+          "Equal chords of a circle (or of congruent circles) subtend equal angles at the centre (at the corresponding centres).",
+          "If the angles subtended by two chords of a circle (or congruent circles) at the centre (corresponding centres) are equal, then the chords are equal.",
+          "Apply concepts of chords and arcs of a circle to real life world problems (such as decorative features, rainbow, bridges, roller coaster track)."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Circle and its Components",
+            "pdfPage": 146
+          },
+          {
+            "number": "8.1",
+            "title": "Theorems (Properties) of a Circle",
+            "pdfPage": 149
+          },
+          {
+            "number": "8.1.1",
+            "title": "One and Only One Circle Can Pass Through Any Three Non-Collinear Points.",
+            "pdfPage": 149
+          },
+          {
+            "number": "8.1.2",
+            "title": "A Straight Line, Drawn from the Centre of a Circle to Bisect a Chord (which is not a diameter) is Perpendicular to the Chord.",
+            "pdfPage": 150
+          },
+          {
+            "number": "8.1.3",
+            "title": "Perpendicular from the Centre of a Circle on a Chord Bisects it.",
+            "pdfPage": 150
+          },
+          {
+            "number": "8.1.4",
+            "title": "If Two Chords of a Circle Are Congruent, then they will be Equidistant from the Centre.",
+            "pdfPage": 151
+          },
+          {
+            "number": "8.1.5",
+            "title": "Two Chords of a Circle which are Equidistant from the Centre of a Circle, are Congruent.",
+            "pdfPage": 151
+          },
+          {
+            "number": "8.1.6",
+            "title": "If Two Arcs of a Circle (or of Congruent Circles) are Congruent, then the Corresponding Chords are Equal.",
+            "pdfPage": 153
+          },
+          {
+            "number": "8.1.7",
+            "title": "If Two Chords of a Circle (or of Congruent Circles) are Congruent (Equal in Measurement) then their Corresponding Arcs (Minor, Major) are Congruent.",
+            "pdfPage": 153
+          },
+          {
+            "number": "8.1.8",
+            "title": "Equal Chords of a Circle (or of Congruent Circles) Subtend Equal Angles at the Centre (at the corresponding Centres).",
+            "pdfPage": 154
+          },
+          {
+            "number": "8.1.9",
+            "title": "If the Angles Subtended by Two Chords of a Circle (or Congruent Circles) at the Centre (Corresponding Centres) are Equal, then the Chords are Equal.",
+            "pdfPage": 154
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 9,
+      "title": "Tangent and Angles of a Circle",
+      "titleEn": null,
+      "pdfStart": 157,
+      "pdfEnd": 169,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Tangent and Angles of a Circle",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Solve problems by using the tangent and angle properties of a circle:\n◦ If a line is drawn perpendicular to a radial segment of a circle at its outer end point, it is tangent to the circle at that point.\n◦ The tangent to a circle and the radial segment joining the point of contact and the centre are perpendicular to each other.\n◦ The two tangents drawn to a circle from a point outside it, are equal in length.\n◦ If two circles touch externally or internally, then the distance between their centres is respectively equal to the sum or difference of their radii.\n◦ The measure of a central angle of a minor arc of a circle is double that of the angle subtended by the corresponding major arc.\n◦ Any two angles in the same segment of a circle are equal.\n◦ The angle in a semi-circle is a right angle, in a segment greater than a semi-circle is less than a right angle, in a segment less than a semi-circle is greater than a right angle.\n◦ The opposite angles of any quadrilateral inscribed in a circle are supplementary.",
+          "Find the arc length and area of sector of a circle using angle in both degrees and radians.",
+          "Apply concepts of tangents and angles of a circle to real life world problems (such as architecture, monuments, pyramids).",
+          "Apply trigonometry to solve real life problems in arc length and area of the sector of circle."
+        ],
+        "headings": [
+          {
+            "number": "9.1",
+            "title": "Tangent to a Circle",
+            "pdfPage": 158
+          },
+          {
+            "number": "9.1.1",
+            "title": "(a) If a Line is Drawn Perpendicular to a Radial Segment of a Circle at its Outer End Point, it is Tangent to the Circle at that Point",
+            "pdfPage": 158
+          },
+          {
+            "number": "9.1.2",
+            "title": "The Two Tangents Drawn to a Circle From a Point Outside it, are Equal in Length.",
+            "pdfPage": 159
+          },
+          {
+            "number": "9.1.3",
+            "title": "(a) If Two Circles Touch Externally, then the Distance Between Their Centres is Equal to the Sum of their Radii.",
+            "pdfPage": 160
+          },
+          {
+            "number": "9.1.4",
+            "title": "The Measure of a Central Angle of a Minor Arc of a Circle is Double that of the Angle Subtended by the Corresponding Major Arc.",
+            "pdfPage": 161
+          },
+          {
+            "number": "9.1.5",
+            "title": "Any Two Angles in the Same Segment of a Circle are Equal.",
+            "pdfPage": 163
+          },
+          {
+            "number": "9.1.6",
+            "title": "(a) The Angle in a Semi-Circle is a Right Angle. (b) The Angle in a Segment Greater than a Semi-Circle is Less than a Right-Angle. (c) The Angle in a Segment Less than a Semi-Circle is Greater than a Right-Angle.",
+            "pdfPage": 163
+          },
+          {
+            "number": "9.1.7",
+            "title": "The Opposite Angles of Any Quadrilateral Inscribed in a Circle are Supplementary.",
+            "pdfPage": 164
+          },
+          {
+            "number": "9.2",
+            "title": "Area of Sector and Arc Length of a Circle",
+            "pdfPage": 165
+          },
+          {
+            "number": "9.2.1",
+            "title": "Arc Length and Area of Sector",
+            "pdfPage": 165
+          },
+          {
+            "number": "9.2.2",
+            "title": "Area of a Sector",
+            "pdfPage": 165
+          }
+        ],
+        "notes": "Page 156 (image 2) contains sub-heading '(b) The Tangent to a Circle and the Radial Segment Joining the Point of Contact and the Centre, are Perpendicular to Each Other' shown as sub-point 'b' under 9.1.1; similarly page 158 (image 4) has sub-point 'b' 'If Two Circles Touch Internally, Then the Distance Between Their Centres is Equal to the Difference of Their Radii.' These are treated as part of the parent numbered section rather than separate numbered headings since no distinct number was printed for them."
+      }
+    },
+    {
+      "number": 10,
+      "title": "Practical Geometry of Circles",
+      "titleEn": null,
+      "pdfStart": 170,
+      "pdfEnd": 177,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Practical Geometry of Circles",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Locate the centre of a given circle.",
+          "Draw a circle passing through three given non-collinear points.",
+          "Complete the circle: by finding the centre, without finding the centre, when a part of its circumference is given.",
+          "Draw a tangent to a given arc, without using the centre, through a given point P when P is the middle point of the arc, at the end of the arc, outside the arc.",
+          "Draw a tangent to a given circle from a point P when P lies on the circumference, outside the circle.",
+          "Draw two tangents to a circle meeting each other at a given angle.",
+          "Apply concepts of practical geometry of a circle to real-life world problems (such as athletic tracks, recreational parks, Ferris wheels and mechanical machines)."
+        ],
+        "headings": [
+          {
+            "number": "10.1",
+            "title": "Construction of a Circle",
+            "pdfPage": 171
+          },
+          {
+            "number": "10.1.1",
+            "title": "Locate the Centre of a Given Circle",
+            "pdfPage": 171
+          },
+          {
+            "number": "10.1.2",
+            "title": "Draw a Circle Passing through Three Given Non-collinear Points",
+            "pdfPage": 171
+          },
+          {
+            "number": "10.1.3",
+            "title": "Complete a Circle by Finding its Centre, When a Part of Its Circumference is Given",
+            "pdfPage": 172
+          },
+          {
+            "number": "10.1.4",
+            "title": "Complete a Circle without Finding its Centre, When a Part of its Circumference (Arc) is Given",
+            "pdfPage": 172
+          },
+          {
+            "number": "10.2",
+            "title": "Tangent to a Circle",
+            "pdfPage": 173
+          },
+          {
+            "number": "10.2.1",
+            "title": "To Draw a Tangent to a Given Arc without using the Centre Through a Given Point P",
+            "pdfPage": 173
+          },
+          {
+            "number": "10.2.2",
+            "title": "Draw a Tangent to a given Circle from a Point P when P Lies on the Circumference.",
+            "pdfPage": 174
+          },
+          {
+            "number": "10.2.3",
+            "title": "Draw Two Tangents to a Given Circle Meeting each other at a Given Angle",
+            "pdfPage": 175
+          }
+        ],
+        "notes": "Section 10.2.2 has sub-parts (a) and (b): (a) 'Draw a Tangent to a given Circle from a Point P when P Lies on the Circumference.' appears on image 5, and (b) 'Draw a tangent to the circle from a point P when P lies outside the circle.' appears on image 6, but only one numbered heading (10.2.2) is printed."
+      }
+    },
+    {
+      "number": 11,
+      "title": "Information Handling",
+      "titleEn": null,
+      "pdfStart": 178,
+      "pdfEnd": 197,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Information Handling",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Construct cumulative frequency table and cumulative frequency polygon or Ogive.",
+          "Interpret the median, quartiles, deciles, percentiles and inter quartile range from cumulative frequency curve.",
+          "Interpret and analyze box and whisker plots.",
+          "Construct and interpret data from scatter diagrams and also draw lines of best fit.",
+          "Measure correlation using scatter diagram.",
+          "Calculate the range, standard deviation and variance for grouped data.",
+          "Use the mean and standard deviation to compare two sets of data.",
+          "Solve real life situations involving variance and standard deviation for grouped data.",
+          "Apply concepts from measures of dispersion to solve real life situations (determining the consistency of data, checking variability in forecasting, manufacturing, finance and economics)."
+        ],
+        "headings": [
+          {
+            "number": "11.1",
+            "title": "Construction of Cumulative Frequencies",
+            "pdfPage": 179
+          },
+          {
+            "number": "11.1.1",
+            "title": "Cumulative Frequency Polygon or Ogive",
+            "pdfPage": 180
+          },
+          {
+            "number": "11.1.2",
+            "title": "Steps for Construction of Cumulative Frequency Polygon or Ogive",
+            "pdfPage": 180
+          },
+          {
+            "number": "11.1.3",
+            "title": "Important Definitions",
+            "pdfPage": 180
+          },
+          {
+            "number": "11.2",
+            "title": "Box-and-Whisker Plot",
+            "pdfPage": 185
+          },
+          {
+            "number": "11.3",
+            "title": "Scatter Diagram",
+            "pdfPage": 186
+          },
+          {
+            "number": "11.4",
+            "title": "Measures of Dispersion",
+            "pdfPage": 191
+          },
+          {
+            "number": "11.4.1",
+            "title": "Range",
+            "pdfPage": 192
+          },
+          {
+            "number": "11.4.2",
+            "title": "Variance",
+            "pdfPage": 193
+          },
+          {
+            "number": "11.4.3",
+            "title": "Standard Deviation",
+            "pdfPage": 193
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 12,
+      "title": "Probability",
+      "titleEn": null,
+      "pdfStart": 198,
+      "pdfEnd": 213,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Probability",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After completing this unit, the students will be able to:",
+        "slos": [
+          "Calculate the probability of combined events using, where appropriate: sample space diagrams, possibility diagram, tree diagrams and Venn diagrams.",
+          "Apply addition law of probability to solve problems involving mutually exclusive events (such as left and right-hand turns, tossing a coin, even and odd numbers on a dice, winning and losing a game)",
+          "Apply the Multiplication law of probability to solve problems involving independent and dependent events (trading, flipping a coin, such as 2 cards being drawn one by one with replacement and without replacement etc.)"
+        ],
+        "headings": [
+          {
+            "number": "12.1",
+            "title": "Probability",
+            "pdfPage": 199
+          },
+          {
+            "number": "12.1.1",
+            "title": "Random Experiment",
+            "pdfPage": 199
+          },
+          {
+            "number": "12.1.2",
+            "title": "Outcomes and Sample Space",
+            "pdfPage": 199
+          },
+          {
+            "number": "12.1.3",
+            "title": "Event",
+            "pdfPage": 199
+          },
+          {
+            "number": "12.1.4",
+            "title": "Combined Events",
+            "pdfPage": 201
+          },
+          {
+            "number": "12.1.5",
+            "title": "Types of Combined Events",
+            "pdfPage": 201
+          },
+          {
+            "number": "12.1.6",
+            "title": "Tree Diagram",
+            "pdfPage": 202
+          },
+          {
+            "number": "12.1.7",
+            "title": "Sample Space Diagram",
+            "pdfPage": 203
+          },
+          {
+            "number": "12.1.8",
+            "title": "Possibility Diagram",
+            "pdfPage": 203
+          },
+          {
+            "number": "12.1.9",
+            "title": "Probability of an Event",
+            "pdfPage": 203
+          },
+          {
+            "number": "12.2",
+            "title": "Addition Law of Probability",
+            "pdfPage": 206
+          },
+          {
+            "number": "12.2.1",
+            "title": "Venn Diagram",
+            "pdfPage": 206
+          },
+          {
+            "number": "12.3",
+            "title": "Multiplication Law of Probability",
+            "pdfPage": 210
+          }
+        ],
+        "notes": "Sub-headings under 12.1.5 (Independent Events, Dependent Events, Mutually Exclusive Events, Non-Mutually Exclusive Events) are lettered (a, b, c, d) without numeric section numbers, so they were not included as separate numbered headings."
+      }
+    }
+  ]
+}

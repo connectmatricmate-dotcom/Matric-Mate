@@ -1,0 +1,75 @@
+{
+  "source": "content/punjab/textbooks/pst-10.pdf",
+  "subject": "pst",
+  "grade": 10,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "PAKISTAN STUDIES 10",
+  "publisher": "Punjab Education, Curriculum, Training and Assessment Authority (PECTAA), Lahore",
+  "curriculum": null,
+  "language": "en",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Ideological Basis of Pakistan",
+      "titleEn": null,
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "Pakistan Movement",
+      "titleEn": null,
+      "page": 13,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "History of Pakistan (1947-Uptill Now) and Constitutional Development in Pakistan",
+      "titleEn": null,
+      "page": 28,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "Geography of Pakistan",
+      "titleEn": null,
+      "page": 64,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "Pakistan and International Affairs",
+      "titleEn": null,
+      "page": 87,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "Resources and Economic Development of Pakistan",
+      "titleEn": null,
+      "page": 103,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "Population, Society and Cultural Diversity in Pakistan",
+      "titleEn": null,
+      "page": 113,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "Women Empowerment in Pakistan",
+      "titleEn": null,
+      "page": 141,
+      "topics": []
+    }
+  ],
+  "notes": "The contents page also lists 'Pairing Scheme and Model Paper' at page 151, which is excluded here as it is not a teaching chapter."
+}

@@ -1,0 +1,110 @@
+{
+  "source": "content/punjab/textbooks/math-9.pdf",
+  "subject": "math",
+  "grade": 9,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "MATHEMATICS 9",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": "This textbook is based on National Curriculum of Pakistan 2023 and has been approved by the Board.",
+  "language": "en",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Real Numbers",
+      "titleEn": null,
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "Logarithms",
+      "titleEn": null,
+      "page": 21,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "Set and Functions",
+      "titleEn": null,
+      "page": 37,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "Factorization and Algebraic Manipulation",
+      "titleEn": null,
+      "page": 65,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "Linear Equations and Inequalities",
+      "titleEn": null,
+      "page": 82,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "Trigonometry",
+      "titleEn": null,
+      "page": 97,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "Coordinate Geometry",
+      "titleEn": null,
+      "page": 123,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "Logic",
+      "titleEn": null,
+      "page": 147,
+      "topics": []
+    },
+    {
+      "number": 9,
+      "title": "Similar Figures",
+      "titleEn": null,
+      "page": 161,
+      "topics": []
+    },
+    {
+      "number": 10,
+      "title": "Graphs of Functions",
+      "titleEn": null,
+      "page": 185,
+      "topics": []
+    },
+    {
+      "number": 11,
+      "title": "Loci and Construction",
+      "titleEn": null,
+      "page": 200,
+      "topics": []
+    },
+    {
+      "number": 12,
+      "title": "Information Handling",
+      "titleEn": null,
+      "page": 215,
+      "topics": []
+    },
+    {
+      "number": 13,
+      "title": "Probability",
+      "titleEn": null,
+      "page": 243,
+      "topics": []
+    }
+  ],
+  "notes": "The contents table lists only units with no sub-topics. Unnumbered back-matter rows (Answers 260, Glossary 279, Symbols/Notations 282, Logarithmic Tables 283) were omitted per instructions."
+}

@@ -1,0 +1,954 @@
+{
+  "source": "content/punjab/textbooks/bio-9.pdf",
+  "subject": "bio",
+  "grade": 9,
+  "medium": "en",
+  "pdfPages": 180,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    4
+  ],
+  "backMatterStart": 176,
+  "locateNotes": "Printed page numbers run 4 behind the PDF labels (printed 1 = PDF page 5). The Glossary heading is visible on PDF page 176, although the table of contents lists Glossary at printed page 173; running heads on PDF pages 167-175 read 'PLANT PHYSIOLOGY' rather than 'BIOSTATISTICS', apparently a printing error in the book.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "THE SCIENCE OF BIOLOGY",
+      "titleEn": null,
+      "pdfStart": 5,
+      "pdfEnd": 24,
+      "read": {
+        "titleOnPage": "THE SCIENCE OF BIOLOGY",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define Biology.",
+          "State that the Holy Quran instructs to reveal the study of Life.",
+          "Define major fields of Biology as Botany, Zoology and Microbiology.",
+          "Define the sub-fields of Biology.",
+          "Relate that Biology connects with other natural sciences.",
+          "Distinguish in terms of the broad subject matter the fields (Biophysics, Biochemistry, Computational Biology, Biogeography, Biostatistics, Biotechnology, Bio-economics).",
+          "Identify the careers in Biology.",
+          "Explain with examples how Biology is a subset of the natural sciences and of the life sciences.",
+          "Justify with examples that science is a collaborative field that requires interdisciplinary researchers working together to share knowledge and critique ideas.",
+          "Describe the steps of the scientific method.",
+          "Evaluate the terms 'hypothesis', 'theory' and 'law' in the context of research in the natural sciences."
+        ],
+        "headings": [
+          {
+            "number": "1.1",
+            "title": "BIOLOGY AND ITS BRANCHES",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.2",
+            "title": "RELATION OF BIOLOGY WITH OTHER SCIENCES",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.3",
+            "title": "CAREERS IN BIOLOGY",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.4",
+            "title": "QURANIC INSTRUCTIONS TO REVEAL THE STUDY OF LIFE",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.5",
+            "title": "SCIENCE AS A COLLABORATIVE FIELD",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.6",
+            "title": "SCIENTIFIC METHOD",
+            "pdfPage": 14
+          },
+          {
+            "number": "1.7",
+            "title": "THEORY AND LAW (PRINCIPLE)",
+            "pdfPage": 16
+          },
+          {
+            "number": "1.8",
+            "title": "MALARIA -AN EXAMPLE OF BIOLOGICAL METHOD",
+            "pdfPage": 17
+          }
+        ],
+        "notes": "The chapter also prints unnumbered sub-headings within sections (e.g. 'Major Fields of Biology', 'Branches or Sub-Fields of Biology' on image 2; 'Biological Problem 1: What is the cause of malaria?' on image 13; 'Biological Problem 2: How Plasmodium gets into the blood of man?' on image 14; 'Experiments on Human Beings' on image 16); these were omitted since numbered headings exist. Under 1.8 the book numbers steps as '1. Observations', '2. Hypothesis', '3. Deduction', '3. Experiment and Results' (the '3' is repeated, as printed). Exercise part C on image 20 has no printed heading visible; its questions are numbered 1-7 followed by 'D. Inquisitive questions.'"
+      }
+    },
+    {
+      "number": 2,
+      "title": "BIODIVERSITY",
+      "titleEn": null,
+      "pdfStart": 25,
+      "pdfEnd": 40,
+      "read": {
+        "titleOnPage": "BIODIVERSITY",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define biodiversity and classification.",
+          "Describe advantages of classification.",
+          "List the taxonomic ranks of classification.",
+          "Discuss the history of classification schemes.",
+          "List the three distinct domains into which living organisms are broadly classified into.",
+          "Describe the complications of classifying viruses.",
+          "Outline the binomial nomenclature system."
+        ],
+        "headings": [
+          {
+            "number": "2.1",
+            "title": "BIODIVERSITY",
+            "pdfPage": 25
+          },
+          {
+            "number": "2.2",
+            "title": "CLASSIFICATION",
+            "pdfPage": 26
+          },
+          {
+            "number": "2.3",
+            "title": "TAXONOMIC RANKS",
+            "pdfPage": 27
+          },
+          {
+            "number": "2.4",
+            "title": "HISTORY OF CLASSIFICATION",
+            "pdfPage": 29
+          },
+          {
+            "number": "2.5",
+            "title": "DOMAINS OF LIVING ORGANISMS",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.6",
+            "title": "CLASSIFICATION OF DOMAIN EUKARYA",
+            "pdfPage": 33
+          },
+          {
+            "number": "2.7",
+            "title": "STATUS OF VIRUS IN CLASSIFICATION",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.8",
+            "title": "BINOMIAL NOMENCLATURE",
+            "pdfPage": 36
+          }
+        ],
+        "notes": "Section numbers are printed with a trailing hyphen (e.g. \"2.1-\") and headings appear in small caps. Unnumbered sub-headings not listed include: 'Importance of Biodiversity', 'Aims and Principles of Classification', 'Advantages of Classification', '(a) Two-Kingdom Classification System', '(b) Three-Kingdom Classification System', '(c) Five-Kingdom Classification System', '(d) Three-Domain Classification System', '1- Domain Archaea', '2- Domain Bacteria', '3. Domain Eukarya', '(a) Kingdom Protista', '(b) Kingdom Fungi', '(c) Kingdom Plantae', '(d) Kingdom Animalia', 'Significance of Binomial nomenclature', 'Rules of Binomial nomenclature'. A watermark ('Web version of PCTB Textbook') overlays all pages but text remains legible."
+      }
+    },
+    {
+      "number": 3,
+      "title": "THE CELL",
+      "titleEn": null,
+      "pdfStart": 41,
+      "pdfEnd": 62,
+      "read": {
+        "titleOnPage": "THE CELL",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe cell as the basic unit of life.",
+          "Compare with diagrams the structure of animal and plant cells.",
+          "Sketch different sub-cellular organelles and outline their roles.",
+          "Identify different types of cells (mesophyll cell, epidermal cell, neurons, muscle, red blood cell, liver cell) and sketch their structures.",
+          "Describe the concept of division of labour and how it applies within cells (across organelles) and in multicellular organisms (across cells)",
+          "Describe cell specialization.",
+          "Define stem cells as unspecialized cells."
+        ],
+        "headings": [
+          {
+            "number": "3.1",
+            "title": "Cell",
+            "pdfPage": 42
+          },
+          {
+            "number": "3.2",
+            "title": "Structure of Cell",
+            "pdfPage": 42
+          },
+          {
+            "number": "3.3",
+            "title": "Structural Advantages of Plant and Animal Cells",
+            "pdfPage": 53
+          },
+          {
+            "number": "3.4",
+            "title": "Cell Specialization",
+            "pdfPage": 54
+          },
+          {
+            "number": "3.5",
+            "title": "Stem Cells",
+            "pdfPage": 57
+          }
+        ],
+        "notes": "On the opening page the outcome about identifying different types of cells is printed with a bullet mark on each of its two lines ('...muscle, red blood' / 'cell, liver cell) and sketch their structures.'); it has been joined here as a single outcome. Section numbers are printed with a hyphen, e.g. '3.1- CELL', and headings appear in small caps. The chapter also contains many unnumbered sub-headings (Cell Wall, Cell Membrane, Cytoplasm, Nucleus, Cytoskeleton, Ribosome, Endoplasmic Reticulum, Golgi Apparatus, Lysosome, Mitochondria, Plastids, Vacuoles, Centrioles, Cilia and Flagella, Advantages of Plant Cell Structures, Advantages of Animal Cell Structures, Division of Labour within and across Cells), which are not listed above since numbered headings exist."
+      }
+    },
+    {
+      "number": 4,
+      "title": "CELL CYCLE",
+      "titleEn": null,
+      "pdfStart": 63,
+      "pdfEnd": 78,
+      "read": {
+        "titleOnPage": "CELL CYCLE",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe cell cycle.",
+          "Explain mitosis and stages of mitosis (by use of sketch and diagrams).",
+          "Explain meiosis and stages of meiosis (by use of sketch and diagrams).",
+          "Compare the processes of mitosis and meiosis.",
+          "Outline the significance of mitosis and meiosis."
+        ],
+        "headings": [
+          {
+            "number": "4.1",
+            "title": "Cell Cycle",
+            "pdfPage": 63
+          },
+          {
+            "number": null,
+            "title": "Interphase",
+            "pdfPage": 63
+          },
+          {
+            "number": "4.2",
+            "title": "Mitosis",
+            "pdfPage": 65
+          },
+          {
+            "number": null,
+            "title": "Phases of Mitosis",
+            "pdfPage": 65
+          },
+          {
+            "number": null,
+            "title": "Significance of Mitosis",
+            "pdfPage": 68
+          },
+          {
+            "number": null,
+            "title": "Errors in Mitosis",
+            "pdfPage": 68
+          },
+          {
+            "number": "4.3",
+            "title": "Meiosis",
+            "pdfPage": 69
+          },
+          {
+            "number": null,
+            "title": "Phases of Meiosis",
+            "pdfPage": 69
+          },
+          {
+            "number": null,
+            "title": "Significance of Meiosis",
+            "pdfPage": 72
+          },
+          {
+            "number": null,
+            "title": "Errors in Meiosis",
+            "pdfPage": 73
+          },
+          {
+            "number": "4.4",
+            "title": "Comparison between Meiosis and Mitosis",
+            "pdfPage": 73
+          },
+          {
+            "number": null,
+            "title": "Similarities",
+            "pdfPage": 73
+          },
+          {
+            "number": null,
+            "title": "Differences",
+            "pdfPage": 74
+          }
+        ],
+        "notes": "Section numbers are printed in the form \"4.1-\", \"4.2-\", etc., with the titles in small caps (e.g. \"CELL CYCLE\", \"MITOSIS\"). Unnumbered sub-headings such as Interphase, Phases of Mitosis, Meiosis-I, Meiosis-II, Prophase-I etc. also appear; only the main shaded/bold section headings are listed. Page images 1-3 are pages 63-65; page numbering runs 63-78."
+      }
+    },
+    {
+      "number": 5,
+      "title": "TISSUES, ORGANS, AND ORGAN SYSTEMS",
+      "titleEn": null,
+      "pdfStart": 79,
+      "pdfEnd": 92,
+      "read": {
+        "titleOnPage": "TISSUES, ORGANS, AND ORGAN SYSTEMS",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Distinguish between tissues, organs and organ systems with examples from animals and plants.",
+          "Enlist the different types of tissue that come together to form the stomach organ in the human body.",
+          "Discuss the organ systems that come together to form the human body.",
+          "Describe the advantages of homeostasis.",
+          "Discuss how various organs and organ systems of the human body work to maintain homeostasis.",
+          "Discuss the different types of tissue that come together to form the leaf.",
+          "Explain plant physiology in terms of structures and roles of various plant organs."
+        ],
+        "headings": [
+          {
+            "number": "5.1",
+            "title": "Levels of Organization",
+            "pdfPage": 79
+          },
+          {
+            "number": "5.2",
+            "title": "Organs and Organ Systems in Plants",
+            "pdfPage": 82
+          },
+          {
+            "number": "5.3",
+            "title": "Organs and Organ Systems in Humans",
+            "pdfPage": 85
+          },
+          {
+            "number": "5.4",
+            "title": "Homeostasis",
+            "pdfPage": 87
+          }
+        ],
+        "notes": "Section numbers are printed with a trailing hyphen (e.g. '5.1- LEVELS OF ORGANIZATION') and headings are set in small caps. Unnumbered sub-headings not listed above include 'Emergent Properties' (image 3), 'Organs in Plants' (image 4), 'Leaf as an Organ' and 'Organ Systems in Plants' (images 5-6), 'Organs in Human Body', 'Stomach as an Organ', 'Organ Systems in Human Body' (images 7-8), 'Importance of Homeostasis' (image 10) and 'Role of Organ Systems in Homeostasis' (image 11). Figure numbering skips from FIGURE 5.4 to FIGURE 5.6 (no 5.5 appears). The 'Roots:' paragraph appears twice, at the end of page 82 and the start of page 83, with slightly different wording - printed as such."
+      }
+    },
+    {
+      "number": 6,
+      "title": "BIOMOLECULES",
+      "titleEn": null,
+      "pdfStart": 93,
+      "pdfEnd": 108,
+      "read": {
+        "titleOnPage": "BIOMOLECULES",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define biochemistry/ molecular biology.",
+          "Outline the various types of common biomolecules (Carbohydrates, Proteins, Lipids, DNA, RNA) including their locations inside the cell and main roles.",
+          "Define carbohydrates and outline the structure, function and sources of carbohydrates.",
+          "Identify carbohydrates as monosaccharides, disaccharides and polysaccharides.",
+          "Outline the structure and function and sources of proteins with structure of amino acids.",
+          "Outline the structure, function and sources of lipids.",
+          "Describe briefly the structure of DNA.",
+          "Outline the function of DNA as carrier of hereditary information.",
+          "Describe briefly the structure of RNA.",
+          "Outline the function of RNA as aid in converting hereditary information into proteins.",
+          "Outline how information in the DNA is converted to information on RNA and then into proteins."
+        ],
+        "headings": [
+          {
+            "number": "6.1",
+            "title": "BIOMOLECULES",
+            "pdfPage": 93
+          },
+          {
+            "number": "6.2",
+            "title": "CARBOHYDRATES",
+            "pdfPage": 95
+          },
+          {
+            "number": "1",
+            "title": "Monosaccharides",
+            "pdfPage": 95
+          },
+          {
+            "number": "2",
+            "title": "Disaccharides",
+            "pdfPage": 96
+          },
+          {
+            "number": "3",
+            "title": "Polysaccharides",
+            "pdfPage": 96
+          },
+          {
+            "number": null,
+            "title": "Sources and Functions of Carbohydrates",
+            "pdfPage": 97
+          },
+          {
+            "number": "6.3",
+            "title": "PROTEINS",
+            "pdfPage": 98
+          },
+          {
+            "number": null,
+            "title": "Structure of Proteins",
+            "pdfPage": 98
+          },
+          {
+            "number": null,
+            "title": "Amino acids",
+            "pdfPage": 98
+          },
+          {
+            "number": null,
+            "title": "Sources and Functions of Proteins",
+            "pdfPage": 99
+          },
+          {
+            "number": "6.4",
+            "title": "LIPIDS",
+            "pdfPage": 99
+          },
+          {
+            "number": null,
+            "title": "Main Groups of Lipids",
+            "pdfPage": 100
+          },
+          {
+            "number": "1",
+            "title": "Fats and Oils",
+            "pdfPage": 100
+          },
+          {
+            "number": "2",
+            "title": "Phospholipids",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "Sources and Functions of Lipids",
+            "pdfPage": 100
+          },
+          {
+            "number": "6.5",
+            "title": "NUCLEIC ACIDS",
+            "pdfPage": 101
+          },
+          {
+            "number": "1",
+            "title": "Deoxyribonucleic Acid (DNA)",
+            "pdfPage": 102
+          },
+          {
+            "number": null,
+            "title": "Function of DNA",
+            "pdfPage": 103
+          },
+          {
+            "number": "2",
+            "title": "Ribonucleic Acid (RNA)",
+            "pdfPage": 103
+          },
+          {
+            "number": "6.6",
+            "title": "THE WORKING OF DNA AND RNA",
+            "pdfPage": 104
+          }
+        ],
+        "notes": "Section numbers are printed with a trailing hyphen (e.g. \"6.1-\") and titles in small caps; sub-sections within 6.2, 6.4, 6.5 are numbered as list items (1., 2., 3. / 1-, 2-) rather than decimal numbering. Images 4-16 are lower resolution; text read as best as legible. Sub-headings such as \"Sources\", \"Functions\", \"Examples\" inside sections were treated as minor labels and mostly omitted except where they are shaded section bars."
+      }
+    },
+    {
+      "number": 7,
+      "title": "ENZYMES",
+      "titleEn": null,
+      "pdfStart": 109,
+      "pdfEnd": 118,
+      "read": {
+        "titleOnPage": "ENZYMES",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define metabolism, catabolism and anabolism with examples.",
+          "Define enzymes and describe their characteristics.",
+          "Describe and depict the mechanism of enzyme action.",
+          "Describe the factors which could influence enzyme activity.",
+          "Describe competitive and non-competitive enzyme inhibition."
+        ],
+        "headings": [
+          {
+            "number": "7.1",
+            "title": "METABOLISM",
+            "pdfPage": 109
+          },
+          {
+            "number": "7.2",
+            "title": "ENZYMES",
+            "pdfPage": 110
+          },
+          {
+            "number": null,
+            "title": "Characteristics of Enzymes",
+            "pdfPage": 110
+          },
+          {
+            "number": "7.3",
+            "title": "MECHANISM OF ENZYME ACTION",
+            "pdfPage": 112
+          },
+          {
+            "number": "1",
+            "title": "Lock and Key Model of Enzyme Action",
+            "pdfPage": 112
+          },
+          {
+            "number": "2",
+            "title": "Induced Fit Model",
+            "pdfPage": 113
+          },
+          {
+            "number": "7.4",
+            "title": "FACTORS THAT AFFECT THE ACTIVITY OF ENZYMES",
+            "pdfPage": 113
+          },
+          {
+            "number": "1",
+            "title": "Temperature",
+            "pdfPage": 113
+          },
+          {
+            "number": "2",
+            "title": "pH",
+            "pdfPage": 114
+          },
+          {
+            "number": "3",
+            "title": "Substrate Concentration",
+            "pdfPage": 114
+          },
+          {
+            "number": "7.5",
+            "title": "ENZYME INHIBITION",
+            "pdfPage": 115
+          },
+          {
+            "number": "1",
+            "title": "Competitive Inhibition",
+            "pdfPage": 115
+          },
+          {
+            "number": "2",
+            "title": "Non-Competitive Inhibition",
+            "pdfPage": 115
+          }
+        ],
+        "notes": "Section numbers are printed with a trailing hyphen (e.g. \"7.1-\"); section headings appear in small caps in the book. Sub-sections under 7.3 and 7.4 are numbered as \"1-\"/\"2.\"/\"1.\" etc. as printed. \"Characteristics of Enzymes\" is an unnumbered bold heading inside 7.2 and has been included."
+      }
+    },
+    {
+      "number": 8,
+      "title": "BIOENERGETICS",
+      "titleEn": null,
+      "pdfStart": 119,
+      "pdfEnd": 132,
+      "read": {
+        "titleOnPage": "BIOENERGETICS",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the importance of oxidation-reduction reactions.",
+          "Explain ATP as a molecule that is the chief energy currency of all cells.",
+          "Describe photosynthesis.",
+          "State the role of chlorophyll found in chloroplast.",
+          "State the equation (in words or symbols) for photosynthesis.",
+          "Describe respiration.",
+          "Describe anaerobic respiration and state its importance.",
+          "State the equation (in words or symbols) for aerobic respiration.",
+          "Compare aerobic and anaerobic respiration with reference to the amount of energy released.",
+          "List ways in which respiratory energy is used in the body.",
+          "Compare respiration and photosynthesis."
+        ],
+        "headings": [
+          {
+            "number": "8.1",
+            "title": "ATP: The Cell's Energy Currency",
+            "pdfPage": 120
+          },
+          {
+            "number": "8.2",
+            "title": "Photosynthesis",
+            "pdfPage": 121
+          },
+          {
+            "number": null,
+            "title": "Mechanism of Photosynthesis",
+            "pdfPage": 121
+          },
+          {
+            "number": null,
+            "title": "1- Light Reactions",
+            "pdfPage": 122
+          },
+          {
+            "number": null,
+            "title": "2- Dark Reactions (Calvin Cycle)",
+            "pdfPage": 123
+          },
+          {
+            "number": null,
+            "title": "Role of Chlorophyll in Photosynthesis",
+            "pdfPage": 124
+          },
+          {
+            "number": "8.3",
+            "title": "Cellular Respiration",
+            "pdfPage": 124
+          },
+          {
+            "number": null,
+            "title": "Aerobic and Anaerobic Respiration",
+            "pdfPage": 124
+          },
+          {
+            "number": null,
+            "title": "1- Aerobic respiration",
+            "pdfPage": 124
+          },
+          {
+            "number": null,
+            "title": "2- Anaerobic Respiration (Fermentation)",
+            "pdfPage": 125
+          },
+          {
+            "number": null,
+            "title": "A. Alcoholic Fermentation:",
+            "pdfPage": 125
+          },
+          {
+            "number": null,
+            "title": "B. Lactic Acid Fermentation:",
+            "pdfPage": 125
+          },
+          {
+            "number": null,
+            "title": "Importance of Fermentation",
+            "pdfPage": 125
+          },
+          {
+            "number": null,
+            "title": "Mechanism of Cellular Respiration",
+            "pdfPage": 126
+          },
+          {
+            "number": null,
+            "title": "1- Glycolysis",
+            "pdfPage": 126
+          },
+          {
+            "number": null,
+            "title": "2- Krebs Cycle",
+            "pdfPage": 126
+          },
+          {
+            "number": null,
+            "title": "3- Electron Transport Chain",
+            "pdfPage": 127
+          },
+          {
+            "number": null,
+            "title": "Use of Respiratory Energy in Body",
+            "pdfPage": 128
+          }
+        ],
+        "notes": "Section numbers are printed with a trailing hyphen (e.g. \"8.1-\") and headings in small caps; rendered here in title case. Subsection headings within 8.1-8.3 are unnumbered, so their \"number\" is null. The heading 'Chapter 8' and title 'BIOENERGETICS' are on separate lines on the opening page. A diagonal watermark 'Web version of PCTB Textbook' crosses all pages but does not obscure the text."
+      }
+    },
+    {
+      "number": 9,
+      "title": "PLANT PHYSIOLOGY",
+      "titleEn": null,
+      "pdfStart": 133,
+      "pdfEnd": 150,
+      "read": {
+        "titleOnPage": "PLANT PHYSIOLOGY",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define mineral nutrition in plants.",
+          "Categorize minerals nutrients of plants into macronutrients and micronutrients.",
+          "State that nitrogen is important in protein synthesis and magnesium for chlorophyll formation.",
+          "Conceptualize transport and its needs.",
+          "Explain the internal structure of root and root hair.",
+          "Describe how roots take up water and mineral salts by active and passive absorption.",
+          "Describe transpiration and relate this process with cell surface and stomatal opening and closing.",
+          "Describe temperature, wind and humidity as the factors affecting the rate of transpiration.",
+          "Describe the mechanism of transport of water and salt in plants.",
+          "Explain the mechanism of food translocation by the theory of Pressure Flow Mechanism.",
+          "Describe the process of gaseous exchange in plants",
+          "Describe the mechanisms/adaptations in plants for excretion of wastes.",
+          "Explain osmotic adjustments in plants."
+        ],
+        "headings": [
+          {
+            "number": "9.1",
+            "title": "NUTRITION IN PLANTS",
+            "pdfPage": 134
+          },
+          {
+            "number": null,
+            "title": "Mineral Nutrition in Plants",
+            "pdfPage": 134
+          },
+          {
+            "number": null,
+            "title": "Roles of Nitrogen and Magnesium",
+            "pdfPage": 135
+          },
+          {
+            "number": "9.2",
+            "title": "TRANSPORT IN PLANTS",
+            "pdfPage": 136
+          },
+          {
+            "number": null,
+            "title": "Internal Structure of Root and Uptake of Water and Salts",
+            "pdfPage": 137
+          },
+          {
+            "number": "9.3",
+            "title": "TRANSPIRATION",
+            "pdfPage": 138
+          },
+          {
+            "number": null,
+            "title": "Mechanism of the opening and Closing of Stomata",
+            "pdfPage": 139
+          },
+          {
+            "number": null,
+            "title": "Factors Affecting the Rate of Transpiration",
+            "pdfPage": 140
+          },
+          {
+            "number": "9.4",
+            "title": "TRANSPORT OF WATER IN PLANTS",
+            "pdfPage": 140
+          },
+          {
+            "number": "9.5",
+            "title": "TRANSLOCATION OF FOOD IN PLANTS",
+            "pdfPage": 141
+          },
+          {
+            "number": "9.6",
+            "title": "GASEOUS EXCHANGE IN PLANTS",
+            "pdfPage": 142
+          },
+          {
+            "number": null,
+            "title": "Process of Gaseous Exchange",
+            "pdfPage": 143
+          },
+          {
+            "number": "9.7",
+            "title": "MECHANISMS FOR EXCRETION IN PLANTS",
+            "pdfPage": 144
+          },
+          {
+            "number": null,
+            "title": "Excretion of Extra Carbon dioxide and Oxygen",
+            "pdfPage": 144
+          },
+          {
+            "number": null,
+            "title": "Excretion of Extra Water",
+            "pdfPage": 144
+          },
+          {
+            "number": null,
+            "title": "Excretion of other Metabolic Wastes",
+            "pdfPage": 145
+          },
+          {
+            "number": "9.8",
+            "title": "OSMOTIC ADJUSTMENTS IN PLANTS",
+            "pdfPage": 146
+          }
+        ],
+        "notes": "Section numbers are printed with a trailing hyphen (e.g. \"9.1-\") except 9.7; the subsections under 9.7 are lettered a-, b-, c- as printed. Main section titles are printed in small caps in the original."
+      }
+    },
+    {
+      "number": 10,
+      "title": "REPRODUCTION IN PLANTS",
+      "titleEn": null,
+      "pdfStart": 151,
+      "pdfEnd": 166,
+      "read": {
+        "titleOnPage": "REPRODUCTION IN PLANTS",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe different types of asexual reproduction i.e. binary fission, budding, spore formation and vegetative propagation.",
+          "Distinguish between vegetative propagation and artificial propagation.",
+          "Explain vegetative propagation in plants (through stem, suckers and leaves).",
+          "Describe the two methods of artificial vegetative propagation (stem cuttings and grafting).",
+          "Explain sexual reproduction in Plants."
+        ],
+        "headings": [
+          {
+            "number": "10.1",
+            "title": "TYPES OF ASEXUAL REPRODUCTION",
+            "pdfPage": 151
+          },
+          {
+            "number": null,
+            "title": "1. Binary Fission",
+            "pdfPage": 152
+          },
+          {
+            "number": null,
+            "title": "2. Budding",
+            "pdfPage": 152
+          },
+          {
+            "number": null,
+            "title": "3. Spore Formation",
+            "pdfPage": 153
+          },
+          {
+            "number": null,
+            "title": "4: Vegetative Propagation",
+            "pdfPage": 153
+          },
+          {
+            "number": null,
+            "title": "(a)- Stem",
+            "pdfPage": 154
+          },
+          {
+            "number": null,
+            "title": "(b)- Suckers",
+            "pdfPage": 155
+          },
+          {
+            "number": null,
+            "title": "(b)- Modified Leaves",
+            "pdfPage": 156
+          },
+          {
+            "number": "10.2",
+            "title": "ARTIFICIAL PROPAGATION",
+            "pdfPage": 156
+          },
+          {
+            "number": null,
+            "title": "1. Cutting",
+            "pdfPage": 156
+          },
+          {
+            "number": null,
+            "title": "2. Grafting",
+            "pdfPage": 157
+          },
+          {
+            "number": null,
+            "title": "Advantages and Disadvantages of Vegetative Propagation",
+            "pdfPage": 157
+          },
+          {
+            "number": "10.3",
+            "title": "SEXUAL REPRODUCTION IN PLANTS",
+            "pdfPage": 158
+          },
+          {
+            "number": null,
+            "title": "Life Cycle of Angiosperms (Flowering Plants)",
+            "pdfPage": 158
+          },
+          {
+            "number": null,
+            "title": "Parts of a Flower",
+            "pdfPage": 159
+          },
+          {
+            "number": null,
+            "title": "Stages of the Life Cycle",
+            "pdfPage": 160
+          },
+          {
+            "number": null,
+            "title": "1- Development of Female Gametophyte (Embryo Sac)",
+            "pdfPage": 160
+          },
+          {
+            "number": null,
+            "title": "2- Development of Male Gametophyte (Pollen Grain)",
+            "pdfPage": 161
+          },
+          {
+            "number": null,
+            "title": "3- Pollination",
+            "pdfPage": 161
+          },
+          {
+            "number": null,
+            "title": "4- Fertilization",
+            "pdfPage": 161
+          },
+          {
+            "number": null,
+            "title": "5-Seed and Fruit Formation",
+            "pdfPage": 162
+          },
+          {
+            "number": null,
+            "title": "6- Development of Sporophytes",
+            "pdfPage": 163
+          }
+        ],
+        "notes": "The two section numbers 10.1, 10.2, 10.3 are printed with a trailing hyphen as '10.1-', '10.2-', '10.3-' and in small-caps styling. Note the book prints '(b)- Suckers' on p.155 and also '(b)- Modified Leaves' on p.156 (duplicate letter, likely a misprint for (c)); the numbered sub-items 4 'Vegetative Propagation' uses a colon ('4: Vegetative Propagation') as printed. Unnumbered subheadings are listed since the chapter has only three numbered sections."
+      }
+    },
+    {
+      "number": 11,
+      "title": "BIOSTATISTICS",
+      "titleEn": null,
+      "pdfStart": 167,
+      "pdfEnd": 175,
+      "read": {
+        "titleOnPage": "BIOSTATISTICS",
+        "sloHeading": null,
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define biostatistics and its uses.",
+          "Define and calculate mean, median and mode.",
+          "Sketch a bar chart for a given set of biological data."
+        ],
+        "headings": [
+          {
+            "number": "11.1",
+            "title": "INTRODUCTION OF BIOSTATISTICS",
+            "pdfPage": 167
+          },
+          {
+            "number": null,
+            "title": "Uses of Biostatistics",
+            "pdfPage": 167
+          },
+          {
+            "number": null,
+            "title": "Examples of the Uses of Biostatistics",
+            "pdfPage": 168
+          },
+          {
+            "number": "11.2",
+            "title": "MEAN, MEDIAN, AND MODE",
+            "pdfPage": 169
+          },
+          {
+            "number": "11.3",
+            "title": "BAR CHART",
+            "pdfPage": 171
+          }
+        ],
+        "notes": "Section numbers are printed with a trailing hyphen (e.g. \"11.1-\"). Subsections under the uses/examples (e.g. \"1- Designing Experiments and Studies\", \"2- Median\", \"3- Mode\", \"Mean\", \"Steps to Create a Bar Chart:\") are minor italic/shaded sub-headings and were not listed as main numbered headings. Running header on images 3-9 reads \"PLANT PHYSIOLOGY\" although the chapter is Biostatistics (apparent printing error)."
+      }
+    }
+  ]
+}

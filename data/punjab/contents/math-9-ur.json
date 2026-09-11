@@ -1,0 +1,110 @@
+{
+  "source": "content/punjab/textbooks/math-9-ur.pdf",
+  "subject": "math",
+  "grade": 9,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "ریاضی نہم (Riyazi - Class 9)",
+  "publisher": "پنجاب کریکولم اینڈ ٹیکسٹ بک بورڈ، لاہور (Punjab Curriculum and Textbook Board, Lahore)",
+  "curriculum": "یہ نصابی کتاب پاکستان کے قومی نصاب 2023 کے عین مطابق ہے اور یہ بورڈ سے منظور شدہ ہے۔",
+  "language": "ur",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "حقیقی اعداد",
+      "titleEn": "Real Numbers",
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "لوگارتھم",
+      "titleEn": "Logarithms",
+      "page": 21,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "سیٹ اور تفاعل",
+      "titleEn": "Sets and Functions",
+      "page": 37,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "تجزی اور الجبری مہارت",
+      "titleEn": "Factorization and Algebraic Manipulation",
+      "page": 65,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "یک درجی مساوات اور غیر مساوات",
+      "titleEn": "Linear Equations and Inequalities",
+      "page": 82,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "تکونیات",
+      "titleEn": "Trigonometry",
+      "page": 97,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "محدداتی جیومیٹری",
+      "titleEn": "Coordinate Geometry",
+      "page": 123,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "منطق",
+      "titleEn": "Logic",
+      "page": 147,
+      "topics": []
+    },
+    {
+      "number": 9,
+      "title": "متشابہ اشکال",
+      "titleEn": "Congruent/Similar Figures",
+      "page": 161,
+      "topics": []
+    },
+    {
+      "number": 10,
+      "title": "تفاعل کے گراف",
+      "titleEn": "Graphs of Functions",
+      "page": 185,
+      "topics": []
+    },
+    {
+      "number": 11,
+      "title": "لوسائی اور بناوٹ",
+      "titleEn": "Loci and Constructions",
+      "page": 200,
+      "topics": []
+    },
+    {
+      "number": 12,
+      "title": "معلوماتی معاملات",
+      "titleEn": "Information Handling",
+      "page": 215,
+      "topics": []
+    },
+    {
+      "number": 13,
+      "title": "احتمال",
+      "titleEn": "Probability",
+      "page": 243,
+      "topics": []
+    }
+  ],
+  "notes": "The contents page (فہرست) lists only unit numbers, titles, and starting page numbers with no sub-topic breakdown; hence 'topics' arrays are empty for all chapters as printed. Items after unit 13 (جوابات، فرہنگ، علامات، لوگارتھم جدول) are answers/glossary/symbols/log tables and are excluded per instructions."
+}

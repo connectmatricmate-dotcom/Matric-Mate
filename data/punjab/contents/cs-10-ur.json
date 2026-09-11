@@ -1,0 +1,75 @@
+{
+  "source": "content/punjab/textbooks/cs-10-ur.pdf",
+  "subject": "cs",
+  "grade": 10,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "کمپیوٹر سائنس اینڈ انٹرپرینیورشپ 10",
+  "publisher": "Punjab Education, Curriculum, Training and Assessment Authority",
+  "curriculum": "نیشنل کریکلم آف پاکستان 2023ء (نظر ثانی شدہ) کے مطابق",
+  "language": "ur",
+  "contentsPages": [
+    4
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "آپریٹنگ سسٹمز: ساخت اور خدمات",
+      "titleEn": "Operating Systems: Structure and Services",
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "سسٹم ریکوری اینڈ مینٹیننس",
+      "titleEn": "System Recovery and Maintenance",
+      "page": 19,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "تعارف برائے پائتھن پروگرامنگ",
+      "titleEn": "Introduction to Python Programming",
+      "page": 40,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "پائتھن میں کنٹرول اسٹرکچر +",
+      "titleEn": "Control Structures in Python +",
+      "page": 57,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "ڈیٹا سائنس کا تعارف",
+      "titleEn": "Introduction to Data Science",
+      "page": 73,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "مصنوعی ذہانت (AI) اور مشین لرننگ (ML) کا تعارف",
+      "titleEn": "Introduction to Artificial Intelligence (AI) and Machine Learning (ML)",
+      "page": 95,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "مصنوعی ذہانت (AI) کے اطلاقات",
+      "titleEn": "Applications of Artificial Intelligence (AI)",
+      "page": 109,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "ڈیجیٹل انٹرپرینیورشپ",
+      "titleEn": "Digital Entrepreneurship",
+      "page": 125,
+      "topics": []
+    }
+  ],
+  "notes": "The contents page lists only unit titles with page numbers; no sub-topic numbering is given. Two additional entries appear after Unit 8 without page numbers: 'سوالیہ پرچے کی تیاری بارے ہدایات' and 'ماڈل سوالیہ پرچہ' (guidance for question paper preparation and model question paper) · these are excluded as back matter per instructions."
+}

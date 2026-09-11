@@ -7,16 +7,18 @@
     "",
     "FBISE publishes Student Learning Outcomes with its own alphanumeric codes, and",
     "every note and question we generate points at the outcome it was written for.",
-    "Punjab publishes nothing equivalent. PCTB holds curriculum authority through",
+    "Punjab publishes no coded outcome matrix. PCTB holds curriculum authority through",
     "textbooks and notified schemes of studies; PBCC sets the paper pattern and the",
     "annual pairing scheme; the nine BISE boards run the exams. The federal NCC SLO",
     "frameworks on ncc.gov.pk are FBISE's, not Punjab's, and tagging Punjab content",
     "with federal codes would be a lie a Punjab student could catch.",
     "",
-    "So for Punjab the examinable unit is the TEXTBOOK TOPIC. The chapter and",
-    "subtopic hierarchy comes from the PCTB books, the mark distribution comes from",
-    "the model papers below, and curriculum_slos rows carry origin='textbook_topic'",
-    "so nothing downstream mistakes our reading of a textbook for a board outcome.",
+    "What the 2023 PCTB editions DO carry is the outcomes themselves: every chapter",
+    "opens with a box headed \"Student's learning outcomes (SLOs)\", printed verbatim.",
+    "Those are the examinable units. They are read out of the books, given codes we",
+    "mint (PJ-PHY-10-C10-S03), and stored with origin='textbook_slo'. Where a chapter",
+    "prints none, as with an Urdu lesson, its topics or the lesson itself stand in,",
+    "with origin='textbook_topic' and a T in the code. See migration 0035.",
     "",
     "ONE CATALOGUE FOR ALL NINE BOARDS. The client confirmed and PBCC's own",
     "notifications agree: curriculum, textbooks and paper pattern are uniform across",
@@ -26,7 +28,9 @@
     "",
     "EVERYTHING HERE IS A SCAN. Unlike FBISE's text PDFs, every Punjab document",
     "below is a scanned image: pdftotext returns zero characters. Extraction reads",
-    "the pages with a vision model instead. See scripts/fetch-punjab.mjs.",
+    "the pages with a vision model instead: scripts/extract-punjab-contents.mjs for",
+    "each contents page, scripts/extract-punjab-outcomes.mjs for inside each chapter,",
+    "then scripts/build-punjab-catalogue.mjs into data/punjab/catalogue.json.",
     "",
     "NOT REDISTRIBUTED. These are the boards' documents, fetched into content/punjab/",
     "which is gitignored, exactly as content/fbise/ is. What lives in git is the",
@@ -39,13 +43,35 @@
       "site (pctb.punjab.gov.pk) refuses connections from outside Pakistan, so these",
       "are fetched by hand and dropped into content/punjab/textbooks/.",
       "",
-      "elearn.punjab.gov.pk is PITB's official digitisation of the same books and its",
-      "chapter endpoints (onlineApp/newchp.php?g=9&s=Physics) return the chapter tree",
-      "as HTML, which is a far better source than a scan. It answers 403 to requests",
-      "from outside Pakistan too, but works from inside, so it is the preferred route."
+      "Only the 2023 editions (\"Based on Revised National Curriculum of Pakistan",
+      "2023\") are used. File names are {subject}-{class}.pdf, with -ur for an",
+      "Urdu-medium copy. Each book also carries its own pairing scheme and model",
+      "paper at the back, which is more current than the model papers below.",
+      "",
+      "SUPERSEDED: elearn.punjab.gov.pk. Its chapter tree matched the textbooks line",
+      "by line, but the pre-2023 textbooks: Biology 9 there has nine chapters, the",
+      "2023 book has eleven. The first catalogue was built from it and was wrong for",
+      "exactly that reason. Do not use it as a source of structure."
     ],
-    "chapterTree": "https://elearn.punjab.gov.pk/onlineApp/newchp.php?g={grade}&s={Subject}",
-    "subjectsOnElearn": ["Physics", "Chemistry", "Biology", "Math"],
+    "have": [
+      "bio-9", "bio-10", "chem-9", "chem-10", "cs-9", "cs-10", "eng-9", "eng-10",
+      "isl-9", "isl-10", "math-9", "math-10", "phy-10", "pst-9", "pst-10",
+      "urd-9", "urd-10",
+      "Urdu medium, same edition as the English: bio-10-ur, chem-10-ur, cs-10-ur, math-9-ur, math-10-ur, pst-9-ur"
+    ],
+    "olderEditions": {
+      "_comment": [
+        "Approved by the client (Adnan), via the colleague who supplied them, on 11 September",
+        "2026, because the 2023 editions could not be found. Two different uses:"
+      ],
+      "phy-9-ur": "The only Physics 9 in hand: National Curriculum 2006, 2018 print. It IS the Class 9 Physics syllabus in the catalogue, 9 units with their printed outcomes. Its units 8 and 9 (thermal properties, transfer of heat) overlap the 2023 Physics 10's chapters 10 and 11.",
+      "phy-10-ur, bio-9-ur, chem-9-ur, cs-9-ur, pst-10-ur": "Different syllabus from the 2023 English books, so they define nothing. Used only to give an Urdu name to a chapter that survived into the new book, matched by title (scripts/build-punjab-catalogue.mjs, matchUrduChapters)."
+    },
+    "awaited": [
+      "phy-9, 2023 edition, either medium: would replace the 2006 book above",
+      "2023 Urdu-medium copies of Physics 9 and 10, Biology 9, Chemistry 9, Computer Science 9 and Pakistan Studies 10: Urdu chapter names only"
+    ],
+    "cs-10": "The English copy in hand starts at Unit 1 with no contents page; its chapters were located from the unit openings.",
     "fetchByHand": true
   },
 

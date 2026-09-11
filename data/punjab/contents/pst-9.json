@@ -1,0 +1,47 @@
+{
+  "source": "content/punjab/textbooks/pst-9.pdf",
+  "subject": "pst",
+  "grade": 9,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "PAKISTAN STUDIES 9",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": null,
+  "language": "en",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Ideological Basis of Pakistan",
+      "titleEn": null,
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "Pakistan Movement and Emergence of Pakistan",
+      "titleEn": null,
+      "page": 18,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "Land and Environment",
+      "titleEn": null,
+      "page": 59,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "Women's Empowerment",
+      "titleEn": null,
+      "page": 95,
+      "topics": []
+    }
+  ],
+  "notes": "The contents table lists only chapter titles and page numbers; no sub-topics are printed. Chapter numbers appear with a trailing period (\"1.\", \"2.\", etc.)."
+}

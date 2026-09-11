@@ -1,0 +1,290 @@
+{
+  "source": "content/punjab/textbooks/bio-9-ur.pdf",
+  "subject": "bio",
+  "grade": 9,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "بائیو لوجی 9",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": null,
+  "language": "mixed",
+  "contentsPages": [
+    3,
+    4
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "بائیولوجی کا تعارف",
+      "titleEn": "INTRODUCTION TO BIOLOGY",
+      "page": 2,
+      "topics": [
+        {
+          "number": "1.1",
+          "title": "بائیولوجی کا تعارف",
+          "titleEn": "Introduction to Biology",
+          "page": 3
+        },
+        {
+          "number": "1.2",
+          "title": "جانداروں کی تنظیم کے درجات",
+          "titleEn": "Levels of Organization of Organisms",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "بائیولوجیکل پرابلم کو حل کرنا",
+      "titleEn": "SOLVING A BIOLOGICAL PROBLEM",
+      "page": 23,
+      "topics": [
+        {
+          "number": "2.1",
+          "title": "بائیولوجیکل بطریقہ",
+          "titleEn": "Biological Method",
+          "page": 23
+        },
+        {
+          "number": "2.2",
+          "title": "ڈیٹا کی ترتیب اور ڈیٹا کا تجزیہ کرنا",
+          "titleEn": "Data Organization and Data Analysis",
+          "page": 33
+        },
+        {
+          "number": "2.3",
+          "title": "ریاضی: سائنسی پراسیس کا اہم جزو",
+          "titleEn": "Mathematics: An integral Part of Scientific Process",
+          "page": 34
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "بائیوڈائیورسٹی (تنوع حیات)",
+      "titleEn": "BIODIVERSITY",
+      "page": 38,
+      "topics": [
+        {
+          "number": "3.1",
+          "title": "بائیوڈائیورسٹی",
+          "titleEn": "Biodiversity",
+          "page": 39
+        },
+        {
+          "number": "3.2",
+          "title": "کلاسیفیکیشن: مقاصد اور اصول",
+          "titleEn": "Classification: Aims and Principles",
+          "page": 40
+        },
+        {
+          "number": "3.3",
+          "title": "کلاسیفیکیشن سسٹمز کی تاریخ",
+          "titleEn": "History of Classification Systems",
+          "page": null
+        },
+        {
+          "number": "3.4",
+          "title": "پانچ کنگڈمز",
+          "titleEn": "The Five Kingdoms",
+          "page": 46
+        },
+        {
+          "number": "3.5",
+          "title": "بائی نومیل نومن کلیچر",
+          "titleEn": "Binomial Nomenclature",
+          "page": 49
+        },
+        {
+          "number": "3.6",
+          "title": "بائیوڈائیورسٹی کا تحفظ",
+          "titleEn": "Conservation of Biodiversity",
+          "page": 50
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "سیلز اور ٹشوز",
+      "titleEn": "CELLS AND TISSUES",
+      "page": 64,
+      "topics": [
+        {
+          "number": "4.1",
+          "title": "مائیکروسکوپی اور سیل تھیوری کا ظہور",
+          "titleEn": "Microscopy and the Emergence of Cell Theory",
+          "page": 65
+        },
+        {
+          "number": "4.2",
+          "title": "سیل کی ساختیں اور افعال",
+          "titleEn": "Cellular Structures and Functions",
+          "page": 71
+        },
+        {
+          "number": "4.3",
+          "title": "سیل کی جسامت اور سطحی رقبہ کا حجم کے تناسب",
+          "titleEn": "Cell Size and Surface area to Volume Ratio",
+          "page": 83
+        },
+        {
+          "number": "4.4",
+          "title": "مالیکیولز کا سیلز میں آنا جانا",
+          "titleEn": "Passage of Molecules Into and Out of Cells",
+          "page": 84
+        },
+        {
+          "number": "4.5",
+          "title": "جانوروں اور پودوں کے ٹشوز",
+          "titleEn": "Animal and Plant Tissues",
+          "page": 90
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "سیل سائیکل",
+      "titleEn": "CELL CYCLE",
+      "page": 105,
+      "topics": [
+        {
+          "number": "5.1",
+          "title": "سیل سائیکل",
+          "titleEn": "Cell Cycle",
+          "page": 106
+        },
+        {
+          "number": "5.2",
+          "title": "مائی ٹوسس",
+          "titleEn": "Mitosis",
+          "page": 107
+        },
+        {
+          "number": "5.3",
+          "title": "میاؤسس",
+          "titleEn": "Meiosis",
+          "page": 115
+        },
+        {
+          "number": "5.4",
+          "title": "اپیاپٹوسس اور نیکروسس",
+          "titleEn": "Apoptosis and Necrosis",
+          "page": 122
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "انزائمز",
+      "titleEn": "ENZYMES",
+      "page": 128,
+      "topics": [
+        {
+          "number": "6.1",
+          "title": "انزائمز کے خواص",
+          "titleEn": "Characteristics of Enzymes",
+          "page": 130
+        },
+        {
+          "number": "6.2",
+          "title": "انزائم ایکشن کا میکانزم",
+          "titleEn": "Mechanism of Enzyme Action",
+          "page": 134
+        },
+        {
+          "number": "6.3",
+          "title": "انزائمز کی تخصیص",
+          "titleEn": "Specificity of Enzymes",
+          "page": 135
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "بائیو انرجٹکس",
+      "titleEn": "BIOENERGETICS",
+      "page": 141,
+      "topics": [
+        {
+          "number": "7.1",
+          "title": "بائیوانرجٹکس اور ATP کا کردار",
+          "titleEn": "Bioenergetics and the Role of ATP",
+          "page": 142
+        },
+        {
+          "number": "7.2",
+          "title": "فوٹوسنتھی سز",
+          "titleEn": "Photosynthesis",
+          "page": 145
+        },
+        {
+          "number": "7.3",
+          "title": "ریسپیریشن",
+          "titleEn": "Respiration",
+          "page": 157
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "نیوٹریشن (تغذیہ)",
+      "titleEn": "NUTRITION",
+      "page": 169,
+      "topics": [
+        {
+          "number": "8.1",
+          "title": "پودوں میں منرل نیوٹریشن",
+          "titleEn": "Mineral Nutrition in Plants",
+          "page": 170
+        },
+        {
+          "number": "8.2",
+          "title": "انسان کی غذا کے اجزاء",
+          "titleEn": "Components of Human Food",
+          "page": 172
+        },
+        {
+          "number": "8.3",
+          "title": "انسان میں ڈائجسشن",
+          "titleEn": "Digestion in Humans",
+          "page": 188
+        },
+        {
+          "number": "8.4",
+          "title": "آنتوں کی معدی بیماریاں",
+          "titleEn": "Disorders of Gut",
+          "page": 199
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "ٹرانسپورٹ",
+      "titleEn": "TRANSPORT",
+      "page": 205,
+      "topics": [
+        {
+          "number": "9.1",
+          "title": "پودوں میں ٹرانسپورٹ",
+          "titleEn": "Transport in Plants",
+          "page": 206
+        },
+        {
+          "number": "9.2",
+          "title": "انسان میں ٹرانسپورٹ",
+          "titleEn": "Transport in Humans",
+          "page": 220
+        },
+        {
+          "number": "9.3",
+          "title": "کارڈیوویسکولر بیماریاں",
+          "titleEn": "Cardiovascular Disorders",
+          "page": 241
+        }
+      ]
+    }
+  ],
+  "notes": "The contents pages group chapters under three untitled 'Sections' (سیکشن 1, سیکشن 2, سیکشن 3) which are shown as section headers rather than numbered chapters; these have been omitted per instructions to include only teaching chapters. Page numbers for some sub-topics (e.g. Biological Method, History of Classification Systems) were not explicitly printed next to the topic in the contents and are left as null or inferred from adjacent entries where clearly printed. Credits/Supplementary Reading and Glossary listed at pages 248-249 are back matter and excluded."
+}

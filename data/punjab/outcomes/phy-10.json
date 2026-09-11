@@ -1,0 +1,1091 @@
+{
+  "source": "content/punjab/textbooks/phy-10.pdf",
+  "subject": "phy",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 204,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    3
+  ],
+  "backMatterStart": 201,
+  "locateNotes": "Printed page numbers run 3 behind the PDF labels (printed 1 = PDF page 4). PDF 201 begins the 'Pairing Scheme / Instructions for Preparation of Examination Paper' (printed i), followed by the Model Paper on PDF 202-204.",
+  "chapters": [
+    {
+      "number": 10,
+      "title": "Thermal Physics",
+      "titleEn": null,
+      "pdfStart": 4,
+      "pdfEnd": 21,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "THERMAL PHYSICS",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this unit, student will be able to:",
+        "slos": [
+          "describe qualitatively the thermal expansion of solids (linear and volumetric expansion).",
+          "explain the thermal expansion of liquids (real and apparent expansion) and gases.",
+          "discuss the pressure and the changes in pressure of a gas in terms of particles [the forces exerted by particles colliding with surfaces, creating a force per unit area.]",
+          "discuss the applications and consequences of thermal expansion in real life.",
+          "define and calculate specific heat for solids and liquids.",
+          "discuss everyday effects due to the large specific heat of water.",
+          "use the terms for the changes in state between solids, liquids and gases  (This includes stating the relative order of magnitudes of the expansion of solids, liquids and gases.)",
+          "describe evaporation in terms of particles [in terms of the escape of more energetic particles from the surface of a liquid].",
+          "discuss how temperature, humidity, surface area and air movement over a surface affect evaporation.",
+          "explain how evaporation causes cooling.",
+          "describe the use of cooling caused by evaporation in the refrigeration process without using harmful CFCs.",
+          "define latent heat of fusion and latent heat of vaporization of ice and water. How these can be determined Experimentally? [including illustrating the analysis of data by sketching temperature-time graph on heating ice.]",
+          "describe superconductivity [as when atoms are in this state, their kinetic energy is low, so there is little (or no) resistance to the flow of electrons.",
+          "state that certain materials, when cooled to near absolute zero, can exhibit superconductivity."
+        ],
+        "headings": [
+          {
+            "number": "10.1",
+            "title": "Thermal Expansion",
+            "pdfPage": 5
+          },
+          {
+            "number": null,
+            "title": "Thermal Expansion in Solids",
+            "pdfPage": 5
+          },
+          {
+            "number": null,
+            "title": "Thermal Expansion in Liquids",
+            "pdfPage": 7
+          },
+          {
+            "number": null,
+            "title": "Thermal Expansion in Gases",
+            "pdfPage": 8
+          },
+          {
+            "number": null,
+            "title": "Consequences of Thermal Expansion in Real Life",
+            "pdfPage": 9
+          },
+          {
+            "number": "10.2",
+            "title": "Specific Heat Capacity",
+            "pdfPage": 10
+          },
+          {
+            "number": null,
+            "title": "Specific Heat Capacity of Solids",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "Specific Heat Capacity of Liquids",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "Effects of Large Specific Heat Capacity of Water",
+            "pdfPage": 12
+          },
+          {
+            "number": "10.3",
+            "title": "Change in State",
+            "pdfPage": 13
+          },
+          {
+            "number": null,
+            "title": "Change in State of a Substance",
+            "pdfPage": 13
+          },
+          {
+            "number": "10.4",
+            "title": "Evaporation",
+            "pdfPage": 13
+          },
+          {
+            "number": null,
+            "title": "Cooling Caused by Evaporation",
+            "pdfPage": 14
+          },
+          {
+            "number": null,
+            "title": "Refrigeration without Chlorofluorocarbons (CFCs)",
+            "pdfPage": 15
+          },
+          {
+            "number": "10.5",
+            "title": "Latent Heat",
+            "pdfPage": 16
+          },
+          {
+            "number": null,
+            "title": "Latent Heat of Fusion",
+            "pdfPage": 16
+          },
+          {
+            "number": null,
+            "title": "Latent Heat of Vaporization",
+            "pdfPage": 17
+          },
+          {
+            "number": "10.6",
+            "title": "Superconductivity",
+            "pdfPage": 18
+          },
+          {
+            "number": null,
+            "title": "How does Superconductivity Work ?",
+            "pdfPage": 19
+          },
+          {
+            "number": null,
+            "title": "Materials That Show Superconductivity",
+            "pdfPage": 19
+          },
+          {
+            "number": null,
+            "title": "Uses of Superconductors",
+            "pdfPage": 19
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 11,
+      "title": "Transfer of Thermal Energy",
+      "titleEn": null,
+      "pdfStart": 22,
+      "pdfEnd": 34,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "TRANSFER OF THERMAL ENERGY",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "explain thermal conduction in all solids (in terms of atomic or molecular lattice vibrations and also in terms of the movement of free (delocalized) electrons in metallic conductors).",
+          "analyze everyday applications of conduction, convection, and radiation. (a) Heating objects such as kitchen pans (b) Heating a room by convection (c) Measuring temperature using an infrared thermometer (d) Using thermal insulation to maintain the temperature of a liquid and to reduce thermal energy transfer in buildings (e) The mechanism of a household hot-water system.",
+          "explain convection in liquids and gases [in terms of density changes]. Justify experiments to illustrate convection.",
+          "explain convection in seawater to support marine life.",
+          "describe the role of land breezes and sea breezes in maintaining moderate coastal climates.",
+          "explain how birds are able to fly for hours without flapping their wings and gliders are able to rise by riding on thermal currents.",
+          "describe the process of thermal energy transfer by radiation [and know that it does not require a medium].",
+          "describe the effect of surface colour and texture on the emission, absorption, and reflection of infrared radiation.",
+          "justify qualitatively how the rate of emission of radiation depends on the surface temperature and surface area of an object.",
+          "analyze the consequence of heat radiation in the greenhouse effect and its effect on global warming."
+        ],
+        "headings": [
+          {
+            "number": "11.1",
+            "title": "Conduction",
+            "pdfPage": 23
+          },
+          {
+            "number": "11.2",
+            "title": "Convection in liquids and Gases",
+            "pdfPage": 24
+          },
+          {
+            "number": "11.3",
+            "title": "Heat Transfer through Radiation",
+            "pdfPage": 28
+          },
+          {
+            "number": "11.4",
+            "title": "Greenhouse Effect",
+            "pdfPage": 32
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 12,
+      "title": "Waves",
+      "titleEn": null,
+      "pdfStart": 35,
+      "pdfEnd": 48,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "WAVES",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "prove that waves transfer energy without transferring matter.",
+          "describe what is meant by wave motion [as illustrated by vibrations in ropes and springs and by experiments using water waves].",
+          "state the types of waves: (i) transverse waves (ii) longitudinal waves",
+          "describe the features of a wave [in terms of wave front, wavelength, frequency, time period, crest (peak), trough, compression, rarefaction, amplitude and wave speed].",
+          "define the terms frequency, wavelength and amplitude.",
+          "recall and apply the equation wave speed = frequency × wavelength; v = f λ",
+          "illustrate that for a transverse wave the direction of vibration is at right angles to the direction of the energy transfer [including giving examples such as electromagnetic radiation, waves on the surface of water, and seismic waves ].",
+          "illustrate that for a longitudinal wave, the direction of vibration is parallel to the direction of the energy transfer [including giving examples such as sound waves and seismic P-waves (primary)].",
+          "describe how waves can undergo reflection, refraction and diffraction (using ripple tank).",
+          "describe how wavelength affects diffraction at an edge.",
+          "describe how wavelength and slit size affect diffraction through a slit.",
+          "analyze the phenomenon of tsunamis generated under the surface of water [in terms of underwater earthquakes/volcanic activity generating waves that increase in frequency and amplitude as they encounter increasingly shallow water]."
+        ],
+        "headings": [
+          {
+            "number": "12.1",
+            "title": "Waves and Nature of Waves",
+            "pdfPage": 36
+          },
+          {
+            "number": "12.2",
+            "title": "Types of Waves",
+            "pdfPage": 37
+          },
+          {
+            "number": "12.3",
+            "title": "Terms and Parameters of Waves",
+            "pdfPage": 40
+          },
+          {
+            "number": "12.4",
+            "title": "Properties of Waves",
+            "pdfPage": 42
+          },
+          {
+            "number": "12.5",
+            "title": "Seismic and Tsunami Waves",
+            "pdfPage": 44
+          }
+        ],
+        "notes": "Sub-sections such as 'Mechanical Waves', 'Electromagnetic Waves', 'Types of Mechanical Waves', 'Transverse Waves', 'Longitudinal Waves', 'Water Wave Experiment to Demonstrate Wave Motion', 'Wave Speed (v) / Wave Equation', 'Reflection of Waves', 'Refraction of Waves', 'Diffraction of Waves', 'Seismic Waves', 'Primary Waves (P-Waves)', 'Tsunami Waves', and 'Characteristics of Tsunami Waves' are printed as unnumbered sub-headings under the main numbered sections and were excluded from the headings list per the given rules."
+      }
+    },
+    {
+      "number": 13,
+      "title": "Sound",
+      "titleEn": null,
+      "pdfStart": 49,
+      "pdfEnd": 64,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "SOUND",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "describe the production of sound.",
+          "describe the longitudinal nature of sound waves.",
+          "state the approximate range of frequencies audible to humans as 20 Hz to 20,000 Hz.",
+          "justify why sound waves cannot travel in vacuum (including experiments to demonstrate this).",
+          "describe how changes in amplitude and frequency affect the loudness and pitch of sound waves.",
+          "describe how different sound sources produce sound waves with different quality (including making reference to the shape of the traces on an oscilloscope).",
+          "describe an echo as the reflection of sound waves.",
+          "justify simple experiments to show the reflection of sound waves.",
+          "illustrate a method involving a measurement of distance and time for determining the speed of sound in air.",
+          "state that the speed of sound in air is approximately 330-350 m s⁻¹.",
+          "describe that, in general, sound travels faster in solids than in liquids and faster in liquids than in gases.",
+          "define ultrasound as sound with a frequency higher than 20 kHz.",
+          "illustrate and analyze the uses of ultrasound (in cleaning, parental and other medical scanning, and in sonar, including calculation of depth or distance from time and wave speed).",
+          "illustrate the use of infrasound (e.g., by elephants in communication and in the study of seismic activity).",
+          "analyze the effects of noise pollution on the environment.",
+          "justify the importance of acoustic protection.",
+          "describe how knowledge of the properties of sound waves is applied in the design of buildings with respect to acoustics.",
+          "explain the use of soft materials to reduce echo sounding (such as in classroom studies and other public gathering buildings).",
+          "explain, with examples, how sound can reflect, refract, and diffract."
+        ],
+        "headings": [
+          {
+            "number": "13.1",
+            "title": "Production and Propagation of sound",
+            "pdfPage": 50
+          },
+          {
+            "number": "13.2",
+            "title": "Speed of Sound",
+            "pdfPage": 53
+          },
+          {
+            "number": "13.3",
+            "title": "Characteristics of Sound",
+            "pdfPage": 53
+          },
+          {
+            "number": "13.4",
+            "title": "Reflection of Sound (Echo)",
+            "pdfPage": 57
+          },
+          {
+            "number": "13.5",
+            "title": "Refraction and Diffraction of Sound",
+            "pdfPage": 59
+          },
+          {
+            "number": "13.6",
+            "title": "Audible Frequency",
+            "pdfPage": 60
+          },
+          {
+            "number": "13.7",
+            "title": "Acoustic protection of Buildings",
+            "pdfPage": 63
+          }
+        ],
+        "notes": "Sub-headings such as 'Production of Sound', 'Propagation of Sound', 'Longitudinal Nature of Sound Waves', 'Loudness', 'Pitch', 'Quality of Sound', 'Musical Sounds and Noise', 'Effects of Noise Pollution', 'Controlling Noise Pollution', 'Refraction of Sound', 'Diffraction of Sound', 'Infrasound', 'Ultrasound', 'Underwater Exploration (SONAR)', 'Industrial Applications' are unnumbered sub-sections under the numbered headings and were not listed separately."
+      }
+    },
+    {
+      "number": 14,
+      "title": "Light",
+      "titleEn": null,
+      "pdfStart": 65,
+      "pdfEnd": 90,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "LIGHT",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "define and use the terms normal, angle of incidence, and angle of reflection.",
+          "describe an experiment to find the position and characteristics of an optical image formed by a plane mirror (same size, same distance from mirror as object, and virtual).",
+          "use the law of reflection to solve simple optical problems.",
+          "apply the qualitative principle that a wave refracts towards the normal when it slows down while entering a medium and that it refracts away from the normal if it speeds up when it enters a new medium (in the case the angle of incidence is zero, then the waves continue parallel to the normal).",
+          "define and use the refractive index from vacuum to a medium for light as c/v.",
+          "define refractive index n as; n = sin i / sin r. Apply Snell's law; n = sin i / sin r, to solve simple problems.",
+          "describe an experiment to show refraction of light by transparent blocks of different shapes.",
+          "define the terms critical angle C and total internal reflection.",
+          "derive the equation; n = 1 / sin C.",
+          "apply the equation; n = 1 / sin C to solve simple problems.",
+          "describe experiments to show internal reflection and total internal reflection.",
+          "evaluate and illustrate the use of optical fibres, particularly in telecommunications, stating the advantages of their use in each context.",
+          "analyze the action of thin converging and thin diverging lenses on a parallel beam of light.",
+          "define and use the terms focal length, principal axis, and principal focus (focal point).",
+          "draw ray diagrams to illustrate the formation of real and virtual images of an object by a converging lens.",
+          "differentiate between real and virtual images.",
+          "define and calculate linear magnification (as the ratio of image length to object length; state and use the equation; linear magnification = image length / object length).",
+          "describe the use of a single convex lens as a magnifying glass.",
+          "describe the use of a single convex lens in various optical device applications (specifically in the case of a magnifying glass, a camera, projector, and a photographic enlarger). This includes drawing ray diagrams to show how each forms an image.",
+          "explain the dispersion of light by a prism [including the detection of non-visible spectra by a thermometer].",
+          "draw ray diagrams to show the formation of images in the normal eye, a short-sighted eye, and a long-sighted eye.",
+          "describe the use of converging and diverging lenses to correct long-sightedness and short-sightedness.",
+          "state that extreme gravity from interstellar objects like black holes can cause light to bend (from the perspective of the observer) in a way that is analogous to a simple lens [This is called 'gravitational lensing ]."
+        ],
+        "headings": [
+          {
+            "number": "14.1",
+            "title": "Reflection of Light",
+            "pdfPage": 67
+          },
+          {
+            "number": "14.2",
+            "title": "Refraction of Light",
+            "pdfPage": 70
+          },
+          {
+            "number": "14.3",
+            "title": "Optical Fibre",
+            "pdfPage": 77
+          },
+          {
+            "number": "14.4",
+            "title": "Thin lenses",
+            "pdfPage": 78
+          },
+          {
+            "number": "14.5",
+            "title": "Optical devices",
+            "pdfPage": 84
+          },
+          {
+            "number": "14.6",
+            "title": "Image Formation in a Normal Eye",
+            "pdfPage": 85
+          },
+          {
+            "number": "14.7",
+            "title": "Gravitational Lens and Acoustic Lens",
+            "pdfPage": 87
+          },
+          {
+            "number": "14.8",
+            "title": "Dispersion of Light by Prism",
+            "pdfPage": 88
+          }
+        ],
+        "notes": "Sub-headings within sections (e.g. Laws of Reflection, Refraction Through Prism, Total Internal Reflection, Refractive Index, Types of Lenses, Power of a Lens, Image Formation by Thin Lenses, Linear Magnification, Short-Sightedness, Long-Sightedness, Gravitational Lensing, Acoustic Lenses) are unnumbered sub-topics and were omitted per instructions to list only numbered section headings."
+      }
+    },
+    {
+      "number": 15,
+      "title": "Electrostatics",
+      "titleEn": null,
+      "pdfStart": 91,
+      "pdfEnd": 106,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ELECTROSTATICS",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "state that there are positive and negative charges [and charge is measured in coulombs].",
+          "state that unlike charges attract and like charges repel.",
+          "describe experiments to show electrostatic charging by friction.",
+          "explain that charging of solids by friction involves only a transfer of negative charge (electrons).",
+          "explain how a conductor can be charged by  electrostatic induction and then \"earthing.\"",
+          "suggest how charging and discharging is used in the application of various devices (e.g., photocopier and electrostatic precipitator).",
+          "describe an electric field as a region in which an electric charge experiences a force.",
+          "state that the direction of an electric field line at a point is the direction of the force on a positive charge at that point.",
+          "discuss and illustrate simple electric field patterns (including the direction of the field): (a) around a point charge (b) around a charged conducting sphere (c) between two oppositely charged parallel conducting plates (end effects will not be examined).",
+          "state examples of electrical conductors and insulators.",
+          "describe an experiment to distinguish between electrical conductors and insulators.",
+          "state and use a simple electron model to explain the difference between electrical conductors and insulators.",
+          "explain how a lightning rod can protect humans.",
+          "explain electrical breakdown (it occurs when a strong electric field passes through a gas and causes its atoms to ionize).",
+          "state that corona discharge and Lichtenberg figures are visible examples of electrical breakdown."
+        ],
+        "headings": [
+          {
+            "number": "15.1",
+            "title": "Electric Charge",
+            "pdfPage": 92
+          },
+          {
+            "number": null,
+            "title": "Properties of Charges",
+            "pdfPage": 93
+          },
+          {
+            "number": "15.2",
+            "title": "Electrostatic induction",
+            "pdfPage": 94
+          },
+          {
+            "number": null,
+            "title": "Charging by Induction and Earthing",
+            "pdfPage": 95
+          },
+          {
+            "number": null,
+            "title": "Electroscope",
+            "pdfPage": 95
+          },
+          {
+            "number": "15.3",
+            "title": "Applications of Electrostatics",
+            "pdfPage": 96
+          },
+          {
+            "number": null,
+            "title": "Photocopier",
+            "pdfPage": 97
+          },
+          {
+            "number": null,
+            "title": "Electrostatic Precipitator",
+            "pdfPage": 97
+          },
+          {
+            "number": "15.4",
+            "title": "Coulomb's Law",
+            "pdfPage": 98
+          },
+          {
+            "number": "15.5",
+            "title": "Electric Field",
+            "pdfPage": 99
+          },
+          {
+            "number": null,
+            "title": "Electric Field Lines",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "Around a Point Charge",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "Around a Charged Conducting Sphere",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "Between Two Oppositely Charged Parallel Conducting Plates",
+            "pdfPage": 101
+          },
+          {
+            "number": "15.6",
+            "title": "Conduction of Electric Charges",
+            "pdfPage": 101
+          },
+          {
+            "number": null,
+            "title": "Electrical Conductors",
+            "pdfPage": 101
+          },
+          {
+            "number": null,
+            "title": "Electrical Insulators",
+            "pdfPage": 102
+          },
+          {
+            "number": null,
+            "title": "Free Electron Model",
+            "pdfPage": 102
+          },
+          {
+            "number": "15.7",
+            "title": "Accumulation of Charges",
+            "pdfPage": 102
+          },
+          {
+            "number": null,
+            "title": "Electrical breakdown",
+            "pdfPage": 103
+          },
+          {
+            "number": null,
+            "title": "Corona discharge",
+            "pdfPage": 103
+          },
+          {
+            "number": null,
+            "title": "Lichtenberg Figures",
+            "pdfPage": 103
+          },
+          {
+            "number": null,
+            "title": "Lightning conductors",
+            "pdfPage": 104
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 16,
+      "title": "Electricity",
+      "titleEn": null,
+      "pdfStart": 107,
+      "pdfEnd": 128,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ELECTRICITY",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "define and calculate electric current, using the equation; I = Q/t.",
+          "explain electrical conduction in metals in terms of the movement of free electrons.",
+          "state that current is measured in amperes and that one ampere is equal to one coulomb per second (C s⁻¹).",
+          "differentiate between direct current D.C and alternating current A.C.",
+          "differentiate between conventional and electronic current.",
+          "justify and illustrate the use of ammeters (analog and digital) with different ranges.",
+          "define e.m.f. as the electrical work done by a source in moving a unit charge around a complete circuit, using the equation; E = W/Q.",
+          "define potential difference (p.d.) as the work done by a unit charge passing through a component, using the equation; V = W/Q.",
+          "state that e.m.f. and p.d. are measured in volts and that one volt is equal to one joule per coulomb (J C⁻¹).",
+          "illustrate the use of voltmeters (analog and digital) with different ranges.",
+          "calculate the total e.m.f when multiple sources are arranged in series.",
+          "state that the e.m.f of identical sources connected in parallel is equal to the e.m.f. of one of the sources.",
+          "define and calculate resistivity, explaining its direct proportionality to resistance and length, and inverse proportionality to cross-sectional area.",
+          "define and apply Ohm's law using the equation; R = V/I.",
+          "describe the effect of temperature increase on the resistance of a resistor, such as in a filament lamp.",
+          "draw circuit diagrams using components such as cells, batteries, power supplies, generators, switches, resistors, thermistors (NTC), light-dependent resistors (LDRs), lamps, motors, ammeters, voltmeters, transformers, fuses, relays, diodes, and LEDs.",
+          "calculate the combined resistance of resistors in series.",
+          "calculate the combined resistance of resistors in parallel.",
+          "calculate current, voltage, and resistance in parts of a circuit or the whole circuit.",
+          "describe the action of negative temperature coefficient (NTC) thermistors and light-dependent resistors (LDRs) and their use as input sensors.",
+          "analyze the function of variable potential dividers in circuits, using the equation; R1/R2 = V1/V2.",
+          "justify and illustrate the use of colour codes for resistors.",
+          "use the equation; power = current × voltage (P = IV) to solve simple problems.",
+          "use the equation energy = current × voltage × time (E = IVt) to solve simple problems.",
+          "define the kilowatt-hour (kWh).",
+          "explain the need to choose components with suitable power ratings.",
+          "calculate the cost of using electrical appliances where the energy unit is the kWh.",
+          "explain the use and operation of trip switches and fuses and choose appropriate fuse ratings and trip switch settings.",
+          "explain what happens when a live wire touches a metal case that is earthed.",
+          "explain why the outer casing of an electrical appliance must be either non-conducting (double-insulated) or earthed.",
+          "state that a mains circuit consists of a live wire (line wire), a neutral wire, and an earth wire.",
+          "explain why fuses and circuit breakers are connected into the live wire for the circuit to be switched OFF safely.",
+          "explain why domestic supplies are connected in parallel."
+        ],
+        "headings": [
+          {
+            "number": "16.1",
+            "title": "Electric Current",
+            "pdfPage": 109
+          },
+          {
+            "number": "16.2",
+            "title": "Electromotive Force and Potential Difference",
+            "pdfPage": 111
+          },
+          {
+            "number": "16.3",
+            "title": "Ohm's Law",
+            "pdfPage": 115
+          },
+          {
+            "number": "16.4",
+            "title": "Combination of Resistances",
+            "pdfPage": 116
+          },
+          {
+            "number": "16.5",
+            "title": "Electrical Resistivity",
+            "pdfPage": 118
+          },
+          {
+            "number": "16.6",
+            "title": "Potential Divider Circuit",
+            "pdfPage": 119
+          },
+          {
+            "number": "16.7",
+            "title": "Resistor Colour Codes",
+            "pdfPage": 120
+          },
+          {
+            "number": "16.8",
+            "title": "Common Use of Electricity",
+            "pdfPage": 122
+          },
+          {
+            "number": "16.9",
+            "title": "Electric Power",
+            "pdfPage": 122
+          },
+          {
+            "number": "16.10",
+            "title": "Household Circuits and Safety Measures",
+            "pdfPage": 124
+          }
+        ],
+        "notes": "On image 15, subheading 'Negative Temperature Coefficient (NTC) Thermistors' and 'Light-Dependent Resistors (LDRs)' appear as unnumbered subsections under 16.7; included as headings without numbers would duplicate style, so they were omitted per instructions to only list numbered headings (they are sub-topics, not separately numbered)."
+      }
+    },
+    {
+      "number": 17,
+      "title": "Electromagnetism",
+      "titleEn": null,
+      "pdfStart": 129,
+      "pdfEnd": 140,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ELECTROMAGNETISM",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "describe the pattern and direction of the magnetic field due to currents in straight wires and in solenoids.",
+          "state the effect on the magnetic field of changing the magnitude and direction of the current.",
+          "describe how the magnetic effect of a current is used in relays and loudspeakers (including giving examples of their application).",
+          "describe an experiment to show that a force acts on a current-carrying conductor in a magnetic field (including the effect of reversing: (a) the current (b) the direction of the field",
+          "state and use the relative directions of force, magnetic field, and current.",
+          "describe the magnetic field patterns between currents in parallel conductors and relate these to the forces on the conductors (excluding the Earth's field).",
+          "state that a current-carrying coil in a magnetic field may experience a turning effect and that the turning effect is increased by increasing: (a) the number of turns on the coil (b) the current (c) the strength of the magnetic field",
+          "describe the operation of an electric motor, including the action of a split-ring commutator and brushes.",
+          "describe and explain the action of relays in switching circuits.",
+          "state that it is theorized that the Earth's magnetic field is generated by the rotation of the Earth and its molten iron core that contains charged particles in motion."
+        ],
+        "headings": [
+          {
+            "number": "17.1",
+            "title": "Magnetic Effects of Steady Current",
+            "pdfPage": 130
+          },
+          {
+            "number": null,
+            "title": "Magnetic Field B Due to Current in a Straight Wire",
+            "pdfPage": 130
+          },
+          {
+            "number": null,
+            "title": "Direction of the Magnetic Field of a Current-Carrying Wire",
+            "pdfPage": 131
+          },
+          {
+            "number": null,
+            "title": "Magnetic Field Due to Current in a Solenoid",
+            "pdfPage": 131
+          },
+          {
+            "number": null,
+            "title": "Properties of Magnetic Field Lines",
+            "pdfPage": 132
+          },
+          {
+            "number": null,
+            "title": "Forces on Parallel Current-Carrying Conductors",
+            "pdfPage": 132
+          },
+          {
+            "number": "17.2",
+            "title": "Force on a Current-Carrying Conductor in a Magnetic Field",
+            "pdfPage": 133
+          },
+          {
+            "number": "17.3",
+            "title": "Turning Effect on a Current-Carrying Coil in Magnetic Field",
+            "pdfPage": 134
+          },
+          {
+            "number": "17.4",
+            "title": "Electric Motor",
+            "pdfPage": 135
+          },
+          {
+            "number": "17.5",
+            "title": "Use of Magnetic Effects of Current",
+            "pdfPage": 136
+          },
+          {
+            "number": "17.6",
+            "title": "Earth's Magnetic Field",
+            "pdfPage": 138
+          },
+          {
+            "number": null,
+            "title": "Origin of Earth's Magnetic Field",
+            "pdfPage": 138
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 18,
+      "title": "Electromagnetic Induction and Electromagnetic Waves",
+      "titleEn": null,
+      "pdfStart": 141,
+      "pdfEnd": 155,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ELECTROMAGNETIC INDUCTION AND ELECTROMAGNETIC (E.M.) WAVES",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, student will be able to:",
+        "slos": [
+          "describe an experiment to demonstrate electromagnetic induction.",
+          "use the fact that the magnitude of an induced e.m.f. is affected by the rate of change of the magnetic field or the rate of cutting of magnetic field lines, and the number of turns in a coil, to solve simple electromagnetic problems.",
+          "use the fact that the effect of the current produced by an induced e.m.f. is to oppose the change producing it (Lenz's law).",
+          "describe how a.c. generators work (rotating coil or rotating magnet setup) and the use of slip rings and brushes where needed.",
+          "sketch and interpret graphs of e.m.f. against time for simple A.C. generators (including relating the position of the generator coil to the peaks, troughs and zeros of the e.m.f.).",
+          "explain the principle of operation of a simple iron-cored transformer.",
+          "use the terms primary, secondary coils and step-up and step-down transformer.",
+          "use the equation VP / VS = NP / NS (where P and S refer to primary and secondary) to solve problems.",
+          "describe the deflection of an electron beam by electric fields and magnetic fields.",
+          "interpret wave forms on oscilloscopes.",
+          "state that the speed of all electromagnetic waves in: vacuum is 3.0 × 10⁸ m s⁻¹, air is approximately the same as in a vacuum.",
+          "explain qualitatively, how scattering of light by molecules in the air give the sky its blue colour during the day and its shades of red during sunset (use of the terms Rayleigh and Mei scattering are not required).",
+          "state that theoretically light can also be considered to be made of massless particles that carry energy and momentum called 'photons'. (Students should know as an example of this particle nature, light exerts pressure on objects (very slight) and this has been used by satellites that have 'solar sails' that accelerate with the help of force from light rays.)"
+        ],
+        "headings": [
+          {
+            "number": "18.1",
+            "title": "Electromagnetic Induction",
+            "pdfPage": 142
+          },
+          {
+            "number": "18.2",
+            "title": "A.C. Generator",
+            "pdfPage": 147
+          },
+          {
+            "number": "18.3",
+            "title": "Transformer",
+            "pdfPage": 148
+          },
+          {
+            "number": "18.4",
+            "title": "Deflection of Electron Beam in Electric and Magnetic Fields",
+            "pdfPage": 150
+          },
+          {
+            "number": "18.5",
+            "title": "Waveform on Oscilloscope",
+            "pdfPage": 151
+          },
+          {
+            "number": "18.6",
+            "title": "Scattering of Light in the Atmosphere",
+            "pdfPage": 153
+          },
+          {
+            "number": "18.7",
+            "title": "Particle Nature of Light",
+            "pdfPage": 154
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 19,
+      "title": "Electronics",
+      "titleEn": null,
+      "pdfStart": 156,
+      "pdfEnd": 168,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ELECTRONICS",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "describe the working of a diode.",
+          "describe the action of a light-emitting diode in passing current in one direction only and emitting light.",
+          "compare analog and digital electronics.",
+          "explain that electronic devices are built from digital logic circuits (that can act as switches that can convert incoming voltage into binary electrical pulses of high and low ( 1 or 0).",
+          "explain that Boolean logic is the basis for converting analog data to digital data (this includes knowing that 'bit' is the smallest unit of data in computing; either 1 or 0. Eight bits make up a byte).",
+          "state in words and in truth table form, the action of logic gates (specifically of AND, OR, NAND, NOR, and NOT).",
+          "identify the use of logic gates for security purposes (e.g: burglar alarm, fire extinguisher etc.).",
+          "use circuit symbols for the logic gates.",
+          "identify in given problems how Boolean switches can be put into combinations that then allow them to achieve logical operations."
+        ],
+        "headings": [
+          {
+            "number": "19.1",
+            "title": "Semiconductors",
+            "pdfPage": 157
+          },
+          {
+            "number": null,
+            "title": "PN Junction",
+            "pdfPage": 158
+          },
+          {
+            "number": null,
+            "title": "Working of Semiconductor Diode",
+            "pdfPage": 158
+          },
+          {
+            "number": null,
+            "title": "Light -Emitting Diode (LED)",
+            "pdfPage": 159
+          },
+          {
+            "number": "19.2",
+            "title": "Analog and Digital Electronics",
+            "pdfPage": 161
+          },
+          {
+            "number": null,
+            "title": "Conversion from Analog to Digital Data",
+            "pdfPage": 161
+          },
+          {
+            "number": "19.3",
+            "title": "Boolean Logic",
+            "pdfPage": 162
+          },
+          {
+            "number": "19.4",
+            "title": "Logic Gates",
+            "pdfPage": 164
+          },
+          {
+            "number": null,
+            "title": "AND GATE",
+            "pdfPage": 164
+          },
+          {
+            "number": null,
+            "title": "OR GATE",
+            "pdfPage": 164
+          },
+          {
+            "number": null,
+            "title": "NOT GATE",
+            "pdfPage": 164
+          },
+          {
+            "number": null,
+            "title": "NAND GATE",
+            "pdfPage": 165
+          },
+          {
+            "number": null,
+            "title": "NOR GATE",
+            "pdfPage": 165
+          },
+          {
+            "number": "19.5",
+            "title": "Applications of Logic Gates",
+            "pdfPage": 166
+          },
+          {
+            "number": null,
+            "title": "Burglar Alarm",
+            "pdfPage": 166
+          },
+          {
+            "number": null,
+            "title": "Fire Alarm System",
+            "pdfPage": 166
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 20,
+      "title": "Atomic and Nuclear Physics",
+      "titleEn": null,
+      "pdfStart": 169,
+      "pdfEnd": 188,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ATOMIC AND NUCLEAR PHYSICS",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "describe the structure of the atom [in terms of a positively charged nucleus and negatively charged electrons that go around the nucleus. This should include an understanding of the big ideas: These electrons do not go around in predictable circular paths in the way that planets go around the sun. The electrons behave as 'quantum particles' and their location and momentum at any point in time is governed by probability; one cannot predict the motion of an electron. The 'shells' in which electrons 'orbit' refer to the level of kinetic energy the electrons possess; the further the shell is from the nucleus, the more energy the electron has. If one were to 'look' at an atom, one would see a fuzzy 'cloud' of electrons with a very small nucleus in the centre.",
+          "justify the findings of the alpha-particle scattering experiments, specifically that it provides evidence for: (a) a very small nucleus surrounded by mostly empty space, (b) a nucleus containing most of the mass of the atom, (c) a nucleus that is positively charged.",
+          "define the terms proton number (atomic number) Z and nucleon number (mass number) A and be able to calculate the number of neutrons in a nucleus.",
+          "recall the term nuclide and use the nuclide notation ᴬᶻX.",
+          "explain what is meant by an isotope and state that an element may have more than one isotope.",
+          "describe the emission of radiation from a nucleus as spontaneous and random.",
+          "describe alpha-particles, beta-particles, and gamma-radiation.",
+          "justify qualitatively the order of strength for alpha-particles, beta-particles, and gamma-radiation in terms of their (a) relative ionizing effects and (b) relative penetrating powers.",
+          "describe the deflection of alpha-particles, beta-particles, and gamma-radiation in electric fields and magnetic fields.",
+          "explain that radioactive decay is a change in an unstable nucleus that can result, most commonly, in the emission of alpha-particles or beta-particles and/or gamma-radiation. (Other types exist but are not required at this level.)",
+          "use decay equations, using nuclide notation, to show the emission of alpha-particles, beta-particles, and gamma-radiation.",
+          "describe nuclear reactions (fission and fusion) with examples. (Fusion as the formation of a larger nucleus by combining two smaller nuclei with the release of energy, and recognize fusion as the energy source for stars.)",
+          "recognize that matter can be converted to energy and vice versa (in this way the law of conservation of energy still holds).",
+          "apply the equation; E = mc² to calculate the energy released in the process of nuclear reactions.",
+          "describe the activity of a radioactive material in terms of counts per unit time.",
+          "define and infer the half-life of materials. (Half-life is the time taken for half the nuclei of an isotope in any sample to decay. Use this definition in calculations, which may involve tables or decay curves.)",
+          "explain and apply the concept of Carbon dating to solve problems.",
+          "explain how the type of radiation emitted and the half-life of the isotope determine which isotope is used for applications, including: (a) household fire (smoke) alarms, (b) irradiating food to kill bacteria, (c) sterilization of equipment using gamma rays, (d) measuring and controlling thicknesses of materials using appropriate radiation, (e) diagnosis and treatment of cancer using gamma rays.",
+          "state the effects of ionizing nuclear radiations on living things, including cell death, mutations, and cancer."
+        ],
+        "headings": [
+          {
+            "number": "20.1",
+            "title": "Atomic Structure",
+            "pdfPage": 171
+          },
+          {
+            "number": "20.2",
+            "title": "Atomic Nucleus",
+            "pdfPage": 172
+          },
+          {
+            "number": "20.3",
+            "title": "Isotopes",
+            "pdfPage": 173
+          },
+          {
+            "number": "20.4",
+            "title": "Radioactivity",
+            "pdfPage": 174
+          },
+          {
+            "number": "20.5",
+            "title": "Radioactive Decay",
+            "pdfPage": 176
+          },
+          {
+            "number": "20.6",
+            "title": "Nuclear Reactions",
+            "pdfPage": 178
+          },
+          {
+            "number": "20.7",
+            "title": "Interconversion of Matter and Energy",
+            "pdfPage": 180
+          },
+          {
+            "number": "20.8",
+            "title": "Half-Life",
+            "pdfPage": 181
+          },
+          {
+            "number": "20.9",
+            "title": "Effects and Uses of Nuclear Radiation",
+            "pdfPage": 184
+          }
+        ],
+        "notes": "Subheadings such as 'Rutherford's Alpha Particle Scattering Experiment', 'Charge Number and Mass Number', 'Emission of α, β and γ Radiations', 'Ionizing Effects and Penetrating Powers', 'Fission Reaction', 'Nuclear Fusion', 'Einstein's Equation and Energy Calculation', 'Carbon Dating', 'Effects of Nuclear Radiation', 'Uses of Nuclear Radiation', and 'Radiation Source' appear as unnumbered sub-section headings within the numbered sections and were not separately listed. The nuclide notation superscript/subscript placement in SLO 4 (ᴬᶻX) is rendered in plain text due to formatting limitations."
+      }
+    },
+    {
+      "number": 21,
+      "title": "Space and Environment",
+      "titleEn": null,
+      "pdfStart": 189,
+      "pdfEnd": 200,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "SPACE AND ENVIRONMENT",
+        "sloHeading": "Student's learning outcomes (SLOs)",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "explain the nature of the Sun [as a star of medium size, it consists mostly of hydrogen and helium, and that it radiates most of its energy in the infrared, visible and ultraviolet regions of the electromagnetic spectrum].",
+          "interpret and compare given planetary data [about orbital distance, orbital period, density, surface temperature and uniform gravitational field strength at the planet's surface].",
+          "use ideas of convection to explain how cyclones are formed.",
+          "explain how global warming contributes to extreme weather events [specifically in the case of hurricanes, heat waves, flooding, rainfall, wildfires, droughts, winter storms].",
+          "explain what is meant by background radiation.",
+          "state the sources that make a significant contribution to background radiation [including: (a) radon gas (in the air) (b) rocks and buildings (c) food and drink (d) cosmic rays]."
+        ],
+        "headings": [
+          {
+            "number": "21.1",
+            "title": "Sun and Planetary Data",
+            "pdfPage": 190
+          },
+          {
+            "number": null,
+            "title": "Orbital Distance",
+            "pdfPage": 191
+          },
+          {
+            "number": null,
+            "title": "Formation of Cyclones",
+            "pdfPage": 192
+          },
+          {
+            "number": "21.2",
+            "title": "Global Warming and Geothermal Activity",
+            "pdfPage": 193
+          },
+          {
+            "number": null,
+            "title": "Hurricanes",
+            "pdfPage": 194
+          },
+          {
+            "number": null,
+            "title": "Heat Waves",
+            "pdfPage": 194
+          },
+          {
+            "number": null,
+            "title": "Flooding",
+            "pdfPage": 195
+          },
+          {
+            "number": null,
+            "title": "Wildfires",
+            "pdfPage": 195
+          },
+          {
+            "number": null,
+            "title": "Droughts",
+            "pdfPage": 195
+          },
+          {
+            "number": null,
+            "title": "Winter Storms",
+            "pdfPage": 196
+          },
+          {
+            "number": "21.3",
+            "title": "Radiation Exposure",
+            "pdfPage": 196
+          },
+          {
+            "number": null,
+            "title": "Background Radiation",
+            "pdfPage": 196
+          },
+          {
+            "number": null,
+            "title": "Sources of Radiation",
+            "pdfPage": 197
+          }
+        ],
+        "notes": "On page 194/195, the sub-points (a) Radon gas (in the air), (b) Rocks and buildings, (c) Food and Drink, (d) Cosmic rays from space are printed as sub-headings under 'Sources of Radiation' but are treated as part of the running text with numbered lists rather than separate numbered section headings, so only the parent heading is listed."
+      }
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "source": "content/punjab/textbooks/urd-9.pdf",
+  "subject": "urd",
+  "grade": 9,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "اُردو (لازمی) برائے جماعت نہم",
+  "publisher": "پنجاب کریکولم اینڈ ٹیکسٹ بک بورڈ، لاہور (Punjab Curriculum and Textbook Board, Lahore)",
+  "curriculum": "قومی نصاب پاکستان (نظر ثانی شدہ) ۲۰۲۳ء کے مطابق",
+  "language": "ur",
+  "contentsPages": [
+    4
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "حمد (نظم)  (مظفر وارثی)",
+      "titleEn": "Hamd (Nazm) · Muzaffar Warsi",
+      "page": 2,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "نعت (نظم)  (مولانا ظفر علی خاں)",
+      "titleEn": "Naat (Nazm) · Maulana Zafar Ali Khan",
+      "page": 7,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "اخلاقِ حَسنہ  (سیّد سلیمان ندوی)",
+      "titleEn": "Akhlaq-e-Hasana · Syed Sulaiman Nadvi",
+      "page": 12,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "اپنی مدد آپ  (سر سیّد احمد خاں)",
+      "titleEn": "Apni Madad Aap · Sir Syed Ahmad Khan",
+      "page": 20,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "کلیم اور مرزا ظاہر دار بیگ  (ڈپٹی نذیر احمد)",
+      "titleEn": "Kaleem aur Mirza Zahir Dar Beg · Deputy Nazir Ahmad",
+      "page": 28,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "نام دیو-مالی  (مولوی عبدالحق)",
+      "titleEn": "Nam Dev–Mali · Maulvi Abdul Haq",
+      "page": 38,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "آرام و سکون  (امتیاز علی تاج)",
+      "titleEn": "Aaram o Sukoon · Imtiaz Ali Taj",
+      "page": 46,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "کتبہ  (غلام عباس)",
+      "titleEn": "Katba · Ghulam Abbas",
+      "page": 58,
+      "topics": []
+    },
+    {
+      "number": 9,
+      "title": "ابتدائی حساب  (ابنِ انشا)",
+      "titleEn": "Ibtidai Hisab · Ibn-e-Insha",
+      "page": 70,
+      "topics": []
+    },
+    {
+      "number": 10,
+      "title": "لڑی میں پروئے ہوئے منظر  (رضا علی عابدی)",
+      "titleEn": "Larhi mein Piroye Hue Manzar · Raza Ali Abidi",
+      "page": null,
+      "topics": []
+    },
+    {
+      "number": 11,
+      "title": "بھیڑیا  (فاروق سرور)",
+      "titleEn": "Bherhiya · Farooq Sarwar",
+      "page": 87,
+      "topics": []
+    },
+    {
+      "number": 12,
+      "title": "محنت کی برکات (نظم)  (مولانا حالیؔ)",
+      "titleEn": "Mehnat ki Barkat (Nazm) · Maulana Hali",
+      "page": 95,
+      "topics": []
+    },
+    {
+      "number": 13,
+      "title": "جاوید کے نام (نظم)  (علامہ محمد اقبالؔ)",
+      "titleEn": "Javed ke Naam (Nazm) · Allama Muhammad Iqbal",
+      "page": 103,
+      "topics": []
+    },
+    {
+      "number": 14,
+      "title": "پیامِ لطیفؔ (نظم)  (شیخ ایاز، مترجم)",
+      "titleEn": "Payam-e-Lateef (Nazm) · Shaikh Ayaz, translator",
+      "page": 107,
+      "topics": []
+    },
+    {
+      "number": 15,
+      "title": "کرکٹ اور مشاعرہ (نظم)  (دلاور فگار)",
+      "titleEn": "Cricket aur Mushaira (Nazm) · Dilawar Figar",
+      "page": 112,
+      "topics": []
+    },
+    {
+      "number": 16,
+      "title": "فقیرانہ آئے صدا کر چلے (غزل)  (میر تقی میرؔ)",
+      "titleEn": "Faqirana Aaye Sada Kar Chale (Ghazal) · Mir Taqi Mir",
+      "page": 119,
+      "topics": []
+    },
+    {
+      "number": 17,
+      "title": "سن تو سہی جہاں میں ہے تیر افسانہ کیا (غزل)  (خواجہ حیدر علی آتشؔ)",
+      "titleEn": "Sun to Sahi Jahan mein Hai Tera Afsana Kya (Ghazal) · Khwaja Haider Ali Aatish",
+      "page": 123,
+      "topics": []
+    },
+    {
+      "number": 18,
+      "title": "غم ہے یا خوشی ہے تُو (غزل)  (ناصر کاظمیؔ)",
+      "titleEn": "Gham Hai ya Khushi Hai Tu (Ghazal) · Nasir Kazmi",
+      "page": 128,
+      "topics": []
+    },
+    {
+      "number": 19,
+      "title": "کاش طوفاں میں سفینے کو اتارا ہوتا (غزل)  (پروین شاکرؔ)",
+      "titleEn": "Kaash Toofan mein Safeeney ko Utara Hota (Ghazal) · Parveen Shakir",
+      "page": 132,
+      "topics": []
+    }
+  ],
+  "notes": "The contents (فہرست) is on image 4, laid out as a two-column table read right to left (items 1–10 in the right half, 11–19 plus فرہنگ in the left half). The page-number cell for item 10 (لڑی میں پروئے ہوئے منظر) appears blank/illegible in the scan, so page is null. Page numbers are printed in Urdu numerals and have been converted to integers. The final entry 'فرہنگ' (glossary, p. 135) is back matter and has been excluded. Author names are printed in the same cell as the titles and are retained; some poets' names carry a taskhees/madd mark that may be rendered imperfectly. Titles with numbering 17 as printed reads 'ہے تیر افسانہ کیا' which is likely a typo for 'ہے تیرا افسانہ کیا' · transcribed as printed."
+}

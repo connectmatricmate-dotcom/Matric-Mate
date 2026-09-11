@@ -1,0 +1,110 @@
+{
+  "source": "content/punjab/textbooks/chem-9.pdf",
+  "subject": "chem",
+  "grade": 9,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "CHEMISTRY 9",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": "Based on Updated/Revised National Curriculum of Pakistan 2023",
+  "language": "en",
+  "contentsPages": [
+    3
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "States of Matter and Phase Changes",
+      "titleEn": null,
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "Atomic Structure",
+      "titleEn": null,
+      "page": 17,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "Chemical Bonding",
+      "titleEn": null,
+      "page": 32,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "Stoichiometry",
+      "titleEn": null,
+      "page": 52,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "Energetics",
+      "titleEn": null,
+      "page": 67,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "Equilibria",
+      "titleEn": null,
+      "page": 83,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "Acid Base Chemistry",
+      "titleEn": null,
+      "page": 93,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "Periodic Table and Periodicity",
+      "titleEn": null,
+      "page": 105,
+      "topics": []
+    },
+    {
+      "number": 9,
+      "title": "Group Properties and Elements",
+      "titleEn": null,
+      "page": 119,
+      "topics": []
+    },
+    {
+      "number": 10,
+      "title": "Environmental Chemistry",
+      "titleEn": null,
+      "page": 129,
+      "topics": []
+    },
+    {
+      "number": 11,
+      "title": "Hydrocarbons",
+      "titleEn": null,
+      "page": 145,
+      "topics": []
+    },
+    {
+      "number": 12,
+      "title": "Empirical Data Collection and Analysis",
+      "titleEn": null,
+      "page": 157,
+      "topics": []
+    },
+    {
+      "number": 13,
+      "title": "Laboratory and Practical Skills",
+      "titleEn": null,
+      "page": 166,
+      "topics": []
+    }
+  ],
+  "notes": "The contents page lists chapter titles only, with no sub-topics. Glossary (177), Index (185) and Bibliography (187) are also listed but excluded as back matter."
+}

@@ -1,0 +1,183 @@
+{
+  "source": "content/punjab/textbooks/isl-9.pdf",
+  "subject": "isl",
+  "grade": 9,
+  "medium": "en",
+  "pdfPages": 170,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [],
+  "backMatterStart": 167,
+  "locateNotes": "Page 167 begins exam paper guidance/pairing scheme and model paper (pages 167-170). Chapter start pages inferred from banner headings visible in thumbnails; small text not fully legible.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "قرآن مجید و حدیثِ نبوی ﷺ",
+      "titleEn": "The Holy Quran and the Hadith of the Prophet ﷺ",
+      "pdfStart": 5,
+      "pdfEnd": 15,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "قرآن مجید و حدیث نبوی صلی اللہ علیہ وآلہ وسلم",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلبہ اس قابل ہو جائیں گے کہ",
+        "slos": [
+          "قرآن مجید کی حفاظت کے بارے میں جان سکیں۔",
+          "قرآن مجید کے جمع وتدوین کے مراحل کے بارے میں جان سکیں۔",
+          "قرآن مجید کو ہدایت کا سرچشمہ مانتے ہوئے اس کی تعلیمات پر عمل پیرا ہو سکیں۔",
+          "قرآن مجید کی عام گیرت کو سمجھ سکیں۔",
+          "نبی کریم خاتم النبیین صلی اللہ علیہ وآلہ وسلم کے دور میں قرآن مجید کی تدوین کے طریقہ کار کا جائزہ لے سکیں۔"
+        ],
+        "headings": [],
+        "notes": "The SLO box on the opening page is laid out in two columns of bullet points; the exact intended reading order between the right and left columns is not fully certain, so the order given here follows right column (top to bottom) then left column (top to bottom)."
+      }
+    },
+    {
+      "number": 2,
+      "title": "ایمانیات و عبادات",
+      "titleEn": "Beliefs and Worship",
+      "pdfStart": 16,
+      "pdfEnd": 44,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ایمانیات وعبادات",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلباء اس قابل ہوجا ئیں گے کہ:",
+        "slos": [
+          "توحید کا معنی ومفہوم واہمیت وفرضیت بیان کرسکیں۔",
+          "قرآن وسنت کی روشنی میں توحید کی اقسام جان سکیں۔",
+          "شرک کا معنی ومفہوم جان سکیں۔",
+          "شرک کی بنیادی اقسام کے بارے میں آگاہی حاصل کرسکیں۔",
+          "عملی زندگی میں اثرات اور شرک سے واقفیت حاصل کر کے عقیدہ ٔتوحید سے تفصانات کا ادراک کرسکیں۔ عقیدہ توحید سے واقفیت حاصل کر کے صرف اللہ پر اپنا ایمان مضبوط کرسکیں۔",
+          "اللہ تعالیٰ کوایک رب جاننے اور مانتے ہوئے آج سے ان تمام معاملات میں اسی سے مدد مانگنے کی کوشش کرسکیں۔ شرک کی وعید سے آگاہ رہنے سے دور رہنے کی کوشش کرسکیں۔"
+        ],
+        "headings": [],
+        "notes": "The SLO bullets on this page are laid out in a two-column format on the page image, making the exact reading order and pairing of some lines uncertain; the transcription above represents a best-effort reconstruction and some phrases (marked by run-on sentences) may not be split into separate bullets as originally intended."
+      }
+    },
+    {
+      "number": 3,
+      "title": "سیرتِ نبوی ﷺ",
+      "titleEn": "Life of the Prophet ﷺ",
+      "pdfStart": 45,
+      "pdfEnd": 82,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "سیرت نبوی (خاتم النبیین صلی اللہ علیہ وآلہ وأصحابہ وسلم) - عہد نبوی کے ماہ وسال (مدنی دور) - (1) فتح مکہ",
+        "sloHeading": "حاصلات تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلباء اس قابل ہو جائیں گے کہ",
+        "slos": [
+          "فتح مکہ کے پس منظر، اسباب اور وجوہات کو جان سکیں۔",
+          "فتح مکہ کے واقعات و معجزات سے واقف ہوسکیں۔",
+          "فتح مکہ کے تناظر میں عفو در گزر کی اہمیت کو سمجھ سکیں۔",
+          "فتح مکہ کے بعد تطہیر کعبہ، بتوں کو گرانا اور کلید کعبہ کی سپردگی کے حوالے سے علم حاصل کر سکیں۔",
+          "فتح مکہ میں نصرت الٰہیہ کے ظہور کو سمجھتے ہوئے اللہ تعالی کے وعدوں کے سچا ہونے پر یقین رکھ سکیں۔",
+          "فتح مکہ کے نتائج کو خود نظر رکھتے ہوئے روزمرہ زندگی میں لوگوں کو معاف کرنے والے بن سکیں۔",
+          "اسلام کے فروغ کے سلسلے میں فتح مکہ کی اہمیت سے آگاہ ہوسکیں۔",
+          "قدرت واختیار رکھتے ہوئے معاف کرنے کی فضیلت سے آگاہ ہوسکیں۔",
+          "فتح مکہ کے نتائج کا جائزہ لے سکیں۔"
+        ],
+        "headings": [],
+        "notes": "The SLOs are printed in two columns on the page (right column and left column) without explicit numbering; the order given here follows right-column-first then left-column reading, but the book itself does not indicate a definitive sequence between the two columns. Chapter number is printed as 'باب سوم' (Chapter Three) in a decorative box rather than as a numeral."
+      }
+    },
+    {
+      "number": 4,
+      "title": "اَخلاق و آداب",
+      "titleEn": "Morals and Manners",
+      "pdfStart": 83,
+      "pdfEnd": 97,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "اَخلاق و آداب",
+        "sloHeading": "حاصلاتِ تعلم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلبہ اس قابل ہوجائیں گے کہ",
+        "slos": [
+          "قرآن وسنت کی روشنی میں اخلاق حَسنہ، شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی کے معنی ومفہوم کو جان سکیں۔",
+          "شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی کی اہمیت اور فضیلت کو سمجھ سکیں۔",
+          "روزمرہ کے معاملات میں شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی اختیار نہ کرنے کے نقصانات کا جائزہ لے سکیں۔",
+          "سیرتِ نبویﷺ کی روشنی میں شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی کی مثالیں تلاش کرکے ان سے عملی زندگی میں سبق حاصل کرسکیں۔",
+          "عملی زندگی میں شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی کے معاشرتی فوائد وثمرات سے استفادہ کرسکیں۔",
+          "شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی کی مثالوں سے سبق حاصل کرسکیں۔",
+          "عملی زندگی کے معاملات میں شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی کا مظاہرہ کرسکیں۔",
+          "شکروقناعت، امانت ودیانت، اخلاص وتقویٰ اور پردہ پوشی کی صفات کو اپنا کر ایک مثالی مسلمان بن کر معاشرے کی خدمت کرسکیں۔",
+          "روزمرہ زندگی میں دوسروں کے عیبوں کی پردہ پوشی کرکے معاشرے کو اَمن و آتشی کا گہوارہ بنا سکیں۔"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 5,
+      "title": "حسنِ معاملات و معاشرت",
+      "titleEn": "Good Dealings and Social Conduct",
+      "pdfStart": 98,
+      "pdfEnd": 115,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "حسنِ معاملات ومعاشرت",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلبہ اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "قسم کے معنی ومفہوم اور اس کی صورتیں جان سکیں۔",
+          "قسم اور حلف میں فرق جان سکیں۔",
+          "قسم کی انفرادی اور اجتماعی اہمیت سمجھ سکیں۔",
+          "قرآن وسنت کی روشنی میں قسم کے احکام اور مسائل سے واقفیت حاصل کرسکیں۔",
+          "قسم کے انفرادی اور اجتماعی اثرات کا جائزہ لے سکیں۔",
+          "روزمرہ معاملات میں قسم کی اہمیت کو مدنظر رکھتے ہوئے اس کو پورا کرنے کی کوشش کرسکیں۔",
+          "جھوٹی قسم کھانے سے اجتناب کرنے والے بن سکیں۔",
+          "قسم کی حساسیت سمجھتے ہوئے روزمرہ زندگی میں غیر ضروری قسموں سے اجتناب کرسکیں اور حلف کی پاسداری کرسکیں۔"
+        ],
+        "headings": [],
+        "notes": "The sub-heading '(1) قَسْم کے احکام ومسائل' appears on the opening page as a section title beneath the chapter heading; not included in SLOs as instructed. Sub-topic numbering not requested."
+      }
+    },
+    {
+      "number": 6,
+      "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
+      "titleEn": "Sources of Guidance and Eminent Personalities of Islam",
+      "pdfStart": 116,
+      "pdfEnd": 155,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلباء اس قابل ہو جائیں گے کہ",
+        "slos": [
+          "حضرت امام زین العابدین رحمة اللہ علیہ کے حالات زندگی اور واقعہ کربلا کا کردار جان سکیں۔",
+          "آپ رحمة اللہ علیہ کی صفات، عبادت و ریاضت اور دینی و معاشرتی خدمات کے روشن پہلووں سے آگاہ ہو کر سبق سیکھ سکیں۔",
+          "واقعہ کربلا کے بعد حضرت امام حسین علیہ السلام کے تکمیل میں مقصد میں حضرت امام زین العابدین رحمة اللہ علیہ کا کردار جان سکیں۔",
+          "آپ رحمة اللہ علیہ کی صفات کو اخلاق اور اپنی عملی زندگی میں اپنا سکیں۔",
+          "آپ رحمة اللہ علیہ کی قائدانہ صلاحیتوں سے واقفیت حاصل کرتے ہوئے انہیں عملی زندگی کا حصہ بنا سکیں۔"
+        ],
+        "headings": [],
+        "notes": "Chapter number is printed as an icon labeled 'باب ششم' (Chapter Six) on the opening page; exact Urdu word rendering of the ordinal in the icon is stylized and slightly hard to fully confirm due to image clarity, but corresponds to 6."
+      }
+    },
+    {
+      "number": 7,
+      "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
+      "titleEn": "Islamic Teachings and the Demands of the Present Age",
+      "pdfStart": 156,
+      "pdfEnd": 166,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "اسلامی تعلیمات اور عصر حاضر کے تقاضے",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کی تکمیل کے بعد طلباء اس قابل ہوجائیں گے کہ",
+        "slos": [
+          "خود اعتمادی وخود انحصاری کا لغوی ومفہوم جان سکیں۔",
+          "خود اعتمادی وخود انحصاری کی اہمیت وفضیلت سمجھ سکیں۔",
+          "اسوہ نبوی خاتم النبیین صلی اللہ علیہ وآلہ وسلم کی روشنی میں خود اعتمادی وخود انحصاری کی مثالیں سمجھ سکیں۔",
+          "خود اعتمادی وخود انحصاری کی مختلف صورتوں اور ان کے اسباب سے واقف ہو سکیں۔",
+          "خود اعتمادی وخود انحصاری کے انفرادی واجتماعی اثرات کا جائزہ لے سکیں۔",
+          "خود اعتمادی وخود انحصاری اختیار کرنے والے بن سکیں۔",
+          "اسلامی تعلیمات اور عصر حاضر کے تقاضوں کو مدنظر رکھتے ہوئے اپنے اندر خود اعتمادی وخود انحصاری کا جذبہ پیدا کر سکیں۔"
+        ],
+        "headings": [],
+        "notes": "Learning outcome bullets under 'حاصلاتِ تعلّم' were transcribed from a somewhat compressed/overlapping layout on page 152; wording of bullet 6 in particular was slightly unclear in the scan and has been reconstructed as closely as possible to the visible text. Page 154 begins a new section '(2) جسمانی وذہنی صحت اور جسمانی ریاضت' with its own separate SLO list, which was not included here as the question asks only about the chapter-opening SLOs on the first page."
+      }
+    }
+  ]
+}

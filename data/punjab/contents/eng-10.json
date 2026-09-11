@@ -1,0 +1,400 @@
+{
+  "source": "content/punjab/textbooks/eng-10.pdf",
+  "subject": "eng",
+  "grade": 10,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "ENGLISH 10",
+  "publisher": "Punjab Education, Curriculum, Training and Assessment Authority (PECTAA)",
+  "curriculum": "This textbook is prepared in accordance with Updated / Revised National Curriculum of Pakistan-2023",
+  "language": "en",
+  "contentsPages": [
+    2,
+    3
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Hazrat Muhammad's (صلی اللہ علیہ وآلہ وسلم) Social Reforms for the Rights of Women, Orphans and Slaves",
+      "titleEn": null,
+      "page": 1,
+      "topics": [
+        {
+          "number": null,
+          "title": "Ethics & Values/ Respecting self and others",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ Pronunciation, Pitch and Voice Variation/ Figurative Language",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Meanings of Unknown Words/ Context Clues/ Exploring Idioms and Proverbs",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Responding the text by Giving Arguments and Opinions",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Editing & Proofreading/ Hyphens & –ough Words/ Writing a Paragraph Using the Process Approach",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "My Beloved Pakistan (Poem)",
+      "titleEn": null,
+      "page": 16,
+      "topics": [
+        {
+          "number": null,
+          "title": "Patriotism/National Pride",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ Paragraphs Join into Comprehensive Text",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Word Family Detective/ Inferred Meanings of Unfamiliar Words",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Presentation on Sustainable Development Goals (SDGs)",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Writing a Dialogue/ Proofreading and Editing",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Digital Globalisation Transforming the English Language",
+      "titleEn": null,
+      "page": 26,
+      "topics": [
+        {
+          "number": null,
+          "title": "Impact of digital globalisation on the English Language",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Text/Comprehension questions/ MCQs/ Objective Summaries of Fiction, Non-Fiction",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Adjectival, Prepositional, and Adverbial Phrases/ Connotative and Denotative Meanings of Words/ Figurative Language, Word Relationships and Nuances in Word Meanings",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Partner Interview",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Writing of Clear and Well - Developed Paragraph/ Mechanics for Correct Writing",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "The Earth: Act Now for Tomorrow",
+      "titleEn": null,
+      "page": 38,
+      "topics": [
+        {
+          "number": null,
+          "title": "SDG-Millenium Development Goals/ Climate action",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ Linking new information with prior knowledge",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Figures of speech",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "A Dialogue",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Techniques to Sequence Events",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "The Happy Prince",
+      "titleEn": null,
+      "page": 48,
+      "topics": [
+        {
+          "number": null,
+          "title": "Innovation, Creativity and Success",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ Cause and Effect/ Skimming/ Scanning/ develops and contrasts the points of view of different characters",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Matter of Understanding Precisely/ Compound Prepositions",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Rhetorical Question/ Group Discussion",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Precise words and phrases/ narrative conclusion/ Clear and coherent writing",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Drug Abuse",
+      "titleEn": null,
+      "page": 63,
+      "topics": [
+        {
+          "number": null,
+          "title": "Prevention of Drugs",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ Critique the Plot Development/ Examine Elements of an Essay, Drama",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Use of Conjunctions and Transitional Devices",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "A Conversation on SDGs/ Role-Play",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Write Informative/Explanatory Texts/ Introduce a Topic and Organize Complex Ideas for Clarity",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Time (Poem)",
+      "titleEn": null,
+      "page": 72,
+      "topics": [
+        {
+          "number": null,
+          "title": "Soft Skills/ Time Management",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ Using summary skills/ Mechanics of Precis Writing",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Capitalization/ Punctuation/ Spelling",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Speaking Confidently and Fluently in Various Contexts",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Transitions/ Syntax/ Precise language/ formal style",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Pollution-Free Pakistan with Greenery All Around",
+      "titleEn": null,
+      "page": 80,
+      "topics": [
+        {
+          "number": null,
+          "title": "Nature and Natural Resources/ Environment Matters",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ analytical response to descriptive, informative texts",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "punctuation and capitalization/ Understand Tenses",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Engage effectively in a range of collaborative discussions",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "analysis of substantive topics or texts",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "The Road Not Taken (Poem)",
+      "titleEn": null,
+      "page": 91,
+      "topics": [
+        {
+          "number": null,
+          "title": "Literature & Poetry/ Bravery",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ Explain with reference to the context/ Summarizing complex concepts/ Making inferences/ Interpreting and integrating information",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Constructing sentences using sentence patterns and structures/ Constructing complex sentences and paragraphs",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Asking and answering questions about choices",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Developing book review/ Precis writing/ Paraphrasing/ Summary skills",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "The Three Questions",
+      "titleEn": null,
+      "page": 103,
+      "topics": [
+        {
+          "number": null,
+          "title": "Literature & Poetry/ Spiritualism",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Comprehension questions/ MCQs/ analyzing a variety of readings",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Practice Direct and Indirect Narration",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Discussion/ Presentation",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "Free Writing/ Proofreading and Editing",
+          "titleEn": null,
+          "page": null
+        }
+      ]
+    }
+  ],
+  "notes": "The contents is laid out as a grid spanning two pages (images 2 and 3) with columns: Unit No., Unit Title, Theme/Sub-theme, Reading and Critical Thinking, Vocabulary and Grammar, Oral Communication Skills, Writing Skills, Page No. The cells of each row are not numbered sub-topics; they have been transcribed as unnumbered topics in the column order given. The contents also lists 'Review 1' (page 61) after Unit 5 and 'Review 2' (page 114) after Unit 10; these are not numbered units and are excluded from the chapters array. The Arabic honorific after 'Hazrat Muhammad's' in Unit 1 is printed as a calligraphic seal and is rendered here as صلی اللہ علیہ وآلہ وسلم."
+}

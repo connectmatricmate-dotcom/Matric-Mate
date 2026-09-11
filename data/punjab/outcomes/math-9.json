@@ -1,0 +1,1016 @@
+{
+  "source": "content/punjab/textbooks/math-9.pdf",
+  "subject": "math",
+  "grade": 9,
+  "medium": "en",
+  "pdfPages": 288,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    2
+  ],
+  "backMatterStart": 262,
+  "locateNotes": "Printed page numbers run 2 behind the PDF labels (printed 1 = PDF 3). Back matter begins with the 'Answers' banner on PDF page 262; Glossary appears at PDF 281, Symbols/Notations at 284, Logarithm tables at 285.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Real Numbers",
+      "titleEn": null,
+      "pdfStart": 3,
+      "pdfEnd": 22,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Real Numbers",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Explain, with examples, that civilizations throughout history have systematically studied living things [e.g., the history of numbers from Sumerians and its development to the present Arabic system]",
+          "Describe the set of real numbers as a combination of rational and irrational numbers",
+          "Demonstrate and verify the properties of equality and inequality of real numbers",
+          "Apply laws of indices to simplify radical expressions",
+          "Apply concepts of real numbers to real-world problems (such as temperature, banking, measures of gain and loss, sources of income and expenditure)"
+        ],
+        "headings": [
+          {
+            "number": "1.1",
+            "title": "Introduction to Real Numbers",
+            "pdfPage": 3
+          },
+          {
+            "number": "1.1.1",
+            "title": "Combination of Rational and Irrational Numbers",
+            "pdfPage": 5
+          },
+          {
+            "number": "1.1.2",
+            "title": "Decimal Representation of Rational Numbers",
+            "pdfPage": 5
+          },
+          {
+            "number": "1.1.3",
+            "title": "Decimal Representation of Irrational Numbers",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.1.4",
+            "title": "Representation of Rational and Irrational Numbers on Number Line",
+            "pdfPage": 7
+          },
+          {
+            "number": "1.1.5",
+            "title": "Properties of Real Numbers",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.2",
+            "title": "Radical Expressions",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.2.1",
+            "title": "Laws of Radicals and Indices",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.2.2",
+            "title": "Surds and their Applications",
+            "pdfPage": 14
+          },
+          {
+            "number": "1.2.3",
+            "title": "Rationalization of Denominator",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.3",
+            "title": "Application of Real Numbers in Daily Life.",
+            "pdfPage": 16
+          },
+          {
+            "number": "1.3.1",
+            "title": "Temperature Conversions",
+            "pdfPage": 17
+          },
+          {
+            "number": "1.3.2",
+            "title": "Profit and Loss",
+            "pdfPage": 18
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 2,
+      "title": "Logarithms",
+      "titleEn": null,
+      "pdfStart": 23,
+      "pdfEnd": 38,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Logarithms",
+        "sloHeading": "Students’ Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Express a number in scientific notation and vice versa.",
+          "Describe logarithm of a number",
+          "Differentiate between common and natural logarithm"
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 23
+          },
+          {
+            "number": "2.1",
+            "title": "Scientific Notation",
+            "pdfPage": 23
+          },
+          {
+            "number": "2.1.1",
+            "title": "Conversion of Numbers from Ordinary Notation to Scientific Notation",
+            "pdfPage": 23
+          },
+          {
+            "number": "2.1.2",
+            "title": "Conversion of Numbers from Scientific Notation to Ordinary Notation",
+            "pdfPage": 24
+          },
+          {
+            "number": "2.2",
+            "title": "Logarithm",
+            "pdfPage": 25
+          },
+          {
+            "number": "2.2.1",
+            "title": "Logarithm of a Real Number",
+            "pdfPage": 25
+          },
+          {
+            "number": "2.3",
+            "title": "Common Logarithm",
+            "pdfPage": 27
+          },
+          {
+            "number": "2.3.1",
+            "title": "Characteristic and Mantissa of Logarithms",
+            "pdfPage": 27
+          },
+          {
+            "number": "2.3.2",
+            "title": "Finding Common Logarithm of a Number",
+            "pdfPage": 28
+          },
+          {
+            "number": "2.3.3",
+            "title": "Concept of Antilogarithm",
+            "pdfPage": 30
+          },
+          {
+            "number": "2.3.4",
+            "title": "Natural Logarithm",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.4",
+            "title": "Laws of Logarithm",
+            "pdfPage": 32
+          },
+          {
+            "number": "2.4.1",
+            "title": "Applications of Logarithm",
+            "pdfPage": 34
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 3,
+      "title": "Set and Functions",
+      "titleEn": null,
+      "pdfStart": 39,
+      "pdfEnd": 66,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Sets and Functions",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Recall:",
+          "Describe mathematics as the study of patterns, structure, and relationships.",
+          "Identify sets and apply operations on three sets (Subsets, overlapping sets and disjoint sets), using Venn diagrams.",
+          "Solve problems on classification and cataloguing by using Venn diagrams for scenarios involving two sets and three sets. Further application of sets.",
+          "Verify and apply properties/laws of union and intersection of three sets through analytical and Venn diagram methods.",
+          "Apply concepts from set theory to real-world problems (such as in demographic classification, categorizing products in shopping malls)",
+          "Explain product, binary relations and its domain and range.",
+          "Recognize that a relation can be represented by a table, ordered pair and graphs.",
+          "Recognize notation and determine the value of a function and its domain and range.",
+          "Identify types of functions (into, onto, one-to-one, injective, surjective and bijective) by using Venn diagrams."
+        ],
+        "headings": [
+          {
+            "number": "3.1",
+            "title": "Mathematics as the Study of Patterns, Structures and Relationships",
+            "pdfPage": 39
+          },
+          {
+            "number": "3.1.1",
+            "title": "Basic Definitions",
+            "pdfPage": 41
+          },
+          {
+            "number": "3.2",
+            "title": "Operations on Sets",
+            "pdfPage": 44
+          },
+          {
+            "number": "3.2.1",
+            "title": "Identification of Sets Using Venn Diagram",
+            "pdfPage": 47
+          },
+          {
+            "number": "3.2.2",
+            "title": "Operations on Three Sets",
+            "pdfPage": 48
+          },
+          {
+            "number": "3.2.2.1",
+            "title": "Properties of union and intersection",
+            "pdfPage": 48
+          },
+          {
+            "number": "3.2.2",
+            "title": "Real-World Applications",
+            "pdfPage": 55
+          },
+          {
+            "number": "3.3",
+            "title": "Binary Relations",
+            "pdfPage": 59
+          },
+          {
+            "number": "3.3.1",
+            "title": "Relation as Table, Ordered Pair and Graphs",
+            "pdfPage": 60
+          },
+          {
+            "number": "3.3.2",
+            "title": "Function and its Domain and Range",
+            "pdfPage": 61
+          },
+          {
+            "number": "3.3.3",
+            "title": "Notation of Function",
+            "pdfPage": 63
+          },
+          {
+            "number": "3.3.4",
+            "title": "Linear and Quadratic Functions",
+            "pdfPage": 64
+          }
+        ],
+        "notes": "Section 3.2.2 heading 'Real-World Applications' appears numbered as 3.2.2 on page/image 17, which duplicates the earlier 3.2.2 'Operations on Three Sets' numbering on image 10 · this is printed as-is in the book, not corrected."
+      }
+    },
+    {
+      "number": 4,
+      "title": "Factorization and Algebraic Manipulation",
+      "titleEn": null,
+      "pdfStart": 67,
+      "pdfEnd": 83,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Factorization and Algebraic Manipulation",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Identify common factors, trinomial factoring, concretely, pictorially and symbolically.",
+          "Factorize quadratic and cubic algebraic expressions:\na4 + a2b2 + b4 or a4 + b4\nax2 + bx + c\n(x + a) (x + b) (x + c) (x + d) + k\na3 + 3a2b + 3ab2 + b3\na3 ± b3\nx2 + px + q\n(ax2 + bx + c) (ax2 + bx + d) + k\n(x + a) (x + b) (x + c) (x + d) + kx2\na3 – 3a2b + 3ab2 – b3",
+          "Find highest common factor and least common multiple of algebraic expressions and know relationship of LCM and HCF.",
+          "Find square root of algebraic expression by factorization and division.",
+          "Apply the concepts of factorization of quadratic and cubic algebraic expression to real-world problems (such as engineering, physics, and finance.)"
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 67
+          },
+          {
+            "number": "4.1",
+            "title": "Identifying Common Factors and Trinomials Concretely, Pictorially and Symbolically",
+            "pdfPage": 67
+          },
+          {
+            "number": "4.1.1",
+            "title": "Common Factors",
+            "pdfPage": 67
+          },
+          {
+            "number": "4.1.2",
+            "title": "Trinomial Factoring",
+            "pdfPage": 68
+          },
+          {
+            "number": "4.1.3",
+            "title": "Factorizing Quadratic and Cubic Algebraic Expressions",
+            "pdfPage": 69
+          },
+          {
+            "number": "4.3",
+            "title": "Highest Common Factor (HCF) and Least Common Multiple (LCM) of Algebraic Expressions",
+            "pdfPage": 76
+          },
+          {
+            "number": "4.3.1",
+            "title": "Highest Common Factor (HCF)",
+            "pdfPage": 76
+          },
+          {
+            "number": "4.3.2",
+            "title": "Least Common Multiple (LCM)",
+            "pdfPage": 77
+          },
+          {
+            "number": "4.3.3",
+            "title": "Relationship Between LCM and HCF",
+            "pdfPage": 78
+          },
+          {
+            "number": "4.4",
+            "title": "Square Root of an Algebraic Expression",
+            "pdfPage": 79
+          },
+          {
+            "number": "4.4.1",
+            "title": "Real World Problems of Factorization",
+            "pdfPage": 80
+          }
+        ],
+        "notes": "The Type – I, Type – II, Type – III, Type – IV, Type – V labels within section 4.1.3 (e.g. 'Type – I: Factorization of expression of the types...') are sub-labels rather than numbered headings, so they were not listed separately as headings, though their content is summarized under 4.1.3's SLO bullet list. Also SLO bullets are printed as a mix of two-column bullet lists across pages; the joining order shown reconstructs the original left/right column layout as best inferred from image 1."
+      }
+    },
+    {
+      "number": 5,
+      "title": "Linear Equations and Inequalities",
+      "titleEn": null,
+      "pdfStart": 84,
+      "pdfEnd": 98,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Linear Equations and Inequalities",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Solve linear equations and inequalities with rational coefficients and represent the solution set on a real line.",
+          "Solve two linear inequalities with two unknowns simultaneously.",
+          "Interpret and identify regions in plane bounded by two linear inequalities in two unknowns.",
+          "Find maximum and minimum values of a function using points in the feasible solution."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 84
+          },
+          {
+            "number": "5.1",
+            "title": "Linear Equation",
+            "pdfPage": 84
+          },
+          {
+            "number": "5.1.1",
+            "title": "Solving a Linear Equation in One Variable",
+            "pdfPage": 84
+          },
+          {
+            "number": "5.2",
+            "title": "Linear Inequalities",
+            "pdfPage": 87
+          },
+          {
+            "number": "5.2.1",
+            "title": "Solution of a Linear Inequality in Two Variables",
+            "pdfPage": 88
+          },
+          {
+            "number": "5.2.2",
+            "title": "Solution of Two Linear Inequalities in Two Variables",
+            "pdfPage": 91
+          },
+          {
+            "number": "5.3",
+            "title": "Feasible Solution",
+            "pdfPage": 93
+          },
+          {
+            "number": "5.3.2",
+            "title": "Maximum and Minimum Values of a Function in the Feasible Solution",
+            "pdfPage": 96
+          }
+        ],
+        "notes": "Section 5.3 appears to contain a subsection labelled 5.3.2 (Maximum and Minimum Values...) without a visible 5.3.1 heading printed anywhere in the provided pages; this is copied as printed."
+      }
+    },
+    {
+      "number": 6,
+      "title": "Trigonometry",
+      "titleEn": null,
+      "pdfStart": 99,
+      "pdfEnd": 124,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Trigonometry",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Identify angles in standard positions expressed in degrees and radian.",
+          "Apply Pythagoras theorem and the sine, the cosine and tangent ratios for acute angles of a right angle.",
+          "Solve real life trigonometric problems in 2-D involving angles of elevation and depression",
+          "Prove the trigonometric identities and apply them to draw different trigonometric relations.",
+          "Solve real life problems involving trigonometric identities."
+        ],
+        "headings": [
+          {
+            "number": "6.1",
+            "title": "Identifying Angles in Standard Position (Degrees and Radians)",
+            "pdfPage": 99
+          },
+          {
+            "number": "6.1.1",
+            "title": "Degree Measurement",
+            "pdfPage": 100
+          },
+          {
+            "number": "6.1.2",
+            "title": "Converting Degrees to Minutes and Seconds",
+            "pdfPage": 101
+          },
+          {
+            "number": "6.1.3",
+            "title": "Converting from Degrees, Minutes and Seconds to Decimal Degrees",
+            "pdfPage": 102
+          },
+          {
+            "number": "6.1.4",
+            "title": "Circular Measure (Radian)",
+            "pdfPage": 102
+          },
+          {
+            "number": "6.2",
+            "title": "Trigonometric Ratios",
+            "pdfPage": 107
+          },
+          {
+            "number": "6.2.1",
+            "title": "Trigonometric Ratios of an Acute Angle",
+            "pdfPage": 108
+          },
+          {
+            "number": "6.2.2",
+            "title": "Trigonometric Ratios of Complementary Angles",
+            "pdfPage": 109
+          },
+          {
+            "number": "6.3",
+            "title": "Trigonometric Identities",
+            "pdfPage": 110
+          },
+          {
+            "number": "6.4",
+            "title": "Values of Trigonometric Ratios of Special Angles",
+            "pdfPage": 114
+          },
+          {
+            "number": "6.5",
+            "title": "Solution of a Triangle",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.6",
+            "title": "The Angle of Elevation and the Angle of Depression",
+            "pdfPage": 121
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 7,
+      "title": "Coordinate Geometry",
+      "titleEn": null,
+      "pdfStart": 125,
+      "pdfEnd": 148,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Coordinate Geometry",
+        "sloHeading": "Students’ Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Derive distance formula by locating the position of two points in coordinate plane.",
+          "Calculate the midpoint of a line segment.",
+          "Find the gradient of a straight line when coordinates of two points are given.",
+          "Find the equation of a straight line in the form y =mx +c.",
+          "Find the gradient of parallel and perpendicular lines.",
+          "Apply distance and midpoint formulas to solve real-life situations such as physical measurements or distances between locations.",
+          "Apply concepts from coordinate geometry to real world problems (such as, aviation and navigation, landscaping, map reading, longitude and latitude).",
+          "Derive equation of a straight line in: slope- intercept form, point-slope form, two-point form, intercepts form, symmetric form, normal form.",
+          "Show that a linear equation in two variables represents a straight line and reduce the general form of the equation of a straight line to the other standard forms."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 125
+          },
+          {
+            "number": "7.1",
+            "title": "Coordinate Plane",
+            "pdfPage": 125
+          },
+          {
+            "number": "7.1.1",
+            "title": "The Distance Formula",
+            "pdfPage": 127
+          },
+          {
+            "number": "7.1.2",
+            "title": "Mid Point Formula",
+            "pdfPage": 128
+          },
+          {
+            "number": "7.2",
+            "title": "Equations of Straight Lines",
+            "pdfPage": 130
+          },
+          {
+            "number": "7.2.1",
+            "title": "Slope or Gradient of a Straight Line Joining Two Points",
+            "pdfPage": 131
+          },
+          {
+            "number": "7.2.2",
+            "title": "Equation of a Straight Line Parallel to the x-axis (or perpendicular to the y-axis)",
+            "pdfPage": 133
+          },
+          {
+            "number": "7.2.3",
+            "title": "Equation of a straight Line Parallel to the y-axis (or perpendicular to the x-axis )",
+            "pdfPage": 133
+          },
+          {
+            "number": "7.2.4",
+            "title": "Standard Forms of Equation of Straight Line: Intercepts of a line",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.2.5",
+            "title": "A Linear Equation in two Variables Represents a Straight Line",
+            "pdfPage": 140
+          },
+          {
+            "number": "7.2.6",
+            "title": "Transform the General Linear Equation to Standard Forms",
+            "pdfPage": 141
+          },
+          {
+            "number": "7.3",
+            "title": "Applications of Coordinate Geometry in Real life Situations",
+            "pdfPage": 145
+          }
+        ],
+        "notes": "Sub-forms 'Point-slope Form', 'Symmetric Form', 'Two-point Form', 'Intercept Form', 'Normal Form' under 7.2.4 are numbered as list items (2,3,4,5,6) without decimal section numbers, so not included separately as headings; they are captured within the bullet listing SLO for standard forms."
+      }
+    },
+    {
+      "number": 8,
+      "title": "Logic",
+      "titleEn": null,
+      "pdfStart": 149,
+      "pdfEnd": 162,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Logic",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Understand a mathematical statement and its proof",
+          "Differentiate between an axiom, conjecture and theorem.",
+          "Formulate simple deductive proofs [algebraic proofs that require showing the LHS to be equal to the RHS. e.g., showing (x − 3)² + 5 = x² − 6x + 14]"
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 149
+          },
+          {
+            "number": "8.1",
+            "title": "Statement",
+            "pdfPage": 150
+          },
+          {
+            "number": "8.1.1",
+            "title": "Logical Operators",
+            "pdfPage": 151
+          },
+          {
+            "number": "8.1.2",
+            "title": "Explanation of the Use of the Symbols",
+            "pdfPage": 151
+          },
+          {
+            "number": "8.1.3",
+            "title": "Mathematical Proof",
+            "pdfPage": 154
+          },
+          {
+            "number": "8.1.4",
+            "title": "Theorem, Conjecture and Axiom",
+            "pdfPage": 156
+          },
+          {
+            "number": "8.1.5",
+            "title": "Deductive Proof",
+            "pdfPage": 159
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 9,
+      "title": "Similar Figures",
+      "titleEn": null,
+      "pdfStart": 163,
+      "pdfEnd": 186,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Similar Figures",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Identify similarity of polygons. Area and volume of similar figures.",
+          "Solve problems using the relationship between areas of similar figures and volume of similar solids.",
+          "Solve real life problems that involve the properties of regular polygons, triangles and parallelograms (such as building architectural structures, fencing, tiling, painting and carpeting a room)."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 163
+          },
+          {
+            "number": "9.1",
+            "title": "Similarity of Polygons",
+            "pdfPage": 163
+          },
+          {
+            "number": "9.1.1",
+            "title": "Identification of Similar Triangles",
+            "pdfPage": 163
+          },
+          {
+            "number": "9.1.2",
+            "title": "Similarity of Quadrilaterals",
+            "pdfPage": 165
+          },
+          {
+            "number": "9.2",
+            "title": "Area of Similar Figures",
+            "pdfPage": 168
+          },
+          {
+            "number": "9.3",
+            "title": "Volume of Similar Solids",
+            "pdfPage": 174
+          },
+          {
+            "number": "9.4",
+            "title": "Geometrical Properties of Polygon and their Applications",
+            "pdfPage": 179
+          },
+          {
+            "number": "9.4.1",
+            "title": "Geometrical Properties of Regular Polygon",
+            "pdfPage": 179
+          },
+          {
+            "number": "9.4.2",
+            "title": "Geometrical Properties of Triangle",
+            "pdfPage": 180
+          },
+          {
+            "number": "9.4.3",
+            "title": "Geometrical Properties of Parallelogram",
+            "pdfPage": 180
+          },
+          {
+            "number": "9.4.4",
+            "title": "Applications of Polygons",
+            "pdfPage": 181
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 10,
+      "title": "Graphs of Functions",
+      "titleEn": null,
+      "pdfStart": 187,
+      "pdfEnd": 201,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Graphs of Functions",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Recall sketch graphs of linear functions (e.g. y = ax + b)",
+          "Plot and interpret the graphs of quadratic, cubic, reciprocal and exponential functions.\nGraph y = ax^n where n is +ve integer, –ve integer, rational number for x > 0 and a is any real number.\nGraph y = ka^x, where x is real a > 1.",
+          "Discover exponential growth/decay of a practical phenomenon through its graph.",
+          "Determine the gradients of curves by drawing tangents.",
+          "Apply concepts of sketching and interpreting graphs to real-life problems (such as in tax payment, income and salary problems and cost and profit analysis)"
+        ],
+        "headings": [
+          {
+            "number": "10.1",
+            "title": "Functions and their Graphs",
+            "pdfPage": 187
+          },
+          {
+            "number": "10.1.1",
+            "title": "Graph of Linear Functions",
+            "pdfPage": 188
+          },
+          {
+            "number": "10.1.2",
+            "title": "Graph of Quadratic Functions",
+            "pdfPage": 188
+          },
+          {
+            "number": "10.1.3",
+            "title": "Graph of Cubic Functions",
+            "pdfPage": 189
+          },
+          {
+            "number": "10.1.4",
+            "title": "Graph of Reciprocal Functions",
+            "pdfPage": 191
+          },
+          {
+            "number": "10.1.5",
+            "title": "Graph of Exponential Functions (y = ka^x where x is real number, a > 1)",
+            "pdfPage": 191
+          },
+          {
+            "number": "10.1.6",
+            "title": "Graphs of y = ax^n (where n is +ve integer, –ve integer or rational number for x > 0 and a is any real number)",
+            "pdfPage": 193
+          },
+          {
+            "number": "10.2",
+            "title": "Exponential Growth / Decay of a Practical Phenomenon through its Graph",
+            "pdfPage": 196
+          },
+          {
+            "number": "10.2.1",
+            "title": "Gradients of Curves by Drawing Tangents",
+            "pdfPage": 197
+          },
+          {
+            "number": "10.2.2",
+            "title": "Applications of Graph in Real-Life",
+            "pdfPage": 198
+          }
+        ],
+        "notes": "The SLOs bullet 'Plot and interpret the graphs...' has two sub-bullet points included within it as printed under that main bullet."
+      }
+    },
+    {
+      "number": 11,
+      "title": "Loci and Construction",
+      "titleEn": null,
+      "pdfStart": 202,
+      "pdfEnd": 216,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Loci and Construction",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Construct a triangle having given two sides and the included angle.",
+          "Construct a triangle having given one side and two of the angles.",
+          "Construct a triangle having given two of its sides and the angle opposite to one of them.",
+          "Draw angle bisectors, perpendicular bisectors, medians, altitudes of a given triangle and verify their concurrency.",
+          "Draw loci and intersection of loci for set of points in two dimensions which are\nat a given distance from a given point.\nat a given distance from a given line\nequidistant from two given points\nequidistant from two given intersecting lines\nSolve real life problems using the loci and interesting loci."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 202
+          },
+          {
+            "number": "11.1",
+            "title": "Construction of Triangles",
+            "pdfPage": 202
+          },
+          {
+            "number": "11.2",
+            "title": "Perpendicular Bisectors and Medians of a Triangle",
+            "pdfPage": 207
+          },
+          {
+            "number": "11.3",
+            "title": "Angle Bisector of a Triangle",
+            "pdfPage": 207
+          },
+          {
+            "number": "11.4",
+            "title": "Altitudes of Triangle",
+            "pdfPage": 208
+          },
+          {
+            "number": "11.5",
+            "title": "Loci and Construction",
+            "pdfPage": 210
+          },
+          {
+            "number": "11.5.1",
+            "title": "Loci in Two Dimensions",
+            "pdfPage": 210
+          },
+          {
+            "number": "11.5.2",
+            "title": "Intersection of Loci",
+            "pdfPage": 211
+          },
+          {
+            "number": "11.6",
+            "title": "Real Life Application of Loci",
+            "pdfPage": 213
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 12,
+      "title": "Information Handling",
+      "titleEn": null,
+      "pdfStart": 217,
+      "pdfEnd": 244,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Information Handling",
+        "sloHeading": "Students’ Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Construct a grouped frequency table, histogram (with unequal class interval) and frequency polygon.",
+          "Calculate the mean, modal class and median of a grouped frequency distribution.",
+          "Solve real life situations involving mean, weighted mean, median and mode for given data (such as allocation of funds in different projects, forecasting future demographics, marketing, forecasting government budgets)."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 217
+          },
+          {
+            "number": null,
+            "title": "Information Handling",
+            "pdfPage": 218
+          },
+          {
+            "number": "12.1",
+            "title": "Ungrouped and Grouped Data",
+            "pdfPage": 218
+          },
+          {
+            "number": "12.1.1",
+            "title": "Frequency Distribution",
+            "pdfPage": 218
+          },
+          {
+            "number": "12.1.2",
+            "title": "Graph of Frequency Distribution",
+            "pdfPage": 221
+          },
+          {
+            "number": "12.1.3",
+            "title": "Histogram (with unequal class limits)",
+            "pdfPage": 222
+          },
+          {
+            "number": "12.1.4",
+            "title": "Frequency Polygon",
+            "pdfPage": 223
+          },
+          {
+            "number": "12.2",
+            "title": "Measures of Location (Central Tendency)",
+            "pdfPage": 227
+          },
+          {
+            "number": "12.2.1",
+            "title": "Arithmetic Mean (A.M.)",
+            "pdfPage": 228
+          },
+          {
+            "number": "12.2.2",
+            "title": "Median",
+            "pdfPage": 231
+          },
+          {
+            "number": "12.2.3",
+            "title": "Mode",
+            "pdfPage": 234
+          },
+          {
+            "number": "12.2.4",
+            "title": "Weighted Mean",
+            "pdfPage": 236
+          },
+          {
+            "number": "12.2.5",
+            "title": "Real Life Situations Involving Mean, Weighted Mean, Median and Mode",
+            "pdfPage": 237
+          }
+        ],
+        "notes": "Section heading 'Formation of Frequency distribution' on image 3 and 'Method of finding Arithmetic Mean for Grouped Data' / 'Short Formula for Computing Arithmetic Mean' on images 13-14 and 'Median for Grouped Data' on image 16, 'Mode for Grouped Data' on image 19, 'Sales and Marketing' on image 21 are unnumbered sub-headings, not listed to keep only numbered ones per instructions; they are omitted."
+      }
+    },
+    {
+      "number": 13,
+      "title": "Probability",
+      "titleEn": null,
+      "pdfStart": 245,
+      "pdfEnd": 261,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Probability",
+        "sloHeading": "Students’ Learning Outcomes",
+        "sloLead": "At the end of the unit, the students will be able to:",
+        "slos": [
+          "Calculate the probability of a single event and the probability of an event not occurring.",
+          "Solve real life problems involving probability.",
+          "Calculate relative frequency as an estimate of probability.",
+          "Calculate expected frequencies.",
+          "Solve real life problems involving relative and expected frequencies."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "INTRODUCTION",
+            "pdfPage": 245
+          },
+          {
+            "number": null,
+            "title": "Basic Concepts of Probability",
+            "pdfPage": 245
+          },
+          {
+            "number": "13.1",
+            "title": "Probability of Single Event",
+            "pdfPage": 246
+          },
+          {
+            "number": "13.2",
+            "title": "Probability of an Event Not Occurring",
+            "pdfPage": 247
+          },
+          {
+            "number": "13.3",
+            "title": "Real Life Problems Involving Probability",
+            "pdfPage": 250
+          },
+          {
+            "number": "13.4",
+            "title": "Relative Frequency as an Estimate of Probability",
+            "pdfPage": 253
+          },
+          {
+            "number": "13.5",
+            "title": "Real Life Application of Relative Frequency",
+            "pdfPage": 254
+          },
+          {
+            "number": "13.6",
+            "title": "Expected Frequency",
+            "pdfPage": 258
+          },
+          {
+            "number": "13.7",
+            "title": "Real Life Application on Expected Frequency",
+            "pdfPage": 258
+          }
+        ],
+        "notes": null
+      }
+    }
+  ]
+}

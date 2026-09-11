@@ -1,0 +1,75 @@
+{
+  "source": "content/punjab/textbooks/pst-10-ur.pdf",
+  "subject": "pst",
+  "grade": 10,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "مطالعہ پاکستان برائے جماعت دہم",
+  "publisher": "پنجاب کریکولم اینڈ ٹیکسٹ بک بورڈ، لاہور",
+  "curriculum": null,
+  "language": "ur",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "پاکستان کی نظریاتی اساس",
+      "titleEn": "Ideological Basis of Pakistan",
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "تحریک پاکستان اور قیام پاکستان کا",
+      "titleEn": "Pakistan Movement and Creation of Pakistan",
+      "page": 15,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "تاریخ پاکستان (1971 تا حال)",
+      "titleEn": "History of Pakistan (1971 to present)",
+      "page": 43,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "پاکستان اور عالمی امور",
+      "titleEn": "Pakistan and Global Affairs",
+      "page": 65,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "زمین اور ماحول",
+      "titleEn": "Land and Environment",
+      "page": 88,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "آبادی، معاشرہ اور پاکستان کی ثقافت",
+      "titleEn": "Population, Society and Culture of Pakistan",
+      "page": 111,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "پاکستان کی معاشی ترقی",
+      "titleEn": "Economic Development of Pakistan",
+      "page": 133,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "خواتین کو بااختیار بنانا",
+      "titleEn": "Empowerment of Women",
+      "page": 160,
+      "topics": []
+    }
+  ],
+  "notes": "Chapter 2 title appears truncated/cut off in the table of contents image as 'تحریک پاکستان اور قیام پاکستان کا' · the printed line seems to end abruptly on the page; the full chapter title based on chapter opening pages likely continues but only what is visible in the contents table is transcribed here."
+}

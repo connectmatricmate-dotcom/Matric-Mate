@@ -1,0 +1,274 @@
+{
+  "source": "content/punjab/textbooks/isl-10.pdf",
+  "subject": "isl",
+  "grade": 10,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "اِسلامیات (لازمی)",
+  "publisher": "پنجاب کریکولم اینڈ ٹیکسٹ بک بورڈ، لاہور (Punjab Curriculum and Textbook Board, Lahore)",
+  "curriculum": "یکساں قومی نصاب 2022ء کے مطابق",
+  "language": "ur",
+  "contentsPages": [
+    4,
+    5
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "قرآن مجید و حدیثِ نبوی ﷺ",
+      "titleEn": "The Holy Quran and the Hadith of the Prophet ﷺ",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "ترجمہ قرآن مجید",
+          "titleEn": "Translation of the Holy Quran",
+          "page": 1
+        },
+        {
+          "number": null,
+          "title": "حفاظت و تدوینِ حدیث (دورِ اوّل)",
+          "titleEn": "Preservation and compilation of Hadith (First period)",
+          "page": 2
+        },
+        {
+          "number": null,
+          "title": "احادیثِ نبویہ ﷺ",
+          "titleEn": "Ahadith of the Prophet ﷺ",
+          "page": 6
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "ایمانیات و عبادات",
+      "titleEn": "Beliefs and Worship",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "ایمانیات: ملائکہ",
+          "titleEn": "Beliefs: Angels",
+          "page": 8
+        },
+        {
+          "number": null,
+          "title": "کُتبِ سماویہ (آسمانی کتابیں)",
+          "titleEn": "The Revealed Books (Heavenly Books)",
+          "page": 11
+        },
+        {
+          "number": null,
+          "title": "عقیدۂ آخرت",
+          "titleEn": "Belief in the Hereafter",
+          "page": 15
+        },
+        {
+          "number": null,
+          "title": "عبادات: زکوٰۃ",
+          "titleEn": "Worship: Zakat",
+          "page": 19
+        },
+        {
+          "number": null,
+          "title": "حج اور قربانی",
+          "titleEn": "Hajj and Sacrifice",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "سیرتِ نبوی ﷺ",
+      "titleEn": "The Life of the Prophet ﷺ",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور) نبی کریم ﷺ بطور معاشرتی مصلح",
+          "titleEn": "The months and years of the Prophet's era (Madinan period): The Holy Prophet ﷺ as a social reformer",
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "غزوۂ تبوک",
+          "titleEn": "The Battle of Tabuk",
+          "page": 26
+        },
+        {
+          "number": null,
+          "title": "حجۃ الوداع",
+          "titleEn": "The Farewell Pilgrimage",
+          "page": 30
+        },
+        {
+          "number": null,
+          "title": "وصالِ نبوی ﷺ",
+          "titleEn": "The passing away of the Prophet ﷺ",
+          "page": 34
+        },
+        {
+          "number": null,
+          "title": "اُسوۂ رسول ﷺ اور ہماری زندگی، نبی کریم ﷺ بطور سرچشمہ ہدایت",
+          "titleEn": "The example of the Messenger ﷺ and our life: The Holy Prophet ﷺ as a source of guidance",
+          "page": null
+        },
+        {
+          "number": null,
+          "title": "صلہ رحمی",
+          "titleEn": "Kindness to relatives",
+          "page": 38
+        },
+        {
+          "number": null,
+          "title": "خواتین کے ساتھ حسنِ سلوک",
+          "titleEn": "Good treatment of women",
+          "page": 42
+        },
+        {
+          "number": null,
+          "title": "اندازِ تربیت",
+          "titleEn": "Method of training",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "اَخلاق و آداب",
+      "titleEn": "Morals and Manners",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "اخلاص و تقویٰ",
+          "titleEn": "Sincerity and piety",
+          "page": 49
+        },
+        {
+          "number": null,
+          "title": "پردہ پوشی",
+          "titleEn": "Concealing faults",
+          "page": 53
+        },
+        {
+          "number": null,
+          "title": "جھوٹ",
+          "titleEn": "Lying",
+          "page": 56
+        },
+        {
+          "number": null,
+          "title": "غیبت اور بہتان",
+          "titleEn": "Backbiting and slander",
+          "page": 59
+        },
+        {
+          "number": null,
+          "title": "جادُو، فال اور توہم پرستی",
+          "titleEn": "Magic, omens and superstition",
+          "page": 62
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "حسنِ معاشرت و معاملات",
+      "titleEn": "Good Social Conduct and Dealings",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "سُود کی حرمت",
+          "titleEn": "Prohibition of interest",
+          "page": 66
+        },
+        {
+          "number": null,
+          "title": "اسلامی ریاست",
+          "titleEn": "The Islamic state",
+          "page": 70
+        },
+        {
+          "number": null,
+          "title": "جہاد فی سبیل اللہ",
+          "titleEn": "Jihad in the way of Allah",
+          "page": 74
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
+      "titleEn": "Sources of Guidance and Eminent Personalities of Islam",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "حضرت امام زید بن علی رحمۃ اللہ علیہ",
+          "titleEn": "Hazrat Imam Zaid bin Ali (RA)",
+          "page": 78
+        },
+        {
+          "number": null,
+          "title": "حضرت عمرو بن العاص رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Hazrat Amr bin al-Aas (RA)",
+          "page": 81
+        },
+        {
+          "number": null,
+          "title": "حضرت جابر بن عبداللہ رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Hazrat Jabir bin Abdullah (RA)",
+          "page": 84
+        },
+        {
+          "number": null,
+          "title": "حضرت انس بن مالک رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Hazrat Anas bin Malik (RA)",
+          "page": 87
+        },
+        {
+          "number": null,
+          "title": "صحابیات رضی اللہ تعالیٰ عنھن",
+          "titleEn": "The female Companions (RA)",
+          "page": 90
+        },
+        {
+          "number": null,
+          "title": "صوفیہ کرام رحمۃ اللہ علیہم",
+          "titleEn": "The Sufi saints (RA)",
+          "page": 94
+        },
+        {
+          "number": null,
+          "title": "علماء و مفکرین رحمۃ اللہ علیہم",
+          "titleEn": "Scholars and thinkers (RA)",
+          "page": 98
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
+      "titleEn": "Islamic Teachings and the Demands of the Present Age",
+      "page": null,
+      "topics": [
+        {
+          "number": "(1",
+          "title": "اسلام میں مستقبل کی منصوبہ بندی",
+          "titleEn": "Planning for the future in Islam",
+          "page": 101
+        },
+        {
+          "number": "(2",
+          "title": "اسلامی تہذیب کے امتیازات",
+          "titleEn": "Distinctions of Islamic civilization",
+          "page": 105
+        }
+      ]
+    }
+  ],
+  "notes": "Chapter numbers are printed in Urdu words (باب اوّل، باب دوم، باب سوم، باب چہارم، باب پنجم، باب ششم، باب ہفتم) and converted to integers. Chapters themselves have no page numbers printed; only sub-topics do. Sub-topic numbering is as printed: Urdu numerals in parentheses for chapters 1-6 and Latin digits in chapter 7. In Chapter 2 the labels (الف) ایمانیات and (ب) عبادات head the numbered items (۱)-(۳) and (۱)-(۲) respectively; these have been merged into the first item of each group. The honorific calligraphic seals after the Prophet's name are rendered as ﷺ."
+}

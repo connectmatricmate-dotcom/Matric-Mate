@@ -1,0 +1,878 @@
+{
+  "source": "content/punjab/textbooks/chem-9.pdf",
+  "subject": "chem",
+  "grade": 9,
+  "medium": "en",
+  "pdfPages": 192,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    4
+  ],
+  "backMatterStart": 181,
+  "locateNotes": "Printed page numbers run 4 behind the PDF labels (printed 1 = page 5), consistent with all chapter openings. Back matter: Glossary begins page 181 (printed 177), Index page 189, Bibliography pages 191-192.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "States of Matter and Phase Changes",
+      "titleEn": null,
+      "pdfStart": 5,
+      "pdfEnd": 20,
+      "read": {
+        "titleOnPage": "States of Matter and Phase Changes",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define chemistry as the study of matter, its properties, composition, and interactions with other matter and energy. Or Study of earth (solids), Air (gases), Sea (liquids) and Sky (plasma) and their interaction with each other.",
+          "Explain with examples that chemistry has many sub-fields and interdisciplinary fields. Some examples include: Biochemistry; Medicinal Chemistry; Polymer Chemistry; Geochemistry; Environmental Chemistry; Analytical Chemistry; Physical Chemistry; Organic Chemistry; Inorganic Chemistry; Nuclear Chemistry; Astrochemistry",
+          "Define matter as a substance having mass and occupying space.",
+          "State the distinguishing macroscopic properties of commonly observed states of solids, liquids and gases in particular density, compressibility and fluidity.",
+          "Identify that state is a distinct form of matter (examples could include familiarity with plasma, intermediate states and exotic states e .g., BEC or liquid crystals)",
+          "Explain the allotropic forms of solids (some examples may include diamond, graphite, and fullerenes)",
+          "Explain the difference between elements, compounds and mixtures",
+          "Identify solutions, colloids, and suspensions as mixtures and give an example of each",
+          "Explain the effect of temperature on solubility and formation of unsaturated and saturated solutions"
+        ],
+        "headings": [
+          {
+            "number": "1.1",
+            "title": "What is Chemistry?",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.2",
+            "title": "States of Matter",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.3",
+            "title": "Element, Compound and Mixture",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.4",
+            "title": "Allotropic Forms of Substances",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.5",
+            "title": "Differences between Elements, Compounds and Mixtures",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.6",
+            "title": "Solution, Colloidal Solution and Suspension",
+            "pdfPage": 14
+          },
+          {
+            "number": "1.7",
+            "title": "Formation of Unsaturated and Saturated Solutions",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.8",
+            "title": "Effect of Temperature on the Solubility of Solutes",
+            "pdfPage": 15
+          }
+        ],
+        "notes": "The second SLO is printed as a lead line followed by an indented list of eleven sub-bullets (Biochemistry ... Astrochemistry); these have been joined into that bullet's string separated by semicolons. Under 1.1 the book prints an unnumbered boxed heading 'Branches of Chemistry' followed by numbered branch headings 1.Physical Chemistry through 11. Astrochemistry (images 2-4); these are branch labels, not numbered sections, so they are not listed in headings."
+      }
+    },
+    {
+      "number": 2,
+      "title": "Atomic Structure",
+      "titleEn": null,
+      "pdfStart": 21,
+      "pdfEnd": 35,
+      "read": {
+        "titleOnPage": "Atomic Structure",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain the structure of the atom as a central nucleus containing neutrons and protons surrounded by electrons in shells",
+          "State that, orbits (shells) are energy levels of electrons and a larger shell implies higher energy and greater average distance from nucleus",
+          "State that electrons are quantum particles with probabilistic paths whose exact paths and locations cannot be mapped (with reference to the uncertainty principle}",
+          "Explain that a nucleus is made up of protons and neutrons held together by strong nuclear force",
+          "Explain that an atomic model is an aid to understand the structure of an atom.",
+          "State the relative charge and relative masses of a subatomic particles (an electron, proton and neutron)",
+          "Interpret the relationship between a subatomic particle, their mass and charge.",
+          "Illustrate the path that positively and negatively charged particles would take under the influence of a Uniform Electric Field.",
+          "Define proton number / atomic number as the number of protons in the nucleus of an atom.",
+          "Explain that the proton number is unique to each element and used to arrange elements in periodic table",
+          "State that radioactivity can change the proton number and alter an atom's identity",
+          "Define nucleon number / atomic mass as sum of number of protons and neutrons in the nucleus of an atom.",
+          "Define isotopes as different atoms of the same element that have same number of protons but different neutrons",
+          "State that isotopes can affect molecular mass but not chemical properties of an atom",
+          "Determine the number of protons and neutrons of different isotopes",
+          "Define relative atomic mass as the average mass of isotopes of an element compared to 1/12th of mass of an atom of Carbon-12",
+          "State that isotopes can exhibit radioactivity",
+          "Discuss the importance of isotopes using carbon dating and medical imaging as examples. Describe the formation of positive (cation) and negative (anion) ions from atoms.",
+          "Interpret and use the symbols for atoms and ions",
+          "Calculate relative atomic mass of an element from relative masses and abundance of isotopes,",
+          "Calculate the relative mass of an isotope given relative atomic mass and abundance of all stable isotopes."
+        ],
+        "headings": [
+          {
+            "number": "2.1",
+            "title": "Structure of Atom",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Discovery of Electrons",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Discovery of Proton",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Discovery of Neutron",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Discovery of Nucleus",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Bohr's Atomic Model",
+            "pdfPage": 25
+          },
+          {
+            "number": "2.2",
+            "title": "Atomic Number and Mass Number",
+            "pdfPage": 26
+          },
+          {
+            "number": "2.3",
+            "title": "Isotopes and their Masses",
+            "pdfPage": 28
+          },
+          {
+            "number": null,
+            "title": "Radioactive Isotopes",
+            "pdfPage": 29
+          },
+          {
+            "number": null,
+            "title": "Applications of Radioactive Isotopes",
+            "pdfPage": 29
+          },
+          {
+            "number": null,
+            "title": "Ionization of Atoms by a Radioactive Source",
+            "pdfPage": 30
+          },
+          {
+            "number": "2.4",
+            "title": "Relative Atomic Mass",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "Calculation of Relative Atomic Mass from Isotopic Abundance",
+            "pdfPage": 31
+          }
+        ],
+        "notes": "The chapter mixes numbered section headings (2.1-2.4) with unnumbered sub-headings; both are listed, with number null for the unnumbered ones. SLOs continue from image 1 onto image 2. In Sample Example 1 (image 12) the printed calculation shows '85 × 57.0' which appears inconsistent with the table value 17.0%, reproduced here only as a note."
+      }
+    },
+    {
+      "number": 3,
+      "title": "Chemical Bonding",
+      "titleEn": null,
+      "pdfStart": 36,
+      "pdfEnd": 55,
+      "read": {
+        "titleOnPage": "Chemical Bonding",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe that noble gas electronic configuration, octet and duplet rules help predict chemical properties of main group elements",
+          "Compare between the formation of cations and anions",
+          "Account for the electropositive and electronegative nature of metals and non-metals.",
+          "Define ionic, covalent, coordinate covalent and metallic bonds",
+          "Differentiate between ionic compounds and covalent compounds. (The following points need to be included in the respective definitions: a. Ionic Bond as strong electrostatic attraction between oppositely charged ions b. Covalent bond as strong electrostatic attraction between shared electrons and two nuclei c. Metallic bond as strong electrostatic attraction between cloud/sea of delocalized electrons and positively charged cations)",
+          "Explain the properties of compounds in terms of bonding and structure",
+          "Compare uses and properties of materials such as strength and conductivity as determined by the type of chemical bond present between their atoms.",
+          "Interpret the strength of forces of attraction and their impact on melting and boiling points of ionic and covalent compounds.",
+          "Justify the availability of free charged particles (electrons or ions) for conduction of electricity in ionic compounds (solid and molten) covalent compounds and metallic bonds.",
+          "Recognize that some substances can ionize when dissolved in water. (e.g. acids dissolves in water and conduct electricity)",
+          "Justify the suitability of usage of graphite, diamond and metals for industrial purposes (Some examples may include: a. graphite as lubricant or an electrode b. diamond in cutting tools c. metals for wires, and sheets)",
+          "Draw the structure of ionic and covalent compounds along with their format ion. {some examples can include: a. ionic bonds in binary compounds such as NaBr, NaF, CaCl2 using dot-and- cross diagrams and Lewisdot structures simple molecules including H2, Cl2, O2, N2, H20, CH4, NH3, HCl, CH3O H, C2H4, CO2, HCN, and similar molecules using dot and-cross diagrams and Lewis- dot structures)"
+        ],
+        "headings": [
+          {
+            "number": "3.1",
+            "title": "Why do atoms form chemical bonds?",
+            "pdfPage": 37
+          },
+          {
+            "number": "3.2",
+            "title": "Chemical Bond",
+            "pdfPage": 37
+          },
+          {
+            "number": "3.2.1",
+            "title": "Ionic Bond",
+            "pdfPage": 38
+          },
+          {
+            "number": "3.2.2",
+            "title": "Covalent Bond",
+            "pdfPage": 40
+          },
+          {
+            "number": "3.2.3",
+            "title": "Coordinate Covalent Bond",
+            "pdfPage": 43
+          },
+          {
+            "number": "3.3",
+            "title": "Metallic Bond",
+            "pdfPage": 45
+          },
+          {
+            "number": "3.4",
+            "title": "Electropositive Character of Metals",
+            "pdfPage": 47
+          },
+          {
+            "number": "3.5",
+            "title": "Electronegative character of Non-metals",
+            "pdfPage": 47
+          },
+          {
+            "number": "3.6",
+            "title": "Compare the properties of ionic and covalent compounds.",
+            "pdfPage": 48
+          },
+          {
+            "number": "3.7",
+            "title": "Intermolecular Forces of Attraction",
+            "pdfPage": 48
+          },
+          {
+            "number": "3.8",
+            "title": "Nature of Bonding and Properties",
+            "pdfPage": 50
+          }
+        ],
+        "notes": "The last SLO is printed with subscripts (H₂, Cl₂, O₂, N₂, H₂0 [printed with a zero], CH₄, NH₃, CH₃O H, C₂H₄, CO₂) which are flattened here; the lettered sub-points a./b./c. appear inline in the printed bullets. Unnumbered sub-headings not listed: 'Types of Bonds', 'Formation of Covalent Compounds', 'Polar and Non-polar Covalent Bonds', 'Properties of Metals', '1. Dipole – Dipole Forces of Attraction', '2. Hydrogen Bonding'."
+      }
+    },
+    {
+      "number": 4,
+      "title": "Stoichiometry",
+      "titleEn": null,
+      "pdfStart": 56,
+      "pdfEnd": 70,
+      "read": {
+        "titleOnPage": "Stoichiometry",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "State the formulae of common elements and compounds.",
+          "Define molecular formula of a compound as the number and type of different atoms in one molecule",
+          "Define empirical formula of a compound as the simplest whole number ratio of different atoms in a Molecule.",
+          "Deduce the formula and name of a binary ionic compounds from ions given relevant information",
+          "Deduce the formula of a molecular substance from the given structure of molecules.",
+          "Use the relationship amount of substance= mass/ molar mass to calculate number of moles, mass, molar mass, relative mass (atomic/molecular/formula) and number of particles",
+          "Define mole as amount of substance containing Avogadro's number 6.02×10²³) of particles",
+          "Explain the relationship between a mole and Avogadro's constant.",
+          "Construct chemical equations and ionic equations to show reactants forming products, including state symbols.",
+          "Deduce the symbol equation with state symbols for a chemical reaction given relevant information."
+        ],
+        "headings": [
+          {
+            "number": "4.1",
+            "title": "Chemical formula",
+            "pdfPage": 57
+          },
+          {
+            "number": "4.2",
+            "title": "Empirical Formula",
+            "pdfPage": 57
+          },
+          {
+            "number": "4.3",
+            "title": "Chemical Formulas of Binary Ionic Compounds",
+            "pdfPage": 58
+          },
+          {
+            "number": "4.4",
+            "title": "Chemical Formulas of Compounds",
+            "pdfPage": 59
+          },
+          {
+            "number": "4.5",
+            "title": "Deduce the molecular formula from the structural formula",
+            "pdfPage": 60
+          },
+          {
+            "number": "4.6",
+            "title": "Avogadro's Number (N_A)",
+            "pdfPage": 61
+          },
+          {
+            "number": "4.7",
+            "title": "The Mole and Molar Mass",
+            "pdfPage": 62
+          },
+          {
+            "number": "4.8",
+            "title": "Chemical Equations and Chemical Reactions",
+            "pdfPage": 64
+          },
+          {
+            "number": "4.9",
+            "title": "Calculations Based on Chemical Equation",
+            "pdfPage": 65
+          }
+        ],
+        "notes": "The SLO on Avogadro's number is printed with an unmatched closing parenthesis: \"6.02×10²³) of particles\". Section 4.6 heading prints N with subscript A. Some text on lower-resolution pages (images 4-15) was read with less certainty, e.g. exercise items are excluded per instructions."
+      }
+    },
+    {
+      "number": 5,
+      "title": "Energetics",
+      "titleEn": null,
+      "pdfStart": 71,
+      "pdfEnd": 86,
+      "read": {
+        "titleOnPage": "Energetics",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain the idea of a chemical system and its connection with its surroundings influences energy transfer during a chemical reaction.",
+          "Differentiate between exothermic and endothermic reactions by giving examples.",
+          "State that thermal energy is called enthalpy change and recognize its sign as negative for exothermic and positive for endothermic reactions",
+          "Define activation energy as the minimum energy that colliding particles must have for a successful collision.",
+          "Explain that activation energy depends on reaction pathway which can be changed using catalysts or enzyme (detailed pathways not required)",
+          "Draw, label and interpret reaction pathway diagram for exothermic and endothermic reaction which includes enthalpy change, activation energy (uncatalyzed and catalyzed), reactants and products",
+          "Recognize that bond breaking is endothermic and bond making is exothermic processes.",
+          "Explain that enthalpy change is sum of energies absorbed and released in bond breaking and bond forming",
+          "Calculate enthalpy change of a reaction given bond energy values",
+          "Explain how respiration (aerobic and anaerobic), an exothermic process, provides energy for biological systems and lipids as reserve stores of energy."
+        ],
+        "headings": [
+          {
+            "number": "5.1",
+            "title": "System and Surounding",
+            "pdfPage": 72
+          },
+          {
+            "number": "5.2",
+            "title": "Enthalpy",
+            "pdfPage": 73
+          },
+          {
+            "number": "5.3",
+            "title": "Exothermic and Endothermic Reactions",
+            "pdfPage": 74
+          },
+          {
+            "number": "5.4",
+            "title": "How does a Reaction take place?",
+            "pdfPage": 79
+          },
+          {
+            "number": "5.5",
+            "title": "Aerobic and Anaerobic Respiration",
+            "pdfPage": 81
+          }
+        ],
+        "notes": "Section 5.1 is printed as \"System and Surounding\" (spelling as in the book). Sections 5.4 and 5.5 are numbered 5.4/5.5 but printed in the chapter as \"5.4\" and \"5.5\" on pages 75 and 77 respectively; note the book skips no numbers. The unnumbered sub-heading \"How is enthalpy different from heat?\" (image 4) and the boxed sub-heading \"Glycolysis\" (image 11) were omitted per the rules."
+      }
+    },
+    {
+      "number": 6,
+      "title": "Equilibria",
+      "titleEn": null,
+      "pdfStart": 87,
+      "pdfEnd": 96,
+      "read": {
+        "titleOnPage": "Equilibria",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Recognize that reversible reactions are shown by symbol and may not go to completion",
+          "Describe how changing the physical conditions of a chemical equilibrium system can redirect reversible reactions (Some examples can include: a. effect of heat on hydrated compounds b. addition of water to anhydrous substances in particular copper (II) sulfate and cobalt (II) chloride",
+          "State that reversible reactions can achieve equilibrium in a closed system when rate of forward and backward reactions are equal."
+        ],
+        "headings": [
+          {
+            "number": "6.1",
+            "title": "Reversible and Irreversible Changes",
+            "pdfPage": 87
+          },
+          {
+            "number": "6.2",
+            "title": "Dynamic Equilibrium",
+            "pdfPage": 89
+          },
+          {
+            "number": "6.3",
+            "title": "Changing the Physical Conditions of a Chemical Reaction",
+            "pdfPage": 90
+          }
+        ],
+        "notes": "Page 87 and 88 contain shaded sub-section banners without numbers: \"Effect of Changing the Temperature on the State of Equilibrium\", \"Effect of Change of Pressure on the Reaction at Equilibrium\" (image 5) and \"Effect of the Presence of a Catalyst on the Reversible Reaction\" (image 6); these are unnumbered so they were not included in the numbered headings list. The second SLO's bracketed example appears to be missing its closing parenthesis as printed."
+      }
+    },
+    {
+      "number": 7,
+      "title": "Acid Base Chemistry",
+      "titleEn": null,
+      "pdfStart": 97,
+      "pdfEnd": 108,
+      "read": {
+        "titleOnPage": "Acid Base Chemistry",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define Bronsted-Lowry acids as proton donors and Bronsted -Lowry bases as proton acceptors",
+          "Recognize that aqueous solutions of acids contain H⁺ ions and aqueous solutions of alkalis contain OH⁻ ions",
+          "Define a strong acid and base as an acid or base that completely dissociates in aqueous solution and weak acid and base that partially dissociates in aqueous solution. (Some examples include: Student writing symbol equations to show these for hydrochloric acid, sulphuric acid, nitric acid, and ethanoic acid. )",
+          "Formulate dissociation equations for an acid or base in aqueous solution.",
+          "Recognize that bases are oxides or hydroxides of metals and that alkalis are water-soluble bases",
+          "Describe the characteristic properties of acids in terms of their reactions with metals, bases and carbonates",
+          "Identify the characteristic properties of bases in terms of their reactions with acids and ammonium salts",
+          "Define acid rain.",
+          "Discuss effects of acid rain and relate them with properties of acids."
+        ],
+        "headings": [
+          {
+            "number": "7.1",
+            "title": "Acids and Bases",
+            "pdfPage": 97
+          },
+          {
+            "number": "7.2",
+            "title": "Different Concepts of Acids and Bases",
+            "pdfPage": 99
+          },
+          {
+            "number": "7.3",
+            "title": "Bronsted – Lowry concepts of Acids and Bases",
+            "pdfPage": 102
+          },
+          {
+            "number": "7.4",
+            "title": "Properties of Acids and Bases",
+            "pdfPage": 104
+          },
+          {
+            "number": "7.5",
+            "title": "Acid Rain and its Effects",
+            "pdfPage": 106
+          }
+        ],
+        "notes": "Unnumbered sub-headings not listed: \"Arrhenius Acids and Bases\" (image 3, a boxed sub-heading under 7.2), lettered items \"a. Acids give the following three types of reactions.\" (image 8) and \"b. Properties of Bases\" (image 9), and \"Effects of Acid Rain\" (image 10). Chapter pages are numbered 93–104."
+      }
+    },
+    {
+      "number": 8,
+      "title": "Periodic Table and Periodicity",
+      "titleEn": null,
+      "pdfStart": 109,
+      "pdfEnd": 122,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Periodic Table and Periodicity",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define the periodic table as an arrangement of elements in periods and groups, in order of increasing proton number/atomic number",
+          "Identify the group or period or block of an element using its electronic configuration (only the idea of subshells related to the blocks can be introduced)",
+          "Explain the relationship between group number and the charge of ions formed from elements in the group in terms of their outermost shells",
+          "Explain similarities in the chemical properties of elements in the same group in terms of their electronic configuration",
+          "Identify trends in group and periods, given information about the elements, including trends for atomic radius, electron affinity, electronegativity, ionization energy, metallic character, reactivity and density",
+          "Use terms alkali metals, alkaline earth metals, halogens, noble gases, transition metals, lanthanides and actinides in reference to the periodic table",
+          "Predict the characteristic properties of an element in a given group by using knowledge of chemical periodicity",
+          "Deduce the nature, possible position in the Periodic Table and the identity of unknown elements from given information about their physical and chemical properties"
+        ],
+        "headings": [
+          {
+            "number": "8.1",
+            "title": "Modern Periodic Table",
+            "pdfPage": 109
+          },
+          {
+            "number": "8.2",
+            "title": "Salient Features of Modern Periodic Table",
+            "pdfPage": 110
+          },
+          {
+            "number": "8.3",
+            "title": "Similarities in the Chemical Properties of Elements in the Same Group",
+            "pdfPage": 113
+          },
+          {
+            "number": "8.4",
+            "title": "Variation of Periodic Properties in Periods and Groups",
+            "pdfPage": 114
+          },
+          {
+            "number": "8.5",
+            "title": "Metallic Character and Reactivity",
+            "pdfPage": 118
+          }
+        ],
+        "notes": "Sub-headings such as 'Periods', 'Groups', 'Atomic Radius', 'Ionization Energy', 'Electron Affinity', 'Electronegativity', 'Density', and 'Relationship between Group Number and Charge of Ions' appear as unnumbered subsection headings within 8.2-8.5 but are not included since they lack section numbers and the numbered headings were already listed."
+      }
+    },
+    {
+      "number": 9,
+      "title": "Group Properties and Elements",
+      "titleEn": null,
+      "pdfStart": 123,
+      "pdfEnd": 132,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Group Properties and Elements",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define group 1 Alkali metals as relatively soft metals with general trends down the group limited to decreasing melting point, increasing density and increasing reactivity.",
+          "Predict properties of other elements in group 1, given information about the elements.",
+          "Predict properties of elements in group 1 in order of reactivity given relevant information.",
+          "Define group 17 halogens as diatomic non-metals with general trends limited to increasing density, and decreasing reactivity.",
+          "Identify the appearance of halogens at rtp as fluorine as pale-yellow gas, chlorine as yellow -green gas, bromine as red -brown liquid, iodine as grey- black solid",
+          "Explain the displacement reactions of halogens with other halide ions and also as reducing agents",
+          "Predict the properties of elements in group 17, given information about the elements",
+          "Analyse the relative thermal stabilities of the hydrogen halides and explain these in terms of bond strengths",
+          "Transition elements",
+          "Describe the transition elements as metals that: have high densities, high melting points, variable oxidation numbers, form coloured compounds and act as catalysts for industrial purposes. (Some examples include catalysts being used are the Haber process, catalytic converters, Contact process and manufacturing of margarine)",
+          "Define the Group 18 noble gases as unreactive, monatomic gases",
+          "Explain this in terms of electronic configuration properties of metals",
+          "Compare the general physical properties of metals and non-metals (Specifically in terms of: a. thermal conductivity b. electrical conductivity c. malleability and ductility d. melting points and boiling points)"
+        ],
+        "headings": [
+          {
+            "number": "9.1",
+            "title": "Properties of Group 1 Elements",
+            "pdfPage": 124
+          },
+          {
+            "number": "9.2",
+            "title": "Properties of Group 17 Elements",
+            "pdfPage": 125
+          },
+          {
+            "number": "9.3",
+            "title": "Group Properties of Transition elements",
+            "pdfPage": 126
+          },
+          {
+            "number": "9.4",
+            "title": "Properties of Noble Gases",
+            "pdfPage": 127
+          },
+          {
+            "number": "9.5",
+            "title": "Physical Properties of Metals and Non-metals",
+            "pdfPage": 128
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 10,
+      "title": "Environmental Chemistry",
+      "titleEn": null,
+      "pdfStart": 133,
+      "pdfEnd": 148,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Environmental Chemistry",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "State that composition of clean, dry air is approximately 78% nitrogen, N₂, 21% oxygen, O₂, and the remainder as a mixture of noble gases and carbon dioxide, CO₂",
+          "State the major sources of air pollutants (Some examples include: a. carbon dioxide from the complete combustion of carbon-containing fuels b. carbon monoxide and particulates from the incomplete combustion of carbon-containing fuels c. methane from the decomposition of vegetation and waste gases from digestion in animals d. oxides of nitrogen from car engines e. sulfur dioxide from the combustion of fossil fuels which contain sulfur compounds f. ground level ozone from reactions of oxides of nitrogen, from car engines, and volatile organic compounds, in presence of light)",
+          "State the adverse effects of air pollutants (Some examples include: a. carbon dioxide: higher levels of carbon dioxide leading to increased global warming, which leads to climate change b. carbon monoxide: toxic gas c. particulates: increased risk of respiratory problems and cancer d. methane: higher levels of methane leading to increased global warming, which leads to climate change e. oxides of nitrogen: acid rain, photochemical smog and respiratory problems f. sulfur dioxide: acid rain and haze)",
+          "Explain how the greenhouse gases carbon dioxide and methane cause global warming, (Some examples include: a. the absorption, reflection and emission of thermal energy b. reducing thermal energy loss to space",
+          "Describe the role of sulfur in the formation of acid rain and impact on the environment. Describe the strategies to reduce the effects of major environmental issues (some examples include: a. climate change: planting trees, reduction in livestock farming, decreasing use of fossil fuels, increasing use of hydrogen and renewable energy, e.g. wind, solar. b. Acid rain: Use of catalytic converters in vehicles, reducing emissions of sulfur dioxide by using low sulfur fuels and flue gas desulfurization with calcium oxide).",
+          "Describe the role of NO and NO₂ (subscript) in the formation of acid rain, both directly and through their catalytic role in the oxidation of atmospheric sulfur dioxide.",
+          "Explain how oxide of nitrogen form in car engines and describe their removal by catalytic converters, e.g. CO + 2NO → 2CO₂ + N₂",
+          "Define photosynthesis as the reaction between carbon dioxide and water to produce glucose and oxygen in the presence of chlorophyll and using energy from light.",
+          "Analyze how to use tools to reduce personal exposure to harmful pollutants (some examples include the usage of masks, air quality indices and CO detectors).",
+          "Identify high risk situation in life including those where long-term exposure to these pollutants can lead to respiratory issues and reduction in quality and longevity of life."
+        ],
+        "headings": [
+          {
+            "number": "10.1",
+            "title": "Composition Of Atmosphere",
+            "pdfPage": 135
+          },
+          {
+            "number": "10.2",
+            "title": "Air Pollutants",
+            "pdfPage": 135
+          },
+          {
+            "number": null,
+            "title": "Major Air Pollutants",
+            "pdfPage": 136
+          },
+          {
+            "number": null,
+            "title": "Sources of Air Pollutants",
+            "pdfPage": 136
+          },
+          {
+            "number": "10.3",
+            "title": "Acid Rain",
+            "pdfPage": 138
+          },
+          {
+            "number": null,
+            "title": "Effects of Acid Rain",
+            "pdfPage": 139
+          },
+          {
+            "number": "10.4",
+            "title": "Global Warming (Greenhouse Effect)",
+            "pdfPage": 140
+          },
+          {
+            "number": null,
+            "title": "Sources of Greenhouse Gases",
+            "pdfPage": 141
+          },
+          {
+            "number": null,
+            "title": "Rise in Sea level",
+            "pdfPage": 142
+          },
+          {
+            "number": null,
+            "title": "Increase in Rainfall",
+            "pdfPage": 142
+          },
+          {
+            "number": null,
+            "title": "Effects on Agriculture",
+            "pdfPage": 143
+          },
+          {
+            "number": null,
+            "title": "Hot Summer and Winter",
+            "pdfPage": 143
+          },
+          {
+            "number": "10.5",
+            "title": "Strategies to Reduce Environmental Issues",
+            "pdfPage": 143
+          },
+          {
+            "number": null,
+            "title": "How to avoid harmful effects of air pollution?",
+            "pdfPage": 145
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 11,
+      "title": "Hydrocarbons",
+      "titleEn": null,
+      "pdfStart": 149,
+      "pdfEnd": 160,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Hydrocarbons",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the properties of alkanes as being generally unreactive, except in terms of combustion and substitution by chlorine",
+          "State that in a substitution reaction one atom or group of atoms is replaced by another atom or group of atoms",
+          "Describe the substitution reaction of alkanes with chlorine as a photochemical reaction, and draw the structural or displayed formulae of the products.",
+          "Describe, using symbol equations, preparation of alkanes from cracking of larger hydrocarbons, hydrogenation of alkenes and alkynes, and reduction of alkyl halides"
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 149
+          },
+          {
+            "number": "11.1",
+            "title": "Hyrocarbons",
+            "pdfPage": 150
+          },
+          {
+            "number": "11.2",
+            "title": "Alkanes",
+            "pdfPage": 151
+          },
+          {
+            "number": "11.3",
+            "title": "Preparation of Alkanes",
+            "pdfPage": 154
+          },
+          {
+            "number": "11.4",
+            "title": "Important Reactions",
+            "pdfPage": 155
+          }
+        ],
+        "notes": "Section 11.1 heading is printed as 'Hyrocarbons' (missing 'd') on page 146, reproduced verbatim. Under 11.3 and 11.4 there are unnumbered sub-headings like '1. Cracking of Higher Hyrocarbons', '2. Reduction of Alkenes and Alkynes', '3. Reduction of Alkyl Halides', '1. Halogenation', '2. Combustion' which are treated as sub-points of the main numbered sections rather than separate numbered headings."
+      }
+    },
+    {
+      "number": 12,
+      "title": "Empirical Data Collection and Analysis",
+      "titleEn": null,
+      "pdfStart": 161,
+      "pdfEnd": 169,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Empirical Data Collection and Analysis",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain that units are standardized for better communication and collaboration. (Some examples may include: In the field of chemistry, the International System of Units (SI) is used to measure physical quantities such as mass, volume, and temperature. This standardized system ensures that chemists worldwide can use the same units to measure and communicate their results, facilitating communication and collaboration in the field. Without standardized units, it would be difficult for chemists to compare their results with one another, and it would be challenging to develop consistent and accurate scientific models. For example, imagine if one chemist measured the mass of a substance in grams while another used ounces. The two measurements would be difficult to compare and combine, potentially leading to inaccurate or inconsistent results.)",
+          "Identify SI units for abstract and physical quantities (some examples include mass, time and amount of matter",
+          "Apply the concept that units can be combined with terms for magnitude, especially kilo, deci, and milli.",
+          "Justify why chemists use cm³, g and s as more practical units when working with small amounts in lab.",
+          "Explain with examples how different tools and techniques can be used to manage accuracy and precision for inherent errors that arise during measurement."
+        ],
+        "headings": [
+          {
+            "number": "12.1",
+            "title": "SI Units in Chemistry",
+            "pdfPage": 163
+          },
+          {
+            "number": "12.1.1",
+            "title": "Metre",
+            "pdfPage": 163
+          },
+          {
+            "number": "12.1.2",
+            "title": "Kilogram",
+            "pdfPage": 163
+          },
+          {
+            "number": "12.1.3",
+            "title": "Second",
+            "pdfPage": 163
+          },
+          {
+            "number": "12.1.4",
+            "title": "Kelvin",
+            "pdfPage": 164
+          },
+          {
+            "number": "12.1.5",
+            "title": "Mole",
+            "pdfPage": 164
+          },
+          {
+            "number": "12.2",
+            "title": "Tools and Techniques to Manage Accuracy and Precision",
+            "pdfPage": 166
+          },
+          {
+            "number": "12.3",
+            "title": "Accuracy and Precision",
+            "pdfPage": 167
+          }
+        ],
+        "notes": "Table 12.4 lists prefixes 'Micro' symbol printed as 'u' (likely intended as μ) - copied as printed."
+      }
+    },
+    {
+      "number": 13,
+      "title": "Laboratory and Practical Skills",
+      "titleEn": null,
+      "pdfStart": 170,
+      "pdfEnd": 180,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Laboratory and Practical Skills",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain, with examples, the types of chemical hazards in the lab and suggest safety precautions. (Types of chemical hazards to be identified: flammable or explosive hazards, corrosive hazards, toxic hazards, reactive hazards, radiation hazards and asphyxiation hazards)",
+          "Recognize the meaning of different chemical hazard signs in the lab and on chemicals.",
+          "Recognize the importance of personal protective equipment (PPE) by correctly identifying the types of PPE needed for different lab. activities.",
+          "Locate the nearest fire extinguisher and emergency shower.",
+          "Show awareness of emergency procedures in the event of an emergency in the lab."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 170
+          },
+          {
+            "number": "13.1",
+            "title": "Chemical Hazards in the Laboratory",
+            "pdfPage": 171
+          },
+          {
+            "number": "13.1.1",
+            "title": "Flammable and Explosive Chemical Hazards",
+            "pdfPage": 171
+          },
+          {
+            "number": "13.1.2",
+            "title": "Corrosive Hazards",
+            "pdfPage": 172
+          },
+          {
+            "number": "13.1.3",
+            "title": "Toxic Chemical Hazards",
+            "pdfPage": 172
+          },
+          {
+            "number": "13.1.4",
+            "title": "Reactive Chemical Hazards",
+            "pdfPage": 173
+          },
+          {
+            "number": "13.1.5",
+            "title": "Radiation Hazards",
+            "pdfPage": 173
+          },
+          {
+            "number": "13.1.6",
+            "title": "Asphyxiation Hazards",
+            "pdfPage": 174
+          },
+          {
+            "number": "13.2",
+            "title": "Hazard Signs",
+            "pdfPage": 175
+          },
+          {
+            "number": "13.3",
+            "title": "Personal Protective Equipment (PPE) in the Laboratory",
+            "pdfPage": 176
+          },
+          {
+            "number": "13.4",
+            "title": "Location of Fire Extinguisher",
+            "pdfPage": 176
+          },
+          {
+            "number": "13.5",
+            "title": "Emergency Situation in the Lab.",
+            "pdfPage": 176
+          }
+        ],
+        "notes": null
+      }
+    }
+  ]
+}

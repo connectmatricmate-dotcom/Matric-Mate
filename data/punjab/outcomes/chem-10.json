@@ -1,0 +1,1235 @@
+{
+  "source": "content/punjab/textbooks/chem-10.pdf",
+  "subject": "chem",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 168,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    3
+  ],
+  "backMatterStart": 165,
+  "locateNotes": "PDF page = printed page + 3 throughout. Page 165 begins 'Pairing Scheme / Instructions for Preparation of Exam Paper' (printed 162), followed by the Model Paper on pages 166-168.",
+  "chapters": [
+    {
+      "number": 14,
+      "title": "States of Matter and Phase Changes",
+      "titleEn": null,
+      "pdfStart": 4,
+      "pdfEnd": 18,
+      "read": {
+        "titleOnPage": "States of Matter and Phase Changes",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain changes of state and internal energy with change in temperature (melting, boiling, freezing, condensation, sublimation and deposition) in terms of kinetic particle theory.",
+          "Distinguish between evaporation and boiling.",
+          "Interpret heating and cooling curves in terms of kinetic theory",
+          "Interpret in terms of kinetic particle theory the effects of changing pressure, temperature and volume of a gas on the other two with regards to Boyle's law, Charles' Law, and Avogadro's Law.",
+          "Explain qualitatively the effect of external pressure on rate of boiling and evaporation",
+          "Explain diffusion of gases in terms of kinetic particle theory.",
+          "Examine qualitatively the effect of molecular mass and temperature on the rate of diffusion",
+          "Discuss applications of sublimation around us.",
+          "{Examples may include: solid air fresheners and 3D printing}",
+          "Explain, with the help of kinetic particle theory, the importance of rates of diffusion of medicines in the body"
+        ],
+        "headings": [
+          {
+            "number": "14.1",
+            "title": "Internal Energy",
+            "pdfPage": 6
+          },
+          {
+            "number": "14.2",
+            "title": "Interconversion of Physical States",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "Conversion of a Solid into a Liquid (Melting)",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "Conversion of a Liquid into a Gas (Boiling)",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "Conversion of a Gas into its Liquid (Condensation)",
+            "pdfPage": 7
+          },
+          {
+            "number": "14.3",
+            "title": "Heating and Cooling Curves",
+            "pdfPage": 7
+          },
+          {
+            "number": "14.4",
+            "title": "Evaporation and Boiling",
+            "pdfPage": 9
+          },
+          {
+            "number": null,
+            "title": "Difference between Evaporation and Boiling",
+            "pdfPage": 9
+          },
+          {
+            "number": null,
+            "title": "Effect of External Pressure on the Rates of Evaporation and Boiling",
+            "pdfPage": 10
+          },
+          {
+            "number": "14.5",
+            "title": "Sublimation",
+            "pdfPage": 10
+          },
+          {
+            "number": null,
+            "title": "Deposition",
+            "pdfPage": 11
+          },
+          {
+            "number": "14.6",
+            "title": "Applications of Sublimation",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "(a) Solid air fresheners",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "(b) Sublimation Printing",
+            "pdfPage": 11
+          },
+          {
+            "number": "14.7",
+            "title": "Kinetic Theory and The Gas Laws",
+            "pdfPage": 12
+          },
+          {
+            "number": null,
+            "title": "Pressure –Volume Relationship (Boyle's Law)",
+            "pdfPage": 12
+          },
+          {
+            "number": null,
+            "title": "Temperature – Volume Relationship – Charles' law",
+            "pdfPage": 13
+          },
+          {
+            "number": null,
+            "title": "Avogadro's Law",
+            "pdfPage": 13
+          },
+          {
+            "number": "14.7",
+            "title": "Diffusion",
+            "pdfPage": 14
+          },
+          {
+            "number": "14.8",
+            "title": "Importance of Rates of diffusion of Medicines in Human Body",
+            "pdfPage": 15
+          }
+        ],
+        "notes": "The section number 14.7 is printed twice in the book: once for \"Kinetic Theory and The Gas Laws\" (image 9) and again for \"Diffusion\" (image 11); reproduced as printed. The Quick Check boxes are numbered 14.1–14.5 but are boxed features and excluded."
+      }
+    },
+    {
+      "number": 15,
+      "title": "Stoichiometry",
+      "titleEn": null,
+      "pdfStart": 19,
+      "pdfEnd": 33,
+      "read": {
+        "titleOnPage": "Stoichiometry",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Use the molar gas volume, 24 dm³ at room temperature and pressure, in calculations involving gases",
+          "Define concentration, use both g/dm³ and mol/ dm³, and convert between them",
+          "Calculate stoichiometric relationships between substances relationships (specifically:",
+          "reacting masses, limiting reactants,",
+          "volume of gasses at r.t.p.,",
+          "volumes of solution and concentrations of solutions in g/ dm³ or mol/ dm³, including conversion between cm³ and dm³)",
+          "Calculate concentration of a solution in a titration using empirical data",
+          "Calculate empirical formula and molecular formula from appropriate data",
+          "Calculate percentage yield, percentage composition by mass and percentage purity from appropriate data."
+        ],
+        "headings": [
+          {
+            "number": "15.1",
+            "title": "Molar Volume",
+            "pdfPage": 20
+          },
+          {
+            "number": "15.2",
+            "title": "Concentration of a solution",
+            "pdfPage": 21
+          },
+          {
+            "number": "15.3",
+            "title": "Calculate the Concentration of a Solution in Titration using Empirical Data",
+            "pdfPage": 22
+          },
+          {
+            "number": "15.4",
+            "title": "Percentage Composition by Mass, Empirical Formula and Molecular Formula",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Percentage Composition by Mass",
+            "pdfPage": 23
+          },
+          {
+            "number": "15.5",
+            "title": "Empirical Formula",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Molecular Formula",
+            "pdfPage": 27
+          },
+          {
+            "number": null,
+            "title": "Calculations Based on Chemical Equation",
+            "pdfPage": 28
+          },
+          {
+            "number": "15.6",
+            "title": "Limiting Reactant",
+            "pdfPage": 28
+          },
+          {
+            "number": null,
+            "title": "How to Identify a Limiting reactant",
+            "pdfPage": 29
+          },
+          {
+            "number": "15.7",
+            "title": "Yield",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "Theoretical yield",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "Percentage yield",
+            "pdfPage": 31
+          },
+          {
+            "number": null,
+            "title": "Percentage Purity",
+            "pdfPage": 31
+          }
+        ],
+        "notes": "Third SLO is printed with an unclosed parenthesis and the following bullets appear to be its sub-points; copied as separate bullets as printed. Superscript '3' in dm3/cm3 rendered as ³. In Example 15.16 the book prints inconsistent values (0.148 mol then '0.138 mol of glucose will give' and later 0.878); reproduced only in body text, not in JSON fields."
+      }
+    },
+    {
+      "number": 16,
+      "title": "Electrochemistry",
+      "titleEn": null,
+      "pdfStart": 34,
+      "pdfEnd": 57,
+      "read": {
+        "titleOnPage": "Electrochemistry",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define redox reactions as simultaneous oxidation and reduction in terms of oxygen, hydrogen, electrons and changes in oxidation state",
+          "Use roman numerals to indicate oxidation number of an element in a compound",
+          "Identify oxidizing and reducing agents in a redox reaction",
+          "Recognize that the oxidation number of elements in their free state is zero",
+          "Derive the formula of ionic compounds from ionic charges and oxidation numbers",
+          "Identify that the oxidation number of a monatomic ion is the same as the charge on the ion",
+          "Explain that the sum of the oxidation numbers in a neutral compound is zero",
+          "Explain that the sum of the oxidation numbers in an ion is equal to the charge on the ion",
+          "Identify redox reactions by the colour changes involved when using acidified aqueous potassium manganate (VII) to (II) or aqueous potassium iodide",
+          "Define electrolysis as decomposition of ionic compound, in molten or aqueous solution, by passage of electric current",
+          "Identify and label in simple electrolytic cells, the anode (+), cathode (-), electrolyte and direction of flow of electrons in external circuit,",
+          "Describe the transfer of charge in external circuit, movement of ions in the electrolyte and transfer of electrons at electrodes",
+          "Identify the products formed at electrodes and describe the observations made during the electrolysis of molten lead (II) chloride, concentrated dilute sulfuric acid using inert electrodes (platinum or carbon/graphite)",
+          "State that hydrogen- oxygen fuel cell uses hydrogen and oxygen to produce electricity with water as the only chemical product",
+          "Describe the advantages and disadvantages of using hydrogen-oxygen fuel cells in comparison with gasoline /petrol engines in vehicles.",
+          "Define corrosion and discuss methods to prevent it. (some examples may include barrier method such as using paint, galvanizing, electroplating; sacrificial protection such as using magnesium blocks in ships)",
+          "Identify the products formed at electrodes and describe the observations made during the electrolysis of dilute copper (II) sulphate using inert electrode or copper electrode",
+          "Predict the identity of products of electrolysis of a halide compound in dilute or concentrated solution",
+          "Construct ionic half- equations for reaction at either electrode.",
+          "Describe electroplating and its applications.",
+          "Sketch a schematic diagram for a voltaic cell e.g., Daniel cell",
+          "Use the voltage data given for voltaic cells to determine order of reactivity of any two metals"
+        ],
+        "headings": [
+          {
+            "number": "16.1",
+            "title": "Oxidation Number of Atoms in compounds and Ions",
+            "pdfPage": 35
+          },
+          {
+            "number": "16.2",
+            "title": "Writing Chemical Formulas of Ionic Compounds by applying Oxidation Numbers",
+            "pdfPage": 37
+          },
+          {
+            "number": "16.3",
+            "title": "Writing Chemical Formulas of Ionic Compounds using Ionic Charges",
+            "pdfPage": 37
+          },
+          {
+            "number": "16.4",
+            "title": "Oxidation and Reduction",
+            "pdfPage": 39
+          },
+          {
+            "number": "16.5",
+            "title": "Oxidation-Reduction Reactions",
+            "pdfPage": 41
+          },
+          {
+            "number": "16.6",
+            "title": "Electrolysis",
+            "pdfPage": 42
+          },
+          {
+            "number": "16.7",
+            "title": "Electrolysis of a Concentrated Aqueous Solution of Sodium Chloride (Brine) using inert electrodes (Graphite /Pt)",
+            "pdfPage": 43
+          },
+          {
+            "number": "16.8",
+            "title": "Electrolysis of Dilute and Concentrated Aqueous solutions of Metal Halides",
+            "pdfPage": 44
+          },
+          {
+            "number": "16.9",
+            "title": "Electrolysis of Concentrated Aqueous Solutions of Metal Halides",
+            "pdfPage": 46
+          },
+          {
+            "number": "16.10",
+            "title": "Electrolysis of Molten Lead (II) Chloride",
+            "pdfPage": 47
+          },
+          {
+            "number": "16.11",
+            "title": "Electrolysis of Dilute solution of Sulphuric Acid using inert electrodes (Carbon or Pt)",
+            "pdfPage": 47
+          },
+          {
+            "number": "16.12",
+            "title": "Electrolysis of Dilute Aqueous solution of Copper Sulphate using Inert electrodes or Copper electrodes",
+            "pdfPage": 48
+          },
+          {
+            "number": "16.13",
+            "title": "Fuel cells",
+            "pdfPage": 48
+          },
+          {
+            "number": "16.14",
+            "title": "Corrosion",
+            "pdfPage": 50
+          },
+          {
+            "number": "16.15",
+            "title": "Electroplating",
+            "pdfPage": 51
+          },
+          {
+            "number": "16.16",
+            "title": "Galvanic Cells",
+            "pdfPage": 53
+          },
+          {
+            "number": "16.17",
+            "title": "Order of Reactivity of Metals using Voltage Data",
+            "pdfPage": 55
+          }
+        ],
+        "notes": "Unnumbered sub-headings within sections (e.g. \"(A) Oxidation\", \"(B) Reduction\", \"Advantages\", \"Disadvantages\", \"Prevention of Corrosion\", \"Coating of the metal surface\", \"Galvanization\", \"Sacrificial Protection\", \"1. Decoration\", \"2. Protection\", \"3. Repair\", \"Procedure of Electroplating\", \"Silver Plating\", \"Copper Plating\") were not listed as numbered headings. Some subscripts/superscripts in the scanned text could not be reproduced exactly."
+      }
+    },
+    {
+      "number": 17,
+      "title": "Reaction Kinetics",
+      "titleEn": null,
+      "pdfStart": 58,
+      "pdfEnd": 69,
+      "read": {
+        "titleOnPage": "Reaction Kinetics",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe collision theory in terms of number of particles per unit volume, frequency of collisions of particles, kinetic energy of particles and activation energy",
+          "State that catalyst increases the rate of reaction provides alternate pathway with lower activation energy, and remains unchanged at the end of a reaction",
+          "Describe the physical parameters that may be affected by the rate of, reaction including change in mass, temperature, and formation of gas",
+          "Interpret data, including graphs, for investigating rate of reaction",
+          "Explain the effect on rate of reaction of changing concentration of a reactant, pressure of gases, surface area of solids, temperature, presence of catalyst (including enzymes) using collision theory",
+          "Justify the importance of chemical kinetics in the food industry to determine ideal harvesting and transportation times for produce."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Reaction Kinetics",
+            "pdfPage": 59
+          },
+          {
+            "number": "17.1",
+            "title": "Collision Theory of Reaction Rate",
+            "pdfPage": 59
+          },
+          {
+            "number": "17.2",
+            "title": "Change in Mass during a Chemical Reaction",
+            "pdfPage": 60
+          },
+          {
+            "number": "17.3",
+            "title": "Change in Temperature during a Chemical Reaction",
+            "pdfPage": 61
+          },
+          {
+            "number": "17.4",
+            "title": "Factors Affecting the Rates of Reactions",
+            "pdfPage": 62
+          },
+          {
+            "number": "17.5",
+            "title": "Importance of Chemical Kinetics in Food Industry",
+            "pdfPage": 66
+          }
+        ],
+        "notes": "Within 17.1 and 17.4 there are unnumbered sub-headings printed in boxes (e.g. \"1. The number of particles per unit volume\", \"2. The frequency of Collisions\", \"3. The kinetic energy of the particles\", \"4. Activation energy\", \"1. Effect of Concentrations of the Reactants\", \"2. Reactants present in gas phase\", \"3. Effect of Surface Area of Solids\", \"4. Effect of Temperature\", \"5. Effect of Catalyst\", \"6. Enzymes as Catalysts\", and \"Formation of a gas during a chemical reaction\"); these are not numbered section headings so are not listed. In the Constructed Response Questions the numbering jumps from 17.4 to 17.6 (no 17.5 printed)."
+      }
+    },
+    {
+      "number": 18,
+      "title": "Salts",
+      "titleEn": null,
+      "pdfStart": 70,
+      "pdfEnd": 76,
+      "read": {
+        "titleOnPage": "Salts",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain that salts are ionic compounds formed due to electrostatic attraction between oppositely charged ions (in which the positive ions come from bases and negative ions come from acids)",
+          "Explain why at STP salts are solids with high melting points.",
+          "Describe that under normal conditions, ionic compounds are usually solids with lattice structures.",
+          "Explain why the molten and aqueous solutions of salts are good conductors of electricity by making reference to the idea of mobile ions",
+          "Describe the general solubility rules for salts. (these are: (a) sodium, nitrate, potassium and ammonium salts are soluble (b) chlorides are soluble except lead and silver (c) carbonates are insoluble except sodium, potassium and ammonium (d) hydroxides are insoluble except sodium, potassium, ammonium and calcium (partially) .",
+          "Describe the preparation, separation and purification of soluble salts by reactions of acids with alkali (titration), excess metal, excess insoluble base, excess insoluble carbonate."
+        ],
+        "headings": [
+          {
+            "number": "18.1",
+            "title": "Arrangement of Ions in Salts",
+            "pdfPage": 71
+          },
+          {
+            "number": "18.2",
+            "title": "Melting Points of Ionic Compounds",
+            "pdfPage": 71
+          },
+          {
+            "number": "18.3",
+            "title": "Conduction of Electricity by Ionic Compounds",
+            "pdfPage": 72
+          },
+          {
+            "number": "18.4",
+            "title": "Soluble and Insoluble Salts",
+            "pdfPage": 72
+          },
+          {
+            "number": "18.5",
+            "title": "Preparation of Soluble Salts",
+            "pdfPage": 73
+          },
+          {
+            "number": null,
+            "title": "(a) Reaction of water soluble acid with water soluble base",
+            "pdfPage": 73
+          },
+          {
+            "number": null,
+            "title": "(b) Reaction of an acid with an insoluble base",
+            "pdfPage": 74
+          }
+        ],
+        "notes": "The fifth SLO bullet's opening parenthesis \"(these are:\" is not closed in the printed text; copied as printed. The lettered sub-points (a)-(d) are printed as separate indented lines within that bullet but are kept in one string per instructions. Subsections (a) and (b) under 18.5 are printed as unnumbered boxed headings; included since they are section headings, not feature boxes."
+      }
+    },
+    {
+      "number": 19,
+      "title": "Nitrogen and Sulphur",
+      "titleEn": null,
+      "pdfStart": 77,
+      "pdfEnd": 89,
+      "read": {
+        "titleOnPage": "Nitrogen and Sulphur",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Recognize that atmospheric oxides of nitrogen {NO and NO2) can react with unburned hydrocarbons to form peroxyacetyl nitrate, PAN, which is a component of photochemical smog",
+          "Describe the role of NO and NO2 in the formation of acid rain both directly and in their catalytic role in the oxidation of atmospheric sulphur dioxide",
+          "State the symbol equation for the production of ammonia in the Haber process, N2(g) + 3H2 (g) ⟶ 2NH3 (g)",
+          "State the sources of the hydrogen (methane) and nitrogen (air) in the Haber process",
+          "State the typical conditions in the Haber process as 450 °C, 20000kPa /20 atm and an iron catalyst",
+          "State the symbol equation for the conversion of sulphur dioxide to sulphur trioxide in the Contact process, 2 SO2 (g) + O2 (g) ⟶ 2 SO3 (g)",
+          "State the sources of the sulphur dioxide (burning sulphur or roasting sulphide ores) and oxygen (air) in the Contact process",
+          "State the typical conditions for the conversion of sulphur dioxide to sulphur trioxide in the Contact process as 450 °C, 200kPa /atm and a vanadium(V) oxide catalyst Oxides",
+          "Describe amphoteric oxides as oxides that react with acids and bases to produce a salt and water",
+          "Classify oxides as acidic, including SO2 and CO2, basic, including CuO and CaO, or amphoteric, limited to Al2O3 and ZnO, related to metallic and non-metallic character.",
+          "properties of metal",
+          "Identify the general chemical properties of metals, limited to their reactions with dilute acids, cold water, steam and oxygen.",
+          "Arrange metals in order of reactivity given relevant information."
+        ],
+        "headings": [
+          {
+            "number": "19.1",
+            "title": "Ammonia",
+            "pdfPage": 78
+          },
+          {
+            "number": null,
+            "title": "Source of Nitrogen",
+            "pdfPage": 78
+          },
+          {
+            "number": null,
+            "title": "Source of Hydrogen",
+            "pdfPage": 79
+          },
+          {
+            "number": "19.2",
+            "title": "Sulphuric Acid",
+            "pdfPage": 79
+          },
+          {
+            "number": "(1",
+            "title": "Preparation of Sulphur dioxide gas",
+            "pdfPage": 79
+          },
+          {
+            "number": "(2",
+            "title": "Oxidation of Sulphur dioxide",
+            "pdfPage": 80
+          },
+          {
+            "number": "19.3",
+            "title": "Oxides",
+            "pdfPage": 81
+          },
+          {
+            "number": null,
+            "title": "Basic Oxides",
+            "pdfPage": 81
+          },
+          {
+            "number": null,
+            "title": "Acidic Oxides",
+            "pdfPage": 81
+          },
+          {
+            "number": null,
+            "title": "Neutral Oxides",
+            "pdfPage": 82
+          },
+          {
+            "number": null,
+            "title": "Amphoteric Oxide",
+            "pdfPage": 82
+          },
+          {
+            "number": "19.4",
+            "title": "Metals",
+            "pdfPage": 83
+          },
+          {
+            "number": null,
+            "title": "Reactions of metals with cold water",
+            "pdfPage": 83
+          },
+          {
+            "number": null,
+            "title": "Reactions of metals with steam",
+            "pdfPage": 83
+          },
+          {
+            "number": null,
+            "title": "Reactions of metals with Oxygen",
+            "pdfPage": 84
+          },
+          {
+            "number": null,
+            "title": "Reactions of metals with dilute acids",
+            "pdfPage": 84
+          },
+          {
+            "number": "19.5",
+            "title": "Reactivity Series of metals",
+            "pdfPage": 85
+          },
+          {
+            "number": "19.6",
+            "title": "Role of oxides of nitrogen in spreading air pollution",
+            "pdfPage": 85
+          }
+        ],
+        "notes": "The first SLO is printed with an opening brace \"{NO and NO2)\" as shown. Subscripts/superscripts in formulae are rendered as plain text. The chapter numbers sections 19.1–19.6 but within 19.2 the steps are printed as \"(1) Preparation of Sulphur dioxide gas\", \"(2) Oxidation of Sulphur dioxide\", then numbered \"3.\" and \"4.\" as running paragraphs (not boxed headings); only the two boxed headings are listed."
+      }
+    },
+    {
+      "number": 20,
+      "title": "Water",
+      "titleEn": null,
+      "pdfStart": 90,
+      "pdfEnd": 101,
+      "read": {
+        "titleOnPage": "Water",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Investigate chemical tests for the presence of water using anhydrous copper (II) sulphate.",
+          "Explain how to test the purity of water using melting point and boiling point.",
+          "Distinguish between Distilled water and tap water with their applications in practical chemistry.",
+          "State that water from natural sources may contain useful and harmful substances. (Some examples include: a. Dissolved oxygen b. metal compounds c. plastics d. sewage e. harmful microbes f. nitrates from fertilizers g. phosphates from fertilizers and detergents",
+          "Recognize that some naturally occurring substances in water are potentially harmful (some examples include: a. some metal compounds that are toxic b. some plastics that harm aquatic life c. sewage that contains harmful microbes which cause disease d. nitrates and phosphates that lead to deoxygenation of water and damage to aquatic life (details of the eutrophication process are not required)",
+          "Explain the treatment of the domestic water supply; (some examples of this includes: a. sedimentation and filtration to remove solids. b. Use of carbon to remove tastes and odours c. Chlorination to kill microbes",
+          "Describe various water-borne diseases and the steps that can be taken to avoid them",
+          "Identify the negative effects of water pollutants on life and the ways to avoid them.",
+          "Explain water scarcity as an important issue faced by Pakistan and the ways in which it can be resolved.",
+          "State that urea, ammonium salts and nitrates are used as fertilizers.",
+          "Explain the use of NPK fertilizers to provide the elements nitrogen, phosphorus and potassium for improved plant growth."
+        ],
+        "headings": [
+          {
+            "number": "20.1",
+            "title": "Water",
+            "pdfPage": 91
+          },
+          {
+            "number": "20.2",
+            "title": "Purity of Water",
+            "pdfPage": 91
+          },
+          {
+            "number": "20.3",
+            "title": "Difference between distilled water and tap water",
+            "pdfPage": 92
+          },
+          {
+            "number": "20.4",
+            "title": "Substances present in water obtained from natural sources",
+            "pdfPage": 92
+          },
+          {
+            "number": "20.5",
+            "title": "Treatment of Domestic Water Supply",
+            "pdfPage": 94
+          },
+          {
+            "number": "20.6",
+            "title": "Effects of pollutants present in water",
+            "pdfPage": 95
+          },
+          {
+            "number": "20.7",
+            "title": "Water Scarcity in Pakistan",
+            "pdfPage": 97
+          },
+          {
+            "number": "20.8",
+            "title": "Elements Essential for Plant Growth",
+            "pdfPage": 97
+          },
+          {
+            "number": "20.9",
+            "title": "Fertilizers",
+            "pdfPage": 98
+          },
+          {
+            "number": "20.10",
+            "title": "Classification of Fertilizers",
+            "pdfPage": 99
+          }
+        ],
+        "notes": "Bullets 4, 5 and 6 of the SLOs open a parenthesis '(' that is never closed in the printed text; the lettered sub-points have been kept inside those bullet strings. Unnumbered sub-headings within sections (e.g. 'Test for Water', 'Useful Substances', 'Dissolved Oxygen', 'Harmful substances and their effects on the quality of water', '(i) Harmful Microbes', '(ii) Heavy metals and their compounds', '(iii) Plastics', '(iv) Nitrates and Phosphates', '(1) Sedimentation', '(2) Filtration', '(3) Chlorination', '(4) Removal of odours', 'How to Control the Negative effects of Pollutants', 'Water-borne Diseases', 'Prevention of water-borne diseases', 'Micro-nutrients (Trace elements)', 'Macro-nutrients', 'Requirements of a Fertilizer', 'Essential Qualities of a Good Fertilizer', 'Nitrogenous Fertilizers', 'Phosphatic Fertilizers', 'Potassium Fertilizers') were not listed since numbered headings exist."
+      }
+    },
+    {
+      "number": 21,
+      "title": "Organic Chemistry",
+      "titleEn": null,
+      "pdfStart": 102,
+      "pdfEnd": 118,
+      "read": {
+        "titleOnPage": "Organic Chemistry",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe organic molecules as either straight-chained, branched or cyclic.",
+          "State that a structural formula is an unambiguous description of the way the atoms in molecules are arranged, including CH2=CH2, CH3CH2OH, CH3COOCH3",
+          "Identify and draw structural formulae for molecules.",
+          "Interpret general formulae of compounds in the same homologous series including alkanes, alkenes, alkynes, alcohols and carboxylic acids.",
+          "Define structural isomers as compounds with the same molecular formula, but different structural formulae, including C4H10 as CH3CH2CH2CH3 and CH3CH(CH3)CH3 and C4H8 as CH3CH2CH=CH2 and CH3CH=CHCH3.",
+          "Identify a functional group as an atom or group of atoms that determine the chemical properties of a homologous series including that for alcohols, aldehydes, ketones, phenols, carboxylic acids, amine, esters, and amide.",
+          "Describe the general characteristics of homologous series. These can include: a. Having the same functional group b. Having the same general formula c. Differing from one member to the next by a CH2 – Unit. d. Displaying a trend in physical properties. e. Sharing similar chemical properties",
+          "State that a saturated compound has molecules in which all carbon-carbon bonds are single bonds.",
+          "State that an unsaturated compound has molecules in which one or more carbon-carbon bonds are not single bonds.",
+          "Name and draw the structural and displayed formulae of unbranched alkanes, alkenes, alcohols, and carboxylic acids. (Include but-1-ene and but-2-ene, propan-1-ol, propan-2-ol, butan-1-ol and butan-2-ol.",
+          "State the type of compound present given the chemical name ending in – ane, -ene, -yne, -ol, or -olc acid or from a molecular, structural or displayed formula.",
+          "Name and draw the displayed formulae of the unbranched esters which can be made from unbranched alcohols and carboxylic acids, each containing up to four carbon atoms."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Organic Chemistry",
+            "pdfPage": 103
+          },
+          {
+            "number": "21.1",
+            "title": "Classifications of Organic Compounds",
+            "pdfPage": 103
+          },
+          {
+            "number": null,
+            "title": "(i) Open Chain or Acyclic Compounds",
+            "pdfPage": 103
+          },
+          {
+            "number": null,
+            "title": "(ii) Closed Chain or cyclic Compounds",
+            "pdfPage": 104
+          },
+          {
+            "number": "21.2",
+            "title": "Structural Formula",
+            "pdfPage": 105
+          },
+          {
+            "number": null,
+            "title": "Displayed Formula or Full Structural Formula",
+            "pdfPage": 105
+          },
+          {
+            "number": null,
+            "title": "Condensed Structural Formula",
+            "pdfPage": 105
+          },
+          {
+            "number": "21.3",
+            "title": "Homologous Series",
+            "pdfPage": 107
+          },
+          {
+            "number": null,
+            "title": "Characteristics of a Homologous Series",
+            "pdfPage": 107
+          },
+          {
+            "number": "21.4",
+            "title": "Isomerism",
+            "pdfPage": 108
+          },
+          {
+            "number": "21.5",
+            "title": "Functional Group",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "(a) Hydroxyl group (-OH)",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "(b) Aldehyde Group",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "(c) Ketone Group",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "(d) Carboxyl Group",
+            "pdfPage": 110
+          },
+          {
+            "number": null,
+            "title": "(e) Amino Group",
+            "pdfPage": 110
+          },
+          {
+            "number": null,
+            "title": "(f) Amide Group",
+            "pdfPage": 110
+          },
+          {
+            "number": null,
+            "title": "(g) Ester Group",
+            "pdfPage": 110
+          },
+          {
+            "number": "21.6",
+            "title": "Naming Organic Compounds",
+            "pdfPage": 111
+          },
+          {
+            "number": null,
+            "title": "1 Alkanes",
+            "pdfPage": 111
+          },
+          {
+            "number": null,
+            "title": "2 Alkyl Group",
+            "pdfPage": 112
+          },
+          {
+            "number": null,
+            "title": "3. Alkenes",
+            "pdfPage": 113
+          },
+          {
+            "number": null,
+            "title": "4. Alcohols",
+            "pdfPage": 114
+          },
+          {
+            "number": null,
+            "title": "5. Carboxylic Acids",
+            "pdfPage": 114
+          },
+          {
+            "number": null,
+            "title": "6. Esters",
+            "pdfPage": 115
+          }
+        ],
+        "notes": "Subscripts/superscripts in chemical formulae within the SLOs are printed as subscripts (e.g. CH2=CH2, C4H10) but rendered as plain text here. The SLO bullet about 'but-1-ene and but-2-ene...' has an opening parenthesis with no closing parenthesis as printed. The SLO with lettered sub-points a–e has been kept as one string, with sub-points inline. Section-level headings such as '(i) Open Chain or Acyclic Compounds', 'Alkanes', 'Alcohols' etc. are printed as unnumbered boxed headings; the only numbered headings are 21.1–21.6."
+      }
+    },
+    {
+      "number": 22,
+      "title": "Hydrocarbons",
+      "titleEn": null,
+      "pdfStart": 119,
+      "pdfEnd": 128,
+      "read": {
+        "titleOnPage": "Hydrocarbons",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "State that the bonding in alkenes includes a double carbon-carbon covalent bond and that alkenes are unsaturated hydrocarbons.",
+          "Describe the manufacture of alkenes by the cracking of large alkane molecules using a high temperature and a catalyst.",
+          "Describe the reasons for the cracking of large alkane molecules.",
+          "Describe the test to distinguish between saturated and unsaturated hydrocarbons by their reaction with aqueous bromine and KMnO4.",
+          "Describe the properties of alkenes in terms of addition reactions with: o bromine or aqueous bromine o hydrogen in the presence of a nickel catalyst o steam in the presence of an acid catalyst and draw the structural or displayed formulae of the products",
+          "Describe, using symbol equations, preparation of alkenes by elimination reaction in halogenoalkanes and alcohols.",
+          "Identify alkynes as hydrocarbons containing triple carbon-carbon covalent bond and that alkynes are unsaturated hydrocarbons.",
+          "Describe the use of ethyne as fuel for welding and in artificially ripening fruits.",
+          "Describe separation of petroleum into useful fraction by fractional distillation.",
+          "Describe how the properties of fractions obtained from petroleum change from the bottom to the top of the fractionating column, limited to: o decreasing chain length o higher volatility o lower boiling points o lower viscosity",
+          "Name the uses of the fractions as: o refinery gas fraction for gas used in heating and cooking o gasoline/petrol fraction for fuel used in cars o naphtha fraction as a chemical feedstock o kerosene /paraffin fraction for jet fuel o diesel oil/ gas oil fraction for fuel used in diesel engines. o fuel oil fraction for fuel used in ships and home heating systems o lubricating oil fraction for lubricants, waxes and polishes o bitumen fraction for making roads",
+          "Name fossil fuels; coal, natural gas and petroleum",
+          "Name methane as main constituent of natural gas",
+          "State that petroleum is a mixture of hydrocarbons, compounds containing hydrogen and carbon only"
+        ],
+        "headings": [
+          {
+            "number": "22.1",
+            "title": "Alkenes",
+            "pdfPage": 120
+          },
+          {
+            "number": "22.2",
+            "title": "Important Reactions of Alkenes",
+            "pdfPage": 121
+          },
+          {
+            "number": "22.3",
+            "title": "Alkynes",
+            "pdfPage": 122
+          },
+          {
+            "number": "22.4",
+            "title": "Sources of organic compounds",
+            "pdfPage": 123
+          },
+          {
+            "number": "22.5",
+            "title": "Refining of Petroleum",
+            "pdfPage": 124
+          },
+          {
+            "number": "1",
+            "title": "Physical Properties of different Petroleum Fractions",
+            "pdfPage": 126
+          }
+        ],
+        "notes": "The subscript in the SLO \"KMnO4.\" is printed as KMnO₄ (subscript 4); subscripts are rendered as plain digits here. Sub-points printed as \"o ...\" lines have been kept inside their parent bullet string, separated by \"o\". Within sections the book prints numbered list items in bold-ish grey (e.g. \"1. By Dehydration of Alcohols\", \"2. By Dehydrohalogenation of Alkyl Halides\", \"3. By Cracking of Alkanes to Alkenes\" on images 2-3; \"1. Addition of Hydrogen\" to \"5. Addition of Water (Steam)\" on images 3-4) · these are treated as list items, not numbered section headings, and are excluded. The boxed heading \"1. Physical Properties of different Petroleum Fractions\" on image 8 is included since it is styled like a section heading. \"Preparation\" (image 2) and \"Petroleum:\" (image 6) are unnumbered sub-headings and were not included."
+      }
+    },
+    {
+      "number": 23,
+      "title": "Monohydroxy Alkanes or Alcohols",
+      "titleEn": null,
+      "pdfStart": 129,
+      "pdfEnd": 136,
+      "read": {
+        "titleOnPage": "Monohydroxy Alkanes or Alcohols",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the manufacture of ethanol (This can be done by discussing fermentation of aqueous glucose at 25-35 °C in the presence of yeast and in the absence of oxygen catalytic addition of steam to ethene at 300°C and 6000kPa /6 atm in the presence of an acid catalyst including a comparison of the advantages and disadvantages of the two methods)",
+          "Describe the combustion of alcohols",
+          "Discuss the applications of alcohols as fuels, including their advantages and disadvantages over fossil fuels.",
+          "Explain the role of alcohols in various industries such as pharmaceuticals, cosmetics, and fuel production.",
+          "Discuss the impact of alcohols on daily life, including their use as solvents and disinfectants."
+        ],
+        "headings": [
+          {
+            "number": "23.1",
+            "title": "Manufacture of Ethyl Alcohol (CH3-CH2-OH)",
+            "pdfPage": 130
+          },
+          {
+            "number": null,
+            "title": "Fermentation of Glucose by Yeast",
+            "pdfPage": 130
+          },
+          {
+            "number": null,
+            "title": "Hydration of Ethene or Ethylene",
+            "pdfPage": 131
+          },
+          {
+            "number": "23.2",
+            "title": "Combustion of Alcohols",
+            "pdfPage": 132
+          },
+          {
+            "number": "23.3",
+            "title": "Applications of Alcohols as Fuels",
+            "pdfPage": 132
+          },
+          {
+            "number": null,
+            "title": "Advantages of Alcohols as Fuels",
+            "pdfPage": 133
+          },
+          {
+            "number": null,
+            "title": "Disadvantages of Alcohols as Fuels",
+            "pdfPage": 133
+          },
+          {
+            "number": "23.4",
+            "title": "Role of Ethanol in Industries",
+            "pdfPage": 133
+          },
+          {
+            "number": null,
+            "title": "Pharmaceutical Industry",
+            "pdfPage": 133
+          },
+          {
+            "number": null,
+            "title": "Cosmetic Industry",
+            "pdfPage": 134
+          },
+          {
+            "number": "23.5",
+            "title": "Impact of Alcohols on Daily life",
+            "pdfPage": 134
+          }
+        ],
+        "notes": "The single first SLO bullet contains both the outcome line and the bracketed clarification; they are joined into one string as printed under one bullet. Subscripts in formulas (e.g. CH3-CH2-OH) are rendered as plain characters."
+      }
+    },
+    {
+      "number": 24,
+      "title": "Carboxylic Acids",
+      "titleEn": null,
+      "pdfStart": 137,
+      "pdfEnd": 144,
+      "read": {
+        "titleOnPage": "Carboxylic Acids",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the reactions of carboxylic acids with metals, bases and carbonates including names and formulae of the salts produced.",
+          "Describe the formation of ethanoic acid by the oxidation of ethanol; with acidified aqueous potassium manganate (VII) & by bacterial oxidation during vinegar production",
+          "Describe the reaction of a carboxylic acid with an alcohol using an acid catalyst to form an ester",
+          "Describe the industrial applications of carboxylic acids and esters, including their use as solvents, flavours, fragrances, and plastics.",
+          "Explain the role of carboxylic acids and esters in daily life, including their use in food preservation, cosmetics, and pharmaceuticals."
+        ],
+        "headings": [
+          {
+            "number": "24.1",
+            "title": "Preparation of Acetic Acid or Ethanoic Acid",
+            "pdfPage": 138
+          },
+          {
+            "number": null,
+            "title": "Oxidation of Ethanol",
+            "pdfPage": 138
+          },
+          {
+            "number": null,
+            "title": "Preparation of Ethanoic acid by Oxidative Fermentation",
+            "pdfPage": 138
+          },
+          {
+            "number": "24.2",
+            "title": "Reactions of Carboxylic Acids as Acids",
+            "pdfPage": 139
+          },
+          {
+            "number": null,
+            "title": "Reaction with Metals",
+            "pdfPage": 139
+          },
+          {
+            "number": null,
+            "title": "Reaction with bases",
+            "pdfPage": 139
+          },
+          {
+            "number": null,
+            "title": "Reaction of Carboxylic Acids with Carbonates",
+            "pdfPage": 139
+          },
+          {
+            "number": "24.3",
+            "title": "Reaction of Carboxylic Acids with Alcohols (Esterification)",
+            "pdfPage": 140
+          },
+          {
+            "number": "24.4",
+            "title": "Industrial Applications of Carboxylic Acids and Esters",
+            "pdfPage": 140
+          },
+          {
+            "number": null,
+            "title": "Carboxylic acids and Esters as Solvents",
+            "pdfPage": 140
+          },
+          {
+            "number": null,
+            "title": "Carboxylic acids and Esters as Flavouring agents",
+            "pdfPage": 140
+          },
+          {
+            "number": null,
+            "title": "Carboxylic Acid and Esters as Synthetic Fibers",
+            "pdfPage": 141
+          },
+          {
+            "number": "24.5",
+            "title": "Carboxylic Acids and Esters in Daily Life",
+            "pdfPage": 141
+          }
+        ],
+        "notes": "Unnumbered sub-headings (e.g. \"Oxidation of Ethanol\") are printed as boxed sub-section titles within numbered sections; they are included with number null. Quick Check boxes were excluded as boxed features."
+      }
+    },
+    {
+      "number": 25,
+      "title": "Biochemistry",
+      "titleEn": null,
+      "pdfStart": 145,
+      "pdfEnd": 155,
+      "read": {
+        "titleOnPage": "Biochemistry",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain the importance and basics of nutrition and healthy eating",
+          "Recognize the main biomolecules; carbohydrates, proteins, lipids and nucleic acids. their sources alongwith the required daily intake for young adults",
+          "Identify carbohydrates as a source of energy",
+          "Describe proteins as natural polyamides and that they are formed from amino acid monomers with the general structure",
+          "Draw the general structure of proteins",
+          "Explain the sources, use and structure of proteins, lipids and carbohydrates",
+          "Describe the importance of nucleic acids",
+          "Explain vitamins, their sources and their importance to health",
+          "Identify applications of biochemistry in testing (blood test, pregnancy test, cancer screening, parental genetic testing), genetic engineering, gene therapy and cloning"
+        ],
+        "headings": [
+          {
+            "number": "25.1",
+            "title": "The Importance of Nutrition",
+            "pdfPage": 146
+          },
+          {
+            "number": "1",
+            "title": "Carbohydrates",
+            "pdfPage": 146
+          },
+          {
+            "number": "2",
+            "title": "Lipids",
+            "pdfPage": 146
+          },
+          {
+            "number": "3",
+            "title": "Proteins",
+            "pdfPage": 146
+          },
+          {
+            "number": "4",
+            "title": "Vitamins and Minerals",
+            "pdfPage": 147
+          },
+          {
+            "number": "25.1.1",
+            "title": "Basics of Healthy Eating",
+            "pdfPage": 147
+          },
+          {
+            "number": "25.1.2",
+            "title": "Healthy Eating",
+            "pdfPage": 147
+          },
+          {
+            "number": "25.2",
+            "title": "Carbohydrates",
+            "pdfPage": 147
+          },
+          {
+            "number": "25.3",
+            "title": "Proteins",
+            "pdfPage": 149
+          },
+          {
+            "number": "25.4",
+            "title": "Lipids",
+            "pdfPage": 150
+          },
+          {
+            "number": "25.5",
+            "title": "Vitamins",
+            "pdfPage": 151
+          },
+          {
+            "number": null,
+            "title": "Importance of Vitamins",
+            "pdfPage": 151
+          },
+          {
+            "number": "25.6",
+            "title": "Nucleic Acids",
+            "pdfPage": 152
+          },
+          {
+            "number": "25.7",
+            "title": "Applications of Biochemistry",
+            "pdfPage": 152
+          },
+          {
+            "number": null,
+            "title": "Blood Tests",
+            "pdfPage": 152
+          },
+          {
+            "number": null,
+            "title": "Pregnancy Test",
+            "pdfPage": 153
+          },
+          {
+            "number": null,
+            "title": "Blood Test for Cancer Screening",
+            "pdfPage": 153
+          },
+          {
+            "number": null,
+            "title": "Parental Genetic Testing",
+            "pdfPage": 153
+          },
+          {
+            "number": null,
+            "title": "Genetic Engineering",
+            "pdfPage": 153
+          },
+          {
+            "number": null,
+            "title": "Gene Therapy",
+            "pdfPage": 153
+          },
+          {
+            "number": null,
+            "title": "Cloning",
+            "pdfPage": 154
+          }
+        ],
+        "notes": "The items \"1. Carbohydrates\", \"2. Lipids\", \"3. Proteins\" and \"4. Vitamins and Minerals\" are printed as boxed headings numbered 1-4 within section 25.1 (they are not numbered 25.1.x); included as printed. Unnumbered boxed headings under 25.5 and 25.7 are also included. Page numbers printed: 142-152."
+      }
+    },
+    {
+      "number": 26,
+      "title": "Polymers",
+      "titleEn": null,
+      "pdfStart": 156,
+      "pdfEnd": 164,
+      "read": {
+        "titleOnPage": "Polymers",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define polymers as large molecules built up from many smaller molecules called monomers.",
+          "Identify the repeating units and / or linkages in addition polymers and in condensation polymers.",
+          "Deduce the structure or repeating unit of a condensation polymer from given monomers and vice versa, limited to: a. polyamides from a dicarboxylic acid and a diamine b. polyesters from a dicarboxylic acid and a diol.",
+          "Describe the differences between addition and condensation polymerization.",
+          "State that plastics are made from polymers.",
+          "Describe how the properties of plastics have implications for their disposal.",
+          "Describe the environmental challenges. caused by plastics, limited to: o disposal in landfill sites o accumulation in oceans o formation of toxic gases from burning",
+          "Describe the structure of: o nylon, a polyamide o PET, a polyester The full name for PET, polyethylene terephthalate, is not required.",
+          "State that PET can be converted back into monomers and repolymerised",
+          "Outline the importance of polymers in the textile industry. (Examples for polymers being used may be given along with their specific properties)."
+        ],
+        "headings": [
+          {
+            "number": "26.1",
+            "title": "Types of Polymers",
+            "pdfPage": 157
+          },
+          {
+            "number": "26.2",
+            "title": "Structure of Monomer from Polymer",
+            "pdfPage": 160
+          },
+          {
+            "number": "26.3",
+            "title": "Plastics",
+            "pdfPage": 161
+          },
+          {
+            "number": "26.4",
+            "title": "Importance of Polymers in Textile Industry",
+            "pdfPage": 161
+          },
+          {
+            "number": "26.5",
+            "title": "Adverse Effects of Plastics",
+            "pdfPage": 162
+          }
+        ],
+        "notes": "Within 26.1 the sub-parts are printed as \"(a) Addition Polymers\" (image 2) and \"(b) Condensation Polymers\" (image 3); within 26.2 the sub-headings \"Addition Polymer\" and \"Condensation Polymer\" are boxed and unnumbered. These are not included as numbered headings. The SLO text \"Describe the environmental challenges. caused by plastics\" contains a stray full stop as printed."
+      }
+    }
+  ]
+}

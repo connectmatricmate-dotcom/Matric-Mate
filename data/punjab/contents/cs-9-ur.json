@@ -1,0 +1,675 @@
+{
+  "source": "content/punjab/textbooks/cs-9-ur.pdf",
+  "subject": "cs",
+  "grade": 9,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "کمپیوٹر سائنس 9 (Computer Science 9)",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": null,
+  "language": "ur",
+  "contentsPages": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "مسائل کوحل کرنا",
+      "titleEn": "Problem Solving",
+      "page": 1,
+      "topics": [
+        {
+          "number": "1.1",
+          "title": "مسئلہ حل کرنے کے مراحل",
+          "titleEn": "Problem Solving Steps",
+          "page": 2
+        },
+        {
+          "number": "1.1.1",
+          "title": "مسئلہ کا تعین",
+          "titleEn": "Defining a Problem",
+          "page": 2
+        },
+        {
+          "number": "1.1.2",
+          "title": "مسئلہ کو سمجھنا",
+          "titleEn": "Understanding a Problem",
+          "page": 3
+        },
+        {
+          "number": "1.1.3",
+          "title": "حل کی منصوبہ بندی",
+          "titleEn": "Planning a Solution",
+          "page": 4
+        },
+        {
+          "number": "1.1.4",
+          "title": "کینڈ ڈسلوشن کی وضاحت",
+          "titleEn": "Defining Candid Solutions",
+          "page": 5
+        },
+        {
+          "number": "1.1.5",
+          "title": "بہترین حل کا انتخاب",
+          "titleEn": "Selecting the Best Solution",
+          "page": 6
+        },
+        {
+          "number": "1.2",
+          "title": "فلو چارٹ",
+          "titleEn": "Flowchart",
+          "page": 6
+        },
+        {
+          "number": "1.2.1",
+          "title": "تعریف",
+          "titleEn": "Definition",
+          "page": 6
+        },
+        {
+          "number": "1.2.2",
+          "title": "مسئلہ کے حل میں فلو چارٹ کی اہمیت",
+          "titleEn": "Importance of Flowcharts in Problem Solving",
+          "page": 7
+        },
+        {
+          "number": "1.2.3",
+          "title": "فلو چارٹ کے لوازم کا تعین",
+          "titleEn": "Determining Requirements for a Flowchart",
+          "page": 7
+        },
+        {
+          "number": "1.2.4",
+          "title": "فلو چارٹ کی علامات",
+          "titleEn": "Flowchart Symbols",
+          "page": 7
+        },
+        {
+          "number": "1.2.5",
+          "title": "فلو چارٹ کی مثالیں",
+          "titleEn": "Examples of Flowchart",
+          "page": 8
+        },
+        {
+          "number": "1.3",
+          "title": "الگورتھم",
+          "titleEn": "Algorithm",
+          "page": 15
+        },
+        {
+          "number": "1.3.1",
+          "title": "تعریف",
+          "titleEn": "Definition",
+          "page": 15
+        },
+        {
+          "number": "1.3.2",
+          "title": "الگورتھم مسئلہ حل کرنے میں اہم کردار ادا کرتا ہے",
+          "titleEn": null,
+          "page": 16
+        },
+        {
+          "number": "1.3.3",
+          "title": "الگورتھم کی تکمیل",
+          "titleEn": null,
+          "page": 17
+        },
+        {
+          "number": "1.3.4",
+          "title": "الگورتھم کی مثالیں",
+          "titleEn": null,
+          "page": 17
+        },
+        {
+          "number": "1.3.5",
+          "title": "الگورتھم کی کارگزاری",
+          "titleEn": null,
+          "page": 21
+        },
+        {
+          "number": "1.3.6",
+          "title": "الگورتھم اور فلو چارٹ کے درمیان فرق",
+          "titleEn": null,
+          "page": 23
+        },
+        {
+          "number": "1.4",
+          "title": "ٹیسٹ ڈیٹا",
+          "titleEn": "Test Data",
+          "page": 24
+        },
+        {
+          "number": "1.4.1",
+          "title": "ٹیسٹنگ کی اہمیت",
+          "titleEn": null,
+          "page": 25
+        },
+        {
+          "number": "1.4.2",
+          "title": "ٹیسٹ ڈیٹا کی اقسام (Test Case)",
+          "titleEn": null,
+          "page": 25
+        },
+        {
+          "number": "1.5",
+          "title": "ویری فیکیشن اور ویلیڈیشن",
+          "titleEn": "Verification and Validation",
+          "page": 26
+        },
+        {
+          "number": "1.5.1",
+          "title": "ویری فیکیشن کے تصور کا مفہوم",
+          "titleEn": "Verification",
+          "page": 26
+        },
+        {
+          "number": "1.5.2",
+          "title": "ویلیڈیشن (Validation) کے تصور کی تفہیم",
+          "titleEn": "Validation",
+          "page": 26
+        },
+        {
+          "number": "1.6",
+          "title": "غلطی کی نشاندہی اوراس کی اصلاح ودرستی",
+          "titleEn": null,
+          "page": 27
+        },
+        {
+          "number": "1.6.1",
+          "title": "ٹریس ٹیبل (Trace Table) کا استعمال",
+          "titleEn": null,
+          "page": 28
+        },
+        {
+          "number": "1.6.2",
+          "title": "نادرست ڈیٹا استعمال کرتے ہوئے ٹیسٹنگ",
+          "titleEn": null,
+          "page": 29
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "بائنری سسٹم",
+      "titleEn": "Binary System",
+      "page": 33,
+      "topics": [
+        {
+          "number": "2.1",
+          "title": "نمبر سسٹم کا تعارف",
+          "titleEn": null,
+          "page": 34
+        },
+        {
+          "number": "2.1.1",
+          "title": "ڈیسیمل/اعشاری",
+          "titleEn": null,
+          "page": 34
+        },
+        {
+          "number": "2.1.2",
+          "title": "ثنائی/بائنری",
+          "titleEn": null,
+          "page": 34
+        },
+        {
+          "number": "2.1.3",
+          "title": "ہیگزاڈیسیمل",
+          "titleEn": null,
+          "page": 34
+        },
+        {
+          "number": "2.2",
+          "title": "نمبر سسٹم کا تبادلہ",
+          "titleEn": null,
+          "page": 35
+        },
+        {
+          "number": "2.2.1",
+          "title": "اعشاری سے ثنائی اور اعشاری سے ہیگزاڈیسیمل نظام میں تبادلہ",
+          "titleEn": null,
+          "page": 35
+        },
+        {
+          "number": "2.2.2",
+          "title": "اعشاری سے ہیگزاڈیسیمل اور ہیگزاڈیسیمل سے اعشاری نظام میں تبادلہ",
+          "titleEn": null,
+          "page": 36
+        },
+        {
+          "number": "2.2.3",
+          "title": "ہیگزاڈیسیمل سے ثنائی اور ثنائی سے ہیگزاڈیسیمل میں تبادلہ",
+          "titleEn": null,
+          "page": 37
+        },
+        {
+          "number": "2.3",
+          "title": "میموری اور ڈیٹا سٹوریج",
+          "titleEn": null,
+          "page": 39
+        },
+        {
+          "number": "2.3.1",
+          "title": "میموری",
+          "titleEn": null,
+          "page": 39
+        },
+        {
+          "number": "2.3.2",
+          "title": "کمپیوٹر میموری میں ڈیٹا کی نمائندگی",
+          "titleEn": null,
+          "page": 40
+        },
+        {
+          "number": "2.3.3",
+          "title": "سٹوریج ڈیوائیسز",
+          "titleEn": null,
+          "page": 43
+        },
+        {
+          "number": "2.4",
+          "title": "کمپیوٹر میموری کے سائز کی پیمائش",
+          "titleEn": null,
+          "page": 43
+        },
+        {
+          "number": "2.5",
+          "title": "بولین الجبرا",
+          "titleEn": null,
+          "page": 44
+        },
+        {
+          "number": "2.5.1",
+          "title": "بولین پری پوزیشن",
+          "titleEn": null,
+          "page": 44
+        },
+        {
+          "number": "2.5.2",
+          "title": "ٹروتھ ٹیبلز",
+          "titleEn": null,
+          "page": 44
+        },
+        {
+          "number": "2.5.3",
+          "title": "لاجیکل اوپریٹرز",
+          "titleEn": null,
+          "page": 45
+        },
+        {
+          "number": "2.5.4",
+          "title": "ٹروتھ ٹیبل",
+          "titleEn": null,
+          "page": 46
+        },
+        {
+          "number": "2.5.5",
+          "title": "بولین الجبرا کے قوانین",
+          "titleEn": null,
+          "page": 47
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "نیٹ ورکس",
+      "titleEn": "Networks",
+      "page": 53,
+      "topics": [
+        {
+          "number": "3.1",
+          "title": "کمپیوٹر نیٹ ورک",
+          "titleEn": null,
+          "page": 54
+        },
+        {
+          "number": "3.1.1",
+          "title": "کمپیوٹر نیٹ ورک کی ضرورت",
+          "titleEn": null,
+          "page": 55
+        },
+        {
+          "number": "3.1.2",
+          "title": "کلائنٹ سرور",
+          "titleEn": null,
+          "page": 57
+        },
+        {
+          "number": "3.2",
+          "title": "نیٹ ورک کا ساختی ڈھانچہ",
+          "titleEn": null,
+          "page": 57
+        },
+        {
+          "number": "3.2.1",
+          "title": "کنکشن کی اقسام",
+          "titleEn": null,
+          "page": 57
+        },
+        {
+          "number": "3.3",
+          "title": "ڈیٹا کمیونیکیشن کی بنیادی",
+          "titleEn": null,
+          "page": 60
+        },
+        {
+          "number": "3.4",
+          "title": "کمپیوٹر نیٹ ورک ماڈلز",
+          "titleEn": null,
+          "page": 62
+        },
+        {
+          "number": "3.4.1",
+          "title": "TCP/IP پروٹوکول سوٹ",
+          "titleEn": null,
+          "page": 64
+        },
+        {
+          "number": "3.5",
+          "title": "ایڈریسنگ کی ضرورت",
+          "titleEn": null,
+          "page": 65
+        },
+        {
+          "number": "3.5.1",
+          "title": "ڈیٹا کمیونیکیشن میں ایڈریسنگ کی اہمیت",
+          "titleEn": null,
+          "page": 65
+        },
+        {
+          "number": "3.5.2",
+          "title": "ٹیلی فون ایڈریسنگ اور نیٹ ورک ایڈریسنگ کا موازنہ",
+          "titleEn": null,
+          "page": 65
+        },
+        {
+          "number": "3.6",
+          "title": "انٹرنیٹ پر ریکوئسٹ HTTP بھیجنا اور HTTP ریسپانس وصول کرنا",
+          "titleEn": null,
+          "page": 66
+        },
+        {
+          "number": "3.6.1",
+          "title": "IP ایڈریسنگ کی وضاحت",
+          "titleEn": null,
+          "page": 67
+        },
+        {
+          "number": "3.7",
+          "title": "روٹنگ",
+          "titleEn": null,
+          "page": 68
+        },
+        {
+          "number": "3.7.1",
+          "title": "روٹر کی وضاحت",
+          "titleEn": null,
+          "page": 68
+        },
+        {
+          "number": "3.7.2",
+          "title": "انٹرنیٹ پر روٹنگ",
+          "titleEn": null,
+          "page": 68
+        },
+        {
+          "number": "3.7.3",
+          "title": "روٹنگ کا عمل",
+          "titleEn": null,
+          "page": 69
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "ڈیٹا اور رازداری کا معاملہ",
+      "titleEn": "Data and Privacy Matters",
+      "page": 73,
+      "topics": [
+        {
+          "number": "4.1",
+          "title": "سیکیورٹی سے متعلق اخلاقی مسائل",
+          "titleEn": null,
+          "page": 74
+        },
+        {
+          "number": "4.1.1",
+          "title": "سیکیورٹی سے متعلق اخلاقی مسائل کو سمجھنا",
+          "titleEn": null,
+          "page": 74
+        },
+        {
+          "number": "4.1.2",
+          "title": "دوسروں کی رازداری کی حفاظت",
+          "titleEn": null,
+          "page": 78
+        },
+        {
+          "number": "4.2",
+          "title": "ڈیٹا رازداری کی اہمیت",
+          "titleEn": null,
+          "page": 79
+        },
+        {
+          "number": "4.2.1",
+          "title": "ڈیٹا کے بڑے مجموعے سے رازداری متاثر ہونے کے خدشات",
+          "titleEn": null,
+          "page": 79
+        },
+        {
+          "number": "4.2.2",
+          "title": "کمپیوٹنگ سسٹم استعمال کرنے سے پیدا ہونے والے ذاتی رازداری خدشات اورحفاظتی خدشات کا تجزیہ",
+          "titleEn": null,
+          "page": 80
+        },
+        {
+          "number": "4.3",
+          "title": "خفیہ کاری (Encryption)",
+          "titleEn": null,
+          "page": 81
+        },
+        {
+          "number": "4.3.1",
+          "title": "روزمرہ زندگی میں انٹرنیٹ پر خفیہ کاری کی اہمیت",
+          "titleEn": null,
+          "page": 82
+        },
+        {
+          "number": "4.3.2",
+          "title": "تبادل سازی کے طریقے",
+          "titleEn": null,
+          "page": 83
+        },
+        {
+          "number": "4.3.2.1",
+          "title": "سیزر سائفر",
+          "titleEn": null,
+          "page": null
+        },
+        {
+          "number": "4.3.2.2",
+          "title": "وگیز سائفر",
+          "titleEn": null,
+          "page": 84
+        },
+        {
+          "number": "4.3.3",
+          "title": "وگیز سائفر بسیف کا استعمال",
+          "titleEn": null,
+          "page": 86
+        },
+        {
+          "number": "4.3.4",
+          "title": "فریکوئنسی تجزیہ استعمال کرتے ہوئے بہتر تبادل کے ساتھ خفیہ کاری",
+          "titleEn": null,
+          "page": 87
+        },
+        {
+          "number": "4.3.5",
+          "title": "تبادل سائفر کے نقائص",
+          "titleEn": null,
+          "page": 88
+        },
+        {
+          "number": "4.4",
+          "title": "کیز (keys) دور پاس ورڈ کے ساتھ خفیہ کاری",
+          "titleEn": null,
+          "page": 89
+        },
+        {
+          "number": "4.4.1",
+          "title": "کرپٹوگرافک کیز اور پاس ورڈز کے درمیان تعلق",
+          "titleEn": null,
+          "page": 89
+        },
+        {
+          "number": "4.4.2",
+          "title": "اچھے پاس ورڈ کی خصوصیات",
+          "titleEn": null,
+          "page": 89
+        },
+        {
+          "number": "4.5",
+          "title": "سائبر کرائم",
+          "titleEn": null,
+          "page": 90
+        },
+        {
+          "number": "4.5.1",
+          "title": "فشنگ حملے کی خصوصیات",
+          "titleEn": null,
+          "page": 92
+        },
+        {
+          "number": "4.5.2",
+          "title": "ڈینائل آف سروس (DOS) (Denial of Service) اٹیک",
+          "titleEn": null,
+          "page": 93
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "ڈیزائننگ ویب سائٹ",
+      "titleEn": "Designing Website",
+      "page": 99,
+      "topics": [
+        {
+          "number": "5.1",
+          "title": "HTML کا تعارف",
+          "titleEn": null,
+          "page": 100
+        },
+        {
+          "number": "5.1.1",
+          "title": "HTML کی تعریف",
+          "titleEn": null,
+          "page": 100
+        },
+        {
+          "number": "5.1.2",
+          "title": "پہلا ویب پیج بنانا اوراس کا اظہار",
+          "titleEn": null,
+          "page": 101
+        },
+        {
+          "number": "5.1.3",
+          "title": "HTML مارک اپ میں استعمال ہونے والے عناصر کی شناخت",
+          "titleEn": null,
+          "page": 101
+        },
+        {
+          "number": "5.1.4",
+          "title": "HTML ٹیگز کی خصوصیات",
+          "titleEn": null,
+          "page": 102
+        },
+        {
+          "number": "5.1.5",
+          "title": "ویب پیج کے اہم عناصر HTML، ہیڈ، باڈی",
+          "titleEn": null,
+          "page": 102
+        },
+        {
+          "number": "5.2",
+          "title": "ٹیکسٹ فارمیٹنگ",
+          "titleEn": null,
+          "page": 103
+        },
+        {
+          "number": "5.2.1",
+          "title": "HTML میں کنٹنٹ فارمیٹنگ",
+          "titleEn": null,
+          "page": 103
+        },
+        {
+          "number": "5.2.2",
+          "title": "ٹیکسٹ فارمیٹنگ ٹیگز (Test Formating Tags) کی شناخت",
+          "titleEn": null,
+          "page": 104
+        },
+        {
+          "number": "5.3",
+          "title": "لسٹ بنانا",
+          "titleEn": null,
+          "page": 105
+        },
+        {
+          "number": "5.3.1",
+          "title": "لسٹ کی اقسام",
+          "titleEn": null,
+          "page": 105
+        },
+        {
+          "number": "5.4",
+          "title": "تصاویر اور ہائپر بیک گراؤنڈ",
+          "titleEn": null,
+          "page": 107
+        },
+        {
+          "number": "5.5",
+          "title": "ہائپرلنک",
+          "titleEn": null,
+          "page": 109
+        },
+        {
+          "number": "5.5.1",
+          "title": "ویب پیج پر ہائپرلنک لگانا",
+          "titleEn": null,
+          "page": 109
+        },
+        {
+          "number": "5.5.2",
+          "title": "اینکر",
+          "titleEn": null,
+          "page": 109
+        },
+        {
+          "number": "5.5.3",
+          "title": "ویب پیج پر اینکر لگانا",
+          "titleEn": null,
+          "page": 109
+        },
+        {
+          "number": "5.5.4",
+          "title": "تصویر پر ہائپرلنک لگانا",
+          "titleEn": null,
+          "page": 110
+        },
+        {
+          "number": "5.6",
+          "title": "ٹیبل بنانا",
+          "titleEn": null,
+          "page": 110
+        }
+      ]
+    }
+  ],
+  "notes": "Page number for topic 4.3.2.1 (سیزر سائفر) is not printed/legible in the contents table on image 5; left as null. Chapters are labelled 'باب' in the summary table (image 2) and 'یونٹ' in the detailed contents (images 3-6); both numbering schemes match (1-5), so the printed unit numbers are used as chapter numbers."
+}

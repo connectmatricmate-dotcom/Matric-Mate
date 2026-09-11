@@ -1,0 +1,1032 @@
+{
+  "source": "content/punjab/textbooks/cs-10.pdf",
+  "subject": "cs",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 127,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": false,
+  "pageOffsets": [],
+  "backMatterStart": null,
+  "locateNotes": "The last unit (Unit 8) appears to run to the end; page 127 contains Short/Long Questions of the unit's exercise, with no separate glossary, answer key or index visible.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Operating Systems: Structure and Services",
+      "titleEn": null,
+      "pdfStart": 1,
+      "pdfEnd": 18,
+      "read": {
+        "titleOnPage": "Operating Systems: Structure and Services",
+        "sloHeading": "Student Learning Outcomes:",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Define an operating system and explain its role as an interface between the user and translate user actions into hardware-level instructions.",
+          "Identify the responsibilities of the OS in managing multiple user accounts.",
+          "Differentiate between the kernel and shell, including their specific functions.",
+          "Explain OS layers and how each layer interacts with the others.",
+          "Identify the role of system libraries and device drivers in OS functionality.",
+          "Explain the stages in the process lifecycle (creation, execution, termination) with examples and apply the First-Come, First-Served (FCFS) process scheduling.",
+          "Describe multitasking and concurrency, giving one real-world analogy.",
+          "Distinguish between primary memory (RAM) and virtual memory.",
+          "Define a process and a thread, and explain how threads share resources within a process.",
+          "Give examples of how multithreading improves performance in applications.",
+          "Define a system call and explain its purpose and types",
+          "Define file system, files, folders, and metadata, and explain their roles in organizing data.",
+          "Explain how these components work together to process a user request from device to server and back."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 1
+          },
+          {
+            "number": "1.1",
+            "title": "Introduction to Operating System (OS)",
+            "pdfPage": 2
+          },
+          {
+            "number": "1.1.1",
+            "title": "Operating System (OS) as the Central System Controller",
+            "pdfPage": 2
+          },
+          {
+            "number": "1.1.2",
+            "title": "Role in User–Hardware Interaction",
+            "pdfPage": 2
+          },
+          {
+            "number": "1.1.3",
+            "title": "Responsibilities in Multi-User Environments Tasks",
+            "pdfPage": 3
+          },
+          {
+            "number": "1.1.4",
+            "title": "Creating and Managing User Accounts",
+            "pdfPage": 3
+          },
+          {
+            "number": "1.2",
+            "title": "Architecture of an Operating System",
+            "pdfPage": 3
+          },
+          {
+            "number": "1.2.1",
+            "title": "Kernel vs Shell",
+            "pdfPage": 3
+          },
+          {
+            "number": "1.2.2",
+            "title": "OS Layers and Modular Design",
+            "pdfPage": 4
+          },
+          {
+            "number": "1.2.3",
+            "title": "System Libraries and Device Drivers",
+            "pdfPage": 5
+          },
+          {
+            "number": "1.3",
+            "title": "Process Management in Operating System (OS)",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.3.1",
+            "title": "Process Life Cycle",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.3.2",
+            "title": "Multitasking and Concurrency",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.3.3",
+            "title": "Process Scheduling Concepts",
+            "pdfPage": 7
+          },
+          {
+            "number": "1.4",
+            "title": "Memory",
+            "pdfPage": 9
+          },
+          {
+            "number": "1.4.1",
+            "title": "Primary Memory (RAM)",
+            "pdfPage": 9
+          },
+          {
+            "number": "1.4.2",
+            "title": "Virtual Memory",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.5",
+            "title": "Processes vs Threads",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.5.1",
+            "title": "Multithreading",
+            "pdfPage": 11
+          },
+          {
+            "number": "1.5.2",
+            "title": "Benefits of Multithreading",
+            "pdfPage": 11
+          },
+          {
+            "number": "1.6",
+            "title": "System Calls",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.6.1",
+            "title": "Types of System Calls",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.7",
+            "title": "File System Structure and Management",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.7.1",
+            "title": "Files",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.7.2",
+            "title": "Folders",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.7.3",
+            "title": "Metadata",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.7.4",
+            "title": "File Systems",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.8",
+            "title": "Types of Operating Systems",
+            "pdfPage": 14
+          },
+          {
+            "number": "1.8.1",
+            "title": "Real-Time Operating System (RTOS)",
+            "pdfPage": 14
+          },
+          {
+            "number": "1.8.2",
+            "title": "Embedded Operating System (EOS)",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.8.3",
+            "title": "Network Operating System (NOS)",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.8.4",
+            "title": "Mobile Operating System",
+            "pdfPage": 15
+          }
+        ],
+        "notes": "The \"Introduction\" section on page 1 is unnumbered but included as a main section heading. Image 5 shows a faint partial line at the bottom edge that is illegible (likely the start of the next page's content). Exercise sections (MCQs, Short Questions, Long Questions, Answer Key) on images 16–18 were excluded per the rules."
+      }
+    },
+    {
+      "number": 2,
+      "title": "System Recovery and Advanced Maintenance",
+      "titleEn": null,
+      "pdfStart": 19,
+      "pdfEnd": 37,
+      "read": {
+        "titleOnPage": "System Recovery and Advanced Maintenance",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Define post-troubleshooting maintenance and explain its role in preventing recurring system issues.",
+          "Use Task Manager, Resource Monitor, Resource Monitor and to monitor CPU, memory, and disk usage, and terminate unresponsive applications by reviewing system logs .",
+          "Start Windows in Safe Mode and explain when this mode is useful.",
+          "Create and use a restore point to return the system to a previous working state.",
+          "Distinguish between System Restore and System Reset, and identify when to use each.",
+          "Explain the purpose of bootable recovery media and when it is required.",
+          "Create a bootable USB using Rufus or built-in Windows tools, choosing the correct partition style (GPT or MBR).",
+          "Identify the differences between GPT and MBR and check a disk's partition style.",
+          "Explain the role of BIOS and UEFI in system startup.",
+          "Describe the Power-On Self-Test (POST) process and its importance.",
+          "Access BIOS/UEFI settings to change boot order or reset defaults.",
+          "Recover deleted files using built-in tools as well as third-party recovery tools such as Tenorshare.",
+          "Perform Disk Cleanup to remove temporary and unnecessary files.",
+          "Apply software updates (patch management) to improve security and stability.",
+          "Run virus scans using Windows Defender and enable real-time protection.",
+          "Create a maintenance calendar to schedule regular updates, cleanups, and scans.",
+          "Maintain repair and update logs using a standard template.",
+          "Explain the importance of keeping accurate system maintenance records."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 19
+          },
+          {
+            "number": "2.1",
+            "title": "Introduction to Post-Troubleshooting",
+            "pdfPage": 20
+          },
+          {
+            "number": "2.1.1",
+            "title": "Importance of Continuous Maintenance",
+            "pdfPage": 20
+          },
+          {
+            "number": "2.1.2",
+            "title": "Impact of Poor Maintenance",
+            "pdfPage": 20
+          },
+          {
+            "number": "2.1.3",
+            "title": "Introduction to System Health Monitoring",
+            "pdfPage": 21
+          },
+          {
+            "number": "2.2",
+            "title": "Using Built-in Diagnostic Tools",
+            "pdfPage": 21
+          },
+          {
+            "number": "2.2.1",
+            "title": "Task Manager",
+            "pdfPage": 22
+          },
+          {
+            "number": "2.2.2",
+            "title": "Resource Monitor",
+            "pdfPage": 23
+          },
+          {
+            "number": "2.2.3",
+            "title": "Event Viewer",
+            "pdfPage": 24
+          },
+          {
+            "number": "2.3",
+            "title": "System Recovery Options",
+            "pdfPage": 25
+          },
+          {
+            "number": "2.3.1",
+            "title": "Safe Mode",
+            "pdfPage": 25
+          },
+          {
+            "number": "2.3.2",
+            "title": "System Restore",
+            "pdfPage": 26
+          },
+          {
+            "number": "2.3.3",
+            "title": "Bootable Recovery Media",
+            "pdfPage": 27
+          },
+          {
+            "number": "2.4",
+            "title": "BIOS/UEFI and Boot Process Awareness",
+            "pdfPage": 29
+          },
+          {
+            "number": "2.4.1",
+            "title": "Role of BIOS / UEFI in Computer Startup",
+            "pdfPage": 29
+          },
+          {
+            "number": "2.4.2",
+            "title": "The POST Test",
+            "pdfPage": 29
+          },
+          {
+            "number": "2.4.3",
+            "title": "Boot order and boot repair",
+            "pdfPage": 30
+          },
+          {
+            "number": "2.5",
+            "title": "Data Recovery Techniques",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.5.1",
+            "title": "Built-in Tools",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.5.2",
+            "title": "Third-party tools",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.5.3",
+            "title": "Limitations of recovery and best practices",
+            "pdfPage": 32
+          },
+          {
+            "number": "2.6",
+            "title": "Best Practices for Preventive Maintenance",
+            "pdfPage": 33
+          },
+          {
+            "number": "2.6.1",
+            "title": "Disk Cleanup",
+            "pdfPage": 33
+          },
+          {
+            "number": "2.6.2",
+            "title": "Patch management/ System Updation",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.6.3",
+            "title": "Staying Protected with Windows Defender",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.6.4",
+            "title": "Keeping a maintenance calendar",
+            "pdfPage": 35
+          },
+          {
+            "number": "2.7",
+            "title": "System Documentation and Logs",
+            "pdfPage": 35
+          }
+        ],
+        "notes": "Page 28 (image 10) contains only the unnumbered sub-heading \"How to Check the Partition Style (MBR or GPT)\" plus boxed features, so no numbered heading is listed for it. Figures/screenshots are low resolution and their embedded text was not transcribed."
+      }
+    },
+    {
+      "number": 3,
+      "title": "Introduction to Python Programming",
+      "titleEn": null,
+      "pdfStart": 38,
+      "pdfEnd": 51,
+      "read": {
+        "titleOnPage": "Introduction to Python Programming",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Understand basic programming concepts and set up a Python development environment.",
+          "Write and interpret basic Python syntax and structure, including variables, data types, and input/output operations.",
+          "Use various operators and expressions in Python, including arithmetic, comparison assignment, logical operators and operator precedence."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 38
+          },
+          {
+            "number": "3.1",
+            "title": "Introduction to Python Programming",
+            "pdfPage": 38
+          },
+          {
+            "number": "3.1.1",
+            "title": "Basic Programming Concepts",
+            "pdfPage": 38
+          },
+          {
+            "number": "3.2",
+            "title": "Basic Python Syntax and Structure",
+            "pdfPage": 41
+          },
+          {
+            "number": "3.2.1",
+            "title": "Variables in Python",
+            "pdfPage": 42
+          },
+          {
+            "number": "3.3",
+            "title": "Operators and Expressions",
+            "pdfPage": 44
+          },
+          {
+            "number": "3.3.1",
+            "title": "Arithmetic Operators",
+            "pdfPage": 45
+          },
+          {
+            "number": "3.3.2",
+            "title": "Comparison Operators",
+            "pdfPage": 45
+          },
+          {
+            "number": "3.3.3",
+            "title": "Assignment Operators",
+            "pdfPage": 46
+          },
+          {
+            "number": "3.3.4",
+            "title": "Logical Operators",
+            "pdfPage": 47
+          },
+          {
+            "number": "3.3.5",
+            "title": "Operator Precedence in Python",
+            "pdfPage": 48
+          }
+        ],
+        "notes": "Unnumbered sub-headings within sections (e.g. \"Setting Up Python Development Environment\", \"Google Colab\", \"Python Comments\", \"Variable Naming Rules in Python\", \"Types of Variables\", \"Input and Output Operations in Python\", \"Integer Inputs\", \"Float Inputs\") were not included since numbered headings exist. The numbered installation steps 1-5 on images 2-4 (e.g. \"4. Configuring the IDE with Python\", \"5. Testing the Configuration\") are procedure steps, not section headings, so they are excluded."
+      }
+    },
+    {
+      "number": 4,
+      "title": "Control Structures in Python",
+      "titleEn": null,
+      "pdfStart": 52,
+      "pdfEnd": 65,
+      "read": {
+        "titleOnPage": "Control Structures in Python",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Implement control structures such as decision-making statements and loops in Python.",
+          "Work with Python modules, functions, and built-in data structures like lists.",
+          "Apply modular programming techniques and object-oriented programming concepts in Python.",
+          "Handle exceptions, perform file operations, and apply testing and debugging techniques in Python."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 52
+          },
+          {
+            "number": "4.1",
+            "title": "Decision Making",
+            "pdfPage": 52
+          },
+          {
+            "number": "4.1.1",
+            "title": "if Statement",
+            "pdfPage": 52
+          },
+          {
+            "number": "4.1.2",
+            "title": "if-else Statement",
+            "pdfPage": 53
+          },
+          {
+            "number": "4.1.3",
+            "title": "Nested Conditions",
+            "pdfPage": 53
+          },
+          {
+            "number": "4.2",
+            "title": "Looping Constructs",
+            "pdfPage": 54
+          },
+          {
+            "number": "4.2.1",
+            "title": "while Loop",
+            "pdfPage": 54
+          },
+          {
+            "number": "4.2.2",
+            "title": "for Loop",
+            "pdfPage": 55
+          },
+          {
+            "number": "4.2.3",
+            "title": "range() Function",
+            "pdfPage": 55
+          },
+          {
+            "number": null,
+            "title": "End statement",
+            "pdfPage": 56
+          },
+          {
+            "number": "4.2.4",
+            "title": "Nested Loops",
+            "pdfPage": 56
+          },
+          {
+            "number": "4.3",
+            "title": "Libraries in Python",
+            "pdfPage": 58
+          },
+          {
+            "number": "4.3.1",
+            "title": "Using Libraries in Python",
+            "pdfPage": 58
+          },
+          {
+            "number": "4.4",
+            "title": "Lists in Python",
+            "pdfPage": 59
+          },
+          {
+            "number": "4.4.1",
+            "title": "Creating Lists",
+            "pdfPage": 59
+          },
+          {
+            "number": "4.4.2",
+            "title": "Accessing List Items",
+            "pdfPage": 59
+          },
+          {
+            "number": "4.4.3",
+            "title": "Modifying a List",
+            "pdfPage": 59
+          },
+          {
+            "number": "4.4.4",
+            "title": "Operations on Lists",
+            "pdfPage": 60
+          },
+          {
+            "number": "4.5",
+            "title": "Testing and Debugging in Python",
+            "pdfPage": 61
+          },
+          {
+            "number": "4.5.1",
+            "title": "Testing",
+            "pdfPage": 61
+          },
+          {
+            "number": "4.5.2",
+            "title": "Debugging",
+            "pdfPage": 62
+          }
+        ],
+        "notes": "The heading on image 2 is printed as \"4.1.2 if¯else Statement\" (a stray macron/hyphen glyph); rendered here as \"if-else Statement\". \"End statement\" (image 5) is an unnumbered sub-heading included for completeness. Image 6 contains only worked examples (Example1/Example2 of nested loops) with no new numbered heading. Images 12-14 are the Exercise (MCQs, Short Questions, Long Questions), excluded per rules."
+      }
+    },
+    {
+      "number": 5,
+      "title": "Introduction to Data Science",
+      "titleEn": null,
+      "pdfStart": 66,
+      "pdfEnd": 83,
+      "read": {
+        "titleOnPage": "Introduction to Data Science",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Explain the concept and importance of data science in everyday life.",
+          "Describe each step in the Data Science Life Cycle (DSLC).",
+          "Identify and define real-world problems that can be solved using data.",
+          "Collect data using surveys, online forms, and observational techniques.",
+          "Perform data cleaning and validation to improve accuracy.",
+          "Use simple SQL queries (SELECT, INSERT) to retrieve and store data from databases.",
+          "Analyze data using basic algorithms (sorting, classification, clustering).",
+          "Create bar charts and dashboards to visually represent data insights.",
+          "Communicate results clearly using charts and written summaries."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 66
+          },
+          {
+            "number": "5.1",
+            "title": "Introduction to Data Science",
+            "pdfPage": 67
+          },
+          {
+            "number": "5.1.1",
+            "title": "Importance of Data in Decision Making",
+            "pdfPage": 67
+          },
+          {
+            "number": "5.1.2",
+            "title": "Real-Life Applications of Data Science",
+            "pdfPage": 67
+          },
+          {
+            "number": "5.2",
+            "title": "Overview of the Data Science Life Cycle",
+            "pdfPage": 67
+          },
+          {
+            "number": "5.2.1",
+            "title": "Understanding the Problem",
+            "pdfPage": 68
+          },
+          {
+            "number": null,
+            "title": "Identifying and Defining a Problem",
+            "pdfPage": 68
+          },
+          {
+            "number": null,
+            "title": "Setting Clear Objectives",
+            "pdfPage": 68
+          },
+          {
+            "number": "5.2.2",
+            "title": "Collecting Data",
+            "pdfPage": 70
+          },
+          {
+            "number": "5.2.3",
+            "title": "Cleaning and Validating Data",
+            "pdfPage": 72
+          },
+          {
+            "number": "5.2.4",
+            "title": "Analyzing Data",
+            "pdfPage": 74
+          },
+          {
+            "number": "5.2.5",
+            "title": "Interpreting Data",
+            "pdfPage": 76
+          },
+          {
+            "number": "5.2.6",
+            "title": "Visualizing and Communicating Results",
+            "pdfPage": 77
+          },
+          {
+            "number": "5.3",
+            "title": "Tools for Visualization",
+            "pdfPage": 78
+          },
+          {
+            "number": "5.3.1",
+            "title": "Creating Charts in Spreadsheets (Excel/Google Sheets)",
+            "pdfPage": 78
+          },
+          {
+            "number": "5.4",
+            "title": "Databases and Storing Data",
+            "pdfPage": 80
+          },
+          {
+            "number": "5.4.1",
+            "title": "What is Database?",
+            "pdfPage": 80
+          }
+        ],
+        "notes": "Sub-headings under 5.2.1 (\"Identifying and Defining a Problem\", \"Setting Clear Objectives\") and other unnumbered sub-headings (e.g. \"Examples: School, Health, Business related Problems and Objectives\", \"Raw Data\", \"Common Data Errors (Missing, Duplicate, Outliers)\", \"Data Validation Techniques\", \"Data Cleaning Methods\", \"Why Cleaning Data Matters\", \"What Does it mean to Analyze Data\", \"Using Simple Tools for Analysis\", \"Importance of Data Visualization\", \"Common Types of Charts and Graphs\", \"Communicating Results\") are printed without numbers; only the first two are listed here as they appear as section-level headings, the rest are minor in-text sub-headings. Numbering as printed: some sections use a trailing dot (5.1.1.) while others do not (5.4.1)."
+      }
+    },
+    {
+      "number": 6,
+      "title": "Introduction Artificial Intelligence (AI), and Machine Learning (ML)",
+      "titleEn": null,
+      "pdfStart": 84,
+      "pdfEnd": 96,
+      "read": {
+        "titleOnPage": "Introduction Artificial Intelligence (AI), and Machine Learning (ML)",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Define artificial intelligence (AI), and machine learning (ML).",
+          "Differentiate between AI, and ML, understanding their unique characteristics and applications.",
+          "Understand the concept of supervised learning and its application to teach systems to make predictions.",
+          "Comprehend unsupervised learning, used for clustering and pattern recognition.",
+          "Understand different algorithms and choose relevant algorithms based on specific business problems. This includes simple linear regression.",
+          "Familiarity with key model performance metrics accuracy.",
+          "Understand where AI and ML are applied in daily life, business, and education.",
+          "Discuss bias, privacy, and responsibility when using AI."
+        ],
+        "headings": [
+          {
+            "number": "6.1",
+            "title": "AI, ML and Overview",
+            "pdfPage": 85
+          },
+          {
+            "number": "6.1.1",
+            "title": "What is AI?",
+            "pdfPage": 85
+          },
+          {
+            "number": "6.1.2",
+            "title": "What is ML?",
+            "pdfPage": 85
+          },
+          {
+            "number": "6.1.3",
+            "title": "Differences between AI and ML",
+            "pdfPage": 85
+          },
+          {
+            "number": "6.2",
+            "title": "Machine Learning Types",
+            "pdfPage": 86
+          },
+          {
+            "number": "6.2.1",
+            "title": "Supervised Learning",
+            "pdfPage": 86
+          },
+          {
+            "number": "6.2.2",
+            "title": "Unsupervised Learning",
+            "pdfPage": 87
+          },
+          {
+            "number": "6.2.3",
+            "title": "Supervised vs Unsupervised Learning",
+            "pdfPage": 87
+          },
+          {
+            "number": "6.3",
+            "title": "Practical Applications of AI/ML",
+            "pdfPage": 88
+          },
+          {
+            "number": "6.3.1",
+            "title": "Smart Assistants and Recommendations",
+            "pdfPage": 88
+          },
+          {
+            "number": "6.3.2",
+            "title": "Business Use Cases Using Customer Analysis and Chatbots",
+            "pdfPage": 89
+          },
+          {
+            "number": "6.3.3",
+            "title": "Bias, Privacy, and Responsibility",
+            "pdfPage": 90
+          },
+          {
+            "number": "6.3",
+            "title": "Supervised and Unsupervised Algorithms",
+            "pdfPage": 91
+          },
+          {
+            "number": "6.4.1",
+            "title": "Linear Regression",
+            "pdfPage": 91
+          },
+          {
+            "number": "6.5",
+            "title": "Evaluating Model Performance",
+            "pdfPage": 93
+          },
+          {
+            "number": "6.5.1",
+            "title": "Confusion Matrix",
+            "pdfPage": 93
+          }
+        ],
+        "notes": "The book misnumbers a section: on image 8 the heading 'Supervised and Unsupervised Algorithms' is printed as '6.3' (repeating the earlier 6.3), yet its subsection is printed as '6.4.1 Linear Regression'. Numbering copied as printed. Other printed inconsistencies: on image 4 the table caption reads 'Table 6.3: Supervised vs Unsupervised Learning' (no Table 6.2 appears), and on image 9 the graph caption is also labelled 'Table 6.5'. Image 4 also prints two 'Example 2' items under 6.2.2 with no 'Example 1'. Within 6.5.1 there is an unnumbered sub-heading 'Accuracy' (omitted per rules)."
+      }
+    },
+    {
+      "number": 7,
+      "title": "Applications of AI",
+      "titleEn": null,
+      "pdfStart": 97,
+      "pdfEnd": 110,
+      "read": {
+        "titleOnPage": "Applications of AI",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Explain how AI can be applied to specific applications in areas like NLP , Robotics, Speech Recognition.",
+          "Conduct a technology recognition experiment where students interact with products based on NLP , Robotics, Speech Recognition.",
+          "Discuss the benefits and limitations of NLP, Robotics, Speech Recognition, and others",
+          "Show that there are instances where use of AI causes social injustices.",
+          "Develop critical thinking skills to assess situations where AI has led to social injustices and identify potential areas of improvement.",
+          "Effectively communicate the social implications of AI, particularly regarding injustices and ethical responsibilities, both in writing and verbally.",
+          "Exhibit an awareness of ethical considerations in AI development and usage, as well as the potential consequences of overlooking these considerations.",
+          "Analyze case studies or scenarios where AI has caused social injustices, and discuss the underlying factors contributing to these issues."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 97
+          },
+          {
+            "number": "7.1",
+            "title": "Introduction to Artificial Intelligence (AI)",
+            "pdfPage": 98
+          },
+          {
+            "number": "7.1.1",
+            "title": "Impact of AI on Jobs and Work?",
+            "pdfPage": 99
+          },
+          {
+            "number": "7.2",
+            "title": "Data and AI",
+            "pdfPage": 99
+          },
+          {
+            "number": "7.2.1",
+            "title": "Automatic Data Collection",
+            "pdfPage": 100
+          },
+          {
+            "number": "7.2.2",
+            "title": "Types of Data: Quality and Quantity",
+            "pdfPage": 100
+          },
+          {
+            "number": "7.3",
+            "title": "Real-World Applications of AI",
+            "pdfPage": 101
+          },
+          {
+            "number": "7.3.1",
+            "title": "Natural Language Processing (NLP)",
+            "pdfPage": 101
+          },
+          {
+            "number": "7.3.2",
+            "title": "Robotics in Everyday Life",
+            "pdfPage": 101
+          },
+          {
+            "number": "7.3.3",
+            "title": "Speech Technology and Voice Control",
+            "pdfPage": 102
+          },
+          {
+            "number": "7.3.4",
+            "title": "Recommendation Systems",
+            "pdfPage": 102
+          },
+          {
+            "number": "7.3.5",
+            "title": "Autonomous Vehicles (Self-driving Vehicles)",
+            "pdfPage": 103
+          },
+          {
+            "number": "7.4",
+            "title": "Benefits and Challenges of AI Applications",
+            "pdfPage": 104
+          },
+          {
+            "number": "7.4.1",
+            "title": "Limitations and Challenges of AI Applications",
+            "pdfPage": 104
+          },
+          {
+            "number": "7.5",
+            "title": "Ethics, Fairness, and Social Impact of AI",
+            "pdfPage": 105
+          },
+          {
+            "number": "7.5.1",
+            "title": "Bias in AI and Algorithms",
+            "pdfPage": 105
+          },
+          {
+            "number": "7.5.2",
+            "title": "Fairness and Transparency in AI",
+            "pdfPage": 105
+          },
+          {
+            "number": "7.5.3",
+            "title": "Privacy, Data Security, and Surveillance",
+            "pdfPage": 106
+          },
+          {
+            "number": "7.5.4",
+            "title": "AI and Social Equity (Fairness in Society)",
+            "pdfPage": 106
+          },
+          {
+            "number": "7.6",
+            "title": "Responsibility of AI Designers",
+            "pdfPage": 106
+          },
+          {
+            "number": "7.6.1",
+            "title": "Following Ethics in AI",
+            "pdfPage": 107
+          }
+        ],
+        "notes": "The SLO bullets print odd spacing before commas (e.g. \"NLP , Robotics\"); copied as printed. Page images are unnumbered scans, so image indices are used. Image 3 activity heading prints as \"Before and AfterC AI\" hart · a typo in the book, but it is a boxed activity and excluded from headings."
+      }
+    },
+    {
+      "number": 8,
+      "title": "Digital Entrepreneurship",
+      "titleEn": null,
+      "pdfStart": 111,
+      "pdfEnd": 127,
+      "read": {
+        "titleOnPage": "Digital Entrepreneurship",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Explain the significance of legal compliance and ethical practices in digital entrepreneurship.",
+          "Identify and describe key data privacy laws.",
+          "Apply ethical decision-making to resolve conflicts of interest and ensure fairness in business operations.",
+          "Recognize responsible marketing practices and explain the necessity of truthful advertising and obtaining user consent for targeted marketing.",
+          "Use structured problem-solving methods, such as root cause analysis and SWOT analysis, to address business challenges.",
+          "Explain the concept of data-driven marketing, including setting measurable goals, defining Key Performance Indicators (KPIs), using analytics tools, and measuring Return on Investment (ROI).",
+          "Describe the role of Customer Relationship Management (CRM) systems in building long-term customer loyalty through personalized communication and loyalty programs.",
+          "Explain how marketing automation tools can improve efficiency, reduce operational costs, and expand customer reach."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 111
+          },
+          {
+            "number": "8.1",
+            "title": "From Basics to Advanced Entrepreneurship",
+            "pdfPage": 112
+          },
+          {
+            "number": "8.2",
+            "title": "Problem-Solving & Adaptability",
+            "pdfPage": 112
+          },
+          {
+            "number": "8.2.1",
+            "title": "Structured Problem-Solving",
+            "pdfPage": 112
+          },
+          {
+            "number": "8.2.2",
+            "title": "Adaptability & Resilience",
+            "pdfPage": 113
+          },
+          {
+            "number": "8.3",
+            "title": "Ethical Business Practices & Digital Ethics",
+            "pdfPage": 114
+          },
+          {
+            "number": "8.3.1",
+            "title": "Ethical Decision-Making",
+            "pdfPage": 114
+          },
+          {
+            "number": "8.3.2",
+            "title": "Responsible Marketing",
+            "pdfPage": 115
+          },
+          {
+            "number": "8.3.3",
+            "title": "Data Privacy Laws",
+            "pdfPage": 116
+          },
+          {
+            "number": "8.4",
+            "title": "Legal Framework & Compliance",
+            "pdfPage": 117
+          },
+          {
+            "number": "8.4.1",
+            "title": "Business Registration in Pakistan",
+            "pdfPage": 117
+          },
+          {
+            "number": "8.4.2",
+            "title": "Contracts in Digital Business",
+            "pdfPage": 119
+          },
+          {
+            "number": "8.4.3",
+            "title": "Intellectual Property Rights (IPR)",
+            "pdfPage": 120
+          },
+          {
+            "number": "8.5",
+            "title": "Strategic Marketing & Branding",
+            "pdfPage": 122
+          },
+          {
+            "number": "8.5.1",
+            "title": "Data-Driven Marketing",
+            "pdfPage": 122
+          },
+          {
+            "number": "8.5.2",
+            "title": "Customer Relationship Management (CRM)",
+            "pdfPage": 123
+          },
+          {
+            "number": "8.5.3",
+            "title": "Marketing Automation",
+            "pdfPage": 124
+          }
+        ],
+        "notes": "Page/image 1 is the opening page; \"Introduction\" is an unnumbered section listed alongside the numbered headings. Sub-headings such as \"Root Cause Analysis\", \"SWOT Analysis\", \"Setbacks Recovery\", \"Conflicts of Interest\", \"Regulatory Awareness\", \"Obtain National Tax Number\", etc. are unnumbered bold sub-headings and were not listed. Image 16 MCQ 8 option B is printed as \"Zoh o\" (appears to be \"Zoho\" with a broken space). Image 17 Long Question 3 is printed with an empty number line followed by parts a) and b), and part b) repeats \"(b)\"."
+      }
+    }
+  ]
+}

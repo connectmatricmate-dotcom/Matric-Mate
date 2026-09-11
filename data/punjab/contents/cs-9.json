@@ -1,0 +1,103 @@
+{
+  "source": "content/punjab/textbooks/cs-9.pdf",
+  "subject": "cs",
+  "grade": 9,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "COMPUTER SCIENCE AND ENTREPRENEURSHIP 9",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": "Based on Revised National Curriculum of Pakistan 2023",
+  "language": "en",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Introduction to Systems",
+      "titleEn": null,
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "Number Systems",
+      "titleEn": null,
+      "page": 24,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "Digital Systems and Logic Design",
+      "titleEn": null,
+      "page": 49,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "System Troubleshooting",
+      "titleEn": null,
+      "page": 69,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "Software System",
+      "titleEn": null,
+      "page": 87,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "Introduction to Computer Networks",
+      "titleEn": null,
+      "page": 99,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "Computational Thinking",
+      "titleEn": null,
+      "page": 123,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "Web Development with HTML, CSS and JavaScript",
+      "titleEn": null,
+      "page": 151,
+      "topics": []
+    },
+    {
+      "number": 9,
+      "title": "Data Science and Data Gathering",
+      "titleEn": null,
+      "page": 179,
+      "topics": []
+    },
+    {
+      "number": 10,
+      "title": "Emerging Technologies in Computer Science",
+      "titleEn": null,
+      "page": 211,
+      "topics": []
+    },
+    {
+      "number": 11,
+      "title": "Ethical, Social, and Legal Concerns in Computer Usage",
+      "titleEn": null,
+      "page": 225,
+      "topics": []
+    },
+    {
+      "number": 12,
+      "title": "Entrepreneurship in Digital Age",
+      "titleEn": null,
+      "page": 243,
+      "topics": []
+    }
+  ],
+  "notes": "The contents table lists a 13th numbered entry, \"Answers\" (page 261), which is back matter and has been excluded. The contents lists only unit-level titles with no sub-topics."
+}

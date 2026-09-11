@@ -1,0 +1,450 @@
+{
+  "source": "content/punjab/textbooks/bio-9.pdf",
+  "subject": "bio",
+  "grade": 9,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "BIOLOGY 9",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": "Based on Revised National Curriculum of Pakistan 2023",
+  "language": "en",
+  "contentsPages": [
+    3,
+    4
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "THE SCIENCE OF BIOLOGY",
+      "titleEn": null,
+      "page": 1,
+      "topics": [
+        {
+          "number": "1.1",
+          "title": "Biology and its Branches",
+          "titleEn": null,
+          "page": 2
+        },
+        {
+          "number": "1.2",
+          "title": "Relation of Biology with Other Sciences",
+          "titleEn": null,
+          "page": 4
+        },
+        {
+          "number": "1.3",
+          "title": "Careers in Biology",
+          "titleEn": null,
+          "page": 6
+        },
+        {
+          "number": "1.4",
+          "title": "Quranic Instructions to Reveal the Study of Life",
+          "titleEn": null,
+          "page": 8
+        },
+        {
+          "number": "1.5",
+          "title": "Science as a Collaborative Field",
+          "titleEn": null,
+          "page": 9
+        },
+        {
+          "number": "1.6",
+          "title": "Scientific Method",
+          "titleEn": null,
+          "page": 10
+        },
+        {
+          "number": "1.7",
+          "title": "Theory and Law/Principle",
+          "titleEn": null,
+          "page": 12
+        },
+        {
+          "number": "1.8",
+          "title": "Malaria -An Example of Biological Method",
+          "titleEn": null,
+          "page": 13
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "BIODIVERSITY",
+      "titleEn": null,
+      "page": 21,
+      "topics": [
+        {
+          "number": "2.1",
+          "title": "Biodiversity",
+          "titleEn": null,
+          "page": 21
+        },
+        {
+          "number": "2.2",
+          "title": "Classification",
+          "titleEn": null,
+          "page": 22
+        },
+        {
+          "number": "2.3",
+          "title": "Taxonomic Ranks",
+          "titleEn": null,
+          "page": 23
+        },
+        {
+          "number": "2.4",
+          "title": "History of Classification",
+          "titleEn": null,
+          "page": 25
+        },
+        {
+          "number": "2.5",
+          "title": "Domains of Living Organisms",
+          "titleEn": null,
+          "page": 27
+        },
+        {
+          "number": "2.6",
+          "title": "Classification of Domain Eukarya",
+          "titleEn": null,
+          "page": 29
+        },
+        {
+          "number": "2.7",
+          "title": "Status of Virus in Classification",
+          "titleEn": null,
+          "page": 30
+        },
+        {
+          "number": "2.8",
+          "title": "Binomial Nomenclature",
+          "titleEn": null,
+          "page": 32
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "THE CELL",
+      "titleEn": null,
+      "page": 37,
+      "topics": [
+        {
+          "number": "3.1",
+          "title": "Cell",
+          "titleEn": null,
+          "page": 38
+        },
+        {
+          "number": "3.2",
+          "title": "Structure of Cell",
+          "titleEn": null,
+          "page": 38
+        },
+        {
+          "number": "3.3",
+          "title": "Structural Advantages of Plant and Animal Cells",
+          "titleEn": null,
+          "page": 49
+        },
+        {
+          "number": "3.4",
+          "title": "Cell Specialization",
+          "titleEn": null,
+          "page": 50
+        },
+        {
+          "number": "3.5",
+          "title": "Stem Cells",
+          "titleEn": null,
+          "page": 53
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "CELL CYCLE",
+      "titleEn": null,
+      "page": 59,
+      "topics": [
+        {
+          "number": "4.1",
+          "title": "Cell Cycle",
+          "titleEn": null,
+          "page": 59
+        },
+        {
+          "number": "4.2",
+          "title": "Mitosis",
+          "titleEn": null,
+          "page": 61
+        },
+        {
+          "number": "4.3",
+          "title": "Meiosis",
+          "titleEn": null,
+          "page": 65
+        },
+        {
+          "number": "4.4",
+          "title": "Comparison between Meiosis and Mitosis",
+          "titleEn": null,
+          "page": 69
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "TISSUES, ORGANS, AND ORGAN SYSTEMS",
+      "titleEn": null,
+      "page": 75,
+      "topics": [
+        {
+          "number": "5.1",
+          "title": "Levels of Organization",
+          "titleEn": null,
+          "page": 75
+        },
+        {
+          "number": "5.2",
+          "title": "Organs and Organ Systems in Plants",
+          "titleEn": null,
+          "page": 78
+        },
+        {
+          "number": "5.3",
+          "title": "Organs and Organ Systems in Humans",
+          "titleEn": null,
+          "page": 81
+        },
+        {
+          "number": "5.4",
+          "title": "Homeostasis",
+          "titleEn": null,
+          "page": 83
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "BIOMOLECULES",
+      "titleEn": null,
+      "page": 89,
+      "topics": [
+        {
+          "number": "6.1",
+          "title": "Biomolecules",
+          "titleEn": null,
+          "page": 89
+        },
+        {
+          "number": "6.2",
+          "title": "Carbohydrates",
+          "titleEn": null,
+          "page": 91
+        },
+        {
+          "number": "6.3",
+          "title": "Proteins",
+          "titleEn": null,
+          "page": 94
+        },
+        {
+          "number": "6.4",
+          "title": "Lipids",
+          "titleEn": null,
+          "page": 95
+        },
+        {
+          "number": "6.5",
+          "title": "Nucleic Acids",
+          "titleEn": null,
+          "page": 97
+        },
+        {
+          "number": "6.6",
+          "title": "The Working of DNA and RNA",
+          "titleEn": null,
+          "page": 100
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "ENZYMES",
+      "titleEn": null,
+      "page": 105,
+      "topics": [
+        {
+          "number": "7.1",
+          "title": "Metabolism",
+          "titleEn": null,
+          "page": 105
+        },
+        {
+          "number": "7.2",
+          "title": "Enzymes",
+          "titleEn": null,
+          "page": 106
+        },
+        {
+          "number": "7.3",
+          "title": "Mechanism of Enzyme Action",
+          "titleEn": null,
+          "page": 108
+        },
+        {
+          "number": "7.4",
+          "title": "Factors that Affect the Activity of Enzymes",
+          "titleEn": null,
+          "page": 109
+        },
+        {
+          "number": "7.5",
+          "title": "Enzyme Inhibition",
+          "titleEn": null,
+          "page": 111
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "BIOENERGETICS",
+      "titleEn": null,
+      "page": 115,
+      "topics": [
+        {
+          "number": "8.1",
+          "title": "ATP: The Cell's Energy Currency",
+          "titleEn": null,
+          "page": 116
+        },
+        {
+          "number": "8.2",
+          "title": "Photosynthesis",
+          "titleEn": null,
+          "page": 117
+        },
+        {
+          "number": "8.3",
+          "title": "Cellular Respiration",
+          "titleEn": null,
+          "page": 120
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "PLANT PHYSIOLOGY",
+      "titleEn": null,
+      "page": 129,
+      "topics": [
+        {
+          "number": "9.1",
+          "title": "Nutrition in Plants",
+          "titleEn": null,
+          "page": 130
+        },
+        {
+          "number": "9.2",
+          "title": "Transport in Plants",
+          "titleEn": null,
+          "page": 132
+        },
+        {
+          "number": "9.3",
+          "title": "Transpiration",
+          "titleEn": null,
+          "page": 134
+        },
+        {
+          "number": "9.4",
+          "title": "Transport of Water and Salts in Plants",
+          "titleEn": null,
+          "page": 136
+        },
+        {
+          "number": "9.5",
+          "title": "Translocation of Food in Plants",
+          "titleEn": null,
+          "page": 137
+        },
+        {
+          "number": "9.6",
+          "title": "Gaseous Exchange in Plants",
+          "titleEn": null,
+          "page": 138
+        },
+        {
+          "number": "9.7",
+          "title": "Mechanisms for Excretion in Plants",
+          "titleEn": null,
+          "page": 140
+        },
+        {
+          "number": "9.8",
+          "title": "Osmotic Adjustments in Plants",
+          "titleEn": null,
+          "page": 142
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "REPRODUCTION IN PLANTS",
+      "titleEn": null,
+      "page": 147,
+      "topics": [
+        {
+          "number": "10.1",
+          "title": "Types of Asexual Reproduction",
+          "titleEn": null,
+          "page": 147
+        },
+        {
+          "number": "10.2",
+          "title": "Artificial Propagation",
+          "titleEn": null,
+          "page": 152
+        },
+        {
+          "number": "10.3",
+          "title": "Sexual Reproduction in Plants",
+          "titleEn": null,
+          "page": 154
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "title": "BIOSTATISTICS",
+      "titleEn": null,
+      "page": 163,
+      "topics": [
+        {
+          "number": "11.1",
+          "title": "Introduction of Biostatistics",
+          "titleEn": null,
+          "page": 163
+        },
+        {
+          "number": "11.2",
+          "title": "Mean, Median, and Mode",
+          "titleEn": null,
+          "page": 165
+        },
+        {
+          "number": "11.3",
+          "title": "Bar Chart",
+          "titleEn": null,
+          "page": 167
+        }
+      ]
+    }
+  ],
+  "notes": "Topic numbers are printed with a trailing hyphen (e.g. '1.1-') and are transcribed as printed. Glossary (p. 173) is listed in the contents but omitted as back matter. Note that contents page numbers do not match the printed page numbers in the body (Chapter 1 is listed as page 1 but begins on printed page 5)."
+}

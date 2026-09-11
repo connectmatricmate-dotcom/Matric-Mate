@@ -1,0 +1,441 @@
+{
+  "source": "content/punjab/textbooks/urd-10.pdf",
+  "subject": "urd",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 164,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    4
+  ],
+  "backMatterStart": 154,
+  "locateNotes": "Printed page numbers run 4 behind PDF labels (printed 2 = PDF 6), consistent throughout. Chapters 17–20 are each headed simply \"غزل\" with the unit number; poet names appear on the preceding author pages. Back matter begins with فرہنگ (glossary) on PDF 154 (printed 150), followed by سوالیہ پرچہ کی تیاری/ماڈل سوالیہ پرچہ on PDF 161–164.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "حمد",
+      "titleEn": "Hamd",
+      "pdfStart": 6,
+      "pdfEnd": 10,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "حمد",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو حمد یہ ادب سے روشناس کرنا",
+          "شامل کتاب حمد کے ذریعے سے اللہ تعالیٰ کی ذات وصفات سے آشنا کرنا",
+          "امیر مینائی کی حمد نگاری سے متعارف کرانا",
+          "قلب ونظر میں عظمتِ توحید اور ایمان کی چاشتگی کا احساس پیدا کرنا",
+          "نظم بہ لحاظ موضوع (حمد، نعت، منقبت اور مناجات) کا تعارف کرانا"
+        ],
+        "headings": [],
+        "notes": "Page 1 contains the poem text of the Hamd; pages 2 and 3 contain exercises (مشق) and an introductory note on حمد، نعت، منقبت اور مناجات, not chapter headings as such."
+      }
+    },
+    {
+      "number": 2,
+      "title": "نعت",
+      "titleEn": "Naat",
+      "pdfStart": 11,
+      "pdfEnd": 15,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "نعت",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو نعت کے لغوی، اصطلاحی مفہوم اور روایت اور ارتقاء کے بارے میں آگاہ کرنا",
+          "طلبہ میں قرآن وسنت کی اہمیت اور اطاعتِ الہٰی، اطاعتِ رسول ﷺ کا ذوق پیدا کرنا",
+          "طلبہ میں نعت گوئی اور نعت خوانی کا عمدہ ذوق پیدا کرنا",
+          "نظم کی اقسام اور مصرع، شعر، قافیہ اور ردیف کے بارے میں طلبہ کو بتانا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 3,
+      "title": "اخلاقِ نبوی خَاتَمُ النَّبِیّٖنَ صَلَّی اللهُ عَلَیْہِ وَعَلٰی اٰلِہٖ وَاَصْحَابِہٖ وَسَلَّم",
+      "titleEn": "Akhlaq-e-Nabawi (ﷺ)",
+      "pdfStart": 16,
+      "pdfEnd": 22,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "اخلاقِ نبوی خاتم النبیین صلی اللہ علیہ وعلیٰ الہ واصحابہ وسلم",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو سیرتِ طیبہ سے روشناس کرانا",
+          "اسلامی اخلاقیات کی بنیادی قدروں سے آگاہ کرنا",
+          "طلبہ میں رسالت مآب خاتم النبیین صلی اللہ علیہ وعلیٰ الہ واصحابہ وسلم کی سیرت کے حوالے سے علمی اور تحقیقی رجحان پیدا کرنا",
+          "شبلی نعمانیؒ کی سیرت نگاری کی امتیازی خصوصیات کے بارے میں بتانا",
+          "طلبہ کو قواعد و انشا (جمع سالم، جمع مکسر، جمع الجمع اور مضمون نویسی) کے بارے میں بتانا"
+        ],
+        "headings": [],
+        "notes": "Third page (image 3) contains exercise/mashq questions, not chapter body text; no further headings appear within the given pages."
+      }
+    },
+    {
+      "number": 4,
+      "title": "سرسیّد کا بچپن",
+      "titleEn": "Sir Syed's Childhood",
+      "pdfStart": 23,
+      "pdfEnd": 31,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "سرسیّد کا بچپن",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کوسرسیّداحمد خاں کی ابتدائی زندگی اور بچپن کے اہم واقعات سے روشناس کرانا",
+          "سرسیّد کے خاندانی پس منظر،تعلیمی ماحول اور شخصیت پر پڑنے والے اثرات کو سمجھنا",
+          "سرسیّد کے بچپن کے تجربات کا موجودہ دور کے تعلیمی اور سماجی حالات سے موازنہ کرنا",
+          "طلبہ میں تاریخی شخصیات کی سوانح عمری پڑھنے اور تجزیہ کرنے کی صلاحیت پیدا کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 5,
+      "title": "مُحسِن محلّہ",
+      "titleEn": "Mohsin-e-Mohalla",
+      "pdfStart": 32,
+      "pdfEnd": 38,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "مُحسِن مَحلّہ",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کوافسانہ''مُحسن مَحلّہ'' کے بنیادی موضوع سے روشناس کرانا",
+          "تنقیدی سوچ کوفروغ دینا تا کہ طلبہ ساجی مسائل پر گہرائی سے سوچ سکیں",
+          "افسانے کے اسلوب، کردار نگاری اور بیانیہ تکنیک کے تجرباتی پہلوسے آگاہ کرنا",
+          "ساجی ذمے داری اوراحساس آدمیت کا جذبہ بیدار کرنا",
+          "طلبہ کوتذکیرو تانیث اور اسم، فعل اور حرف کی پہچان کروانا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 6,
+      "title": "کفّارہ",
+      "titleEn": "Kaffara",
+      "pdfStart": 39,
+      "pdfEnd": 51,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "کفّاره",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کوپریم چند کے اسلوب اوران کے افسانوں کی ساجی اوراخلاقی پیش کش سے روشناس کرانا",
+          "افسانے کے مرکزی خیال، پلاٹ، کردار نگاری اور افسانوی تکنیک کا شعور پیدا کرنا",
+          "طلبہ کومعاشرے کے لیے مثبت اورمفید کردار ادا کرنے کی ترغیب دینا",
+          "طلبہ کوحروف کی چند اقسام کے بارے میں بتانا"
+        ],
+        "headings": [],
+        "notes": "The story author's name printed is 'پریم چنٹی' which likely refers to Premchand (پریم چند); rendered as printed. Chapter title 'کفّاره' means atonement/expiation in Urdu."
+      }
+    },
+    {
+      "number": 7,
+      "title": "سویرے جو کل آنکھ میری کھلی",
+      "titleEn": "Sawere Jo Kal Aankh Meri Khuli",
+      "pdfStart": 52,
+      "pdfEnd": 60,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "سویرے جو کل آنکھ میری کھلی",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو پطرس بخاری کے مزاحیہ مضامین میں انفرادیت اوراسلوب بیان سے روشناس کرانا",
+          "مزاح کی ادبی اہمیت اورمعاشرتی رویوں پر تنقید کو سمجھنے کی صلاحیت پیدا کرنا",
+          "طلبہ میں طنزومزاح کے ذریعے سے معاشرتی مسائل پر تنقیدی سوچ پیدا کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 8,
+      "title": "دوستی کا پھل",
+      "titleEn": "The Fruit of Friendship",
+      "pdfStart": 61,
+      "pdfEnd": 69,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "دوستی کا پھل",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو پنجابی لوک ادب اور ثقافتی ورثے سے روشناس کرانا",
+          "پنجابی لوک داستان ''دوستی کا پھل'' میں پنجابی زبان کے الفاظ، محاورات اور اسلوب بیان کو سمجھنے میں رہنمائی فراہم کرنا",
+          "طلبہ کو کہانی کے عناصر (پلاٹ، کردار، کہانی کے موضوع، اخلاقی سبق) کی شناخت کرنے کی تربیت دینا",
+          "طلبہ کو حروف کی مختلف اقسام اور تلخیص نگاری کے بارے میں بتانا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 9,
+      "title": "میرا گاؤں",
+      "titleEn": "My Village",
+      "pdfStart": 70,
+      "pdfEnd": 77,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "میرا گاؤں",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو ناول کے موضوعات، کرداروں اور واقعات کی تفہیم کرانا",
+          "طلبہ کو پاک بھارت جنگ 1965ء کے بارے میں بتانا",
+          "گاؤں کی معاشرتی، ثقافتی اور معاشی زندگی سے روشناس کرانا",
+          "طلبہ کو ناول کے موضوعات پر تنقیدی انداز میں سوچنے کی ترغیب دینا",
+          "ناول کے اسلوب، زبان اور بیانیے کا تجزیہ کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 10,
+      "title": "بابل کے کھنڈر",
+      "titleEn": "The Ruins of Babylon",
+      "pdfStart": 78,
+      "pdfEnd": 86,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "بابل کے کھنڈر",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو 'بابل' کی قدیم تہذیب کی تاریخ، ثقافت اور اہمیت سے روشناس کرانا",
+          "جمیل الدین عالی کے ادبی اسلوب اور مشاہدات کو سمجھنے میں رہ نمائی فراہم کرنا",
+          "طلبہ میں تاریخی، سیاحتی مقامات اور ثقافتی ورثے کی قدر و قیمت کا شعور اور دل چسپی پیدا کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 11,
+      "title": "اولڈ ایج ہوم",
+      "titleEn": "Old Age Home",
+      "pdfStart": 87,
+      "pdfEnd": 104,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "اولڈ ایج ہوم",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کوافسانے کے موضوع یعنی معاشرے میں بزرگوں کی بے قدری اور تنہائی سے روشناس کرانا",
+          "ساجی رویوں،اخلاقی قدروں اور خاندانی نظام کے زوال اور انہدام پر تنقیدی نظر ڈالنا",
+          "افسانہ کے اسلوب، بیانیہ تکنیک اور علامتی معنویت کو سمجھنا",
+          "طلبہ کو نثری صنف خاکہ نگاری، افسانہ نگاری اور ذومعنی، تشبیہ الفاظ سے روشناس کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 12,
+      "title": "کچھ ذریعۂ تعلیم کے باب میں",
+      "titleEn": "Something on the Medium of Instruction",
+      "pdfStart": 105,
+      "pdfEnd": 111,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "کچھ ذریعۂ تعلیم کے باب میں",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو تعلیم کے بنیادی ذرائع اور ان کی اہمیت سے آشنا کرنا",
+          "اردو زبان کی اہمیت بیان کرنا",
+          "طلبہ میں خود اعتمادی پیدا کرنا کہ وہ اردو کو ذریعۂ تعلیم بناتے ہوئے تحصیلِ علم کریں",
+          "عربی، فارسی، انگریزی اور دیگر مقامی، علاقائی زبانوں کے اردو پر اثرات کا جائزہ لینا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 13,
+      "title": "آدمی نامہ",
+      "titleEn": "Aadmi Nama",
+      "pdfStart": 112,
+      "pdfEnd": 117,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "آدمی نامہ",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو نظیرا کبر آبادی کی عوام دوست فکر سے روشناس کرنا",
+          "ساجی ناانصافی، امیر، غریب کی تفریق کا شعور دینا",
+          "نظیرا کبر آبادی کی عوامی شاعری اوران کے موضوعات پر روشنی ڈالنا",
+          "مجاز مرسل اور کنایہ کا تصوّر واضح کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 14,
+      "title": "نمودِ صُبح",
+      "titleEn": "Namood-e-Subh",
+      "pdfStart": 118,
+      "pdfEnd": 123,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "نمود صُبح",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "میرانیس کی مرثیہ نگاری سے روشناس کرتے ہوئے مرثیہ کے اجزائے ترکیبی کی توضیح کرنا",
+          "طلبہ کو اسلامی تہذیب، اخلاقی اقدار اور جذبۂ شہادت سے آگاہ کرنا",
+          "طلبہ کو مشکل الفاظ وتراکیب، تشبیہات واستعارات اور صنائع وبدائع کے بارے میں بتانا",
+          "میرانیس کی زبان عربی، فارسی اور اردو کا حسین امتزاج ہے، ان خصوصیات کے حوالے سے طلبہ کو آگاہی دینا"
+        ],
+        "headings": [],
+        "notes": "Poem text (pages 1-2) not included per instructions; only opening page heading/SLOs extracted."
+      }
+    },
+    {
+      "number": 15,
+      "title": "خِطاب بہ جوانانِ اِسلام",
+      "titleEn": "Khitab ba Jawanan-e-Islam",
+      "pdfStart": 124,
+      "pdfEnd": 129,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "خطاب بہ جوانانِ اسلام",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کوعلامہ محمداقبال رحمتہ اللہ علیہ کی شاعری میں بیان کردہ موضوعاتِ خودی، عرفانِ ذات، نظریہ عشق اورحرکت وعمل جیسے فلسفیانہ موضوعات سے آگاہ کرنا",
+          "طلبہ کو حریت وآزادی، خوداعتمادی اورمقصدِحیات کی تعلیم دینا",
+          "طلبہ میں تنقیدی اورتخلیقی سوچ پیدا کرنا تا کہ وہ علامہ محمداقبال رحمتہ اللہ علیہ کی شاعری پرنئے زاویوں سے غوروفکر کرنے کے قابل ہو سکیں",
+          "طلبہ کواستعارہ اوراراکانِ استعارہ سے روشناس کرنا"
+        ],
+        "headings": [],
+        "notes": "Poem text on pages 120-121 and exercise questions on pages 121-122 are not included as headings per instructions; only the opening page's SLO box was extracted. Some Urdu diacritics/spacing may vary slightly from the scanned rendering due to OCR-level transcription of the image."
+      }
+    },
+    {
+      "number": 16,
+      "title": "وغیرہ",
+      "titleEn": "Waghera",
+      "pdfStart": 130,
+      "pdfEnd": 134,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "وغیرہ",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو طنز و مزاح کی ادبی صنف سے آگاہ کرنا",
+          "طلبہ کوانور مسعود کی مزاحیہ شاعری کی امتیازی خصوصیات کے بارے میں بتانا",
+          "طلبہ کو نظم کے موضوع، اسلوب، ہیئت اور تکنیک سے روشناس کرنا",
+          "طلبہ میں تخلیقی صلاحیتیں اُبھارنا",
+          "طلبہ کو اشعار کی تشریح کا طریقہ سکھانا"
+        ],
+        "headings": [],
+        "notes": "Page 126 contains the poem text itself (not marked as SLO), attributed at the end to '(دیوارِ گریہ ۔۔۔ اشعار کے پیچھے)'. Pages 127-128 contain exercise (مشق) questions, not part of opening page content, included here only for context and not treated as SLOs."
+      }
+    },
+    {
+      "number": 17,
+      "title": "بازیچۂ اطفال ہے دنیا مرے آگے",
+      "titleEn": "Bazicha-e-Atfal Hai Dunya Mere Aage",
+      "pdfStart": 135,
+      "pdfEnd": 139,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "غزل",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کومرزاغالب کے اشعار میں پوشیدہ زندگی، جذبۂ عشق اورنج والم سے جُڑے فلسفیانہ پہلوؤں سے آشنا کرنا",
+          "اردوشاعری میں مرزاغالب کے مقام اوران کے اثرات کاتعین کرنا",
+          "غالب کے کلام پرمختلف تنقیدی آراء کاموازنہ اورتقابل کرنا",
+          "طلبہ کوغزل اوراس کے لوازم یعنی مطلع، مقطع، قافیہ، ردیف وغیرہ سے روشناس کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 18,
+      "title": "اثر اس کو ذرا نہیں ہوتا",
+      "titleEn": "Asar Us Ko Zara Nahin Hota",
+      "pdfStart": 140,
+      "pdfEnd": 144,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "غزل",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کو مومن خاں مومن کے دور میں غزل کے بارے میں آگاہ کرنا",
+          "طلبہ کو مومن خاں مومن کی غزل گوئی کی امتیازی خصوصیات سے روشناس کرنا",
+          "طلبہ میں شعرِفہمی کا عمدہ ذوق پیدا کرنا",
+          "طلبہ کو مومن خاں مومن کی غزل کے موضوعات بارے معلومات فراہم کرنا",
+          "صنعتِ تضاد اور اس کے مختلف پہلوؤں پر روشنی ڈالنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 19,
+      "title": "ہے مشقِ سخن جاری، چکّی کی مشقّت بھی",
+      "titleEn": "Hai Mashq-e-Sukhan Jari, Chakki Ki Mashaqqat Bhi",
+      "pdfStart": 145,
+      "pdfEnd": 149,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "غزل",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کوحسرت موہانی کے فکروفن سے آشنا کرنا",
+          "طلبہ کوغزل کی ہیئت اور دیگر شعری محاسن سے روشناس کرنا",
+          "طلبہ کوتغزل یعنی غزل کی خصوصیات کی شناخت کروانا",
+          "طلبہ کومولانا حسرت موہانی کی تحریکی اور انقلابی شاعری کے پس منظر اور پیش منظر سے آگاہ کرنا"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 20,
+      "title": "یوں کہنے کو پیرایۂ اِظہار بہت ہے",
+      "titleEn": "Yun Kahne Ko Pairaya-e-Izhar Bahut Hai",
+      "pdfStart": 150,
+      "pdfEnd": 153,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "غزل",
+        "sloHeading": "تدریسی مقاصد",
+        "sloLead": null,
+        "slos": [
+          "طلبہ کوجدید اردوغزل سے روشناس کرانا",
+          "زہرا نگاہ کی شاعری کی مدد سے طلبہ کوجدید غزل کے رجحانات ،موضوعات اوراسالیب سے متعارف کرانا",
+          "زہرا نگاہ کی شاعری میں خواتین کے جذبات ،مسائل اورمعاشرتی تناظرات کوسمجھنا",
+          "طلبہ کوزہرا نگاہ کی غزل کے حوالے سے خواتین کی خودمختاری ،سماجی ناانصافی اورنفسیاتی کشمکش جیسے موضوعات پرتبادلۂ خیال کرنا"
+        ],
+        "headings": [],
+        "notes": "Poem verses on page 1 (image 1) are not learning outcomes and were excluded from 'slos'; they are the ghazal text itself, credited to فراق. Exercise pages (images 2-3) contain مشق questions, not part of chapter opening content requested."
+      }
+    }
+  ]
+}

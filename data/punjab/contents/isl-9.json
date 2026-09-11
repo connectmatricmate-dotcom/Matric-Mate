@@ -1,0 +1,442 @@
+{
+  "source": "content/punjab/textbooks/isl-9.pdf",
+  "subject": "isl",
+  "grade": 9,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "اسلامیات (لازمی) برائے جماعت نہم",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": "یکساں قومی نصاب 2022ء کے مطابق",
+  "language": "ur",
+  "contentsPages": [
+    3,
+    4
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "قرآن مجید و حدیثِ نبوی ﷺ",
+      "titleEn": "The Holy Quran and the Hadith of the Prophet ﷺ",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "قرآن مجید کی تدوین اور اس کی حفاظت",
+          "titleEn": "Compilation of the Holy Quran and its preservation",
+          "page": 1
+        },
+        {
+          "number": null,
+          "title": "حفاظت و تدوینِ حدیث (دورِ اوّل)",
+          "titleEn": "Preservation and compilation of Hadith (First era)",
+          "page": 4
+        },
+        {
+          "number": null,
+          "title": "احادیثِ نبویہ ﷺ",
+          "titleEn": "Ahadith of the Prophet ﷺ",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "ایمانیات و عبادات",
+      "titleEn": "Beliefs and Worship",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "ایمانیات:",
+          "titleEn": "Beliefs",
+          "page": null
+        },
+        {
+          "number": "(1",
+          "title": "عقیدۂ توحید",
+          "titleEn": "Belief in the Oneness of Allah",
+          "page": 12
+        },
+        {
+          "number": "(2",
+          "title": "عقیدۂ رسالت",
+          "titleEn": "Belief in Prophethood",
+          "page": 16
+        },
+        {
+          "number": "(3",
+          "title": "ملائکہ (فرشتے)",
+          "titleEn": "Angels",
+          "page": 19
+        },
+        {
+          "number": "(4",
+          "title": "کتبِ سماویہ (آسمانی کتابیں)",
+          "titleEn": "The revealed books",
+          "page": 21
+        },
+        {
+          "number": "(5",
+          "title": "عقیدۂ آخرت",
+          "titleEn": "Belief in the Hereafter",
+          "page": 25
+        },
+        {
+          "number": null,
+          "title": "عبادات:",
+          "titleEn": "Worship",
+          "page": null
+        },
+        {
+          "number": "(1",
+          "title": "نماز",
+          "titleEn": "Salah",
+          "page": 29
+        },
+        {
+          "number": "(2",
+          "title": "روزہ",
+          "titleEn": "Fasting",
+          "page": 32
+        },
+        {
+          "number": "(3",
+          "title": "زکوٰۃ",
+          "titleEn": "Zakat",
+          "page": 35
+        },
+        {
+          "number": "(4",
+          "title": "حج اور قربانی",
+          "titleEn": "Hajj and sacrifice",
+          "page": 38
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "سیرتِ نبوی ﷺ",
+      "titleEn": "Life of the Prophet ﷺ",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "عہدِ نبوی ﷺ کے ماہ و سال (مدنی دور)",
+          "titleEn": "The months and years of the Prophet's era (Madani period)",
+          "page": null
+        },
+        {
+          "number": "(1",
+          "title": "فتحِ مکہ",
+          "titleEn": "Conquest of Makkah",
+          "page": 41
+        },
+        {
+          "number": "(2",
+          "title": "غزوۂ حنین",
+          "titleEn": "Battle of Hunayn",
+          "page": 44
+        },
+        {
+          "number": "(3",
+          "title": "عام الوفود (9 ہجری)",
+          "titleEn": "The Year of Delegations (9 AH)",
+          "page": 47
+        },
+        {
+          "number": "(4",
+          "title": "غزوۂ تبوک",
+          "titleEn": "Battle of Tabuk",
+          "page": 50
+        },
+        {
+          "number": "(5",
+          "title": "حجۃ الوداع",
+          "titleEn": "The Farewell Pilgrimage",
+          "page": 54
+        },
+        {
+          "number": "(6",
+          "title": "وصالِ نبوی ﷺ",
+          "titleEn": "The passing of the Prophet ﷺ",
+          "page": 57
+        },
+        {
+          "number": null,
+          "title": "اُسوۂ رسول ﷺ اور ہماری زندگی",
+          "titleEn": "The example of the Messenger ﷺ and our life",
+          "page": null
+        },
+        {
+          "number": "(1",
+          "title": "حضرت محمد مصطفیٰ ﷺ کا بچپن اور جوانی",
+          "titleEn": "The childhood and youth of Muhammad Mustafa ﷺ",
+          "page": 60
+        },
+        {
+          "number": "(2",
+          "title": "حضرت محمد مصطفیٰ ﷺ کا ذوقِ عبادت",
+          "titleEn": "The devotion to worship of Muhammad Mustafa ﷺ",
+          "page": 64
+        },
+        {
+          "number": "(3",
+          "title": "حضرت محمد مصطفیٰ ﷺ کی سخاوت و ایثار",
+          "titleEn": "The generosity and self-sacrifice of Muhammad Mustafa ﷺ",
+          "page": 67
+        },
+        {
+          "number": "(4",
+          "title": "صلہ رحمی",
+          "titleEn": "Kindness to relatives",
+          "page": 70
+        },
+        {
+          "number": "(5",
+          "title": "خواتین کے ساتھ حسنِ سلوک",
+          "titleEn": "Good treatment of women",
+          "page": 73
+        },
+        {
+          "number": "(6",
+          "title": "اندازِ تربیت",
+          "titleEn": "Method of training",
+          "page": 76
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "اَخلاق و آداب",
+      "titleEn": "Morals and Manners",
+      "page": null,
+      "topics": [
+        {
+          "number": "(1",
+          "title": "شکر و قناعت",
+          "titleEn": "Gratitude and contentment",
+          "page": 79
+        },
+        {
+          "number": "(2",
+          "title": "امانت و دیانت",
+          "titleEn": "Trustworthiness and honesty",
+          "page": 80
+        },
+        {
+          "number": "(3",
+          "title": "اخلاص و تقویٰ",
+          "titleEn": "Sincerity and piety",
+          "page": 81
+        },
+        {
+          "number": "(4",
+          "title": "پردہ پوشی",
+          "titleEn": "Concealing faults",
+          "page": 83
+        },
+        {
+          "number": null,
+          "title": "بری عادات سے اجتناب",
+          "titleEn": "Avoiding bad habits",
+          "page": null
+        },
+        {
+          "number": "(1",
+          "title": "تکبر",
+          "titleEn": "Arrogance",
+          "page": 85
+        },
+        {
+          "number": "(2",
+          "title": "حسد",
+          "titleEn": "Envy",
+          "page": 86
+        },
+        {
+          "number": "(3",
+          "title": "جھوٹ",
+          "titleEn": "Lying",
+          "page": 87
+        },
+        {
+          "number": "(4",
+          "title": "غیبت اور بہتان",
+          "titleEn": "Backbiting and slander",
+          "page": 88
+        },
+        {
+          "number": "(5",
+          "title": "جادو، فال اور توہم پرستی",
+          "titleEn": "Magic, omens and superstition",
+          "page": 90
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "حسنِ معاملات و معاشرت",
+      "titleEn": "Good Dealings and Social Conduct",
+      "page": null,
+      "topics": [
+        {
+          "number": "(1",
+          "title": "قسم کے احکام و مسائل",
+          "titleEn": "Rulings and issues of oaths",
+          "page": 94
+        },
+        {
+          "number": "(2",
+          "title": "گواہی کے احکام و مسائل",
+          "titleEn": "Rulings and issues of testimony",
+          "page": 97
+        },
+        {
+          "number": "(3",
+          "title": "حقوق العباد (ہمسایوں کے حقوق)",
+          "titleEn": "Rights of people (rights of neighbours)",
+          "page": 100
+        },
+        {
+          "number": "(4",
+          "title": "سُود کی حرمت",
+          "titleEn": "Prohibition of interest",
+          "page": 103
+        },
+        {
+          "number": "(5",
+          "title": "اسلامی ریاست",
+          "titleEn": "The Islamic state",
+          "page": 106
+        },
+        {
+          "number": "(6",
+          "title": "جہاد فی سبیل اللہ",
+          "titleEn": "Jihad in the way of Allah",
+          "page": 109
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
+      "titleEn": "Sources of Guidance and Eminent Personalities of Islam",
+      "page": null,
+      "topics": [
+        {
+          "number": null,
+          "title": "اہلِ بیت اطہار رضی اللہ تعالیٰ عنہم",
+          "titleEn": "The pure household of the Prophet",
+          "page": null
+        },
+        {
+          "number": "(1",
+          "title": "حضرت امام زین العابدین رحمۃ اللہ علیہ",
+          "titleEn": "Imam Zayn al-Abidin",
+          "page": 112
+        },
+        {
+          "number": "(2",
+          "title": "حضرت امام زید بن علی رحمۃ اللہ علیہ",
+          "titleEn": "Imam Zayd bin Ali",
+          "page": 116
+        },
+        {
+          "number": null,
+          "title": "صحابہ کرام رضی اللہ تعالیٰ عنہم",
+          "titleEn": "The noble Companions",
+          "page": null
+        },
+        {
+          "number": "(1",
+          "title": "حضرت ابو موسیٰ اشعری رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Abu Musa al-Ash'ari",
+          "page": 119
+        },
+        {
+          "number": "(2",
+          "title": "حضرت عبد اللہ بن عمرو بن العاص رضی اللہ تعالیٰ عنہما",
+          "titleEn": "Abdullah bin Amr bin al-As",
+          "page": 122
+        },
+        {
+          "number": "(3",
+          "title": "حضرت عمرو بن اُمیہ رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Amr bin Umayyah",
+          "page": 124
+        },
+        {
+          "number": "(4",
+          "title": "حضرت عمرو بن العاص رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Amr bin al-As",
+          "page": 126
+        },
+        {
+          "number": "(5",
+          "title": "حضرت جابر بن عبد اللہ رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Jabir bin Abdullah",
+          "page": 129
+        },
+        {
+          "number": "(6",
+          "title": "حضرت انس بن مالک رضی اللہ تعالیٰ عنہ",
+          "titleEn": "Anas bin Malik",
+          "page": 132
+        },
+        {
+          "number": null,
+          "title": "صحابیات رضی اللہ تعالیٰ عنہنّ",
+          "titleEn": "The female Companions",
+          "page": 135
+        },
+        {
+          "number": null,
+          "title": "صوفیائے کرام رحمۃ اللہ علیہم",
+          "titleEn": "The noble Sufis",
+          "page": 141
+        },
+        {
+          "number": null,
+          "title": "علماء و مفکرین رحمۃ اللہ علیہم",
+          "titleEn": "Scholars and thinkers",
+          "page": 147
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
+      "titleEn": "Islamic Teachings and the Demands of the Present Age",
+      "page": null,
+      "topics": [
+        {
+          "number": "(1",
+          "title": "خودی، اعتماد اور خود انحصاری",
+          "titleEn": "Selfhood, confidence and self-reliance",
+          "page": 152
+        },
+        {
+          "number": "(2",
+          "title": "جسمانی و ذہنی صحت اور جسمانی ریاضت",
+          "titleEn": "Physical and mental health and physical exercise",
+          "page": 154
+        },
+        {
+          "number": "(3",
+          "title": "اسلام میں مستقبل کی منصوبہ بندی کی اہمیت",
+          "titleEn": "The importance of planning for the future in Islam",
+          "page": 157
+        },
+        {
+          "number": "(4",
+          "title": "اسلامی تہذیب کے امتیازات",
+          "titleEn": "Distinctions of Islamic civilization",
+          "page": 160
+        }
+      ]
+    }
+  ],
+  "notes": "Chapter numbers are printed in Urdu ordinal words (باب اوّل، دوم، سوم، چہارم، پنجم، ششم، ہفتم); rendered as integers 1-7. Chapters themselves have no page number printed, only their sub-sections. Two end items on the contents page (\"احتمانی پرچہ اسلامیات لازمی برائے جماعت نہم کی تیاری\" p.163 and \"ماڈل پرچہ\" p.164) are back matter and excluded. Item 6-(1) of chapter 4's first list \"شکر و قناعت\" p.79 – numbering restarts within the 'بری عادات سے اجتناب' sub-list as printed. Honorific abbreviations in the original are calligraphic seals; transcribed in words. Some names (e.g. حضرت عمرو بن اُمیہ) are slightly blurred in the scan."
+}

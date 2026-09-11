@@ -1,0 +1,2601 @@
+{
+  "source": "content/punjab/textbooks/cs-9.pdf",
+  "subject": "cs",
+  "grade": 9,
+  "medium": "en",
+  "pdfPages": 264,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    3
+  ],
+  "backMatterStart": 264,
+  "locateNotes": "PDF page 264 is the 'Answers' section (printed page 261). Printed page numbers run about 3 behind PDF page numbers.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Introduction to Systems",
+      "titleEn": null,
+      "pdfStart": 4,
+      "pdfEnd": 26,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Introduction to Systems",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": null,
+        "slos": [
+          "Define and describe general system theory, its types, objectives, components, and interactions.",
+          "Explain the concept of a system, including objectives, components, and communication.",
+          "Describe what constitutes a system and its role in various domains.",
+          "Explain the importance of system objectives and common objectives such as processing information, supporting applications, and achieving specific goals.",
+          "Understand the role and importance of system components and their interactions.",
+          "Explain the significance of interactions among various systems.",
+          "Differentiate between natural and artificial systems.",
+          "Categorize and describe various types of natural and artificial systems, their objectives, components, and interactions.",
+          "Provide examples of natural systems, including physical, chemical, biological and psychological systems along with their characteristics.",
+          "Provide examples and functions of artificial systems, including knowledge systems, engineering systems, and social systems.",
+          "Analyze systems to identify their objectives, components, and interactions.",
+          "Compare and contrast different types of systems, highlighting variations in objectives, components, and interactions.",
+          "Conduct research on specific system types and present findings effectively.",
+          "Create diagrams or models to visually represent the structure and interactions of systems.",
+          "Assess the role and importance of system objectives in real-world applications.",
+          "Demonstrate understanding of how systems apply to different fields and serve specific functions.",
+          "Define and describe a computer as a system, including its objectives, architecture, components, and interactions.",
+          "Understand the primary objectives of a computing system, including processing data, executing instructions, and providing a user interface.",
+          "Recognize the role and importance of computer system components and their interactions.",
+          "Identify necessary and auxiliary components of a computer system.",
+          "Identify different types of computing systems, such as computers, software, computer networks, and the Internet.",
+          "Understand the Von Neumann architecture and its core components: CPU, motherboard, memory, storage devices, input/output ports, and devices.",
+          "Explain the relationship between the CPU, memory, and storage, and how data flows within a system.",
+          "Describe how components within a computer system interact to execute tasks, such as how the CPU fetches, decodes, and executes instructions stored in memory.",
+          "Differentiate between the roles of hardware and software in a computer system.",
+          "Define and describe Computing system and its types including Computer, Software, Network and the Internet.",
+          "Describe the main functions of system software, such as operating systems, and application software."
+        ],
+        "headings": [
+          {
+            "number": "1.1",
+            "title": "Theory of Systems",
+            "pdfPage": 5
+          },
+          {
+            "number": "1.1.1",
+            "title": "Basic Concepts of Systems",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.1.1.1",
+            "title": "Objective",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.1.1.2",
+            "title": "Components",
+            "pdfPage": 7
+          },
+          {
+            "number": "1.1.1.3",
+            "title": "Environment",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.1.1.4",
+            "title": "Communication",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.2",
+            "title": "Types of Systems",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.2.1",
+            "title": "Natural Systems",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.2.1.1",
+            "title": "Physical Systems",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.2.1.2",
+            "title": "Chemical Systems",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.2.1.3",
+            "title": "Biological Systems",
+            "pdfPage": 10
+          },
+          {
+            "number": "1.2.1.4",
+            "title": "Psychological Systems",
+            "pdfPage": 11
+          },
+          {
+            "number": "1.2.2",
+            "title": "Artificial Systems",
+            "pdfPage": 11
+          },
+          {
+            "number": "1.2.2.1",
+            "title": "Knowledge Systems",
+            "pdfPage": 11
+          },
+          {
+            "number": "1.2.2.2",
+            "title": "Engineering Systems",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.2.2.3",
+            "title": "Social Systems",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.3",
+            "title": "System and Science",
+            "pdfPage": 14
+          },
+          {
+            "number": "1.3.1",
+            "title": "Natural Science",
+            "pdfPage": 14
+          },
+          {
+            "number": "1.3.2",
+            "title": "Design Science",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.3.3",
+            "title": "Computer Science",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.3.3.1",
+            "title": "Natural Science of Computer Science",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.3.3.2",
+            "title": "Design Science of Computer Science",
+            "pdfPage": 15
+          },
+          {
+            "number": "1.4",
+            "title": "Computer as a System",
+            "pdfPage": 16
+          },
+          {
+            "number": "1.4.1",
+            "title": "Objective",
+            "pdfPage": 16
+          },
+          {
+            "number": "1.4.2",
+            "title": "Components",
+            "pdfPage": 16
+          },
+          {
+            "number": "1.4.3",
+            "title": "Interactions among Components",
+            "pdfPage": 17
+          },
+          {
+            "number": "1.4.4",
+            "title": "Environment",
+            "pdfPage": 18
+          },
+          {
+            "number": "1.4.5",
+            "title": "Interaction with the Environment",
+            "pdfPage": 18
+          },
+          {
+            "number": "1.5",
+            "title": "The Architecture of von Neumann Computers",
+            "pdfPage": 18
+          },
+          {
+            "number": "1.5.1",
+            "title": "Components",
+            "pdfPage": 18
+          },
+          {
+            "number": "1.5.2",
+            "title": "Working",
+            "pdfPage": 20
+          },
+          {
+            "number": "1.5.3",
+            "title": "Characteristics",
+            "pdfPage": 20
+          },
+          {
+            "number": "1.5.4",
+            "title": "Advantages and Disadvantages",
+            "pdfPage": 21
+          },
+          {
+            "number": "1.6",
+            "title": "Computing Systems",
+            "pdfPage": 21
+          },
+          {
+            "number": "1.6.1",
+            "title": "Types of Computing Systems",
+            "pdfPage": 22
+          },
+          {
+            "number": "1.6.2",
+            "title": "Computer Network as Systems",
+            "pdfPage": 22
+          },
+          {
+            "number": "1.6.2.1",
+            "title": "Objectives",
+            "pdfPage": 22
+          },
+          {
+            "number": "1.6.2.2",
+            "title": "Components",
+            "pdfPage": 22
+          },
+          {
+            "number": "1.6.2.3",
+            "title": "Environment",
+            "pdfPage": 22
+          },
+          {
+            "number": "1.6.2.4",
+            "title": "Types of Computer Networks",
+            "pdfPage": 22
+          },
+          {
+            "number": "1.6.3",
+            "title": "Internet as a System",
+            "pdfPage": 23
+          },
+          {
+            "number": "1.6.3.1",
+            "title": "Internet Protocols",
+            "pdfPage": 23
+          },
+          {
+            "number": "1.6.3.2",
+            "title": "Interaction among Components",
+            "pdfPage": 23
+          },
+          {
+            "number": "1.6.3.3",
+            "title": "Environment",
+            "pdfPage": 23
+          }
+        ],
+        "notes": "The SLOs on page 1 are grouped under two unnumbered sub-headings, 'Understand System Theory:' and 'Computing Systems', which are not themselves outcomes; they have been omitted from the slos array but are noted here since the array only contains the bulleted outcome text. An unnumbered 'Introduction' section appears on image 2 before section 1.1 but is not included in headings since it lacks a heading number and is prose introducing the chapter."
+      }
+    },
+    {
+      "number": 2,
+      "title": "Number Systems",
+      "titleEn": null,
+      "pdfStart": 27,
+      "pdfEnd": 51,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Number Systems",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "Understand Number System:",
+        "slos": [
+          "The different numbering systems, including decimal, binary, hexadecimal, and octal, and their respective base values and digits.",
+          "Why computers primarily use the binary number system for data representation.",
+          "Machine-level representation of data, including how data is stored and processed within the computer's architecture.",
+          "The representation of whole and real numbers in a computer, including binary encoding methods for both.",
+          "How various arithmetic operations, such as addition, subtraction, multiplication, and division, are performed on binary representations of numbers?",
+          "The concept of common text encoding schemes, such as ASCII and Unicode, and How they represent characters.",
+          "How digital data representations work for various forms of multimedia, such as images, audios, videos, and other multimedia resources.",
+          "Different file formats and their variations for specific applications.",
+          "The concept of file extensions and their significance in identifying file types and applications.",
+          "Key terms related to data representation, including ASCII, Unicode, binary, signed and unsigned numbers, bits, bytes, hexadecimal number systems, negatives in binary, two's complement, binary arithmetic, overflow, and underflow.",
+          "The concept of Boolean functions, to represent logic operations and relationships between binary variables.",
+          "How to construct Boolean expressions using variables and Boolean operators.",
+          "Common Boolean identities and simplification techniques.",
+          "The concept of duality in Boolean algebra, where OR becomes AND, and 0 becomes 1.",
+          "The fundamentals of digital logic, which involves using binary digits (0 and 1) to process and store information.",
+          "Difference between analog and digital signals and understanding their key differences.",
+          "Various logic gates (AND, OR, NOT, NAND, XOR) and their functions in processing binary data.",
+          "The purpose and construction of truth tables for evaluating the output of logic expressions based on input combinations.",
+          "The concept of switches and their role in digital systems, often used to represent binary input.",
+          "Karnaugh maps as a visual tool for simplifying Boolean expressions.",
+          "Truth table, Boolean expression, circuit diagram of Half-adder and Full-adder",
+          "Half-adder and Full-adder as digital systems with specific objectives, components and interaction among those components"
+        ],
+        "headings": [
+          {
+            "number": "2.1",
+            "title": "Numbering Systems",
+            "pdfPage": 28
+          },
+          {
+            "number": "2.1.1",
+            "title": "Decimal System",
+            "pdfPage": 28
+          },
+          {
+            "number": "2.1.2",
+            "title": "Binary System",
+            "pdfPage": 28
+          },
+          {
+            "number": "2.1.2.1",
+            "title": "Conversion from Decimal to Binary",
+            "pdfPage": 29
+          },
+          {
+            "number": "2.1.3",
+            "title": "Octal System",
+            "pdfPage": 30
+          },
+          {
+            "number": "2.1.3.1",
+            "title": "Conversion from Decimal to Octal",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.1.4",
+            "title": "Hexadecimal System",
+            "pdfPage": 32
+          },
+          {
+            "number": "2.1.4.1",
+            "title": "Converting Decimal to Hexadecimal",
+            "pdfPage": 33
+          },
+          {
+            "number": "2.2",
+            "title": "Data Representation in Computing Systems",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.2.1",
+            "title": "Binary Encoding of Integers (Z) and Real Numbers (R)",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.2.2",
+            "title": "Whole Numbers (W) and Integers (Z)",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.2.2.1",
+            "title": "Whole Numbers (W)",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.2.2.2",
+            "title": "Integers (Z)",
+            "pdfPage": 35
+          },
+          {
+            "number": "2.2.2.3",
+            "title": "Negative Values and Two's Complement",
+            "pdfPage": 35
+          },
+          {
+            "number": "2.3",
+            "title": "Storing Real Values in Computer Memory",
+            "pdfPage": 36
+          },
+          {
+            "number": "2.3.1",
+            "title": "Understanding Floating-Point Representation",
+            "pdfPage": 36
+          },
+          {
+            "number": "2.3.1.1",
+            "title": "Single Precision (32-bit)",
+            "pdfPage": 37
+          },
+          {
+            "number": "2.3.1.2",
+            "title": "Double Precision (64-bit)",
+            "pdfPage": 38
+          },
+          {
+            "number": "2.4",
+            "title": "Binary Arithmetic Operations",
+            "pdfPage": 39
+          },
+          {
+            "number": "2.4.1",
+            "title": "Addition",
+            "pdfPage": 39
+          },
+          {
+            "number": "2.4.2",
+            "title": "Subtraction",
+            "pdfPage": 40
+          },
+          {
+            "number": "2.4.3",
+            "title": "Multiplication",
+            "pdfPage": 40
+          },
+          {
+            "number": "2.4.3",
+            "title": "Division",
+            "pdfPage": 41
+          },
+          {
+            "number": "2.5",
+            "title": "Common Text Encoding Schemes",
+            "pdfPage": 42
+          },
+          {
+            "number": "2.5.1",
+            "title": "ASCII",
+            "pdfPage": 42
+          },
+          {
+            "number": "2.5.1",
+            "title": "Extended ASCII",
+            "pdfPage": 45
+          },
+          {
+            "number": "2.5.2",
+            "title": "Unicode",
+            "pdfPage": 45
+          },
+          {
+            "number": "2.5.2.1",
+            "title": "UTF-8",
+            "pdfPage": 45
+          },
+          {
+            "number": "2.5.2.2",
+            "title": "UTF-16",
+            "pdfPage": 45
+          },
+          {
+            "number": "2.5.2.3",
+            "title": "UTF-32",
+            "pdfPage": 45
+          },
+          {
+            "number": "2.6",
+            "title": "Storing Images, Audio, and Video in Computers",
+            "pdfPage": 46
+          },
+          {
+            "number": "2.6.1",
+            "title": "Storing Images",
+            "pdfPage": 46
+          },
+          {
+            "number": "2.6.2",
+            "title": "Storing Audio",
+            "pdfPage": 47
+          },
+          {
+            "number": "2.6.3",
+            "title": "Storing Video",
+            "pdfPage": 47
+          },
+          {
+            "number": "2.6.4",
+            "title": "How Computers Store These Files",
+            "pdfPage": 48
+          }
+        ],
+        "notes": "Section 2.4.3 appears twice in the printed text · once for 'Multiplication' (image 14) and again for 'Division' (image 15), a numbering inconsistency in the original book; both are transcribed exactly as printed rather than corrected. Section 2.5.1 also appears twice, once for 'ASCII' (image 16) and again for 'Extended ASCII' (image 19), also transcribed as printed."
+      }
+    },
+    {
+      "number": 3,
+      "title": "Digital Systems and Logic Design",
+      "titleEn": null,
+      "pdfStart": 52,
+      "pdfEnd": 71,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Digital Systems and Logic Design",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Understand Boolean functions and operations it, such as Boolean AND, and OR.",
+          "Construct Boolean expressions using variables and Boolean operators.",
+          "Relate common Boolean identities and Boolean simplification procedures.",
+          "Understand the concept of duality in Boolean algebra.",
+          "Subtopics such analog and digital signals",
+          "Introduce several types of gates and their functions.",
+          "Build truth tables for the operations of logical expressions.",
+          "Employ the K-Maps in minimizing Boolean expressions.",
+          "Introduce logic diagrams of digital system.",
+          "Analyze and design half-adder and full-adder circuits."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 53
+          },
+          {
+            "number": "3.1",
+            "title": "Basics of Digital Systems",
+            "pdfPage": 53
+          },
+          {
+            "number": "3.1.1",
+            "title": "What is an Analog Signal",
+            "pdfPage": 53
+          },
+          {
+            "number": "3.1.2",
+            "title": "Fundamentals of Digital Logic",
+            "pdfPage": 55
+          },
+          {
+            "number": "3.2",
+            "title": "Boolean Algebra and Logic Gates",
+            "pdfPage": 55
+          },
+          {
+            "number": "3.2.1",
+            "title": "Boolean Functions and Expressions",
+            "pdfPage": 55
+          },
+          {
+            "number": "3.2.1.1",
+            "title": "Binary Variables and Logic Operations",
+            "pdfPage": 55
+          },
+          {
+            "number": "3.2.1.2",
+            "title": "Construction of Boolean Functions",
+            "pdfPage": 57
+          },
+          {
+            "number": "3.2.2",
+            "title": "Logic Gates and their Functions",
+            "pdfPage": 58
+          },
+          {
+            "number": "3.3",
+            "title": "Simplification of Boolean Functions",
+            "pdfPage": 62
+          },
+          {
+            "number": "3.4",
+            "title": "Creating Logic Diagrams",
+            "pdfPage": 65
+          },
+          {
+            "number": "3.5",
+            "title": "Application of Digital Logic",
+            "pdfPage": 65
+          },
+          {
+            "number": "3.5.1",
+            "title": "Half-adder and Full-adder Circuits",
+            "pdfPage": 65
+          },
+          {
+            "number": "3.5.1.1",
+            "title": "Half-adder Circuits",
+            "pdfPage": 65
+          },
+          {
+            "number": "3.5.1.2",
+            "title": "Full-adder Circuits",
+            "pdfPage": 66
+          },
+          {
+            "number": "3.5.2",
+            "title": "Karnaugh Map( K-Map)",
+            "pdfPage": 67
+          },
+          {
+            "number": "3.5.2.1",
+            "title": "Structure of Karnaugh Maps",
+            "pdfPage": 67
+          },
+          {
+            "number": "3.5.2.2",
+            "title": "Minterms in Boolean Algebra",
+            "pdfPage": 67
+          },
+          {
+            "number": "3.5.2.3",
+            "title": "Creating Karnaugh Maps",
+            "pdfPage": 68
+          }
+        ],
+        "notes": "Page numbering runs 49-68 across the 20 images provided. Some section text (e.g., Minterm Notation subsection on image 17) appears without a distinct numbered heading and was not separately listed."
+      }
+    },
+    {
+      "number": 4,
+      "title": "System Troubleshooting",
+      "titleEn": null,
+      "pdfStart": 72,
+      "pdfEnd": 89,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "System Troubleshooting",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Explain the importance of troubleshooting in maintaining and operating computer systems effectively.",
+          "Describe how systematic troubleshooting helps prevent and resolve computer issues.",
+          "Demonstrate the ability to systematically troubleshoot computer issues",
+          "Apply basic troubleshooting techniques, including Restarting a computer, Identifying and addressing basic software hardware issues.",
+          "Identify and resolve common computer issues, such as Application freezing, unresponsive peripherals, Software conflicts and operating system crashes.",
+          "Implement strategies for maintaining a safe and organized computer workspace.",
+          "Understand the importance of data backups and apply methods for effective data protection",
+          "Diagnose and address hardware issues, including hardware failures like RAM or hard drive issues. Performing component replacements and upgrades.",
+          "Recognizing and addressing security threats such as malware infections.",
+          "Apply best practices for maintaining system security by updating operating systems, creating and managing strong passwords, recognizing and addressing malware threats.",
+          "Use built-in help features and internet resources effectively to troubleshoot complex issues.",
+          "Communicate solutions and troubleshooting steps clearly to assist peers and staff with computer-related problems.",
+          "Transfer troubleshooting knowledge to help others and collaborate effectively in solving computer issues."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 73
+          },
+          {
+            "number": "4.1",
+            "title": "System Troubleshooting",
+            "pdfPage": 73
+          },
+          {
+            "number": "4.1.1",
+            "title": "Systematic Process of Troubleshooting",
+            "pdfPage": 73
+          },
+          {
+            "number": "4.1.1.1",
+            "title": "Identify Problem",
+            "pdfPage": 74
+          },
+          {
+            "number": "4.1.1.2",
+            "title": "Establish a Theory of Probable Cause",
+            "pdfPage": 74
+          },
+          {
+            "number": "4.1.1.3",
+            "title": "Test the Theory to Determine the Cause",
+            "pdfPage": 74
+          },
+          {
+            "number": "4.1.1.4",
+            "title": "Establish a Plan of Action to Resolve the Problem",
+            "pdfPage": 74
+          },
+          {
+            "number": "4.1.1.5",
+            "title": "Implement the Solution",
+            "pdfPage": 74
+          },
+          {
+            "number": "4.1.1.6",
+            "title": "Verify Full System Functionality",
+            "pdfPage": 74
+          },
+          {
+            "number": "4.1.1.7",
+            "title": "Document Findings, Actions, and Outcomes",
+            "pdfPage": 75
+          },
+          {
+            "number": "4.1.2",
+            "title": "Importance of Troubleshooting in Computing Systems",
+            "pdfPage": 75
+          },
+          {
+            "number": "4.1.2.1",
+            "title": "Preventing Downtime",
+            "pdfPage": 75
+          },
+          {
+            "number": "4.1.2.2",
+            "title": "Ensuring Data Integrity",
+            "pdfPage": 75
+          },
+          {
+            "number": "4.1.2.3",
+            "title": "Improving Security",
+            "pdfPage": 75
+          },
+          {
+            "number": "4.1.2.4",
+            "title": "Enhancing Performance",
+            "pdfPage": 75
+          },
+          {
+            "number": "4.1.2.5",
+            "title": "Extending Equipment Life",
+            "pdfPage": 76
+          },
+          {
+            "number": "4.1.2.6",
+            "title": "Saving Costs",
+            "pdfPage": 76
+          },
+          {
+            "number": "4.1.1.7",
+            "title": "Enhancing User Experience",
+            "pdfPage": 76
+          },
+          {
+            "number": "4.2",
+            "title": "Troubleshooting Strategies",
+            "pdfPage": 77
+          },
+          {
+            "number": "4.2.1",
+            "title": "Basic Software-Related Issues",
+            "pdfPage": 77
+          },
+          {
+            "number": "4.2.1.1",
+            "title": "Common Software Issues and Solutions",
+            "pdfPage": 77
+          },
+          {
+            "number": "4.2.1.2",
+            "title": "Restarting and Shutting Down",
+            "pdfPage": 77
+          },
+          {
+            "number": "4.2.2",
+            "title": "Basic Hardware-Related Issues",
+            "pdfPage": 78
+          },
+          {
+            "number": "4.2.2.1",
+            "title": "Common Hardware Issues and Solutions",
+            "pdfPage": 78
+          },
+          {
+            "number": "4.2.2.2",
+            "title": "Maintaining a Safe Workspace",
+            "pdfPage": 78
+          },
+          {
+            "number": "4.2.3",
+            "title": "Hardware Diagnosis and Maintenance",
+            "pdfPage": 79
+          },
+          {
+            "number": "4.2.3.1",
+            "title": "Recognizing Hardware Failures",
+            "pdfPage": 79
+          },
+          {
+            "number": "4.2.3.2",
+            "title": "Component Replacements and Upgrades",
+            "pdfPage": 80
+          },
+          {
+            "number": "4.2.4",
+            "title": "Security and Maintenance",
+            "pdfPage": 80
+          },
+          {
+            "number": "4.2.4.1",
+            "title": "Maintaining Software",
+            "pdfPage": 81
+          },
+          {
+            "number": "4.2.4.2",
+            "title": "Addressing Security Threats",
+            "pdfPage": 82
+          },
+          {
+            "number": "4.2.5",
+            "title": "Data Management and Backups",
+            "pdfPage": 83
+          },
+          {
+            "number": "4.2.5.1",
+            "title": "Managing Storage Space",
+            "pdfPage": 83
+          },
+          {
+            "number": "4.2.5.2",
+            "title": "Data Backup Methods",
+            "pdfPage": 83
+          },
+          {
+            "number": "4.2.6",
+            "title": "Using Resources for Troubleshooting",
+            "pdfPage": 84
+          },
+          {
+            "number": "4.1.7",
+            "title": "Assisting Others",
+            "pdfPage": 84
+          },
+          {
+            "number": "4.1.7.1",
+            "title": "Communication and Collaboration",
+            "pdfPage": 84
+          },
+          {
+            "number": "4.7.2.2",
+            "title": "Sharing Troubleshooting Knowledge",
+            "pdfPage": 85
+          },
+          {
+            "number": null,
+            "title": "Summary",
+            "pdfPage": 85
+          }
+        ],
+        "notes": "Section numbering is inconsistent/irregular as printed in the book itself (e.g. 4.1.1.7 'Enhancing User Experience' appears after 4.1.2.6 on image 5; 'Assisting Others' is numbered 4.1.7 though it appears after section 4.2.6; 'Sharing Troubleshooting Knowledge' is numbered 4.7.2.2). These are copied exactly as printed, not corrected."
+      }
+    },
+    {
+      "number": 5,
+      "title": "Software System",
+      "titleEn": null,
+      "pdfStart": 90,
+      "pdfEnd": 101,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Software System",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Identify and explain the significance of system software and application software.",
+          "Understand the role and main functions of system software.",
+          "Explain how operating systems manage hardware resources, provide user interfaces, and run applications.",
+          "Describe how utility software enhances system performance, security, and maintenance.",
+          "Understand how device drivers facilitate communication between hardware devices and the operating system.",
+          "Recognize the main functions of commonly used application software, such as word processing, spreadsheet, presentation, and graphic design applications.",
+          "Discuss the uses and significance of various application software in different domains (e.g., business, education, graphics design, etc.).",
+          "Differentiate between system software (e.g., operating systems, utility software, device drivers) and application software in terms of their roles and functions.",
+          "Proficiently use prominent system software including operating systems, utility software, and device drivers.",
+          "Navigate the user interface, manage files, and perform system tasks using operating systems.",
+          "Utilize utility software and tools for optimizing system performance and maintaining security.  Install, update, and troubleshoot device drivers for various hardware components",
+          "Use commonly used application software to perform specific tasks or create content (e.g., word processing, spreadsheets, presentations).",
+          "Identify appropriate software tools for specific tasks, taking into account their functions and capabilities.",
+          "Use application software for productivity, creativity, and communication purposes.",
+          "Demonstrate and differentiate between system software and application software, understanding their roles within a computer system."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 91
+          },
+          {
+            "number": "5.1",
+            "title": "Software",
+            "pdfPage": 91
+          },
+          {
+            "number": "5.1.2",
+            "title": "Types of Software",
+            "pdfPage": 91
+          },
+          {
+            "number": "5.1.2.1",
+            "title": "System Software",
+            "pdfPage": 91
+          },
+          {
+            "number": "5.1.2.2",
+            "title": "Application Software",
+            "pdfPage": 91
+          },
+          {
+            "number": "5.1.2.3",
+            "title": "Differentiating Between System Software and Application Software",
+            "pdfPage": 91
+          },
+          {
+            "number": "5.2",
+            "title": "Introduction to System Software",
+            "pdfPage": 92
+          },
+          {
+            "number": "5.2.1",
+            "title": "Operating System",
+            "pdfPage": 92
+          },
+          {
+            "number": "5.2.1.1",
+            "title": "Managing Hardware Resources",
+            "pdfPage": 93
+          },
+          {
+            "number": "5.2.1.2",
+            "title": "Providing a User Interface",
+            "pdfPage": 93
+          },
+          {
+            "number": "5.2.1.3",
+            "title": "Running Applications",
+            "pdfPage": 94
+          },
+          {
+            "number": "5.2.2",
+            "title": "Utility Programs",
+            "pdfPage": 95
+          },
+          {
+            "number": "5.2.2.1",
+            "title": "Disk Cleanup",
+            "pdfPage": 95
+          },
+          {
+            "number": "5.2.2.2",
+            "title": "Antivirus Software",
+            "pdfPage": 95
+          },
+          {
+            "number": "5.2.2.3",
+            "title": "Backup Software",
+            "pdfPage": 95
+          },
+          {
+            "number": "5.2.2.4",
+            "title": "File Compression Tools",
+            "pdfPage": 96
+          },
+          {
+            "number": "5.2.3",
+            "title": "Device Drivers",
+            "pdfPage": 96
+          },
+          {
+            "number": "5.3",
+            "title": "Application Software",
+            "pdfPage": 97
+          },
+          {
+            "number": "5.3.1",
+            "title": "Commonly used application software",
+            "pdfPage": 97
+          },
+          {
+            "number": "5.3.1.1",
+            "title": "Word Processing Software",
+            "pdfPage": 97
+          },
+          {
+            "number": "5.3.1.2",
+            "title": "Spreadsheet Software",
+            "pdfPage": 98
+          },
+          {
+            "number": "5.3.1.3",
+            "title": "Graphic Design Software",
+            "pdfPage": 98
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 6,
+      "title": "Introduction to Computer Networks",
+      "titleEn": null,
+      "pdfStart": 102,
+      "pdfEnd": 125,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Introduction to Computer Networks",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Understand and explain computer networks as systems, their objectives, components, and data communication among these components.",
+          "Understand fundamental concepts in data communication, including sender, receiver, protocol, message, and communication medium.",
+          "Understand key concepts related to computer networks, including networking devices, network topologies, and transmission modes.",
+          "Understand the 7-layer OSI networking model and its related protocols.",
+          "Understand the benefits of using computer networks, such as resource sharing and data communication.",
+          "Understand how data is transmitted across computer networks, including packet and circuit switching, and secure communication through encapsulation.",
+          "Understand how protocols, data, packets, and network services like DNS and DHCP function in a networked environment.",
+          "Understand different methods of network security, their advantages, and disadvantages.",
+          "Understand real-world applications of computer networks, including various network-based services and how they are used.",
+          "Know standard protocols involved in TCP/IP communications.",
+          "Know key networking terms like the 5-layer OSI networking model, packet switching, circuit switching, router, TCP/IP, IP, UDP, DNS, DHCP, host, browsers, layering, encapsulation, and various protocols involved in TCP/IP communications.",
+          "Differentiate between components of data communication.",
+          "Differentiate networking devices and network topologies.",
+          "Differentiate transmission modes.",
+          "Identify and describe different types of networks using the 7-layer OSI networking model.",
+          "Explain how data is transmitted across networks and describe the standard protocols involved.",
+          "Define and explain the uses of protocols, data, packets, and network services like DNS and DHCP.",
+          "Describe different methods of network security and their advantages and disadvantages."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 103
+          },
+          {
+            "number": "6.1",
+            "title": "Network as a System",
+            "pdfPage": 103
+          },
+          {
+            "number": "6.1.1",
+            "title": "Objectives of Computer Networks",
+            "pdfPage": 104
+          },
+          {
+            "number": "6.2",
+            "title": "Fundamental Concepts in Data Communication",
+            "pdfPage": 105
+          },
+          {
+            "number": "6.2.1",
+            "title": "Components of Data Communication",
+            "pdfPage": 105
+          },
+          {
+            "number": "6.3",
+            "title": "Networking Devices",
+            "pdfPage": 105
+          },
+          {
+            "number": "6.3.1",
+            "title": "Switch",
+            "pdfPage": 105
+          },
+          {
+            "number": "6.3.2",
+            "title": "Router",
+            "pdfPage": 106
+          },
+          {
+            "number": "6.3.3",
+            "title": "Access Point",
+            "pdfPage": 107
+          },
+          {
+            "number": "6.4",
+            "title": "Network Topologies",
+            "pdfPage": 108
+          },
+          {
+            "number": "6.4.1",
+            "title": "Bus Topology",
+            "pdfPage": 108
+          },
+          {
+            "number": "6.4.2",
+            "title": "Star Topology",
+            "pdfPage": 109
+          },
+          {
+            "number": "6.4.3",
+            "title": "Ring Topology",
+            "pdfPage": 110
+          },
+          {
+            "number": "6.4.4",
+            "title": "Mesh Topology",
+            "pdfPage": 110
+          },
+          {
+            "number": "6.5",
+            "title": "Transmission Modes",
+            "pdfPage": 111
+          },
+          {
+            "number": "6.5.1",
+            "title": "Simplex Communication",
+            "pdfPage": 111
+          },
+          {
+            "number": "6.5.2",
+            "title": "Half-Duplex Communication",
+            "pdfPage": 111
+          },
+          {
+            "number": "6.5.3",
+            "title": "Full-Duplex Communication",
+            "pdfPage": 112
+          },
+          {
+            "number": "6.6",
+            "title": "The OSI Networking Model",
+            "pdfPage": 113
+          },
+          {
+            "number": "6.7",
+            "title": "Ipv4 and Ipv6",
+            "pdfPage": 115
+          },
+          {
+            "number": "6.7.1",
+            "title": "Internet Protocol version 4 (IPv4)",
+            "pdfPage": 115
+          },
+          {
+            "number": "6.7.1",
+            "title": "Internet Protocol version 6 (IPv6)",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.8",
+            "title": "Protocols and Network Services",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.8.1",
+            "title": "Introduction to Protocols",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.8.2",
+            "title": "DNS and DHCP",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.9",
+            "title": "Network Security",
+            "pdfPage": 116
+          },
+          {
+            "number": "6.9.1",
+            "title": "Importance of Network Security",
+            "pdfPage": 117
+          },
+          {
+            "number": "6.9.2",
+            "title": "Key Concepts in Network Security",
+            "pdfPage": 117
+          },
+          {
+            "number": "6.9.3",
+            "title": "Common Threats to Network Security",
+            "pdfPage": 118
+          },
+          {
+            "number": "6.10",
+            "title": "Types of Networks",
+            "pdfPage": 119
+          },
+          {
+            "number": "6.10.1",
+            "title": "Personal Area Network (PAN)",
+            "pdfPage": 119
+          },
+          {
+            "number": null,
+            "title": "Local Area Network (LAN)",
+            "pdfPage": 119
+          },
+          {
+            "number": "6.10.1",
+            "title": "Metropolitan Area Network (MAN)",
+            "pdfPage": 120
+          },
+          {
+            "number": "6.10.1",
+            "title": "Wide Area Network (WAN)",
+            "pdfPage": 120
+          },
+          {
+            "number": "6.10.1",
+            "title": "Campus Area Network (CAN)",
+            "pdfPage": 121
+          },
+          {
+            "number": "6.11",
+            "title": "Real-World Applications of Computer Networks",
+            "pdfPage": 121
+          },
+          {
+            "number": "6.11.1",
+            "title": "Business",
+            "pdfPage": 121
+          },
+          {
+            "number": "6.11.1",
+            "title": "Education",
+            "pdfPage": 121
+          },
+          {
+            "number": "6.11.2",
+            "title": "Healthcare",
+            "pdfPage": 121
+          },
+          {
+            "number": "6.12",
+            "title": "Standard Protocols in TCP/IP Communications",
+            "pdfPage": 122
+          },
+          {
+            "number": "6.12.1",
+            "title": "Introduction to TCP/IP",
+            "pdfPage": 122
+          },
+          {
+            "number": "6.12.2",
+            "title": "Key Protocols",
+            "pdfPage": 122
+          },
+          {
+            "number": "6.13",
+            "title": "Network Security Methods",
+            "pdfPage": 122
+          },
+          {
+            "number": "6.13.1",
+            "title": "Firewalls",
+            "pdfPage": 122
+          },
+          {
+            "number": "6.13.2",
+            "title": "Encryption",
+            "pdfPage": 122
+          },
+          {
+            "number": "6.13.3",
+            "title": "Antivirus Software",
+            "pdfPage": 122
+          }
+        ],
+        "notes": "The book repeats the section number '6.10.1' for Metropolitan Area Network (MAN), Wide Area Network (WAN), and Campus Area Network (CAN) instead of incrementing (6.10.2, 6.10.3, 6.10.4). Similarly '6.7.1' is used for both IPv4 and IPv6 subsections, and '6.11.1' is used for both Business and Education subsections. These are copied verbatim as printed. The 'Local Area Network (LAN)' heading on the page after 6.10.1 PAN is printed as a bold heading but without any section number."
+      }
+    },
+    {
+      "number": 7,
+      "title": "Computational Thinking",
+      "titleEn": null,
+      "pdfStart": 126,
+      "pdfEnd": 153,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Computational Thinking",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Define computational thinking and its key components: decomposition, pattern recognition, abstraction, and algorithms.",
+          "Explain the principles of computational thinking, including problem understanding, problem simplification, and solution selection and design.",
+          "Describe algorithm design methods, specifically flowcharts and pseudocode, and understand the differences between them.",
+          "Create and interpret flowcharts to represent algorithms visually.",
+          "Write pseudocode to outline algorithms in a structured, human-readable format.",
+          "Engage in algorithmic activities, such as design and evaluation techniques.",
+          "Conduct dry runs of flowcharts and pseudocode to manually verify their correctness.",
+          "Understand the concept and importance of LARP (Logic of Algorithms for Resolution of Problems).",
+          "Implement LARP activities to practice writing algorithms and drawing flowcharts.",
+          "Identify different types of errors in algorithms, including syntax errors, logical errors, and runtime errors.",
+          "Apply debugging techniques to find and fix errors in algorithms.",
+          "Recognize common error messages encountered during LARP and learn how to address them.",
+          "Demonstrate problem-solving skills by applying computational thinking principles to real- world scenarios.",
+          "Evaluate the efficiency of different algorithms and improve them based on performance analysis."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 127
+          },
+          {
+            "number": "7.1",
+            "title": "Definition of Computational Thinking",
+            "pdfPage": 127
+          },
+          {
+            "number": "7.1.1",
+            "title": "Decomposition",
+            "pdfPage": 128
+          },
+          {
+            "number": "7.1.2",
+            "title": "Pattern Recognition",
+            "pdfPage": 129
+          },
+          {
+            "number": "7.1.3",
+            "title": "Abstraction",
+            "pdfPage": 130
+          },
+          {
+            "number": "7.1.3",
+            "title": "Algorithms",
+            "pdfPage": 130
+          },
+          {
+            "number": "7.2",
+            "title": "Principles of Computational Thinking",
+            "pdfPage": 133
+          },
+          {
+            "number": "7.2.1",
+            "title": "Problem Understanding",
+            "pdfPage": 133
+          },
+          {
+            "number": "7.2.2",
+            "title": "Problem Simplification",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.2.3",
+            "title": "Solution Selection and Design",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.3",
+            "title": "Algorithm Design Methods",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.3.1",
+            "title": "Flowcharts",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.3.1.1",
+            "title": "Importance of Flowcharts",
+            "pdfPage": 134
+          },
+          {
+            "number": "7.3.1.2",
+            "title": "Flowchart Symbols",
+            "pdfPage": 135
+          },
+          {
+            "number": "7.3.2",
+            "title": "Pseudocode",
+            "pdfPage": 138
+          },
+          {
+            "number": "7.3.3",
+            "title": "Differentiating Flowcharts and Pseudocode",
+            "pdfPage": 142
+          },
+          {
+            "number": "7.4",
+            "title": "Algorithmic Activities",
+            "pdfPage": 144
+          },
+          {
+            "number": "7.4.1",
+            "title": "Design and Evaluation Techniques",
+            "pdfPage": 144
+          },
+          {
+            "number": "7.4.1.1",
+            "title": "Time Complexity",
+            "pdfPage": 144
+          },
+          {
+            "number": "7.4.1.2",
+            "title": "Space Complexity",
+            "pdfPage": 145
+          },
+          {
+            "number": "7.5",
+            "title": "Dry Run",
+            "pdfPage": 145
+          },
+          {
+            "number": "7.5.1",
+            "title": "Dry Run of a Flowchart",
+            "pdfPage": 145
+          },
+          {
+            "number": "7.5.2",
+            "title": "Dry Run of Pseudocode",
+            "pdfPage": 146
+          },
+          {
+            "number": "7.5.3",
+            "title": "Simulation",
+            "pdfPage": 147
+          },
+          {
+            "number": "7.6",
+            "title": "Introduction to LARP (Logic of Algorithms for Resolution of Problems)",
+            "pdfPage": 148
+          },
+          {
+            "number": "7.6.1",
+            "title": "Why is LARP Important?",
+            "pdfPage": 148
+          },
+          {
+            "number": "7.6.2",
+            "title": "Writing Algorithms",
+            "pdfPage": 148
+          },
+          {
+            "number": "7.6.3",
+            "title": "Drawing Flowcharts in LARP",
+            "pdfPage": 149
+          },
+          {
+            "number": "7.7",
+            "title": "Error Identification and Debugging",
+            "pdfPage": 150
+          },
+          {
+            "number": "7.7.1",
+            "title": "Types of Errors",
+            "pdfPage": 150
+          },
+          {
+            "number": "7.7.2",
+            "title": "Debugging Techniques",
+            "pdfPage": 151
+          },
+          {
+            "number": "7.7.3",
+            "title": "Common Error Messages in LARP",
+            "pdfPage": 151
+          }
+        ],
+        "notes": "Page 124 introduction text contains an apparent typo/error in printed text: 'in a way that a can be executed by a computer' · copied verbatim as printed."
+      }
+    },
+    {
+      "number": 8,
+      "title": "Web Development with HTML, CSS and JavaScript",
+      "titleEn": null,
+      "pdfStart": 154,
+      "pdfEnd": 181,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Web Development with HTML, CSS, and JavaScript",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Understand JavaScript syntax and data types.",
+          "Work with variables, operators, and functions in JavaScript.",
+          "Handle events and user input with JavaScript.",
+          "Create simple programs using JavaScript.",
+          "Create HTML forms and style them.",
+          "Use JavaScript to handle events with operators, variables, and functions.",
+          "Develop static web pages.",
+          "Apply HTML tags appropriately to create web pages.",
+          "Create a basic HTML page.",
+          "Add text, images, and links to a page.",
+          "Create lists and tables.",
+          "Apply styles to HTML elements.",
+          "Work with fonts, colors, and backgrounds.",
+          "Create web pages to display data in the paragraphs and lists.",
+          "Familiarize students with CSS syntax.",
+          "Create layouts with CSS.",
+          "Add animations and transitions with CSS.",
+          "Develop, test, and debug static web pages.",
+          "Organize images and text effectively.",
+          "Use JavaScript along with HTML to handle events using operators, variables, and functions."
+        ],
+        "headings": [
+          {
+            "number": "8.1",
+            "title": "Web Development",
+            "pdfPage": 155
+          },
+          {
+            "number": "8.1.1",
+            "title": "Why Learn Web Development?",
+            "pdfPage": 155
+          },
+          {
+            "number": "8.2",
+            "title": "Basic Components of Web Development",
+            "pdfPage": 156
+          },
+          {
+            "number": "8.3",
+            "title": "Getting Started with HTML",
+            "pdfPage": 157
+          },
+          {
+            "number": "8.3.1",
+            "title": "History of HTML",
+            "pdfPage": 158
+          },
+          {
+            "number": "8.3.2",
+            "title": "Setting up a Development Environment",
+            "pdfPage": 158
+          },
+          {
+            "number": "8.3.3",
+            "title": "Creating a \"Hello, World!\" HTML Application",
+            "pdfPage": 159
+          },
+          {
+            "number": "8.3.3.1",
+            "title": "Writing the HTML Code",
+            "pdfPage": 159
+          },
+          {
+            "number": "8.3.3.2",
+            "title": "Viewing the HTML File",
+            "pdfPage": 160
+          },
+          {
+            "number": "8.4",
+            "title": "HTML Basic Structure",
+            "pdfPage": 161
+          },
+          {
+            "number": "8.4.1",
+            "title": "HTML Tags",
+            "pdfPage": 161
+          },
+          {
+            "number": "8.5",
+            "title": "Creating Content with HTML",
+            "pdfPage": 161
+          },
+          {
+            "number": "8.5.1",
+            "title": "Headings",
+            "pdfPage": 161
+          },
+          {
+            "number": "8.5.1.1",
+            "title": "Example",
+            "pdfPage": 162
+          },
+          {
+            "number": "8.5.2",
+            "title": "Paragraphs",
+            "pdfPage": 163
+          },
+          {
+            "number": "8.5.3",
+            "title": "Links",
+            "pdfPage": 163
+          },
+          {
+            "number": "8.5.4",
+            "title": "Images",
+            "pdfPage": 163
+          },
+          {
+            "number": "8.5.5",
+            "title": "Lists",
+            "pdfPage": 163
+          },
+          {
+            "number": "8.5.5.1",
+            "title": "Unordered List",
+            "pdfPage": 163
+          },
+          {
+            "number": "8.5.5.2",
+            "title": "Ordered List",
+            "pdfPage": 164
+          },
+          {
+            "number": "8.5.6",
+            "title": "Creating Tables in HTML",
+            "pdfPage": 164
+          },
+          {
+            "number": "8.5.7",
+            "title": "HTML Comments",
+            "pdfPage": 164
+          },
+          {
+            "number": "8.6",
+            "title": "Styling with CSS",
+            "pdfPage": 165
+          },
+          {
+            "number": "8.6.1",
+            "title": "Basic Structure of CSS",
+            "pdfPage": 165
+          },
+          {
+            "number": "8.6.2",
+            "title": "Integrating CSS in HTML",
+            "pdfPage": 165
+          },
+          {
+            "number": "8.6.4",
+            "title": "Styling HTML Elements with Fonts, Colors, Backgrounds Styling Fonts",
+            "pdfPage": 166
+          },
+          {
+            "number": "8.6.3.1",
+            "title": "Styling Backgrounds",
+            "pdfPage": 166
+          },
+          {
+            "number": "8.6.4",
+            "title": "Creating Layouts and Organizing Content",
+            "pdfPage": 167
+          },
+          {
+            "number": "8.6.5",
+            "title": "Adding Animations and Transitions Using CSS",
+            "pdfPage": 170
+          },
+          {
+            "number": "8.6.5.1",
+            "title": "Adding Animations",
+            "pdfPage": 170
+          },
+          {
+            "number": "8.6.5.2",
+            "title": "Adding Transitions",
+            "pdfPage": 170
+          },
+          {
+            "number": "8.7",
+            "title": "Introduction to JavaScript",
+            "pdfPage": 171
+          },
+          {
+            "number": "8.7.1",
+            "title": "Basic Syntax and Examples",
+            "pdfPage": 172
+          },
+          {
+            "number": "8.7.1",
+            "title": "Variables and Data Types",
+            "pdfPage": 173
+          },
+          {
+            "number": "8.7.1.1",
+            "title": "Declaring Variables",
+            "pdfPage": 173
+          },
+          {
+            "number": "8.7.1.2",
+            "title": "Dry Run Example",
+            "pdfPage": 173
+          },
+          {
+            "number": "8.7.1.3",
+            "title": "Data Types",
+            "pdfPage": 173
+          },
+          {
+            "number": "8.7.2",
+            "title": "Functions in JavaScript",
+            "pdfPage": 174
+          },
+          {
+            "number": "8.7.2.1",
+            "title": "Simple Function",
+            "pdfPage": 174
+          },
+          {
+            "number": "8.7.2.2",
+            "title": "Function with Parameters",
+            "pdfPage": 174
+          },
+          {
+            "number": "8.7.2.3",
+            "title": "Function with Multiple Parameters",
+            "pdfPage": 174
+          },
+          {
+            "number": "8.7.3",
+            "title": "Handling Events and User Input",
+            "pdfPage": 175
+          },
+          {
+            "number": "8.7.3.1",
+            "title": "Managing Events and User Interactions with JavaScript",
+            "pdfPage": 176
+          },
+          {
+            "number": "8.7.4",
+            "title": "Creating Interactive Elements",
+            "pdfPage": 176
+          },
+          {
+            "number": "8.7.4.1",
+            "title": "Developing Simple Programs and Forms",
+            "pdfPage": 176
+          },
+          {
+            "number": "8.7.4.2",
+            "title": "Integrating JavaScript with HTML for Interactive Functionality",
+            "pdfPage": 177
+          },
+          {
+            "number": "8.8",
+            "title": "Developing and Debugging",
+            "pdfPage": 178
+          },
+          {
+            "number": "8.8.1",
+            "title": "Debugging Techniques",
+            "pdfPage": 178
+          },
+          {
+            "number": "8.8.2",
+            "title": "Identifying and Fixing Common Issues",
+            "pdfPage": 179
+          },
+          {
+            "number": "8.8.3",
+            "title": "Deploying and Testing",
+            "pdfPage": 179
+          },
+          {
+            "number": "8.8.3.1",
+            "title": "Strategies for Testing Web Pages",
+            "pdfPage": 179
+          }
+        ],
+        "notes": "Section 8.6.4 heading 'Styling HTML Elements with Fonts, Colors, Backgrounds Styling Fonts' appears to duplicate numbering with the later 8.6.4 'Creating Layouts and Organizing Content'; both are printed as 8.6.4 in the source (numbering not corrected as instructed). Section 8.6.3.1 'Styling Backgrounds' appears despite no visible 8.6.3 heading printed in the text."
+      }
+    },
+    {
+      "number": 9,
+      "title": "Data Science and Data Gathering",
+      "titleEn": null,
+      "pdfStart": 182,
+      "pdfEnd": 213,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Data Science and Data Gathering",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Understand Data Types: Identify and differentiate between qualitative and quantitative data, and explain their importance in data analysis.",
+          "Organise and Analyse Data: Organise data effectively and apply basic data analysis techniques to draw meaningful conclusions from both structured and unstructured data.",
+          "Utilize Data Collection Methods: Gain knowledge of various data collection methods and tools, including surveys, questionnaires, and online sources, and understand how to use these methods to gather relevant data.",
+          "Describe Data Storage Techniques: Describe different data storage techniques such as spreadsheets, databases, data warehouses, and NoSQL, and understand their applications in managing data.",
+          "Apply Data Visualization Techniques: Organize the importance of data visualization and be able to use various tools to create visual representations of data, such as charts and graphs, to effectively communicate information.",
+          "Pre-process and Analyse Data: Learn data pre-processing techniques and apply quantitative and qualitative analysis methods to interpret data and generate insights.",
+          "Utilize Collaborative Tools and Cloud Computing: Understand the role of cloud storage and collaborative tools in data management, and apply best practices for data protection and remote access.",
+          "Address Ethical Data Considerations: Be aware of ethical practices related to data privacy, confidentiality, and legal frameworks, and understand the importance of secure data handling.",
+          "Explore Data Science Fundamentals: Gain an introduction to data science, including its definition, scope, and fundamental principles, and understand the impact of data science on various applications.",
+          "Understand Big Data and Its Applications: Explain the concept of big data, its characteristics, and its practical applications in domains, such as retail, healthcare, finance, and transportation.",
+          "Recognize Data Science Tools and Techniques: Learn about various data science tools and techniques, including predictive modelling and graph analytics, and understand their applications in solving real-world problems.",
+          "Recognize Future Trends in Data Handling: Identify emerging trends in data analytics, artificial intelligence, and machine learning, and make informed predictions about future developments in digital data management and analysis."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 183
+          },
+          {
+            "number": "9.1",
+            "title": "Data",
+            "pdfPage": 183
+          },
+          {
+            "number": "9.2",
+            "title": "Data Types",
+            "pdfPage": 184
+          },
+          {
+            "number": "9.2.1",
+            "title": "Qualitative Data",
+            "pdfPage": 184
+          },
+          {
+            "number": "9.2.2",
+            "title": "Quantitative Data",
+            "pdfPage": 185
+          },
+          {
+            "number": "9.3",
+            "title": "Organising and Analysing Data",
+            "pdfPage": 188
+          },
+          {
+            "number": "9.3.1",
+            "title": "Data Collection Methods and Tools",
+            "pdfPage": 190
+          },
+          {
+            "number": "9.3.1.1",
+            "title": "Gathering Data from Online Sources",
+            "pdfPage": 191
+          },
+          {
+            "number": "9.4",
+            "title": "Data Types",
+            "pdfPage": 193
+          },
+          {
+            "number": "9.4.1",
+            "title": "Structured Data",
+            "pdfPage": 193
+          },
+          {
+            "number": "9.4.2",
+            "title": "Unstructured Data",
+            "pdfPage": 193
+          },
+          {
+            "number": "9.5",
+            "title": "Data Storage Techniques",
+            "pdfPage": 193
+          },
+          {
+            "number": "9.5.1",
+            "title": "Spreadsheets",
+            "pdfPage": 194
+          },
+          {
+            "number": "9.5.2",
+            "title": "Databases",
+            "pdfPage": 194
+          },
+          {
+            "number": "9.5.3",
+            "title": "Data Warehouses",
+            "pdfPage": 194
+          },
+          {
+            "number": "9.5.4",
+            "title": "NoSQL",
+            "pdfPage": 194
+          },
+          {
+            "number": "9.6",
+            "title": "Data Visualization",
+            "pdfPage": 195
+          },
+          {
+            "number": "9.6.1",
+            "title": "Importance and Benefits of Data Visualization",
+            "pdfPage": 195
+          },
+          {
+            "number": "9.6.2",
+            "title": "Visualizing Different Data Types",
+            "pdfPage": 195
+          },
+          {
+            "number": "9.7",
+            "title": "Data Pre-Processing and Analysis",
+            "pdfPage": 196
+          },
+          {
+            "number": "9.7.1",
+            "title": "Data Pre-processing",
+            "pdfPage": 196
+          },
+          {
+            "number": "9.7.1.1",
+            "title": "Data Pre-processing Techniques",
+            "pdfPage": 196
+          },
+          {
+            "number": "9.7.2",
+            "title": "Implementing Data Validation and Cleaning Processes",
+            "pdfPage": 197
+          },
+          {
+            "number": "9.7.3",
+            "title": "Data Analysis Techniques",
+            "pdfPage": 197
+          },
+          {
+            "number": "9.7.3.1",
+            "title": "Quantitative Analysis",
+            "pdfPage": 197
+          },
+          {
+            "number": "9.7.3.2",
+            "title": "Qualitative Analysis",
+            "pdfPage": 199
+          },
+          {
+            "number": "9.8",
+            "title": "Collaborative Tools and Cloud Storage",
+            "pdfPage": 200
+          },
+          {
+            "number": "9.8.1",
+            "title": "Cloud Storage for Data Management",
+            "pdfPage": 200
+          },
+          {
+            "number": "9.8.2",
+            "title": "Remote Access",
+            "pdfPage": 200
+          },
+          {
+            "number": "9.8.3",
+            "title": "Data Backups",
+            "pdfPage": 201
+          },
+          {
+            "number": "9.8.4",
+            "title": "Collaborative Authoring",
+            "pdfPage": 201
+          },
+          {
+            "number": "9.8.5",
+            "title": "Benefits of Collaborative Tools",
+            "pdfPage": 202
+          },
+          {
+            "number": "9.9",
+            "title": "Introduction to Data Science",
+            "pdfPage": 202
+          },
+          {
+            "number": "9.9.1",
+            "title": "Understanding Data Science",
+            "pdfPage": 202
+          },
+          {
+            "number": "9.9.2",
+            "title": "Interdisciplinary Nature of Data Science",
+            "pdfPage": 202
+          },
+          {
+            "number": "9.9.3",
+            "title": "Data Science Workflow",
+            "pdfPage": 203
+          },
+          {
+            "number": "9.10",
+            "title": "Big Data and its Applications",
+            "pdfPage": 204
+          },
+          {
+            "number": "9.10.1",
+            "title": "Introduction to Big Data",
+            "pdfPage": 204
+          },
+          {
+            "number": "9.10.2",
+            "title": "Practical Applications of Big Data",
+            "pdfPage": 205
+          },
+          {
+            "number": "9.10.3",
+            "title": "Tools and Techniques in Data Science",
+            "pdfPage": 205
+          },
+          {
+            "number": "9.10.3.1",
+            "title": "Data Science Tools",
+            "pdfPage": 205
+          },
+          {
+            "number": "9.10.3.2",
+            "title": "Data Science Techniques",
+            "pdfPage": 206
+          },
+          {
+            "number": "9.10.3.3",
+            "title": "Applications of Data Science Techniques",
+            "pdfPage": 207
+          },
+          {
+            "number": "9.10.3.4",
+            "title": "Predictions for the Future of Digital Tools in Data Management and Analysis",
+            "pdfPage": 208
+          }
+        ],
+        "notes": "Section 9.4 is numbered 9.4 in the printed book even though a similarly titled 'Data Types' heading already appears as 9.2 earlier in the chapter; this duplication is as printed. Sub-bullet headings like 'Statistical Analysis' or 'Data Gathering/Extraction/Integration' within running text are bolded but not given section numbers, so they are excluded from the headings list per instructions."
+      }
+    },
+    {
+      "number": 10,
+      "title": "Emerging Technologies in Computer Science",
+      "titleEn": null,
+      "pdfStart": 214,
+      "pdfEnd": 227,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Emerging Technologies in Computer Science",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Define Artificial Intelligence (AI) and understand its historical context and evolution.",
+          "Identify various applications of AI in different domains such as healthcare, education, and gaming.",
+          "Explain the subfields of AI, including machine learning, natural language processing, computer vision, and robotics.",
+          "Distinguish between different types of AI algorithms, including explainable (whitebox) and unexplainable (blackbox) models.",
+          "Understand the role of AI techniques in advancing machine learning models and other capabilities.",
+          "Define the Internet of Things (IoT) and understand its significance in connecting devices and systems.",
+          "Describe the components of IoT systems, including sensors, devices, networks, and data analysis.",
+          "Explore various applications of IoT in domains such as smart homes, healthcare, and transportation.",
+          "Discuss security and privacy considerations in IoT deployments.",
+          "Analyze the potential risks and challenges associated with AI and IoT, including data privacy and algorithmic bias.",
+          "Examine policy and regulatory frameworks addressing the challenges of AI and IoT Evaluate the societal impact of AI and IoT on daily life, work environments, and society at large.",
+          "Develop strategies for addressing ethical concerns and maximizing the societal benefits of AI and IoT."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 215
+          },
+          {
+            "number": "10.1",
+            "title": "Introduction to Artificial Intelligence (AI)",
+            "pdfPage": 215
+          },
+          {
+            "number": "10.1.1",
+            "title": "Understanding AI",
+            "pdfPage": 215
+          },
+          {
+            "number": "10.1.2",
+            "title": "Historical Context of Artificial Intelligence:",
+            "pdfPage": 215
+          },
+          {
+            "number": "10.1.3",
+            "title": "Applications and Subfields",
+            "pdfPage": 216
+          },
+          {
+            "number": "10.2",
+            "title": "AI Algorithms and Techniques",
+            "pdfPage": 218
+          },
+          {
+            "number": "10.2.1",
+            "title": "Types of AI Algorithms:",
+            "pdfPage": 218
+          },
+          {
+            "number": "10.2.1.1",
+            "title": "Explainable (Whitebox) Algorithms",
+            "pdfPage": 218
+          },
+          {
+            "number": "10.2.1.2",
+            "title": "Unexplainable (Blackbox) Algorithms",
+            "pdfPage": 220
+          },
+          {
+            "number": "10.3",
+            "title": "Introduction to Internet of Things (IoT)",
+            "pdfPage": 220
+          },
+          {
+            "number": "10.3.1",
+            "title": "Understanding IoT",
+            "pdfPage": 220
+          },
+          {
+            "number": "10.3.1.1",
+            "title": "Definition and Components",
+            "pdfPage": 220
+          },
+          {
+            "number": "10.3.2",
+            "title": "IoT Applications",
+            "pdfPage": 222
+          },
+          {
+            "number": "10.3.3",
+            "title": "Security and Privacy Considerations in IoT Deployments:",
+            "pdfPage": 223
+          },
+          {
+            "number": "10.4",
+            "title": "Implications and Future of Emerging Technologies",
+            "pdfPage": 223
+          },
+          {
+            "number": "10.4.1",
+            "title": "Implications of AI and IoT",
+            "pdfPage": 223
+          },
+          {
+            "number": "10.4.1.1",
+            "title": "Risks and Challenges",
+            "pdfPage": 223
+          },
+          {
+            "number": "10.4.1.2",
+            "title": "Societal Impact and Adaptation",
+            "pdfPage": 224
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 11,
+      "title": "Ethical, Social, and Legal Concerns in Computer Usage",
+      "titleEn": null,
+      "pdfStart": 228,
+      "pdfEnd": 245,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Ethical, Social, and Legal Concerns in Computer Usage",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Describe the importance of using computers safely and responsibly in daily activities.",
+          "Explain how to protect personal information while using computers and online platforms.",
+          "Identify the factors to consider when selecting computer hardware and software for safety, efficiency, and compatibility.",
+          "Explain how choosing the right hardware and software affects the overall computer experience.",
+          "Demonstrate how to create strong, unique passwords and explain their importance.",
+          "Describe the need for regular software updates and the role they play in maintaining device security.",
+          "Identify potential risks associated with clicking on unknown links and downloading files from untrusted sources.",
+          "Explain the concept and benefits of Two-Factor Authentication (2FA).",
+          "Describe the risks of using public Wi-Fi for sensitive transactions and the importance of secure networks.",
+          "Identify and avoid common online scams and phishing attempts.",
+          "Explain the importance of regularly backing up important data and describe methods for doing so.",
+          "Describe responsible behavior on social media, email, cloud services, and online applications.",
+          "Explain the significance of privacy settings and data security measures in protecting personal information online.",
+          "Identify ethical and legal responsibilities related to intellectual property rights, including copyright, trademarks, and patents.",
+          "Discuss the importance of respecting intellectual property and the implications of software piracy.",
+          "Describe privacy laws and their purpose in protecting personal information online.",
+          "Explain the legal consequences of unauthorized access to personal data and the responsibilities of companies to safeguard user information.",
+          "Explain the principles of data ethics, including transparency, respect for privacy, and accountability.",
+          "Describe ethical guidelines for data collection, storage, and sharing, including the importance of informed consent and data security.",
+          "Analyze real-life case studies of data breaches to understand the impact of poor data security and the importance of following legal and ethical guidelines.",
+          "Define and explain the significance of copyrights, trademarks, and patents in protecting digital content and inventions.",
+          "Discuss the ethical and legal responsibilities related to intellectual property rights and the consequences of infringing on these rights.",
+          "Demonstrate techniques for safe online research, including using reliable sources, checking authorship, and cross-checking information.",
+          "Explain strategies for protecting privacy during online research, such as using private browsing and avoiding suspicious links.",
+          "Recognize signs of internet addiction and suggest strategies for promoting balanced internet usage and engaging in offline activities.",
+          "ethical concerns and maximizing the societal benefits of AI and IoT."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 229
+          },
+          {
+            "number": null,
+            "title": "Secure and Conscientious Computer Usage",
+            "pdfPage": 229
+          },
+          {
+            "number": "11.1",
+            "title": "Responsible Computer Usage",
+            "pdfPage": 230
+          },
+          {
+            "number": "11.2",
+            "title": "Safe and Secure Operation of Digital Platforms",
+            "pdfPage": 231
+          },
+          {
+            "number": "11.2.1",
+            "title": "Safe Operation of Digital Platforms and Devices",
+            "pdfPage": 231
+          },
+          {
+            "number": "11.2.2",
+            "title": "Secure Use of Digital Platforms",
+            "pdfPage": 232
+          },
+          {
+            "number": "11.3",
+            "title": "Best Practices in Online Behavior",
+            "pdfPage": 232
+          },
+          {
+            "number": "11.3.1",
+            "title": "Responsible Use of Social Media, Email, Cloud Services, and Online Applications",
+            "pdfPage": 232
+          },
+          {
+            "number": "11.3.2",
+            "title": "Importance of Privacy Settings and Data Security Measures",
+            "pdfPage": 233
+          },
+          {
+            "number": "11.4",
+            "title": "Legal and Ethical Frameworks",
+            "pdfPage": 233
+          },
+          {
+            "number": "11.4.1",
+            "title": "Legal Frameworks for Privacy",
+            "pdfPage": 233
+          },
+          {
+            "number": "11.4.1.1",
+            "title": "Understanding Privacy Laws and Their Implications",
+            "pdfPage": 233
+          },
+          {
+            "number": "11.4.1.2",
+            "title": "Laws Protecting User Privacy and Consequences of Unauthorized Access",
+            "pdfPage": 234
+          },
+          {
+            "number": "11.4.2",
+            "title": "Data Ethics and Responsible Use",
+            "pdfPage": 234
+          },
+          {
+            "number": "11.4.2.1",
+            "title": "Introduction to Data Ethics and Principles Governing Data Handling",
+            "pdfPage": 234
+          },
+          {
+            "number": "11.4.2.2",
+            "title": "Ethical Considerations in Data Collection, Storage, and Sharing",
+            "pdfPage": 234
+          },
+          {
+            "number": "11.4.2.3",
+            "title": "Ethical Guidelines for Data Usage and Management",
+            "pdfPage": 235
+          },
+          {
+            "number": "11.5",
+            "title": "Intellectual Property Rights",
+            "pdfPage": 236
+          },
+          {
+            "number": "11.5.1",
+            "title": "Concepts of Intellectual Property",
+            "pdfPage": 236
+          },
+          {
+            "number": "11.5.1.1",
+            "title": "Copyright, Trademarks, Patents, and Their Significance in Digital Content",
+            "pdfPage": 236
+          },
+          {
+            "number": "11.5.1.2",
+            "title": "Ethical and Legal Responsibilities Regarding Intellectual Property Rights",
+            "pdfPage": 236
+          },
+          {
+            "number": "11.5.2",
+            "title": "Legal Compliance in Computing",
+            "pdfPage": 236
+          },
+          {
+            "number": "11.6",
+            "title": "Responsible Internet Use",
+            "pdfPage": 236
+          },
+          {
+            "number": "11.6.1",
+            "title": "Safe Data Searches and Online Research",
+            "pdfPage": 237
+          },
+          {
+            "number": "11.6.1.1",
+            "title": "Techniques for Safe Data Searches and Credibility Assessment",
+            "pdfPage": 237
+          },
+          {
+            "number": "11.6.1.2",
+            "title": "Avoiding Privacy Risks During Online Research and Information Gathering",
+            "pdfPage": 237
+          },
+          {
+            "number": "11.6.2",
+            "title": "Preventing Internet Addiction",
+            "pdfPage": 237
+          },
+          {
+            "number": "11.6.2.1",
+            "title": "Understanding Internet Addiction and Promoting Balanced Usage",
+            "pdfPage": 237
+          },
+          {
+            "number": "11.6.2.2",
+            "title": "Strategies for Digital Well-being and Fostering Healthy Online Habits",
+            "pdfPage": 238
+          },
+          {
+            "number": "11.6.3",
+            "title": "Social Networking Safety and Online Interactions",
+            "pdfPage": 238
+          },
+          {
+            "number": "11.6.3.1",
+            "title": "Privacy Settings, Responsible Sharing, and Online Etiquette",
+            "pdfPage": 238
+          },
+          {
+            "number": "11.6.3.2",
+            "title": "Addressing Cyberbullying, Harassment, and Respectful Online Interactions",
+            "pdfPage": 238
+          },
+          {
+            "number": "11.7",
+            "title": "Impact of Computing on Society",
+            "pdfPage": 239
+          },
+          {
+            "number": "11.7.1",
+            "title": "Influence on Behaviors and Practices",
+            "pdfPage": 239
+          },
+          {
+            "number": "11.7.1.1",
+            "title": "Environmental, Ethical, Legal, Societal, Economic, and Cultural Impacts",
+            "pdfPage": 239
+          },
+          {
+            "number": "11.7.1.2",
+            "title": "Role of Computing in Global Trade, Communication, and Cultural Evolution",
+            "pdfPage": 240
+          },
+          {
+            "number": "11.7.2",
+            "title": "Assessing Computing Advancements",
+            "pdfPage": 240
+          },
+          {
+            "number": "11.7.2.1",
+            "title": "Benefits and Risks of Computing Advancements (Social Networking, Misinformation)",
+            "pdfPage": 240
+          },
+          {
+            "number": "11.7.2.2",
+            "title": "Trade-offs Between Privacy, Security, and Usability in Computing Systems",
+            "pdfPage": 241
+          }
+        ],
+        "notes": "The last SLO bullet on image 2 appears to be printed incompletely/misprinted in the book itself, starting with a lowercase 'ethical concerns...' with no verb; reproduced verbatim as printed."
+      }
+    },
+    {
+      "number": 12,
+      "title": "Entrepreneurship in Digital Age",
+      "titleEn": null,
+      "pdfStart": 246,
+      "pdfEnd": 263,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Entrepreneurship in Digital Age",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "By the end of this chapter, you will be able to:",
+        "slos": [
+          "Define entrepreneurship and understand its significance in the digital age.",
+          "Differentiate between various types of entrepreneurs, including startup founders, social entrepreneurs, and intrapreneurs.",
+          "Identify key characteristics of successful entrepreneurs, such as innovation and risk-taking.",
+          "Analyze the impact of digital technologies on entrepreneurship, including digital marketing and e-commerce strategies.",
+          "Utilize digital tools and platforms for market research, online marketing, and managing e-commerce operations.",
+          "Apply data analysis techniques to make informed business decisions.",
+          "Generate and develop innovative business ideas through problem identification and creative problem-solving techniques.",
+          "Create comprehensive business plans that include market analysis, revenue models, and digital marketing strategies.",
+          "Understand the principles of ethical and sustainable entrepreneurship and their importance in business operations. Poor data security and the importance of following legal and ethical guidelines."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 247
+          },
+          {
+            "number": "12.1",
+            "title": "Entrepreneurship",
+            "pdfPage": 247
+          },
+          {
+            "number": "12.1.1",
+            "title": "Examples of Entrepreneurship",
+            "pdfPage": 247
+          },
+          {
+            "number": "12.1.1.1",
+            "title": "Tech Startups",
+            "pdfPage": 247
+          },
+          {
+            "number": "12.1.1.1",
+            "title": "Local Businesses",
+            "pdfPage": 248
+          },
+          {
+            "number": "12.1.2",
+            "title": "Key Characteristics of Entrepreneurs",
+            "pdfPage": 248
+          },
+          {
+            "number": "12.1.1.1",
+            "title": "Innovation",
+            "pdfPage": 248
+          },
+          {
+            "number": "12.1.1.2",
+            "title": "Risk-Taking",
+            "pdfPage": 248
+          },
+          {
+            "number": "12.1.2",
+            "title": "Why is Entrepreneurship Important?",
+            "pdfPage": 249
+          },
+          {
+            "number": "12.1.2.1",
+            "title": "Economic Growth",
+            "pdfPage": 249
+          },
+          {
+            "number": "12.1.3.2",
+            "title": "Innovation and Progress",
+            "pdfPage": 249
+          },
+          {
+            "number": "12.2",
+            "title": "Entrepreneurship in the Digital Landscape",
+            "pdfPage": 249
+          },
+          {
+            "number": "12.2.1",
+            "title": "Digital Transformation and Entrepreneurship",
+            "pdfPage": 249
+          },
+          {
+            "number": "12.2.2",
+            "title": "Role of Digital Technologies",
+            "pdfPage": 249
+          },
+          {
+            "number": "12.2.2.1",
+            "title": "Social Media",
+            "pdfPage": 250
+          },
+          {
+            "number": "12.2.2.2",
+            "title": "Mobile Apps",
+            "pdfPage": 250
+          },
+          {
+            "number": "12.2.2.3",
+            "title": "Cloud Computing",
+            "pdfPage": 250
+          },
+          {
+            "number": "12.2.2.4",
+            "title": "Big Data Analytics",
+            "pdfPage": 250
+          },
+          {
+            "number": "12.2.2.5",
+            "title": "Digital Marketing and E-commerce",
+            "pdfPage": 250
+          },
+          {
+            "number": null,
+            "title": "Digital Marketing Strategies",
+            "pdfPage": 251
+          },
+          {
+            "number": "12.2.3.2",
+            "title": "E-commerce Platforms",
+            "pdfPage": 252
+          },
+          {
+            "number": "12.2.4",
+            "title": "Case Studies",
+            "pdfPage": 252
+          },
+          {
+            "number": "12.2.4.1",
+            "title": "Daraz",
+            "pdfPage": 252
+          },
+          {
+            "number": "12.2.4.2",
+            "title": "Bykea",
+            "pdfPage": 252
+          },
+          {
+            "number": "12.2.4",
+            "title": "Challenges and Opportunities",
+            "pdfPage": 253
+          },
+          {
+            "number": "12.2.4.1",
+            "title": "Opportunities",
+            "pdfPage": 253
+          },
+          {
+            "number": "12.2.4.2",
+            "title": "Challenges",
+            "pdfPage": 253
+          },
+          {
+            "number": "12.3",
+            "title": "Digital Tools and Platforms",
+            "pdfPage": 253
+          },
+          {
+            "number": "12.3.1",
+            "title": "Overview of Digital Tools",
+            "pdfPage": 253
+          },
+          {
+            "number": "12.3.1",
+            "title": "Market Research Tools",
+            "pdfPage": 254
+          },
+          {
+            "number": "12.3.3",
+            "title": "Online Marketing Tools",
+            "pdfPage": 255
+          },
+          {
+            "number": null,
+            "title": "Strategies for social media marketing, SEO, and content creation:",
+            "pdfPage": 255
+          },
+          {
+            "number": "12.3.3",
+            "title": "E-commerce Platforms",
+            "pdfPage": 255
+          },
+          {
+            "number": "12.4",
+            "title": "Business Idea Generation",
+            "pdfPage": 256
+          },
+          {
+            "number": "12.4.1",
+            "title": "Ideation and Problem Solving",
+            "pdfPage": 256
+          },
+          {
+            "number": "12.4.2",
+            "title": "Problem Identification",
+            "pdfPage": 256
+          },
+          {
+            "number": "12.4.3",
+            "title": "Creative Problem Solving",
+            "pdfPage": 257
+          },
+          {
+            "number": "12.5",
+            "title": "Developing Business Plans",
+            "pdfPage": 257
+          },
+          {
+            "number": "12.5.1",
+            "title": "Creating Comprehensive Business Plans",
+            "pdfPage": 258
+          },
+          {
+            "number": "12.5.2",
+            "title": "Components of a Business Plan",
+            "pdfPage": 258
+          },
+          {
+            "number": "12.5.3",
+            "title": "Prototyping and Iteration",
+            "pdfPage": 260
+          },
+          {
+            "number": "12.6",
+            "title": "Ethical and Sustainable Entrepreneurship",
+            "pdfPage": 260
+          },
+          {
+            "number": "12.6.1",
+            "title": "Ethical Practices and Sustainable Growth",
+            "pdfPage": 260
+          },
+          {
+            "number": "12.6.2",
+            "title": "Ethical Entrepreneurship",
+            "pdfPage": 261
+          },
+          {
+            "number": "12.6.4",
+            "title": "Sustainable Development Goals (SDGs)",
+            "pdfPage": 261
+          }
+        ],
+        "notes": "Some heading numbers appear inconsistent/mis-numbered in the printed text itself (e.g. '12.1.1.1 Local Businesses' repeating a number already used, '12.1.3.2 Innovation and Progress' skipping levels, '12.2.3.2 E-commerce Platforms' and second '12.3.3' heading), these are transcribed exactly as printed without correction."
+      }
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "source": "content/punjab/textbooks/math-10.pdf",
+  "subject": "math",
+  "grade": 10,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "MATHEMATICS 10",
+  "publisher": "Punjab Education, Curriculum, Training and Assessment Authority",
+  "curriculum": "This textbook is based on updated/revised National Curriculum of Pakistan 2023",
+  "language": "en",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Complex Numbers",
+      "titleEn": null,
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "Quadratic Equations and Inequalities",
+      "titleEn": null,
+      "page": 22,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "Matrices and Determinants",
+      "titleEn": null,
+      "page": 47,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "Functions and Graphs",
+      "titleEn": null,
+      "page": 81,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "Algebraic Fractions",
+      "titleEn": null,
+      "page": 97,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "Vectors in Plane",
+      "titleEn": null,
+      "page": 111,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "Trigonometry",
+      "titleEn": null,
+      "page": 125,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "Chords and Arcs of a Circle",
+      "titleEn": null,
+      "page": 143,
+      "topics": []
+    },
+    {
+      "number": 9,
+      "title": "Tangent and Angles of a Circle",
+      "titleEn": null,
+      "page": 155,
+      "topics": []
+    },
+    {
+      "number": 10,
+      "title": "Practical Geometry of Circles",
+      "titleEn": null,
+      "page": 168,
+      "topics": []
+    },
+    {
+      "number": 11,
+      "title": "Information Handling",
+      "titleEn": null,
+      "page": 176,
+      "topics": []
+    },
+    {
+      "number": 12,
+      "title": "Probability",
+      "titleEn": null,
+      "page": 196,
+      "topics": []
+    }
+  ],
+  "notes": "The Table of Contents lists unit names only, with no sub-topics. Non-teaching entries (Answers 212, Glossary 237, Symbols 241, Pairing Scheme & Model Paper 242) were omitted as instructed."
+}

@@ -1,0 +1,47 @@
+{
+  "source": "content/punjab/textbooks/pst-9-ur.pdf",
+  "subject": "pst",
+  "grade": 9,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "مطالعہ پاکستان برائے جماعت نہم",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": null,
+  "language": "ur",
+  "contentsPages": [
+    2
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "پاکستان کی نظریاتی اساس",
+      "titleEn": "Ideological Basis of Pakistan",
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "تحریک پاکستان اور پاکستان کا قیام",
+      "titleEn": "Pakistan Movement and Creation of Pakistan",
+      "page": 18,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "زمین اور ماحول",
+      "titleEn": "Land and Environment",
+      "page": 59,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "خواتین کو بااختیار بنانا",
+      "titleEn": "Empowering Women",
+      "page": 95,
+      "topics": []
+    }
+  ],
+  "notes": "The contents page (فہرست) lists only chapter titles with page numbers; no sub-topics are listed. Chapter numbers are printed as '-1', '-2', '-3', '-4' before the titles."
+}

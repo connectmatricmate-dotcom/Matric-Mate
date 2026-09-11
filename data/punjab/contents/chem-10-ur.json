@@ -1,0 +1,110 @@
+{
+  "source": "content/punjab/textbooks/chem-10-ur.pdf",
+  "subject": "chem",
+  "grade": 10,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "کیمسٹری 10 (Chemistry 10)",
+  "publisher": "Punjab Education, Curriculum, Training and Assessment Authority (PECTAA)",
+  "curriculum": "Based on Revised National Curriculum of Pakistan 2023",
+  "language": "mixed",
+  "contentsPages": [
+    3
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 14,
+      "title": "مادہ کی حالتیں اور ان میں تبدیلیاں (States of Matter and Phase Changes)",
+      "titleEn": "States of Matter and Phase Changes",
+      "page": 1,
+      "topics": []
+    },
+    {
+      "number": 15,
+      "title": "سٹائیکیومیٹری (Stoichiometry)",
+      "titleEn": "Stoichiometry",
+      "page": 14,
+      "topics": []
+    },
+    {
+      "number": 16,
+      "title": "الیکٹروکیمسٹری (Electrochemistry)",
+      "titleEn": "Electrochemistry",
+      "page": 29,
+      "topics": []
+    },
+    {
+      "number": 17,
+      "title": "ری ایکشن کائی نیٹکس (Reaction Kinetics)",
+      "titleEn": "Reaction Kinetics",
+      "page": 52,
+      "topics": []
+    },
+    {
+      "number": 18,
+      "title": "سالٹس (Salts)",
+      "titleEn": "Salts",
+      "page": 63,
+      "topics": []
+    },
+    {
+      "number": 19,
+      "title": "نائٹروجن اور سلفر (Nitrogen and Sulphur)",
+      "titleEn": "Nitrogen and Sulphur",
+      "page": 69,
+      "topics": []
+    },
+    {
+      "number": 20,
+      "title": "پانی (Water)",
+      "titleEn": "Water",
+      "page": 80,
+      "topics": []
+    },
+    {
+      "number": 21,
+      "title": "آرگینک کیمسٹری (Organic Chemsitry)",
+      "titleEn": "Organic Chemistry",
+      "page": 91,
+      "topics": []
+    },
+    {
+      "number": 22,
+      "title": "ہائیڈروکاربنز (Hydrocarbons)",
+      "titleEn": "Hydrocarbons",
+      "page": 107,
+      "topics": []
+    },
+    {
+      "number": 23,
+      "title": "مونو ہائیڈروکسی الکینز یا الکوحلز (Monohydroxy Alkanes or Alcohols)",
+      "titleEn": "Monohydroxy Alkanes or Alcohols",
+      "page": 116,
+      "topics": []
+    },
+    {
+      "number": 24,
+      "title": "کاربوکسلک ایسڈز (Carboxylic Acids)",
+      "titleEn": "Carboxylic Acids",
+      "page": 123,
+      "topics": []
+    },
+    {
+      "number": 25,
+      "title": "بائیوکیمسٹری (Biochemistry)",
+      "titleEn": "Biochemistry",
+      "page": 131,
+      "topics": []
+    },
+    {
+      "number": 26,
+      "title": "پولیمرز (Polymers)",
+      "titleEn": "Polymers",
+      "page": 141,
+      "topics": []
+    }
+  ],
+  "notes": "The contents page also lists 'پیئرنگ سکیم/ماڈل پیپر' at page 150 with no chapter number, which is excluded as back matter per instructions."
+}

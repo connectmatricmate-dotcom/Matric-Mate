@@ -1,0 +1,2132 @@
+{
+  "source": "content/punjab/textbooks/pst-10.pdf",
+  "subject": "pst",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 156,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    2
+  ],
+  "backMatterStart": 153,
+  "locateNotes": "Printed page numbers run two behind the PDF labels (printed 1 = PDF 3); all chapter openings match the contents list. PDF 153 begins 'Preparation of Examination Paper of Pakistan Studies (Compulsory) for Class 10th' (pairing scheme), followed by the Model Paper on PDF 154-156.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Ideological Basis of Pakistan",
+      "titleEn": null,
+      "pdfStart": 3,
+      "pdfEnd": 14,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "IDEOLOGICAL BASIS OF PAKISTAN",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define the term ideology and understand the major sources of the ideology of Pakistan.",
+          "Relate Pakistan's ideology to the basic values of Islam and the economic and social deprivations of the Muslims in India, using historical evidence and scholarly analysis.",
+          "Analyze the basic components of the ideology of Pakistan (sovereignty of Allah, equity and justice, democracy and equal rights for minorities).",
+          "Evaluate Pakistan's ideology with reference to the statements of Quaid Azam (رحمتہ اللہ علیہ) and Allama Iqbal (رحمتہ اللہ علیہ), including their vision for a Muslim state and the role of Islam in Pakistan's identity and governance.",
+          "Explain Muslim reformers and sociocultural aspects of Muslim India.",
+          "Understand the origin and evolution of the Two-Nation Theory."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Ideology",
+            "pdfPage": 3
+          },
+          {
+            "number": null,
+            "title": "Ideology of Pakistan",
+            "pdfPage": 3
+          },
+          {
+            "number": null,
+            "title": "Important Sources of Ideology of Pakistan",
+            "pdfPage": 4
+          },
+          {
+            "number": null,
+            "title": "1. Common Religion",
+            "pdfPage": 4
+          },
+          {
+            "number": null,
+            "title": "2. Common Political Objectives",
+            "pdfPage": 4
+          },
+          {
+            "number": null,
+            "title": "3. Common Educational Objectives",
+            "pdfPage": 4
+          },
+          {
+            "number": null,
+            "title": "4. Common Economic Objectives",
+            "pdfPage": 5
+          },
+          {
+            "number": null,
+            "title": "5. Common Cultural Objectives",
+            "pdfPage": 5
+          },
+          {
+            "number": null,
+            "title": "Ideology of Pakistan and Basic Values of Islam",
+            "pdfPage": 5
+          },
+          {
+            "number": null,
+            "title": "Social and Economic Deprivation of Muslims in India",
+            "pdfPage": 5
+          },
+          {
+            "number": null,
+            "title": "Basic Components of the Ideology of Pakistan",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "1. Beliefs",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "2. Pillars of Islam",
+            "pdfPage": 7
+          },
+          {
+            "number": null,
+            "title": "3. Sovereignty of Almighty Allah",
+            "pdfPage": 7
+          },
+          {
+            "number": null,
+            "title": "4. Rule of Law",
+            "pdfPage": 7
+          },
+          {
+            "number": null,
+            "title": "5. Brotherhood and Equality",
+            "pdfPage": 7
+          },
+          {
+            "number": null,
+            "title": "6. Justice and Equity",
+            "pdfPage": 8
+          },
+          {
+            "number": null,
+            "title": "7. Democracy",
+            "pdfPage": 9
+          },
+          {
+            "number": null,
+            "title": "8. Equal Rights of Minorities",
+            "pdfPage": 9
+          },
+          {
+            "number": null,
+            "title": "Explanation of the Ideology of Pakistan in the Light of the Sayings of Allama Muhammad Iqbal (رحمتہ اللہ علیہ) and Quaid-e-Azam Muhammad Ali Jinnah (رحمتہ اللہ علیہ)",
+            "pdfPage": 9
+          },
+          {
+            "number": null,
+            "title": "Ideology of Pakistan and Allama Muhammad Iqbal (رحمتہ اللہ علیہ)",
+            "pdfPage": 9
+          },
+          {
+            "number": null,
+            "title": "Ideology of Pakistan and Quaid-e-Azam Muhammad Ali Jinnah (رحمتہ اللہ علیہ)",
+            "pdfPage": 10
+          },
+          {
+            "number": null,
+            "title": "Muslim Reformers and the Socio-Cultural Aspects of the Muslim India",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "The Muslim Reformers",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "Socio-Cultural Aspects of the Muslim India",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "Awareness of Ideology of Pakistan",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "The Two-Nation Theory: Origin and Evolution",
+            "pdfPage": 11
+          },
+          {
+            "number": null,
+            "title": "1. Beginning of the Two-Nation Theory in the Subcontinent",
+            "pdfPage": 12
+          },
+          {
+            "number": null,
+            "title": "2. Sir Syed Ahmad Khan and the Two-Nation Theory",
+            "pdfPage": 12
+          },
+          {
+            "number": null,
+            "title": "3. Chaudhry Rahmat Ali and the Two-Nation Theory",
+            "pdfPage": 12
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 2,
+      "title": "Pakistan Movement",
+      "titleEn": null,
+      "pdfStart": 15,
+      "pdfEnd": 29,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "PAKISTAN MOVEMENT",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define British colonialism and its impacts on various aspects of life in the Indo-Pakistan subcontinent.",
+          "Recognize the significant role of Sir Syed Ahmed Khan as a reformer whose efforts, connections with the Western world and establishment of the Aligarh Movement played a crucial role in the success of the Pakistan Movement.",
+          "Analyze the important political developments between 1906 and 1920 (from Simla deputation till Khilafat Movement.)",
+          "Analyze the important political developments between 1920 and 1939 (from Khilafat Movement till Day of Deliverance.)",
+          "Evaluate the political developments from 1940 till 1947.",
+          "Discuss the role of political leaders, including women and minorities, in the making of Pakistan. (Quaid-e-Azam (رحمتہ اللہ علیہ), Fatima Jinnah and SP Singha)"
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Background of the Pakistan Movement",
+            "pdfPage": 15
+          },
+          {
+            "number": null,
+            "title": "British Colonialism and Its Impacts on Various Aspects of Life in the Sub-continent",
+            "pdfPage": 15
+          },
+          {
+            "number": null,
+            "title": "Significant Role of Sir Syed Ahmed Khan as a Reformer",
+            "pdfPage": 16
+          },
+          {
+            "number": null,
+            "title": "Sir Syed Ahmad Khan and the Aligarh Movement",
+            "pdfPage": 16
+          },
+          {
+            "number": null,
+            "title": "Objectives of the Aligarh Movement",
+            "pdfPage": 16
+          },
+          {
+            "number": null,
+            "title": "Endeavors of the Aligarh Movement",
+            "pdfPage": 16
+          },
+          {
+            "number": null,
+            "title": "Important Political Developments During 1906-1920",
+            "pdfPage": 17
+          },
+          {
+            "number": null,
+            "title": "Partition of Bengal 1905",
+            "pdfPage": 17
+          },
+          {
+            "number": null,
+            "title": "The Simla Deputation 1906",
+            "pdfPage": 18
+          },
+          {
+            "number": null,
+            "title": "Establishment of the Muslim League 1906",
+            "pdfPage": 18
+          },
+          {
+            "number": null,
+            "title": "Minto-Morley Reforms 1909",
+            "pdfPage": 18
+          },
+          {
+            "number": null,
+            "title": "Lucknow Pact 1916",
+            "pdfPage": 19
+          },
+          {
+            "number": null,
+            "title": "Khilafat Movement 1919",
+            "pdfPage": 19
+          },
+          {
+            "number": null,
+            "title": "Non-Cooperation Movement 1920",
+            "pdfPage": 19
+          },
+          {
+            "number": null,
+            "title": "Hijrat Movement 1920",
+            "pdfPage": 19
+          },
+          {
+            "number": null,
+            "title": "Important Political Developments Between 1920-1939",
+            "pdfPage": 20
+          },
+          {
+            "number": null,
+            "title": "Delhi Proposals 1927",
+            "pdfPage": 20
+          },
+          {
+            "number": null,
+            "title": "Simon Commission 1927",
+            "pdfPage": 20
+          },
+          {
+            "number": null,
+            "title": "Nehru Report 1928",
+            "pdfPage": 20
+          },
+          {
+            "number": null,
+            "title": "Fourteen Points of Quaid-e-Azam (رحمتہ اللہ علیہ), 1929",
+            "pdfPage": 20
+          },
+          {
+            "number": null,
+            "title": "Allama Muhammad Iqbal's (رحمتہ اللہ علیہ) Allahabad Address 1930",
+            "pdfPage": 21
+          },
+          {
+            "number": null,
+            "title": "The 1935 Act, Provincial Autonomy, and Congress Ministries",
+            "pdfPage": 22
+          },
+          {
+            "number": null,
+            "title": "Important Political Developments During 1940-1947",
+            "pdfPage": 22
+          },
+          {
+            "number": null,
+            "title": "Lahore Resolution 1940",
+            "pdfPage": 22
+          },
+          {
+            "number": null,
+            "title": "Text of the Resolution",
+            "pdfPage": 22
+          },
+          {
+            "number": null,
+            "title": "Crips Mission 1942",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Proposals of the Cripps Mission",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Wavell Plan 1945",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Simla Conference 1945 and Elections 1945-46",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Cabinet Mission Plan 1946",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Direct Action Day 1946",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Interim Government 1946",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "3rd June 1947 Plan",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "The Indian Independence Act, 1947",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Radcliffe Award",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Dawn of Independence",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Role of Quaid-e-Azam Muhammad Ali Jinnah (رحمتہ اللہ علیہ) in the Creation of Pakistan",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Role of Mohtarma Fatima Jinnah in the Creation of Pakistan",
+            "pdfPage": 27
+          },
+          {
+            "number": null,
+            "title": "Role of SP Singha in the Establishment of Pakistan",
+            "pdfPage": 27
+          }
+        ],
+        "notes": "Crips Mission heading is spelled 'Crips Mission 1942' as printed on the page (likely a typo for 'Cripps Mission')."
+      }
+    },
+    {
+      "number": 3,
+      "title": "History of Pakistan (1947-Uptill Now) and Constitutional Development in Pakistan",
+      "titleEn": null,
+      "pdfStart": 30,
+      "pdfEnd": 65,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "HISTORY OF PAKISTAN (1947-UP TILL NOW) AND CONSTITUTIONAL DEVELOPMENT IN PAKISTAN",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Identify the initial challenges confronted by the newly formed state of Pakistan, with a particular focus on economic, geopolitical, refugee, constitutional reform, and administrative issues.",
+          "Explain how successful Pakistan was in overcoming the initial problems faced.",
+          "Evaluate the contributions and leadership of Quaid-e-Azam رحمتہ اللہ علیہ as the first Governor General and Liaqat Ali Khan as the first Prime Minister of Pakistan, analysing their impact on the country's political, social, and economic development.",
+          "Critically analyse the ruling periods of different governments, evaluating their policies/reforms from 1958 till 2025",
+          "Critically analyse the causes and impacts of the Wars of 1948, 1965, 1971, Kargil 1999 and Operation Bunyan-um-Marsoos between Pakistan and India.",
+          "Analyse the social, political and economic impacts of International wars (War on Terror and Soviet-Afghan war) on Pakistan",
+          "Identify salient features of Objectives Resolution in order to signify its impact on constitutional development in Pakistan.",
+          "Outline the salient features of the Constitution of 1956, 1962, and 1973.",
+          "Compare and contrast the constitutions of 1956 and 1962, particularly with reference to the Islamic features included in both constitutions.",
+          "Evaluate the reasons for the failure of the constitution of 1956 and 1962.",
+          "Discuss the significance of the rule of law as a fundamental principle of a democratic state and propose methods to enhance the law and order situation in Pakistan."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Initial Challenges Confronted by Pakistan",
+            "pdfPage": 30
+          },
+          {
+            "number": "1",
+            "title": "Economic Problems",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "(i) Distribution of Factories and Banks",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "ii) Distribution of Military Assets",
+            "pdfPage": 31
+          },
+          {
+            "number": null,
+            "title": "iii) River Water Dispute",
+            "pdfPage": 31
+          },
+          {
+            "number": "2",
+            "title": "Geographical Problems",
+            "pdfPage": 31
+          },
+          {
+            "number": null,
+            "title": "Radcliffe Award",
+            "pdfPage": 31
+          },
+          {
+            "number": "3",
+            "title": "Problems of Division of Princely States",
+            "pdfPage": 32
+          },
+          {
+            "number": "4",
+            "title": "Constitutional Problems",
+            "pdfPage": 32
+          },
+          {
+            "number": "5",
+            "title": "Administrative Problems",
+            "pdfPage": 32
+          },
+          {
+            "number": "6",
+            "title": "Settlement of Migrants",
+            "pdfPage": 32
+          },
+          {
+            "number": null,
+            "title": "How Successful was Pakistan in Overcoming the Initial Problems?",
+            "pdfPage": 33
+          },
+          {
+            "number": null,
+            "title": "Quaid-e-Azam Muhammad Ali Jinnah's (رحمتہ اللہ علیہ) Role as First Governor General",
+            "pdfPage": 33
+          },
+          {
+            "number": null,
+            "title": "Liaqat Ali Khan's Role as First Prime Minister",
+            "pdfPage": 34
+          },
+          {
+            "number": null,
+            "title": "Ruling Periods of Different Governments from 1958 to 2025",
+            "pdfPage": 35
+          },
+          {
+            "number": "1",
+            "title": "Ayub Khan Era (1958-1969)",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "(i) Lack of Political Leadership",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "(ii) Delay in Elections",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "(iii) Frequent Changes in the Governments",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "(iv) Constant Hurdles in Making Constitution",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "Basic Democracies System (1959)",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "Muslim Family Laws (1961)",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "Presidential Elections of 1965",
+            "pdfPage": 36
+          },
+          {
+            "number": null,
+            "title": "Impacts of Elections on Politics",
+            "pdfPage": 36
+          },
+          {
+            "number": null,
+            "title": "Ayub Khan's Reforms",
+            "pdfPage": 36
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 36
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 36
+          },
+          {
+            "number": null,
+            "title": "Reforms in Education and the Social Sector",
+            "pdfPage": 36
+          },
+          {
+            "number": null,
+            "title": "Yahya Khan Regime 1969-1971",
+            "pdfPage": 37
+          },
+          {
+            "number": null,
+            "title": "Legal Framework Order (1970)",
+            "pdfPage": 37
+          },
+          {
+            "number": null,
+            "title": "General Elections of 1970",
+            "pdfPage": 37
+          },
+          {
+            "number": null,
+            "title": "Separation of East Pakistan and Emergence of Bangladesh",
+            "pdfPage": 38
+          },
+          {
+            "number": null,
+            "title": "Causes of Separation of East Pakistan",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(i) Geographical Distance",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(ii) Impacts of Hindus on Trade and Services",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(iii) Role of the Hindu Teachers",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(iv) The Language Issue",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(v) Problem of Representation Ratio",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(vi) Indian Interference",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(vii) Six Points of Sheikh Mujeeb-ur-Rehman",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "(viii) General Elections of 1970",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "Zulfiqar Ali Bhutto's Era (1971-77)",
+            "pdfPage": 40
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 40
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 40
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 40
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 41
+          },
+          {
+            "number": null,
+            "title": "Economic and Social Reforms",
+            "pdfPage": 41
+          },
+          {
+            "number": null,
+            "title": "Constitutional Amendment Related to Khatm-e-Nabuwwat, 1974",
+            "pdfPage": 41
+          },
+          {
+            "number": null,
+            "title": "Foreign Affairs",
+            "pdfPage": 41
+          },
+          {
+            "number": null,
+            "title": "Administrative reforms",
+            "pdfPage": 41
+          },
+          {
+            "number": null,
+            "title": "General Muhammad Zia-ul-Haq's Era (1977-1988)",
+            "pdfPage": 41
+          },
+          {
+            "number": null,
+            "title": "Industrial and Agricultural Reforms",
+            "pdfPage": 42
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 42
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 42
+          },
+          {
+            "number": null,
+            "title": "Economic Reforms",
+            "pdfPage": 42
+          },
+          {
+            "number": null,
+            "title": "Social Reforms",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Foreign Affairs",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Benazir Bhutto's First Term (1988-1990)",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Economic Reforms",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Social Reforms",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Foreign Affairs",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "End of the Government",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Benazir Bhutto's Second Term (1993-1996)",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Economic Reforms",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Social Reforms",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Presidential Election",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "End of the Government",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Mian Muhammad Nawaz Sharif's First Term (1990-93)",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Economic Reforms",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Social Reforms",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Constitutional Reforms",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Administration Reforms",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "End of the Government",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Mian Muhammad Nawaz Sharif's Second Term (1997-99)",
+            "pdfPage": 47
+          },
+          {
+            "number": "1",
+            "title": "Economic Reforms and Privatization",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "i) Strengthening the Economy",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "ii) Marketing Liberalization",
+            "pdfPage": 47
+          },
+          {
+            "number": "2",
+            "title": "Development of Modern Infrastructure",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "i) Motorway Project",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "ii) Improved Transportation Network",
+            "pdfPage": 47
+          },
+          {
+            "number": "3",
+            "title": "Strengthening National Security",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "i. Chaghai Nuclear Tests 1998",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "ii. National Pride and Sovereignty",
+            "pdfPage": 47
+          },
+          {
+            "number": "4",
+            "title": "Constitutional and Political Reforms",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "i) Strengthening Democracy",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "ii) Party Discipline and Stability",
+            "pdfPage": 48
+          },
+          {
+            "number": "5",
+            "title": "Economic Development and Investment",
+            "pdfPage": 48
+          },
+          {
+            "number": null,
+            "title": "i) Boosting Agriculture and Rural Development",
+            "pdfPage": 48
+          },
+          {
+            "number": null,
+            "title": "ii) Encouraging Foreign Investment",
+            "pdfPage": 48
+          },
+          {
+            "number": "6",
+            "title": "Advancing Technology and Communication",
+            "pdfPage": 48
+          },
+          {
+            "number": null,
+            "title": "i) Telecommunication Revolution",
+            "pdfPage": 48
+          },
+          {
+            "number": "7",
+            "title": "Diplomatic Outreach and International Relations",
+            "pdfPage": 48
+          },
+          {
+            "number": null,
+            "title": "i) Promoting Peace with Neighbours",
+            "pdfPage": 48
+          },
+          {
+            "number": null,
+            "title": "ii) Improvement in US-Pakistan Relations",
+            "pdfPage": 48
+          },
+          {
+            "number": null,
+            "title": "Pakistan as a Nuclear Power",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "Mian Muhammad Nawaz Sharif's Third Term of Government (2013-17)",
+            "pdfPage": 49
+          },
+          {
+            "number": "1",
+            "title": "Reforms in the Energy Sector",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "i- Energy Projects",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "ii- Ending Power Outages",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "iii- Reforming Energy Policies",
+            "pdfPage": 49
+          },
+          {
+            "number": "2",
+            "title": "China-Pakistan Economic Corridor (CPEC)",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "i) Initiation and Development",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "ii) Economic Impacts",
+            "pdfPage": 50
+          },
+          {
+            "number": "3",
+            "title": "Issuance of Health Card",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "i- Insurance Coverage",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "ii- Access to Health Care",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "iii- Reduction of Financial Burden",
+            "pdfPage": 50
+          },
+          {
+            "number": "4",
+            "title": "Basic Infrastructure Development",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "i- Transportation Projects",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "ii- Public Transportation",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "iii- Infrastructure Modernization",
+            "pdfPage": 50
+          },
+          {
+            "number": "5",
+            "title": "Economic Development",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "i- Stable Economic Policies",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "ii- Improvement in GDP",
+            "pdfPage": 50
+          },
+          {
+            "number": null,
+            "title": "iii- Foreign Investment",
+            "pdfPage": 51
+          },
+          {
+            "number": "6",
+            "title": "Law and Order",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "i- Counterterrorism Operations",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "ii- Security Measures",
+            "pdfPage": 51
+          },
+          {
+            "number": "7",
+            "title": "The National Endowment for Science and Technology- NEST",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "i- Objectives",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "ii- Funding for Innovation",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "iii. Connecting Sectors",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "General Pervez Musharraf's Era (1999-2008)",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Economic Reforms",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Social Reforms",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Constitutional Reforms",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Administrative Reforms",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "General Elections (2002)",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Syed Yousaf Raza Gilani's Era (2008-12)",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Economic Reforms",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Social Reforms",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "Administrative Reforms",
+            "pdfPage": 53
+          },
+          {
+            "number": null,
+            "title": "End of the Government",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "Imran Khan's Era (2018-22)",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "Industrial Reforms",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "Agricultural Reforms",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "Educational Reforms",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "Health Reforms",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "Economic and Social Reforms",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "Foreign Policy and Administrative Reforms",
+            "pdfPage": 54
+          },
+          {
+            "number": null,
+            "title": "End of Government",
+            "pdfPage": 55
+          },
+          {
+            "number": null,
+            "title": "Mian Muhammad Shahbaz Sharif's First Era (2022-23)",
+            "pdfPage": 55
+          },
+          {
+            "number": null,
+            "title": "Mian Muhammad Shahbaz Sharif's Second Era (2024-Till Date)",
+            "pdfPage": 55
+          },
+          {
+            "number": null,
+            "title": "Wars Between Pakistan and India (1948, 1965, 1971, and Kargil 1999)",
+            "pdfPage": 55
+          },
+          {
+            "number": null,
+            "title": "Pakistan-India War (1948)",
+            "pdfPage": 55
+          },
+          {
+            "number": null,
+            "title": "Pakistan-India War (1965)",
+            "pdfPage": 56
+          },
+          {
+            "number": null,
+            "title": "Main Events of the War",
+            "pdfPage": 56
+          },
+          {
+            "number": null,
+            "title": "Impacts of War",
+            "pdfPage": 56
+          },
+          {
+            "number": null,
+            "title": "Pakistan and India War (1971)",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Events of War (1971)",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Pakistan and India Kargil War (1999)",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Operation Bunyan-um-Marsoos (2025)",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Background",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "Events",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "Impacts of International Wars on Pakistan",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "War Against Terrorism and Soviet-Afghan War",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "War Against Terrorism",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "Soviet-Afghan War",
+            "pdfPage": 59
+          },
+          {
+            "number": null,
+            "title": "Objectives Resolution (1949)",
+            "pdfPage": 59
+          },
+          {
+            "number": "1",
+            "title": "Sovereignty of Almighty Allah",
+            "pdfPage": 59
+          },
+          {
+            "number": "2",
+            "title": "Adherence to Islamic Values",
+            "pdfPage": 59
+          },
+          {
+            "number": "3",
+            "title": "Islamic Way of Life",
+            "pdfPage": 59
+          },
+          {
+            "number": "4",
+            "title": "Protection of Minorities",
+            "pdfPage": 59
+          },
+          {
+            "number": "5",
+            "title": "Provision of Basic Rights",
+            "pdfPage": 59
+          },
+          {
+            "number": "6",
+            "title": "Federal Form of Government",
+            "pdfPage": 59
+          },
+          {
+            "number": "7",
+            "title": "Development of Backward Areas",
+            "pdfPage": 60
+          },
+          {
+            "number": "8",
+            "title": "Independence of Judiciary",
+            "pdfPage": 60
+          },
+          {
+            "number": "9",
+            "title": "Urdu as National Language",
+            "pdfPage": 60
+          },
+          {
+            "number": null,
+            "title": "Importance of Objectives Resolution",
+            "pdfPage": 60
+          },
+          {
+            "number": null,
+            "title": "Salient Features of the Constitutions of 1956, 1962, and 1973",
+            "pdfPage": 60
+          },
+          {
+            "number": null,
+            "title": "Salient Features of the Constitution of 1956",
+            "pdfPage": 60
+          },
+          {
+            "number": null,
+            "title": "Abrogation of the Constitution",
+            "pdfPage": 61
+          },
+          {
+            "number": null,
+            "title": "Salient Features of Constitution of 1962",
+            "pdfPage": 61
+          },
+          {
+            "number": null,
+            "title": "Failure of the Constitution of 1962",
+            "pdfPage": 62
+          },
+          {
+            "number": null,
+            "title": "Salient Features of the Constitution of 1973",
+            "pdfPage": 62
+          },
+          {
+            "number": null,
+            "title": "Importance of Rule of Law",
+            "pdfPage": 63
+          },
+          {
+            "number": null,
+            "title": "Suggestions for Improving Law and Order Situation in Pakistan",
+            "pdfPage": 63
+          }
+        ],
+        "notes": "Some sub-heading numbering styles are inconsistent as printed (e.g. 'ii)' without a preceding 'i)' label on page for Distribution of Military Assets, since 'i)' appears as '(i) Distribution of Factories and Banks' on the previous page under section 1). These have been transcribed exactly as printed."
+      }
+    },
+    {
+      "number": 4,
+      "title": "Geography of Pakistan",
+      "titleEn": null,
+      "pdfStart": 66,
+      "pdfEnd": 88,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "GEOGRAPHY OF PAKISTAN",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain Pakistan's precise cardinal location on a world map.",
+          "Evaluate the significance of Pakistan's location.",
+          "Locate Pakistan on the world map and assess the significance of its geographical location in terms of its geopolitical and economic importance.",
+          "Describe the significance of Pakistan's major cities based on their geographical location, including their relationship to surrounding physical features such as rivers, mountains, and coastal areas.",
+          "Label the significant mountain ranges, plateaus, rivers, and plains of Pakistan on a physical map, and explain their importance to the country's physical and human geography.",
+          "Investigate different factors affecting the various types of forests and evaluate the advantages and disadvantages of irrigated plantations and mangroves with regard to sustainability and climatic impacts and protecting against natural disasters.",
+          "Investigate geographical, climatic, political, cultural, economic and industrial aspects influencing natural vegetation and forests using geographic representations and geospatial technologies for deeper understanding.",
+          "Utilize geographic tools and techniques to annotate and map the spatial distribution of the different types of forests in Pakistan, including productive and protective forests, and also elaborate their benefits and uses for the country.",
+          "Compare the climatic zones of Pakistan in terms of the distribution of temperature, precipitation, including monsoons, cyclones (Western Depressions), and convectional rain, using a variety of resources such as newspapers, weather charts, geographic representations, and geospatial technologies.",
+          "Assess the ramifications of seasonal shifts in temperature, pressure, and wind patterns on Pakistan's economy taking into consideration the effects of cold, ice, and snow on mountainous areas, as well as the effects of storms, floods, and droughts on agriculture, industry, and communication.",
+          "Analyze the factors that contribute to global warming, as well as the resulting physical processes and phenomena that are linked to flooding, climate change, and other environmental hazards.",
+          "Evaluate the environmental impacts of fossil fuel consumption and suggest approaches to minimize the impacts of climate change and global warming, emphasizing the roles of governments and societies in environmental management. {Case Study: Evaluate the effectiveness of Pakistan's National Disaster Management Authority (NDMA) in disaster management and propose measures to improve disaster preparedness and response.}"
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Introduction",
+            "pdfPage": 67
+          },
+          {
+            "number": null,
+            "title": "Location of Pakistan",
+            "pdfPage": 67
+          },
+          {
+            "number": null,
+            "title": "Significance of Pakistan's Geographical Location in Terms of Its Geo-Political and Economic Importance",
+            "pdfPage": 68
+          },
+          {
+            "number": null,
+            "title": "Major Cities of Pakistan",
+            "pdfPage": 69
+          },
+          {
+            "number": null,
+            "title": "Importance of Major Cities in Relation to Rivers, Mountains and Coastal Areas",
+            "pdfPage": 69
+          },
+          {
+            "number": null,
+            "title": "Landforms of Pakistan",
+            "pdfPage": 70
+          },
+          {
+            "number": null,
+            "title": "Importance of Mountains",
+            "pdfPage": 70
+          },
+          {
+            "number": null,
+            "title": "Lifestyles of the People Living in Various Landforms of Pakistan",
+            "pdfPage": 70
+          },
+          {
+            "number": null,
+            "title": "Important Glaciers and Rivers of Pakistan",
+            "pdfPage": 72
+          },
+          {
+            "number": null,
+            "title": "Importance of Glaciers",
+            "pdfPage": 72
+          },
+          {
+            "number": null,
+            "title": "Rivers of Pakistan",
+            "pdfPage": 73
+          },
+          {
+            "number": null,
+            "title": "River Indus and Its Tributaries",
+            "pdfPage": 73
+          },
+          {
+            "number": null,
+            "title": "Barrages and Dams of Pakistan",
+            "pdfPage": 73
+          },
+          {
+            "number": null,
+            "title": "The Important Dams of Pakistan",
+            "pdfPage": 74
+          },
+          {
+            "number": null,
+            "title": "Canals of Pakistan",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "Various Factors Affecting Different Types of Forests",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "Geographical, Climatic, Political, Cultural, Economic, and Industrial Aspects Influencing Natural Vegetation and Forests",
+            "pdfPage": 76
+          },
+          {
+            "number": null,
+            "title": "Distribution of Different Types of Forests in Pakistan, Their Benefits and Uses",
+            "pdfPage": 77
+          },
+          {
+            "number": null,
+            "title": "Productive and Protective Forests",
+            "pdfPage": 78
+          },
+          {
+            "number": null,
+            "title": "Mangrove Forests",
+            "pdfPage": 79
+          },
+          {
+            "number": null,
+            "title": "Climate of Pakistan",
+            "pdfPage": 79
+          },
+          {
+            "number": null,
+            "title": "Seasons of Pakistan",
+            "pdfPage": 80
+          },
+          {
+            "number": null,
+            "title": "Impacts of Climate",
+            "pdfPage": 81
+          },
+          {
+            "number": null,
+            "title": "Impacts of Climate Change (Temperature, Floods, Storms, Droughts) on the Economy of Pakistan",
+            "pdfPage": 82
+          },
+          {
+            "number": null,
+            "title": "Impacts of Storm, Flood, and Drought on Agriculture, Infrastructure, and Transportation Systems",
+            "pdfPage": 83
+          },
+          {
+            "number": null,
+            "title": "Global Warming",
+            "pdfPage": 84
+          },
+          {
+            "number": null,
+            "title": "Link of Global Warming with Floods, Climate Change, and Other Environmental Hazards",
+            "pdfPage": 84
+          },
+          {
+            "number": null,
+            "title": "Environmental Impacts of Fossil Fuels Consumption",
+            "pdfPage": 85
+          },
+          {
+            "number": null,
+            "title": "Role of Government and Society in Reducing Pollution From Fossil Fuels",
+            "pdfPage": 85
+          },
+          {
+            "number": null,
+            "title": "Role of Pakistan National Disaster Management Authority",
+            "pdfPage": 86
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 5,
+      "title": "Pakistan and International Affairs",
+      "titleEn": null,
+      "pdfStart": 89,
+      "pdfEnd": 104,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "PAKISTAN AND INTERNATIONAL AFFAIRS",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Appreciate the importance of foreign policy for any country and evaluate the foreign policy of Pakistan with reference to its need and adherence to the guiding principles and objectives.",
+          "Analyze the geo-political importance of Pakistan with reference to its neighboring states.",
+          "Critically assess the diplomatic ties of Pakistan with neighbouring countries in the region, its impacts and prospects for future relations.",
+          "Examine the significance of the United Nations, its primary organs and their goals, its involvement in global peacekeeping efforts, and the contributions of Pakistan to the UNO in different global peacekeeping activities particularly on occasions of natural calamities and disasters.",
+          "Evaluate Pakistan's foreign relations with other countries focusing on SAARC countries, OIC countries, Britain and commonwealth countries and relate its efforts in highlighting issues of Muslim World on all platforms including OIC.",
+          "Analyze the difficulties faced by United Nations in resolving the crisis in Kashmir, Afghanistan, and Palestine."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Foreign Policy of Pakistan",
+            "pdfPage": 89
+          },
+          {
+            "number": null,
+            "title": "Importance of Foreign Policy of Pakistan",
+            "pdfPage": 89
+          },
+          {
+            "number": null,
+            "title": "Guiding Principles of Foreign Policy",
+            "pdfPage": 90
+          },
+          {
+            "number": null,
+            "title": "Objectives of Pakistan's Foreign Policy",
+            "pdfPage": 90
+          },
+          {
+            "number": null,
+            "title": "Geo-Political Importance of Pakistan with Reference to Its Neighbouring Countries",
+            "pdfPage": 91
+          },
+          {
+            "number": null,
+            "title": "Diplomatic Ties of Pakistan with Neighbouring Countries in the Region, Impacts and Prospects for Future Relations",
+            "pdfPage": 92
+          },
+          {
+            "number": null,
+            "title": "Diplomatic Ties of Pakistan with India",
+            "pdfPage": 92
+          },
+          {
+            "number": null,
+            "title": "Diplomatic Ties of Pakistan with Iran",
+            "pdfPage": 93
+          },
+          {
+            "number": null,
+            "title": "Diplomatic Ties of Pakistan with Afghanistan",
+            "pdfPage": 94
+          },
+          {
+            "number": null,
+            "title": "Diplomatic Ties of Pakistan with China",
+            "pdfPage": 95
+          },
+          {
+            "number": null,
+            "title": "United Nations",
+            "pdfPage": 96
+          },
+          {
+            "number": null,
+            "title": "Importance of the United Nations",
+            "pdfPage": 96
+          },
+          {
+            "number": null,
+            "title": "Basic Organs of the United Nations",
+            "pdfPage": 96
+          },
+          {
+            "number": null,
+            "title": "United Nations and Pakistan",
+            "pdfPage": 98
+          },
+          {
+            "number": null,
+            "title": "Pakistan's Relations with SAARC Countries",
+            "pdfPage": 99
+          },
+          {
+            "number": null,
+            "title": "Pakistan's Relations with the Member Countries of the Organization of Islamic Cooperation",
+            "pdfPage": 99
+          },
+          {
+            "number": null,
+            "title": "Pakistan's Relations with the United Kingdom",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "Pakistan's Relations with Commonwealth Countries",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "Difficulties Faced by the United Nations in Resolving the Crises of Kashmir, Afghanistan, and Palestine",
+            "pdfPage": 101
+          },
+          {
+            "number": null,
+            "title": "Problems Faced by the United Nations in Resolving the Kashmir Issue",
+            "pdfPage": 101
+          },
+          {
+            "number": null,
+            "title": "Problems Faced by the United Nations in Resolving the Afghanistan Issue",
+            "pdfPage": 101
+          },
+          {
+            "number": null,
+            "title": "Problems Faced by the United Nations in Resolving the Palestine Issue",
+            "pdfPage": 102
+          }
+        ],
+        "notes": "Sub-headings under 'Basic Organs of the United Nations' (General Assembly, Security Council, Trusteeship Council, Economic and Social Council, International Court of Justice, Secretariat) are numbered with (1)-(6) in the text on images 8-10 but are treated as sub-points of the organs list rather than separate section headings; only the main heading is listed for brevity, though these are distinct titled subsections in the book."
+      }
+    },
+    {
+      "number": 6,
+      "title": "Resources and Economic Development of Pakistan",
+      "titleEn": null,
+      "pdfStart": 105,
+      "pdfEnd": 114,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "RESOURCES AND ECONOMIC DEVELOPMENT OF PAKISTAN",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain the importance of agriculture, its problems, and the efforts made to modernize agriculture.",
+          "Describe the production and distribution of major crops.",
+          "Develop comprehensive understanding of the classification of farming, including livestock farming and fish farming, with a focus on animal husbandry.",
+          "Investigate the major obstacles in the livestock industry of Pakistan, such as disease outbreaks, limited market access and inadequate infrastructure. Also develop sustainable strategies to promote livestock practices and minimize environmental and social impacts.",
+          "Assess the possible economic impact of the fishing industry in Pakistan, including the socio-economic advantages of fish farming while analyzing infrastructure development initiatives such as the Gwadar Port, CPEC, Makran Coastal Highway, and fishing markets to support sustainable fisheries and suggest potential solutions for achieving this goal.",
+          "Highlight the overall impact of telecommunications on a country, considering its role in driving social and economic progress, the benefits it offers for business and industry, as well as its potential negative effects on the social and political aspects of society.",
+          "Analyze the challenges of providing telecommunication in some parts of Pakistan and describe recent improvements in telecommunication, particularly with reference to the education sector, and also discuss the prospects for its future development.",
+          "Discuss the main problems in the development of industry in Pakistan (tourism, transport and infrastructure)."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Agriculture",
+            "pdfPage": 105
+          },
+          {
+            "number": null,
+            "title": "Importance of Agriculture",
+            "pdfPage": 106
+          },
+          {
+            "number": null,
+            "title": "Problems of Agriculture",
+            "pdfPage": 106
+          },
+          {
+            "number": null,
+            "title": "Modernization in Pakistan's Agriculture",
+            "pdfPage": 107
+          },
+          {
+            "number": null,
+            "title": "Production and Distribution of Major Crops of Pakistan",
+            "pdfPage": 107
+          },
+          {
+            "number": null,
+            "title": "Livestock and Fish Farming (Fisheries)",
+            "pdfPage": 108
+          },
+          {
+            "number": null,
+            "title": "Major Obstacles in the Livestock Sector of Pakistan",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "Sustainable Strategies to Promote Livestock Sector",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "Fish Farming",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "Socio-Economic Advantages of Fish Farming",
+            "pdfPage": 109
+          },
+          {
+            "number": null,
+            "title": "Possible Economic Impacts of Fishing Industry in Pakistan",
+            "pdfPage": 110
+          },
+          {
+            "number": null,
+            "title": "Fishing Industry and Basic Infrastructure",
+            "pdfPage": 110
+          },
+          {
+            "number": null,
+            "title": "Gwadar Port, CPEC, Makran Coastal Highway, and Fish Markets",
+            "pdfPage": 110
+          },
+          {
+            "number": null,
+            "title": "Suggestions for the Development of Fishing Industry",
+            "pdfPage": 111
+          },
+          {
+            "number": null,
+            "title": "Telecommunications",
+            "pdfPage": 111
+          },
+          {
+            "number": null,
+            "title": "Importance and Impacts of Telecommunications",
+            "pdfPage": 111
+          },
+          {
+            "number": null,
+            "title": "Role of Telecommunications",
+            "pdfPage": 112
+          },
+          {
+            "number": null,
+            "title": "Challenges for Providing Telecommunications",
+            "pdfPage": 112
+          },
+          {
+            "number": null,
+            "title": "Main Problems Related to Tourism, Transport and Infrastructure",
+            "pdfPage": 113
+          },
+          {
+            "number": "1",
+            "title": "Tourism",
+            "pdfPage": 113
+          },
+          {
+            "number": "2",
+            "title": "Transport",
+            "pdfPage": 113
+          },
+          {
+            "number": "3",
+            "title": "Infrastructure",
+            "pdfPage": 113
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "number": 7,
+      "title": "Population, Society and Cultural Diversity in Pakistan",
+      "titleEn": null,
+      "pdfStart": 115,
+      "pdfEnd": 142,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "POPULATION, SOCIETY AND CULTURAL DIVERSITY IN PAKISTAN",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the growth and distribution of Population in Pakistan and impact of population explosion on society (Census table be added from 1951 to date).",
+          "Discuss the gender composition, gender discrimination and its related problems and solution.",
+          "Explain the salient features of Pakistani society with reference to the social values, customs and traditions.",
+          "Investigate how various cultural elements / components influence the promotion or variation of cultural diversity within a society.",
+          "Explain the significance of individuals in shaping a meaningful society, community and state.",
+          "Examine the influence of various languages and dialects spoken within a country on national unity and integration.",
+          "Analyze the origin and development of folklore and drama in literary history of Pakistan.",
+          "Examine the concept of unity with reference to regional cultures leading to national integration and analyze the effects of globalization on Pakistani society and culture.",
+          "Analyze the development of Pakistani society in relation to the diverse facets and consequences of social dynamics, including women's status, feudalism, and tribalism.",
+          "Describe the need and importance of inter-faith harmony, tolerance and resilience against terrorism.",
+          "Provide an analysis of the characteristics and key concept of social stratification, and the way it leads to social inequality that affects both individuals and society as a whole.",
+          "Trace the contribution and achievements of minorities in nation building.",
+          "Analyse the influence of noteworthy mystical orders in Pakistan across diverse regions to highlight the shared principles in their teachings and the way they have become a cohesive spiritual entity in Pakistani society and culture.",
+          "Discuss the educational and health conditions in Pakistan.",
+          "Recognize the significance of sports as a vital recreational pursuit, and examine the prevalence of popular traditional, non-traditional, national and international sports in Pakistan.",
+          "Analyse the importance of tourism and highlight natural and cultural attractions of Pakistan for tourism."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Growth and Distribution of Population in Pakistan",
+            "pdfPage": 115
+          },
+          {
+            "number": null,
+            "title": "Population Growth Rate",
+            "pdfPage": 116
+          },
+          {
+            "number": null,
+            "title": "Province-wise Density of Population",
+            "pdfPage": 116
+          },
+          {
+            "number": null,
+            "title": "Rural-Urban Composition and Distribution of Population",
+            "pdfPage": 116
+          },
+          {
+            "number": null,
+            "title": "Gender Composition and Gender Discrimination: Problems and Their Solution",
+            "pdfPage": 117
+          },
+          {
+            "number": null,
+            "title": "Salient Features of Pakistani Society with Social Values, Customs and Traditions",
+            "pdfPage": 118
+          },
+          {
+            "number": null,
+            "title": "The Role of Cultural Elements in Promotion and Transformation of Social Diversity",
+            "pdfPage": 118
+          },
+          {
+            "number": null,
+            "title": "Significance of Individuals in Shaping a Meaningful Society, Community and State",
+            "pdfPage": 119
+          },
+          {
+            "number": null,
+            "title": "Influence of a Country's Languages and Dialects on National Integration",
+            "pdfPage": 119
+          },
+          {
+            "number": null,
+            "title": "Origin and Development of Folklore and Drama in the Literary History of Pakistan",
+            "pdfPage": 120
+          },
+          {
+            "number": null,
+            "title": "Origin and Development of Drama",
+            "pdfPage": 121
+          },
+          {
+            "number": null,
+            "title": "Regional Cultures That Lead to Unity and National Integration",
+            "pdfPage": 121
+          },
+          {
+            "number": null,
+            "title": "Effects of Globalization on Pakistani Society and Culture",
+            "pdfPage": 122
+          },
+          {
+            "number": null,
+            "title": "Diverse Facets of Social Dynamics Women's Status, Feudalism and Tribalism in Pakistan",
+            "pdfPage": 123
+          },
+          {
+            "number": null,
+            "title": "Tribalism in Pakistan",
+            "pdfPage": 124
+          },
+          {
+            "number": null,
+            "title": "Need and Importance of Inter-Faith Harmony, Tolerance and Resilience Against Terrorism",
+            "pdfPage": 124
+          },
+          {
+            "number": null,
+            "title": "Concept and Characteristics of Social Stratification",
+            "pdfPage": 125
+          },
+          {
+            "number": null,
+            "title": "Characteristics of Social Stratification",
+            "pdfPage": 126
+          },
+          {
+            "number": null,
+            "title": "Salient Features of Pakistan's Culture and Society",
+            "pdfPage": 126
+          },
+          {
+            "number": null,
+            "title": "Contribution and Achievements of Minorities in Nation Building",
+            "pdfPage": 129
+          },
+          {
+            "number": null,
+            "title": "Mystical Orders",
+            "pdfPage": 130
+          },
+          {
+            "number": null,
+            "title": "Educational Condition in Pakistan",
+            "pdfPage": 132
+          },
+          {
+            "number": null,
+            "title": "Educational Structure of Pakistan",
+            "pdfPage": 132
+          },
+          {
+            "number": null,
+            "title": "Educational Problems and Their Solution",
+            "pdfPage": 133
+          },
+          {
+            "number": null,
+            "title": "Suggestions for Solving Educational Problems",
+            "pdfPage": 134
+          },
+          {
+            "number": null,
+            "title": "Education and Employment Opportunities",
+            "pdfPage": 134
+          },
+          {
+            "number": null,
+            "title": "Health Conditions in Pakistan",
+            "pdfPage": 138
+          },
+          {
+            "number": null,
+            "title": "Sports",
+            "pdfPage": 138
+          },
+          {
+            "number": null,
+            "title": "Popular Traditional, Non-Traditional, National and International Sports in Pakistan",
+            "pdfPage": 139
+          },
+          {
+            "number": null,
+            "title": "Importance of Tourism and Natural & Cultural Attractions for Tourism in Pakistan",
+            "pdfPage": 141
+          }
+        ],
+        "notes": "Section headings such as 'Social Norms' and 'Customs and Traditions' on image 4, and numbered sub-lists like '1. Chishtia Order' etc. on images 16-17, and '1. Status of Women in Pakistan' etc. on images 9-10, and 'Positive Impacts'/'Negative Impacts' on image 8, and '1. Pakistan Armed Forces' through '10. Media Industry' on images 20-23 are sub-headings within larger sections and are not all listed individually here to avoid redundancy; only main section headings are included."
+      }
+    },
+    {
+      "number": 8,
+      "title": "Women Empowerment in Pakistan",
+      "titleEn": null,
+      "pdfStart": 143,
+      "pdfEnd": 152,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "WOMEN EMPOWERMENT IN PAKISTAN",
+        "sloHeading": "Student Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe briefly the history of women's rights in Islam in the light of Qur'an and Sunnah.",
+          "Describe women's role in Pakistan Movement.",
+          "Discuss women's contributions to National Development from 1947 till now.",
+          "Define Violence and Violence against Women and its impact on Pakistani society with reference to Constitutional provisions.",
+          "Discuss Government's efforts to address the issue of violence against women in Pakistan.",
+          "Describe Government's efforts regarding women's protection and their empowerment."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Women's Rights in Islam in the light of Qur'an and Sunnah",
+            "pdfPage": 143
+          },
+          {
+            "number": null,
+            "title": "Women's Role in Pakistan Movement",
+            "pdfPage": 144
+          },
+          {
+            "number": null,
+            "title": "Women's Contribution to National Development from 1947 till Now",
+            "pdfPage": 145
+          },
+          {
+            "number": null,
+            "title": "Definition of Violence and Violence against Women",
+            "pdfPage": 148
+          },
+          {
+            "number": null,
+            "title": "Impact of Violence upon Pakistani Society with Reference to Constitutional Provisions",
+            "pdfPage": 148
+          },
+          {
+            "number": null,
+            "title": "Common Perception about Violence against Women",
+            "pdfPage": 148
+          },
+          {
+            "number": null,
+            "title": "Government's Efforts to Address the Issue of Violence Against Women in Pakistan",
+            "pdfPage": 149
+          },
+          {
+            "number": null,
+            "title": "Punjab Marriage Restraint Act 2015",
+            "pdfPage": 149
+          },
+          {
+            "number": null,
+            "title": "The Punjab Protection of Women Against Violence Act 2016",
+            "pdfPage": 149
+          },
+          {
+            "number": null,
+            "title": "Government's Efforts Regarding Women's Protection and Women's Empowerment",
+            "pdfPage": 149
+          }
+        ],
+        "notes": null
+      }
+    }
+  ]
+}

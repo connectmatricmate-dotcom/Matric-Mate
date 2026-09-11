@@ -1,0 +1,160 @@
+{
+  "source": "content/punjab/textbooks/urd-10.pdf",
+  "subject": "urd",
+  "grade": 10,
+  "medium": "en",
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "bookTitle": "اُردُو برائے جماعت دہم",
+  "publisher": "پنجاب ایجوکیشن، کریکولم، ٹریننگ اینڈ اسسمنٹ اتھارٹی (PECTAA)",
+  "curriculum": null,
+  "language": "ur",
+  "contentsPages": [
+    3,
+    4
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "حمد",
+      "titleEn": "Hamd",
+      "page": 2,
+      "topics": []
+    },
+    {
+      "number": 2,
+      "title": "نعت",
+      "titleEn": "Naat",
+      "page": 7,
+      "topics": []
+    },
+    {
+      "number": 3,
+      "title": "اخلاقِ نبوی خَاتَمُ النَّبِیّٖنَ صَلَّی اللهُ عَلَیْہِ وَعَلٰی اٰلِہٖ وَاَصْحَابِہٖ وَسَلَّم",
+      "titleEn": "Akhlaq-e-Nabawi (ﷺ)",
+      "page": 12,
+      "topics": []
+    },
+    {
+      "number": 4,
+      "title": "سرسیّد کا بچپن",
+      "titleEn": "Sir Syed's Childhood",
+      "page": 19,
+      "topics": []
+    },
+    {
+      "number": 5,
+      "title": "مُحسِن محلّہ",
+      "titleEn": "Mohsin-e-Mohalla",
+      "page": 28,
+      "topics": []
+    },
+    {
+      "number": 6,
+      "title": "کفّارہ",
+      "titleEn": "Kaffara",
+      "page": 35,
+      "topics": []
+    },
+    {
+      "number": 7,
+      "title": "سویرے جو کل آنکھ میری کھلی",
+      "titleEn": "Sawere Jo Kal Aankh Meri Khuli",
+      "page": 48,
+      "topics": []
+    },
+    {
+      "number": 8,
+      "title": "دوستی کا پھل",
+      "titleEn": "The Fruit of Friendship",
+      "page": 57,
+      "topics": []
+    },
+    {
+      "number": 9,
+      "title": "میرا گاؤں",
+      "titleEn": "My Village",
+      "page": 66,
+      "topics": []
+    },
+    {
+      "number": 10,
+      "title": "بابل کے کھنڈر",
+      "titleEn": "The Ruins of Babylon",
+      "page": 74,
+      "topics": []
+    },
+    {
+      "number": 11,
+      "title": "اولڈ ایج ہوم",
+      "titleEn": "Old Age Home",
+      "page": 83,
+      "topics": []
+    },
+    {
+      "number": 12,
+      "title": "کچھ ذریعۂ تعلیم کے باب میں",
+      "titleEn": "Something on the Medium of Instruction",
+      "page": 101,
+      "topics": []
+    },
+    {
+      "number": 13,
+      "title": "آدمی نامہ",
+      "titleEn": "Aadmi Nama",
+      "page": 108,
+      "topics": []
+    },
+    {
+      "number": 14,
+      "title": "نمودِ صُبح",
+      "titleEn": "Namood-e-Subh",
+      "page": 114,
+      "topics": []
+    },
+    {
+      "number": 15,
+      "title": "خِطاب بہ جوانانِ اِسلام",
+      "titleEn": "Khitab ba Jawanan-e-Islam",
+      "page": 120,
+      "topics": []
+    },
+    {
+      "number": 16,
+      "title": "وغیرہ",
+      "titleEn": "Waghera",
+      "page": 126,
+      "topics": []
+    },
+    {
+      "number": 17,
+      "title": "بازیچۂ اطفال ہے دنیا مرے آگے",
+      "titleEn": "Bazicha-e-Atfal Hai Dunya Mere Aage",
+      "page": 131,
+      "topics": []
+    },
+    {
+      "number": 18,
+      "title": "اثر اس کو ذرا نہیں ہوتا",
+      "titleEn": "Asar Us Ko Zara Nahin Hota",
+      "page": 136,
+      "topics": []
+    },
+    {
+      "number": 19,
+      "title": "ہے مشقِ سخن جاری، چکّی کی مشقّت بھی",
+      "titleEn": "Hai Mashq-e-Sukhan Jari, Chakki Ki Mashaqqat Bhi",
+      "page": 141,
+      "topics": []
+    },
+    {
+      "number": 20,
+      "title": "یوں کہنے کو پیرایۂ اِظہار بہت ہے",
+      "titleEn": "Yun Kahne Ko Pairaya-e-Izhar Bahut Hai",
+      "page": 146,
+      "topics": []
+    }
+  ],
+  "notes": "The contents (حُسنِ ترتیب) is arranged in four sections: حصّہ حمد و نعت (items 1-2), حصّہ نثر (3-12), حصّہ نظم (13-16), حصّہ غزل (17-20). The numbering is a single running sequence across sections; the columns give عنوان (title) and شاعر/مصنّف (poet/author), which are not reproduced here. Front/back matter listed after item 20 (فرہنگ p.150, سوالیہ پرچے کی تیاری بارے ہدایات p.157, ماڈل سوالیہ پرچہ p.158) has been omitted per instructions. Ghazal titles are the first lines as printed."
+}

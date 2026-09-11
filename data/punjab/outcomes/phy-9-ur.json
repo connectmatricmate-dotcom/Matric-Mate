@@ -1,0 +1,716 @@
+{
+  "source": "content/punjab/textbooks/phy-9-ur.pdf",
+  "subject": "phy",
+  "grade": 9,
+  "medium": "ur",
+  "pdfPages": 236,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    4
+  ],
+  "backMatterStart": 227,
+  "locateNotes": "Offset between printed page numbers and PDF labels is consistently +4 (printed 1 = PDF 5). Back matter: Glossary (فرہنگ) begins on PDF page 227 (printed 223); Index (انڈیکس) on PDF 231 and bibliography (کتابیات) on PDF 234. Thumbnail resolution is low, so Urdu titles were read partly from the contents list.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "طبیعی مقداریں اور پیائش",
+      "titleEn": "Physical Quantities and Measurement",
+      "pdfStart": 5,
+      "pdfEnd": 29,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "طبیعی مقداریں اور پیمائش",
+        "sloHeading": "طلبہ کے علمی حاصل نتائج",
+        "sloLead": "اس یونٹ کی تکمیل کے بعد طلبہ اس قابل ہوجائیں گے کہ:",
+        "slos": [
+          "سائنس، ٹیکنالوجی اور سوسائٹی میں فزکس کا اہم کردار بیان کرسکیں۔",
+          "مثالوں سے واضح کرسکیں کہ سائنس کی بنیادی عددی مقداروں اور یونٹس اور یونٹس پر مشتمل طبیعی مقداروں پر ہے۔",
+          "بنیادی مقداروں اور ماخوذ مقداروں کے مابین فرق کرسکیں۔",
+          "سسٹم انٹرنیشنل کے بنیادی یونٹس، ان کی علامات اور طبیعی مقداروں کی فہرست بناسکیں۔",
+          "بنیادی اور ماخوذ یونٹس کے پری فکسز کی علامات اور ان سے متعلق ملٹی پلز اور سب ملٹی پلز کو ایک دوسرے سے بدل سکیں۔",
+          "پیائش اور حسابی عمل کے جوابات سائنٹیفیک نوٹیشن میں لکھ سکیں۔",
+          "لمبائی کی پیائش سے متعلق ورنیئر کیلیپرز اور سکریو گیج کے استعمال کا طریقہ کار بیان کرسکیں۔",
+          "پیائشی اوزار مثلاً میٹرراڈ، ورنیئر کیلیپرز، اور سکریو گیج کی خامیوں کی نشاندہی اور وضاحت کرسکیں۔",
+          "لیبارٹری میں نتائج بتانے اور ریکارڈ کرنے کے لیے اعداد کے اہم ہندسوں کی ضرورت بیان کرسکیں۔"
+        ],
+        "headings": [
+          {
+            "number": "1.1",
+            "title": "فزکس کا تعارف (Introduction To Physics)",
+            "pdfPage": 7
+          },
+          {
+            "number": "1.2",
+            "title": "طبیعی مقداریں (Physical Quantities)",
+            "pdfPage": 8
+          },
+          {
+            "number": "1.3",
+            "title": "انٹرنیشنل سسٹم آف یونٹس (International System of Units)",
+            "pdfPage": 9
+          },
+          {
+            "number": "1.4",
+            "title": "پری فکسز (Prefixes)",
+            "pdfPage": 11
+          },
+          {
+            "number": "1.5",
+            "title": "سائنٹیفک نوٹیشن (Scientific Notation)",
+            "pdfPage": 12
+          },
+          {
+            "number": "1.6",
+            "title": "پیائشی آلات (Measuring Instruments)",
+            "pdfPage": 13
+          },
+          {
+            "number": "1.7",
+            "title": "اہم ہندسے (Significant Figures)",
+            "pdfPage": 24
+          }
+        ],
+        "notes": "Base Quantities and Derived Quantities are shown as boxed definitions on image 5 without explicit section numbers, so not included as numbered headings; sub-sections like Metre Rod, Vernier Callipers, Screw Gauge, Mass Measuring Instruments, Stopwatch, Measuring Cylinder appear as unnumbered subheadings within section 1.6 and were omitted per instructions for unnumbered sub-features, though they are core instructional content rather than boxed features."
+      }
+    },
+    {
+      "number": 2,
+      "title": "کائینامیٹکس",
+      "titleEn": "Kinematics",
+      "pdfStart": 30,
+      "pdfEnd": 57,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "کائنی میٹکس (Kinematics)",
+        "sloHeading": "طلبہ کے علمی ماحصل/نتائج",
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبہ اس قابل ہوجائیں گے کہ",
+        "slos": [
+          "مثالوں کے ذریعہ وضاحت کرسکیں کہ اجسام کیسے بیک وقت ریسٹ اور موشن (rest and motion) میں کس طرح ہوسکتے ہیں۔",
+          "مختلف اقسام کی موشن یعنی ٹرانسلیٹری ٹرانسلیٹری (لی نیئر linear، رینڈم random اور سرکلر circular)، روٹیٹری (rotatory)، اور وائبریٹری (vibratory) کی شناخت کرسکیں اوران میں فرق بیان کرسکیں۔",
+          "مثالوں کے ذریعے فاصلہ اور ڈس پلیسمنٹ (displacement)، سپیڈ اورولاسٹی میں تفریق کرسکیں۔",
+          "ویکٹر مقداروں کا خطوط کے ذریعے اظہار کرسکیں۔",
+          "سپیڈ، ولاسٹی اوراکسلریشن (acceleration) کی تعریف کرسکیں۔",
+          "فاصلہ - ٹائم اور ولاسٹی - ٹائم گراف بناسکیں اوران کی تشریح کرسکیں۔",
+          "فاصلہ - ٹائم اور ولاسٹی - ٹائم گراف کے سلوپ (slope) معلوم کرسکیں اور ان کی تشریح کرسکیں۔",
+          "گراف سے کسی جسم کی حالت معلوم کرسکیں کہ وہ: (i) ریسٹ میں ہے (ii) کونسٹنٹ سپیڈ سے حرکت کررہا ہے (iii) ویری ایبل سپیڈ سے حرکت کررہا ہے",
+          "کسی جسم کا طے کردہ فاصلہ معلوم کرنے کے لیے سپیڈ - ٹائم گراف کے نیچے دیا گیا ایریا معلوم کرسکیں۔"
+        ],
+        "headings": [
+          {
+            "number": "2.1",
+            "title": "ریسٹ اورموشن (Rest and Motion)",
+            "pdfPage": 31
+          },
+          {
+            "number": "2.2",
+            "title": "موشن کی اقسام (Types of Motion)",
+            "pdfPage": 32
+          },
+          {
+            "number": null,
+            "title": "ٹرانسلیٹری موشن (Translatory Motion)",
+            "pdfPage": 32
+          },
+          {
+            "number": null,
+            "title": "لی نیئر موشن (Linear motion)",
+            "pdfPage": 33
+          },
+          {
+            "number": null,
+            "title": "سرکلر موشن (Circular motion)",
+            "pdfPage": 33
+          },
+          {
+            "number": null,
+            "title": "رینڈم موشن (Random motion)",
+            "pdfPage": 33
+          },
+          {
+            "number": null,
+            "title": "روٹیری موشن (Rotatory Motion)",
+            "pdfPage": 34
+          },
+          {
+            "number": null,
+            "title": "وائبریٹری موشن (Vibratory Motion)",
+            "pdfPage": 34
+          },
+          {
+            "number": "2.3",
+            "title": "سکیلرز اور ویکٹرز (Scalars and Vectors)",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "سکیلرز (Scalars)",
+            "pdfPage": 35
+          },
+          {
+            "number": null,
+            "title": "ویکٹرز (Vectors)",
+            "pdfPage": 36
+          },
+          {
+            "number": null,
+            "title": "ویکٹرز کا اظہار (Representation of Vectors)",
+            "pdfPage": 36
+          },
+          {
+            "number": "2.4",
+            "title": "موشن سے متعلق اصطلاحات (Terms Associated with Motion)",
+            "pdfPage": 37
+          },
+          {
+            "number": null,
+            "title": "پوزیشن (Position)",
+            "pdfPage": 37
+          },
+          {
+            "number": null,
+            "title": "فاصلہ اور ڈس پلیسمنٹ (Distance and Displacement)",
+            "pdfPage": 38
+          },
+          {
+            "number": null,
+            "title": "سپیڈ اور ولاسٹی (Speed and Velocity)",
+            "pdfPage": 38
+          },
+          {
+            "number": null,
+            "title": "یونیفارم سپیڈ (Uniform Speed)",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "ولاسٹی (Velocity)",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "یونیفارم ولاسٹی (Uniform Velocity)",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "ایکسلریشن (Acceleration)",
+            "pdfPage": 41
+          },
+          {
+            "number": null,
+            "title": "یونیفارم ایکسلریشن (Uniform Acceleration)",
+            "pdfPage": 41
+          },
+          {
+            "number": "2.5",
+            "title": "موشن کا گرافیکل تجزیہ (Graphical Analysis of Motion)",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "فاصلہ - ٹائم گراف (Distance-Time Graph)",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "ریسٹ کی حالت میں جسم (Object at Rest)",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "کونسٹنٹ سپیڈ سے حرکت کرتا ہوا جسم (Object Moving with Constant Speed)",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "ویری ایبل سپیڈ سے حرکت کرتا ہوا جسم (Object Moving with Variable Speed)",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "سپیڈ-ٹائم گراف (Speed-Time Graph)",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "کونسٹنٹ سپیڈ سے حرکت کرتا ہوا جسم (Object Moving with Constant Speed)",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "یونیفارم ایکسلریشن سے حرکت کرتا ہوا جسم (Object Moving with uniformly changing Speed)",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "متحرک جسم کا طے کردہ فاصلہ (Distance Travelled by a Moving Object)",
+            "pdfPage": 46
+          },
+          {
+            "number": "2.6",
+            "title": "حرکت کی مساوات (Equations of Motion)",
+            "pdfPage": 47
+          },
+          {
+            "number": "2.7",
+            "title": "آزادانہ گرتے ہوئے اجسام کی حرکت (Motion of Freely Falling Bodies)",
+            "pdfPage": 52
+          }
+        ],
+        "notes": "The SLO list markers (bullet arrows) are not standard characters and were omitted per instructions; item 8's sub-points (i, ii, iii) are joined into a single string as required. Page-27 box lists section numbers (2.1-2.7) as a table of contents style overview, not headings in body text, so these were not duplicated in the headings list except where they appear as actual section headings in the body text. Some subheadings under 2.5 repeat the phrase 'Object Moving with Constant Speed' as printed on both page 39 and page 41 in different contexts (distance-time vs speed-time graphs)."
+      }
+    },
+    {
+      "number": 3,
+      "title": "ڈائنامکس",
+      "titleEn": "Dynamics",
+      "pdfStart": 58,
+      "pdfEnd": 87,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ڈائنامکس",
+        "sloHeading": "طلبہ کے علمی ماحصل / نتائج",
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبہ اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "مومینٹم، فورس، انرشیا، فرکشن اور سینٹری پیٹل فورس کی تعریف کرسکیں۔",
+          "نیچے دی گئی مساوات کو استعمال کر کے مشقی سوالات حل کرسکیں۔ مومینٹم میں تبدیلی / وقت = فورس",
+          "روزمرہ زندگی کی عملی مثالوں سے فورس کے تصور کی وضاحت کرسکیں۔",
+          "نیوٹن کے موشن کے قوانین بیان کرسکیں۔",
+          "ماس اور وزن میں فرق کرسکیں اور F = ma اور w = mg کی مدد سے مشقی سوالات حل کرسکیں۔",
+          "نیوٹن کے دوسرے قانون کی مدد سے بے فرکشن پلی سے گزرتی ہوئی ڈوری کے سروں سے منسلک دواجسام کی موشن کے دوران ڈوری میں ٹینشن اور ایکسلریشن معلوم کرسکیں۔",
+          "مومینٹم کے کنزرویشن کا قانون بیان کرسکیں۔",
+          "دواجسام کے ٹکراؤ میں مومینٹم کے کنزرویشن کا قانون استعمال کرسکیں۔",
+          "مومینٹم کے کنزرویشن کے قانون کی مدد سے دواجسام کے ٹکراؤ کے بعدان کی ولاسٹی معلوم کرسکیں۔",
+          "ٹائروں کی سطح کی روڈ کی حالت، سکڈنگ اور بریکنگ فورس کے حوالہ سے گاڑیوں کی حرکت پر فرکشن کے اثرات کی وضاحت کرسکیں۔",
+          "یہ بتاسکیں کہ رولنگ فرکشن سلائیڈنگ فرکشن کے مقابلہ میں بہت کم ہوتی ہے۔",
+          "فرکشن کو کم کرنے کے مختلف طریقوں کی فہرست تیار کرسکیں۔"
+        ],
+        "headings": [
+          {
+            "number": "3.1",
+            "title": "فورس، انرشیا اور مومینٹم (Force, Inertia and Momentum)",
+            "pdfPage": 63
+          },
+          {
+            "number": "3.2",
+            "title": "نیوٹن کے موشن کے قوانین (Newton's Laws of Motion)",
+            "pdfPage": 65
+          },
+          {
+            "number": "3.3",
+            "title": "فرکشن (Friction)",
+            "pdfPage": 78
+          },
+          {
+            "number": "3.4",
+            "title": "سرکلر موشن (Circular Motion)",
+            "pdfPage": 83
+          }
+        ],
+        "notes": "Two entries under 'اہم تصورات' box on page 55 (image 4) list 3.1 مومینٹم, 3.2 نیوٹن کے موشن کے قوانین, 3.3 فرکشن, 3.4 یونیفارم سرکلر موشن as section topics; heading titles as they actually appear in body text were used where found. Subheadings like 'Momentum', 'Newton's First/Second/Third Law of Motion', 'Mass and Weight', 'Rolling Friction', 'Braking and Skidding', 'Centripetal Force', 'Centrifugal Force', 'Banking of the Roads', 'Cream Separator', 'Washing Machine Dryer' appear as bolded sub-topics without explicit numbering, so they were not listed separately per instructions to include only numbered headings; main numbered ones only included."
+      }
+    },
+    {
+      "number": 4,
+      "title": "فورسز کا گھمانے کا اثر",
+      "titleEn": "Turning Effect of Forces",
+      "pdfStart": 88,
+      "pdfEnd": 112,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "فورسز کا گھمانے کا اثر",
+        "sloHeading": "طلبہ کے علمی حاصل ماحصل",
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبہ اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "لائک اوراُن لائک لائک پیرالل فورسز کی تعریف بیان کریں۔",
+          "فورسز اوریکٹرزکو جمع کرنے کا ہیڈ ٹوٹیل رُول بیان کریں۔",
+          "بیان کریں کہ کس طرح کسی فورس کو اس کے عمودی کمپیونٹس میں تقسیم کیا جاتا ہے۔",
+          "عمودی کمپیونٹس سے کسی فورس کی مقدار اور سمت معلوم کریں۔",
+          "مومنٹ آف فورس یا ٹارک کی تعریف بیان کریں بطور: اکسز آف روٹیشن سے فورس کے عمل کی لائن کا عمودی فاصلہ x فورس = ٹارک",
+          "روزمرہ زندگی کے حوالے سے فورس کے گھمانے کے اثر کی تشریح کریں۔",
+          "مومنٹس کا اصول بیان کریں۔",
+          "کسی جسم کے سنٹر آف ماس اور سنٹر آف گریویٹی کی تعریف کریں۔",
+          "کپل کی بطور ایسی دو فورسز کے تعریف کریں جو روٹیشن پیدا کرنے کی کوشش کرتی ہیں۔",
+          "ثابت کریں کہ کپل کا کسی بھی پوائنٹ کے گرد مومنٹ ایک جیسا رہتا ہے۔",
+          "ایکوی لبریم کی تعریف کریں اور روزمرہ زندگی سے مثالیں دے کر اس کی اقسام کی درجہ بندی کریں۔",
+          "کسی جسم کے ایکوی لبریم کی دو شرائط بیان کریں۔",
+          "سادہ متوازن سسٹمز میں صرف ایک ایکسز پر قائم اجسام سے متعلق مشقی سوالات حل کریں۔"
+        ],
+        "headings": [
+          {
+            "number": "4.1",
+            "title": "لائک اوراُن لائک لائک پیرالل فورسز (Like and Unlike Parallel Forces)",
+            "pdfPage": 90
+          },
+          {
+            "number": "4.2",
+            "title": "ریزلٹنٹ آف فورسز (Resultant of Forces)",
+            "pdfPage": 91
+          },
+          {
+            "number": "4.3",
+            "title": "ریزولیشن آف فورسز (Resolution of Forces)",
+            "pdfPage": 93
+          },
+          {
+            "number": "4.4",
+            "title": "ٹارک یا مومنٹ آف فورس (Torque or Moment of a Force)",
+            "pdfPage": 94
+          },
+          {
+            "number": "4.5",
+            "title": "مومنٹس کا اصول (Principle of Moments)",
+            "pdfPage": 96
+          },
+          {
+            "number": "4.6",
+            "title": "سنٹر آف ماس (Centre of Mass)",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "سنٹر آف گریویٹی (Centre of Gravity)",
+            "pdfPage": 100
+          },
+          {
+            "number": "4.7",
+            "title": "کپل (Couple)",
+            "pdfPage": 102
+          },
+          {
+            "number": "4.8",
+            "title": "ایکوی لبریم (Equilibrium)",
+            "pdfPage": 103
+          },
+          {
+            "number": "4.9",
+            "title": "سٹیبیلٹی اور سنٹر آف ماس کی پوزیشن (Stability and Position of Centre of Mass)",
+            "pdfPage": 109
+          }
+        ],
+        "notes": "The SLO section heading text on image 1 is partly blurred/illegible in the scan; transcription is a best-effort reading. The heading numbered 4.1 on the contents list (image 2) reads 'اجسام اور فورسز' but the actual section heading printed on image 3 is 'لائک اور ان لائک لائک پیرالل فورسز'; both are reported as printed on their respective pages rather than reconciled. Section 4.6 'Centre of Gravity' subheading on image 13 is not separately numbered in the text, consistent with the table of contents which lists only 4.6 for Centre of Mass."
+      }
+    },
+    {
+      "number": 5,
+      "title": "گریوی ٹیشن",
+      "titleEn": "Gravitation",
+      "pdfStart": 113,
+      "pdfEnd": 123,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "گریوی ٹیشن",
+        "sloHeading": "طلبہ کے علمی حاصل شدہ نتائج",
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبا اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "نیوٹن کا گریوی ٹیشن کا قانون بیان کر سکیں۔",
+          "وضاحت کر سکیں کہ گریوی ٹیشنل فورسز نیوٹن کے تیسرے قانون سے ہم آہنگ ہیں۔",
+          "وضاحت کر سکیں کہ فیلڈ آف فورس کی ایک مثال گریوی ٹیشنل فورس ہے۔",
+          "وزن کی تعریف کر سکیں بطور ایسی فورس کے جو گریوی ٹیشنل فیلڈ میں کسی جسم پر عمل کرتی ہے۔",
+          "گریوی ٹیشن کے قانون کی مدد سے زمین کا ماس معلوم کر سکیں۔",
+          "نیوٹن کے گریوی ٹیشن کے قانون کی مدد سے مشقی سوالات حل کر سکیں۔",
+          "وضاحت کر سکیں کہ g کی قیمت سطح زمین سے بلندی بڑھنے پر کم ہوتی جاتی ہے۔",
+          "سیٹلائٹس کی موشن کو سمجھنے کے لیے نیوٹن کے گریوی ٹیشن کے قانون کی اہمیت پر بحث کر سکیں۔"
+        ],
+        "headings": [
+          {
+            "number": "5.1",
+            "title": "فورس آف گریوی ٹیشن (Force of Gravitation)",
+            "pdfPage": 114
+          },
+          {
+            "number": "5.2",
+            "title": "زمین کا ماس (Mass of the Earth)",
+            "pdfPage": 117
+          },
+          {
+            "number": "5.3",
+            "title": "بلندی کے ساتھ g میں تبدیلی (Variation of g with Altitude)",
+            "pdfPage": 118
+          },
+          {
+            "number": "5.4",
+            "title": "مصنوعی سیٹلائٹس (Artificial Satellites)",
+            "pdfPage": 119
+          }
+        ],
+        "notes": "Page 116 contains an unnumbered subsection heading 'مصنوعی سیٹلائٹس کی موشن (Motion of Artificial Satellites)' which appears to be a subsection of 5.4 but is not separately numbered; it was not included as a standalone heading. Some SLO bullet text may have minor OCR uncertainty due to scan quality."
+      }
+    },
+    {
+      "number": 6,
+      "title": "ورک اور انرجی",
+      "titleEn": "Work and Energy",
+      "pdfStart": 124,
+      "pdfEnd": 152,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ورک اورانرجی",
+        "sloHeading": "طلبہ کے عملی حصائل نتائج",
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبہ اس قابل ہوجائیں گے کہ",
+        "slos": [
+          "ورک اوراس کے SI یونٹ کی تعریف کریں۔",
+          "دی گئی مساوات سے کیا گیاورک معلوم کریں۔۔ ورک = فورس × فورس کی سمت میں طے کردہ فاصلہ",
+          "انرجی، کائی نیٹک انرجی اور پوٹینشل انرجی کی تعریف بیان کریں۔انرجی کے SI یونٹ کی تعریف کریں۔",
+          "ثابت کریں کہ کائی نیٹک انرجی K.E. = 1/2 mv2 اور پوٹینشل انرجی P.E. = mgh، ان مساوات کی مدد سے مشقی سوالات حل کریں۔",
+          "انرجی کی مختلف اقسام کی مثالوں کے ساتھ فہرست تیار کریں۔",
+          "درج ذیل حوالوں سے ایسے پروسیس (process) بیان کریں جن کے ذریعے انرجی کوایک شکل سے دوسری شکل میں تبدیل کیاجاتا ہے۔۔ فوسل فیول انرجی۔ ہائیڈروالیکٹرک جنریشن۔ سولرانرجی۔ نیوکلیئرانرجی۔ جیوتھرمل انرجی۔ ونڈانرجی۔ بائیوماس انرجی",
+          "ماس انرجی مساوات E = mc2 بیان کریں اوراس کی مدد سے مشقی سوالات حل کریں۔"
+        ],
+        "headings": [
+          {
+            "number": "6.1",
+            "title": "ورک (Work)",
+            "pdfPage": 127
+          },
+          {
+            "number": "6.2",
+            "title": "انرجی (Energy)",
+            "pdfPage": 129
+          },
+          {
+            "number": "6.3",
+            "title": "کائی نیٹک انرجی (Kinetic Energy)",
+            "pdfPage": 129
+          },
+          {
+            "number": "6.4",
+            "title": "پوٹینشل انرجی (Potential Energy)",
+            "pdfPage": 131
+          },
+          {
+            "number": "6.5",
+            "title": "انرجی کی اقسام (Forms of Energy)",
+            "pdfPage": 133
+          },
+          {
+            "number": "6.6",
+            "title": "انرجی کی باہمی تبدیلی (Interconversion of Energy)",
+            "pdfPage": 135
+          },
+          {
+            "number": "6.7",
+            "title": "انرجی کے بڑے ذرائع (Major Sources of Energy)",
+            "pdfPage": 136
+          },
+          {
+            "number": "6.8",
+            "title": "افی شینسی (Efficiency)",
+            "pdfPage": 145
+          },
+          {
+            "number": "6.9",
+            "title": "پاور (Power)",
+            "pdfPage": 147
+          }
+        ],
+        "notes": "The 'تصوراتی تعلق' box and 'اہم تصورات' listing on pages 1 and 2 were excluded as they are boxed features, not learning outcomes or numbered headings. Sub-headings for individual energy forms (Mechanical, Heat, Electrical, Sound, Light, Chemical, Nuclear) under 6.5 are unnumbered sub-sections and were omitted per instructions to only include numbered headings."
+      }
+    },
+    {
+      "number": 7,
+      "title": "مادہ کی خصوصیات",
+      "titleEn": "Properties of Matter",
+      "pdfStart": 153,
+      "pdfEnd": 178,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "مادہ کی خصوصیات",
+        "sloHeading": "طلبہ کے علمی حاصل ماحصل",
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبہ اس قابل ہو جا ئیں گے کہ:",
+        "slos": [
+          "مادہ کے کائی ٹیک مالیکیولرنظریہ (ٹھوس، مائع، اور گیس حالت) کو بیان کر سکیں۔",
+          "مادہ کی چوتھی حالت (پلازما) کو مختصر بیان کر سکیں۔",
+          "ڈینسٹی کی تعریف کر سکیں۔",
+          "چند ٹھوس، مائع، اور گیس اجسام کی ڈینسٹی کا آپس میں موازنہ کر سکیں۔",
+          "پریشر بلطور (یونٹ ایریا پر عمود اکائی گئی فورس) کی تعریف کر سکیں۔",
+          "روزمرہ زندگی میں مثالوں سے وضاحت کر سکیں کہ فورس اور ایریا کی تبدیلی سے پریشر کیسے بدلتا ہے۔",
+          "وضاحت کر سکیں کہ اسٹماسفیرز، پریشر ڈالتا ہے۔",
+          "وضاحت کر سکیں کہ مائع کی سطح کی بلندی سے اسٹماسفیرک پریشر کیسے معلوم کیا جاتا ہے۔",
+          "وضاحت کر سکیں کہ زمین کی سطح سے بلندی پر جاتے ہوئے اسٹماسفیرک پریشر کم ہوجاتا ہے۔",
+          "بیان کر سکیں کہ کسی علاقے میں اسٹماسفیرک پریشر کی تبدیلی موسم کی تبدیلی میں تبدیلی کی نشان دہی کرتی ہے۔",
+          "پاسکل کے قانون کی تعریف کر سکیں۔",
+          "پاسکل کے قانون کا اطلاق مثالوں سے واضح کریں اوراس کے استعمال کا عملی مظاہرہ کر سکیں۔",
+          "مائع کی سطح کے نیچے پریشر کا گہرائی اور ڈینسٹی سے تعلق (P=pgh) بیان کریں اوراس کی مدد سے مشقی سوالات حل کر سکیں۔",
+          "ارشمیدس کے اصول کی تعریف کر سکیں۔",
+          "ارشمیدس کے اصول کی مدد سے کسی جسم کی ڈینسٹی معلوم کر سکیں۔",
+          "کسی جسم پر مائع کے اچھال کی فورس کی تعریف کر سکیں۔",
+          "بے جان اجسام کے تیرنے کے اصول کی تعریف کر سکیں۔",
+          "وضاحت کر سکیں کہ فورس کسی جسم کے سائز اور شکل میں تبدیلی پیدا کر سکتی ہے۔",
+          "سٹریس، سٹرین، ینگز موڈولس کی اصطلاحات کی تعریف کر سکیں۔",
+          "ہک کے قانون (Hooke's law) کی تعریف اور ایلاسٹک لمٹ (elastic limit) کی وضاحت کر سکیں۔"
+        ],
+        "headings": [
+          {
+            "number": "7.1",
+            "title": "مادہ کا کائی ٹیک مالیکیولر ماڈل (Kinetic Molecular Model of Matter)",
+            "pdfPage": 155
+          },
+          {
+            "number": "7.2",
+            "title": "ڈینسٹی (Density)",
+            "pdfPage": 157
+          },
+          {
+            "number": "7.3",
+            "title": "پریشر (Pressure)",
+            "pdfPage": 158
+          },
+          {
+            "number": "7.4",
+            "title": "اسٹماسفیرک پریشر (Atmospheric Pressure)",
+            "pdfPage": 159
+          },
+          {
+            "number": "7.5",
+            "title": "مائعات میں پریشر (Pressure in Liquids)",
+            "pdfPage": 162
+          },
+          {
+            "number": "7.7",
+            "title": "تیرنے کا اصول (Principle of Floatation)",
+            "pdfPage": 168
+          },
+          {
+            "number": "7.8",
+            "title": "ایلاسٹیسٹی (Elasticity)",
+            "pdfPage": 169
+          },
+          {
+            "number": "7.9",
+            "title": "بک کا قانون (Hooke's Law)",
+            "pdfPage": 170
+          }
+        ],
+        "notes": "Section 7.6 (اچھال کی فورس / Upthrust Force per the Important Concepts box on image 2) is not visible as an explicit numbered heading in the extracted body text; a heading '(Archimedes Principle) ارشمیدس کا اصول' appears around image 12 without a printed number, and 'کسی جسم کی ڈینسٹی (Density of an Object)' appears on image 15 also without a printed number - these could not be confidently matched to a numbered 7.6 heading so were omitted from the headings list. The heading numbered 7.9 in the printed text reads 'Hooke's Law', though the Important Concepts summary box lists 7.9 as 'Stress, Strain and Young's Modulus' - this discrepancy is preserved as printed rather than reconciled. The SLO heading text was partially unclear/blurred in the source image."
+      }
+    },
+    {
+      "number": 8,
+      "title": "مادہ کی حرارتی خصوصیات",
+      "titleEn": "Thermal Properties of Matter",
+      "pdfStart": 179,
+      "pdfEnd": 207,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "مادہ کی حرارتی خصوصیات",
+        "sloHeading": "طلبہ سے علمی حاصل امتیاز کیج",
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبہ اس قابل ہو جا کیں گے کہ۔",
+        "slos": [
+          "ٹمپریچر کی تعریف بطور ایسی مقدار جو تھرمل انرجی کے بہاؤ کی سمت کا تعین کرتی ہے کریں۔",
+          "حرارت کی تعریف (ٹمپریچر کے فرق کی وجہ سے دو اجسام کے درمیان منتقل ہونے والی انرجی) کریں۔",
+          "ایک تھرمومیٹر بنانے کے لیے درکار میٹریل کی تھرمومیٹری کی بنیادی خصوصیات کی فہرست مرتب کریں۔",
+          "ایک سکیل کے ٹمپریچر کو دوسرے سکیل (فارن ہائیٹ، سیلسیس اور کیلون) میں تبدیل کریں۔",
+          "کسی جسم کے ٹمپریچر میں اضافہ کواس کی انٹرنل انرجی میں اضافہ کے طور پر بیان کریں۔",
+          "حرارتی گنجائش اور مخصوص حرارتی گنجائش کی تعریف کریں۔",
+          "میلٹنگ کی مخفی حرارت اور ایوپوریشن کی مخفی حرارت کو (ٹمپریچر میں تبدیلی کے بغیر حالت کی تبدیلی کے لیے انتقال انرجی) کے طور پر بیان کریں۔",
+          "ٹمپریچر-ٹائم گراف بنا کر برف کے میلٹنگ کی مخفی حرارت اور پانی کے ایوپوریشن کی مخفی حرارت معلوم کرنے کے تجربات بیان کریں۔",
+          "ایوپوریشن کے عمل کی وضاحت کریں نیز بوائلنگ اور ایوپوریشن کے عمل میں فرق واضح کریں۔",
+          "واضح کریں کہ ایوپوریشن کا عمل ٹھنڈک کا باعث بنتا ہے۔",
+          "سطحی ایوپوریشن پر اثر انداز ہونے والے عوامل تحریر کریں۔",
+          "ٹھوس اجسام کے حرارتی پھیلاؤ کی بطور لینیئر اور والیومیٹرک پھیلاؤ کی وضاحت کریں۔",
+          "مائعات کے حرارتی پھیلاؤ (حقیقی اور ظاہری) کو واضح کریں۔",
+          "اس یونٹ میں سیکھی گئی مساوات پر مبنی مشقی سوالات حل کریں۔"
+        ],
+        "headings": [
+          {
+            "number": "8.1",
+            "title": "Temperature and Heat",
+            "pdfPage": 182
+          },
+          {
+            "number": "8.2",
+            "title": "Thermometer",
+            "pdfPage": 184
+          },
+          {
+            "number": "8.3",
+            "title": "Specific Heat Capacity",
+            "pdfPage": 188
+          },
+          {
+            "number": "8.4",
+            "title": "Change of State",
+            "pdfPage": 190
+          },
+          {
+            "number": "8.5",
+            "title": "Latent Heat of Fusion",
+            "pdfPage": 192
+          },
+          {
+            "number": "8.6",
+            "title": "Latent Heat of Vaporization",
+            "pdfPage": 198
+          },
+          {
+            "number": "8.7",
+            "title": "The Evaporation",
+            "pdfPage": 199
+          },
+          {
+            "number": "8.8",
+            "title": "Thermal Expansion",
+            "pdfPage": 201
+          }
+        ],
+        "notes": "Image 8 text appears cut off/unclear at bottom of page 179; page numbering matches printed page numbers 176-203. The SLO heading text 'طلبہ سے علمی حاصل امتیاز کیج' appears to be a stylized/decorative rendering and may not be perfectly legible."
+      }
+    },
+    {
+      "number": 9,
+      "title": "انتقال حرارت",
+      "titleEn": "Transfer of Heat",
+      "pdfStart": 208,
+      "pdfEnd": 226,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "انتقال حرارت",
+        "sloHeading": null,
+        "sloLead": "اس یونٹ کے مطالعہ کے بعد طلبہ اس قابل ہوجائیں گے کہ",
+        "slos": [
+          "اعادہ کرسکیں کہ تھرمل انرجی بلند ٹمپریچر والی جگہ سے کم ٹمپریچر والی جگہ کی طرف منتقل ہوتی ہے۔",
+          "مالیکیولزاورالیکٹرونز کی بنیاد پر بیان کرسکیں کہ ٹھوس اجسام میں انتقال حرارت کیسے عمل میں آتی ہے۔",
+          "ٹھوس کنڈکٹرز میں انتقال حرارت پر اثر انداز ہونے والے عوامل بیان کرسکیں اور اس طرح تھرمل کنڈکٹیویٹی کی تعریف کرسکیں۔",
+          "ٹھوس کنڈکٹرز کے تھرمل کنڈیکٹیویٹی پر مبنی مشقی سوالات حل کرسکیں۔",
+          "حرارت کے اچھے اور باقص کنڈکٹرز کی مثالیں تحریر کرسکیں اوران کا استعمال بیان کرسکیں۔",
+          "مائعات اور گیسز میں ڈینسٹی کے فرق کے باعث کنویکشن کرنٹس (convection currents) کی وضاحت کرسکیں۔",
+          "روزمرہ زندگی میں کنویکشن کے ذریعے انتقال حرارت کی چند مثالیں بیان کرسکیں۔",
+          "وضاحت کرسکیں کہ انسولیشن، کنڈکشن کے ذریعے ہونے والی انرجی ٹرانسفر میں کمی کرتی ہے۔",
+          "تمام اجسام سے ریڈی ایشنز خارج ہونے کا عمل بیان کرسکیں۔",
+          "وضاحت کرسکیں کہ ریڈی ایشن کے ذریعے کسی جسم کی انرجی ٹرانسفر کے لیے کسی میٹیریل میڈیم کی ضرورت نہیں ہوتی اور انرجی ٹرانسفر کی شرح کا انحصار ہے: سطح کا رنگ اور ساخت، سطح کا ٹمپریچر، سطح کا ایریا"
+        ],
+        "headings": [
+          {
+            "number": "9.1",
+            "title": "انتقال حرارت (Transfer of Heat)",
+            "pdfPage": 210
+          },
+          {
+            "number": "9.2",
+            "title": "کنڈکشن (Conduction)",
+            "pdfPage": 211
+          },
+          {
+            "number": "9.3",
+            "title": "کنویکشن (Convection)",
+            "pdfPage": 215
+          },
+          {
+            "number": "9.4",
+            "title": "ریڈی ایشن (Radiation)",
+            "pdfPage": 218
+          },
+          {
+            "number": "9.5",
+            "title": "انتقال حرارت کا اطلاق روزمرہ اور نتائج (Applications and Consequences of Radiations)",
+            "pdfPage": 222
+          }
+        ],
+        "notes": "The shaded heading bar above the learning outcomes on the opening page (image 1) is not clearly legible, so 'sloHeading' could not be confidently transcribed and is left null. The 'Research Skills' (تحقیقی مہارت) and 'Science, Technology and Society' (سائنس، ٹیکنالوجی اور سوسائٹی سے تعلق) sections on image 2/3 contain further bulleted outcome-like statements, but these appear under separate headings distinct from the main SLO list and were not included in 'slos'. Some Urdu diacritics/spacing in the SLO transcription are approximate due to image resolution."
+      }
+    }
+  ]
+}

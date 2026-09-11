@@ -1,0 +1,284 @@
+{
+  "source": "content/punjab/textbooks/eng-10.pdf",
+  "subject": "eng",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 124,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    4
+  ],
+  "backMatterStart": 120,
+  "locateNotes": "Offset is consistent: PDF page = printed page + 4. A 'Review 2' section appears on PDF page 118 after Unit 10; back matter proper ('Instructions for Preparation of Exam Paper of English for Class 10', followed by the Model Paper on PDF pages 122-124) starts at PDF page 120.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Hazrat Muhammad's (صلی اللہ علیہ وآلہ وسلم) Social Reforms for the Rights of Women, Orphans and Slaves",
+      "titleEn": null,
+      "pdfStart": 5,
+      "pdfEnd": 19,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Hazrat Muhammad's (رسول اللہ خاتَمَ النَّبیّٖن صَلَّى اللّٰهُ عَلَيْهِ وَعَلٰ آلِهٖ وَأَصْحَابِهٖ وَسَلَّمَ) Social Reforms for the Rights of Women, Orphans and Slaves",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "respond to the text by giving arguments and opinions.",
+          "read with correct pronunciation, appropriate pitch and voice variation suitable for fictional and nonfictional texts.",
+          "ask and answer higher-order questions to guide/assess reading (e.g., Why is the author saying this right now? Why did the author choose this word? How is this different from what I read somewhere else? What would have happened if...? What would I/you do if...?",
+          "discuss and evaluate how authors use language, including figurative language, considering the impact on the reader.",
+          "clarify the meaning of unknown and multiple-meaning words and phrases based on the content, choosing flexibly from a range of strategies.",
+          "use context (e.g., the overall meaning of a sentence, paragraph, or text; a word's position or function in a sentence) as a clue to the meaning of a word or phrase.",
+          "comprehend and use contemporary idioms and proverbs in the different texts and in their speech.",
+          "apply editing and proofreading skills to a wide range of texts and contexts.",
+          "use hyphens (hyphenated nouns and adjectives) in words, letter string –ough words.",
+          "follow the steps of the process approach to plan for writing a paragraph: brainstorming, structuring, mind-mapping using a variety of graphic organizers, free writing, and note-taking."
+        ],
+        "headings": [],
+        "notes": "Pre-reading question box present on page 1 but not included in SLOs per rules. Some Arabic honorific text (salutations after 'Hazrat Muhammad' and 'He') is repeated throughout pages 2-3 in small script; transcribed as best legible."
+      }
+    },
+    {
+      "number": 2,
+      "title": "My Beloved Pakistan (Poem)",
+      "titleEn": null,
+      "pdfStart": 20,
+      "pdfEnd": 29,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "My Beloved Pakistan",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "analyze and present complex ideas and issues in two/three act play, or assembly/class presentation, preferably on SDGs.",
+          "discuss their own and others' reading comprehension critically.",
+          "analyze that text comprises a group of paragraphs that develop on the main idea addressed by the author throughout the text.",
+          "make recommendations and develop an interest in a variety of texts including fiction, non-fiction texts and poetry.",
+          "identify and correctly use patterns of word changes that indicate different meanings or parts of speech (e.g., analyze, analysis, analytical; advocate, advocacy).",
+          "consult general and specialized reference materials (e.g., dictionaries, glossaries, thesauruses), both print and digital, to find the pronunciation of a word or determine or clarify its precise meaning, its part of speech, or its etymology.",
+          "verify the preliminary determination of the meaning of a word or phrase (e.g., by checking the inferred meaning in context or in a dictionary).",
+          "write a dialogue between multiple people, giving narration/background in brackets, using conventions of the director's notes. Use vocabulary, tone and style appropriate to the context and relationship between the addresser and addressee.",
+          "apply the techniques of writing the first draft with sufficient details, proofreading and editing to suit the purpose and audience.",
+          "write and critique (self/peer checking) the final draft after editing and proofreading."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 3,
+      "title": "Digital Globalisation Transforming the English Language",
+      "titleEn": null,
+      "pdfStart": 30,
+      "pdfEnd": 41,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Digital Globalisation Transforming the English Language",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "demonstrate attentive listening skills while working in pairs and taking turns to speak with standard pronunciation and intonation.",
+          "analyse organisational patterns in a text: list/ sequence of ideas/events comparison-contrast cause-effect problem-solution reasons/ assumptions-conclusion",
+          "provide an objective summary of fiction, non-fiction and poetry texts.",
+          "read and use inference and deduction to recognise implicit meaning (e.g. look for supporting details within a text/paragraph) using prior knowledge and contextual cues effectively.",
+          "identify and use adjectival, prepositional, and adverbial phrases in reading and writing tasks.",
+          "distinguish between the connotative and denotative meanings of words, both similar and dissimilar denotations and their appropriate use in a variety of writing, and texts.",
+          "demonstrate understanding of figurative language, word relationships, and nuances in word meanings.",
+          "ensure that the topic sentence of each paragraph contains the main idea of the essay/piece of writing and also that each paragraph develops the idea of its topic sentence. Use the technique of hook, and lead-in sentences to develop the flow of thought.",
+          "write multiple paragraphs essays or stories, poems or playscript using mechanics for correct writing.",
+          "write narratives to develop real or imagined experiences or events using effective techniques, well-chosen details, and well-structured event sequences."
+        ],
+        "headings": [],
+        "notes": "The 'analyse organisational patterns' bullet contains sub-points marked with 'o' that were joined into a single string per the given rules."
+      }
+    },
+    {
+      "number": 4,
+      "title": "The Earth: Act Now for Tomorrow",
+      "titleEn": null,
+      "pdfStart": 42,
+      "pdfEnd": 51,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Earth: Act Now for Tomorrow",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "ask and answer questions of personal relevance, information and a variety of communicative purposes.",
+          "link new facts, terms, and concepts with prior knowledge. Choose words and phrases for effect.",
+          "comment on implied meaning, e.g. writer's viewpoint, relationships between characters etc.",
+          "explain whether predictions about the content of a text are acceptable or should be modified and why?",
+          "interpret figures of speech (e.g., euphemism, oxymoron) in context and analyze their role in the text.",
+          "analyze nuances in the meaning of words with similar denotations.",
+          "acquire and use appropriate words and phrases for reading, writing, speaking, and listening; independently gather vocabulary when considering a word or phrase important for comprehension or expression.",
+          "engage and orient the reader by setting out a problem, situation, or observation and its significance, establishing one or multiple point(s) of view, and introducing a narrator and/or characters; create a smooth progression of experiences or events.",
+          "use narrative techniques, such as dialogue, pacing, description, reflection, and multiple plot lines, to develop experiences, events, and/or characters.",
+          "use a variety of techniques to sequence events so that they build on one another to create a coherent whole and build toward a particular tone and outcome (e.g., a sense of mystery, suspense, growth, or resolution)."
+        ],
+        "headings": [],
+        "notes": "Pre-reading questions box on page 1 not included as they are not part of the learning outcomes list."
+      }
+    },
+    {
+      "number": 5,
+      "title": "The Happy Prince",
+      "titleEn": null,
+      "pdfStart": 52,
+      "pdfEnd": 66,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Happy Prince",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "apply the use of rhetorical questions  for a range of audiences.",
+          "distinguish cause from effect, fact from opinion (e.g., by noting outcomes, personal comments, beliefs and biases), and generalized statements from evidence-based information with specific reference to informational texts.",
+          "apply skimming and scanning strategies for relevant information and main points in texts to identify the writer's purpose, and  intended audience. Infer the theme/main idea of the text, distinguishing between fact and opinion where necessary.",
+          "examine how an author develops and contrasts the points of view of different characters or narrators in a text.",
+          "demonstrate knowledge and application of parts of speech in oral and written communication in varying degrees of complexity.",
+          "apply knowledge of parts of speech, tenses, sentence structure and other features of grammar and vocabulary to understand how language functions in different contexts and make effective choices for meaning or style while reading, listening and writing.",
+          "identify and use compound prepositions and prepositional phrases in writing.",
+          "use precise words and phrases, telling details, and sensory language to convey a vivid picture of the experiences, events, setting, and/or characters.",
+          "provide a conclusion that follows from and reflects on what is experienced, observed, or resolved over the course of the narrative.",
+          "produce clear and coherent writing in which the development, organization, and style are appropriate to the task, purpose, and audience.",
+          "develop and strengthen writing by planning, revising, editing, rewriting, or trying   approach, focusing on addressing  what is most significant for a specific purpose."
+        ],
+        "headings": [],
+        "notes": "On the opening page, the second-to-last outcome (about precise words and phrases) is printed without a bullet marker but appears as a continuation of the compound prepositions bullet in the source; it has been kept as its own separate string based on visible spacing/sentence structure. The phrase 'trying   approach' has an apparent missing word (possibly 'trying a new approach') but is transcribed as printed."
+      }
+    },
+    {
+      "number": 6,
+      "title": "Drug Abuse",
+      "titleEn": null,
+      "pdfStart": 67,
+      "pdfEnd": 75,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Drug Abuse",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "perform a drama/ role play/play script showing different roles and scenarios preferably on SDGs.",
+          "critique the plot development with respect to different aspects of the story.",
+          "examine the particular elements of a story or drama (e.g., how the setting shapes the characters or plot).",
+          "examine and interpret the use of conjunctions and transitional devices in speech and writing for effective communication.",
+          "recognise and use subordinating conjunctions to connect independent clause/s to dependent clause/, e.g., He could not attend the meeting because he was sick.",
+          "recognize and use correlative conjunctions including pairs such as both/and, either/or, neither/nor, not/but and not only/but also, etc.",
+          "write informative/explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization, and analysis of content.",
+          "introduce a topic, organize complex ideas, concepts, and information so that each new element builds on that which precedes it to create a unified whole; include formatting (e.g., headings), graphics (e.g., figures, tables), and multimedia when useful to aid comprehension.",
+          "develop the topic thoroughly by selecting the most significant and relevant facts, extended definitions, concrete details, quotations, or other information and examples appropriate to the audience's knowledge of the topic."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 7,
+      "title": "Time (Poem)",
+      "titleEn": null,
+      "pdfStart": 76,
+      "pdfEnd": 83,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Time",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "speak confidently in a wide range of contexts, for example, to fulfil different purposes.",
+          "examine the central idea of an informational text and analyse its development over the course of text, including its relationship to supporting ideas; provide an objective summary of the text.",
+          "use summary skills to extract salient points and develop a mind map.",
+          "examine the mechanics of precis writing and practice giving a precis of a text.",
+          "demonstrate command of the conventions of Standard English capitalization, punctuation, and spelling when writing in different varieties of texts.",
+          "observe hyphenation conventions.",
+          "use appropriate and varied transitions and syntax to link the major sections of the text, create cohesion, and clarify the relationships among complex ideas and concepts.",
+          "use precise language, domain-specific vocabulary, and techniques such as metaphor, simile, and analogy to manage the complexity of the topic.",
+          "establish and maintain a formal style and objective tone while attending to the norms and conventions of the discipline in which they are writing.",
+          "provide a concluding statement or section that follows from and supports the information or explanation presented (e.g., articulating implications or the significance of the topic)."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 8,
+      "title": "Pollution-Free Pakistan with Greenery All Around",
+      "titleEn": null,
+      "pdfStart": 84,
+      "pdfEnd": 94,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Pollution-Free Pakistan with Greenery All Around",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "engage effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners.",
+          "give an informed personal and analytical response to descriptive, informative texts and poetry.",
+          "reading to analyse descriptive/argumentative/persuasive essays.",
+          "reading to analyse application/letter/report/summary/biography.",
+          "cite strong and thorough textual evidence to support analysis of what the text says explicitly as well as give inferences drawn from the text.",
+          "produce legible work that shows the correct spelling of the conventions of punctuation and capitalization.",
+          "use all types of tenses correctly in speech and writing.",
+          "write arguments to support claims in an analysis of substantive topics or texts, using valid reasoning and relevant and sufficient evidence.",
+          "introduce precise, knowledgeable claim(s), establish the significance of the claim(s), distinguish the claim(s) from alternate or opposing claims, and create an organization that logically sequences claim(s), counter claims, reasons, and evidence.",
+          "develop claim(s) and counterclaims fairly and thoroughly, supplying the most relevant evidence for each while pointing out the strengths and limitations of both in a manner that anticipates the audience's knowledge level, concerns, values, and possible biases.",
+          "use words, phrases, and clauses as well as varied syntax to link the major sections of the text, create cohesion, and clarify the relationships between claim(s) and reasons, between reasons and evidence, and between claim(s) and counter claims."
+        ],
+        "headings": [],
+        "notes": "One bullet ('use all types of tenses correctly in speech and writing.') is printed without a bullet marker in the image, unlike the others which have a bullet icon; included as its own outcome as it appears on its own line."
+      }
+    },
+    {
+      "number": 9,
+      "title": "The Road Not Taken (Poem)",
+      "titleEn": null,
+      "pdfStart": 95,
+      "pdfEnd": 106,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Road Not Taken",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "ask and answer questions of personal relevance, information and a variety of communicative purposes.",
+          "summarise complex concepts, processes, or information by paraphrasing them using correct language structure, transitional devices, own words and relevant punctuation marks.",
+          "make inferences to draw conclusions from, e.g. contextual information, writer's viewpoint, implied information",
+          "interpret and integrate information from a variety of sources for comprehension (e.g., maps, graphs, charts, diagrams)",
+          "construct sentences using the sentence patterns and structures.",
+          "construct complex sentences and paragraphs using main and subordinate clauses with appropriate transitional devices and correct punctuation.",
+          "examine the mechanics of developing a book review.",
+          "write a book review report.",
+          "develop precis writing skills. Write precis effectively.",
+          "use paraphrasing skills to paraphrase a poem.",
+          "use summary skills to write an objective summary of the given text and poems."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 10,
+      "title": "The Three Questions",
+      "titleEn": null,
+      "pdfStart": 107,
+      "pdfEnd": 119,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Three Questions",
+        "sloHeading": "Learning Outcomes",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "respond to the text by giving arguments and opinions.",
+          "read, view and analyse a variety of readings grade-appropriate and high-interest books and texts from print and non-print sources: o poetry (free verse, narrative and rhythmic) o personal recounts (e.g., diary entries, biographies) o narratives (e.g., fables, historical fiction, science fiction, legends) o procedures (e.g., recipes, directions, instruction manuals) o information reports (e.g., project reports, fact sheets, brochures) o interpersonal texts (e.g. informal and formal letters, notices, emails) o factual recounts (e.g., eye-witness accounts, news bulletins) o drama (play scripts) o explanations (e.g., how something works) o expositions (e.g., reviews, arguments)",
+          "change into indirect/direct speech (present, past and perfect tenses, future, modals, time and questions, orders, requests, suggestions and advice) in speech and writing.",
+          "write multiple paragraphs of free writing for fluency, creativity, brainstorming or pleasure.",
+          "Proofread and edit texts for errors in o sentence structure. o subject/verb agreement. o noun/pronoun agreement. o reference words, connectives/transitional devices. o punctuation and spelling."
+        ],
+        "headings": [],
+        "notes": "Page 104 line 4 reads 'They said in way everything could be done at its proper time.' as printed, which appears to be a misprint (possibly 'this way') but is transcribed verbatim."
+      }
+    }
+  ]
+}

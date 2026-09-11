@@ -1,0 +1,731 @@
+{
+  "source": "content/punjab/textbooks/bio-10.pdf",
+  "subject": "bio",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 128,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    4
+  ],
+  "backMatterStart": 121,
+  "locateNotes": "Chapter 3 banner appears to read 'HUMAN BLOOD CIRCULARITY SYSTEM' in the thumbnail, differing from the contents listing 'Human Blood Circulatory System'; thumbnail resolution makes this slightly uncertain. Chapter 6 banner reads 'REPRODUCTIVE SYSTEM' while contents lists 'Reproduction'. Back matter starts with the Glossary (pdf 121), followed by Pairing Scheme (125) and Model Paper (126-128).",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Human Digestive System",
+      "titleEn": null,
+      "pdfStart": 5,
+      "pdfEnd": 15,
+      "read": {
+        "titleOnPage": "HUMAN DIGESTIVE SYSTEM",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the needs of ingestion, digestion, absorption, assimilation and egestion.",
+          "Identify and describe the structures of the main regions of the alimentary canal and the associated organs.",
+          "Describe swallowing and peristalsis.",
+          "Sort out the action of enzymes in specific regions of alimentary canal, with respect to their substrates and products.",
+          "State the role of the liver.",
+          "Describe the structure of a villus, including the roles of capillaries and lacteals.",
+          "State the signs and symptoms, causes, treatments and preventions of the disorders of gut i.e., diarrhoea, constipation, and ulcer."
+        ],
+        "headings": [
+          {
+            "number": "1.1",
+            "title": "NUTRITION AND ITS IMPORTANCE",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.2",
+            "title": "HUMAN DIGESTIVE SYSTEM",
+            "pdfPage": 6
+          },
+          {
+            "number": "1.3",
+            "title": "DISORDERS OF THE DIGESTIVE SYSTEM",
+            "pdfPage": 13
+          }
+        ],
+        "notes": "Within 1.2 the book prints numbered sub-parts as a list (1. Oral Cavity, 2. Pharynx and Oesophagus, 3. Stomach, 4. Small Intestine, 5. Large intestine) plus unnumbered boxed sub-headings 'Absorption of Food' (image 6) and 'Role of liver' (image 8); these were not treated as numbered section headings."
+      }
+    },
+    {
+      "number": 2,
+      "title": "Human Respiratory System",
+      "titleEn": null,
+      "pdfStart": 16,
+      "pdfEnd": 27,
+      "read": {
+        "titleOnPage": "HUMAN RESPIRATORY SYSTEM",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the roles of the parts of the air passageway and lungs.",
+          "Describe the mechanism of breathing in terms of movements of ribs and diaphragm.",
+          "Differentiate between the composition of inspired and expired air.",
+          "Discuss briefly diseases related to respiratory system like bronchitis, emphysema, pneumonia, asthma, and lung cancer."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Breathing",
+            "pdfPage": 17
+          },
+          {
+            "number": "2.1",
+            "title": "HUMAN RESPIRATORY SYSTEM",
+            "pdfPage": 17
+          },
+          {
+            "number": "A",
+            "title": "The Air Passageway",
+            "pdfPage": 17
+          },
+          {
+            "number": "1",
+            "title": "Nostrils and Nasal cavity",
+            "pdfPage": 18
+          },
+          {
+            "number": "2",
+            "title": "Pharynx",
+            "pdfPage": 18
+          },
+          {
+            "number": "3",
+            "title": "Larynx",
+            "pdfPage": 18
+          },
+          {
+            "number": "4",
+            "title": "Trachea and Bronchi",
+            "pdfPage": 19
+          },
+          {
+            "number": "5",
+            "title": "Bronchioles and Alveoli",
+            "pdfPage": 19
+          },
+          {
+            "number": "B",
+            "title": "The Lungs",
+            "pdfPage": 19
+          },
+          {
+            "number": null,
+            "title": "Blood Circulation in Lungs",
+            "pdfPage": 20
+          },
+          {
+            "number": "2.2",
+            "title": "THE MECHANISM OF BREATHING",
+            "pdfPage": 20
+          },
+          {
+            "number": "1",
+            "title": "Inhalation (inspiration)",
+            "pdfPage": 20
+          },
+          {
+            "number": "2",
+            "title": "Exhalation (expiration)",
+            "pdfPage": 21
+          },
+          {
+            "number": null,
+            "title": "The Rate of Breathing",
+            "pdfPage": 21
+          },
+          {
+            "number": null,
+            "title": "Composition of the Inhaled and the Exhaled Air",
+            "pdfPage": 21
+          },
+          {
+            "number": "2.3",
+            "title": "RESPIRATORY DISORDERS",
+            "pdfPage": 21
+          },
+          {
+            "number": "1",
+            "title": "Bronchitis",
+            "pdfPage": 21
+          },
+          {
+            "number": "2",
+            "title": "Emphysema",
+            "pdfPage": 22
+          },
+          {
+            "number": "3",
+            "title": "Pneumonia",
+            "pdfPage": 22
+          },
+          {
+            "number": "4",
+            "title": "Asthma",
+            "pdfPage": 23
+          },
+          {
+            "number": "5",
+            "title": "Lung Cancer",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Effects of Smoking",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Other Effects of Smoking",
+            "pdfPage": 25
+          }
+        ],
+        "notes": "The chapter prints only three top-level numbered sections (2.1, 2.2, 2.3); the A./B. and 1.–5. items are the book's boxed sub-headings within them and are included with their printed labels. Unnumbered sub-headings (Breathing, Blood Circulation in Lungs, The Rate of Breathing, Composition of the Inhaled and the Exhaled Air, Effects of Smoking, Other Effects of Smoking) are listed with number null."
+      }
+    },
+    {
+      "number": 3,
+      "title": "Human Blood Circulatory System",
+      "titleEn": null,
+      "pdfStart": 28,
+      "pdfEnd": 41,
+      "read": {
+        "titleOnPage": "HUMAN BLOOD CIRCULARITY SYSTEM",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe how the blood is circulated inside the human body.",
+          "Explain how blood is used to transport materials throughout the human body.",
+          "Identify the different types of organs connected to the blood system and their roles.",
+          "Identify the different components that make up the blood.",
+          "Name the cell types found in blood and their roles.",
+          "Explain the structure of the heart with a diagram.",
+          "Explain common heart diseases (coronary heart disease, myocardial infarction, angina).",
+          "Explain the harmful effects of smoking related to heart diseases."
+        ],
+        "headings": [
+          {
+            "number": "3.1",
+            "title": "BLOOD AND ITS COMPONENTS",
+            "pdfPage": 29
+          },
+          {
+            "number": "3.2",
+            "title": "HUMAN HEART",
+            "pdfPage": 32
+          },
+          {
+            "number": "3.3",
+            "title": "BLOOD VESSELS",
+            "pdfPage": 34
+          },
+          {
+            "number": "3.4",
+            "title": "ARTERIAL AND VENOUS SYSTEMS",
+            "pdfPage": 36
+          },
+          {
+            "number": "3.5",
+            "title": "CARDIOVASCULAR DISORDERS",
+            "pdfPage": 37
+          }
+        ],
+        "notes": "The opening page prints the title as \"HUMAN BLOOD CIRCULARITY SYSTEM\" (apparently a misprint for \"Circulatory\"); copied as printed. Within sections the book uses unnumbered/numbered sub-headings (e.g. \"1. Blood Plasma\", \"2. Blood Cells (and Cell-like Bodies)\", \"Structure of the Heart\", \"The Circulation of Blood\", \"Heartbeat\", \"1. Arteries\", \"2. Capillaries\", \"3. Veins\", \"Arterial System\", \"Venous System\", \"1. Coronary Heart Disease (CHD)\", \"2. Myocardial Infarction\", \"3. Angina Pectoris\", \"Harmful Effects of Smoking Related to Heart Diseases\"); these list-style sub-headings were not included as numbered section headings."
+      }
+    },
+    {
+      "number": 4,
+      "title": "Human Urinary System",
+      "titleEn": null,
+      "pdfStart": 42,
+      "pdfEnd": 51,
+      "read": {
+        "titleOnPage": "HUMAN URINARY SYSTEM",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Identify the different organs of urinary system.",
+          "Relate the structure of the kidney with its function.",
+          "State that nephron is the excretory unit of kidney.",
+          "Locate the different parts of nephrons and relate them with their function.",
+          "State that main role of the kidney is urine formation.",
+          "Describe that urine formation involves three processes i.e., filtration, reabsorption and secretion.",
+          "Explain that the kidney plays an important role in osmoregulation.",
+          "Identify the causes and treatment of kidney stones.",
+          "Outline the causes of kidney failure and treatments."
+        ],
+        "headings": [
+          {
+            "number": "4.1",
+            "title": "HUMAN URINARY SYSTEM",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "The Kidneys",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Structure of the Kidney",
+            "pdfPage": 43
+          },
+          {
+            "number": null,
+            "title": "Nephron",
+            "pdfPage": 44
+          },
+          {
+            "number": "4.2",
+            "title": "FUNCTIONING OF THE KIDNEY",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Role of Kidneys in Osmoregulation",
+            "pdfPage": 46
+          },
+          {
+            "number": "4.3",
+            "title": "DISORDERS OF KIDNEY",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "Treatment of Kidney Failure",
+            "pdfPage": 48
+          }
+        ],
+        "notes": "Within 4.2 the three steps are printed as numbered sub-labels (1. Pressure Filtration, 2. Reabsorption, 3. Tubular Secretion) and within 4.3 as (1. Kidney Stones, 2. Kidney (Renal) Failure); these are list numbers rather than section numbers, so they are not included as numbered headings. Similarly 'a. Dialysis' and 'b. Kidney Transplantation' under Treatment of Kidney Failure are lettered sub-items."
+      }
+    },
+    {
+      "number": 5,
+      "title": "Coordination",
+      "titleEn": null,
+      "pdfStart": 52,
+      "pdfEnd": 67,
+      "read": {
+        "titleOnPage": "COORDINATION",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the nervous system and its role.",
+          "Discuss the central nervous system and peripheral nervous system.",
+          "Outline the types of neurons with diagrams.",
+          "Define a stimulus with examples.",
+          "State that nerve impulses are electrical signals that travel across neuron.",
+          "Define and sketch synapses.",
+          "Introduce neurotransmitters.",
+          "Explain through sketching a diagram the involvement of the nervous system when a person accidentally touches something painfully hot and withdraws their hands as a reflex.",
+          "Explain the endocrine system.",
+          "Identify the major endocrine glands and hormones with their functions."
+        ],
+        "headings": [
+          {
+            "number": "5.1",
+            "title": "NEURONS – THE UNITS OF NERVOUS SYSTEM",
+            "pdfPage": 53
+          },
+          {
+            "number": "5.2",
+            "title": "DIVISIONS OF THE NERVOUS SYSTEM",
+            "pdfPage": 56
+          },
+          {
+            "number": "5.3",
+            "title": "ENDOCRINE SYSTEM",
+            "pdfPage": 60
+          }
+        ],
+        "notes": "The chapter also contains many unnumbered sub-headings (e.g. 'Structure of Neuron', 'Synapse and Neurotransmitters', 'Types of Neurons', 'Nerve', 'Reflex Action') and numbered/lettered sub-items within sections (1. Central Nervous System (CNS), A. Brain, B. Spinal Cord, 2. Peripheral Nervous System (PNS), 1. Pituitary Gland, a./b. Hormones of Anterior/Posterior Lobe of Pituitary, 2. Thyroid gland, 3 Parathyroid glands, 4. Adrenal glands, v. Pancreas, 6. Gonads); these are item numberings rather than section numbers, so only the 5.x headings are listed. Note the book prints '3 Parathyroid glands' without a period and 'v. Pancreas' out of sequence with the surrounding numerals."
+      }
+    },
+    {
+      "number": 6,
+      "title": "Reproduction",
+      "titleEn": null,
+      "pdfStart": 68,
+      "pdfEnd": 76,
+      "read": {
+        "titleOnPage": "REPRODUCTIVE SYSTEM",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe the role of hormones in both male and female sexual development.",
+          "Describe the process of gametogenesis and fertilization.",
+          "Identify, on diagrams of the parts of male reproductive system and describe their functions.",
+          "Identify, on diagrams of the parts of female reproductive system and describe their functions.",
+          "Explain AIDS as an example of sexually transmitted diseases."
+        ],
+        "headings": [
+          {
+            "number": "6.1",
+            "title": "FORMATION OF GAMETES AND FERTILIZATION",
+            "pdfPage": 68
+          },
+          {
+            "number": "6.2",
+            "title": "ROLE OF HORMONES IN SEXUAL DEVELOPMENT",
+            "pdfPage": 71
+          },
+          {
+            "number": "6.3",
+            "title": "REPRODUCTIVE SYSTEMS",
+            "pdfPage": 72
+          },
+          {
+            "number": "6.4",
+            "title": "SEXUALLY TRANSMITTED DISEASES",
+            "pdfPage": 73
+          }
+        ],
+        "notes": "The chapter title printed on the opening page is \"REPRODUCTIVE SYSTEM\" (the prompt refers to it as \"Reproduction\"). Unnumbered sub-headings also appear within sections: \"Formation of Gametes\", \"(a) Formation of Male Gametes\", \"(b) Formation of Female Gametes\", \"Fertilization\" (images 2-3); \"Hormones in Male Sexual Development\", \"Hormones in Female Sexual Development\" (images 4-5); \"Male Reproductive System\" (image 5), \"Female Reproductive System\" (image 6), \"Acquired Immunodeficiency Syndrome (AIDS)\" (image 6). These are not included in \"headings\" per the numbered-heading rule."
+      }
+    },
+    {
+      "number": 7,
+      "title": "Inheritance",
+      "titleEn": null,
+      "pdfStart": 77,
+      "pdfEnd": 89,
+      "read": {
+        "titleOnPage": "INHERITANCE",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Sketch the structure of chromosomes.",
+          "Define genotype and phenotype, allele, homozygous, heterozygous, dominant, recessive",
+          "Illustrate Mendelian inheritance laws through monohybrid and dihybrid cross.",
+          "Outline function of DNA as carrier of hereditary information",
+          "Describe briefly the structure of RNA as single stranded macromolecule made of nucleotides with nitrogenous base overhangs.",
+          "Outline the function of RNA as aid in converting hereditary information into useful proteins.",
+          "Outline how information in the DNA is converted to information on RNA and then into proteins."
+        ],
+        "headings": [
+          {
+            "number": "7.1",
+            "title": "STRUCTURE OF CHROMOSOME",
+            "pdfPage": 78
+          },
+          {
+            "number": "7.2",
+            "title": "DNA AND RNA",
+            "pdfPage": 79
+          },
+          {
+            "number": "7.3",
+            "title": "MENDEL'S LAWS OF INHERITANCE",
+            "pdfPage": 81
+          }
+        ],
+        "notes": "Unnumbered sub-section headings appear in grey/boxed style and were not included: \"Functioning of DNA and RNA\" (image 3), \"Gene and Allele\", \"Genotype\" (image 4), \"Selection of garden pea for experiments\" (image 5), \"Mendel's Experiments\" (image 6), \"Experiment 1\", \"Conclusions\" (image 7), \"Experiment 2\" (image 9), \"Conclusions:\", \"Law of Independent Assortment\" (image 10)."
+      }
+    },
+    {
+      "number": 8,
+      "title": "Biotechnology",
+      "titleEn": null,
+      "pdfStart": 90,
+      "pdfEnd": 99,
+      "read": {
+        "titleOnPage": "BIOTECHNOLOGY",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Introduce biotechnology.",
+          "Explain the role of yeast in the production of bread and ethanol.",
+          "Understand that bacteria are useful in biotechnology and genetic modification.",
+          "Describe the basic method of genetic engineering/genetic modification.",
+          "Discuss potential advantages and risks of genetic modification."
+        ],
+        "headings": [
+          {
+            "number": "8.1",
+            "title": "INTRODUCTION OF BIOTECHNOLOGY",
+            "pdfPage": 91
+          },
+          {
+            "number": null,
+            "title": "Importance of Yeast in Fermentation",
+            "pdfPage": 91
+          },
+          {
+            "number": null,
+            "title": "Role in Bread Making",
+            "pdfPage": 91
+          },
+          {
+            "number": null,
+            "title": "Role in Ethanol Production",
+            "pdfPage": 91
+          },
+          {
+            "number": null,
+            "title": "Importance of Bacteria in Biotechnology",
+            "pdfPage": 91
+          },
+          {
+            "number": null,
+            "title": "Role in Biotechnology",
+            "pdfPage": 92
+          },
+          {
+            "number": null,
+            "title": "Role in Genetic Modification",
+            "pdfPage": 92
+          },
+          {
+            "number": "8.2",
+            "title": "GENETIC ENGINEERING",
+            "pdfPage": 92
+          },
+          {
+            "number": "1",
+            "title": "Gene Editing",
+            "pdfPage": 92
+          },
+          {
+            "number": null,
+            "title": "Examples of Gene Editing",
+            "pdfPage": 92
+          },
+          {
+            "number": "2",
+            "title": "Gene Transfer",
+            "pdfPage": 93
+          },
+          {
+            "number": null,
+            "title": "Examples of Gene Transfer",
+            "pdfPage": 94
+          },
+          {
+            "number": "8.3",
+            "title": "APPLICATIONS OF BIOTECHNOLOGY",
+            "pdfPage": 95
+          },
+          {
+            "number": "1",
+            "title": "Food Biotechnology",
+            "pdfPage": 95
+          },
+          {
+            "number": "2",
+            "title": "Medical Biotechnology",
+            "pdfPage": 95
+          },
+          {
+            "number": "3",
+            "title": "Environmental Biotechnology",
+            "pdfPage": 96
+          },
+          {
+            "number": "4",
+            "title": "Marine Biotechnology",
+            "pdfPage": 96
+          },
+          {
+            "number": "5",
+            "title": "Industrial Biotechnology",
+            "pdfPage": 96
+          },
+          {
+            "number": "8.4",
+            "title": "POTENTIAL RISKS OF BIOTECHNOLOGY",
+            "pdfPage": 97
+          }
+        ],
+        "notes": "Numbered sub-items under 8.2 are printed as \"1. Gene Editing\" and \"2- Gene Transfer\" (differing styles), and the application sections are printed as numbered list items 1-5 rather than as 8.3.1 etc.; these are recorded as printed. Unnumbered sub-headings within sections are included with number null."
+      }
+    },
+    {
+      "number": 9,
+      "title": "Diseases and Immunity",
+      "titleEn": null,
+      "pdfStart": 100,
+      "pdfEnd": 109,
+      "read": {
+        "titleOnPage": "DISEASES AND IMMUNITY",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe infectious and non-infectious diseases and their types with examples.",
+          "Define zoonotic diseases and give their types.",
+          "Describe vector borne diseases with examples.",
+          "Enlist allergies with some common types."
+        ],
+        "headings": [
+          {
+            "number": "9.1",
+            "title": "DISEASE",
+            "pdfPage": 101
+          },
+          {
+            "number": null,
+            "title": "Basic Types of Diseases",
+            "pdfPage": 101
+          },
+          {
+            "number": null,
+            "title": "Other Types of Diseases",
+            "pdfPage": 102
+          },
+          {
+            "number": null,
+            "title": "Types of Allergies",
+            "pdfPage": 103
+          },
+          {
+            "number": "9.2",
+            "title": "PATHOGENS",
+            "pdfPage": 104
+          },
+          {
+            "number": "9.3",
+            "title": "IMMUNITY",
+            "pdfPage": 105
+          },
+          {
+            "number": null,
+            "title": "First Line of Defence",
+            "pdfPage": 106
+          },
+          {
+            "number": null,
+            "title": "Second Line of Defence",
+            "pdfPage": 106
+          },
+          {
+            "number": null,
+            "title": "Third Line of Defence",
+            "pdfPage": 107
+          },
+          {
+            "number": null,
+            "title": "Blood Clotting",
+            "pdfPage": 107
+          }
+        ],
+        "notes": "Only 9.1, 9.2 and 9.3 are printed as numbered section headings; the other headings listed are unnumbered shaded sub-headings included for completeness. Within sections, items such as \"1. Infectious Diseases (Infections)\", \"2. Non-Infectious Diseases\", \"1. Zoonotic Diseases\", \"2. Vector-Borne Diseases\", \"3- Allergies\" are numbered list items rather than section headings and were not listed."
+      }
+    },
+    {
+      "number": 10,
+      "title": "Evolution",
+      "titleEn": null,
+      "pdfStart": 110,
+      "pdfEnd": 120,
+      "read": {
+        "titleOnPage": "EVOLUTION",
+        "sloHeading": "Students Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Explain the theory of evolution by natural selection with examples.",
+          "Define species.",
+          "Discuss briefly the observations Darwin made during his voyage on HMS Beagle.",
+          "Describe sources of variation which can lead to speciation and evolution.",
+          "Describe evidence of evolution with regards to the following: - Paleontology (fossil record) - Comparative anatomy (homologous structures, vestigial structures) - Selective breeding"
+        ],
+        "headings": [
+          {
+            "number": "10.1",
+            "title": "DARWIN'S OBSERVATIONS",
+            "pdfPage": 111
+          },
+          {
+            "number": "10.2",
+            "title": "THEORY OF EVOLUTION BY NATURAL SELECTION",
+            "pdfPage": 112
+          },
+          {
+            "number": null,
+            "title": "Natural Selection",
+            "pdfPage": 112
+          },
+          {
+            "number": null,
+            "title": "Examples of Natural Selection",
+            "pdfPage": 113
+          },
+          {
+            "number": "10.3",
+            "title": "SPECIES AND SPECIATION",
+            "pdfPage": 114
+          },
+          {
+            "number": null,
+            "title": "Species",
+            "pdfPage": 114
+          },
+          {
+            "number": null,
+            "title": "Speciation",
+            "pdfPage": 114
+          },
+          {
+            "number": "10.4",
+            "title": "SOURCES OF VARIATION",
+            "pdfPage": 115
+          },
+          {
+            "number": "1",
+            "title": "Mutations",
+            "pdfPage": 115
+          },
+          {
+            "number": "2",
+            "title": "Genetic Recombination",
+            "pdfPage": 115
+          },
+          {
+            "number": "3",
+            "title": "Gene Flow (Migration)",
+            "pdfPage": 116
+          },
+          {
+            "number": "4",
+            "title": "Random Pairing of Gametes",
+            "pdfPage": 116
+          },
+          {
+            "number": "10.5",
+            "title": "EVIDENCES OF EVOLUTION",
+            "pdfPage": 116
+          },
+          {
+            "number": "1",
+            "title": "Palaeontology (Fossil Record)",
+            "pdfPage": 116
+          },
+          {
+            "number": "2",
+            "title": "Comparative Anatomy",
+            "pdfPage": 117
+          },
+          {
+            "number": null,
+            "title": "Homologous Structures",
+            "pdfPage": 117
+          },
+          {
+            "number": null,
+            "title": "Vestigial Structures",
+            "pdfPage": 117
+          },
+          {
+            "number": "3",
+            "title": "Selective Breeding",
+            "pdfPage": 118
+          }
+        ],
+        "notes": "The fifth SLO prints three dashed sub-points; they have been kept inside that bullet's string. Within sections 10.4 and 10.5 the book numbers sub-topics as boxed headings (1-, 2-, ... and 1., 2., 3.); these are included with their printed numbering. Exercise MCQ 2 option (d) is printed as 'llopatric' (apparently a typo for 'Allopatric')."
+      }
+    }
+  ]
+}

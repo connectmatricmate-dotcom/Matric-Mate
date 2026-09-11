@@ -1,0 +1,274 @@
+{
+  "source": "content/punjab/textbooks/eng-9.pdf",
+  "subject": "eng",
+  "grade": 9,
+  "medium": "en",
+  "pdfPages": 168,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    4
+  ],
+  "backMatterStart": 164,
+  "locateNotes": "Printed page numbers run 4 lower than PDF labels (printed 1 = PDF 5). PDF 164 is the 'UNITS 7-11 Review 2' section that follows Unit 11; it is a review section rather than a glossary/index. A 'Review 1' section similarly appears at PDF 87 between Units 6 and 7.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "The Saviour of Mankind",
+      "titleEn": null,
+      "pdfStart": 5,
+      "pdfEnd": 19,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Saviour of Mankind",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "speak confidently and fluently in a wide range of contexts, for example, (conflict resolution, panel discussion, role-play, dialogue, etc.) to fulfil different purposes (exposition, argumentation, etc.)",
+          "analyse that text comprises a group of paragraphs that develop on the main idea addressed by the author throughout the text.",
+          "apply skimming and scanning strategies for relevant information and main points in texts to identify the writer's purpose and intended audience. Infer the theme/main idea of the text, distinguishing between fact and opinion where necessary.",
+          "examine the central idea of an informational text and analyse its development over the course of the text, including its relationship to supporting ideas; provide an objective summary of the text.",
+          "demonstrate knowledge and application of parts of speech in oral and written communication in varying degrees of complexity.",
+          "follow the steps of the process approach to plan for writing a paragraph: brainstorming, structuring, mind-mapping using a variety of graphic organizers, free writing, and note-taking (Topics may be chosen from the list of themes, sub-themes and text types).",
+          "write informative/explanatory texts to examine and convey complex ideas, concepts, and information clearly and accurately through the effective selection, organization, and analysis of content."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 2,
+      "title": "Patriotism",
+      "titleEn": null,
+      "pdfStart": 20,
+      "pdfEnd": 34,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Patriotism",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "respond to text through oral discussion, telling short stories and acting plays.",
+          "read with correct pronunciation, appropriate pitch and voice variation suitable for fictional and nonfictional texts.",
+          "distinguish cause from effect, fact from opinion (e.g., by noting outcomes, personal comments, beliefs and biases), and generalized statements from evidence-based information with specific reference to informational texts.",
+          "read, view and analyse a variety of readings grade-appropriate and high-interest books and texts from print and non-print sources: Expositions (e.g., reviews, arguments)",
+          "apply knowledge of parts of speech, tenses, sentence structure and other features of grammar and vocabulary to understand how language functions in different contexts and make effective choices for meaning or style while reading, listening and writing.",
+          "write arguments to support claims in an analysis of substantive topics or texts, using valid reasoning and relevant and sufficient evidence."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 3,
+      "title": "Daffodils (Poem)",
+      "titleEn": null,
+      "pdfStart": 35,
+      "pdfEnd": 52,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Daffodils",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "demonstrate attentive listening' skills to respond orally with standard pronunciation and intonation.",
+          "use pre-reading and while-reading strategies to analyse and explore different layers of meaning within texts including biases and opinions.",
+          "demonstrate understanding of figurative language, word relationships, and nuances in word meanings.",
+          "identify and use compound prepositions and prepositional phrases in writing.",
+          "use paraphrasing skills to paraphrase a poem.",
+          "use summary skills to write an objective summary of the given text and poems."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 4,
+      "title": "Hazrat Asma (رضی اللہ تعالٰی عنہا)",
+      "titleEn": "Hazrat Asma (may Allah be pleased with her)",
+      "pdfStart": 53,
+      "pdfEnd": 61,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Hazrat Asma (رضی اللہ تعالیٰ عنہا)",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "engage effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners.",
+          "explain whether predictions about the content of a text are acceptable or should be modified and why.",
+          "use all types of tenses correctly in speech and writing. Use gerunds, infinitives, and participles. Use the aspect of time correctly in speech and writing.",
+          "write narratives to develop real or imagined experiences or events using effective techniques, well-chosen details, and well-structured event sequences."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 5,
+      "title": "Women Empowerment through Entrepreneurship",
+      "titleEn": null,
+      "pdfStart": 62,
+      "pdfEnd": 75,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Women Empowerment through Entrepreneurship",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "use rhetorical questions for a range of audiences.",
+          "examine different points of view (e.g., first-person, third-person narrative). determine an author's point of view or purpose in a text. analyse how authors distinguish their position from that of others.",
+          "analyze various types of biographies and autobiographies connected to different fields and professions. (e.g., a person's life story in print and multimedia), determining which details are emphasized in each type.",
+          "comprehend and use contemporary idioms and proverbs in the different texts and in their speech.",
+          "demonstrate command of the conventions of standard english capitalization, punctuation, and spelling when writing in different varieties of texts.",
+          "write formal letters to people in extended academic and professional environments for various purposes."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 6,
+      "title": "The Value of Time",
+      "titleEn": null,
+      "pdfStart": 76,
+      "pdfEnd": 89,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Value of Time",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "engage in extended discussions.",
+          "examine how an author develops and contrasts the points of view of different characters or narrators in a text.",
+          "critique the plot development with respect to different aspects of the story.",
+          "examine the particular elements of a story or drama (e.g., how the setting shapes the characters or plot).",
+          "examine stages of plot development in a fictional text. (exposition, setting, climax, character development, resolution)",
+          "analyze how complex characters (e.g., those with multiple or conflicting motivations) develop over the course of a text, interact with other characters, and advance the plot or develop the theme.",
+          "apply editing and proofreading skills to a wide range of texts and contexts.",
+          "apply the techniques of writing the first draft with sufficient details, proofreading and editing to suit the purpose and audience.",
+          "write and critique (self/peer checking) the final draft after editing and proofreading. Ensure that the topic sentence of each paragraph contains the main idea of the essay/piece of writing and also that each paragraph develops the idea of its topic sentence. Use the technique of hook, and lead-in sentences to develop the flow of thought."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 7,
+      "title": "If (Poem)",
+      "titleEn": null,
+      "pdfStart": 90,
+      "pdfEnd": 96,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "If",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "discuss how authors use language, including figurative language, considering the impact on the reader. Discuss their own understanding of the above critically.",
+          "make recommendations and develop an interest in fiction and poetry.",
+          "provide an objective summary of fiction and poetry texts.",
+          "examine and interpret the use of conjunctions and transitional devices in speech and writing for effective communication.",
+          "recognize and use subordinating conjunctions to connect independent clause/s to dependent clause/, e.g., He could not attend the meeting because he was sick.",
+          "recognize and use correlative conjunctions including pairs such as both/and, either/or, neither/nor, not/but and not only/but also, etc."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 8,
+      "title": "The Impact of Globalisation on Culture and Economy",
+      "titleEn": null,
+      "pdfStart": 97,
+      "pdfEnd": 109,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Impact of Globalisation on Culture and Economy",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "ask and answer questions of personal relevance, information and a variety of communicative purposes.",
+          "construct sentences using the sentence patterns and structures learnt in earlier classes.",
+          "construct complex sentences and paragraphs using main and subordinate clauses with appropriate transitional devices and correct punctuation in varying degrees of complexity",
+          "develop precis writing skills. Write precis effectively.",
+          "write multiple paragraphs of free writing for fluency, creativity, brainstorming or pleasure.",
+          "Proofread and edit texts for errors in sentence structure, subject/verb agreement, noun/pronoun agreement, reference words, connectives/transitional devices, punctuation and spelling."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 9,
+      "title": "Quality Education: A Key to Success",
+      "titleEn": null,
+      "pdfStart": 110,
+      "pdfEnd": 123,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Quality Education: A Key to Success",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "perform a drama/ role play/play script preferably on SDGs.",
+          "summarize complex concepts, processes, or information by paraphrasing them using correct language structure, transitional devices, own words and relevant punctuation marks. Make inferences to draw conclusions from, e.g. contextual information, writer's viewpoint, implied information.",
+          "interpret and integrate information from a variety of sources for comprehension (e.g., maps, graphs, charts, diagrams).",
+          "cite strong and thorough textual evidence to support analysis of what the text says explicitly as well as give inferences drawn from the text.",
+          "clarify the meaning of unknown and multiple-meaning words and phrases.",
+          "identify and use adjectival, prepositional, and adverbial phrases in reading and writing tasks.",
+          "research for short projects to answer a question (including a self-generated question) or solve a problem; synthesize multiple sources available on the subject, demonstrating understanding of the subject under investigation while writing or presenting their assignment.",
+          "examine the mechanics of developing a book review, Write a book review report."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 10,
+      "title": "The Silent Predator and the Majestic Prey– Snow Leopard and Markhor",
+      "titleEn": null,
+      "pdfStart": 124,
+      "pdfEnd": 135,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Silent Predator and the Majestic Prey – Snow Leopard and Markhor",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, students will be able to:",
+        "slos": [
+          "give an informed personal and analytical response to a descriptive and informative text.",
+          "reading to analyse descriptive/argumentative essays.",
+          "distinguish between the connotative and denotative meanings of words, both similar and dissimilar denotations and their appropriate use in a variety of writing, and texts.",
+          "acquire and use appropriate words and phrases for reading, writing, speaking, and listening; independently gather vocabulary when considering a word or phrase important for comprehension or expression.",
+          "use hyphens (hyphenated nouns and adjectives) in words, letter string –ough /words.",
+          "write a descriptive composition (giving physical description and characteristics/traits of a person/object/place moving from general to specific), using correct punctuation and spelling, by using the process approach – brainstorming, mind mapping, and writing a first draft.",
+          "demonstrate attentive listening skills to respond orally with standard pronunciation and intonation."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    },
+    {
+      "number": 11,
+      "title": "The Dear Departed (one-act play)",
+      "titleEn": null,
+      "pdfStart": 136,
+      "pdfEnd": 163,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Dear Departed (one-act play)",
+        "sloHeading": "Learning Outcomes:",
+        "sloLead": "By the end of this unit, the students will be able to:",
+        "slos": [
+          "explore simple to complex ideas and issues in one-act play, or assembly/class presentation",
+          "analyse organisational patterns in a text to list/ sequence of ideas/events, comparison-contrast, cause-effect, problem-solution, reasons/ assumptions-conclusion",
+          "change into indirect/direct speech (present, past and perfect tenses, future, modals, time and questions, orders, requests, suggestions and advice) in speech and writing.",
+          "write multiple paragraphs essays or stories, poems or playscript using mechanics for correct writing.",
+          "write a dialogue between multiple people, giving narration/background in brackets, using conventions of the director's notes. Use vocabulary, tone and style appropriate to the context and relationship between the addresser and addressee."
+        ],
+        "headings": [],
+        "notes": null
+      }
+    }
+  ]
+}

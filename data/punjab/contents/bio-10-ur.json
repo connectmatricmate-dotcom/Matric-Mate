@@ -1,0 +1,316 @@
+{
+  "source": "content/punjab/textbooks/bio-10-ur.pdf",
+  "subject": "bio",
+  "grade": 10,
+  "medium": "ur",
+  "extractedAt": "2026-09-11",
+  "model": "claude-sonnet-5",
+  "bookTitle": "بائیولوجی 10 (Biology 10)",
+  "publisher": "Punjab Curriculum and Textbook Board, Lahore",
+  "curriculum": "Based on updated/revised National Curriculum of Pakistan 2023",
+  "language": "ur",
+  "contentsPages": [
+    3,
+    4
+  ],
+  "contentsComplete": true,
+  "chapters": [
+    {
+      "number": 1,
+      "title": "انسان کا ڈائجیسٹو سسٹم",
+      "titleEn": "Human Digestive System",
+      "page": 1,
+      "topics": [
+        {
+          "number": "1.1",
+          "title": "نیوٹریشن اور اس کی اہمیت",
+          "titleEn": "Nutrition and its Importance",
+          "page": null
+        },
+        {
+          "number": "1.2",
+          "title": "انسان کا ڈائجیسٹو سسٹم",
+          "titleEn": "Human Digestive System",
+          "page": null
+        },
+        {
+          "number": "1.3",
+          "title": "ڈائجیسٹوسسٹم کی بیماریاں",
+          "titleEn": "Disorders of the Digestive System",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "انسان کا ریسپریٹری سسٹم",
+      "titleEn": "Human Respiratory System",
+      "page": 12,
+      "topics": [
+        {
+          "number": "2.1",
+          "title": "انسان کا ریسپریٹری سسٹم",
+          "titleEn": "Human Respiratory System",
+          "page": null
+        },
+        {
+          "number": "2.2",
+          "title": "تنفس کا طریقہ کار",
+          "titleEn": "Mechanism of Respiration",
+          "page": null
+        },
+        {
+          "number": "2.3",
+          "title": "تنفس کی بیماریاں",
+          "titleEn": "Diseases of Respiration",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "انسان کا بلڈسرکولیٹری سسٹم",
+      "titleEn": "Human Cardiovascular System",
+      "page": 24,
+      "topics": [
+        {
+          "number": "3.1",
+          "title": "خون اور اس کی ترکیب",
+          "titleEn": "Blood and its Composition",
+          "page": null
+        },
+        {
+          "number": "3.2",
+          "title": "انسان کا دل",
+          "titleEn": "Human Heart",
+          "page": null
+        },
+        {
+          "number": "3.3",
+          "title": "بلڈویسلز",
+          "titleEn": "Blood Vessels",
+          "page": null
+        },
+        {
+          "number": "3.4",
+          "title": "آرٹریئل اور وینس سسٹم",
+          "titleEn": "Arterial and Venous System",
+          "page": null
+        },
+        {
+          "number": "3.5",
+          "title": "کارڈیوویسکولر بیماریاں",
+          "titleEn": "Cardiovascular Diseases",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "انسان کا ایوریزی سسٹم",
+      "titleEn": "Human Excretory System",
+      "page": 38,
+      "topics": [
+        {
+          "number": "4.1",
+          "title": "انسان کا ایوریزی سسٹم",
+          "titleEn": "Human Excretory System",
+          "page": null
+        },
+        {
+          "number": "4.2",
+          "title": "گردے کا فعل",
+          "titleEn": "Function of Kidney",
+          "page": null
+        },
+        {
+          "number": "4.3",
+          "title": "گردے کی بیماریاں",
+          "titleEn": "Diseases of Kidney",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "کوآرڈی نیشن",
+      "titleEn": "Coordination",
+      "page": 48,
+      "topics": [
+        {
+          "number": "5.1",
+          "title": "نیوران- نروس سسٹم کی اکائیاں",
+          "titleEn": "Neuron - Units of Nervous System",
+          "page": null
+        },
+        {
+          "number": "5.2",
+          "title": "نروس سسٹم کے حصے",
+          "titleEn": "Parts of Nervous System",
+          "page": null
+        },
+        {
+          "number": "5.3",
+          "title": "اینڈوکرائن سسٹم",
+          "titleEn": "Endocrine System",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "ریپروڈکشن",
+      "titleEn": "Reproduction",
+      "page": 65,
+      "topics": [
+        {
+          "number": "6.1",
+          "title": "گیمیٹس کا بننا اور فرٹیلائزیشن",
+          "titleEn": "Formation of Gametes and Fertilization",
+          "page": null
+        },
+        {
+          "number": "6.2",
+          "title": "جنسی تولید میں ہارمونز کا کردار",
+          "titleEn": "Role of Hormones in Sexual Reproduction",
+          "page": null
+        },
+        {
+          "number": "6.3",
+          "title": "ریپروڈکٹوسسٹم",
+          "titleEn": "Reproductive System",
+          "page": null
+        },
+        {
+          "number": "6.4",
+          "title": "جنسی عمل سے ہونے والی بیماریاں",
+          "titleEn": "Diseases Caused by Sexual Activity",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "وراثت",
+      "titleEn": "Heredity",
+      "page": 74,
+      "topics": [
+        {
+          "number": "7.1",
+          "title": "کروموسوم کی ساخت",
+          "titleEn": "Structure of Chromosome",
+          "page": null
+        },
+        {
+          "number": "7.2",
+          "title": "ڈی این اے اور آر این اے",
+          "titleEn": "DNA and RNA",
+          "page": null
+        },
+        {
+          "number": "7.3",
+          "title": "مینڈل کے قوانین وراثت",
+          "titleEn": "Mendel's Laws of Inheritance",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "بائیوٹیکنالوجی",
+      "titleEn": "Biotechnology",
+      "page": 86,
+      "topics": [
+        {
+          "number": "8.1",
+          "title": "بائیوٹیکنالوجی کا تعارف",
+          "titleEn": "Introduction to Biotechnology",
+          "page": null
+        },
+        {
+          "number": "8.2",
+          "title": "جینیٹک انجینئرنگ",
+          "titleEn": "Genetic Engineering",
+          "page": null
+        },
+        {
+          "number": "8.3",
+          "title": "بائیوٹیکنالوجی کا اطلاق",
+          "titleEn": "Applications of Biotechnology",
+          "page": null
+        },
+        {
+          "number": "8.4",
+          "title": "بائیوٹیکنالوجی کے ممکنہ خطرات",
+          "titleEn": "Possible Hazards of Biotechnology",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "بیماریاں اور قوت مدافعت",
+      "titleEn": "Diseases and Immunity",
+      "page": 96,
+      "topics": [
+        {
+          "number": "9.1",
+          "title": "بیماری",
+          "titleEn": "Disease",
+          "page": null
+        },
+        {
+          "number": "9.2",
+          "title": "بیماری پھیلانے والے جراثیم",
+          "titleEn": "Disease Causing Organisms",
+          "page": null
+        },
+        {
+          "number": "9.3",
+          "title": "قوت مدافعت",
+          "titleEn": "Immunity",
+          "page": null
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "ارتقا",
+      "titleEn": "Evolution",
+      "page": 107,
+      "topics": [
+        {
+          "number": "10.1",
+          "title": "ڈارون کے مشاہدات",
+          "titleEn": "Darwin's Observations",
+          "page": null
+        },
+        {
+          "number": "10.2",
+          "title": "قدرتی چناؤ سے ارتقا کا نظریہ",
+          "titleEn": "Theory of Evolution by Natural Selection",
+          "page": null
+        },
+        {
+          "number": "10.3",
+          "title": "پی شیزراور پی شیزز کا بننا",
+          "titleEn": "Formation of Species and Speciation",
+          "page": null
+        },
+        {
+          "number": "10.4",
+          "title": "تغیرات کے ذرائع",
+          "titleEn": "Sources of Variation",
+          "page": null
+        },
+        {
+          "number": "10.5",
+          "title": "ارتقا کے ثبوت",
+          "titleEn": "Evidences of Evolution",
+          "page": null
+        }
+      ]
+    }
+  ],
+  "notes": "Chapter/topic titles are transcribed exactly as printed in the Urdu contents pages (images 3-4); English renderings are provided based on the chapter opening pages (images 5, 12) where titles appeared bilingually. Topic 10.3 title transcription is somewhat uncertain due to unusual script rendering of 'پی شیزراور پی شیزز' which appears to correspond to 'species and speciation formation'."
+}

@@ -1,0 +1,181 @@
+{
+  "source": "content/punjab/textbooks/isl-10.pdf",
+  "subject": "isl",
+  "grade": 10,
+  "medium": "en",
+  "pdfPages": 113,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [],
+  "backMatterStart": null,
+  "locateNotes": "Thumbnails are low resolution; titles read from banner shapes and partially legible Urdu text. Page 113 appears to continue the last chapter's exercises, so no separate back matter was identified.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "قرآن مجید و حدیثِ نبوی ﷺ",
+      "titleEn": "The Holy Quran and the Hadith of the Prophet ﷺ",
+      "pdfStart": 6,
+      "pdfEnd": 12,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "قرآن مجید و حدیث نبوی (خاتم النبیین صلی اللہ علیہ وعلی الہ واصحابہ وسلم)",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلبہ اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "مذکورہ سورتوں کا تعارف اوران کے شان نزول کے بارے میں جان سکیں۔",
+          "مذکورہ سورتوں کا بامحاورہ ترجمہ پڑھ کر سمجھ سکیں۔",
+          "سورتوں کے منتخب الفاظ کے معانی جان سکیں۔",
+          "سورتوں میں موجود تعلیمات کو سمجھ سکیں۔",
+          "تلاوتِ قرآن مجید کے آداب پر عمل کر سکیں۔",
+          "منتخب سورتوں میں مذکورہ تعلیمات کو سمجھ کر روزمرہ زندگی میں ان پر عمل کر سکیں۔"
+        ],
+        "headings": [],
+        "notes": "This is a sub-topic opening page (الف - ترجمہ قرآن مجید) within Chapter 1; page 2 begins a new sub-section (ب - حفاظت و تدوین حدیث: دور اول) with its own hasilat-e-taleem box, but per instructions only the first image's SLO box was extracted since that is the chapter's opening page. The second SLO box on page 2 was not included per the task scope of the opening page."
+      }
+    },
+    {
+      "number": 2,
+      "title": "ایمانیات و عبادات",
+      "titleEn": "Beliefs and Worship",
+      "pdfStart": 13,
+      "pdfEnd": 30,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ایمانیات وعبادات",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلباء اس قابل ہوجائیں گے کہ:",
+        "slos": [
+          "فرشتوں کے تصور اوران کی تخلیق کے مقصد سے آگاہ ہوسکیں۔",
+          "فرشتوں کی صفات سے آگاہ ہوسکیں۔",
+          "فرشتوں کی ذمے داریوں سے آگاہی حاصل کرسکیں۔",
+          "حدیث جبریل علیہ السلام کے تناظر میں تعلیم وتعلّم کے آداب کا جائزہ لے سکیں۔",
+          "اس پرایمان رکھتے ہیں کہ اللہ تعالیٰ کی ذات اپنے احکام کی انجام دہی کے لیے فرشتوں سمیت کسی بھی مخلوق کی محتاج نہیں ہے۔",
+          "اللہ تعالیٰ کی نوری مخلوق فرشتوں پرایمان پختہ ہوتے ہوئے اپنی عملی زندگی میں ان کے ادب واحترام کولحوظ خاطر رکھ سکیں اوران کے متعلق بات کرتے ہوئے تعظیمی رویہ اختیار کرسکیں۔",
+          "حدیث جبریل علیہ السلام سے سبق حاصل کرتے ہوئے تعلیم وتعلّم کے آداب کا عملی مظاہرہ کرسکیں۔"
+        ],
+        "headings": [],
+        "notes": "Chapter number printed as Urdu word 'دوم' (meaning 'second') under 'باب', not as a numeral; rendered here as integer 2. The section '(الف) ایمانیات' and sub-heading '1۔ ملائکہ(فرشتے)' appear on the opening page but are part of body structure, not SLO headings, so not included in 'headings' per instructions."
+      }
+    },
+    {
+      "number": 3,
+      "title": "سیرتِ نبوی ﷺ",
+      "titleEn": "The Life of the Prophet ﷺ",
+      "pdfStart": 31,
+      "pdfEnd": 53,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "سیرت نبوی ( خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم )",
+        "sloHeading": "حاصلات تعلم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلباء اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "غزوہ تبوک کے اسباب، وجوہات اور پس منظر سے آگاہ ہوسکیں۔",
+          "اس غزوہ کی مشکلات اور منافقین کے کردار کو جان سکیں۔",
+          "اس غزوہ میں نبی کریم خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم اور صحابہ کرام رضی اللہ تعالی عنہم بالخصوص حضرت ابوبکر صدیق رضی اللہ تعالی عنہ اور اس کے نتیجے میں اللہ تعالی کی مدد سے آگاہ ہوسکیں۔",
+          "غزوہ تبوک کے موقع پر مدینہ منورہ میں حضرت علی رضی اللہ عنہ کی انتظامی صلاحیتوں کی وجہ سے آگاہ ہوسکیں۔",
+          "نبی کریم خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم اور صحا��ہ کرام رضی اللہ تعالی عنہم کے کلمۃ اللہ (غلبہ اسلام) کے لیے قربانی کا جذبہ پیدا کرسکیں۔",
+          "منافقین کے کردار سے آگاہ ہوکر تمام صورتوں سے اجتناب کرنے والے بن سکیں۔",
+          "حضرت کعب بن مالک رضی اللہ تعالی عنہ کے واقعے سے حاصل کرتے ہوئے ہر حال میں سچائی پر کاربند رہنے والے بن سکیں۔"
+        ],
+        "headings": [],
+        "notes": "Opening page also carries additional sub-headings not captured in 'title': '(الف) عہد نبوی کے ماہ وسال (مدنی دور)', 'نبی کریم خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم بطور معاشرتی مصلح', and '(1) غزوہ تبوک'. The 4th SLO bullet's ending wording is slightly hard to fully disambiguate due to overlapping symbol/diacritic marks in the scan, but the transcribed text reflects the visible printed words."
+      }
+    },
+    {
+      "number": 4,
+      "title": "اَخلاق و آداب",
+      "titleEn": "Morals and Manners",
+      "pdfStart": 54,
+      "pdfEnd": 70,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "اَخلاق و آداب",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلباء اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "اخلاص وتقویٰ کے معنی و مفہوم کو جان سکیں۔",
+          "قرآن وسنت کی روشنی میں اخلاص وتقویٰ کی اہمیت وفضیلت کو سمجھ سکیں۔",
+          "سیرتِ نبوی (خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم) سے اخلاص وتقویٰ کی مثالیں سمجھ سکیں۔",
+          "اخلاص وتقویٰ اختیار نہ کرنے کے دنیوی واخروی نقصانات کا جائزہ لے سکیں۔",
+          "عملی زندگی میں اخلاص وتقویٰ کے فوائد وثمرات کی اہمیت کا جائزہ لے سکیں۔",
+          "سیرتِ نبوی (خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم) سے اخلاص وتقویٰ کی مثالوں سے اسباق حاصل کرسکیں۔",
+          "عملی زندگی کے معاملات میں اخلاص وتقویٰ کا مظاہرہ کرسکیں۔",
+          "اخلاص وتقویٰ کو اپنا کر ایک مثالی مسلمان بن کر اپنی دنیا و آخرت بہتر بنا سکیں۔"
+        ],
+        "headings": [],
+        "notes": "The honorific 'خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم' (peace be upon him) appears repeatedly after references to the Prophet throughout pages 2-3; it has been included where it forms part of an SLO sentence. Some Arabic Qur'anic/Hadith text and translations on pages 2-3 are narrative/explanatory content, not SLOs, and are not included per instructions. Page 3 exercise section (مشق) begins but is not part of SLOs."
+      }
+    },
+    {
+      "number": 5,
+      "title": "حسنِ معاشرت و معاملات",
+      "titleEn": "Good Social Conduct and Dealings",
+      "pdfStart": 71,
+      "pdfEnd": 82,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "حُسنِ معاملات و معاشرت",
+        "sloHeading": "حاصلاتِ تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلبہ اس قابل ہوجائیں گے کہ:",
+        "slos": [
+          "سود کے معنی اور مفہوم اوراس کی اقسام جان سکیں۔",
+          "قرآن وسنت کی روشنی میں سودی حرمت کے احکام جان سکیں۔",
+          "سودی لین دین کے احکام ومسائل سمجھ سکیں۔",
+          "سودی معاملات سے پیدا ہونے والے دیگر کاروباری ذرائع کے استعمال کا موازنہ کرسکیں۔",
+          "سود کے انفرادی، اجتماعی، دینی اور دنیوی نقصانات اور مضر اثرات کا تجزیہ کرسکیں۔",
+          "سودی حرمت کی قرض حسنہ کی ترغیب کو سمجھ کر روزمرہ زندگی کے اس مطابق ڈھال سکیں۔",
+          "سودی لین دین سے ممانعت کی حکمت کو سمجھ کر اس کے احکام ومسائل سمجھ کر اس سے نفرت کرنے اور گریز کرنے والے بن سکیں۔"
+        ],
+        "headings": [],
+        "notes": "The opening page also carries a sub-heading '(1) سُود کی حُرمت' beneath the chapter title, indicating this chapter is divided into numbered topics; only topic (1) is covered across these three pages. Page 3 contains exercise (مشق) questions, not further SLOs or headings."
+      }
+    },
+    {
+      "number": 6,
+      "title": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
+      "titleEn": "Sources of Guidance and Eminent Personalities of Islam",
+      "pdfStart": 83,
+      "pdfEnd": 105,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "ہدایت کے سرچشمے اور مشاہیر اسلام",
+        "sloHeading": "حاصلات تعلّم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طالبہ اس قابل ہوجائیں گے کہ:",
+        "slos": [
+          "حضرت امام زید بن علی رحمۃ اللہ علیہ کے حالات زندگی جان سکیں۔",
+          "حضرت امام زید بن علی رحمۃ اللہ علیہ کی سیرت وکردار سے آگاہ ہوسکیں۔",
+          "حضرت امام زید بن علی رحمۃ اللہ علیہ کی صفات علم ،تفقّہ، عبادت وریاضت اور دینی ومعاشرتی خدمات کے روشن پہلوؤں سے آگاہ ہو کر سبق سیکھ سکیں۔",
+          "حضرت امام زید بن علی رحمۃ اللہ علیہ کے اخلاق وصفات سے واقفیت حاصل کر کے ان کو اپنی عملی زندگی میں لاسکیں۔",
+          "حضرت امام زید بن علی رحمۃ اللہ علیہ کی سیرت سے سبق حاصل کر کے اپنی عملی زندگی کا حصہ بناسکیں۔"
+        ],
+        "headings": [],
+        "notes": "Page 78 contains a section heading 'حضرت امام زید بن علی رحمۃ اللہ علیہ' under the chapter title, before the SLOs box; this was treated as the topic within the chapter opening rather than a separate chapter heading."
+      }
+    },
+    {
+      "number": 7,
+      "title": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
+      "titleEn": "Islamic Teachings and the Demands of the Present Age",
+      "pdfStart": 106,
+      "pdfEnd": 113,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
+        "sloHeading": "حاصلاتِ تعلم",
+        "sloLead": "اس سبق کو پڑھنے کے بعد طلبہ اس قابل ہو جائیں گے کہ:",
+        "slos": [
+          "مستقبل کی منصوبہ بندی کے معنی ومفہوم جان سکیں۔",
+          "قرآن وسنت کی روشنی میں مستقبل کی منصوبہ بندی کی اہمیت کو سمجھ سکیں۔",
+          "اسوہ نبوی (خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم) کی روشنی میں مستقبل کی منصوبہ بندی کی مثالیں سمجھ سکیں۔",
+          "مستقبل کی منصوبہ بندی کے اسباب کی مختلف صورتوں اور شرعی حدود وقیود سے واقف ہوسکیں۔",
+          "مستقبل کی منصوبہ بندی کے انفرادی واجتماعی اثرات کا جائزہ لے سکیں۔",
+          "شرعی حدود وقیود میں مستقبل کی منصوبہ بندی اختیار کرنے والے بن سکیں۔",
+          "اسلامی تعلیمات اور عصرِ حاضر کے تقاضوں کو مدنظر رکھتے ہوئے مستقبل کی منصوبہ بندی کرنے والے بن سکیں۔"
+        ],
+        "headings": [],
+        "notes": null
+      }
+    }
+  ]
+}

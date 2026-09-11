@@ -1,0 +1,1278 @@
+{
+  "source": "content/punjab/textbooks/pst-9.pdf",
+  "subject": "pst",
+  "grade": 9,
+  "medium": "en",
+  "pdfPages": 112,
+  "extractedAt": "2026-09-11",
+  "model": "claude-opus-5",
+  "contentsPage": true,
+  "pageOffsets": [
+    2
+  ],
+  "backMatterStart": 110,
+  "locateNotes": "PDF page offset is +2 relative to printed page numbers (chapter 1 printed p.1 = PDF p.3). Page 110 begins the \"Terminology/Glossary\" section, which runs to page 112.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Ideological Basis of Pakistan",
+      "titleEn": null,
+      "pdfStart": 3,
+      "pdfEnd": 19,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Ideological Basis of Pakistan",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Define the term ideology.",
+          "Identify the major sources of Pakistan Ideology.",
+          "Explain the ideology of Pakistan with reference to the basic values of Islam, Muslim reformers and socio-cultural aspects of Muslim India.",
+          "Trace the origins and evolution of Two-Nation Theory, with specific reference to economic and social deprivation of Muslims in India.",
+          "Explain the concept of Pakistan ideology in the light of the pronouncements of Allama Muhammad Iqbal رحمتہ اللہ علیہ and Quaid-e-Azam Muhammad Ali Jinnah رحمتہ اللہ علیہ."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Definition, Sources and Significance of Ideology",
+            "pdfPage": 3
+          },
+          {
+            "number": null,
+            "title": "Ideology",
+            "pdfPage": 3
+          },
+          {
+            "number": null,
+            "title": "Sources of Ideology",
+            "pdfPage": 4
+          },
+          {
+            "number": null,
+            "title": "Importance of Ideology",
+            "pdfPage": 5
+          },
+          {
+            "number": null,
+            "title": "Meanings of Ideology of Pakistan",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "Explanation of the Ideology of Pakistan with Reference to the Basic Values of Islam, Muslim Reformers and Socio-cultural Aspects of Muslim India",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "Islamic Values",
+            "pdfPage": 6
+          },
+          {
+            "number": null,
+            "title": "The Muslim Reformers",
+            "pdfPage": 7
+          },
+          {
+            "number": null,
+            "title": "Social and Cultural Conditions of the Muslims of the Subcontinent",
+            "pdfPage": 7
+          },
+          {
+            "number": null,
+            "title": "Islamic State and the Rights of Minorities",
+            "pdfPage": 8
+          },
+          {
+            "number": null,
+            "title": "Awareness about Ideology of Pakistan",
+            "pdfPage": 9
+          },
+          {
+            "number": null,
+            "title": "Elements of Ideology of Pakistan",
+            "pdfPage": 9
+          },
+          {
+            "number": "1",
+            "title": "Beliefs",
+            "pdfPage": 9
+          },
+          {
+            "number": "2",
+            "title": "Pillars of Islam",
+            "pdfPage": 10
+          },
+          {
+            "number": "3",
+            "title": "Rule of Law",
+            "pdfPage": 10
+          },
+          {
+            "number": "4",
+            "title": "Equality and Brotherhood",
+            "pdfPage": 11
+          },
+          {
+            "number": "5",
+            "title": "Justice and Equity",
+            "pdfPage": 12
+          },
+          {
+            "number": null,
+            "title": "Explanation of the origin and evolution of Two-Nation Theory, with specific reference to economic and social deprivation of Muslims of the subcontinent",
+            "pdfPage": 13
+          },
+          {
+            "number": null,
+            "title": "Two-Nation Theory: Origin and Evolution",
+            "pdfPage": 13
+          },
+          {
+            "number": "1",
+            "title": "Two-Nation Theory in the Subcontinent",
+            "pdfPage": 13
+          },
+          {
+            "number": "2",
+            "title": "Sir Syed Ahmad Khan and Two-Nation Theory",
+            "pdfPage": 14
+          },
+          {
+            "number": "3",
+            "title": "Ch. Rahmat Ali and Two-Nation Theory",
+            "pdfPage": 14
+          },
+          {
+            "number": null,
+            "title": "Economic Deprivation of Muslims in India",
+            "pdfPage": 15
+          },
+          {
+            "number": null,
+            "title": "Explanation of the Ideology of Pakistan in the Light of the Pronouncements of Allama Muhammad Iqbal رحمتہ اللہ علیہ and Quaid-e-Azam Muhammad Ali Jinnah رحمتہ اللہ علیہ",
+            "pdfPage": 15
+          },
+          {
+            "number": null,
+            "title": "Allama Muhammad Iqbal رحمتہ اللہ علیہ and Ideology of Pakistan",
+            "pdfPage": 16
+          },
+          {
+            "number": null,
+            "title": "Quaid-e-Azam رحمتہ اللہ علیہ and Ideology of Pakistan",
+            "pdfPage": 16
+          }
+        ],
+        "notes": "Some Urdu honorific phrases (رحمتہ اللہ علیہ) appear as small superscript Arabic/Urdu script beside names in the original; rendered here as transliterated text since exact calligraphic form cannot be reproduced. Page 9 header shows a small circled '9' repeatedly which appears to be a printing artifact/logo rather than a page number, distinct from the sequential page numbers (2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17) shown at corners."
+      }
+    },
+    {
+      "number": 2,
+      "title": "Pakistan Movement and Emergence of Pakistan",
+      "titleEn": null,
+      "pdfStart": 20,
+      "pdfEnd": 60,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "The Pakistan Movement and Emergence of Pakistan",
+        "sloHeading": "Students' Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Briefly describe the Historical events of the Pakistan Movement: 1857-1940 1940-1947",
+          "Discuss the role of Quaid-e-Azam رحمتہ اللہ علیہ in the making of Pakistan with reference to his political and constitutional efforts.",
+          "Describe the early problems faced after the creation of Pakistan with emphasis on Economic, political, Refugees' and Administrative problems.",
+          "Discuss Quaid-e-Azam's رحمتہ اللہ علیہ role and achievements as first Governor-General of Pakistan.",
+          "Identify Liaqat Ali Khan's role and achievements as first Prime Minister of Pakistan with special reference to Objectives Resolution 1949.",
+          "Identify the main aspects of the 1956 Constitution.",
+          "Explain the causes of Martial Law promulgated in 1958.",
+          "Explain the contribution, reforms and achievements of Ayub Khan.",
+          "Identify the main features of 1962 constitution.",
+          "Discuss the Presidential Elections of 1965 and their impact on politics.",
+          "Describe the spirit of Pakistani people and the armed forces during 1965 war.",
+          "Discuss the key aspects of the LFO promulgated by Yahya Khan.",
+          "Analyze 1970 elections and their aftermath.",
+          "Discuss the causes of separation of East-Pakistan."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Background of Pakistan Movement",
+            "pdfPage": 20
+          },
+          {
+            "number": null,
+            "title": "Aligarh Movement and Sir Syed Ahmad Khan",
+            "pdfPage": 21
+          },
+          {
+            "number": null,
+            "title": "Partition of Bengal 1905",
+            "pdfPage": 22
+          },
+          {
+            "number": null,
+            "title": "Simla Deputation 1906",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Establishment of Muslim League 1906",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Minto-Morley Reforms 1909",
+            "pdfPage": 23
+          },
+          {
+            "number": null,
+            "title": "Lucknow Pact 1916",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Khilafat Movement 1919",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Non-Cooperation Movement 1920",
+            "pdfPage": 24
+          },
+          {
+            "number": null,
+            "title": "Hijrat Movement 1920",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Nehru Report 1928",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Fourteen Points of Quaid-e-Azam رحمتہ اللہ علیہ 1929",
+            "pdfPage": 25
+          },
+          {
+            "number": null,
+            "title": "Allama Muhammad Iqbal's رحمتہ اللہ علیہ Allahabad Address, 1930",
+            "pdfPage": 26
+          },
+          {
+            "number": null,
+            "title": "Act of 1935 and the Provincial Autonomy",
+            "pdfPage": 27
+          },
+          {
+            "number": null,
+            "title": "Lahore Resolution 1940",
+            "pdfPage": 27
+          },
+          {
+            "number": null,
+            "title": "Text of the Resolution",
+            "pdfPage": 27
+          },
+          {
+            "number": null,
+            "title": "Cripps Mission 1942",
+            "pdfPage": 28
+          },
+          {
+            "number": null,
+            "title": "Proposals of Cripps Mission",
+            "pdfPage": 28
+          },
+          {
+            "number": null,
+            "title": "Simla Conference and Elections",
+            "pdfPage": 29
+          },
+          {
+            "number": null,
+            "title": "Cabinet Mission Plan 1946",
+            "pdfPage": 29
+          },
+          {
+            "number": null,
+            "title": "Direct Action Day",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "Interim Government",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "3rd June 1947 Plan",
+            "pdfPage": 30
+          },
+          {
+            "number": null,
+            "title": "The Indian Independence Bill, 1947",
+            "pdfPage": 31
+          },
+          {
+            "number": null,
+            "title": "Radcliffe Award",
+            "pdfPage": 31
+          },
+          {
+            "number": null,
+            "title": "Dawn of Independence",
+            "pdfPage": 31
+          },
+          {
+            "number": null,
+            "title": "Role of Quaid-e-Azam Muhammad Ali Jinnah رحمتہ اللہ علیہ in the making of Pakistan with reference to his political and constitutional efforts",
+            "pdfPage": 31
+          },
+          {
+            "number": null,
+            "title": "Consolidation of the State and making of Constitution 1947-56",
+            "pdfPage": 34
+          },
+          {
+            "number": null,
+            "title": "Early Problems of Pakistan",
+            "pdfPage": 34
+          },
+          {
+            "number": "1",
+            "title": "Radcliffe Award",
+            "pdfPage": 34
+          },
+          {
+            "number": "2",
+            "title": "Settlement of Migrants",
+            "pdfPage": 34
+          },
+          {
+            "number": "3",
+            "title": "Administrative Problems",
+            "pdfPage": 35
+          },
+          {
+            "number": "4",
+            "title": "Economic Problems",
+            "pdfPage": 36
+          },
+          {
+            "number": "5",
+            "title": "Distribution of Military Assets",
+            "pdfPage": 36
+          },
+          {
+            "number": "6",
+            "title": "Agricultural Problems",
+            "pdfPage": 36
+          },
+          {
+            "number": "7",
+            "title": "Political Problems",
+            "pdfPage": 37
+          },
+          {
+            "number": null,
+            "title": "Quaid-e-Azam Muhammad Ali Jinnah's رحمتہ اللہ علیہ Role and achievements as First Governor General",
+            "pdfPage": 37
+          },
+          {
+            "number": null,
+            "title": "Liaqat Ali Khan's Role and achievements as First Prime Minister",
+            "pdfPage": 39
+          },
+          {
+            "number": null,
+            "title": "Objectives Resolution 1949",
+            "pdfPage": 40
+          },
+          {
+            "number": null,
+            "title": "Salient features of the constitution of 1956",
+            "pdfPage": 42
+          },
+          {
+            "number": null,
+            "title": "Abrogation of the Constitution",
+            "pdfPage": 42
+          },
+          {
+            "number": null,
+            "title": "Accession of States and Tribal Areas to Pakistan",
+            "pdfPage": 42
+          },
+          {
+            "number": "1",
+            "title": "State of Jammu and Kashmir",
+            "pdfPage": 43
+          },
+          {
+            "number": "2",
+            "title": "Hyderabad Deccan State",
+            "pdfPage": 43
+          },
+          {
+            "number": "3",
+            "title": "Junagarh State",
+            "pdfPage": 43
+          },
+          {
+            "number": "4",
+            "title": "Manavadar State",
+            "pdfPage": 43
+          },
+          {
+            "number": "5",
+            "title": "Swat State, Khairpur State and Bahawalpur State",
+            "pdfPage": 44
+          },
+          {
+            "number": "6",
+            "title": "Tribal Areas",
+            "pdfPage": 44
+          },
+          {
+            "number": "1",
+            "title": "Ayub Khan Era, 1958-1969",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Lack of Political Leadership",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Delay in Elections",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Role of Bureaucracy",
+            "pdfPage": 44
+          },
+          {
+            "number": null,
+            "title": "Failure of Parliamentary System",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Constant Hurdles in Making of Constitution",
+            "pdfPage": 45
+          },
+          {
+            "number": "2",
+            "title": "Basic Democracies System 1959",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Union Council / Town Committee",
+            "pdfPage": 45
+          },
+          {
+            "number": null,
+            "title": "Tehsil Council / Thana Council",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "District Council",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Divisional Council",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Importance of the System",
+            "pdfPage": 46
+          },
+          {
+            "number": null,
+            "title": "Muslim Family Laws Ordinance 1961",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "Salient Feature of the Constitution of 1962",
+            "pdfPage": 47
+          },
+          {
+            "number": null,
+            "title": "Failure of the 1962 Constitution",
+            "pdfPage": 48
+          },
+          {
+            "number": "4",
+            "title": "Presidential Elections 1965",
+            "pdfPage": 48
+          },
+          {
+            "number": null,
+            "title": "Impact of Elections on Politics",
+            "pdfPage": 48
+          },
+          {
+            "number": "5",
+            "title": "Pakistan and India War 1965",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "Main Events of 1965 War",
+            "pdfPage": 49
+          },
+          {
+            "number": null,
+            "title": "Impact of War",
+            "pdfPage": 50
+          },
+          {
+            "number": "6",
+            "title": "Economic Development",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "Focus on Agriculture Sector",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "Focus on Industrial Sector",
+            "pdfPage": 51
+          },
+          {
+            "number": null,
+            "title": "Improvement in Education and Social Sector",
+            "pdfPage": 52
+          },
+          {
+            "number": "7",
+            "title": "Five year Development Plans of General Ayub Khan' Era",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Second Five Year Development Plan (1960-1965)",
+            "pdfPage": 52
+          },
+          {
+            "number": null,
+            "title": "Third Five Year Plan (1965-1970)",
+            "pdfPage": 52
+          },
+          {
+            "number": "1",
+            "title": "Yahya Khan Regime 1969-71",
+            "pdfPage": 53
+          },
+          {
+            "number": "2",
+            "title": "Legal Framework Order (LFO) 1970",
+            "pdfPage": 53
+          },
+          {
+            "number": "3",
+            "title": "General Elections of 1970",
+            "pdfPage": 54
+          },
+          {
+            "number": "4",
+            "title": "Separation of East Pakistan and Emergence of Bangladesh",
+            "pdfPage": 56
+          },
+          {
+            "number": "5",
+            "title": "Causes of Separation of East Pakistan",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Geographical Distance",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Impact of Hindus on Trade and Services",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Economic Backwardness",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Role of Hindu Teachers",
+            "pdfPage": 57
+          },
+          {
+            "number": null,
+            "title": "Language Issue",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "Problem of Representation Ratio",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "Indian Interference",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "Six points of Sheikh Mujibur Rehman",
+            "pdfPage": 58
+          },
+          {
+            "number": null,
+            "title": "Elections of 1970",
+            "pdfPage": 58
+          }
+        ],
+        "notes": "Images 40-41 contain end-of-chapter Questions and are not included in headings per instructions. Some Urdu honorific text (رحمتہ اللہ علیہ) appears as small superscript after names in the original; reproduced inline here as printed."
+      }
+    },
+    {
+      "number": 3,
+      "title": "Land and Environment",
+      "titleEn": null,
+      "pdfStart": 61,
+      "pdfEnd": 96,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Land and Environment",
+        "sloHeading": "Student's Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Identify the location of Pakistan with reference to its latitudes and longitudes and its neighbours, with the help of a physical map.",
+          "Describe the major landform features of Pakistan (Mountain ranges, Plateaus, Plains etc.)",
+          "Identify the major climatic regions of Pakistan and briefly describe the characteristics of every region.",
+          "Identify the location of major glaciers and rivers of Pakistan and highlight their importance.",
+          "Discuss major types of forests, their distribution, importance and protection.",
+          "Identify the wildlife of Pakistan, their habitat and efforts to protect wildlife in Pakistan.",
+          "Describe the characteristics of major natural Regions of Pakistan and human environment in them.",
+          "Discuss the nature and importance of environmental hazards of Pakistan and their associated problems and solutions.",
+          "Describe the problems associated with the conservation of water, land, natural vegetation and wildlife."
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Location of Pakistan",
+            "pdfPage": 61
+          },
+          {
+            "number": null,
+            "title": "Importance of Location",
+            "pdfPage": 62
+          },
+          {
+            "number": null,
+            "title": "Physical Features of Pakistan",
+            "pdfPage": 63
+          },
+          {
+            "number": "1",
+            "title": "Mountain Ranges",
+            "pdfPage": 63
+          },
+          {
+            "number": null,
+            "title": "Northern Mountain Ranges",
+            "pdfPage": 64
+          },
+          {
+            "number": null,
+            "title": "Karakoram Range",
+            "pdfPage": 64
+          },
+          {
+            "number": null,
+            "title": "Himalayan Range",
+            "pdfPage": 65
+          },
+          {
+            "number": null,
+            "title": "North Western Mountain Range",
+            "pdfPage": 66
+          },
+          {
+            "number": null,
+            "title": "Hindukush Range",
+            "pdfPage": 66
+          },
+          {
+            "number": null,
+            "title": "Western Mountain Ranges",
+            "pdfPage": 66
+          },
+          {
+            "number": null,
+            "title": "Koh-e-sufaid",
+            "pdfPage": 66
+          },
+          {
+            "number": null,
+            "title": "Waziristan Hills",
+            "pdfPage": 67
+          },
+          {
+            "number": null,
+            "title": "Koh-e-Sulaiman",
+            "pdfPage": 67
+          },
+          {
+            "number": null,
+            "title": "Kirthar Hills",
+            "pdfPage": 68
+          },
+          {
+            "number": null,
+            "title": "Salt Range",
+            "pdfPage": 68
+          },
+          {
+            "number": "2",
+            "title": "Plain Areas",
+            "pdfPage": 68
+          },
+          {
+            "number": null,
+            "title": "Coastal Plains",
+            "pdfPage": 69
+          },
+          {
+            "number": null,
+            "title": "Deserts",
+            "pdfPage": 69
+          },
+          {
+            "number": "3",
+            "title": "Plateaus",
+            "pdfPage": 70
+          },
+          {
+            "number": null,
+            "title": "Pothwar Plateau",
+            "pdfPage": 70
+          },
+          {
+            "number": null,
+            "title": "Balochistan Plateau",
+            "pdfPage": 70
+          },
+          {
+            "number": null,
+            "title": "Climate of Pakistan",
+            "pdfPage": 71
+          },
+          {
+            "number": "1",
+            "title": "Sub-Tropical Continental Highland",
+            "pdfPage": 72
+          },
+          {
+            "number": "2",
+            "title": "Sub-Tropical Continental Plateau",
+            "pdfPage": 72
+          },
+          {
+            "number": "3",
+            "title": "Sub-Tropical Continental Lowland",
+            "pdfPage": 72
+          },
+          {
+            "number": "4",
+            "title": "Tropical Coastland",
+            "pdfPage": 72
+          },
+          {
+            "number": null,
+            "title": "Impact of Climate on Human Life",
+            "pdfPage": 72
+          },
+          {
+            "number": null,
+            "title": "Major Glaciers and Rivers of Pakistan",
+            "pdfPage": 74
+          },
+          {
+            "number": null,
+            "title": "Glacier",
+            "pdfPage": 74
+          },
+          {
+            "number": null,
+            "title": "Siachen Glacier",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "Baltoro Glacier",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "Batora Glacier",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "Biafo Glacier",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "Hisper Glacier",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "Importance of glaciers",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "The rivers of Pakistan",
+            "pdfPage": 75
+          },
+          {
+            "number": null,
+            "title": "River Indus and its Tributaries",
+            "pdfPage": 76
+          },
+          {
+            "number": null,
+            "title": "Eastern Tributaries of River Indus",
+            "pdfPage": 76
+          },
+          {
+            "number": "i",
+            "title": "River Ravi",
+            "pdfPage": 76
+          },
+          {
+            "number": "ii",
+            "title": "River Sutlej",
+            "pdfPage": 76
+          },
+          {
+            "number": "iii",
+            "title": "River Chenab",
+            "pdfPage": 77
+          },
+          {
+            "number": "iv",
+            "title": "River Jhelum",
+            "pdfPage": 77
+          },
+          {
+            "number": null,
+            "title": "Western Tributaries of River Indus",
+            "pdfPage": 78
+          },
+          {
+            "number": null,
+            "title": "The Rivers of Balochistan falling into Arabian Sea",
+            "pdfPage": 78
+          },
+          {
+            "number": null,
+            "title": "Canals of Pakistan",
+            "pdfPage": 78
+          },
+          {
+            "number": "i",
+            "title": "Flood Canals",
+            "pdfPage": 79
+          },
+          {
+            "number": "ii",
+            "title": "Perennial Canals",
+            "pdfPage": 79
+          },
+          {
+            "number": "iii",
+            "title": "Non-Perennial Canals",
+            "pdfPage": 79
+          },
+          {
+            "number": "iv",
+            "title": "Link Canals",
+            "pdfPage": 79
+          },
+          {
+            "number": null,
+            "title": "Forests",
+            "pdfPage": 79
+          },
+          {
+            "number": null,
+            "title": "Importance of Forests",
+            "pdfPage": 80
+          },
+          {
+            "number": null,
+            "title": "Wildlife in Pakistan",
+            "pdfPage": 81
+          },
+          {
+            "number": null,
+            "title": "Natural Regions of Pakistan",
+            "pdfPage": 82
+          },
+          {
+            "number": "1",
+            "title": "Plain Region",
+            "pdfPage": 83
+          },
+          {
+            "number": "i",
+            "title": "Areas",
+            "pdfPage": 83
+          },
+          {
+            "number": "ii",
+            "title": "Climate",
+            "pdfPage": 83
+          },
+          {
+            "number": "iii",
+            "title": "Vegetation",
+            "pdfPage": 83
+          },
+          {
+            "number": "iv",
+            "title": "Economic Conditions",
+            "pdfPage": 83
+          },
+          {
+            "number": null,
+            "title": "Population",
+            "pdfPage": 84
+          },
+          {
+            "number": "2",
+            "title": "Desert Region",
+            "pdfPage": 84
+          },
+          {
+            "number": "I",
+            "title": "Areas",
+            "pdfPage": 84
+          },
+          {
+            "number": "ii",
+            "title": "Climate",
+            "pdfPage": 84
+          },
+          {
+            "number": "iii",
+            "title": "Vegetation",
+            "pdfPage": 84
+          },
+          {
+            "number": "iv",
+            "title": "Economic Conditions",
+            "pdfPage": 84
+          },
+          {
+            "number": "v",
+            "title": "Population",
+            "pdfPage": 84
+          },
+          {
+            "number": "3",
+            "title": "Coastal Region",
+            "pdfPage": 84
+          },
+          {
+            "number": "I",
+            "title": "Areas",
+            "pdfPage": 84
+          },
+          {
+            "number": "ii",
+            "title": "Climate",
+            "pdfPage": 85
+          },
+          {
+            "number": "iii",
+            "title": "Vegetation",
+            "pdfPage": 85
+          },
+          {
+            "number": "iv",
+            "title": "Economic Conditions",
+            "pdfPage": 85
+          },
+          {
+            "number": "v",
+            "title": "Population",
+            "pdfPage": 85
+          },
+          {
+            "number": "4",
+            "title": "Arid and Semi Arid Mountain Region",
+            "pdfPage": 85
+          },
+          {
+            "number": null,
+            "title": "Arid Mountain Region",
+            "pdfPage": 85
+          },
+          {
+            "number": "I",
+            "title": "Areas",
+            "pdfPage": 85
+          },
+          {
+            "number": "ii",
+            "title": "Vegetation",
+            "pdfPage": 86
+          },
+          {
+            "number": "iii",
+            "title": "Climate",
+            "pdfPage": 86
+          },
+          {
+            "number": "iv",
+            "title": "Population",
+            "pdfPage": 86
+          },
+          {
+            "number": null,
+            "title": "Semi Arid Mountain Region",
+            "pdfPage": 86
+          },
+          {
+            "number": "I",
+            "title": "Areas",
+            "pdfPage": 86
+          },
+          {
+            "number": "ii",
+            "title": "Climate",
+            "pdfPage": 86
+          },
+          {
+            "number": "iii",
+            "title": "Vegetation",
+            "pdfPage": 86
+          },
+          {
+            "number": "iv",
+            "title": "Population",
+            "pdfPage": 86
+          },
+          {
+            "number": "5",
+            "title": "Humid and Sub Humid Mountain Region",
+            "pdfPage": 86
+          },
+          {
+            "number": null,
+            "title": "Humid Mountain Region",
+            "pdfPage": 86
+          },
+          {
+            "number": "I",
+            "title": "Areas",
+            "pdfPage": 86
+          },
+          {
+            "number": "ii",
+            "title": "Climate",
+            "pdfPage": 87
+          },
+          {
+            "number": "iii",
+            "title": "Vegetation",
+            "pdfPage": 87
+          },
+          {
+            "number": "iv",
+            "title": "Population",
+            "pdfPage": 87
+          },
+          {
+            "number": null,
+            "title": "Sub Humid Mountain Region",
+            "pdfPage": 87
+          },
+          {
+            "number": "I",
+            "title": "Areas",
+            "pdfPage": 87
+          },
+          {
+            "number": "ii",
+            "title": "Climate",
+            "pdfPage": 87
+          },
+          {
+            "number": "iii",
+            "title": "Vegetation",
+            "pdfPage": 87
+          },
+          {
+            "number": "iv",
+            "title": "Population",
+            "pdfPage": 87
+          },
+          {
+            "number": null,
+            "title": "Major Environmental Hazards and their Remedies",
+            "pdfPage": 87
+          },
+          {
+            "number": "1",
+            "title": "Pollution",
+            "pdfPage": 88
+          },
+          {
+            "number": null,
+            "title": "Air Pollution",
+            "pdfPage": 88
+          },
+          {
+            "number": null,
+            "title": "Water Pollution",
+            "pdfPage": 89
+          },
+          {
+            "number": null,
+            "title": "Land Pollution",
+            "pdfPage": 89
+          },
+          {
+            "number": "2",
+            "title": "Deforestation",
+            "pdfPage": 90
+          },
+          {
+            "number": "3",
+            "title": "Desertification",
+            "pdfPage": 90
+          },
+          {
+            "number": "4",
+            "title": "Salinity and Water Logging",
+            "pdfPage": 91
+          },
+          {
+            "number": null,
+            "title": "Problems associated with the conservation strategies for water, land, natural vegetation and wildlife",
+            "pdfPage": 92
+          },
+          {
+            "number": "i",
+            "title": "Water",
+            "pdfPage": 92
+          },
+          {
+            "number": "ii",
+            "title": "Land",
+            "pdfPage": 92
+          },
+          {
+            "number": "iii",
+            "title": "Vegetation",
+            "pdfPage": 93
+          },
+          {
+            "number": "iv",
+            "title": "Wildlife",
+            "pdfPage": 94
+          }
+        ],
+        "notes": "Sub-heading numbering in this chapter is inconsistent in the original (e.g. some sections labelled 'I.' with capital I, others 'i.' lowercase, for parallel sub-points like Areas/Climate/Vegetation/Population); these are reproduced as printed. Page images 35 and 36 contain only the Questions/Activity/Instructions for Teachers sections, which per instructions are excluded from headings."
+      }
+    },
+    {
+      "number": 4,
+      "title": "Women's Empowerment",
+      "titleEn": null,
+      "pdfStart": 97,
+      "pdfEnd": 109,
+      "read": {
+        "model": "claude-sonnet-5",
+        "titleOnPage": "Women's Empowerment",
+        "sloHeading": "Student's Learning Outcomes",
+        "sloLead": "After studying this chapter, students will be able to:",
+        "slos": [
+          "Describe briefly the history of women's rights in Islam in the light of Qur'an and Sunnah.",
+          "Describe the women's role in Pakistan Movement.",
+          "Discuss women's contributions in National Development from 1947 till now.",
+          "Define Violence and Violence against Women and its impact upon Pakistani society with reference to Constitutional provisions.",
+          "Discuss Government's efforts to address the issue of Violence against Women in Pakistan.",
+          "Describe Government's efforts regarding women's protection and their Empowerment"
+        ],
+        "headings": [
+          {
+            "number": null,
+            "title": "Women's Rights in Islam in the light of Qur'an and Sunnah",
+            "pdfPage": 97
+          },
+          {
+            "number": null,
+            "title": "Women's Role in Pakistan Movement",
+            "pdfPage": 100
+          },
+          {
+            "number": null,
+            "title": "Women's Contribution in National Development from 1947 till now",
+            "pdfPage": 102
+          },
+          {
+            "number": null,
+            "title": "Definition of Violence and Violence against Women",
+            "pdfPage": 105
+          },
+          {
+            "number": null,
+            "title": "Impact of Violence upon Pakistani Society with Reference to Constitutional Provisions",
+            "pdfPage": 105
+          },
+          {
+            "number": null,
+            "title": "Common Perception about Violence against Women",
+            "pdfPage": 105
+          },
+          {
+            "number": null,
+            "title": "Government's Efforts to Address the Issue of Violence Against Women in Pakistan",
+            "pdfPage": 106
+          },
+          {
+            "number": null,
+            "title": "Punjab Marriage Restraint Act 2015",
+            "pdfPage": 107
+          },
+          {
+            "number": null,
+            "title": "Punjab Protection of Women Against Violence Act 2016",
+            "pdfPage": 107
+          },
+          {
+            "number": null,
+            "title": "Government's Efforts to Address Women's Protection and Women's Empowerment",
+            "pdfPage": 107
+          }
+        ],
+        "notes": null
+      }
+    }
+  ]
+}
