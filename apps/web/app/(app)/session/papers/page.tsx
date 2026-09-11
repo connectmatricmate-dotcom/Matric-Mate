@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { asBoard, pastPapersByYear } from '@matricmate/core';
+import { asBoard, pastPaperGroups } from '@matricmate/core';
 import { PapersScreen } from '@/components/screens/PapersScreen';
 import { createClient } from '@/lib/supabase/server';
 
@@ -18,10 +18,12 @@ export default async function PapersPage() {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
   const { data: profile } = auth.user
-    ? await supabase.from('profiles').select('grade,board').eq('id', auth.user.id).maybeSingle()
+    ? await supabase.from('profiles').select('grade,board,onboarding').eq('id', auth.user.id).maybeSingle()
     : { data: null };
 
   const board = asBoard(profile?.board);
-  const groups = pastPapersByYear(board, profile?.grade ?? 9);
+  // Punjab lists run per subject, so only the student's own subjects.
+  const subjects = (profile?.onboarding as { subjects?: string[] } | null)?.subjects;
+  const groups = pastPaperGroups(board, profile?.grade ?? 9, subjects);
   return <PapersScreen groups={groups} board={board} />;
 }

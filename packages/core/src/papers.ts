@@ -19,6 +19,7 @@ import catalogueJson from '../../../data/fbise/papers.json';
 import punjabJson from '../../../data/punjab/papers.json';
 import { BOARD_LABEL } from './boards';
 import { SUBJECTS } from './content';
+import { translate, type Language } from './i18n';
 import type { Board } from './types';
 
 export type FbisePastPaper = {
@@ -76,31 +77,41 @@ export function fbisePastPapersByYear(grade: number = 9): { year: number; papers
  * A past paper as a screen shows it, whichever board it came from.
  *
  * FBISE publishes one PDF per session covering every subject; the Punjab
- * boards publish per subject and per board. Both reduce to a titled link and
- * the site it opens on, which is all a screen needs, so the two screens stay
- * one screen.
+ * boards publish per subject and per board, as papers, answer keys and model
+ * papers. Both reduce to a link and the site it opens on; the Punjab fields
+ * are what pastPaperTitle words a line from, so the two apps say it alike.
  */
 export type PastPaperLink = {
   key: string;
-  year: number;
-  label: string;
+  year: number | null;
   url: string;
   /** The site the link opens on, for the "hosted on" line. */
   host: string;
   selfHosted: boolean;
-  /** Punjab only: which board set it, and for which subject. */
+  /** FBISE: the board's own title. Punjab lines are worded by pastPaperTitle. */
+  label?: string;
   board?: string;
+  boardName?: string;
   subject?: string;
+  /** A span, for a compilation: "2015 to 2019". */
+  years?: string;
+  session?: 'annual' | 'supplementary';
+  kind?: 'paper' | 'answer-key' | 'model-paper';
+  keyType?: 'mcq' | 'marking-scheme';
+  part?: 'objective' | 'subjective';
+  withKey?: boolean;
 };
 
-type PunjabPaper = {
+export type PastPaperGroup = { key: string; year?: number; subject?: string; papers: PastPaperLink[] };
+
+type PunjabPaper = Omit<PastPaperLink, 'key' | 'host' | 'selfHosted' | 'year'> & {
   board: string;
-  boardName: string;
   classLevel: number;
-  year: number;
-  subject: string;
-  label: string;
+  year?: number;
   url: string;
+  subject: string;
+  /** A page inside a combined PDF: several subjects' model papers in one file. */
+  page?: number;
 };
 type PunjabCatalogue = { retrieved: string | null; papers: PunjabPaper[] };
 const punjab = punjabJson as PunjabCatalogue;
@@ -113,44 +124,91 @@ const hostOf = (url: string): string => {
   }
 };
 
+const KIND_ORDER = { paper: 0, 'answer-key': 1, 'model-paper': 2 } as const;
+/** Newest first; a compilation sorts by its last year; an undated model paper last. */
+const recency = (p: PastPaperLink): number => p.year ?? (Number(p.years?.split(' ').pop()) || 0);
+
+function punjabLinks(grade: number): PastPaperLink[] {
+  return punjab.papers
+    .filter((p) => p.classLevel === grade)
+    .map(({ page, classLevel: _grade, ...p }) => ({
+      ...p,
+      key: `${p.url}#${page ?? ''}|${p.subject}|${p.kind}|${p.keyType ?? ''}|${p.part ?? ''}`,
+      year: p.year ?? null,
+      // A browser opens a combined PDF at the right subject's page.
+      url: page ? `${p.url}#page=${page}` : p.url,
+      host: hostOf(p.url),
+      selfHosted: false,
+    }));
+}
+
 /**
- * Past papers for a student's board and class, grouped by year, newest first.
- * Punjab papers within a year run in the app's subject order, then by board.
+ * Past papers for a student's board and class, in the groups a screen shows.
+ *
+ * FBISE by year, newest first, as always. Punjab by subject, in the app's
+ * subject order and only the student's own subjects when given: nine boards
+ * times years times kinds is two hundred lines a class, which no student
+ * scrolls, while one subject's is a short list. Within a subject, newest
+ * first, then papers before keys before model papers.
  */
-export function pastPapersByYear(board: Board, grade: number): { year: number; papers: PastPaperLink[] }[] {
-  const links: PastPaperLink[] =
-    board === 'punjab'
-      ? punjab.papers
-          .filter((p) => p.classLevel === grade)
-          .map((p) => ({
-            key: p.url,
-            year: p.year,
-            label: p.label,
-            url: p.url,
-            host: hostOf(p.url),
-            selfHosted: false,
-            board: p.board,
-            subject: p.subject,
-          }))
-      : fbisePastPapers(grade).map((p) => ({
-          key: p.file,
-          year: p.year,
-          label: p.label,
-          url: p.url,
-          host: p.selfHosted ? '' : hostOf(p.url),
-          selfHosted: p.selfHosted,
-        }));
-  const order = new Map(SUBJECTS.map((s, i) => [s.id, i]));
-  const years = [...new Set(links.map((p) => p.year))].sort((a, b) => b - a);
-  return years.map((year) => ({
-    year,
-    papers: links
-      .filter((p) => p.year === year)
-      .sort(
-        (a, b) =>
-          (order.get(a.subject ?? '') ?? 99) - (order.get(b.subject ?? '') ?? 99) || (a.board ?? '').localeCompare(b.board ?? ''),
-      ),
-  }));
+export function pastPaperGroups(board: Board, grade: number, subjects?: string[]): PastPaperGroup[] {
+  if (board !== 'punjab') {
+    return fbisePastPapersByYear(grade).map(({ year, papers }) => ({
+      key: String(year),
+      year,
+      papers: papers.map((p) => ({
+        key: p.file,
+        year: p.year,
+        label: p.label,
+        url: p.url,
+        host: p.selfHosted ? '' : hostOf(p.url),
+        selfHosted: p.selfHosted,
+      })),
+    }));
+  }
+  const links = punjabLinks(grade);
+  const wanted = subjects?.length ? new Set(subjects) : null;
+  return SUBJECTS.map((s) => s.id)
+    .filter((id) => !wanted || wanted.has(id))
+    .map((subject) => ({
+      key: subject,
+      subject,
+      papers: links
+        .filter((p) => p.subject === subject)
+        .sort(
+          (a, b) =>
+            recency(b) - recency(a) ||
+            KIND_ORDER[a.kind ?? 'paper'] - KIND_ORDER[b.kind ?? 'paper'] ||
+            (a.boardName ?? '').localeCompare(b.boardName ?? ''),
+        ),
+    }))
+    .filter((g) => g.papers.length > 0);
+}
+
+/**
+ * One Punjab line's title, in the student's language: "2025 Annual · Past
+ * paper with key", "2026 · Model paper". FBISE lines keep the board's title.
+ */
+export function pastPaperTitle(p: PastPaperLink, lang: Language): string {
+  if (p.label && !p.kind) return p.label;
+  const when = [p.years ?? (p.year ? String(p.year) : ''), p.session ? translate(lang, p.session === 'annual' ? 'session.paperAnnual' : 'session.paperSupplementary') : '']
+    .filter(Boolean)
+    .join(' ');
+  const kind =
+    p.kind === 'model-paper'
+      ? 'session.paperKindModel'
+      : p.kind === 'answer-key'
+        ? p.keyType === 'marking-scheme'
+          ? 'session.paperKindScheme'
+          : 'session.paperKindMcqKey'
+        : p.withKey
+          ? 'session.paperKindPaperKey'
+          : p.part === 'objective'
+            ? 'session.paperKindObjective'
+            : p.part === 'subjective'
+              ? 'session.paperKindSubjective'
+              : 'session.paperKindPaper';
+  return when ? `${when} · ${translate(lang, kind)}` : translate(lang, kind);
 }
 
 /** The name a year heading carries: "FBISE", "Punjab Board". */
@@ -166,9 +224,9 @@ export const pastPapersBoardLabel = (board: Board): string => BOARD_LABEL[board]
  * claim what the catalogue has.
  */
 export function pastPaperYears(grade: number = 9, board: Board = 'fbise'): { from: number; to: number; count: number } | null {
-  const papers = pastPapersByYear(board, grade).flatMap((g) => g.papers);
-  if (!papers.length) return null;
-  const years = papers.map((p) => p.year);
+  const papers = pastPaperGroups(board, grade).flatMap((g) => g.papers);
+  const years = papers.map((p) => p.year).filter((y): y is number => y !== null);
+  if (!years.length) return null;
   return { from: Math.min(...years), to: Math.max(...years), count: papers.length };
 }
 
