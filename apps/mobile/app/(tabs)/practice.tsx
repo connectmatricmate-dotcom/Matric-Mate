@@ -1,4 +1,4 @@
-import { formatDate, pastPaperYears } from '@matricmate/core';
+import { boardName, formatDate, pastPaperYears } from '@matricmate/core';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { router } from 'expo-router';
@@ -58,9 +58,13 @@ export default function Practice() {
    * 10 student got the same promise above the honest empty state behind it.
    */
   const classLevel = state.onboarding?.classLevel ?? 9;
-  const years = pastPaperYears(classLevel);
+  const board = state.onboarding?.board ?? 'fbise';
+  const years = pastPaperYears(classLevel, board);
   const papersSub = years
-    ? t('practice.papersSub', { years: years.from === years.to ? years.from : `${years.from} to ${years.to}` })
+    ? t('practice.papersSub', {
+        board: boardName(board, lang),
+        years: years.from === years.to ? years.from : `${years.from} to ${years.to}`,
+      })
     : t('practice.papersSubNone', { n: classLevel });
   const subFor = (m: (typeof MODES)[number]) => (m.href === '/session/papers' ? papersSub : t(m.sub));
 
@@ -77,7 +81,7 @@ export default function Practice() {
       ) : null}
 
       <TileGrid
-        tiles={MODES.map((m) => {
+        tiles={MODES.filter((m) => m.href !== '/session/topper-papers' || board !== 'punjab').map((m) => {
           const open = paid || m.href === '/session/topper-papers';
           return {
             key: m.label,

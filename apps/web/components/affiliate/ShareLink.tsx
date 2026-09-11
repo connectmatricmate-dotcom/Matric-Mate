@@ -39,7 +39,7 @@ export function ShareLink({ link, code, name }: { link: string; code: string; na
     try {
       await navigator.share({
         title: 'MatricMate',
-        text: `${name} has invited you to MatricMate: notes, past papers and an AI tutor for FBISE Class 9 and 10.`,
+        text: `${name} has invited you to MatricMate: notes, past papers and an AI tutor for FBISE and Punjab Board Class 9 and 10.`,
         url: link,
       });
     } catch {

@@ -108,7 +108,7 @@ export function AccountView() {
               <Icon name="award" size={22} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-extrabold text-ink">{t('tutor.classRowValue', { n: classLevel })}</span>
+              <span className="block text-[15px] font-extrabold text-ink">{t('tutor.classRowValue', { n: classLevel, board: boardName(state.onboarding?.board, lang) })}</span>
               <span className="block text-[13px] text-ink2">{t('tutor.classWarnBody').split('.')[0]}.</span>
             </span>
             <Btn

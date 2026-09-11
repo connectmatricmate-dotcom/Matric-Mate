@@ -12,7 +12,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, Attempt, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
+import { AI_QUOTA, Attempt, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, boardChoice, setContentBoard, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
 import { useAuth } from './auth';
 import { supabase } from '../lib/supabase';
 import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
@@ -428,14 +428,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
          */
         const serverGrade = server?.grade === 10 ? 10 : server?.grade === 9 ? 9 : null;
         const localGrade = stateRef.current.onboarding?.classLevel ?? 9;
-        if (serverGrade && serverGrade !== localGrade) {
+        // The board the same way: a student who picks Punjab on the website
+        // is served Punjab by the database from then on, so this phone has to
+        // follow or it shows a syllabus the server no longer gives it.
+        const serverBoard = boardChoice(server?.onboarding);
+        const localBoard = stateRef.current.onboarding?.board ?? 'fbise';
+        if ((serverGrade && serverGrade !== localGrade) || (serverBoard && serverBoard !== localBoard)) {
+          const classLevel = serverGrade ?? localGrade;
+          const board = serverBoard ?? localBoard;
           void deleteAllDownloads();
-          setContentGrade(serverGrade);
+          setContentGrade(classLevel);
+          setContentBoard(board);
           setState((s) => ({
             ...EMPTY,
             user: s.user,
             settings: s.settings,
-            onboarding: { ...(s.onboarding ?? { board: 'fbise', medium: 'en', group: 'science', subjects: [] }), classLevel: serverGrade },
+            onboarding: { ...(s.onboarding ?? { board: 'fbise', medium: 'en', group: 'science', subjects: [] }), classLevel, board },
           }));
           setHydrated(true);
           return;
@@ -618,12 +626,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
      never gets one white frame on a cold start. */
   setDarkUi(state.settings.dark);
 
-  // And on the student's class. The server filters by it (RLS); this keeps
-  // the local cache and labels honest.
+  // And on the student's class and board. The server filters by both (RLS);
+  // these keep the local cache, the synchronous chapter lookups and the labels
+  // honest. Set while rendering, like the theme above, not in an effect: the
+  // lookups are module reads, and an effect lands after the screens below
+  // have already read the old syllabus, with nothing to make them read again.
+  // That would leave a Punjab student looking at FBISE's chapters.
   const classLevel = state.onboarding?.classLevel ?? 9;
-  useEffect(() => {
-    setContentGrade(classLevel);
-  }, [classLevel]);
+  setContentGrade(classLevel);
+  setContentBoard(state.onboarding?.board ?? 'fbise');
 
   const actions = useMemo<Actions>(
     () => ({
@@ -635,6 +646,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ),
       markStreakCelebrated: () => setState((s) => ({ ...s, lastStreakCelebrated: todayKey() })),
       setOnboarding: (o) => {
+        // A different board makes every downloaded chapter the old board's.
+        // The first choice (no board yet) has nothing on disk to clear.
+        const previousBoard = stateRef.current.onboarding?.board;
+        if (o.board && previousBoard && o.board !== previousBoard) void deleteAllDownloads();
         const onboarding: Onboarding = {
           classLevel: 9,
           board: 'fbise',

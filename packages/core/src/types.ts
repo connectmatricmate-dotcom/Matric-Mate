@@ -14,10 +14,18 @@ export type Subject = {
   chapterCount: number;
 };
 
+/** The examining boards the app serves. Chapters, outcomes and accounts each carry one. */
+export type Board = 'fbise' | 'punjab';
+
 export type Chapter = {
   id: string;
   subjectId: string;
   number: number;
+  /**
+   * Which board's syllabus this chapter is from. Absent on the bundled
+   * catalogue, which is FBISE's; live rows always carry it (migration 0034).
+   */
+  board?: Board;
   /**
    * Which class this chapter belongs to, 9 or 10.
    *

@@ -1,13 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { Board } from '@matricmate/core';
 import { useApp, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen } from './StepScreen';
 
 export function ChooseBoard() {
-  const { actions } = useApp();
+  const { state, actions } = useApp();
   const t = useT();
   const router = useRouter();
+  const [value, setValue] = useState<Board>(state.onboarding?.board ?? 'fbise');
 
   return (
     <StepScreen
@@ -16,16 +19,21 @@ export function ChooseBoard() {
       sub={t('onboarding.boardSub')}
       cta={t('common.continue')}
       onNext={() => {
-        actions.setOnboarding({ board: 'fbise' });
+        actions.setOnboarding({ board: value });
         router.push('/onboarding/medium');
       }}
     >
-      <ChoiceCard title={t('onboarding.fbise')} sub={t('onboarding.fbiseSub')} selected />
+      <ChoiceCard
+        title={t('onboarding.fbise')}
+        sub={t('onboarding.fbiseSub')}
+        selected={value === 'fbise'}
+        onClick={() => setValue('fbise')}
+      />
       <ChoiceCard
         title={t('onboarding.punjab')}
         sub={t('onboarding.punjabSub')}
-        disabled
-        disabledLabel={t('onboarding.comingSoon')}
+        selected={value === 'punjab'}
+        onClick={() => setValue('punjab')}
       />
     </StepScreen>
   );

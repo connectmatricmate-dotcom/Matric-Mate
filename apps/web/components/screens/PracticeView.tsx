@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDate, pastPaperYears } from '@matricmate/core';
+import { boardName, formatDate, pastPaperYears } from '@matricmate/core';
 import Link from 'next/link';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
@@ -32,9 +32,13 @@ export function PracticeView() {
    * 10 student got the same promise above the honest empty state behind it.
    */
   const classLevel = state.onboarding?.classLevel ?? 9;
-  const years = pastPaperYears(classLevel);
+  const board = state.onboarding?.board ?? 'fbise';
+  const years = pastPaperYears(classLevel, board);
   const papersSub = years
-    ? t('practice.papersSub', { years: years.from === years.to ? years.from : `${years.from} to ${years.to}` })
+    ? t('practice.papersSub', {
+        board: boardName(board, lang),
+        years: years.from === years.to ? years.from : `${years.from} to ${years.to}`,
+      })
     : t('practice.papersSubNone', { n: classLevel });
   const subFor = (m: (typeof MODES)[number]) => (m.href === '/session/papers' ? papersSub : t(m.sub));
 
@@ -49,7 +53,7 @@ export function PracticeView() {
       <Split>
         <Work className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
-            {MODES.map((m) =>
+            {MODES.filter((m) => m.href !== '/session/topper-papers' || board !== 'punjab').map((m) =>
               m.accent ? (
                 // The timed test is the special one, so it gets a whole row,
                 // laid out like the AI banner below rather than a stray tile.

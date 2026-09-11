@@ -9,7 +9,7 @@
  * without rewiring.
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
-import { Attempt, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
+import { Attempt, Language, PlanTask, StringKey, SyncOp, TestResult, XP, buildPlan, configureTutor, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, boardChoice, setContentBoard, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, translate, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
 import {
   EMPTY,
   Onboarding,
@@ -131,11 +131,16 @@ const actions: Actions = {
         ...o,
       },
     }));
-    // The class lives on profiles.grade too, because row level security
-    // follows that column. Pushed fire-and-forget whenever it changes.
+    // The class lives on profiles.grade and the board on profiles.board,
+    // because row level security follows both. Pushed whenever either
+    // changes; the board reaches its column through the onboarding record
+    // (migration 0036), so it has to be sent even when the class is not.
     const snap = getSnapshot();
-    if (o.classLevel && snap.user) {
-      void createClient().from('profiles').update({ grade: o.classLevel, onboarding: snap.onboarding }).eq('id', snap.user.id);
+    if ((o.classLevel || o.board) && snap.user) {
+      void createClient()
+        .from('profiles')
+        .update({ ...(o.classLevel ? { grade: o.classLevel } : {}), onboarding: snap.onboarding })
+        .eq('id', snap.user.id);
     }
   },
   /**
@@ -485,8 +490,15 @@ async function syncStudyState(userId: string): Promise<void> {
    */
   const serverGrade = server?.grade === 10 ? 10 : server?.grade === 9 ? 9 : null;
   const localGrade = getSnapshot().onboarding?.classLevel ?? 9;
-  if (serverGrade && serverGrade !== localGrade) {
-    setContentGrade(serverGrade);
+  // And the board: the database serves whichever board the account chose, so
+  // a choice made on the phone has to reach this browser too.
+  const serverBoard = boardChoice(server?.onboarding);
+  const localBoard = getSnapshot().onboarding?.board ?? 'fbise';
+  if ((serverGrade && serverGrade !== localGrade) || (serverBoard && serverBoard !== localBoard)) {
+    const classLevel = serverGrade ?? localGrade;
+    const board = serverBoard ?? localBoard;
+    setContentGrade(classLevel);
+    setContentBoard(board);
     update((s) => ({
       ...EMPTY,
       user: s.user,
@@ -494,12 +506,12 @@ async function syncStudyState(userId: string): Promise<void> {
       settings: s.settings,
       hydrated: true,
       onboarding: {
-        board: 'fbise',
         medium: 'en',
         group: 'science',
         subjects: [],
         ...(s.onboarding ?? {}),
-        classLevel: serverGrade,
+        classLevel,
+        board,
       },
     }));
     void flush(userId);
@@ -763,9 +775,12 @@ export function useT() {
 
   const contentMedium = state.settings.language;
   const classLevel = state.onboarding?.classLevel ?? 9;
-  useEffect(() => {
-    setContentGrade(classLevel);
-  }, [classLevel]);
+  // Set while rendering, not in an effect: the chapter lookups these steer are
+  // module reads, and an effect lands after the screens below have already
+  // read the old syllabus, with nothing to make them read again. That would
+  // leave a Punjab student looking at FBISE's chapters.
+  setContentGrade(classLevel);
+  setContentBoard(state.onboarding?.board ?? 'fbise');
 
   useEffect(() => {
     setContentMedium(contentMedium);

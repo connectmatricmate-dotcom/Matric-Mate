@@ -36,7 +36,7 @@ const ENTRIES: { key: 'ask' | 'explain' | 'photo'; label: StringKey; sub: String
 ];
 
 export function TutorView() {
-  const { derived } = useApp();
+  const { state, derived } = useApp();
   const router = useRouter();
   const [picking, setPicking] = useState(false);
   const t = useT();
@@ -136,7 +136,7 @@ export function TutorView() {
               <Icon name="doc" className="shrink-0 text-teal" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[14.5px] font-extrabold text-ink">{t('tutor.paperTitle')}</span>
-                <span className="block text-[13px] text-ink2">{t('tutor.paperSub')}</span>
+                <span className="block text-[13px] text-ink2">{t(state.onboarding?.board === 'punjab' ? 'tutor.paperSubPunjab' : 'tutor.paperSub')}</span>
               </span>
               <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
             </Card>

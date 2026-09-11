@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { AI_QUOTA, SUBJECTS } from '@matricmate/core';
+import { AI_QUOTA, BOARD_LABEL, SUBJECTS, asBoard, type Board } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -55,6 +55,9 @@ export type Guarded = {
    *  every AI route must filter by this itself or it would happily serve a
    *  grade-9 student class-10 material and defeat the one-class wall. */
   grade: 9 | 10;
+  /** The caller's board from profiles.board, for the same reason: RLS keeps
+   *  a Punjab student's reads to Punjab chapters, and admin queries skip RLS. */
+  board: Board;
 };
 
 /**
@@ -79,7 +82,7 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
 
   const [{ data: ent }, { data: prof }] = await Promise.all([
     admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade,role').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade,role,board').eq('id', userId).maybeSingle(),
   ]);
 
   /*
@@ -100,6 +103,7 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
   const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
   if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
   const grade: 9 | 10 = prof?.grade === 10 ? 10 : 9;
+  const board = asBoard(prof?.board);
 
   const { data: usage } = await admin
     .from('ai_usage')
@@ -114,7 +118,7 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
     return NextResponse.json({ error: 'quota_exhausted', quota }, { status: 429 });
   }
 
-  return { userId, admin, quota, grade };
+  return { userId, admin, quota, grade, board };
 }
 
 /** Charge after delivery, never before: a failed request costs nothing. */
@@ -153,14 +157,17 @@ export async function chapterGrounding(
   maxChars = 24_000,
   /** When given, a chapter from another class reads as not-found. */
   grade?: 9 | 10,
+  /** When given, a chapter from another board reads as not-found. */
+  board?: Board,
 ): Promise<Grounding | null> {
   const { data: chapter } = await admin
     .from('chapters')
-    .select('id,title,subject_id,grade')
+    .select('id,title,subject_id,grade,board')
     .eq('id', chapterId)
     .maybeSingle();
   if (!chapter) return null;
   if (grade && chapter.grade !== grade) return null;
+  if (board && asBoard(chapter.board) !== board) return null;
 
   let { data: sections } = await admin
     .from('chapter_sections')
@@ -227,13 +234,13 @@ export async function chapterGrounding(
  * and told just as plainly not to pretend otherwise: the failure mode to avoid
  * is a confident question about content this chapter does not actually contain.
  */
-export function groundingBrief(g: Grounding, grade: 9 | 10): string {
+export function groundingBrief(g: Grounding, grade: 9 | 10, board: Board = 'fbise'): string {
   if (g.grounded) return `Chapter: ${g.title}\n${g.text}`;
   const subject = SUBJECTS.find((s) => s.id === g.subjectId)?.name ?? g.subjectId;
   return (
-    `Chapter: ${g.title} (${subject}, FBISE Class ${grade}).\n` +
+    `Chapter: ${g.title} (${subject}, ${BOARD_LABEL[board]} Class ${grade}).\n` +
     'There is no chapter text available for this one, so work from your own knowledge of what the ' +
-    `FBISE Class ${grade} syllabus covers under this chapter title. Stay inside that scope: no topic ` +
+    `${BOARD_LABEL[board]} Class ${grade} syllabus covers under this chapter title. Stay inside that scope: no topic ` +
     'that belongs to another chapter, and nothing beyond this class. Keep to the standard, ' +
     'uncontroversial content every textbook for this chapter covers, and do not invent board ' +
     'policies, mark distributions or quotations from a textbook you cannot see.'

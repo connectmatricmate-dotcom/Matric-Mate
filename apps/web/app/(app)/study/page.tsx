@@ -6,7 +6,7 @@ import { getChapters, getSubjects } from '@/lib/content-readers';
 
 export const metadata: Metadata = {
   title: 'Study',
-  description: 'Your FBISE Class 9 subjects, chapter by chapter.',
+  description: 'Your subjects, chapter by chapter.',
 };
 
 async function Subjects() {

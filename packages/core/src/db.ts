@@ -28,8 +28,8 @@
  * React Native storage adapter), and this file only needs the query builder
  * shape, so it takes it structurally.
  */
-import { CHAPTERS, SUBJECTS, chapterById, contentFor, primeContent, subjectById } from './content';
-import { AudioTrack, Blank, Chapter, ChapterContent, Flashcard, Mcq, Medium, Section, ShortQ, Subject } from './types';
+import { SUBJECTS, bundledChapters, chapterById, contentFor, primeContent, setSyllabus, subjectById } from './content';
+import { AudioTrack, Blank, Board, Chapter, ChapterContent, Flashcard, Mcq, Medium, Section, ShortQ, Subject } from './types';
 
 /**
  * The slice of a Supabase client this file uses. Typed loosely on purpose: the
@@ -137,20 +137,37 @@ export const contentMedium = (): Medium => medium;
 export const isLive = (): boolean => db !== null;
 
 /**
- * The student's class. The DATABASE does the real filtering (row level
- * security serves each account only its own grade's chapters), so this is
- * not a query parameter: it exists so a class switch can flush every cached
- * answer from the old class, and so screens can label what they show.
+ * The student's class and board. The DATABASE does the real filtering (row
+ * level security serves each account only its own board's and class's
+ * chapters), so neither is a query parameter. They exist so a change can
+ * flush every cached answer from the old syllabus, so the synchronous lookups
+ * in content.ts can refuse chapters primed before it, and so screens can
+ * label what they show.
+ *
+ * Call them while rendering, not from an effect. The lookups they steer are
+ * plain module reads with no subscription, so a value set in an effect lands
+ * after the screens below have already read the old one, and nothing makes
+ * them read again.
  */
 let grade: 9 | 10 = 9;
+let board: Board = 'fbise';
 
 export function setContentGrade(next: 9 | 10): void {
   if (next === grade) return;
   grade = next;
   cache.clear();
+  setSyllabus({ board, grade });
+}
+
+export function setContentBoard(next: Board): void {
+  if (next === board) return;
+  board = next;
+  cache.clear();
+  setSyllabus({ board, grade });
 }
 
 export const contentGrade = (): 9 | 10 => grade;
+export const contentBoard = (): Board => board;
 
 /**
  * Last good answer per query key. Not an optimisation: it is what stands
@@ -249,6 +266,7 @@ type ChapterRow = {
   subject_id: string;
   number: number;
   grade: number;
+  board: Board | null;
   board_unit: number | null;
   exam_marks: number | null;
   exam_share: number | null;
@@ -277,6 +295,9 @@ const toChapter = (r: ChapterRow, counts?: { mcqs: number; cards: number; sectio
      is not a filter. It is what lets a synchronous lookup say which class the
      chapter it just handed back belongs to. */
   grade: Number(r.grade) || 9,
+  // Checked by every synchronous lookup against the student's own board, so a
+  // row primed before a board change cannot be served after it.
+  board: r.board ?? 'fbise',
   boardUnit: r.board_unit ?? undefined,
   examMarks: r.exam_marks ?? undefined,
   examShare: r.exam_share ?? undefined,
@@ -345,7 +366,7 @@ export async function primeAllContent(client?: ContentClient): Promise<void> {
     // and the whole app tells a paying student there is nothing to study.
     const { data, error } = await table('chapters', at)
       .select(
-        'id,subject_id,number,grade,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+        'id,subject_id,number,grade,board,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
           'mcqs(count),flashcards(count),chapter_sections(count)',
       )
       .eq('mcqs.medium', medium)
@@ -390,7 +411,7 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
       // every count doubles.
       const { data, error } = await table('chapters', at!)
         .select(
-          'id,subject_id,number,grade,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+          'id,subject_id,number,grade,board,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
             'mcqs(count),flashcards(count),chapter_sections(count)',
         )
         .eq('subject_id', subjectId)
@@ -420,7 +441,7 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
 
       return { error, data: mapped };
     },
-    () => CHAPTERS[subjectId] ?? [],
+    () => bundledChapters(subjectId),
   );
 }
 

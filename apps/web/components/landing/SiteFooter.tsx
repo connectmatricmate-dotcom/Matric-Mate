@@ -21,7 +21,7 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
         <div className="max-w-[300px]">
           <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} />
           <p className="mt-3 text-mk-small text-ink2">
-            Exam preparation for FBISE Class 9, in English and Urdu medium. Built in Pakistan.
+            Exam preparation for FBISE and Punjab Board, Class 9 and 10, in English and Urdu medium. Built in Pakistan.
           </p>
           {/* The registered office. Rendered only when it is filled in: a blank
               line reads as an oversight, an invented address is worse. */}

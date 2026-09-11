@@ -13,8 +13,8 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'What MatricMate is',
     paragraphs: [
-      'MatricMate is exam-preparation software for FBISE Class 9 and Class 10. It gives you notes, audio lessons, practice questions, past papers and an AI tutor. It is a study aid. It does not set, mark or influence any board examination, and it is not affiliated with the Federal Board of Intermediate and Secondary Education.',
-      'Study content follows the FBISE syllabus and model papers. Payments are handled by a State Bank licensed Pakistani payment gateway, which processes cards, wallets and bank transfers on our behalf.',
+      'MatricMate is exam-preparation software for FBISE and Punjab Board Class 9 and Class 10. It gives you notes, audio lessons, practice questions, past papers and an AI tutor. It is a study aid. It does not set, mark or influence any board examination, and it is not affiliated with the Federal Board of Intermediate and Secondary Education, any Board of Intermediate and Secondary Education in Punjab, or the Punjab textbook authority.',
+      'Study content follows each board’s own syllabus: the FBISE syllabus and model papers, and for Punjab the official Punjab textbooks and the learning outcomes printed in them. Payments are handled by a State Bank licensed Pakistani payment gateway, which processes cards, wallets and bank transfers on our behalf.',
     ],
   },
   {

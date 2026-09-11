@@ -3,7 +3,7 @@ import { SignUpForm } from '@/components/auth/SignUpForm';
 
 export const metadata: Metadata = {
   title: 'Create your account',
-  description: 'Create a free MatricMate account and start preparing for FBISE Class 9 today.',
+  description: 'Create a free MatricMate account and start preparing for your Class 9 or 10 board exams today.',
 };
 
 export default async function SignUpPage({ searchParams }: { searchParams: Promise<{ next?: string; ref?: string }> }) {

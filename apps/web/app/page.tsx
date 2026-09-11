@@ -38,7 +38,7 @@ const PAINS: { icon: IconName; title: string; body: string }[] = [
 ];
 
 const STEPS = [
-  { n: 1, title: 'Pick your subjects', body: 'Class 9 or Class 10, FBISE, English or Urdu medium. Your syllabus loads, nothing else.' },
+  { n: 1, title: 'Pick your subjects', body: 'Class 9 or Class 10, FBISE or Punjab Board, English or Urdu medium. Your syllabus loads, nothing else.' },
   { n: 2, title: 'Study the chapter', body: 'Notes, worked examples and an audio lesson you can play while travelling.' },
   { n: 3, title: 'Practise honestly', body: 'MCQs, flashcards, blanks and past papers. Each answer records how sure you were.' },
   { n: 4, title: 'Fix what’s weak', body: 'The app names the topics costing you marks and builds a test out of exactly those.' },
@@ -69,7 +69,7 @@ const CONFIDENCE_TAGS: { label: string; tone: 'green' | 'orange' | 'red'; body: 
 const FAQ = [
   {
     q: 'Which board and class does this cover?',
-    a: 'FBISE Class 9 and Class 10, both in English and Urdu medium. Punjab Board follows after.',
+    a: 'FBISE and Punjab Board, Class 9 and Class 10, in English and Urdu medium. Punjab covers all nine BISE boards, which set their papers from the same Punjab textbooks.',
   },
   {
     q: 'Does it work without internet?',
@@ -126,7 +126,7 @@ export default function LandingPage() {
                 <span className="fx-rise fx-d1 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3.5 py-1.5 text-[12.5px] font-extrabold text-tealtint">
                   <Icon name="gradCap" size={14} className="shrink-0 text-cyan" />
                   <span>
-                    FBISE Class 9 &amp; 10 · English &amp; <Ur>اردو</Ur> medium
+                    FBISE &amp; Punjab Board · Class 9 &amp; 10 · English &amp; <Ur>اردو</Ur>
                   </span>
                 </span>
 

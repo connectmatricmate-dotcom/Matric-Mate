@@ -8,6 +8,7 @@ import { CHAPTER_TITLES_UR, SUBJECT_NAMES_UR } from './i18n/names-ur';
  * ALL of this is replaced by client-supplied content via the admin CMS (M7).
  */
 import {
+  Board,
   Chapter,
   ChapterContent,
   Mcq,
@@ -267,11 +268,51 @@ export function primeContent(next: { subjects?: Subject[]; chapters?: Chapter[] 
   }
 }
 
-/** Live chapters for a subject, or the bundled ones if nothing has loaded. */
-export const chaptersFor = (subjectId: string): Chapter[] => liveBySubject?.[subjectId] ?? CHAPTERS[subjectId] ?? [];
+/**
+ * The syllabus this student is on: their board and their class.
+ *
+ * Two things follow from it. The bundled catalogue is FBISE Class 9 and
+ * nothing else, so it is a fallback only for that student; for anyone else it
+ * is another board's or another class's chapters shown under their name, and
+ * an empty list is the honest answer. And a chapter primed from the server
+ * before a board or class change belongs to the old syllabus: priming only
+ * ever replaces the subjects it has rows for, so without a check a subject
+ * with nothing in the new syllabus would keep showing the old one's list.
+ *
+ * Set by db.ts (setContentBoard, setContentGrade), which only the app stores
+ * call. Not for app code.
+ */
+let syllabus: { board: Board; grade: 9 | 10 } | null = null;
 
-export const chapterById = (id: string): Chapter | undefined =>
-  liveChapters?.[id] ?? ALL_CHAPTERS.find((c) => c.id === id);
+export function setSyllabus(next: { board: Board; grade: 9 | 10 }): void {
+  syllabus = next;
+}
+
+/*
+ * Null until an app store says whose syllabus this is, and then both checks
+ * apply. The web server never says: one process renders pages for every
+ * student at once, so it has no "current student", and a Class 10 or Punjab
+ * chapter title rendered there must not be filtered against a default. Left
+ * unset, the server behaves exactly as it did before boards existed.
+ */
+const bundleIsTheirs = (): boolean => !syllabus || (syllabus.board === 'fbise' && syllabus.grade === 9);
+const isTheirs = (c: Chapter): boolean =>
+  !syllabus || ((c.board ?? 'fbise') === syllabus.board && c.grade === syllabus.grade);
+
+/** The bundled chapters for a subject, when the bundle is this student's syllabus. */
+export const bundledChapters = (subjectId: string): Chapter[] => (bundleIsTheirs() ? (CHAPTERS[subjectId] ?? []) : []);
+
+/** Live chapters for a subject, or the bundled ones if nothing has loaded. */
+export const chaptersFor = (subjectId: string): Chapter[] => {
+  const live = liveBySubject?.[subjectId]?.filter(isTheirs);
+  return live?.length ? live : bundledChapters(subjectId);
+};
+
+export const chapterById = (id: string): Chapter | undefined => {
+  const live = liveChapters?.[id];
+  if (live && isTheirs(live)) return live;
+  return bundleIsTheirs() ? ALL_CHAPTERS.find((c) => c.id === id) : undefined;
+};
 
 export const subjectById = (id: string): Subject | undefined =>
   liveSubjects?.find((s) => s.id === id) ?? SUBJECTS.find((s) => s.id === id);

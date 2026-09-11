@@ -172,7 +172,7 @@ export default function Tutor() {
         <Icon name="doc" color={C.teal} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('tutor.paperTitle')}</Text>
-          <Small>{t('tutor.paperSub')}</Small>
+          <Small>{t(state.onboarding?.board === 'punjab' ? 'tutor.paperSubPunjab' : 'tutor.paperSub')}</Small>
         </View>
         <Chevron size={18} color={C.ink3} />
       </Card>

@@ -128,7 +128,7 @@ export default function Account() {
         <Card flat style={{ paddingVertical: 0 }}>
           <Item
             title={t('tutor.classRow')}
-            sub={t('tutor.classRowValue', { n: classLevel })}
+            sub={t('tutor.classRowValue', { n: classLevel, board: boardName(state.onboarding?.board, lang) })}
             icon="award"
             onPress={() => {
               const next = classLevel === 9 ? 10 : 9;

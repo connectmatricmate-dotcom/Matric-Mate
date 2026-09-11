@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { api, chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
+import { api, boardName, chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
@@ -41,7 +41,7 @@ export function ExamIntro({
   const label = ai
     ? t('tutor.aiTestTitle')
     : paper
-      ? `FBISE ${paper}`
+      ? `${boardName(state.onboarding?.board, lang)} ${paper}`
       : chapter
         ? chapterName(chapterById(chapter), lang)
         : subjectName(subjectById(subjectId), lang);

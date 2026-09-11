@@ -20,6 +20,7 @@ export * from './billing';
 export * from './tokens';
 export * from './icons';
 export * from './papers';
+export * from './boards';
 export * from './tutor-actions';
 export { api } from './api';
 export {
@@ -27,9 +28,11 @@ export {
   connectLocalContent,
   setContentMedium,
   setContentGrade,
+  setContentBoard,
   setContentOnline,
   contentMedium,
   contentGrade,
+  contentBoard,
   isLive,
   fetchSlos,
   fetchAiSession,

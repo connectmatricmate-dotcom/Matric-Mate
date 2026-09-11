@@ -70,7 +70,7 @@ export default function MockPaper() {
             toast(t('tutor.buildStopped'));
           }}
         />
-        <Header title={t('tutor.paperTitle')} sub={t('tutor.paperSub')} back />
+        <Header title={t('tutor.paperTitle')} sub={t(state.onboarding?.board === 'punjab' ? 'tutor.paperSubPunjab' : 'tutor.paperSub')} back />
         <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
         <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
           {derived.subjects.map((sid) => (

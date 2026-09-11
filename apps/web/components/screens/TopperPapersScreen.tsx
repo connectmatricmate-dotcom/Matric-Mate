@@ -8,8 +8,11 @@ import { useLang, useT } from '@/lib/store';
 
 export function TopperPapersScreen({
   groups,
+  punjab = false,
 }: {
   groups: { subjectId: string; scripts: FbiseTopperPaper[] }[];
+  /** A Punjab student reached this by link: say why there is nothing, rather than show FBISE's. */
+  punjab?: boolean;
 }) {
   const t = useT();
   const { lang } = useLang();
@@ -32,7 +35,11 @@ export function TopperPapersScreen({
 
       {groups.length === 0 ? (
         <div className="mt-4">
-          <Empty icon="award" title={t('session.papersEmptyTitle')} sub={t('session.papersEmptyBody')} />
+          <Empty
+            icon="award"
+            title={t(punjab ? 'session.toppersNonePunjabTitle' : 'session.papersEmptyTitle')}
+            sub={t(punjab ? 'session.toppersNonePunjabBody' : 'session.papersEmptyBody')}
+          />
         </div>
       ) : (
         <div className="mt-4 grid gap-3 md:grid-cols-2">

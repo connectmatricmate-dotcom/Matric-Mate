@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { AI_QUOTA, SUBJECTS } from '@matricmate/core';
+import { AI_QUOTA, BOARD_LABEL, SUBJECTS, asBoard, type Board } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { chapterGrounding } from '@/lib/ai/guard';
@@ -92,16 +92,20 @@ type QuotaState = { limit: number; used: number; remaining: number; resetAt: str
  * breakpoint: Anthropic then serves it from prompt cache at a tenth of the
  * price. The per-student block goes AFTER this, never inside it.
  */
-const weightageDigest = new Map<number, string>();
+const weightageDigest = new Map<string, string>();
 
-async function buildStandingContext(admin: ReturnType<typeof createAdminClient>, grade: number): Promise<string> {
-  const cached = weightageDigest.get(grade);
+async function buildStandingContext(admin: ReturnType<typeof createAdminClient>, grade: number, board: Board): Promise<string> {
+  const key = `${board}:${grade}`;
+  const cached = weightageDigest.get(key);
   if (cached) return cached;
   const { data } = await admin
     .from('chapters')
     .select('id,subject_id,number,title,exam_share,exam_marks')
     .eq('review_status', 'published')
     .eq('grade', grade)
+    // The admin client skips RLS: without this a Punjab student's tutor would
+    // be handed FBISE's chapter list as their syllabus, and the other way round.
+    .eq('board', board)
     .order('subject_id')
     .order('number');
   const bySubject = new Map<string, string[]>();
@@ -124,22 +128,42 @@ async function buildStandingContext(admin: ReturnType<typeof createAdminClient>,
     if (lines?.length) parts.push(`${s.name}:\n${lines.join('\n')}`);
   }
   const digest = parts.join('\n\n');
-  weightageDigest.set(grade, digest);
+  weightageDigest.set(key, digest);
   return digest;
 }
 
-const personaFor = (grade: number) => `You are the MatricMate tutor: a warm, patient teacher for FBISE Class ${grade} students in Pakistan (SSC Part ${grade === 10 ? 'Two' : 'One'}, the 2022-23 National Curriculum assessment framework).
+/**
+ * The two clauses of the persona that are about the board. FBISE's are the
+ * original wording, unchanged. Punjab chapters carry no weightings until the
+ * pairing scheme is read, so the tutor is told not to make any up.
+ */
+const SYLLABUS: Record<Board, { framework: string; grounding: string; site: string }> = {
+  fbise: {
+    framework: 'the 2022-23 National Curriculum assessment framework',
+    site: 'fbise.edu.pk',
+    grounding:
+      "- Ground answers in the FBISE syllabus and the chapter weightings provided below. When a student asks what matters for the exam, use the board's real percentages.",
+  },
+  punjab: {
+    framework: 'the Punjab textbooks, 2023 edition',
+    site: "their own BISE board's website",
+    grounding:
+      '- Ground answers in the Punjab Board syllabus and the chapters provided below. Where a chapter shows its share of the paper, use it; where none is shown, do not invent one.',
+  },
+};
+
+const personaFor = (grade: number, board: Board) => `You are the MatricMate tutor: a warm, patient teacher for ${BOARD_LABEL[board]} Class ${grade} students in Pakistan (SSC Part ${grade === 10 ? 'Two' : 'One'}, ${SYLLABUS[board].framework}).
 
 How you teach:
 - Answer like a good teacher at a whiteboard: short direct answer first, then the steps that get there. Numbered steps for numericals and derivations.
 - Answer in the account's language, given below, whatever script the student typed in. Keep technical terms in English either way, the way Pakistani classrooms do.
-- Ground answers in the FBISE syllabus and the chapter weightings provided below. When a student asks what matters for the exam, use the board's real percentages.
+${SYLLABUS[board].grounding}
 - Exam craft counts: point out what examiners award marks for, common mistakes, and how many marks a question of this kind usually carries.
 - Keep answers tight. A focused answer a student finishes beats a lecture they abandon. No filler, no repeated caveats.
 - If a question is outside Class ${grade} study (other classes are fine to touch briefly when they help), gently steer back to the syllabus. You are a study tutor, not a general assistant: politely decline requests unrelated to studying.
 - When a photo is attached, read it carefully first. If it shows a question, solve it step by step; if it shows notes or a diagram, explain it. If the photo is unreadable, say so and ask for a clearer one.
 - Use web search only when the question genuinely needs current information (board dates, notifications, recent changes); the syllabus itself you already know.
-- Never invent board policies, dates or marks distributions. If unsure, say so and suggest checking fbise.edu.pk.
+- Never invent board policies, dates or marks distributions. If unsure, say so and suggest checking ${SYLLABUS[board].site}.
 - Write in plain text: short paragraphs and numbered lists only. No markdown headings, no asterisks or bold markers, no tables, no LaTeX. Write fractions with / and powers with ^, the way they are typed in class notes.
 - Never use an em dash. Use a comma, a colon, or a new sentence instead.
 
@@ -219,7 +243,7 @@ export async function POST(req: NextRequest) {
    */
   const [{ data: ent }, { data: prof }, usage, { count: lastMinute }, owned] = await Promise.all([
     admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade,role').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade,role,board').eq('id', userId).maybeSingle(),
     admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
     // The abuse wall: a human student cannot ask five thoughtful questions in
     // a minute; a script can. Counted from persisted messages, so it cannot be
@@ -249,6 +273,7 @@ export async function POST(req: NextRequest) {
   if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
   // The tutor teaches the student's own class: persona, weightage and all.
   const grade = prof?.grade === 10 ? 10 : 9;
+  const board = asBoard(prof?.board);
 
   const used = usage.data?.used ?? 0;
   const quota: QuotaState = {
@@ -309,8 +334,8 @@ export async function POST(req: NextRequest) {
      * chapter's own published notes before answering. Same wording as the
      * screen they came from, instead of a generic recital of the topic.
      */
-    askedFrom ? chapterGrounding(admin, askedFrom, profile.medium === 'ur' ? 'ur' : 'en', 12_000, grade) : null,
-    buildStandingContext(admin, grade),
+    askedFrom ? chapterGrounding(admin, askedFrom, profile.medium === 'ur' ? 'ur' : 'en', 12_000, grade, board) : null,
+    buildStandingContext(admin, grade, board),
   ]);
 
   const thread = threadResult?.id ?? null;
@@ -341,7 +366,7 @@ export async function POST(req: NextRequest) {
     ? ''
     : grounding.grounded
       ? `\n\nTHE CHAPTER THEY ARE STUDYING (${grounding.title}). Answer from this text where it applies, and use its wording and symbols so the answer matches their notes:\n${grounding.text}`
-      : `\n\nTHE CHAPTER THEY ARE STUDYING: ${grounding.title}. We have no notes on file for it, so answer from the FBISE Class ${grade} syllabus for that chapter and stay inside its scope.`;
+      : `\n\nTHE CHAPTER THEY ARE STUDYING: ${grounding.title}. We have no notes on file for it, so answer from the ${BOARD_LABEL[board]} Class ${grade} syllabus for that chapter and stay inside its scope.`;
 
   const userContent: Anthropic.ContentBlockParam[] = [];
   if (image) userContent.push({ type: 'image', source: { type: 'base64', ...image } });
@@ -378,7 +403,7 @@ export async function POST(req: NextRequest) {
               // Stable bytes first with the cache breakpoint, volatile
               // student block after it, so the big block caches across
               // every student.
-              { type: 'text', text: personaFor(grade) + standing, cache_control: { type: 'ephemeral' } },
+              { type: 'text', text: personaFor(grade, board) + standing, cache_control: { type: 'ephemeral' } },
               { type: 'text', text: studentBlock + groundingBlock },
             ],
             tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }, ...TUTOR_TOOLS],

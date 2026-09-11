@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { BOARD_WITH_ARTICLE } from '@matricmate/core';
 import { AI_COST, AI_MODEL, type Grounding, chapterGrounding, chargeQuota, groundingBrief, guardAi } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
@@ -103,6 +104,8 @@ export async function POST(req: NextRequest) {
     .select('id,title,exam_share')
     .eq('subject_id', subjectId)
     .eq('grade', g.grade)
+    // The admin client skips RLS, so the board wall is this line.
+    .eq('board', g.board)
     .eq('review_status', 'published')
     .order('number');
   if (!subject || !chapterRows?.length) return NextResponse.json({ error: 'no_content' }, { status: 404 });
@@ -153,7 +156,7 @@ export async function POST(req: NextRequest) {
   // Section C: the model writes long questions from the two heaviest chapters.
   const heavy = [...chapters].sort((a, b) => b.share - a.share).slice(0, 2);
   const groundings = (
-    await Promise.all(heavy.map((c) => chapterGrounding(g.admin, c.id, medium, 9000, g.grade)))
+    await Promise.all(heavy.map((c) => chapterGrounding(g.admin, c.id, medium, 9000, g.grade, g.board)))
   ).filter(Boolean) as Grounding[];
 
   /**
@@ -217,13 +220,13 @@ export async function POST(req: NextRequest) {
           max_tokens: 2600 * part.count,
           output_config: { effort: 'medium', format: { type: 'json_schema', schema: LONG_SCHEMA } },
           system:
-            `You write Section C long questions for an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) board paper. ${part.grounding.grounded ? 'Work ONLY from the chapter text provided.' : 'Follow the chapter brief provided.'} Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ` +
+            `You write Section C long questions for ${BOARD_WITH_ARTICLE[g.board]} Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) board paper. ${part.grounding.grounded ? 'Work ONLY from the chapter text provided.' : 'Follow the chapter brief provided.'} Each question demands an extended answer: derivations, multi-part numericals, explain-with-examples. Give a thorough model answer and 4 to 6 marking points showing where each mark is earned. ` +
             languageRule(medium),
           messages: [
             {
               role: 'user',
               content:
-                `${groundingBrief(part.grounding, g.grade)}\n\n---\n` +
+                `${groundingBrief(part.grounding, g.grade, g.board)}\n\n---\n` +
                 `Write exactly ${part.count} long question${part.count === 1 ? '' : 's'} in board style.` +
                 (part.topic
                   ? ` Build it around "${part.topic}". Other questions on this paper cover the chapter's other topics, so do not stray onto them.`

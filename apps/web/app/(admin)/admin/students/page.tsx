@@ -31,13 +31,16 @@ async function StudentTable() {
 
       <Panel title="Students">
         {rows.length ? (
-          <Table head={['Student', 'Joined', 'Teacher', 'Paid', 'Plan', '']}>
+          <Table head={['Student', 'Class', 'Joined', 'Teacher', 'Paid', 'Plan', '']}>
             {rows.map((r) => (
               <Row key={r.id}>
                 <Td>
                   <span className="block font-extrabold text-ink">{r.name}</span>
                   <span className="block text-[12px] text-ink2">{r.email}</span>
                   {r.phone ? <span className="block text-[12px] text-ink3">{r.phone}</span> : null}
+                </Td>
+                <Td className="whitespace-nowrap text-ink2">
+                  {r.grade} · {r.board === 'punjab' ? 'Punjab' : 'FBISE'}
                 </Td>
                 <Td className="whitespace-nowrap text-ink2">{when(r.joined)}</Td>
                 <Td className="text-ink2">{r.teacher ?? '·'}</Td>

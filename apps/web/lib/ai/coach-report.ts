@@ -1,6 +1,6 @@
 import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
-import { weakTopics } from '@matricmate/core';
+import { BOARD_WITH_ARTICLE, asBoard, weakTopics, type Board } from '@matricmate/core';
 import type { Attempt } from '@matricmate/core';
 import { AI_MODEL } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
@@ -43,6 +43,7 @@ export type CoachDigest = {
   subjects: string[];
   language: string;
   grade: number;
+  board: Board;
 };
 
 type AttemptRow = { chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string };
@@ -60,7 +61,7 @@ export async function buildDigestFromDb(
       .order('at', { ascending: false })
       .limit(1000),
     admin.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: false }).limit(400),
-    admin.from('profiles').select('grade,onboarding').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade,board,onboarding').eq('id', userId).maybeSingle(),
   ]);
 
   const all = (rows ?? []) as AttemptRow[];
@@ -95,6 +96,7 @@ export async function buildDigestFromDb(
     subjects: onboarding?.subjects ?? [],
     language: onboarding?.medium === 'ur' ? 'ur' : 'en',
     grade: (profile as { grade?: number } | null)?.grade === 10 ? 10 : 9,
+    board: asBoard((profile as { board?: string } | null)?.board),
   };
 }
 
@@ -124,7 +126,7 @@ export async function writeCoachReport(
     max_tokens: 1200,
     output_config: { effort: 'low', format: { type: 'json_schema', schema: REPORT_SCHEMA } },
     system:
-      `You are a study coach for an FBISE Class ${digest.grade} (SSC-${digest.grade === 10 ? 'II' : 'I'}) student in Pakistan. From their week of practice data, write: summary (2 warm, specific sentences about the week; if they did little, a kind nudge, never a scolding), weak (their 2 weakest topics with one plain-words sentence each on why it matters for the board paper), actions (exactly 3 short, concrete things to do this week, each doable in one sitting). Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
+      `You are a study coach for ${BOARD_WITH_ARTICLE[digest.board]} Class ${digest.grade} (SSC-${digest.grade === 10 ? 'II' : 'I'}) student in Pakistan. From their week of practice data, write: summary (2 warm, specific sentences about the week; if they did little, a kind nudge, never a scolding), weak (their 2 weakest topics with one plain-words sentence each on why it matters for the board paper), actions (exactly 3 short, concrete things to do this week, each doable in one sitting). Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
       languageRule(digest.language),
     messages: [
       {

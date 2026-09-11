@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, H2, Header, Pill, Row, Screen, Small, Spacer, useToast } from '../../src/components/ui';
-import { api , chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
+import { api, boardName, chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -38,7 +38,7 @@ export default function ExamIntro() {
   const label = isAi
     ? t('tutor.aiTestTitle')
     : paper
-      ? `FBISE ${paper}`
+      ? `${boardName(state.onboarding?.board, lang)} ${paper}`
       : chapter
         ? chapterName(chapterById(chapter), lang)
         : subjectName(subjectById(subjectId), lang);

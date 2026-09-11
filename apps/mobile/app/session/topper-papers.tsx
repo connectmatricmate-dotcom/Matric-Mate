@@ -3,16 +3,23 @@ import { fbiseToppersFor, fbiseTopperSubjectIds, subjectById, subjectName, toppe
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
 import { Btn, Card, Empty, Header, Row, Screen, ScriptText, Small, Spacer, useToast } from '../../src/components/ui';
 import { useLang, useT } from '../../src/i18n';
+import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
 
 export default function TopperPapers() {
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
-  const groups = fbiseTopperSubjectIds().map((subjectId) => ({
-    subjectId,
-    scripts: fbiseToppersFor(subjectId),
-  }));
+  const { state } = useApp();
+  // FBISE's own scripts. Not offered to a Punjab student anywhere, and a link
+  // that lands here anyway says why there are none rather than showing them.
+  const punjab = state.onboarding?.board === 'punjab';
+  const groups = punjab
+    ? []
+    : fbiseTopperSubjectIds().map((subjectId) => ({
+        subjectId,
+        scripts: fbiseToppersFor(subjectId),
+      }));
 
   async function openScript(url: string) {
     try {
@@ -47,7 +54,11 @@ export default function TopperPapers() {
       <Spacer h={S.md} />
 
       {groups.length === 0 ? (
-        <Empty emoji="🏆" title={t('session.papersEmptyTitle')} sub={t('session.papersEmptyBody')} />
+        <Empty
+          emoji="🏆"
+          title={t(punjab ? 'session.toppersNonePunjabTitle' : 'session.papersEmptyTitle')}
+          sub={t(punjab ? 'session.toppersNonePunjabBody' : 'session.papersEmptyBody')}
+        />
       ) : (
         <View style={{ gap: S.sm }}>
           {groups.map(({ subjectId, scripts }) => {

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 const SERVICES: { name: string; what: string }[] = [
   {
     name: 'Chapter notes',
-    what: 'Every chapter of the FBISE Class 9 and Class 10 syllabus, written as revision notes rather than a textbook reprint. English and Urdu medium, switchable at any time.',
+    what: 'Every chapter of the FBISE and Punjab Board Class 9 and Class 10 syllabus, written as revision notes rather than a textbook reprint. English and Urdu medium, switchable at any time.',
   },
   {
     name: 'Audio lessons',
@@ -35,7 +35,7 @@ const SERVICES: { name: string; what: string }[] = [
   },
   {
     name: 'Mock papers',
-    what: 'Full-length papers in the FBISE pattern, timed and marked, with a breakdown afterwards of where the marks went.',
+    what: 'Full-length papers in the board pattern, timed and marked, with a breakdown afterwards of where the marks went.',
   },
   {
     name: 'Past papers',

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { BOARD_WITH_ARTICLE } from '@matricmate/core';
 import { AI_COST, AI_MODEL, chargeQuota, guardAi } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 1500,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: VERDICT_SCHEMA } },
       system:
-        `You are an FBISE Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) examiner marking a short answer. Award marks strictly by the marking points: each point earned is stated or clearly implied in the student answer. Partial credit is normal. Never award more than the maximum marks. feedback is 2 to 4 encouraging but honest sentences telling the student exactly what earned marks and what to add next time. missed lists the marking points they did not earn, empty when full marks. Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
+        `You are ${BOARD_WITH_ARTICLE[g.board]} Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) examiner marking a short answer. Award marks strictly by the marking points: each point earned is stated or clearly implied in the student answer. Partial credit is normal. Never award more than the maximum marks. feedback is 2 to 4 encouraging but honest sentences telling the student exactly what earned marks and what to add next time. missed lists the marking points they did not earn, empty when full marks. Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
         languageRule(medium),
       messages: [
         {

@@ -95,7 +95,7 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
             toast(t('tutor.buildStopped'));
           }}
         />
-        <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.paperTitle')} sub={t('tutor.paperSub')} />
+        <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.paperTitle')} sub={t(state.onboarding?.board === 'punjab' ? 'tutor.paperSubPunjab' : 'tutor.paperSub')} />
         <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
         <div className="flex flex-wrap gap-2">
           {derived.subjects.map((sid) => (

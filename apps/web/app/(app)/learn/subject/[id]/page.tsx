@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const subject = await getSubject(id);
   return subject
-    ? { title: subject.name, description: `Every FBISE Class 9 ${subject.name} chapter: notes, audio, MCQs and past papers.` }
+    ? { title: subject.name, description: `Every ${subject.name} chapter: notes, audio, MCQs and past papers.` }
     : { title: 'Subject' };
 }
 

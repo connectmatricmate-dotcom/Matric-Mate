@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { SUBJECT_ICON, accuracy, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, type IconName, type StringKey } from '@matricmate/core';
+import { SUBJECT_ICON, accuracy, boardName, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, type IconName, type StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoachRail, ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
@@ -22,6 +22,9 @@ export function DashboardView() {
   const { state, derived, actions } = useApp();
   const t = useT();
   const { lang } = useLang();
+  // Topper scripts are FBISE's own marked answer sheets. No Punjab board
+  // publishes any, so a Punjab student is not offered another board's.
+  const quick = QUICK.filter((q) => q.href !== '/session/topper-papers' || state.onboarding?.board !== 'punjab');
   const now = useNow();
   const firstName = (state.user?.name ?? t('common.student')).split(' ')[0];
 
@@ -86,7 +89,7 @@ export function DashboardView() {
       />
       {/* Which class this whole dashboard is showing. One line, always on. */}
       <p className="-mt-4 mb-5 text-[13px] font-extrabold text-teal">
-        {t('tutor.classBadge', { n: state.onboarding?.classLevel ?? 9 })}
+        {t('tutor.classBadge', { n: state.onboarding?.classLevel ?? 9, board: boardName(state.onboarding?.board, lang) })}
       </p>
 
       <Split>
@@ -195,8 +198,8 @@ export function DashboardView() {
           {/* Quick actions */}
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('dash.quickActions')}</h2>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-              {QUICK.map((q) => (
+            <div className={`grid grid-cols-2 gap-3 md:grid-cols-3 ${quick.length > 4 ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}>
+              {quick.map((q) => (
                 <Link key={q.label} href={q.href} className="h-full">
                   <Card flat className="flex h-full min-h-[88px] flex-col gap-2 transition-colors duration-200 hover:border-teal">
                     <Icon name={q.icon} size={22} className="text-teal" />

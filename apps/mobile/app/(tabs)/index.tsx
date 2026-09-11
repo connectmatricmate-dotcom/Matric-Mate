@@ -19,7 +19,7 @@ import {
   TileGrid,
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
-import { SUBJECT_COLORS, accuracy, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, todayKey } from '@matricmate/core';
+import { SUBJECT_COLORS, accuracy, boardName, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, todayKey } from '@matricmate/core';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { useLang, useT } from '../../src/i18n';
@@ -113,7 +113,7 @@ export default function Dashboard() {
       <AppHeader eyebrow={today} title={t('dash.greeting', { name: firstName })} />
       {/* Which class this whole dashboard is showing. One line, always on. */}
       <Small style={{ fontFamily: F.bodyBold, color: C.teal, marginTop: -6 }}>
-        {t('tutor.classBadge', { n: state.onboarding?.classLevel ?? 9 })}
+        {t('tutor.classBadge', { n: state.onboarding?.classLevel ?? 9, board: boardName(state.onboarding?.board, lang) })}
       </Small>
       <Spacer h={S.sm} />
       {milestoneToday ? <Confetti /> : null}
@@ -288,10 +288,11 @@ export default function Dashboard() {
       <Spacer h={S.md} />
       <CoachCard />
 
-      {/* Quick actions */}
+      {/* Quick actions. Topper scripts are FBISE's own marked answer sheets and
+          no Punjab board publishes any, so a Punjab student is not offered them. */}
       <SectionTitle>{t('dash.quickActions')}</SectionTitle>
       <TileGrid
-        tiles={QUICK.map((q) => ({
+        tiles={QUICK.filter((q) => q.href !== '/session/topper-papers' || state.onboarding?.board !== 'punjab').map((q) => ({
           key: q.label,
           node: (
             <Card

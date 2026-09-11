@@ -49,15 +49,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   robots: ALLOW_INDEXING ? undefined : { index: false, follow: false },
   title: {
-    default: 'MatricMate · FBISE Class 9 and 10 exam preparation',
+    default: 'MatricMate · FBISE and Punjab Board Class 9 and 10 exam preparation',
     template: '%s · MatricMate',
   },
   description:
-    'Chapter-wise notes, audio lessons, past papers and a 24/7 AI tutor for FBISE Class 9 and Class 10, in English and Urdu medium. Practise, find your weak topics, and walk into the exam ready.',
-  keywords: ['FBISE', 'Class 9', 'Class 10', 'SSC', 'matric', 'past papers', 'Pakistan', 'exam preparation', 'Urdu medium'],
+    'Chapter-wise notes, past papers and a 24/7 AI tutor for FBISE and Punjab Board Class 9 and Class 10, in English and Urdu medium. Practise, find your weak topics, and walk into the exam ready.',
+  keywords: ['FBISE', 'Punjab Board', 'BISE', 'Class 9', 'Class 10', 'SSC', 'matric', 'past papers', 'Pakistan', 'exam preparation', 'Urdu medium'],
   openGraph: {
-    title: 'MatricMate · FBISE Class 9 and 10 exam preparation',
-    description: 'Notes, audio lessons, past papers and an AI tutor for FBISE Class 9 and Class 10, in English and Urdu.',
+    title: 'MatricMate · FBISE and Punjab Board Class 9 and 10 exam preparation',
+    description: 'Notes, past papers and an AI tutor for FBISE and Punjab Board Class 9 and Class 10, in English and Urdu.',
     siteName: 'MatricMate',
     locale: 'en_PK',
     type: 'website',
@@ -74,8 +74,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'MatricMate · FBISE Class 9 exam preparation',
-    description: 'Notes, audio lessons, past papers and an AI tutor for FBISE Class 9, in English and Urdu.',
+    title: 'MatricMate · FBISE and Punjab Board Class 9 and 10 exam preparation',
+    description: 'Notes, past papers and an AI tutor for FBISE and Punjab Board Class 9 and Class 10, in English and Urdu.',
     images: ['/brand/icon-512.png'],
   },
 };

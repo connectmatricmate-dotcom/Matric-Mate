@@ -27,6 +27,8 @@ export type StudentRow = {
   validTill: string | null;
   paidTotal: number;
   teacher: string | null;
+  grade: 9 | 10;
+  board: 'fbise' | 'punjab';
 };
 
 export const allStudents = cache(async (): Promise<StudentRow[]> => {
@@ -51,5 +53,7 @@ export const allStudents = cache(async (): Promise<StudentRow[]> => {
     validTill: (r.valid_till as string | null) ?? null,
     paidTotal: Number(r.paid_total ?? 0),
     teacher: (r.teacher as string | null) ?? null,
+    grade: Number(r.grade) === 10 ? 10 : 9,
+    board: r.board === 'punjab' ? 'punjab' : 'fbise',
   }));
 });

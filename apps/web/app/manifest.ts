@@ -17,10 +17,10 @@ import type { MetadataRoute } from 'next';
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'MatricMate · FBISE Class 9 exam preparation',
+    name: 'MatricMate · Class 9 and 10 exam preparation',
     short_name: 'MatricMate',
     description:
-      'Chapter notes, audio lessons, past papers and a 24/7 AI tutor for FBISE Class 9, in English and Urdu medium.',
+      'Chapter notes, past papers and a 24/7 AI tutor for FBISE and Punjab Board Class 9 and 10, in English and Urdu medium.',
     start_url: '/dashboard',
     display: 'browser',
     background_color: '#FAFBF7',

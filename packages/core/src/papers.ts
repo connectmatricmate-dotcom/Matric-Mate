@@ -16,7 +16,10 @@
  * copy of the catalogue instead of drifting.
  */
 import catalogueJson from '../../../data/fbise/papers.json';
+import punjabJson from '../../../data/punjab/papers.json';
+import { BOARD_LABEL } from './boards';
 import { SUBJECTS } from './content';
+import type { Board } from './types';
 
 export type FbisePastPaper = {
   year: number;
@@ -70,6 +73,90 @@ export function fbisePastPapersByYear(grade: number = 9): { year: number; papers
 }
 
 /**
+ * A past paper as a screen shows it, whichever board it came from.
+ *
+ * FBISE publishes one PDF per session covering every subject; the Punjab
+ * boards publish per subject and per board. Both reduce to a titled link and
+ * the site it opens on, which is all a screen needs, so the two screens stay
+ * one screen.
+ */
+export type PastPaperLink = {
+  key: string;
+  year: number;
+  label: string;
+  url: string;
+  /** The site the link opens on, for the "hosted on" line. */
+  host: string;
+  selfHosted: boolean;
+  /** Punjab only: which board set it, and for which subject. */
+  board?: string;
+  subject?: string;
+};
+
+type PunjabPaper = {
+  board: string;
+  boardName: string;
+  classLevel: number;
+  year: number;
+  subject: string;
+  label: string;
+  url: string;
+};
+type PunjabCatalogue = { retrieved: string | null; papers: PunjabPaper[] };
+const punjab = punjabJson as PunjabCatalogue;
+
+const hostOf = (url: string): string => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+};
+
+/**
+ * Past papers for a student's board and class, grouped by year, newest first.
+ * Punjab papers within a year run in the app's subject order, then by board.
+ */
+export function pastPapersByYear(board: Board, grade: number): { year: number; papers: PastPaperLink[] }[] {
+  const links: PastPaperLink[] =
+    board === 'punjab'
+      ? punjab.papers
+          .filter((p) => p.classLevel === grade)
+          .map((p) => ({
+            key: p.url,
+            year: p.year,
+            label: p.label,
+            url: p.url,
+            host: hostOf(p.url),
+            selfHosted: false,
+            board: p.board,
+            subject: p.subject,
+          }))
+      : fbisePastPapers(grade).map((p) => ({
+          key: p.file,
+          year: p.year,
+          label: p.label,
+          url: p.url,
+          host: p.selfHosted ? '' : hostOf(p.url),
+          selfHosted: p.selfHosted,
+        }));
+  const order = new Map(SUBJECTS.map((s, i) => [s.id, i]));
+  const years = [...new Set(links.map((p) => p.year))].sort((a, b) => b - a);
+  return years.map((year) => ({
+    year,
+    papers: links
+      .filter((p) => p.year === year)
+      .sort(
+        (a, b) =>
+          (order.get(a.subject ?? '') ?? 99) - (order.get(b.subject ?? '') ?? 99) || (a.board ?? '').localeCompare(b.board ?? ''),
+      ),
+  }));
+}
+
+/** The name a year heading carries: "FBISE", "Punjab Board". */
+export const pastPapersBoardLabel = (board: Board): string => BOARD_LABEL[board];
+
+/**
  * The span of past papers we actually link to, or null when there are none.
  *
  * The practice tile advertised "FBISE 2019 to 2025" as a literal in both
@@ -78,8 +165,8 @@ export function fbisePastPapersByYear(grade: number = 9): { year: number; papers
  * empty state behind it. The tile reads this instead, so it can only ever
  * claim what the catalogue has.
  */
-export function pastPaperYears(grade: number = 9): { from: number; to: number; count: number } | null {
-  const papers = fbisePastPapers(grade);
+export function pastPaperYears(grade: number = 9, board: Board = 'fbise'): { from: number; to: number; count: number } | null {
+  const papers = pastPapersByYear(board, grade).flatMap((g) => g.papers);
   if (!papers.length) return null;
   const years = papers.map((p) => p.year);
   return { from: Math.min(...years), to: Math.max(...years), count: papers.length };
