@@ -42,9 +42,16 @@
  * partially written.
  */
 
+import dns from 'node:dns';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import net from 'node:net';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// This network advertises IPv6 it cannot route, and a connection that tries
+// it first fails as a bare "fetch failed". IPv4 only.
+dns.setDefaultResultOrder('ipv4first');
+net.setDefaultAutoSelectFamily(false);
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -61,9 +68,28 @@ const GRADE = (() => {
   return i === -1 ? 9 : Number(process.argv[i + 1]) || 9;
 })();
 const GRADE_LABEL = `Class ${GRADE}`;
+
+/**
+ * Which board. `--board punjab` reads chapters and outcomes from
+ * data/punjab/catalogue.json, built from the board's own 2023 textbooks.
+ * Every Punjab outcome is printed inside the chapter it belongs to, so there
+ * is no mapping phase: the catalogue already says which chapter each one is.
+ * Generated copies go to content/generated/punjab/, and the prompts name the
+ * Punjab boards and their paper instead of the Federal Board's. With the flag
+ * absent, every FBISE path and prompt is exactly what it was.
+ */
+const BOARD = (() => {
+  const i = process.argv.indexOf('--board');
+  return i !== -1 && process.argv[i + 1] === 'punjab' ? 'punjab' : 'fbise';
+})();
+const PUNJAB = BOARD === 'punjab';
+const BOARD_LABEL = PUNJAB ? 'Punjab board' : 'FBISE';
+
 const DATA = resolve(ROOT, GRADE === 10 ? 'data/fbise/ssc2' : 'data/fbise');
 const MAPDIR = resolve(DATA, 'mapping');
-const GENDIR = resolve(ROOT, GRADE === 10 ? 'content/generated/ssc2' : 'content/generated');
+const GENDIR = PUNJAB
+  ? resolve(ROOT, `content/generated/punjab/grade-${GRADE}`)
+  : resolve(ROOT, GRADE === 10 ? 'content/generated/ssc2' : 'content/generated');
 const SPEC_FILE = GRADE === 10 ? resolve(ROOT, 'data/fbise/chapters-ssc2.json') : null;
 
 const args = process.argv.slice(2);
@@ -78,7 +104,22 @@ const DRY = args.includes('--dry-run');
 const BRIEFS = args.includes('--briefs');
 const FROM_DISK = args.includes('--from-disk');
 const REMAP = args.includes('--remap');
-const ONLY_SUBJECT = flag('subject');
+/**
+ * One subject, or several as a comma list in priority order: `--subject
+ * phy,chem,bio`. With --max-spend the order is what gets done first.
+ */
+const ONLY_SUBJECTS = (() => {
+  const v = flag('subject');
+  return typeof v === 'string' ? v.split(',').map((x) => x.trim()).filter(Boolean) : null;
+})();
+/**
+ * A ceiling in US dollars for this run, at Sonnet's list price. No new
+ * chapter starts once it is reached; the ones in flight finish. The key that
+ * pays for generation also pays for every student's AI tutor, so a run that
+ * spends the balance to zero takes the live app's AI down with it.
+ */
+const MAX_SPEND = Number(flag('max-spend', 0)) || 0;
+const PRICE = { input: 2 / 1e6, output: 10 / 1e6 };
 /**
  * One chapter, by id. For filling a single hole without respending on the
  * whole subject: `--chapter isl-6`, optionally with `--medium ur`. Repeatable
@@ -134,6 +175,9 @@ async function loadEnv() {
  * overloaded upstream, and a reply that is not valid JSON. Everything else is a
  * real error and is thrown, because retrying a bad request just spends money.
  */
+/** What this run has cost, in tokens, for the closing line. A run on someone's balance should say what it spent. */
+const spent = { input: 0, output: 0 };
+
 async function ask(env, { system, prompt, maxTokens = 8000, attempt = 1, netAttempt = 1 }) {
   // A dropped connection (wifi blip, DNS hiccup) surfaces as a thrown
   // "fetch failed", at the request or mid-stream. That is the network's
@@ -202,6 +246,11 @@ async function ask(env, { system, prompt, maxTokens = 8000, attempt = 1, netAtte
         }
         if (event.type === 'content_block_delta' && event.delta?.text) text += event.delta.text;
         if (event.type === 'message_delta' && event.delta?.stop_reason) stopReason = event.delta.stop_reason;
+        // Billed tokens, counted per call. Input arrives with message_start,
+        // output with the closing message_delta. Retried calls count too,
+        // because they are billed too.
+        if (event.type === 'message_start') spent.input += event.message?.usage?.input_tokens ?? 0;
+        if (event.type === 'message_delta') spent.output += event.usage?.output_tokens ?? 0;
         if (event.type === 'error') throw new Error(`stream error: ${event.error?.message ?? 'unknown'}`);
       }
     }
@@ -321,7 +370,7 @@ async function mapSlosToChapters(env, subject, chapters, slos) {
 
 /* ---------------------------------------------------- phase 2: generation */
 
-const GEN_SYSTEM = `You write exam-preparation material for FBISE ${GRADE_LABEL} students in Pakistan.
+const FBISE_SYSTEM = `You write exam-preparation material for FBISE ${GRADE_LABEL} students in Pakistan.
 
 You are given one chapter and the exact learning outcomes the Federal Board
 examines on it. Everything you write must serve those outcomes.
@@ -356,6 +405,42 @@ Write them the way the board writes them, and give the marking points a marker
 would actually look for.
 
 Return only JSON matching the schema you are given. No prose, no code fence.`;
+
+/**
+ * The same standard, said about the Punjab boards.
+ *
+ * Built by swapping the five sentences that name FBISE rather than by keeping
+ * a second copy, so an edit to the standard reaches both boards. Each swap
+ * must land: if one of those sentences is ever reworded, this throws instead
+ * of quietly sending Punjab students a prompt that still says Federal Board.
+ */
+const punjabSystem = (text) => {
+  const swaps = [
+    [`material for FBISE ${GRADE_LABEL} students`, `material for Punjab board ${GRADE_LABEL} students`],
+    [
+      'the exact learning outcomes the Federal Board\nexamines on it.',
+      'the learning outcomes the Punjab textbook (PCTB,\n2023 edition) prints for it, word for word.',
+    ],
+    [
+      'A 14 or 15 year old sitting the SSC Part 1 annual exam.',
+      GRADE === 10
+        ? 'A 15 or 16 year old sitting the SSC Part 2 (Class 10) annual exam of a Punjab\nboard: Lahore, Rawalpindi, Multan, Faisalabad or any of the others, which all\nset papers from the same textbook.'
+        : 'A 14 or 15 year old sitting the SSC Part 1 (Class 9) annual exam of a Punjab\nboard: Lahore, Rawalpindi, Multan, Faisalabad or any of the others, which all\nset papers from the same textbook.',
+    ],
+    ['Write them the way the board writes them', 'Write them the way the Punjab boards write them'],
+    [
+      'Return only JSON matching the schema you are given.',
+      'Never use an em dash; use a comma, a colon, or a new sentence.\n\nReturn only JSON matching the schema you are given.',
+    ],
+  ];
+  for (const [from, to] of swaps) {
+    if (!text.includes(from)) throw new Error(`Punjab prompt: "${from.slice(0, 40)}" is no longer in the FBISE standard`);
+    text = text.replace(from, to);
+  }
+  return text;
+};
+
+const GEN_SYSTEM = PUNJAB ? punjabSystem(FBISE_SYSTEM) : FBISE_SYSTEM;
 
 /** The one instruction that changes between the two mediums. */
 const mediumRule = (medium) =>
@@ -392,7 +477,7 @@ async function generateChapter(env, { subject, chapter, slos, medium }) {
    * app keeps labelling them "not on the annual paper", which is true.
    */
   const grounded = slos.length > 0;
-  const head = `Subject: ${subject.name}, FBISE ${GRADE_LABEL}.
+  const head = `Subject: ${subject.name}, ${BOARD_LABEL} ${GRADE_LABEL}.
 Chapter ${chapter.number}: ${chapter.title}
 ${chapter.blurb ? `Scope: ${chapter.blurb}` : ''}
 
@@ -400,7 +485,7 @@ ${
   grounded
     ? `THE OUTCOMES THIS CHAPTER IS EXAMINED ON:\n${sloText}`
     : `THIS CHAPTER HAS NO MAPPED BOARD OUTCOMES. The board's framework does not list
-assessable outcomes under this title, so work from what the FBISE ${GRADE_LABEL} syllabus
+assessable outcomes under this title, so work from what the ${BOARD_LABEL} ${GRADE_LABEL} syllabus
 covers for a chapter of this name and from standard textbook treatment of it. Stay
 inside this chapter's scope, do not stray into neighbouring chapters, and do not claim
 any exam weighting or marks distribution for it.`
@@ -549,6 +634,28 @@ function sift(out, slos) {
   return { clean: { sections, mcqs, flashcards, shortQs, blanks }, dropped, fatal };
 }
 
+/**
+ * No em dash reaches a student. The repo's rule for every line of copy, and
+ * the one the model breaks most: 248 of FBISE's first 4,283 MCQs carry one.
+ * Asking in the prompt lowers the count; this makes it zero. Replaced with the
+ * comma the sentence almost always wanted, the Urdu comma in Urdu, and
+ * dropped outright at the start or end of a string.
+ */
+function dashless(value, comma) {
+  if (typeof value === 'string') {
+    return value
+      .replace(/^\s*\u2014\s*/, '')
+      .replace(/\s*\u2014\s*$/, '')
+      .replace(/\s*\u2014\s*/g, comma);
+  }
+  if (Array.isArray(value)) return value.map((v) => dashless(v, comma));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, dashless(v, comma)]));
+  }
+  return value;
+}
+const commaFor = (medium) => (medium === 'ur' ? '، ' : ', ');
+
 /* -------------------------------------------------------------- to tables */
 
 const rows = (out, { chapter, subject, medium, status }) => {
@@ -604,6 +711,38 @@ const rows = (out, { chapter, subject, medium, status }) => {
   };
 };
 
+/**
+ * Replace one chapter-medium's rows: clear every table, then insert.
+ *
+ * Retried whole when the network drops, not statement by statement. A write
+ * can reach the server and still lose its reply, so the retry starts again
+ * from the clear and meets the same empty slate instead of rows the first
+ * attempt left behind. A refusal from the database itself (a bad row, a
+ * constraint) is a real error and is not retried. A dropped connection on 11
+ * September lost seven Urdu chapters' writes in two minutes; their content
+ * was safe on disk, but a run should not need rescuing from one.
+ */
+async function replaceRows(db, chapter, medium, tables) {
+  const flaky = (message) => /fetch failed|network|ECONNRESET|ETIMEDOUT|EAI_AGAIN|socket|terminated/i.test(message);
+  for (let attempt = 1; ; attempt++) {
+    try {
+      for (const table of Object.keys(tables)) {
+        const { error } = await db.from(table).delete().eq('chapter_id', chapter.id).eq('medium', medium);
+        if (error) throw new Error(`${table} clear: ${error.message}`);
+      }
+      for (const [table, batch] of Object.entries(tables)) {
+        if (!batch.length) continue;
+        const { error } = await db.from(table).insert(batch);
+        if (error) throw new Error(`${table}: ${error.message}`);
+      }
+      return;
+    } catch (e) {
+      if (attempt >= 6 || !flaky(String(e.message))) throw e;
+      await new Promise((r) => setTimeout(r, Math.min(60_000, 3000 * 2 ** (attempt - 1))));
+    }
+  }
+}
+
 /* ----------------------------------------------- the disk seam (agent route) */
 
 /**
@@ -634,7 +773,10 @@ async function writeBriefs(subject, chapters, slos, mapping) {
       standard: GEN_SYSTEM,
       urduRule: mediumRule('ur').trim(),
       outcomes: mine.map((s) => ({ code: s.code, cognitive: s.cognitive, text: s.text })),
-      writeTo: [`content/generated/${chapter.id}-en.json`, `content/generated/${chapter.id}-ur.json`],
+      writeTo: [
+        relative(ROOT, resolve(GENDIR, `${chapter.id}-en.json`)),
+        relative(ROOT, resolve(GENDIR, `${chapter.id}-ur.json`)),
+      ],
       schema: {
         sections: [{ title: 'string', blocks: '[{kind:h|p|def|formula|list|example, ...}]', slo_codes: ['string'] }],
         mcqs: [{ topic: 's', q: 's', options: ['a', 'b', 'c', 'd'], answer: 0, explanation: 's', difficulty: 'easy|medium|hard', slo_code: 's' }],
@@ -670,7 +812,7 @@ async function insertFromDisk(db, doc, chapters, slos, mapping, STATUS) {
       const label = `${chapter.id}/${medium}`;
       let raw;
       try {
-        raw = JSON.parse(await readFile(file, 'utf8'));
+        raw = dashless(JSON.parse(await readFile(file, 'utf8')), commaFor(medium));
       } catch {
         continue; // not written yet, which is normal mid-run
       }
@@ -685,15 +827,7 @@ async function insertFromDisk(db, doc, chapters, slos, mapping, STATUS) {
       const tables = rows(clean, { chapter, subject: doc, medium, status: STATUS });
       try {
         if (!DRY) {
-          for (const table of Object.keys(tables)) {
-            const { error } = await db.from(table).delete().eq('chapter_id', chapter.id).eq('medium', medium);
-            if (error) throw new Error(`${table} clear: ${error.message}`);
-          }
-          for (const [table, batch] of Object.entries(tables)) {
-            if (!batch.length) continue;
-            const { error } = await db.from(table).insert(batch);
-            if (error) throw new Error(`${table}: ${error.message}`);
-          }
+          await replaceRows(db, chapter, medium, tables);
         }
         written++;
         const counts = Object.entries(tables).map(([t, r]) => `${r.length} ${t.replace('chapter_', '')}`);
@@ -725,14 +859,32 @@ async function main() {
 
   await mkdir(MAPDIR, { recursive: true });
 
-  const SPEC = JSON.parse(await readFile(SPEC_FILE ?? resolve(DATA, 'chapters.json'), 'utf8'));
+  const SPEC = PUNJAB ? {} : JSON.parse(await readFile(SPEC_FILE ?? resolve(DATA, 'chapters.json'), 'utf8'));
 
-  const files = (await readdir(DATA)).filter((f) => f.endsWith('.json') && f !== 'index.json' && !f.includes('-'));
   const subjects = [];
-  for (const f of files) {
-    const doc = JSON.parse(await readFile(resolve(DATA, f), 'utf8'));
-    if (ONLY_SUBJECT && doc.subject !== ONLY_SUBJECT) continue;
-    subjects.push(doc);
+  if (PUNJAB) {
+    // One document per subject in the FBISE shape, so everything below runs
+    // unchanged. Each outcome already carries its chapter number.
+    const catalogue = JSON.parse(await readFile(resolve(ROOT, 'data/punjab/catalogue.json'), 'utf8'));
+    const { data: names } = await db.from('subjects').select('id,name');
+    const nameOf = new Map((names ?? []).map((r) => [r.id, r.name]));
+    const bySubject = new Map();
+    for (const s of catalogue.slos.filter((x) => x.grade === GRADE)) {
+      if (!bySubject.has(s.subject)) bySubject.set(s.subject, []);
+      bySubject.get(s.subject).push({ code: s.code, text: s.text, cognitive: null, assessment: null, chapter: s.chapter });
+    }
+    for (const [subject, list] of bySubject) {
+      if (ONLY_SUBJECTS && !ONLY_SUBJECTS.includes(subject)) continue;
+      subjects.push({ subject, name: nameOf.get(subject) ?? subject, domains: [{ code: 'textbook', slos: list }] });
+    }
+    if (ONLY_SUBJECTS) subjects.sort((a, b) => ONLY_SUBJECTS.indexOf(a.subject) - ONLY_SUBJECTS.indexOf(b.subject));
+  } else {
+    const files = (await readdir(DATA)).filter((f) => f.endsWith('.json') && f !== 'index.json' && !f.includes('-'));
+    for (const f of files) {
+      const doc = JSON.parse(await readFile(resolve(DATA, f), 'utf8'));
+      if (ONLY_SUBJECTS && !ONLY_SUBJECTS.includes(doc.subject)) continue;
+      subjects.push(doc);
+    }
   }
 
   let written = 0;
@@ -746,6 +898,10 @@ async function main() {
       .select('id,number,title,blurb')
       .eq('subject_id', doc.subject)
       .eq('grade', GRADE)
+      // Physics chapter 3 exists once per board per class. Without this, a
+      // Punjab chapter would be generated against FBISE outcomes, and the
+      // other way round.
+      .eq('board', BOARD)
       .order('number');
     if (!chapters?.length) {
       console.log(`${C.yellow('skip')} ${doc.subject}: no chapters`);
@@ -763,10 +919,11 @@ async function main() {
       continue;
     }
 
-    // Phase 1: mapping, cached.
+    // Phase 1: mapping, cached. Punjab needs none: the book printed each
+    // outcome inside its chapter, and the catalogue kept that.
     const mapPath = resolve(MAPDIR, `${doc.subject}.json`);
-    let mapping;
-    if (!REMAP) {
+    let mapping = PUNJAB ? Object.fromEntries(slos.map((s) => [s.code, s.chapter])) : undefined;
+    if (!mapping && !REMAP) {
       try {
         mapping = JSON.parse(await readFile(mapPath, 'utf8')).mapping;
       } catch {
@@ -794,7 +951,7 @@ async function main() {
 
     if (BRIEFS) {
       const n = await writeBriefs(doc, chapters, slos, mapping);
-      console.log(`${C.green('   ok')} ${doc.subject.padEnd(6)} ${C.dim(`${n} briefs -> content/generated/briefs/`)}`);
+      console.log(`${C.green('   ok')} ${doc.subject.padEnd(6)} ${C.dim(`${n} briefs -> ${relative(ROOT, resolve(GENDIR, 'briefs'))}/`)}`);
       continue;
     }
 
@@ -853,7 +1010,7 @@ async function main() {
   const runJob = async ({ doc, chapter, mine, medium }) => {
     const label = `${chapter.id}/${medium}`;
     try {
-      const raw = await generateChapter(env, { subject: doc, chapter, slos: mine, medium });
+      const raw = dashless(await generateChapter(env, { subject: doc, chapter, slos: mine, medium }), commaFor(medium));
       const { clean, dropped: bad, fatal } = sift(raw, mine);
 
       if (fatal) {
@@ -876,15 +1033,7 @@ async function main() {
         // different row that owns the slot. Clearing first also makes a
         // regeneration a clean replacement rather than two overlapping
         // sets of questions for the same chapter.
-        for (const table of Object.keys(tables)) {
-          const { error } = await db.from(table).delete().eq('chapter_id', chapter.id).eq('medium', medium);
-          if (error) throw new Error(`${table} clear: ${error.message}`);
-        }
-        for (const [table, batch] of Object.entries(tables)) {
-          if (!batch.length) continue;
-          const { error } = await db.from(table).insert(batch);
-          if (error) throw new Error(`${table}: ${error.message}`);
-        }
+        await replaceRows(db, chapter, medium, tables);
       }
       written++;
       console.log(
@@ -899,16 +1048,24 @@ async function main() {
   };
 
   let cursor = 0;
+  let capped = 0;
+  const costSoFar = () => spent.input * PRICE.input + spent.output * PRICE.output;
   const worker = async () => {
     for (;;) {
       const job = jobs[cursor++];
       if (!job) return;
+      if (MAX_SPEND && costSoFar() >= MAX_SPEND) {
+        capped++;
+        continue;
+      }
       await runJob(job);
     }
   };
   await Promise.all(Array.from({ length: Math.max(1, CONCURRENCY) }, worker));
 
-  console.log(C.bold(`\n  ${written} chapter-media written, ${dropped} dropped${DRY ? ' (dry run, nothing saved)' : ''}\n`));
+  console.log(C.bold(`\n  ${written} chapter-media written, ${dropped} dropped${DRY ? ' (dry run, nothing saved)' : ''}`));
+  console.log(C.dim(`  ${spent.input.toLocaleString()} tokens in, ${spent.output.toLocaleString()} out, about $${costSoFar().toFixed(2)} at list price\n`));
+  if (capped) console.log(C.yellow(`  ${capped} chapter-media not started: the $${MAX_SPEND} ceiling was reached. Re-run with --missing to continue.\n`));
 }
 
 main().catch((e) => {
