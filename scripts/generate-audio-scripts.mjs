@@ -79,7 +79,7 @@ const UNSPEAKABLE = [
   { re: /\b\d+\s*\/\s*\d+\b/, why: 'bare fraction, write it in words' },
   { re: /\^|\bm\/s\b|\bkg\b(?!\s*\()/, why: 'bare unit or exponent, write it in words' },
   { re: /[*_#`]|\[[^\]]*\]\(/, why: 'markdown, speak plain prose' },
-  { re: /—/, why: 'em dash, repo rule' },
+  { re: /\u2014/, why: 'em dash, repo rule' },
 ];
 const unspeakable = (t) => UNSPEAKABLE.filter(({ re }) => re.test(t)).map(({ why }) => why);
 
