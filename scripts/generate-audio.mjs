@@ -135,6 +135,13 @@ async function main() {
       return m ? { file: f, chapterId: m[1], medium: m[2] } : null;
     })
     .filter(Boolean)
+    // A language subject has one lesson, in its own language (see
+    // generate-audio-scripts.mjs). An old script in the other language must
+    // not come back as a second track: --missing once re-narrated sixteen of
+    // them straight after they had been removed.
+    .filter((j) => !(j.chapterId.startsWith('urd-') && j.medium === 'en'))
+    .filter((j) => !(j.chapterId.startsWith('eng-') && j.medium === 'ur'))
+    .filter((j) => !(j.chapterId.startsWith('isl-pj-') && j.medium === 'en'))
     .filter((j) => (ONLY_CHAPTER ? j.chapterId === ONLY_CHAPTER : true))
     .filter((j) => (ONLY_SUBJECT ? j.chapterId.startsWith(`${ONLY_SUBJECT}-`) : true))
     .sort((a, b) => a.file.localeCompare(b.file));
