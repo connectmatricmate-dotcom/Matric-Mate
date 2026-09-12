@@ -57,10 +57,9 @@ const catalogue = catalogueJson as Catalogue;
 /**
  * FBISE past papers for a class, newest year first.
  *
- * The grade is a parameter and not a constant because both classes exist now.
- * The catalogue currently holds SSC-I papers only, so a Class 10 student gets
- * an empty list and the screen says so, which is the honest answer. Showing
- * them Class 9 papers as "your board's papers" was not.
+ * The grade is a parameter and not a constant because both classes exist now:
+ * SSC-I papers are Class 9, SSC-II Class 10. Showing a Class 10 student the
+ * Class 9 papers as "your board's papers" was the bug this parameter fixed.
  */
 export function fbisePastPapers(grade: number = 9): FbisePastPaper[] {
   return catalogue.pastPapers.filter((p) => p.classLevel === grade).slice().sort((a, b) => b.year - a.year);

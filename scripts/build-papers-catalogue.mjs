@@ -23,10 +23,16 @@
  * the thing no amount of generated content teaches.
  */
 
+import dns from 'node:dns';
 import { readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import net from 'node:net';
 import { fileURLToPath } from 'node:url';
+
+// IPv4 only: this network advertises IPv6 it cannot route.
+dns.setDefaultResultOrder('ipv4first');
+net.setDefaultAutoSelectFamily(false);
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'data/fbise');
@@ -39,11 +45,19 @@ const C = {
   yellow: (s) => `\x1b[33m${s}\x1b[0m`,
 };
 
-/** The board's index pages, one per year. It adds a new one each session. */
+/**
+ * The board's index pages, one per year and part. It adds a new one each
+ * session. SSC-I is Class 9, SSC-II Class 10; the app serves both. The year
+ * here is only a fallback: the newest page also carries the latest session
+ * (2026 papers sit on the "2025" page), so a paper's own path decides.
+ */
 const PAST_PAPER_PAGES = [
   { year: 2025, url: 'https://fbise.edu.pk/AllOldPapersSSC1.php' },
   { year: 2024, url: 'https://fbise.edu.pk/AllOldPapersSSC1_2024.php' },
   { year: 2023, url: 'https://fbise.edu.pk/AllOldPapersSSC1_2023.php' },
+  { year: 2025, url: 'https://fbise.edu.pk/AllOldPapersSSC2.php' },
+  { year: 2024, url: 'https://fbise.edu.pk/AllOldPapersSSC2_2024.php' },
+  { year: 2023, url: 'https://fbise.edu.pk/AllOldPapersSSC2_2023.php' },
 ];
 
 const TOPPERS_PAGE = 'https://fbise.edu.pk/topper_copies.php';
@@ -113,6 +127,25 @@ const SELF_HOSTED = [
     accessibility: true,
     extractedFrom: 'https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip',
   },
+  {
+    year: 2025,
+    file: 'SSC-II Normal.pdf',
+    label: 'SSC Part 2 First Annual 2025',
+    url: publicUrl('2025/ssc-ii-first-annual-2025.pdf'),
+    classLevel: 10,
+    selfHosted: true,
+    extractedFrom: 'https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip',
+  },
+  {
+    year: 2025,
+    file: 'SSC-II HIC.pdf',
+    label: 'SSC Part 2 First Annual 2025, hearing impaired candidates',
+    url: publicUrl('2025/ssc-ii-first-annual-2025-hic.pdf'),
+    classLevel: 10,
+    selfHosted: true,
+    accessibility: true,
+    extractedFrom: 'https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip',
+  },
 ];
 
 /** Subject from a topper filename. The board names them inconsistently. */
@@ -146,9 +179,14 @@ const LABEL_OF = (file) =>
     // is no boundary to match.
     .replace(/[_\s-]1A(\d{2})(?![0-9])/i, ' First Annual 20$1')
     .replace(/[_\s-]2A(\d{2})(?![0-9])/i, ' Second Annual 20$1')
+    // The 2026 files drop the code for words: SSC-II-1_Annual.
+    .replace(/[_\s-]1[_\s-]Annual\b/i, ' First Annual')
+    .replace(/[_\s-]2[_\s-]Annual\b/i, ' Second Annual')
     .replace(/[_-]+/g, ' ')
-    .replace(/\bSSC-?I\b/i, 'SSC Part 1')
-    .replace(/\bSSC-?II\b/i, 'SSC Part 2')
+    // Hyphens are spaces by now, so "SSC-II" reads "SSC II". Part 2 first:
+    // "SSC I" must not claim the first half of "SSC II".
+    .replace(/\bSSC[-\s]?II\b/i, 'SSC Part 2')
+    .replace(/\bSSC[-\s]?I\b/i, 'SSC Part 1')
     .replace(/\bHIC\b/i, 'Hearing impaired candidates')
     .replace(/\bQP\b/i, 'question papers')
     .replace(/\s+/g, ' ')
@@ -167,6 +205,7 @@ async function main() {
   /* past papers ---------------------------------------------------------- */
 
   const pastPapers = [];
+  const seenUrls = new Set();
   for (const { year, url } of PAST_PAPER_PAGES) {
     let hrefs = [];
     try {
@@ -179,13 +218,20 @@ async function main() {
       const file = decodeURIComponent(href.split('/').pop());
       // The ZIP is replaced by the two PDFs pulled out of it, added below.
       if (/\.zip$/i.test(file)) continue;
-      // SSC-II is Class 10. Keep it out: this app is Class 9.
+      // Pages repeat a session's files; one entry per file.
+      const link = absolute(href);
+      if (seenUrls.has(link)) continue;
+      seenUrls.add(link);
+      // SSC-II is Class 10, SSC-I Class 9, read from the file name: the Class
+      // 10 pages also list the odd Class 9 file.
       const isPartTwo = /SSC[-_ ]?II/i.test(file);
+      const paperYear = Number(decodeURIComponent(href).match(/Old Question Paper\/(\d{4})\//i)?.[1]) || year;
+      const label = LABEL_OF(file);
       pastPapers.push({
-        year,
+        year: paperYear,
         file,
-        label: LABEL_OF(file),
-        url: absolute(href),
+        label: /\b20\d{2}\b/.test(label) ? label : `${label} ${paperYear}`,
+        url: link,
         classLevel: isPartTwo ? 10 : 9,
         // A browser cannot open one page of a ZIP, so these are the only files
         // we ever have to host ourselves.
@@ -196,6 +242,23 @@ async function main() {
   }
 
   pastPapers.push(...SELF_HOSTED);
+
+  // The board's pages link the odd file that is not there (the 2024 Class 9
+  // Tech paper answers 404). A student tapping a dead link learns nothing, so
+  // every file is fetched before it is listed: its first bytes must be a PDF.
+  const live = [];
+  for (const p of pastPapers) {
+    try {
+      const res = await fetch(p.url, { headers: { Range: 'bytes=0-7' } });
+      const head = Buffer.from(await res.arrayBuffer()).toString('latin1', 0, 5);
+      if (res.ok && head === '%PDF-') live.push(p);
+      else console.log(`${C.yellow('  --')} dropped ${p.label}: ${res.status} ${res.ok ? 'not a PDF' : ''}`);
+    } catch (e) {
+      console.log(`${C.yellow('  --')} dropped ${p.label}: ${e.message}`);
+    }
+  }
+  pastPapers.length = 0;
+  pastPapers.push(...live);
 
   /* topper answer scripts ------------------------------------------------ */
 
@@ -240,10 +303,11 @@ async function main() {
   await writeFile(resolve(OUT, 'papers.json'), `${JSON.stringify(doc, null, 2)}\n`);
 
   const cls9 = pastPapers.filter((p) => p.classLevel === 9);
+  const cls10 = pastPapers.filter((p) => p.classLevel === 10);
   const hosting = pastPapers.filter((p) => p.selfHosted);
   console.log(
     C.dim(
-      `\n  ${cls9.length} Class 9 past papers, ${toppers.length} topper scripts -> data/fbise/papers.json` +
+      `\n  ${cls9.length} Class 9 and ${cls10.length} Class 10 past papers, ${toppers.length} topper scripts -> data/fbise/papers.json` +
         `${hosting.length ? `\n  ${hosting.length} served from our own storage, extracted from the board's ZIP` : ''}`,
     ),
   );

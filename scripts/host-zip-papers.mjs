@@ -9,22 +9,28 @@
  * nothing. This handles the one case where linking does not work.
  *
  * The 2025 first annual session is published as a single 16 MB ZIP holding four
- * papers, two of them Class 10. A browser cannot open one page of a ZIP, so
- * linking to it would hand a Class 9 student a large download and ask them to
- * find their own paper inside it. The two Class 9 files are pulled out and put
- * in the public `papers` bucket instead.
+ * papers, two per class. A browser cannot open one page of a ZIP, so linking
+ * to it would hand a student a large download and ask them to find their own
+ * paper inside it. All four are pulled out and put in the public `papers`
+ * bucket instead.
  *
  * Safe to re-run: uploads are upsert, so this rebuilds the bucket from scratch
  * if it is ever lost.
  */
 
 import { execFile } from 'node:child_process';
+import dns from 'node:dns';
+import net from 'node:net';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { createClient } from '@supabase/supabase-js';
+
+// IPv4 only: this network advertises IPv6 it cannot route.
+dns.setDefaultResultOrder('ipv4first');
+net.setDefaultAutoSelectFamily(false);
 
 const run = promisify(execFile);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -41,10 +47,13 @@ const BUCKET = 'papers';
 const SOURCES = [
   {
     zip: 'https://www.fbise.edu.pk/Old%20Question%20Paper/2025/SSC_1A25_QP.zip',
-    // The archive also holds SSC-II Normal and SSC-II HIC, which are Class 10.
+    // Two papers per class: Class 9 (SSC-I) and, since the app serves both
+    // classes, Class 10 (SSC-II), each with its hearing-impaired variant.
     take: [
       { inZip: 'SSC-I Normal.pdf', to: '2025/ssc-i-first-annual-2025.pdf' },
       { inZip: 'SSC-I HIC.pdf', to: '2025/ssc-i-first-annual-2025-hic.pdf' },
+      { inZip: 'SSC-II Normal.pdf', to: '2025/ssc-ii-first-annual-2025.pdf' },
+      { inZip: 'SSC-II HIC.pdf', to: '2025/ssc-ii-first-annual-2025-hic.pdf' },
     ],
   },
 ];
