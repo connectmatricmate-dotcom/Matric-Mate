@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetch as expoFetch } from 'expo/fetch';
 import { AppState } from 'react-native';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { configureTutor, connectContent, primeAllContent } from '@matricmate/core';
+import { configureTutor, connectContent } from '@matricmate/core';
 import { SITE_URL } from './site';
 
 /**
@@ -115,8 +115,16 @@ export const supabase: SupabaseClient =
  * that throws on every call.
  */
 connectContent(client);
-// Warm the synchronous lookups so chapter titles are real from the first render.
-void primeAllContent(client ?? undefined);
+/*
+ * The chapter index is not warmed here any more. It was, once, at import, and
+ * that was the only time it ever ran: before the stored session was back, so a
+ * fresh install primed nothing (chapters are readable only when signed in), in
+ * English whatever the student reads in, and never again after a sign-in or a
+ * class, board or language change. The study store owns it now and re-primes
+ * whenever any of those change, and clears the cache (core's
+ * clearContentCache) when the account or the syllabus changes; see `reprime`
+ * and `restart` in store/app.tsx.
+ */
 
 /**
  * Point the tutor at the web app's API, which holds the AI key and enforces

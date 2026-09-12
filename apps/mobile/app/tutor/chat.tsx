@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Image, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Image, ScrollView, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../../src/components/Icon';
-import { IconButton, Pill, Row, Screen, ScriptText, Small, Tap, TypingDots, useRevealed, useToast } from '../../src/components/ui';
+import { IconButton, Pill, Row, Screen, ScriptText, Small, Tap, Text, TextInput, TypingDots, useRevealed, useToast } from '../../src/components/ui';
 import { useKeyboardOverlap } from '../../src/core/keyboard';
 import { ChapterPicker } from '../../src/components/ChapterPicker';
 import {
@@ -21,9 +21,12 @@ import {
   subjectById,
   subjectName,
   weakTopics,
+  type ChapterChoice,
   type TutorAction,
   type TutorImage,
 } from '@matricmate/core';
+import { aiFailureKey } from '../../src/components/aiFailure';
+import { useAsync } from '../../src/core/useAsync';
 import type { StringKey } from '../../src/i18n';
 import { supabase } from '../../src/lib/supabase';
 import { useLang, useT } from '../../src/i18n';
@@ -77,6 +80,7 @@ function LiveAnswer({ text }: { text: string }) {
  */
 function AnswerActions({ actions }: { actions: TutorAction[] }) {
   const t = useT();
+  const { lang } = useLang();
   if (!actions.length) return null;
   return (
     <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
@@ -98,8 +102,10 @@ function AnswerActions({ actions }: { actions: TutorAction[] }) {
             <Text numberOfLines={1} style={{ flexShrink: 1, fontFamily: F.bodyBold, fontSize: 12.5, color: C.onBrand }}>
               {t(TUTOR_ACTION_LABEL[a.kind] as StringKey)}
             </Text>
+            {/* The chapter's name in today's language, looked up again at
+                render: a chip parsed before a language switch kept the old one. */}
             <Text numberOfLines={1} style={{ flexShrink: 1, fontFamily: F.body, fontSize: 11.5, color: C.onBrand, opacity: 0.85 }}>
-              · {a.chapterTitle}
+              · {chapterName(chapterById(a.chapterId), lang) || a.chapterTitle}
             </Text>
           </View>
         </Tap>
@@ -120,7 +126,7 @@ function AnswerActions({ actions }: { actions: TutorAction[] }) {
 function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const t = useT();
   const { lang } = useLang();
-  const { state, derived } = useApp();
+  const { state, derived, contentKey } = useApp();
 
   /**
    * The questions a student does not think to ask.
@@ -145,7 +151,10 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
     if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
     out.push(t('tutor.starterMarks'));
     return out.slice(0, 4);
-  }, [state.attempts, state.lastChapterId, derived.subjects, lang, t]);
+    // contentKey is not read here and has to be listed: chapterById and
+    // weakTopics read the chapter index, which fills in underneath.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.attempts, state.lastChapterId, derived.subjects, lang, t, contentKey]);
 
   /*
    * Two blocks, pushed apart, rather than one column of everything.
@@ -177,7 +186,7 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
           <Text style={{ fontFamily: F.display, fontSize: 20, color: C.ink, textAlign: 'center' }}>
             {t('tutor.emptyTitle')}
           </Text>
-          <Small style={{ textAlign: 'center', lineHeight: 20 }}>{t('tutor.emptyBody')}</Small>
+          <Small style={{ textAlign: 'center' }}>{t('tutor.emptyBody')}</Small>
         </View>
       </View>
 
@@ -202,14 +211,21 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
                 }}
               >
                 <Text
-                  style={{
-                    flex: 1,
-                    fontFamily: F.body,
-                    fontSize: 13,
-                    lineHeight: 19,
-                    color: C.ink,
-                    textAlign: textStart(),
-                  }}
+                  style={[
+                    {
+                      flex: 1,
+                      fontFamily: F.body,
+                      fontSize: 13,
+                      lineHeight: 19,
+                      color: C.ink,
+                      textAlign: textStart(),
+                    },
+                    // A line with Urdu in it, which is every line in the Urdu
+                    // interface and a weak topic's name in the English one,
+                    // needs Nastaliq's leading: at 19 the lines overlapped
+                    // and lost their tails.
+                    isUrduScript(line) ? { ...urdu(13), flex: 1 } : null,
+                  ]}
                 >
                   {line}
                 </Text>
@@ -234,7 +250,7 @@ export default function Chat() {
     /** Open the camera on arrival, for the "Solve from a photo" tile. */
     photo?: string;
   }>();
-  const { state, actions, derived } = useApp();
+  const { state, actions, derived, contentKey } = useApp();
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
@@ -243,6 +259,9 @@ export default function Chat() {
   const scroller = useRef<ScrollView | null>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  /** A saved thread's history: loading, loaded, or failed with a retry. */
+  const [history, setHistory] = useState<'loading' | 'ready' | 'failed'>(thread ? 'loading' : 'ready');
+  const [historyTry, setHistoryTry] = useState(0);
   /**
    * A draft arrives in the box and is left alone.
    *
@@ -281,9 +300,8 @@ export default function Chat() {
     if (!uid || !/^[0-9a-f-]{36}$/i.test(messageId)) return;
     void rateTutorAnswer(supabase, { messageId, userId: uid, rating });
   };
-  const [contextLabel, setContextLabel] = useState<string | undefined>(
-    chapter ? chapterName(chapterById(chapter), lang) || undefined : undefined
-  );
+  /** The label a saved thread was stored with, for a thread with no chapter attached now. */
+  const [threadLabel, setThreadLabel] = useState<string | undefined>(undefined);
   /**
    * The chapter this thread is answering from, which the student can change.
    * It starts as whatever route they arrived by and is set again by the
@@ -291,38 +309,78 @@ export default function Chat() {
    * reciting the syllabus in general.
    */
   const [groundedId, setGroundedId] = useState<string | undefined>(chapter);
+  /*
+   * Its name, read for this screen and put in the student's language at
+   * render. It was looked up once, synchronously, when the screen opened: a
+   * Class 10 or Punjab chapter the index had not loaded yet had no name, so
+   * the label was blank, and a name picked in English stayed English after a
+   * switch to Urdu.
+   */
+  const groundedRow = useAsync(
+    () => (groundedId ? api.getChapter(groundedId) : Promise.resolve(undefined)),
+    [groundedId ?? '', contentKey],
+  );
+  const [pickedChoice, setPickedChoice] = useState<ChapterChoice | null>(null);
+  const groundedName = groundedId
+    ? chapterName(
+        groundedRow.data ?? chapterById(groundedId) ?? (pickedChoice?.id === groundedId ? pickedChoice : undefined),
+        lang,
+      )
+    : '';
+  const contextLabel = (groundedId ? groundedName : '') || threadLabel || undefined;
   const [picking, setPicking] = useState(false);
   /** The server's count, not a local guess. Null until the first fetch lands. */
   const quota = useQuota();
 
-  /** A saved thread's history, loaded once. New chats skip this entirely. */
+  /**
+   * A saved thread's history. New chats skip this entirely.
+   *
+   * Paged, because a select stops at a thousand rows without saying so and a
+   * long thread lost its newest messages. Merged in front of anything already
+   * on screen rather than replacing it, so a question sent before the history
+   * landed is not wiped. And it says when it could not load, with a retry,
+   * instead of quietly showing an empty chat.
+   */
   useEffect(() => {
     if (!thread) return;
     let alive = true;
+    const PAGE = 500;
     (async () => {
       try {
-        const [{ data: rows }, { data: meta }] = await Promise.all([
-          supabase.from('chat_messages').select('id,role,content,at').eq('thread_id', thread).order('at'),
-          supabase.from('chat_threads').select('context_label').eq('id', thread).maybeSingle(),
-        ]);
-        if (!alive || !rows) return;
-        setMessages(
-          rows.map((r) => ({
-            id: r.id as string,
-            role: r.role === 'assistant' ? ('ai' as const) : ('user' as const),
-            text: r.content as string,
-            at: Date.parse(r.at as string),
-          }))
-        );
-        if (meta?.context_label) setContextLabel((c) => c ?? (meta.context_label as string));
+        const rows: { id: string; role: string; content: string; at: string }[] = [];
+        for (let from = 0; ; from += PAGE) {
+          const { data, error } = await supabase
+            .from('chat_messages')
+            .select('id,role,content,at')
+            .eq('thread_id', thread)
+            .order('at')
+            .order('id')
+            .range(from, from + PAGE - 1);
+          if (error) throw error;
+          const page = (data ?? []) as typeof rows;
+          rows.push(...page);
+          if (page.length < PAGE) break;
+        }
+        const { data: meta } = await supabase.from('chat_threads').select('context_label').eq('id', thread).maybeSingle();
+        if (!alive) return;
+        const loaded: ChatMessage[] = rows.map((r) => ({
+          id: r.id,
+          role: r.role === 'assistant' ? ('ai' as const) : ('user' as const),
+          text: r.content,
+          at: Date.parse(r.at),
+        }));
+        const known = new Set(loaded.map((m) => m.id));
+        setMessages((now) => [...loaded, ...now.filter((m) => !known.has(m.id))]);
+        if (meta?.context_label) setThreadLabel(meta.context_label as string);
+        setHistory('ready');
       } catch {
-        // History is a nicety; the chat still works as a fresh thread.
+        if (alive) setHistory('failed');
       }
     })();
     return () => {
       alive = false;
     };
-  }, [thread]);
+  }, [thread, historyTry]);
 
   const outOfQuestions = quota !== null && quota.remaining <= 0;
 
@@ -330,6 +388,10 @@ export default function Chat() {
     const clean = text.trim();
     if ((!clean && !photo) || thinking) return;
     if (outOfQuestions) {
+      // Kept in the box, not dropped: a question that arrived from another
+      // screen used to vanish here, and it is still the question they want
+      // answered once the allowance comes back.
+      if (clean) setInput(clean);
       toast(t('tutor.limitToast'));
       return;
     }
@@ -376,15 +438,7 @@ export default function Chat() {
       setMessages((m) => m.filter((x) => x.id !== mine.id));
       setInput(clean);
       if (image) setPhoto(image);
-      const note = {
-        offline: t('tutor.offline'),
-        quota: t('tutor.limitToast'),
-        rate: t('tutor.slowDown'),
-        plan: t('tutor.planNeeded'),
-        refused: t('tutor.refused'),
-        error: t('tutor.errorReply'),
-      }[res.reason];
-      toast(note);
+      toast(t(aiFailureKey(res.reason)));
       return;
     }
 
@@ -411,7 +465,12 @@ export default function Chat() {
     try {
       if (fromCamera) {
         const perm = await ImagePicker.requestCameraPermissionsAsync();
-        if (!perm.granted) return;
+        // Said out loud: a refused permission used to make the camera button
+        // do nothing at all, which reads as a broken button.
+        if (!perm.granted) {
+          toast(t('tutor.cameraDenied'));
+          return;
+        }
       }
       const result = fromCamera
         ? await ImagePicker.launchCameraAsync({ quality: 0.6, base64: true })
@@ -512,7 +571,28 @@ export default function Chat() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {messages.length === 0 && !thinking ? <EmptyChat onStarter={setInput} /> : null}
+        {/* A saved thread on its way is not an empty chat: the greeting and
+            the starters used to show over a conversation that was loading. */}
+        {history === 'loading' && messages.length === 0 ? (
+          <View style={{ paddingVertical: S.xl, alignItems: 'center' }}>
+            <TypingDots />
+          </View>
+        ) : history === 'failed' ? (
+          <View style={{ alignItems: 'center', gap: S.sm, paddingVertical: S.md }}>
+            <Small style={{ textAlign: 'center' }}>{t('states.errorTitle')}</Small>
+            <Pill
+              tone="teal"
+              onPress={() => {
+                setHistory('loading');
+                setHistoryTry((n) => n + 1);
+              }}
+            >
+              {t('common.retry')}
+            </Pill>
+          </View>
+        ) : messages.length === 0 && !thinking ? (
+          <EmptyChat onStarter={setInput} />
+        ) : null}
 
         {messages.map((m) =>
           m.role === 'user' ? (
@@ -553,14 +633,16 @@ export default function Chat() {
             >
               {/* Markdown-aware: the model sometimes marks up its answer,
                   and students should read headings and lists, not asterisks. */}
-              <Markdown text={parseTutorActions(m.text).text} size={13.5} />
-              <AnswerActions actions={parseTutorActions(m.text).actions} />
+              <Markdown text={parseTutorActions(m.text, false, lang).text} size={13.5} />
+              <AnswerActions actions={parseTutorActions(m.text, false, lang).actions} />
               {m.steps?.map((step, i) => (
                 <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                   <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={{ fontFamily: F.bodyBold, fontSize: 11, color: C.teal }}>{i + 1}</Text>
                   </View>
-                  <Text style={{ flex: 1, fontFamily: F.body, fontSize: 13.5, lineHeight: 22, color: C.ink }}>{step}</Text>
+                  {/* In its own script's face and leading: a step in Urdu at
+                      a 22 line height overlapped the one below it. */}
+                  <ScriptText text={step} size={13.5} style={{ flex: 1 }} />
                 </Row>
               ))}
               <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
@@ -596,7 +678,9 @@ export default function Chat() {
                 <Pill
                   tone="grey"
                   onPress={() => {
-                    Clipboard.setStringAsync(m.text);
+                    // The answer as the student read it: the raw text carries
+                    // the [[practice:...]] tags the buttons are built from.
+                    Clipboard.setStringAsync(parseTutorActions(m.text, false, lang).text);
                     toast(t('tutor.copied'));
                   }}
                 >
@@ -676,12 +760,12 @@ export default function Chat() {
           >
             <Icon name="book" size={13} color={C.teal} />
             <Text numberOfLines={1} style={{ flexShrink: 1, fontFamily: F.bodyBold, fontSize: 11.5, color: C.teal }}>
-              {t('tutor.chapterAttached', { chapter: contextLabel ?? chapterName(chapterById(groundedId), lang) })}
+              {t('tutor.chapterAttached', { chapter: contextLabel ?? '' })}
             </Text>
             <Tap
               onPress={() => {
                 setGroundedId(undefined);
-                setContextLabel(undefined);
+                setThreadLabel(undefined);
               }}
               hit
             >
@@ -697,7 +781,9 @@ export default function Chat() {
         onPick={({ chapter: picked, topic }) => {
           setPicking(false);
           setGroundedId(picked.id);
-          setContextLabel(picked.title);
+          // Named from the choice until the chapter row arrives, and in the
+          // student's language either way: this used to be the English title.
+          setPickedChoice(picked);
           // A topic is a starting question; a whole chapter is only context,
           // because "explain the whole of Chemistry unit 4" is not a question
           // anybody wants answered in one go.

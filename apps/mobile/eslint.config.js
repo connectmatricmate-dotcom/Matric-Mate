@@ -25,4 +25,31 @@ module.exports = defineConfig([
     // the type shim Expo rewrites on every install.
     ignores: ['dist/*', '.expo/*', 'expo-env.d.ts'],
   },
+  {
+    /*
+     * Text and TextInput come from src/components/ui, which caps how far the
+     * phone's font size setting may enlarge them. React 19 ignores
+     * defaultProps on function components, so there is no global switch: a
+     * screen that imports react-native's own scales without limit, and at
+     * Android's largest setting its labels break mid-word and push rows off
+     * the screen. ui.tsx is the one file that wraps them. The certificates
+     * screens are not covered yet: one still imports react-native's Text.
+     */
+    files: ['app/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
+    ignores: ['src/components/ui.tsx', 'app/certificates/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'react-native',
+              importNames: ['Text', 'TextInput'],
+              message: 'Import Text and TextInput from src/components/ui: they cap font scaling (FONT_SCALE_CAP).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);

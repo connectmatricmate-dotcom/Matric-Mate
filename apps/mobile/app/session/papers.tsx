@@ -1,5 +1,5 @@
 import { Linking, View } from 'react-native';
-import { boardName, pastPaperGroups, pastPaperTitle, subjectById, subjectName } from '@matricmate/core';
+import { boardName, pastPaperGroups, pastPaperTitle, paperBoardName, subjectById, subjectName } from '@matricmate/core';
 import { Btn, Card, Empty, Header, Item, Screen, SectionTitle, Small, Spacer, useToast } from '../../src/components/ui';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -47,7 +47,9 @@ export default function Papers() {
                     key={p.key}
                     icon="doc"
                     title={pastPaperTitle(p, lang)}
-                    sub={p.boardName ? `${p.boardName} · ${hosted}` : hosted}
+                    // The board in the app's language, named as the website names it:
+                    // "BISE Multan" sat in English in the Urdu interface.
+                    sub={p.boardName ? `${paperBoardName(p.boardName, lang)} · ${hosted}` : hosted}
                     last={i === g.papers.length - 1}
                     right={<Btn title={t('session.viewPaper')} variant="line" sm onPress={() => openPaper(p.url)} />}
                   />

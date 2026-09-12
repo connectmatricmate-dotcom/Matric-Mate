@@ -5,8 +5,9 @@
  * edge on white cards. The characters live in core as data, so the web app
  * draws the same one from the same file.
  */
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { AVATARS } from '@matricmate/core';
+import { Text } from './ui';
 
 export function AvatarBadge({ index, size = 40 }: { index: number; size?: number }) {
   const avatar = AVATARS[index] ?? AVATARS[0];

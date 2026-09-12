@@ -1,44 +1,99 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Text , View } from 'react-native';
+import { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, ErrorState, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Ur, useToast } from '../../../src/components/ui';
-import { api , chapterPct, hasStudyMaterial , isUrduScript, pickAudioTrack, subjectById, subjectName } from '@matricmate/core';
+import { Btn, Card, Empty, ErrorState, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Text, Ur } from '../../../src/components/ui';
+import {
+  api,
+  belongsToChapter,
+  chapterBlurb,
+  contentFor,
+  hasStudyMaterial,
+  isAuthored,
+  isUrduScript,
+  itemKey,
+  pickAudioTrack,
+  subjectById,
+  subjectMedium,
+  subjectName,
+} from '@matricmate/core';
+import type { Chapter } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack, localChapter } from '../../../src/core/downloads';
 import { Confetti, Pop } from '../../../src/components/celebration';
+import { useChapterDownload } from '../../../src/components/ChapterDownload';
 import { LockedNotice } from '../../../src/components/LockedNotice';
+import { useOnline } from '../../../src/core/connectivity';
 import { cheer } from '../../../src/core/haptics';
 import { useAsync } from '../../../src/core/useAsync';
 import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S, alpha } from '../../../src/theme';
 
+/** A row whose counts mean something: a live row, or one with counts in it. The bundled catalogue has zeroes and no board. */
+const countsKnown = (c: Chapter): boolean => c.board !== undefined || hasStudyMaterial(c);
+
 export default function ChapterHub() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { state, actions } = useApp();
+  const { state, actions, contentKey } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const toast = useToast();
-  const [busy, setBusy] = useState(false);
-  const { data: fetchedChapter, loading: chapterLoading } = useAsync(() => api.getChapter(id), [id]);
-  /* With no signal the catalogue cannot answer for a Class 10 chapter, because
-     the bundle is Class 9. The row saved with the download can, which is what
-     keeps a downloaded chapter openable on a bus. */
-  const chapter = fetchedChapter ?? localChapter(id) ?? undefined;
-  const { data: content, reload: reloadContent } = useAsync(() => api.getChapterContent(id), [id]);
-  const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id]);
+  const online = useOnline();
+  const download = useChapterDownload(id);
+  // contentKey in every read: a language, class or board switch reaches an
+  // open chapter instead of leaving it on the old one until it is reopened.
+  const { data: fetchedChapter, loading: chapterLoading } = useAsync(() => api.getChapter(id), [id, contentKey]);
+  /*
+   * With no signal the catalogue cannot answer for a Class 10 chapter, because
+   * the bundle is Class 9. The row saved with the download can, which is what
+   * keeps a downloaded chapter openable on a bus. And it wins over a fetched
+   * row with no counts in it: offline or on a slow read FBISE Class 9 got the
+   * bundle's zero-count row, and a chapter sitting on the phone said
+   * "Nothing to revise here".
+   */
+  const saved = localChapter(id) ?? undefined;
+  const chapter = (fetchedChapter && countsKnown(fetchedChapter) ? fetchedChapter : (saved ?? fetchedChapter)) ?? undefined;
+  const { data: content, reload: reloadContent } = useAsync(() => api.getChapterContent(id), [id, contentKey]);
+  const { data: tracks } = useAsync(() => api.getAudioTracks(id), [id, contentKey]);
   // No row, no row in the grid: a chapter offers an audio lesson only once one
   // has really been recorded and published. Offline the fetch returns nothing,
   // so the copy saved with the download answers instead and a downloaded
-  // chapter keeps offering the lesson that is sitting on the phone.
-  const audio =
-    pickAudioTrack(tracks ?? [], state.settings.contentMedium) ??
-    localAudioTrack(id, state.settings.contentMedium);
+  // chapter keeps offering the lesson that is sitting on the phone. Picked in
+  // the subject's own language: an Urdu subject's lesson is Urdu for everyone.
+  const trackMedium = subjectMedium(id, state.onboarding?.board, state.settings.contentMedium);
+  const audio = pickAudioTrack(tracks ?? [], trackMedium) ?? localAudioTrack(id, trackMedium);
+
+  /**
+   * Progress from this chapter's own counts, the row resolved above and the
+   * content loaded here, not from the synchronous index.
+   *
+   * The shared chapterPct reads the index, which offline has nothing for a
+   * Class 10 chapter and zeroes for an FBISE Class 9 one, so its divisors fell
+   * to one: a single read section and a single answer made 100%, and used up
+   * the chapter's one celebration for good. Null when the counts are unknown,
+   * which shows no figure and celebrates nothing.
+   */
+  const sectionTotal = (chapter && countsKnown(chapter) ? chapter.sectionCount : 0) || content?.sections.length || 0;
+  const mcqTotal = (chapter && countsKnown(chapter) ? chapter.mcqCount : 0) || content?.mcqs.length || 0;
+  const readKeys = new Set(state.readSections.filter((s) => belongsToChapter(s, id)).map(itemKey));
+  const answered = new Set(state.attempts.filter((a) => a.chapterId === id).map((a) => a.mcqId)).size;
+  const qTarget = Math.min(mcqTotal, 10);
+  const pct: number | null =
+    sectionTotal || qTarget
+      ? Math.min(
+          100,
+          Math.round(
+            (sectionTotal ? (Math.min(readKeys.size, sectionTotal) / sectionTotal) * 70 : 0) +
+              (qTarget ? (Math.min(answered, qTarget) / qTarget) * 30 : 0),
+          ),
+        )
+      : null;
   /**
    * The 100% moment, once per chapter, ever. A student who clears a chapter
    * deserves a bigger beat than a full progress ring; a student re-visiting
-   * a cleared chapter deserves not to be confettied every time.
+   * a cleared chapter deserves not to be confettied every time. Only with
+   * real counts behind it, and only for a chapter this screen will show.
    */
-  const justCleared = chapterPct(id, state.readSections, state.attempts) >= 100 && !state.celebratedChapters.includes(id);
+  const justCleared =
+    pct !== null && pct >= 100 && !!chapter && hasStudyMaterial(chapter) && !state.celebratedChapters.includes(id);
   useEffect(() => {
     if (justCleared) {
       cheer();
@@ -67,6 +122,23 @@ export default function ChapterHub() {
     );
   }
 
+  // No row at all once the read has settled: offline on a chapter that is not
+  // on the phone, or an id this syllabus does not have (an old link, or one
+  // from before a board or class change). A blank teal card said neither.
+  if (!chapter) {
+    return (
+      <Screen>
+        <Header title=" " back />
+        <Spacer h={S.lg} />
+        {!online ? (
+          <ErrorState title={t('offline.title')} sub={t('offline.sub')} retry={t('common.retry')} onRetry={reloadContent} />
+        ) : (
+          <Empty emoji="🔍" title={t('states.notFoundTitle')} sub={t('states.notFoundBody')} />
+        )}
+      </Screen>
+    );
+  }
+
   /**
    * Paid-only gate, before any content fetch. Without a plan the RLS wall
    * returns empty content anyway; fetching and rendering that would read as
@@ -74,7 +146,13 @@ export default function ChapterHub() {
    * what is inside, and the plain-text route to a plan, which is exactly
    * what LockedNotice is allowed to say on Play.
    */
-  const locked = !!chapter && chapter.premium && !state.premium.active;
+  /*
+   * Also locked, not empty: an account with no plan reads zero counts on
+   * every chapter under row level security, and the empty-chapter screen
+   * below told it "Nothing to revise here" about a chapter full of notes.
+   */
+  const locked = !!chapter && !state.premium.active && (chapter.premium || !hasStudyMaterial(chapter));
+  const blurb = chapter ? chapterBlurb(chapter, lang) : '';
   if (locked) {
     return (
       <Screen>
@@ -85,11 +163,13 @@ export default function ChapterHub() {
           ) : (
             <H2 style={{ color: C.onBrand }}>{chapter.title}</H2>
           )}
-          {isUrduScript(chapter.blurb) ? (
-            <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{chapter.blurb}</Ur>
+          {isUrduScript(blurb) ? (
+            <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{blurb}</Ur>
           ) : (
-            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
-              {chapter.blurb}
+            // A Latin blurb keeps the Latin face in the Urdu interface: in
+            // Nastaliq this line height cut its descenders (see F.latin).
+            <Text style={{ fontFamily: F.latin.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
+              {blurb}
             </Text>
           )}
         </Card>
@@ -118,7 +198,11 @@ export default function ChapterHub() {
    */
   const contentFailed =
     !!chapter && !!content && hasStudyMaterial(chapter) &&
-    !content.sections.length && !content.mcqs.length && !content.flashcards.length;
+    ((!content.sections.length && !content.mcqs.length && !content.flashcards.length) ||
+      // The bundled FBISE sample standing in for a live chapter whose read
+      // failed: shown as if it were the chapter, it synced sample section ids
+      // as read. A live row (it has a board) never has the sample for content.
+      (chapter.board !== undefined && isAuthored(id) && content === contentFor(id)));
   if (contentFailed) {
     return (
       <Screen>
@@ -136,8 +220,14 @@ export default function ChapterHub() {
 
   // Guards a direct link or an old bookmark to a chapter the board doesn't
   // examine: no notes, audio, flashcards, MCQs, short questions or blanks
-  // exist for it, so there is nothing the usual grid could open.
-  if (chapter && !hasStudyMaterial(chapter)) {
+  // exist for it, so there is nothing the usual grid could open. Only when the
+  // row can say so: a zero-count row from the bundle knows nothing, and the
+  // content read below decides instead.
+  const nothingInIt =
+    !!chapter && countsKnown(chapter) === false
+      ? !!content && !content.sections.length && !content.mcqs.length && !content.flashcards.length
+      : !!chapter && !hasStudyMaterial(chapter);
+  if (chapter && nothingInIt) {
     return (
       <Screen>
         <Header title={t('study.chapterN', { n: chapter.number })} sub={subjectName(subjectById(chapter.subjectId), lang)} back />
@@ -147,43 +237,56 @@ export default function ChapterHub() {
           ) : (
             <H2 style={{ color: C.onBrand }}>{chapter.title}</H2>
           )}
-          {isUrduScript(chapter.blurb) ? (
-            <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{chapter.blurb}</Ur>
+          {isUrduScript(blurb) ? (
+            <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{blurb}</Ur>
           ) : (
-            <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
-              {chapter.blurb}
+            // Latin face for a Latin blurb, as above.
+            <Text style={{ fontFamily: F.latin.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
+              {blurb}
             </Text>
           )}
         </Card>
         <Spacer h={S.lg} />
-        <Empty title={t('study.emptyChapterTitle')} sub={t('study.emptyChapterBody')} />
+        {/* Offline, a chapter that is not on the phone is not an empty one. */}
+        {!online && !download.listed ? (
+          <ErrorState title={t('offline.title')} sub={t('offline.sub')} retry={t('common.retry')} onRetry={reloadContent} />
+        ) : (
+          <Empty title={t('study.emptyChapterTitle')} sub={t('study.emptyChapterBody')} />
+        )}
       </Screen>
     );
   }
 
-  const pct = chapterPct(id, state.readSections, state.attempts);
-  const downloaded = state.downloads.includes(id);
-
-
-  async function toggleDownload() {
-    setBusy(true);
-    const result = await actions.toggleDownload(id);
-    setBusy(false);
-    if (result === 'downloaded') toast(t('study.saveOffline'));
-    else if (result === 'removed') toast(t('study.removedOffline'));
-    else toast(t('downloads.saveFailed'));
-  }
-  const readCount = content ? content.sections.filter((s) => state.readSections.includes(s.id)).length : 0;
+  // Read in either medium counts once, as it does for progress everywhere else.
+  const readCount = content ? content.sections.filter((s) => readKeys.has(itemKey(s.id))).length : 0;
   const best = state.results.filter((r) => r.chapterId === id).sort((a, b) => (b.total ? b.score / b.total : 0) - (a.total ? a.score / a.total : 0))[0];
-  const knownCards = content ? content.flashcards.filter((f) => state.cardsKnown.includes(f.id)).length : 0;
+  const knownKeys = new Set(state.cardsKnown.map(itemKey));
+  const knownCards = content ? content.flashcards.filter((f) => knownKeys.has(itemKey(f.id))).length : 0;
+  const noNotes = !!content && content.sections.length === 0;
+  /**
+   * Where "Continue reading" picks up: the section they stopped at when this
+   * is the chapter they were last in, else the first one not yet read. It
+   * always opened at section one.
+   */
+  const resumeAt = content
+    ? state.lastChapterId === id
+      ? Math.min(Math.max(state.lastSectionIndex, 0), Math.max(0, content.sections.length - 1))
+      : Math.max(0, content.sections.findIndex((s) => !readKeys.has(itemKey(s.id))))
+    : 0;
 
   return (
     <Screen
       footer={
-        <Btn
-          title={readCount ? t('study.continueReading') : t('study.startReading')}
-          onPress={() => router.push(`/learn/reader/${id}`)}
-        />
+        // A chapter with questions and no notes starts with the questions:
+        // "Start reading" opened an empty reader.
+        noNotes && content?.mcqs.length ? (
+          <Btn title={t('study.mcqs')} onPress={() => router.push(`/session/setup?chapter=${id}`)} />
+        ) : (
+          <Btn
+            title={readCount ? t('study.continueReading') : t('study.startReading')}
+            onPress={() => router.push(`/learn/reader/${id}${readCount ? `?section=${resumeAt}` : ''}`)}
+          />
+        )
       }
     >
       {justCleared ? <Confetti /> : null}
@@ -199,19 +302,26 @@ export default function ChapterHub() {
         sub={chapter ? subjectName(subjectById(chapter.subjectId), lang) : ' '}
         back
         right={
-          busy ? (
+          download.busy ? (
             <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
               <ActivityIndicator size="small" color={C.teal} />
             </View>
           ) : (
             // Keyed on the state, so the icon swap replays the pop: saving a
-            // chapter visibly lands instead of just recolouring.
-            <Pop key={downloaded ? 'saved' : 'unsaved'}>
-              <IconButton icon={downloaded ? 'check' : 'download'} tone={downloaded ? 'active' : 'card'} onPress={toggleDownload} />
+            // chapter visibly lands instead of just recolouring. A tick only
+            // for a copy that opens in this language; a copy saved in the
+            // other one downloads again. Removing asks first.
+            <Pop key={download.readable ? 'saved' : 'unsaved'}>
+              <IconButton
+                icon={download.readable ? 'check' : 'download'}
+                tone={download.readable ? 'active' : 'card'}
+                onPress={download.press}
+              />
             </Pop>
           )
         }
       />
+      {download.confirm}
 
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         {state.settings.language === 'ur' && chapter?.urduTitle ? (
@@ -229,19 +339,23 @@ export default function ChapterHub() {
               : t('study.examShare', { n: chapter.examShare })}
           </Text>
         ) : null}
-        {isUrduScript(chapter?.blurb ?? '') ? (
-          <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{chapter?.blurb}</Ur>
+        {isUrduScript(blurb) ? (
+          <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{blurb}</Ur>
         ) : (
-          <Text style={{ fontFamily: F.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
-            {chapter?.blurb}
+          // Latin face for a Latin blurb, as on the locked card above.
+          <Text style={{ fontFamily: F.latin.body, fontSize: 13, lineHeight: 21, color: alpha(C.onBrand, 0.92), marginTop: 4 }}>
+            {blurb}
           </Text>
         )}
-        <Row gap={S.md} style={{ marginTop: S.md }}>
-          <View style={{ flex: 1, height: 7, backgroundColor: alpha(C.onBrand, 0.25), borderRadius: 99, overflow: 'hidden' }}>
-            <View style={{ width: `${pct}%`, height: '100%', backgroundColor: C.orange, borderRadius: 99 }} />
-          </View>
-          <Text style={{ fontFamily: F.display, fontSize: 15, color: C.onBrand }}>{pct}%</Text>
-        </Row>
+        {/* No figure while the counts are unknown, rather than a made-up one. */}
+        {pct !== null ? (
+          <Row gap={S.md} style={{ marginTop: S.md }}>
+            <View style={{ flex: 1, height: 7, backgroundColor: alpha(C.onBrand, 0.25), borderRadius: 99, overflow: 'hidden' }}>
+              <View style={{ width: `${pct}%`, height: '100%', backgroundColor: C.orange, borderRadius: 99 }} />
+            </View>
+            <Text style={{ fontFamily: F.display, fontSize: 15, color: C.onBrand }}>{pct}%</Text>
+          </Row>
+        ) : null}
       </Card>
 
       <Spacer h={S.lg} />
@@ -252,7 +366,7 @@ export default function ChapterHub() {
           sub={content ? t('study.notesSub', { n: content.sections.length, read: readCount }) : t('common.loading')}
           icon="book"
           pct={content?.sections.length ? (readCount / content.sections.length) * 100 : 0}
-          onPress={() => router.push(`/learn/reader/${id}`)}
+          onPress={() => router.push(`/learn/reader/${id}${readCount ? `?section=${resumeAt}` : ''}`)}
         />
         {audio ? (
           <Item
@@ -262,12 +376,16 @@ export default function ChapterHub() {
             onPress={() => router.push(`/learn/audio/${id}`)}
           />
         ) : null}
-        <Item
-          title={t('tutor.sheetMake')}
-          sub={t('tutor.aiMade')}
-          icon="spark"
-          onPress={() => router.push(`/learn/sheet/${id}`)}
-        />
+        {/* Written by the AI on the server, so it cannot open offline, and
+            offering it there only led to an error. */}
+        {online ? (
+          <Item
+            title={t('tutor.sheetMake')}
+            sub={t('tutor.aiMade')}
+            icon="spark"
+            onPress={() => router.push(`/learn/sheet/${id}`)}
+          />
+        ) : null}
         <Item
           title={t('study.flashcards')}
           sub={content ? t('study.flashcardsSub', { n: content.flashcards.length, known: knownCards }) : ''}
@@ -310,21 +428,25 @@ export default function ChapterHub() {
         <>
           <SectionTitle>{t('study.upNext')}</SectionTitle>
           <Card flat>
+            {/* No notes is its own case, first: "start with the notes" over a
+                button to the chapter test contradicted itself. */}
             <Small style={{ color: C.ink }}>
-              {readCount === 0
-                ? t('study.coachStart')
-                : readCount < content.sections.length
-                  ? t('study.coachKeepGoing')
-                  : t('study.coachDone')}
+              {noNotes
+                ? t('reader.noNotesTitle')
+                : readCount === 0
+                  ? t('study.coachStart')
+                  : readCount < content.sections.length
+                    ? t('study.coachKeepGoing')
+                    : t('study.coachDone')}
             </Small>
             <Spacer h={S.sm} />
             <Btn
-              title={readCount >= content.sections.length ? t('study.chapterTest') : t('study.mcqs')}
+              title={!noNotes && readCount >= content.sections.length ? t('study.chapterTest') : t('study.mcqs')}
               variant="line"
               sm
               onPress={() =>
                 router.push(
-                  readCount >= content.sections.length
+                  !noNotes && readCount >= content.sections.length
                     ? `/session/exam-intro?chapter=${id}`
                     : `/session/setup?chapter=${id}`,
                 )
@@ -335,12 +457,24 @@ export default function ChapterHub() {
       ) : null}
 
       <Spacer h={S.lg} />
-      <Row gap={S.sm}>
-        <Pill tone={downloaded ? 'green' : 'grey'} icon={downloaded ? 'check' : 'download'}>
-          {downloaded ? t('study.savedOffline') : t('study.notDownloaded')}
+      <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+        <Pill tone={download.readable ? 'green' : 'grey'} icon={download.readable ? 'check' : 'download'}>
+          {download.readable ? t('study.savedOffline') : t('study.notDownloaded')}
         </Pill>
-        {downloaded ? <Pill tone="grey">{formatBytes(chapterDownloadBytes(id))}</Pill> : null}
+        {download.listed ? <Pill tone="grey">{formatBytes(chapterDownloadBytes(id))}</Pill> : null}
       </Row>
+      {/* Saved, but in the other language: said, with the way to fix it. */}
+      {download.savedInNote ? (
+        <Card flat tint={C.orangeTint} style={{ marginTop: S.sm }}>
+          <Small>{download.savedInNote}</Small>
+          {online ? (
+            <>
+              <Spacer h={S.sm} />
+              <Btn title={t('downloads.downloadAgain')} variant="line" sm icon="download" onPress={download.press} loading={download.busy} />
+            </>
+          ) : null}
+        </Card>
+      ) : null}
     </Screen>
   );
 }

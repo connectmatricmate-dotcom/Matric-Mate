@@ -1,10 +1,11 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
+import { URDU_LINE_HEIGHT, fontSize, isUrduScript } from '@matricmate/core';
 import { AvatarBadge } from './AvatarBadge';
 import { useApp } from '../store/app';
 import { C, F, S, rowDir } from '../theme';
-import { H2, IconButton, Pill, Small, Tap } from './ui';
+import { H2, IconButton, Pill, Small, Tap, Text } from './ui';
 
 /** Tab-root header: streak → progress, gear → settings, bell → notifications.
  *  The avatar is identity, not a control: settings are behind the gear only. */
@@ -39,7 +40,20 @@ export function AppHeader({
             {eyebrow}
           </Small>
         ) : null}
-        <H2 numberOfLines={1}>{title}</H2>
+        {/* A title with Urdu in it gets the Nastaliq face and its leading even
+            in the English interface: the greeting carries the student's own
+            name, and one written in Urdu lost its descenders to the Latin
+            line height. */}
+        <H2
+          numberOfLines={1}
+          style={
+            isUrduScript(title)
+              ? { fontFamily: F.urduBold, lineHeight: Math.round(fontSize.h2 * URDU_LINE_HEIGHT) }
+              : undefined
+          }
+        >
+          {title}
+        </H2>
       </View>
 
       {right}

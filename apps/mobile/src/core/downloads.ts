@@ -53,9 +53,10 @@ import {
   Medium,
   api,
   connectLocalContent,
+  contentBoard,
   fetchChapterContentLive,
+  isOneLanguageSubject,
   pickAudioTrack,
-  setContentMedium,
 } from '@matricmate/core';
 import { audioUrl } from './audio';
 import { supabase } from '../lib/supabase';
@@ -108,6 +109,82 @@ const chapterFile = (chapterId: string): File | null => {
   return dir ? new File(dir, 'chapter.json') : null;
 };
 
+const otherMedium = (medium: Medium): Medium => (medium === 'en' ? 'ur' : 'en');
+
+/**
+ * WHAT A LANGUAGE SWITCH DOES TO A DOWNLOAD
+ *
+ * A download is saved under the medium the student had when they saved it,
+ * because for most subjects the two mediums are two different texts. So after
+ * a switch, a Physics chapter saved in English is still on the phone but is not
+ * the Urdu chapter the student now reads, and it is reported as not readable
+ * offline until it is downloaded again. It is not deleted: switching back finds
+ * it, and it still costs space until removed.
+ *
+ * The subjects written in one language are the exception. English, Urdu, and
+ * Islamiyat on the Punjab board read the same for every student, and their
+ * content is filed under both mediums, so either saved copy is the right one
+ * and a switch changes nothing about them. See subjectMedium in core.
+ *
+ * Audio is looser on purpose, the same call pickAudioTrack makes online: a
+ * lesson in the other language beats no lesson, and its track row says which
+ * language it is in, so the player can say so.
+ */
+
+/**
+ * Which saved copy of a chapter serves a student reading in `medium`, or null
+ * when nothing on disk can. Their own first, then, for a one-language subject
+ * only, the other medium's.
+ */
+function servingMedium(chapterId: string, medium: Medium): Medium | null {
+  if (snapshotFile(chapterId, medium)?.exists) return medium;
+  const other = otherMedium(medium);
+  if (isOneLanguageSubject(chapterId, contentBoard()) && snapshotFile(chapterId, other)?.exists) return other;
+  return null;
+}
+
+/**
+ * Whether a downloaded chapter can be opened offline by a student reading in
+ * `medium`. False for a chapter downloaded only in the other medium, unless it
+ * is a one-language subject (see above), and false when nothing is saved.
+ */
+export function readableOffline(chapterId: string, medium: Medium): boolean {
+  try {
+    return servingMedium(chapterId, medium) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/** The mediums a chapter's notes and questions are saved in on this phone. */
+export function savedMediums(chapterId: string): Medium[] {
+  try {
+    return (['en', 'ur'] as const).filter((m) => Boolean(snapshotFile(chapterId, m)?.exists));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Of these downloaded chapters, the ones a student reading in `medium` cannot
+ * open offline and would have to download again. What a language switch is
+ * about to cost, counted before it happens.
+ */
+export function needsDownloadIn(chapterIds: string[], medium: Medium): string[] {
+  return chapterIds.filter((id) => !readableOffline(id, medium));
+}
+
+/** The track row saved in one medium's slot, or null. */
+function savedTrack(chapterId: string, slot: Medium): AudioTrack | null {
+  try {
+    const file = audioMetaFile(chapterId, slot);
+    if (!file?.exists) return null;
+    return JSON.parse(file.textSync()) as AudioTrack;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The saved track row for a downloaded lesson.
  *
@@ -115,15 +192,14 @@ const chapterFile = (chapterId: string): File | null => {
  * student with no signal cannot fetch it. Without this the chapter hub would
  * hide the audio option for a chapter whose lesson is sitting on the phone,
  * and the player would have no duration to show.
+ *
+ * The row saved with this medium's download, then the other medium's: after a
+ * language switch the lesson already on the phone still plays, and the row's
+ * own `medium` tells the player which language it is. This is also the way to
+ * ask whether a chapter has any recording on disk at all.
  */
 export function localAudioTrack(chapterId: string, medium: Medium): AudioTrack | null {
-  try {
-    const file = audioMetaFile(chapterId, medium);
-    if (!file?.exists) return null;
-    return JSON.parse(file.textSync()) as AudioTrack;
-  } catch {
-    return null;
-  }
+  return savedTrack(chapterId, medium) ?? savedTrack(chapterId, otherMedium(medium));
 }
 
 /**
@@ -155,11 +231,28 @@ export function localChapter(chapterId: string): Chapter | null {
  *
  * The player prefers this over the streaming URL, so a downloaded chapter
  * plays with no signal and costs the student no data on a replay.
+ *
+ * `medium` is the language of the recording wanted, which is what the player
+ * asks with. A download files its MP3 under the student's medium, but the
+ * lessons for Urdu, English and Punjab Islamiyat exist in one language only,
+ * so an English-medium student's Urdu lesson sits in the `en` slot as an Urdu
+ * recording. Looked up by slot alone, the player asked for `ur` and found
+ * nothing, and every such download was dead offline. So the saved track row
+ * decides first, in either slot; the slot itself only answers for downloads
+ * made before the row was kept beside the file.
+ *
+ * It does not hand back the other language's recording when this language's
+ * is wanted: online, the player would then play a stale English file over the
+ * Urdu one it could stream. For "is any lesson on disk", ask localAudioTrack.
  */
 export function localAudioUri(chapterId: string, medium: Medium): string | null {
   try {
-    const file = audioFile(chapterId, medium);
-    return file?.exists ? file.uri : null;
+    for (const slot of [medium, otherMedium(medium)]) {
+      const file = audioFile(chapterId, slot);
+      if (file?.exists && savedTrack(chapterId, slot)?.medium === medium) return file.uri;
+    }
+    const own = audioFile(chapterId, medium);
+    return own?.exists ? own.uri : null;
   } catch {
     return null;
   }
@@ -205,10 +298,15 @@ export function formatBytes(bytes: number): string {
   return `${(kb / 1024).toFixed(1)} MB`;
 }
 
-/** Reads a chapter's offline snapshot, or null when nothing was saved for that medium. */
+/**
+ * Reads a chapter's offline snapshot, or null when nothing saved can serve
+ * that medium. A one-language subject is served from either medium's copy;
+ * see "what a language switch does" above.
+ */
 function readLocal(chapterId: string, medium: Medium): ChapterContent | null {
   try {
-    const file = snapshotFile(chapterId, medium);
+    const serving = servingMedium(chapterId, medium);
+    const file = serving ? snapshotFile(chapterId, serving) : null;
     if (!file?.exists) return null;
     return JSON.parse(file.textSync()) as ChapterContent;
   } catch {
@@ -238,8 +336,10 @@ function readLocal(chapterId: string, medium: Medium): ChapterContent | null {
  * student opens it in the plane with no signal.
  */
 export async function downloadChapter(chapterId: string, medium: Medium): Promise<void> {
-  setContentMedium(medium);
-  const content = await fetchChapterContentLive(chapterId, supabase);
+  // The medium goes to the query itself. It used to be set app-wide first,
+  // which emptied the whole content cache, and a language switch made while
+  // a download was running was undone by it.
+  const content = await fetchChapterContentLive(chapterId, supabase, medium);
 
   const dir = chapterDir(chapterId);
   const dest = snapshotFile(chapterId, medium);
@@ -320,10 +420,21 @@ export async function downloadChapter(chapterId: string, medium: Medium): Promis
   }
 }
 
-/** Removes every file this chapter has on disk, in any medium. */
+/**
+ * Removes every file this chapter has on disk, in any medium.
+ *
+ * Never throws. The class and board switches call this after the server has
+ * already said yes, and a filesystem error thrown there left the phone on the
+ * old syllabus while the account had moved on. A folder that would not delete
+ * is a few stray megabytes; the next delete or download sweeps it.
+ */
 export function deleteChapterDownload(chapterId: string): void {
-  const dir = chapterDir(chapterId);
-  if (dir?.exists) dir.delete();
+  try {
+    const dir = chapterDir(chapterId);
+    if (dir?.exists) dir.delete();
+  } catch {
+    /* see above */
+  }
 }
 
 /**
@@ -334,10 +445,16 @@ export function deleteChapterDownload(chapterId: string): void {
  * files behind those entries would live on with nothing left in state to
  * point at them, taking up space forever with no way for the student to
  * delete them from the downloads screen again.
+ *
+ * Never throws, for the same reason as deleteChapterDownload.
  */
 export function deleteAllDownloads(): void {
-  const r = root();
-  if (r?.exists) r.delete();
+  try {
+    const r = root();
+    if (r?.exists) r.delete();
+  } catch {
+    /* see deleteChapterDownload */
+  }
 }
 
 connectLocalContent(async (chapterId, medium) => readLocal(chapterId, medium));

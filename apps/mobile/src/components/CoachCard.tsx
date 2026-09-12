@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { chapterById, chapterName, chaptersFor, fetchLatestCoachReport, isUrduScript, nextAction, nextStep } from '@matricmate/core';
+import { chapterById, chapterName, fetchLatestCoachReport, isUrduScript, nextAction, nextStep, planChapterId } from '@matricmate/core';
 import { Btn, Card, Label, ScriptText, Skeleton, Small } from './ui';
 import { useAsync } from '../core/useAsync';
 import { useLang, useT } from '../i18n';
@@ -29,11 +29,16 @@ import { Markdown } from './Markdown';
  * decision again, only with more steps.
  */
 export function CoachCard() {
-  const { state, derived } = useApp();
+  const { state, derived, contentLoading } = useApp();
   const t = useT();
   const { lang } = useLang();
+  const grade = state.onboarding?.classLevel ?? 9;
+  const board = state.onboarding?.board ?? 'fbise';
 
-  const { data, loading } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '']);
+  /* Read again when the class, board or language changes, not only per
+     account: a report written for last month's syllabus, or in the other
+     language, used to sit under "This week" until the app was restarted. */
+  const { data, loading } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '', grade, board, lang]);
 
   /* The one thing to do next, chosen in core so the browser picks the same
      thing for the same student. Null when there is genuinely nothing: a
@@ -42,7 +47,8 @@ export function CoachCard() {
   const step = nextStep(
     nextAction({
       subjectIds: derived.subjects,
-      grade: state.onboarding?.classLevel ?? 9,
+      grade,
+      board,
       lastChapterId: state.lastChapterId,
       lastSectionIndex: state.lastSectionIndex,
       readSections: state.readSections,
@@ -64,7 +70,9 @@ export function CoachCard() {
    * pieces of writing in the same box, one of them wrong, on every dashboard
    * open. Shape-matched to the real card so nothing jumps when it arrives.
    */
-  if (loading) {
+  // The plan and the first chapter both wait on the chapter index, so a new
+  // student's welcome waits with them rather than naming nothing.
+  if ((loading && !data) || (!data && contentLoading && derived.plan.length === 0)) {
     return (
       <Card flat tint={C.tealTint} border={C.teal} style={{ gap: 8 }}>
         <Label style={{ color: C.teal }}>{t('tutor.coachTitle')}</Label>
@@ -83,15 +91,23 @@ export function CoachCard() {
 
   if (!data) {
     const firstName = (state.user?.name ?? '').split(' ')[0];
-    const chapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
-    const first = chapter ?? chaptersFor(derived.subjects[0] ?? 'phy')[0];
+    /* The same chapter the button below starts, chosen the same way. This
+       named the first chapter of the first subject, Matrices for everyone,
+       while the button under it started a chapter that has something in it. */
+    const firstId = planChapterId(derived.subjects, grade, state.lastChapterId, state.readSections, board);
+    const firstChapter = firstId ? chapterName(chapterById(firstId), lang) : '';
+    const steps = [
+      firstChapter ? t('tutor.coachStep1', { chapter: firstChapter }) : null,
+      t('tutor.coachStep2'),
+      t('tutor.coachStep3'),
+    ].filter((s): s is string => !!s);
     return (
       <Card flat tint={C.tealTint} border={C.teal} style={{ gap: 8 }}>
         <Label style={{ color: C.teal }}>{t('tutor.coachTitle')}</Label>
         <ScriptText text={t('tutor.coachWelcome', { name: firstName })} size={13.5} />
         <Label style={{ color: C.ink2, marginTop: 2 }}>{t('tutor.coachFirstSteps')}</Label>
         <View style={{ gap: 4 }}>
-          {[t('tutor.coachStep1', { chapter: chapterName(first, lang) }), t('tutor.coachStep2'), t('tutor.coachStep3')].map(
+          {steps.map(
             (step, i) => (
               <View key={i} style={{ flexDirection: rowDir(), alignItems: 'flex-start', gap: 6 }}>
                 <Small>{i + 1}.</Small>

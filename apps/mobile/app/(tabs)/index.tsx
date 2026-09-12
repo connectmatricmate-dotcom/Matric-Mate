@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName, SUBJECT_ICON } from '../../src/components/Icon';
@@ -13,13 +13,27 @@ import {
   Screen,
   ScriptText,
   SectionTitle,
+  Skeleton,
   Small,
   Spacer,
   Tap,
+  Text,
   TileGrid,
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
-import { SUBJECT_COLORS, accuracy, boardName, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, todayKey } from '@matricmate/core';
+import {
+  SUBJECT_COLORS,
+  accuracy,
+  boardName,
+  chapterById,
+  chapterName,
+  chapterPct,
+  formatDate,
+  inSyllabus,
+  subjectById,
+  subjectName,
+  todayKey,
+} from '@matricmate/core';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { useLang, useT } from '../../src/i18n';
@@ -27,8 +41,14 @@ import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { useAsync } from '../../src/core/useAsync';
 import { supabase } from '../../src/lib/supabase';
-import { C, F, S, alpha, rowDir } from '../../src/theme';
+import { C, F, S, alpha, rowDir, textStart } from '../../src/theme';
 
+/*
+ * The Flashcards tile names no chapter on purpose: the flashcards screen picks
+ * one of the student's own chapters that has cards, names it, and lets them
+ * change it (see PracticeChapter). It used to land on Matrices or on FBISE's
+ * `phy-1`, whatever the student's class and board.
+ */
 const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
   { label: 'dash.quickMcq', icon: 'target', href: '/session/setup' },
   { label: 'dash.quickCards', icon: 'cards', href: '/session/flashcards' },
@@ -38,7 +58,7 @@ const QUICK: { label: StringKey; icon: IconName; href: string }[] = [
 ];
 
 export default function Dashboard() {
-  const { state, derived, actions } = useApp();
+  const { state, derived, actions, contentLoading } = useApp();
   const t = useT();
   const { lang } = useLang();
   const firstName = (state.user?.name ?? t('common.student')).split(' ')[0];
@@ -85,15 +105,36 @@ export default function Dashboard() {
   const streakActiveToday = state.activeDays.includes(todayKey());
   const milestoneToday =
     streakActiveToday && MILESTONES.includes(derived.streak) && state.lastStreakCelebrated !== todayKey();
+  /**
+   * The burst, held here rather than read off the store.
+   *
+   * Marking the streak celebrated lands in the same commit that mounts the
+   * confetti, so reading `milestoneToday` for it unmounted the pieces before a
+   * single frame of them ran: only the haptic ever fired. Latched for as long
+   * as the pieces take, then let go.
+   */
+  const [burst, setBurst] = useState(false);
+  // Latched while rendering, the way React documents adjusting state to a
+  // change: the milestone is seen in this render, and the burst with it.
+  if (milestoneToday && !burst) setBurst(true);
   useEffect(() => {
-    if (milestoneToday) {
-      cheer();
-      actions.markStreakCelebrated();
-    }
+    if (!milestoneToday) return;
+    cheer();
+    actions.markStreakCelebrated();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [milestoneToday]);
+  useEffect(() => {
+    if (!burst) return;
+    const timer = setTimeout(() => setBurst(false), 2400);
+    return () => clearTimeout(timer);
+  }, [burst]);
 
-  const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
+  // Only a chapter of their own syllabus: after a board or class change the
+  // last one read belongs to the old one.
+  const lastChapter =
+    state.lastChapterId && inSyllabus(state.lastChapterId, state.onboarding?.classLevel ?? 9, state.onboarding?.board)
+      ? chapterById(state.lastChapterId)
+      : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
   const planDone = derived.plan.filter((task) => task.done).length;
   const today = formatDate(now, lang, { weekday: 'long', day: 'numeric', month: 'short' });
@@ -101,7 +142,9 @@ export default function Dashboard() {
   /** Plan labels are composed here so they follow the app language. */
   function planLabel(task: (typeof derived.plan)[number]) {
     const chapter = chapterById(task.chapterId);
-    const name = chapter ? chapterName(chapter, lang) : '';
+    // A chapter the index has not named yet (offline, say) reads as its
+    // subject, never as "Read  · 15 min" with a hole in it.
+    const name = chapter ? chapterName(chapter, lang) : subjectName(subjectById(task.subjectId), lang);
     if (task.kind === 'read') return t('dash.taskRead', { chapter: name });
     if (task.kind === 'mcq') return t('dash.taskMcq', { chapter: name });
     if (task.weakTopic) return t('dash.taskWeak', { topic: task.weakTopic, n: task.weakAccuracy ?? 0 });
@@ -116,7 +159,7 @@ export default function Dashboard() {
         {t('tutor.classBadge', { n: state.onboarding?.classLevel ?? 9, board: boardName(state.onboarding?.board, lang) })}
       </Small>
       <Spacer h={S.sm} />
-      {milestoneToday ? <Confetti /> : null}
+      {burst ? <Confetti /> : null}
 
       {/* The streak lives in the header pill alone. A second chip here said
           the same thing twice, and its entrance slide dragged the row in
@@ -126,11 +169,13 @@ export default function Dashboard() {
       <Card style={{ backgroundColor: C.teal, borderColor: C.teal }}>
         <Row>
           <H3 style={{ color: C.onBrand, flex: 1 }}>{t('dash.todayPlan')}</H3>
-          <View style={{ backgroundColor: alpha(C.onBrand, 0.18), paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 }}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: C.onBrand }}>
-              {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
-            </Text>
-          </View>
+          {derived.plan.length ? (
+            <View style={{ backgroundColor: alpha(C.onBrand, 0.18), paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 }}>
+              <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: C.onBrand }}>
+                {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
+              </Text>
+            </View>
+          ) : null}
         </Row>
 
         <View style={{ marginVertical: S.md, height: 7, backgroundColor: alpha(C.onBrand, 0.25), borderRadius: 99, overflow: 'hidden' }}>
@@ -144,6 +189,28 @@ export default function Dashboard() {
           />
         </View>
 
+        {/* No plan yet. While the chapter index is on its way the plan is
+            simply not built, so it gets a skeleton; once it has landed and
+            there is still nothing to plan from, it says so and offers the
+            chapters instead of "0/0" over an empty card. */}
+        {derived.plan.length === 0 ? (
+          contentLoading ? (
+            <View style={{ gap: 10, paddingTop: 4 }}>
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} h={16} w={i === 1 ? '70%' : '85%'} style={{ backgroundColor: alpha(C.onBrand, 0.22) }} />
+              ))}
+            </View>
+          ) : (
+            <View style={{ gap: S.sm }}>
+              <ScriptText text={t('dash.planEmpty')} size={13.5} color={C.onBrand} />
+              <Tap onPress={() => router.push('/(tabs)/study')} hit>
+                <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.onBrand, textDecorationLine: 'underline', textAlign: textStart() }}>
+                  {t('downloads.browse')}
+                </Text>
+              </Tap>
+            </View>
+          )
+        ) : null}
         {derived.plan.map((task) => (
           <View
             key={task.id}
@@ -266,11 +333,17 @@ export default function Dashboard() {
               </View>
               <View style={{ flex: 1, minWidth: 0 }}>
                 <ScriptText text={chapterName(lastChapter, lang)} face="bodyBold" size={14.5} lines={1} />
+                {/* "Section 0 of 0" is not a position: a chapter whose count
+                    is not known yet shows its subject alone. */}
                 <ScriptText
-                  text={`${subjectName(subjectById(lastChapter.subjectId), lang)} · ${t('dash.sectionOf', {
-                    a: Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount),
-                    b: lastChapter.sectionCount,
-                  })}`}
+                  text={
+                    lastChapter.sectionCount > 0
+                      ? `${subjectName(subjectById(lastChapter.subjectId), lang)} · ${t('dash.sectionOf', {
+                          a: Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount),
+                          b: lastChapter.sectionCount,
+                        })}`
+                      : subjectName(subjectById(lastChapter.subjectId), lang)
+                  }
                   size={13}
                   color={C.ink2}
                 />
@@ -300,7 +373,12 @@ export default function Dashboard() {
               style={{ flex: 1, minHeight: 58, flexDirection: rowDir(), alignItems: 'center', gap: S.sm }}
             >
               <Icon name={q.icon} color={C.teal} />
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t(q.label)}</Text>
+              {/* Shrinks beside the icon and wraps: "Topper papers" is 97dp in
+                  a 98dp slot, so any font larger than the default ran it out
+                  of the tile. */}
+              <Text numberOfLines={2} style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink, flexShrink: 1 }}>
+                {t(q.label)}
+              </Text>
             </Card>
           ),
         }))}

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, SUBJECT_ICON } from '../../src/components/Icon';
@@ -14,6 +14,7 @@ import {
   ScriptText,
   Skeleton,
   Small,
+  TextInput,
 } from '../../src/components/ui';
 import { SUBJECT_COLORS, api, boardName, chapterName, hasStudyMaterial, mediumName, subjectName, subjectPct } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
@@ -22,7 +23,7 @@ import { useApp } from '../../src/store/app';
 import { C, F, S, isWeb, rowDir, textStart } from '../../src/theme';
 
 export default function Study() {
-  const { state, derived } = useApp();
+  const { state, derived, contentKey } = useApp();
   const t = useT();
   const { lang } = useLang();
   const [q, setQ] = useState('');
@@ -30,11 +31,14 @@ export default function Study() {
   // chapter count or a "continue" chapter, so there's nothing useful to show
   // until both have arrived. Keeping them on one `loading` flag is what stops
   // the list flashing empty between "subjects in" and "chapters in".
+  // Keyed on contentKey as well as the subjects: a class, board or language
+  // change, here or from the website, used to leave the old syllabus's lists
+  // on this tab while the percentages beside them followed the new one.
   const { data: subjects, loading, error, reload } = useAsync(async () => {
     const list = await api.getSubjects(derived.subjects);
     const chapters = await Promise.all(list.map((s) => api.getChapters(s.id)));
     return list.map((s, i) => ({ s, chapters: chapters[i] }));
-  }, [derived.subjects.join()]);
+  }, [derived.subjects.join(), contentKey]);
 
   const rows = useMemo(() => {
     if (!subjects) return [];
@@ -58,7 +62,10 @@ export default function Study() {
               (c) => c.title.toLowerCase().includes(needle) || (c.urduTitle ?? '').includes(needle),
             )
       );
-  }, [subjects, q, state.readSections, state.attempts, state.lastChapterId]);
+    // contentKey is not read here and has to be listed: subjectPct reads the
+    // chapter index, which changes underneath without React knowing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subjects, q, state.readSections, state.attempts, state.lastChapterId, contentKey]);
 
   const setup = state.onboarding;
   const eyebrow = setup
@@ -100,7 +107,9 @@ export default function Study() {
         />
       </View>
 
-      {loading ? (
+      {/* Skeleton only before the first answer: a refresh after a switch keeps
+          the old list up for the moment it takes, rather than blanking it. */}
+      {loading && !subjects ? (
         <View style={{ gap: S.md }}>
           {[0, 1, 2, 3].map((i) => (
             <Card key={i} flat>

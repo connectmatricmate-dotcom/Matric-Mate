@@ -9,13 +9,59 @@
  * the sync, never the screen. See @matricmate/core's sync.ts for the shared
  * queue/merge logic and the reasoning behind it.
  */
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AI_QUOTA, Attempt, Group, Language, Medium, Notification, PlanTask, SyncOp, TestResult, XP, buildPlan, enqueueOp, flushQueue, hydrateStudyState, level, markNotificationsRead, mergeHydratedState, boardChoice, setContentBoard, setContentGrade, setContentMedium, streakFrom, syncActiveDay, syncAttempt, syncCardKnown, syncCardUnknown, syncAccountPrefs, syncPlanTask, syncReadSection, syncResult, todayKey, totalXp, wipeStudyHistory, xpForAttempt } from '@matricmate/core';
-import { useAuth } from './auth';
+import {
+  AI_QUOTA,
+  Attempt,
+  Board,
+  Group,
+  Language,
+  Medium,
+  Notification,
+  PlanTask,
+  SyncOp,
+  TestResult,
+  XP,
+  boardChoice,
+  buildPlan,
+  clearContentCache,
+  clearSyncQueue,
+  contentVersion,
+  enqueueOp,
+  flushQueue,
+  gradeChoice,
+  hydrateStudyState,
+  hydratedXp,
+  level,
+  markNotificationsRead,
+  mergeHydratedState,
+  newRowId,
+  primeAllContent,
+  setContentBoard,
+  setContentGrade,
+  setContentMedium,
+  streakFrom,
+  subscribeContent,
+  syncAccountPrefs,
+  syncActiveDay,
+  syncAttempt,
+  syncCardKnown,
+  syncCardUnknown,
+  syncPlanTask,
+  syncReadSection,
+  syncResult,
+  todayKey,
+  wipeStudyHistory,
+  xpForAttempt,
+} from '@matricmate/core';
+import type { HydratedStudyState } from '@matricmate/core';
+import { setBeforeSignOut, useAuth } from './auth';
+import { session } from './session';
 import { supabase } from '../lib/supabase';
-import { deleteAllDownloads, deleteChapterDownload, downloadChapter } from '../core/downloads';
+import { useOnline } from '../core/connectivity';
+import { deleteAllDownloads, deleteChapterDownload, downloadChapter as saveOffline } from '../core/downloads';
 import { setDarkUi, setUrduUi } from '../theme';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
@@ -28,7 +74,8 @@ const KEY = 'mm.state.v2';
  * Where a signed-in student's unsent writes wait. Keyed per user, not one
  * shared key, so a still-queued answer from whoever last used this phone can
  * never be attributed to the next person who signs in on it (a shared family
- * or classroom phone is not a hypothetical here).
+ * or classroom phone is not a hypothetical here). It is only ever loaded, and
+ * so only ever sent, under its own student's session.
  */
 const queueKey = (userId: string) => `mm.syncQueue.${userId}`;
 
@@ -52,6 +99,29 @@ function saveQueue(userId: string, queue: SyncOp[]): void {
 }
 
 /**
+ * How long a switch, a profile write or a sign-out flush waits on the network
+ * before going ahead, and how long one read of the chapter index may take.
+ * PostgREST does not reject a stalled request, it simply never settles, and
+ * every await on it here sits in front of something a student is looking at.
+ */
+const NETWORK_WAIT_MS = 8000;
+const PRIME_WAIT_MS = 15000;
+
+/** `work`, or `fallback` if it fails or has not settled within `ms`. */
+function within<T>(work: PromiseLike<T>, ms: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    Promise.resolve(work).then(
+      (value) => value,
+      () => fallback,
+    ),
+    new Promise<T>((resolve) => {
+      timer = setTimeout(() => resolve(fallback), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+}
+
+/**
  * Module constant, not an inline literal: as a literal it took a new identity
  * on every derive, which defeated every useMemo keyed on derived.subjects and
  * re-walked all chapters per state change on the progress and report screens.
@@ -65,6 +135,36 @@ export type Onboarding = {
   group: Group;
   subjects: string[];
 };
+
+const ONBOARDING_DEFAULTS: Onboarding = {
+  classLevel: 9,
+  board: 'fbise',
+  medium: 'en',
+  group: 'science',
+  subjects: [],
+};
+
+const savedSubjects = (onboarding: unknown): string[] => {
+  const list = (onboarding as { subjects?: unknown } | null)?.subjects;
+  return Array.isArray(list) ? list.filter((x): x is string => typeof x === 'string') : [];
+};
+
+/**
+ * The parts of a saved onboarding record this app can use, checked one by
+ * one: the website writes the same column, and not always every field.
+ */
+function readSaved(saved: Record<string, unknown> | null): Partial<Onboarding> {
+  const out: Partial<Onboarding> = {};
+  const grade = gradeChoice(saved);
+  if (grade) out.classLevel = grade;
+  const board = boardChoice(saved);
+  if (board) out.board = board;
+  if (saved?.medium === 'en' || saved?.medium === 'ur') out.medium = saved.medium;
+  if (saved?.group === 'science' || saved?.group === 'arts') out.group = saved.group;
+  const subjects = savedSubjects(saved);
+  if (subjects.length) out.subjects = subjects;
+  return out;
+}
 
 export type Settings = {
   /** Language of the interface. Separate from `contentMedium`, which is the syllabus language. */
@@ -89,7 +189,7 @@ export type State = {
    * Everything below is a cache of one student, and the moment a different
    * one signs in on this phone it is not merely stale, it is somebody else's.
    * Persisted so the check survives the app being killed between the two
-   * sign-ins.
+   * sign-ins. Every reset keeps it: see `restart`.
    */
   ownerId: string | null;
   user: { id: string; name: string; contact: string } | null;
@@ -166,6 +266,29 @@ const devicePrefs = (s: Settings): Settings => ({
   fontScale: s.fontScale,
 });
 
+/**
+ * The nudge preferences belong to the account, so the server's copy wins
+ * outright. Null means the student has never set them and this device's
+ * defaults stand.
+ */
+const withAccountPrefs = (s: Settings, server: HydratedStudyState): Settings =>
+  server.accountPrefs ? { ...s, ...server.accountPrefs } : s;
+
+/**
+ * Folds a hydrate into local state: the merge, the account's nudge
+ * preferences, and XP.
+ *
+ * `pending` is the queue still to be sent. With it the merge lets known cards
+ * and plan ticks follow the server except where this phone has a change on
+ * its way, and XP is the server's own total plus what it has not summed yet
+ * (hydratedXp; the server total needs migration 0039, and until then this is
+ * the old recount from local history).
+ */
+function withServer(s: State, server: HydratedStudyState, pending: SyncOp[]): State {
+  const merged = mergeHydratedState(s, server, pending);
+  return { ...merged, settings: withAccountPrefs(s.settings, server), xp: hydratedXp(merged, server, pending) };
+}
+
 /* ------------------------------------------------------------------ context */
 
 /**
@@ -178,6 +301,13 @@ type Actions = {
   /** Records that a chapter's 100% moment has been shown, so it never repeats. */
   markChapterCelebrated: (chapterId: string) => void;
   markStreakCelebrated: () => void;
+  /**
+   * Saves onboarding choices. For the first run, and for the choices that
+   * cost nothing to change (medium, subjects). A student who already has a
+   * class or board changes it with switchClass or switchBoard, which also
+   * start their progress over; this only clears the downloads and the
+   * resume point, which belong to the old syllabus whoever is asking.
+   */
   setOnboarding: (o: Partial<Onboarding>) => void;
   recordAttempt: (a: Omit<Attempt, 'id' | 'at'>) => Attempt;
   addResult: (r: Omit<TestResult, 'id' | 'at'>) => TestResult;
@@ -200,16 +330,45 @@ type Actions = {
    * downloads screen claiming offline access to a chapter with nothing
    * actually on disk, which is exactly what a plane-mode student would
    * discover at the worst possible time.
+   *
+   * Decided by state.downloads alone: a chapter listed there is removed, in
+   * every medium, even when it was saved in the other one. To fetch the
+   * current medium's copy of a chapter already listed, use downloadChapter.
    */
   toggleDownload: (chapterId: string) => Promise<'downloaded' | 'removed' | 'failed'>;
+  /**
+   * Downloads a chapter in the student's current medium, whether or not it is
+   * already listed (a chapter saved before a language switch), and never
+   * removes anything. The copy in the other medium stays.
+   */
+  downloadChapter: (chapterId: string) => Promise<'downloaded' | 'failed'>;
+  /** Removes a chapter's offline copy, in every medium. No confirmation; that is the screen's. */
+  removeDownload: (chapterId: string) => void;
   markCard: (cardId: string, known: boolean) => void;
   consumeAi: () => boolean;
   readNotifications: () => void;
   setSettings: (s: Partial<Settings>) => void;
   /** The single language switch: interface and syllabus move together. */
   setLanguage: (next: Language) => void;
-  /** Server-enforced class change; 'cooldown' when the 7-day wall says no. */
+  /**
+   * Server-enforced class change; 'cooldown' when the 7-day wall says no.
+   * Signed out (the first run, before any account exists) the choice is just
+   * corrected on the phone and resolves 'ok'.
+   */
   switchClass: (next: 9 | 10) => Promise<'ok' | 'cooldown' | 'error'>;
+  /**
+   * Board change with switchClass's contract: the profile first, then this
+   * account's server history, then the phone (downloads, progress, queued
+   * writes). 'error' when the profile write did not land, with nothing on the
+   * phone touched. Signed out it is a correction, as for switchClass.
+   */
+  switchBoard: (next: Board) => Promise<'ok' | 'error'>;
+  /**
+   * Sends every queued write now. Resolves with how many are still unsent,
+   * which is 0 unless the phone is offline. Bounded: never waits much longer
+   * than eight seconds.
+   */
+  syncNow: () => Promise<number>;
   resetDemo: () => void;
 };
 
@@ -225,6 +384,20 @@ type Ctx = {
     plan: PlanTask[];
     subjects: string[];
   };
+  /**
+   * Changes whenever what a content fetch would return can have changed: the
+   * board, the class, the medium, or the chapter index being read again
+   * (sign-in, a switch, a profile write landing, coming back online). Put it
+   * in the dependency list of every content fetch and of every memo over
+   * chapterById or chaptersFor, and a switch reaches every mounted screen.
+   */
+  contentKey: string;
+  /**
+   * True while the chapter index for the current syllabus is being read, so a
+   * list that is empty right now may not be empty in a second. False offline,
+   * where nothing is being read. Show a skeleton rather than "0 chapters".
+   */
+  contentLoading: boolean;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -238,6 +411,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * server the moment a session and a connection both exist.
    */
   const { user: authUser, entitlement, loading: authLoading } = useAuth();
+  const online = useOnline();
   const [state, setState] = useState<State>(EMPTY);
   const [localLoaded, setLocalLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -251,7 +425,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   /** Unsent study-state writes for the signed-in user, mirrored to AsyncStorage on every change. */
   const queueRef = useRef<SyncOp[]>([]);
-  const flushingRef = useRef(false);
+  /**
+   * Bumped whenever the queue is replaced rather than added to: dropped by a
+   * switch or a reset, or put aside for another account. A flush that was
+   * sending the old queue checks it on the way back, and leaves alone a queue
+   * that is no longer the one it was sending.
+   */
+  const queueGenRef = useRef(0);
+  /** The flush in flight, if any, so a second caller waits on it instead of starting another. */
+  const flushRef = useRef<Promise<void> | null>(null);
   /**
    * Which user id the server hydration (and queue load) has already run for
    * this cold start, or null for signed-out. Guards against re-running on
@@ -260,6 +442,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * second copy of `authUser` threaded through `useMemo` deps.
    */
   const syncedForRef = useRef<string | null>(null);
+  /**
+   * The account whose saved choices did not reach the server, so the next
+   * foreground tries again. See saveChoices.
+   */
+  const choicesUnsavedRef = useRef<string | null>(null);
 
   /**
    * The last day this session has queued an "I studied" row for.
@@ -276,7 +463,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * A ref, reset by definition on every app start, so the first study action
    * of each session queues one op. The queue collapses duplicates by day and
    * the write is an idempotent upsert, so the worst case is one redundant
-   * upsert per session.
+   * upsert per session. Also reset by every restart: a switch wipes the
+   * server's active days, today's included.
    */
   const activeDaySyncedRef = useRef<string | null>(null);
 
@@ -317,16 +505,74 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }, 250);
   }, [state, hydrated]);
 
-  const flush = useCallback(async (userId: string) => {
-    if (flushingRef.current) return;
-    flushingRef.current = true;
-    try {
-      const { remaining, flushed, dropped } = await flushQueue(supabase, userId, queueRef.current);
-      queueRef.current = remaining;
-      if (flushed || dropped) saveQueue(userId, remaining);
-    } finally {
-      flushingRef.current = false;
-    }
+  /**
+   * Sends the queue, in rounds.
+   *
+   * A round sends a snapshot. Anything queued while it was in flight used to
+   * be lost: the round wrote its leftovers back over the whole queue, so an
+   * answer given while the previous one was still sending (a set answered at
+   * speed) was dropped from memory and from disk without ever being sent. Now
+   * a round takes out exactly the ops that left (`settled`: sent, or refused
+   * for good), so whatever arrived meanwhile stays and goes next round.
+   */
+  const flush = useCallback((userId: string): Promise<void> => {
+    if (flushRef.current) return flushRef.current;
+    if (!queueRef.current.length) return Promise.resolve();
+    const run = (async () => {
+      for (let round = 0; round < 5; round += 1) {
+        const gen = queueGenRef.current;
+        const batch = queueRef.current;
+        if (!batch.length) return;
+        const { remaining, flushed, dropped, settled, cancelled } = await flushQueue(supabase, userId, batch);
+        // The queue this was sending has been thrown away (clearSyncQueue, see
+        // dropQueue), or a different student is signed in now. Writing
+        // anything back would resurrect ops somebody meant to discard, or file
+        // them under the wrong account.
+        if (cancelled || gen !== queueGenRef.current || syncedForRef.current !== userId) return;
+        const gone = new Set(settled);
+        queueRef.current = queueRef.current.filter((op) => !gone.has(op.id));
+        if (flushed || dropped) saveQueue(userId, queueRef.current);
+        // Stopped on an op that has to wait, which means no signal: the next
+        // foreground tries again. Or nothing new came in while sending: done.
+        if (remaining.length || !queueRef.current.length) return;
+      }
+    })()
+      .catch(() => {})
+      .finally(() => {
+        flushRef.current = null;
+      });
+    flushRef.current = run;
+    return run;
+  }, []);
+
+  /** The flush in flight, then one more for anything it left, bounded. */
+  const sendAll = useCallback(
+    (userId: string): Promise<void> =>
+      within(
+        (async () => {
+          await flush(userId);
+          if (queueRef.current.length) await flush(userId);
+        })(),
+        NETWORK_WAIT_MS,
+        undefined,
+      ),
+    [flush],
+  );
+
+  /**
+   * Empties the queue, then waits (a bounded time) for a flush already sending
+   * part of it, which clearSyncQueue stops after the write it is on. For the
+   * switches and the reset: answers queued under the old syllabus must not
+   * land after the server history is wiped, or they come back into the new
+   * one on the next hydrate. They used to, and the chapter the plan resumes on
+   * came back with them.
+   */
+  const dropQueue = useCallback((userId: string): Promise<void> => {
+    queueGenRef.current += 1;
+    queueRef.current = clearSyncQueue();
+    saveQueue(userId, []);
+    const inflight = flushRef.current;
+    return inflight ? within(inflight, NETWORK_WAIT_MS, undefined) : Promise.resolve();
   }, []);
 
   /**
@@ -348,6 +594,103 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   /**
+   * Signing out sends what is queued first, while the session still exists.
+   * Registered with the auth store, which runs it; see setBeforeSignOut.
+   */
+  useEffect(() => {
+    setBeforeSignOut(async () => {
+      const uid = syncedForRef.current;
+      if (uid) await sendAll(uid);
+    });
+    return () => setBeforeSignOut(null);
+  }, [sendAll]);
+
+  /**
+   * Bumped when a write to the profile has changed what row level security
+   * serves (a class or board landing on profiles), so the chapter index is
+   * read again under the new rules. Never read for its value.
+   */
+  const [profileEpoch, setProfileEpoch] = useState(0);
+  const syllabusChanged = useCallback(() => {
+    // Answers cached a moment ago, and the index read a moment ago, were
+    // given under the old rules, and the cache keys do not say so. The epoch
+    // bump then reads the index again (see reprime).
+    clearContentCache();
+    setProfileEpoch((e) => e + 1);
+  }, []);
+
+  /**
+   * Writes the onboarding choices, and the class that goes with them, to the
+   * account, and says whether they landed.
+   *
+   * Awaited wherever the class or board moves: row level security serves
+   * chapters by profiles.grade and profiles.board, so until this lands the
+   * database answers for the old syllabus, and the chapter index has to be
+   * read again after it, not before. A failure other than the class cooldown
+   * is remembered and retried on the next foreground, with whatever the
+   * choices are by then.
+   */
+  const saveChoices = useCallback(async (uid: string, onboarding: Onboarding): Promise<boolean> => {
+    const { error } = await within<{ error: unknown }>(
+      supabase.from('profiles').update({ onboarding, grade: onboarding.classLevel }).eq('id', uid),
+      NETWORK_WAIT_MS,
+      { error: { message: 'timeout' } },
+    );
+    const cooldown = String((error as { message?: unknown } | null)?.message ?? '').includes('grade_cooldown');
+    choicesUnsavedRef.current = error && !cooldown ? uid : null;
+    return !error;
+  }, []);
+
+  /**
+   * The phone's half of starting a syllabus over: files off disk, cached
+   * content, the chapter index and the practice session forgotten, and every
+   * piece of progress reset, keeping only whose phone this is, the account's
+   * inbox and the device's settings. The new class or board changes the key
+   * reprime watches, so the index is read again straight after.
+   *
+   * ownerId is kept on purpose. Every reset used to spread EMPTY and drop it,
+   * and with no owner recorded the sign-out check below (previousOwner) never
+   * fired, so the next student to sign in on the phone inherited the choices,
+   * any progress made since, and the downloads.
+   */
+  const restart = useCallback((onboarding: Onboarding) => {
+    deleteAllDownloads();
+    clearContentCache();
+    session.clear();
+    activeDaySyncedRef.current = null;
+    // Right away, not only on the next render: a screen reading a synchronous
+    // lookup before then must already see the new syllabus.
+    setContentGrade(onboarding.classLevel);
+    setContentBoard(onboarding.board);
+    setState((s) => ({
+      ...EMPTY,
+      ownerId: s.ownerId,
+      user: s.user,
+      settings: s.settings,
+      notifications: s.notifications,
+      onboarding,
+    }));
+  }, []);
+
+  /**
+   * The rest of a switch, once the server has said yes: queued writes from
+   * the old syllabus dropped, the server's history wiped, then the phone.
+   * The wipe is awaited now, and bounded. Fired and forgotten, it raced the
+   * flush of answers still queued from the old syllabus, which then landed
+   * after it and reappeared in the new one.
+   */
+  const startOver = useCallback(
+    async (uid: string | null, onboarding: Onboarding) => {
+      if (uid) {
+        await dropQueue(uid);
+        await within(wipeStudyHistory(supabase, uid), NETWORK_WAIT_MS, false);
+      }
+      restart(onboarding);
+    },
+    [dropQueue, restart],
+  );
+
+  /**
    * On sign-in (including the app's very first launch already signed in),
    * pull server study-state before this device shows any of it. Skipped
    * entirely for a signed-out student. Guarded by `syncedForRef` so a token
@@ -358,6 +701,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!localLoaded || authLoading) return;
     const uid = authUser?.id ?? null;
     let cancelled = false;
+    const stale = () => cancelled || syncedForRef.current !== uid;
 
     // Everything that can call setState runs inside this async body, even the
     // two branches with no real async work, so nothing here sets state
@@ -390,20 +734,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (switchedAccount) {
         // Paid chapters on disk go too. They were bought by the account that
         // is leaving, and the reader does not ask who downloaded them.
-        void deleteAllDownloads();
-        if (previousOwner) await AsyncStorage.removeItem(queueKey(previousOwner));
+        deleteAllDownloads();
+        /*
+         * The leaving student's unsent answers are no longer deleted. They
+         * sit under their own key, load only for their own session, and go
+         * the next time they sign in here; deleting them lost every answer
+         * given offline before a sign-out. Only this session's copy goes.
+         * So do cached chapters (the cache answers whoever asks, paid content
+         * included) and any practice session left in memory. clearSyncQueue
+         * also stops a send still in flight for the account that has gone;
+         * anything it did not reach is still in that account's stored queue.
+         */
+        queueGenRef.current += 1;
+        queueRef.current = clearSyncQueue();
+        clearContentCache();
+        session.clear();
+        activeDaySyncedRef.current = null;
         setState((s) => ({ ...EMPTY, ownerId: uid, settings: devicePrefs(s.settings) }));
       } else if (uid) {
         setState((s) => (s.ownerId === uid ? s : { ...s, ownerId: uid }));
       }
 
       if (!uid) {
+        queueGenRef.current += 1;
         queueRef.current = [];
         setHydrated(true);
         return;
       }
 
-      queueRef.current = await loadQueue(uid);
+      const stored = await loadQueue(uid);
+      if (stale()) return;
+      // Ahead of anything queued while it loaded, which is newer.
+      queueRef.current = [...stored, ...queueRef.current];
 
       /**
        * A device that already carries study state renders now and merges the
@@ -417,58 +779,108 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
        * six seconds at most: a student installing on a dead network gets an
        * empty but working app now and their history on the next good signal.
        */
-      const apply = (server: Awaited<ReturnType<typeof hydrateStudyState>>) => {
-        if (cancelled || syncedForRef.current !== uid) return;
+      const apply = async (server: HydratedStudyState | null): Promise<void> => {
+        if (stale() || !server) return;
+        // After a change of account the phone has no choices by definition,
+        // and stateRef may not have caught up with the reset yet: reading it
+        // could hand the previous student's choices to this one's profile.
+        const local = switchedAccount ? null : stateRef.current.onboarding;
+        const localChose = Boolean(local?.subjects?.length);
+        const saved = server.onboarding;
+        /*
+         * What the account has actually chosen. profiles.grade and
+         * profiles.board both default on a new account, so on their own they
+         * cannot tell "chose Class 9, FBISE" from "has not said". A student
+         * who picked Class 10 during onboarding, which runs signed out, was
+         * made Class 9 by their very first sign-in: the new profile read 9, and
+         * this phone took that for a switch made on the website and reset
+         * itself. So the class counts only when the saved onboarding carries
+         * one (gradeChoice), as boardChoice already did for the board. When it
+         * does, profiles.grade is the value taken: it is what the database
+         * serves.
+         */
+        const chosenGrade = gradeChoice(saved);
+        const serverGrade: 9 | 10 | null =
+          chosenGrade === null ? null : server.grade === 10 ? 10 : server.grade === 9 ? 9 : chosenGrade;
+        const serverBoard = boardChoice(saved);
+        const serverHasSubjects = savedSubjects(saved).length > 0;
+
         /**
          * The class on the SERVER wins, always. A switch made on the website
          * must reset this phone too, or one subscription quietly serves two
          * classes, which is the exact thing the client asked us to prevent.
-         * Adopting it is a full local restart: downloads off disk, progress
-         * gone, same as switching here.
+         * Adopting it is a full local restart, the same as switching here, and
+         * then the account's history for its new syllabus is merged in. That
+         * last part used to be skipped until the next cold start. The board
+         * the same way: a student who picks Punjab on the website is served
+         * Punjab by the database from then on.
          */
-        const serverGrade = server?.grade === 10 ? 10 : server?.grade === 9 ? 9 : null;
-        const localGrade = stateRef.current.onboarding?.classLevel ?? 9;
-        // The board the same way: a student who picks Punjab on the website
-        // is served Punjab by the database from then on, so this phone has to
-        // follow or it shows a syllabus the server no longer gives it.
-        const serverBoard = boardChoice(server?.onboarding);
-        const localBoard = stateRef.current.onboarding?.board ?? 'fbise';
-        if ((serverGrade && serverGrade !== localGrade) || (serverBoard && serverBoard !== localBoard)) {
-          const classLevel = serverGrade ?? localGrade;
-          const board = serverBoard ?? localBoard;
-          void deleteAllDownloads();
-          setContentGrade(classLevel);
-          setContentBoard(board);
-          setState((s) => ({
-            ...EMPTY,
-            user: s.user,
-            settings: s.settings,
-            onboarding: { ...(s.onboarding ?? { board: 'fbise', medium: 'en', group: 'science', subjects: [] }), classLevel, board },
-          }));
-          setHydrated(true);
+        if (
+          local &&
+          localChose &&
+          ((serverGrade !== null && serverGrade !== local.classLevel) || (serverBoard !== null && serverBoard !== local.board))
+        ) {
+          await dropQueue(uid);
+          if (stale()) return;
+          const onboarding: Onboarding = {
+            ...local,
+            ...(serverHasSubjects ? readSaved(saved) : {}),
+            classLevel: serverGrade ?? local.classLevel,
+            board: serverBoard ?? local.board,
+            // The medium is this phone's language too; see devicePrefs.
+            medium: local.medium,
+          };
+          restart(onboarding);
+          const pending = queueRef.current;
+          setState((s) => withServer(s, server, pending));
           return;
         }
-        if (server) {
+
+        /*
+         * A phone with no choices of its own, signing in to an account that
+         * has them: a reinstall, a new phone, or the next sibling after a
+         * sign-out. The account's choices are adopted whole, its medium
+         * included, since that is the syllabus its progress was made in. This
+         * used to fall into the class check above, compare against a default
+         * of Class 9, "adopt" the class with no subjects, and send a Class 10
+         * student on a new phone back through onboarding.
+         */
+        if (!localChose && serverHasSubjects) {
+          const choices = readSaved(saved);
+          const onboarding: Onboarding = {
+            ...ONBOARDING_DEFAULTS,
+            ...choices,
+            classLevel: serverGrade ?? (server.grade === 10 ? 10 : 9),
+          };
+          const pending = queueRef.current;
           setState((s) => {
-            const merged = mergeHydratedState(s, server);
-            // Choices already made on this device win; the server's copy is
-            // for the phone that has none, which is what a reinstall is.
-            const onboarding = s.onboarding?.subjects?.length
-              ? s.onboarding
-              : ((server.onboarding as Onboarding | null) ?? s.onboarding);
-            // The nudge preferences belong to the account, so the server's
-            // copy wins outright. Null means the student has never set them
-            // and this device's defaults stand.
-            const settings = server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings;
-            return { ...merged, onboarding, settings, xp: totalXp(merged.attempts, merged.cardsKnown) };
+            const next = withServer(s, server, pending);
+            return {
+              ...next,
+              onboarding,
+              settings: { ...next.settings, language: onboarding.medium, contentMedium: onboarding.medium },
+            };
           });
+          return;
         }
-        // The account had no saved choices but this device does: an account
-        // created before choices synced. Send them up so the next reinstall
-        // lands in the app, not back in the class picker.
-        const onb = stateRef.current.onboarding;
-        if (onb?.subjects?.length && !server?.onboarding) {
-          void supabase.from('profiles').update({ onboarding: onb }).eq('id', uid);
+
+        // Choices already made on this device win; the server's copy was for
+        // the phone that had none, handled above.
+        const pending = queueRef.current;
+        setState((s) => withServer(s, server, pending));
+
+        /*
+         * The device has choices the account does not: made during onboarding,
+         * which runs signed out, or on an account created before choices
+         * synced. Sent up and awaited, because until they land the database
+         * serves the account's defaults, and the chapter index is then read
+         * again under the right class and board. This used to run only after
+         * the class check, which had already returned for exactly the student
+         * it was for.
+         */
+        if (local && localChose && (chosenGrade === null || serverBoard === null || !serverHasSubjects)) {
+          const ok = await saveChoices(uid, local);
+          if (ok && !stale()) syllabusChanged();
         }
       };
 
@@ -490,9 +902,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       if (deviceHasState) {
         setHydrated(true);
-        void hydrateStudyState(supabase, uid).then((server) => {
-          apply(server);
-          void flush(uid);
+        void hydrateStudyState(supabase, uid).then(async (server) => {
+          await apply(server);
+          if (!stale()) void flush(uid);
         });
         return;
       }
@@ -501,8 +913,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         hydrateStudyState(supabase, uid),
         new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000)),
       ]);
-      apply(server);
-      if (cancelled || syncedForRef.current !== uid) return;
+      await apply(server);
+      if (stale()) return;
       setHydrated(true);
       void flush(uid);
     })();
@@ -510,7 +922,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [localLoaded, authLoading, authUser?.id, flush]);
+  }, [localLoaded, authLoading, authUser?.id, flush, dropQueue, restart, saveChoices, syllabusChanged]);
 
   /**
    * Retries whatever is still queued whenever the student picks the phone
@@ -519,14 +931,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * standing risks on Expo Go drift), so "the app came back to the
    * foreground" stands in for "we might have a connection again", the same
    * proxy store/auth.tsx already uses to re-check entitlement on resume.
+   * Choices that failed to save are retried on the same cue.
    */
   useEffect(() => {
     const sub = AppState.addEventListener('change', (status) => {
       const uid = syncedForRef.current;
-      if (status === 'active' && uid) void flush(uid);
+      if (status !== 'active' || !uid) return;
+      void flush(uid);
+      const onboarding = stateRef.current.onboarding;
+      if (choicesUnsavedRef.current === uid && onboarding) {
+        void saveChoices(uid, onboarding).then((ok) => {
+          if (ok && syncedForRef.current === uid) syllabusChanged();
+        });
+      }
     });
     return () => sub.remove();
-  }, [flush]);
+  }, [flush, saveChoices, syllabusChanged]);
 
   /**
    * Records today as studied, locally and on the server, exactly once per
@@ -545,14 +965,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return s.activeDays.includes(t) ? s : { ...s, activeDays: [...s.activeDays, t] };
   };
 
-  /**
-   * Keep the content layer on the student's medium.
-   *
-   * db.ts queries by medium and nothing ever set it, so every live read came
-   * back English however the student had it configured. A full Urdu
-   * translation of all nine subjects sat in the database that no Urdu-medium
-   * student could reach.
-   */
   /**
    * The home screen, live.
    *
@@ -577,23 +989,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       timer = setTimeout(async () => {
         const server = await hydrateStudyState(supabase, liveUserId);
         if (cancelled || !server) return;
-        setState((s) => {
-          const merged = mergeHydratedState(s, server);
-          return {
-            ...merged,
-            /*
-             * The server wins on plan ticks, unlike everything else here.
-             * The rest are sets that only ever grow, so a union is right for
-             * them. A tick can be taken back, and a union would quietly
-             * restore a task the student just uncrossed on their laptop.
-             */
-            planDone: server.planDone,
-            // Same reasoning: a switch turned off on the laptop must turn off
-            // here, and a merge would never let it.
-            settings: server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings,
-            xp: totalXp(merged.attempts, merged.cardsKnown),
-          };
-        });
+        /*
+         * Plan ticks and known cards follow the server here, except where this
+         * phone has a change still queued: the merge is given the queue for
+         * exactly that. A tick or a card can be taken back, and the plain
+         * union this used to be for cards quietly restored one the student had
+         * just un-marked. (Plan ticks had their own override to the same end,
+         * which also threw away a tick made here and not yet sent.) The nudge
+         * settings the same way: a switch turned off on the laptop turns off
+         * here.
+         */
+        const pending = syncedForRef.current === liveUserId ? queueRef.current : [];
+        setState((s) => withServer(s, server, pending));
       }, 1200);
     };
 
@@ -609,10 +1016,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, [liveUserId]);
 
+  /**
+   * Keep the content layer on the student's medium.
+   *
+   * db.ts queries by medium and nothing ever set it, so every live read came
+   * back English however the student had it configured. A full Urdu
+   * translation of all nine subjects sat in the database that no Urdu-medium
+   * student could reach.
+   */
   const contentMedium = state.settings.language;
-  useEffect(() => {
-    setContentMedium(contentMedium);
-  }, [contentMedium]);
+  // While rendering, like the class and board: in an effect, the screens'
+  // fetches a language switch set off ran first and came back in the old
+  // language, and stayed that way until the screen was opened again.
+  setContentMedium(contentMedium);
 
   /**
    * The same switch drives how the interface is drawn: Nastaliq type, and the
@@ -633,8 +1049,68 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // have already read the old syllabus, with nothing to make them read again.
   // That would leave a Punjab student looking at FBISE's chapters.
   const classLevel = state.onboarding?.classLevel ?? 9;
+  const board: Board = state.onboarding?.board ?? 'fbise';
   setContentGrade(classLevel);
-  setContentBoard(state.onboarding?.board ?? 'fbise');
+  setContentBoard(board);
+
+  /**
+   * The chapter index behind every synchronous lookup (chapterById,
+   * chaptersFor, the plan), and which syllabus it was last read for.
+   *
+   * It used to be read once, at import, before the stored session was even
+   * back, and never again. A fresh install primed nothing (chapters are
+   * readable only when signed in), and nothing re-read it after sign-in,
+   * sign-up or a class, board or language change, so Class 10 and Punjab
+   * students had empty lookups and an empty plan, and FBISE Class 9 students
+   * the bundle's zero counts, until something else happened to read them.
+   *
+   * Reads run one at a time, and a request made while one is in flight runs
+   * once more after it, so `primed.key` says exactly which syllabus the last
+   * finished read was for: that is what contentLoading compares. (Core drops
+   * a read that started before a switch, so an old one cannot land over a new
+   * one either way.)
+   */
+  const [primed, setPrimed] = useState<{ key: string; version: number }>({ key: '', version: 0 });
+  const primeRef = useRef<{ running: boolean; wanted: string }>({ running: false, wanted: '' });
+  const reprime = useCallback((key: string) => {
+    const p = primeRef.current;
+    p.wanted = key;
+    if (p.running) return;
+    p.running = true;
+    void (async () => {
+      let ran = '';
+      try {
+        while (ran !== p.wanted) {
+          ran = p.wanted;
+          await within(primeAllContent(), PRIME_WAIT_MS, undefined);
+        }
+      } finally {
+        p.running = false;
+        setPrimed((s) => ({ key: ran, version: s.version + 1 }));
+      }
+    })();
+  }, []);
+
+  // Who is asking matters as much as what: row level security answers per
+  // account, and a signed-out read returns nothing at all.
+  const syllabusKey = `${liveUserId ?? '-'}:${board}:${classLevel}:${contentMedium}:${profileEpoch}`;
+  useEffect(() => {
+    // Offline there is nothing to read it from; coming back online reads it
+    // again, which is also what refreshes screens that loaded without signal.
+    if (!localLoaded || authLoading || !online) return;
+    reprime(syllabusKey);
+  }, [localLoaded, authLoading, online, syllabusKey, reprime]);
+
+  /*
+   * Core's own count of changes to the index: it moves when any read changes
+   * it (a screen's chapter fetch included, not only the reads above), and on
+   * a syllabus or medium change. Read after the setters above, which can move
+   * it during this very render; core tells subscribers in a microtask, so the
+   * render that follows is the one that sees it.
+   */
+  const indexVersion = useSyncExternalStore(subscribeContent, contentVersion, contentVersion);
+  const contentKey = `${board}:${classLevel}:${contentMedium}:${indexVersion}.${primed.version}`;
+  const contentLoading = online && primed.key !== syllabusKey;
 
   const actions = useMemo<Actions>(
     () => ({
@@ -646,29 +1122,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ),
       markStreakCelebrated: () => setState((s) => ({ ...s, lastStreakCelebrated: todayKey() })),
       setOnboarding: (o) => {
-        // A different board makes every downloaded chapter the old board's.
-        // The first choice (no board yet) has nothing on disk to clear.
-        const previousBoard = stateRef.current.onboarding?.board;
-        if (o.board && previousBoard && o.board !== previousBoard) void deleteAllDownloads();
-        const onboarding: Onboarding = {
-          classLevel: 9,
-          board: 'fbise',
-          medium: 'en',
-          group: 'science',
-          subjects: [],
-          ...(stateRef.current.onboarding ?? {}),
-          ...o,
-        };
-        setState((s) => ({ ...s, onboarding }));
-        // Fire and forget: choices follow the account so a reinstall skips
-        // this flow. Signed out (the very first run) there is no account row
-        // yet; the hydration reconciliation above pushes them up after
-        // sign-in instead.
+        const before = stateRef.current.onboarding;
+        const onboarding: Onboarding = { ...ONBOARDING_DEFAULTS, ...(before ?? {}), ...o };
+        /*
+         * A different board or class makes every downloaded chapter the old
+         * syllabus's, and the chapter the plan resumes on with them. The very
+         * first choice has nothing to clear. The files used to go and the list
+         * of them stay, so the downloads screen showed "0 KB" rows for
+         * chapters no longer on the phone.
+         */
+        const moved = Boolean(before) && (onboarding.board !== before?.board || onboarding.classLevel !== before?.classLevel);
+        if (moved) deleteAllDownloads();
+        setState((s) => ({
+          ...s,
+          onboarding,
+          ...(moved ? { downloads: [], lastChapterId: undefined, lastSectionIndex: 0 } : {}),
+        }));
+        // Choices follow the account so a reinstall skips this flow. Signed
+        // out (the very first run) there is no account row yet; the hydration
+        // above sends them up after sign-in instead. When the class or board
+        // moved, the chapter index is read again once the database serves it.
         const uid = syncedForRef.current;
-        if (uid) void supabase.from('profiles').update({ onboarding, grade: onboarding.classLevel }).eq('id', uid);
+        if (uid) {
+          void saveChoices(uid, onboarding).then((ok) => {
+            if (ok && moved && syncedForRef.current === uid) syllabusChanged();
+          });
+        }
       },
       recordAttempt: (a) => {
-        const full: Attempt = { ...a, id: `a-${Date.now()}-${Math.round(Math.random() * 1e4)}`, at: Date.now() };
+        /*
+         * One id for the answer here and its row in Postgres. It had a local
+         * `a-<time>` id while the row went up under another, so the next
+         * hydrate saw two answers where there was one: attempts doubled, XP
+         * doubled, and a weak topic appeared after two real mistakes.
+         */
+        const full: Attempt = { ...a, id: newRowId(), at: Date.now() };
         setState((s) =>
           touchToday({
             ...s,
@@ -688,7 +1176,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return full;
       },
       addResult: (r) => {
-        const full: TestResult = { ...r, id: `r-${Date.now()}`, at: Date.now() };
+        // The same single id as an attempt, for the same reason.
+        const full: TestResult = { ...r, id: newRowId(), at: Date.now() };
         setState((s) => touchToday({ ...s, results: [full, ...s.results] }));
         queueAndFlush(syncResult(full));
         markDayActive();
@@ -741,12 +1230,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           return 'removed';
         }
         try {
-          await downloadChapter(chapterId, stateRef.current.settings.contentMedium);
+          await saveOffline(chapterId, stateRef.current.settings.contentMedium);
         } catch {
           return 'failed';
         }
         setState((s) => (s.downloads.includes(chapterId) ? s : { ...s, downloads: [...s.downloads, chapterId] }));
         return 'downloaded';
+      },
+      downloadChapter: async (chapterId) => {
+        try {
+          await saveOffline(chapterId, stateRef.current.settings.contentMedium);
+        } catch {
+          return 'failed';
+        }
+        setState((s) => (s.downloads.includes(chapterId) ? s : { ...s, downloads: [...s.downloads, chapterId] }));
+        return 'downloaded';
+      },
+      removeDownload: (chapterId) => {
+        deleteChapterDownload(chapterId);
+        setState((s) => ({ ...s, downloads: s.downloads.filter((x) => x !== chapterId) }));
       },
       markCard: (cardId, known) => {
         const wasKnown = stateRef.current.cardsKnown.includes(cardId);
@@ -833,6 +1335,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
        * split, so nothing can drift: the interface setting, the content
        * medium the query layer filters on, and the medium stored on the
        * profile that the website's server reads.
+       *
+       * Downloads are left as they are. See "what a language switch does to a
+       * download" in core/downloads.ts for what that means for each subject.
        */
       setLanguage: (next) => {
         setState((s) => ({
@@ -849,46 +1354,88 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       /**
        * Change class, the four-step contract: server first (the trigger there
        * enforces the 7 day cooldown and RLS follows profiles.grade), then
-       * disk, then server history, then local state. Server-first on purpose:
-       * if the cooldown rejects it, nothing local has been touched yet.
+       * queued writes and server history, then disk and local state.
+       * Server-first on purpose: if the cooldown rejects it, nothing local has
+       * been touched yet.
+       *
+       * Signed out there is no account to ask and no history to lose: that is
+       * the first run, where a student who went back and picked the other
+       * class used to meet an error they could not get past.
        */
       switchClass: async (next) => {
-        const uid = authUser?.id;
-        if (!uid) return 'error';
+        const uid = authUser?.id ?? null;
         const current = stateRef.current.onboarding;
-        const onboarding: Onboarding = {
-          board: 'fbise',
-          medium: 'en',
-          group: 'science',
-          subjects: [],
-          ...(current ?? {}),
-          classLevel: next,
-        };
-        const { error } = await supabase.from('profiles').update({ grade: next, onboarding }).eq('id', uid);
-        if (error) return String(error.message).includes('grade_cooldown') ? 'cooldown' : 'error';
-        deleteAllDownloads();
-        void wipeStudyHistory(supabase, uid);
-        setContentGrade(next);
-        setState((s) => ({ ...EMPTY, user: s.user, settings: s.settings, onboarding }));
+        // Already there: nothing to change, and certainly nothing to wipe.
+        if (current && current.classLevel === next) return 'ok';
+        const onboarding: Onboarding = { ...ONBOARDING_DEFAULTS, ...(current ?? {}), classLevel: next };
+        if (uid) {
+          const { error } = await within<{ error: unknown }>(
+            supabase.from('profiles').update({ grade: next, onboarding }).eq('id', uid),
+            NETWORK_WAIT_MS,
+            { error: { message: 'timeout' } },
+          );
+          if (error) {
+            return String((error as { message?: unknown }).message ?? '').includes('grade_cooldown') ? 'cooldown' : 'error';
+          }
+        }
+        await startOver(uid, onboarding);
         return 'ok';
+      },
+      /**
+       * Change board, the same contract as switchClass.
+       *
+       * It used to be a plain setOnboarding: instant, no warning, the files
+       * deleted but the list of them kept, and every attempt, result and read
+       * section from the old board kept here and on the server. The plan and
+       * Continue then opened chapters the database no longer serves, and other
+       * devices merged the old board's attempts back in on their next sync.
+       * There is no cooldown on a board (the database has none), so the only
+       * failure is the write not landing, and then nothing here is touched.
+       */
+      switchBoard: async (next) => {
+        const uid = authUser?.id ?? null;
+        const current = stateRef.current.onboarding;
+        if (current && current.board === next) return 'ok';
+        const onboarding: Onboarding = { ...ONBOARDING_DEFAULTS, ...(current ?? {}), board: next };
+        if (uid) {
+          // profiles.board follows the onboarding record (migration 0036).
+          const { error } = await within<{ error: unknown }>(
+            supabase.from('profiles').update({ onboarding }).eq('id', uid),
+            NETWORK_WAIT_MS,
+            { error: { message: 'timeout' } },
+          );
+          if (error) return 'error';
+        }
+        await startOver(uid, onboarding);
+        return 'ok';
+      },
+      syncNow: async () => {
+        const uid = syncedForRef.current;
+        if (uid) await sendAll(uid);
+        return queueRef.current.length;
       },
       resetDemo: () => {
         // Files on disk, not just the state pointing at them: otherwise every
         // download from before the reset keeps its space on the phone with no
         // entry left in state.downloads to delete it from again.
         deleteAllDownloads();
+        session.clear();
+        activeDaySyncedRef.current = null;
         // And the server, not just this device. Progress syncs now, so a local
         // clear is undone by the next hydration: the student presses reset,
         // sees zero, reopens the app and their history is back. Not awaited,
         // because the screen should respond at once, and a failed delete leaves
         // rows that the next reset will catch rather than anything broken.
+        // The queue goes first, or answers still waiting to send land after
+        // the wipe and bring part of the history straight back.
         const uid = authUser?.id;
-        if (uid) void wipeStudyHistory(supabase, uid);
+        if (uid) void dropQueue(uid).then(() => wipeStudyHistory(supabase, uid));
         /* Notifications survive. They belong to the account, nothing here can
            delete them, and blanking them locally only made the inbox look
            cleared until the next hydration read every one of them back. */
         setState((s) => ({
           ...EMPTY,
+          ownerId: s.ownerId,
           user: s.user,
           onboarding: s.onboarding,
           settings: s.settings,
@@ -896,7 +1443,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }));
       },
     }),
-    [queueAndFlush, markDayActive, authUser?.id],
+    [queueAndFlush, markDayActive, authUser?.id, saveChoices, syllabusChanged, startOver, dropQueue, sendAll],
   );
 
   /**
@@ -940,11 +1487,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       aiLeft: Math.max(0, aiLimit - usedToday),
       aiLimit,
       subjects,
+      // Can be empty while the index loads (contentLoading): the plan no
+      // longer falls back to a chapter whose counts it cannot see.
       plan: buildPlan({
         subjectIds: subjects,
-        // The student's own class, so the plan can never point at the other
-        // one's syllabus. See planChapterId.
+        // The student's own class and board, so the plan can never point at
+        // another syllabus. See planChapterId.
         grade: view.onboarding?.classLevel ?? 9,
+        board: view.onboarding?.board ?? 'fbise',
         lastChapterId: view.lastChapterId,
         attempts: view.attempts,
         doneIds: view.planDone,
@@ -954,9 +1504,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         cardsKnown: view.cardsKnown,
       }),
     };
-  }, [view]);
+    // The index versions are not read here, and have to be listed: buildPlan
+    // reads the chapter index through synchronous lookups that change
+    // underneath without React knowing, so the plan is rebuilt each time it does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, indexVersion, primed.version]);
 
-  return <AppCtx.Provider value={{ state: view, hydrated, actions, derived }}>{children}</AppCtx.Provider>;
+  return (
+    <AppCtx.Provider value={{ state: view, hydrated, actions, derived, contentKey, contentLoading }}>
+      {children}
+    </AppCtx.Provider>
+  );
 }
 
 export function useApp(): Ctx {

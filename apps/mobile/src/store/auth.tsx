@@ -1,4 +1,4 @@
-import { normaliseMobile } from '@matricmate/core';
+import { normaliseMobile, setQuotaUser } from '@matricmate/core';
 import type { StringKey } from '@matricmate/core';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
@@ -48,6 +48,61 @@ const OFFLINE_GRACE_MS = 30 * 24 * 60 * 60 * 1000;
  * screen that cannot decide what it is.
  */
 const ENTITLEMENT_TIMEOUT_MS = 8000;
+
+/**
+ * The same bound for the profile read (name and role), which the splash waits
+ * on for a signed-in cold start. It had none, and PostgREST does not reject a
+ * stalled request, so on a dead connection the app sat on its logo.
+ */
+const PROFILE_TIMEOUT_MS = 8000;
+
+/**
+ * The shortest gap between two quiet re-checks of the same signed-in account.
+ *
+ * The auth client reports the same session twice at every cold start (the
+ * stored one read back, then the same one as an event) and again on every
+ * token refresh. One re-read covers all of those.
+ */
+const SAME_USER_RECHECK_MS = 60_000;
+
+/** How long signing out waits for unsent answers, and for the push handover, before going ahead. */
+const SIGN_OUT_FLUSH_MS = 6000;
+const PUSH_RELEASE_MS = 4000;
+
+/**
+ * Waits for `work`, but never longer than `ms`, and never throws. Used where
+ * a stalled request would otherwise hold a student on a button that does not
+ * answer; whatever was still running carries on in the background.
+ */
+async function settle(work: Promise<unknown>, ms: number): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      work.catch(() => {}),
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, ms);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Work that has to finish while the session still exists, registered by the
+ * study store (store/app.tsx), which sits below this provider and so cannot be
+ * reached from it any other way.
+ *
+ * It sends the answers still waiting in the offline queue. Signing out wipes
+ * the phone's copy of the student's progress, and it used to do so with
+ * answers given offline still unsent, while the dialog in front of it promised
+ * that progress stayed saved.
+ */
+let beforeSignOut: (() => Promise<void>) | null = null;
+
+export function setBeforeSignOut(work: (() => Promise<void>) | null): void {
+  beforeSignOut = work;
+}
 
 type CachedEntitlement = Entitlement & { cachedAt?: number };
 
@@ -185,6 +240,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /** Guards against a slow response from a previous user overwriting the current one. */
   const currentUserId = useRef<string | null>(null);
+  /** The account whose profile has been read successfully, so a failed re-read can keep it. */
+  const profileReadFor = useRef<string | null>(null);
+  /** When the signed-in account was last re-checked, for SAME_USER_RECHECK_MS. */
+  const checkedAt = useRef(0);
 
   const loadEntitlement = useCallback(async (userId: string) => {
     setChecking(true);
@@ -235,15 +294,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase.from('profiles').select('name,role').eq('id', userId).maybeSingle();
-    if (currentUserId.current === userId) {
-      setProfileName(data?.name ?? null);
-      const r = data?.role;
-      setRole(r === 'affiliate' || r === 'admin' ? r : 'student');
-      // Even on a failed read: the answer is then "student", the old behaviour,
-      // and holding the splash forever would be worse than that default.
-      setRoleReady(true);
+    type ProfileRow = { name?: string | null; role?: string | null };
+    let row = null as ProfileRow | null;
+    let failed = false;
+    try {
+      // Raced against a timeout, for the same reason as the entitlement read.
+      const { data, error } = await Promise.race([
+        supabase.from('profiles').select('name,role').eq('id', userId).maybeSingle(),
+        new Promise<{ data: null; error: { message: string } }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), PROFILE_TIMEOUT_MS),
+        ),
+      ]);
+      row = data as ProfileRow | null;
+      failed = Boolean(error);
+    } catch {
+      failed = true;
     }
+    if (currentUserId.current !== userId) return;
+    // A failed re-read of an account already on screen changes nothing: its
+    // name and role were read a moment ago and have not stopped being true.
+    if (failed && profileReadFor.current === userId) return;
+    if (!failed) profileReadFor.current = userId;
+    setProfileName(row?.name ?? null);
+    const r = row?.role;
+    setRole(r === 'affiliate' || r === 'admin' ? r : 'student');
+    // Even on a failed read: the answer is then "student", the old behaviour,
+    // and holding the splash forever would be worse than that default.
+    setRoleReady(true);
   }, []);
 
   /** Applies a session change: remember who it is, then fetch what they own. */
@@ -251,7 +328,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (next: Session | null) => {
       setSession(next);
       const id = next?.user.id ?? null;
+      const sameUser = id !== null && id === currentUserId.current;
       currentUserId.current = id;
+      // Whose AI count the shared quota store holds. A different account, or
+      // none, empties it, and answers to requests made for the previous one
+      // are refused from then on: the next student on a shared phone used to
+      // inherit the last one's count, and a chat box disabled for the day.
+      // The same account again changes nothing, so a token refresh is free.
+      setQuotaUser(id);
 
       if (!id) {
         setEntitlement(NONE);
@@ -259,8 +343,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfileName(null);
         setRole('student');
         setRoleReady(false);
+        profileReadFor.current = null;
         return;
       }
+      /*
+       * The same account again: a token refresh, which comes about hourly and
+       * on every resume after a long background, or the start-up session
+       * reported a second time. What this student has paid for and who they
+       * are did not change with their token, so nothing is taken down while
+       * it is re-checked. Dropping both ready flags here swapped all five tabs
+       * for a spinner and remounted them, so every refresh threw away each
+       * tab's scroll position and state and refetched everything.
+       */
+      if (sameUser) {
+        if (Date.now() - checkedAt.current < SAME_USER_RECHECK_MS) return;
+        checkedAt.current = Date.now();
+        void loadEntitlement(id);
+        void loadProfile(id);
+        return;
+      }
+      checkedAt.current = Date.now();
       setRoleReady(false);
       setEntitlementReady(false);
       // Cached value first so the UI is right immediately, server second. Goes
@@ -399,10 +501,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
 
       async signOut() {
+        // Unsent answers first, while the session that owns them still exists.
+        // Bounded, because a student on no signal must still be able to sign
+        // out; what cannot be sent now stays queued under their own account
+        // and goes the next time they sign in on this phone.
+        if (beforeSignOut) await settle(beforeSignOut(), SIGN_OUT_FLUSH_MS);
         // Before the session goes, not after: the phone has to be handed back
         // while we can still prove who is handing it over. Otherwise the next
         // student to sign in on this device inherits the last one's push.
-        await releasePushToken();
+        // Bounded too: fetching the device token can hang with no signal.
+        await settle(releasePushToken(), PUSH_RELEASE_MS);
         await supabase.auth.signOut();
         const id = currentUserId.current;
         // Drop the cached entitlement with the session. Leaving it behind would

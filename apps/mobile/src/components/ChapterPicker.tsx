@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import {
+  api,
   chapterChoices,
   chapterName,
   fetchChapterTopics,
@@ -15,7 +16,7 @@ import { useLang, useT } from '../i18n';
 import { useApp } from '../store/app';
 import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../theme';
 import { Icon } from './Icon';
-import { Sheet, Small, Tap } from './ui';
+import { Sheet, Small, Tap, Text, TextInput } from './ui';
 
 /**
  * Choosing what the tutor should answer from: subject, then chapter, then the
@@ -42,22 +43,33 @@ export type ChapterPick = { chapter: ChapterChoice; topic?: string };
 
 type Level = { kind: 'subjects' } | { kind: 'chapters'; subjectId: string } | { kind: 'topics'; chapter: ChapterChoice };
 
-export function ChapterPicker(props: { visible: boolean; onClose: () => void; onPick: (pick: ChapterPick) => void }) {
+export function ChapterPicker(props: {
+  visible: boolean;
+  onClose: () => void;
+  onPick: (pick: ChapterPick) => void;
+  /**
+   * Stop at the chapter. The practice screens want a chapter and nothing
+   * inside it, so a third tap on "The whole chapter" would be a tap for
+   * nothing.
+   */
+  chapterOnly?: boolean;
+}) {
   const t = useT();
   /* Mounted only while open, which is what resets it: somebody who backed out
      of Chemistry last time is not usually coming back to Chemistry. */
   if (!props.visible) return null;
   /* One stable title on the sheet; where you are in the tree is the
-     breadcrumb inside it. */
+     breadcrumb inside it. The list below brings its own scroller, so the
+     search box stays put above it rather than scrolling away. */
   return (
-    <Sheet visible onClose={props.onClose} title={t('tutor.pickChapterTitle')}>
-      <Picking onPick={props.onPick} />
+    <Sheet visible onClose={props.onClose} title={t('tutor.pickChapterTitle')} scroll={false}>
+      <Picking onPick={props.onPick} chapterOnly={props.chapterOnly} />
     </Sheet>
   );
 }
 
-function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
-  const { derived } = useApp();
+function Picking({ onPick, chapterOnly }: { onPick: (pick: ChapterPick) => void; chapterOnly?: boolean }) {
+  const { derived, contentKey, contentLoading } = useApp();
   const t = useT();
   const { lang } = useLang();
   const [level, setLevel] = useState<Level>({ kind: 'subjects' });
@@ -66,7 +78,63 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
    *  synchronous setState the moment the level changes. */
   const [topics, setTopics] = useState<{ forChapter: string; list: string[] } | null>(null);
 
-  const choices = useMemo(() => chapterChoices(derived.subjects), [derived.subjects]);
+  // contentKey is not read here and has to be listed: chapterChoices reads the
+  // chapter index, which fills in (or changes syllabus) underneath without
+  // React knowing, and a picker opened a second early used to stay on "0".
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const choices = useMemo(() => chapterChoices(derived.subjects), [derived.subjects, contentKey]);
+
+  /**
+   * A subject the index has nothing for yet is read when it is opened.
+   *
+   * The lists above come from the synchronous index, and a Class 10 or Punjab
+   * student who opened this before it had loaded saw "0 chapters" on every
+   * subject and an empty list under each. Keyed by subject and syllabus, so a
+   * list read before a switch is never shown after it.
+   */
+  const [fetched, setFetched] = useState<Record<string, ChapterChoice[]>>({});
+  const opened = level.kind === 'chapters' ? level.subjectId : null;
+  const fetchKey = opened ? `${contentKey}|${opened}` : null;
+  const haveOpened = opened ? choices.some((c) => c.subjectId === opened) : true;
+  useEffect(() => {
+    if (!opened || !fetchKey || haveOpened) return;
+    let alive = true;
+    const subject = subjectById(opened);
+    api.getChapters(opened).then(
+      (rows) => {
+        if (!alive) return;
+        setFetched((f) => ({
+          ...f,
+          [fetchKey]: rows.map((c) => ({
+            id: c.id,
+            title: c.title,
+            urduTitle: c.urduTitle,
+            subjectId: opened,
+            subjectName: subject?.name ?? opened,
+            subjectUrduName: subject?.urduName,
+            number: c.number,
+          })),
+        }));
+      },
+      // A failed read settles as an empty list, so the spinner gives way to
+      // the "no chapters" line instead of turning forever.
+      () => {
+        if (alive) setFetched((f) => ({ ...f, [fetchKey]: [] }));
+      },
+    );
+    return () => {
+      alive = false;
+    };
+  }, [opened, fetchKey, haveOpened]);
+
+  const listFor = (sid: string): ChapterChoice[] => {
+    const own = choices.filter((c) => c.subjectId === sid);
+    return own.length ? own : (fetched[`${contentKey}|${sid}`] ?? []);
+  };
+  /** Nothing to show yet, and something is still on its way. */
+  const stillLoading = (sid: string): boolean =>
+    listFor(sid).length === 0 && (contentLoading || (opened === sid && !fetched[`${contentKey}|${sid}`]));
+  const pickChapter = (c: ChapterChoice) => (chapterOnly ? onPick({ chapter: c }) : setLevel({ kind: 'topics', chapter: c }));
 
   /* Section headings are the only part of this that needs the network, so
      they are fetched when the third level is actually opened, not before. */
@@ -141,9 +209,13 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
         ) : null}
       </View>
 
-      {/* Bounded, so a subject with thirteen chapters cannot push the search
-          box off the screen, and the list scrolls under it instead. */}
-      <ScrollView style={{ maxHeight: 330 }} keyboardShouldPersistTaps="handled">
+      {/* Takes whatever height the sheet has left and scrolls within it, so a
+          subject with thirteen chapters cannot push the search box off the
+          screen. It used to be a fixed 330, inside a sheet with its own cap:
+          in Urdu on a short phone the two did not fit together and the last
+          rows could never be scrolled into view, and with the keyboard up the
+          list sat behind it. */}
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} keyboardShouldPersistTaps="handled">
         {searching ? (
           hits.length === 0 ? (
             <Blank text={t('tutor.mentionNone')} />
@@ -155,7 +227,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
                 title={chapterName(c, lang)}
                 sub={lang === 'ur' ? (c.subjectUrduName ?? c.subjectName) : c.subjectName}
                 last={i === hits.length - 1}
-                onPress={() => setLevel({ kind: 'topics', chapter: c })}
+                onPress={() => pickChapter(c)}
               />
             ))
           )
@@ -163,29 +235,40 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
           derived.subjects.map((sid, i) => {
             const subject = subjectById(sid);
             const count = choices.filter((c) => c.subjectId === sid).length;
+            // A subject the index has not answered for yet is not a subject
+            // with no chapters: it says so rather than "0 chapters".
+            const waiting = count === 0 && contentLoading;
             return (
               <RowItem
                 key={sid}
-                badge={String(count)}
+                badge={waiting ? '…' : String(count)}
                 title={subjectName(subject, lang) || sid}
-                sub={t('tutor.chapterCount', { n: count })}
+                sub={waiting ? t('common.loading') : count ? t('tutor.chapterCount', { n: count }) : undefined}
                 last={i === derived.subjects.length - 1}
                 onPress={() => setLevel({ kind: 'chapters', subjectId: sid })}
               />
             );
           })
         ) : level.kind === 'chapters' ? (
-          choices
-            .filter((c) => c.subjectId === level.subjectId)
-            .map((c, i, all) => (
+          listFor(level.subjectId).length === 0 ? (
+            stillLoading(level.subjectId) ? (
+              <View style={{ paddingVertical: S.lg, alignItems: 'center' }}>
+                <ActivityIndicator color={C.teal} />
+              </View>
+            ) : (
+              <Blank text={t('tutor.noChapters')} />
+            )
+          ) : (
+            listFor(level.subjectId).map((c, i, all) => (
               <RowItem
                 key={c.id}
                 badge={String(c.number)}
                 title={chapterName(c, lang)}
                 last={i === all.length - 1}
-                onPress={() => setLevel({ kind: 'topics', chapter: c })}
+                onPress={() => pickChapter(c)}
               />
             ))
+          )
         ) : (
           <>
             {/* Stopping at the chapter is a real answer, so it leads. */}

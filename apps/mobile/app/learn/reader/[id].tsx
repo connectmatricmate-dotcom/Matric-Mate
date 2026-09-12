@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -8,6 +8,7 @@ import {
   Btn,
   Card,
   Chevron,
+  Empty,
   ErrorState,
   H2,
   IconButton,
@@ -21,10 +22,13 @@ import {
   Small,
   Spacer,
   Tap,
+  Text,
   Ur,
   useToast,
 } from '../../../src/components/ui';
-import { api , Block, chapterName, isUrduScript } from '@matricmate/core';
+import { api, Block, chapterName, isUrduScript, subjectMedium, weakTopics } from '@matricmate/core';
+import { aiFailureKey } from '../../../src/components/aiFailure';
+import { LockedNotice } from '../../../src/components/LockedNotice';
 import { useAsync } from '../../../src/core/useAsync';
 import { useOnline } from '../../../src/core/connectivity';
 import { useLang, useT } from '../../../src/i18n';
@@ -37,17 +41,30 @@ import { useQuota } from '../../../src/core/useQuota';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
 
-/** Body text in whichever script it's written in. */
-function Prose({ text, size, style }: { text: string; size: number; style?: object }) {
+/**
+ * Body text in whichever script it's written in, and in that script's face:
+ * English notes in the Urdu interface keep the Latin face, because in
+ * Nastaliq this line height cut their descenders off (see F.latin). `bold`
+ * picks the bold of the same script; a Latin bold face on an Urdu term threw
+ * it out of Nastaliq altogether.
+ */
+function Prose({ text, size, bold, style }: { text: string; size: number; bold?: boolean; style?: object }) {
   if (isUrduScript(text)) {
     return (
-      <Ur size={size} style={style}>
+      <Ur size={size} style={[bold ? { fontFamily: F.urduBold } : null, style]}>
         {text}
       </Ur>
     );
   }
   return (
-    <Text style={[{ fontFamily: F.bodyReg, fontSize: size, lineHeight: size * 1.72, color: C.ink }, style]}>{text}</Text>
+    <Text
+      style={[
+        { fontFamily: bold ? F.latin.bodyBold : F.latin.bodyReg, fontSize: size, lineHeight: size * 1.72, color: C.ink },
+        style,
+      ]}
+    >
+      {text}
+    </Text>
   );
 }
 
@@ -60,7 +77,21 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           <Ur size={20 * scale}>{b.text}</Ur>
         </View>
       ) : (
-        <H2 style={{ marginTop: S.md, marginBottom: S.sm, fontSize: 21 * scale }}>{b.text}</H2>
+        // An English heading keeps the Latin face and the left edge in the
+        // Urdu interface too, like the prose under it. Its line height scales
+        // with the reading size: at "Large" the fixed one crowded the text.
+        <H2
+          style={{
+            marginTop: S.md,
+            marginBottom: S.sm,
+            fontFamily: F.latin.display,
+            fontSize: 21 * scale,
+            lineHeight: Math.round(27 * scale),
+            textAlign: 'left',
+          }}
+        >
+          {b.text}
+        </H2>
       );
     case 'p':
       return (
@@ -84,7 +115,7 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
           }}
         >
           <Label style={{ color: C.teal, textAlign: rtl ? 'right' : 'left' }}>{labels.definition}</Label>
-          {b.term ? <Prose text={b.term} size={14 * scale} style={{ fontFamily: F.bodyBold }} /> : null}
+          {b.term ? <Prose text={b.term} size={14 * scale} bold /> : null}
           <View style={{ marginTop: 4 }}>
             <Prose text={b.text} size={14.5 * scale} />
           </View>
@@ -148,7 +179,7 @@ const SUGGESTIONS: StringKey[] = ['reader.suggest1', 'reader.suggest2', 'reader.
 
 export default function Reader() {
   const { id, section: startAt } = useLocalSearchParams<{ id: string; section?: string }>();
-  const { state, actions, derived } = useApp();
+  const { state, actions, derived, contentKey } = useApp();
   // One number app-wide; the local counter under-counts a paper by two.
   const quota = useQuota();
   const aiLeft = quota?.remaining ?? derived.aiLeft;
@@ -157,11 +188,13 @@ export default function Reader() {
   const online = useOnline();
   const toast = useToast();
   const insets = useSafeAreaInsets();
-  const { data: fetchedChapter } = useAsync(() => api.getChapter(id), [id]);
+  // contentKey in both: a language, class or board switch reaches an open reader.
+  const { data: fetchedChapter } = useAsync(() => api.getChapter(id), [id, contentKey]);
   /* Offline the catalogue has no Class 10 chapter to give, so the sticky header
      would have no name. The row saved with the download has one. */
   const chapter = fetchedChapter ?? localChapter(id) ?? undefined;
-  const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(id), [id]);
+  const { data: content, loading, error, reload } = useAsync(() => api.getChapterContent(id), [id, contentKey]);
+  const board = state.onboarding?.board ?? 'fbise';
   /**
    * Where the reader opens.
    *
@@ -174,9 +207,8 @@ export default function Reader() {
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
-  /** The last question asked in the sheet, so "continue in chat" opens on
-   *  it instead of an empty thread. */
-  const [asked, setAsked] = useState<string | null>(null);
+  /** The server's thread for questions asked from this reader, once there is one. */
+  const [threadId, setThreadId] = useState<string | null>(null);
   // True while this screen is mounted; ask() checks it before setState after
   // its await, because the student may have left mid-request.
   const aliveRef = useRef(true);
@@ -196,10 +228,19 @@ export default function Reader() {
    * every translated chapter in the database.
    */
   const sectionsAreUrdu = sections.some((s) => isUrduScript(s.title));
+  /**
+   * The "Urdu notes are on the way" line, only where they are. English, Urdu
+   * and Punjab Islamiyat are written in one language for every student, so on
+   * an English chapter the note apologised for a translation that is never
+   * coming, on every chapter of the subject.
+   */
+  const urduPending = urduMedium && !sectionsAreUrdu && subjectMedium(id, board, 'ur') === 'ur';
   /* Clamped against what actually loaded: a link can name a section this
      chapter does not have, and the content arrives after the first render. */
   const idx = Math.min(rawIdx, Math.max(0, sections.length - 1));
   const section = sections[idx];
+  /** Settled and nothing to show: a failed read, no download offline, or a chapter with no notes. */
+  const empty = !loading && !sections.length;
   const scale = [0.92, 1, 1.12][state.settings.fontScale];
   const total = sections.length || 1;
   const readPct = useMemo(() => ((idx + 1) / total) * 100, [idx, total]);
@@ -215,26 +256,37 @@ export default function Reader() {
   }
 
   async function ask(prompt: string) {
-    setAsked(prompt);
     setAsking(true);
     setAnswer(null);
     try {
       // The server enforces quota and plan; the answer says why if it can't.
-      const res = await api.askTutor(prompt, { context: chapter?.title });
+      // The chapter id grounds the answer in this chapter's own notes, and the
+      // profile carries the student's language: without them the tutor
+      // answered in English from the syllabus in general.
+      const res = await api.askTutor(prompt, {
+        context: chapter ? chapterName(chapter, lang) : undefined,
+        chapterId: id,
+        threadId,
+        profile: {
+          name: state.user?.name,
+          medium: state.settings.contentMedium,
+          language: state.settings.language,
+          subjects: derived.subjects,
+          weakTopics: weakTopics(state.attempts)
+            .slice(0, 3)
+            .map((w) => w.topic),
+        },
+      });
       if (!aliveRef.current) return;
       if (res.reason) {
-        const note = {
-          offline: t('tutor.offline'),
-          quota: t('tutor.limitToast'),
-          rate: t('tutor.slowDown'),
-          plan: t('tutor.planNeeded'),
-          refused: t('tutor.refused'),
-          error: t('tutor.errorReply'),
-        }[res.reason];
-        toast(note);
+        toast(t(aiFailureKey(res.reason)));
         return;
       }
       setAnswer({ text: res.text, steps: res.steps });
+      // The conversation now exists on the server, so "Open full chat" opens
+      // it rather than asking the same question again at the cost of another
+      // of the day's questions.
+      if (res.threadId) setThreadId(res.threadId);
       // Keep the local counter roughly in step with the server's.
       actions.consumeAi();
     } catch {
@@ -277,7 +329,7 @@ export default function Reader() {
           ]}
           showsVerticalScrollIndicator={false}
         >
-          {loading ? (
+          {loading && !section ? (
             <View style={{ gap: S.md }}>
               <Skeleton w="40%" h={12} />
               <Skeleton w="80%" h={22} />
@@ -285,6 +337,31 @@ export default function Reader() {
                 <Skeleton key={i} h={14} />
               ))}
             </View>
+          ) : empty ? (
+            /*
+             * Nothing to read, said plainly. The content read never throws, so
+             * the error branch that used to be here could not render: offline
+             * on a chapter that was not downloaded, after a language switch,
+             * or on a slow first read, the page went blank under "Section 1
+             * of 1" and Finish said "Progress saved" having saved nothing.
+             */
+            !online ? (
+              <ErrorState title={t('offline.title')} sub={t('offline.sub')} retry={t('common.retry')} onRetry={reload} />
+            ) : !state.premium.active ? (
+              // Without a plan the database answers with nothing, which is
+              // not the same as a chapter with no notes.
+              <LockedNotice variant="locked" />
+            ) : chapter && chapter.sectionCount > 0 ? (
+              <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
+            ) : (
+              <Empty
+                emoji="📖"
+                title={t('reader.noNotesTitle')}
+                sub={t('reader.noNotesBody')}
+                // Back down to the chapter when it is underneath, rather than a second copy of it on top.
+                cta={<Btn title={t('session.backToChapter')} variant="line" sm onPress={() => router.dismissTo(`/learn/chapter/${id}`)} />}
+              />
+            )
           ) : error && !section ? (
             <ErrorState
               title={t('states.errorTitle')}
@@ -296,17 +373,33 @@ export default function Reader() {
             <>
               <Label>{t('reader.section', { a: idx + 1, b: total })}</Label>
               <Spacer h={S.sm} />
-              {urduMedium && !sectionsAreUrdu ? (
+              {urduPending ? (
                 <Card flat tint={C.tealTint} style={{ marginBottom: S.md }}>
                   <Small>{t('reader.urduMediumNote')}</Small>
                 </Card>
               ) : null}
-              {/* Gated on a bundled-sample field before, so a real Urdu
-                  chapter never showed its section heading. */}
-              {isUrduScript(section.title) ? (
-                <View style={{ marginBottom: S.sm }}>
-                  <Ur size={19}>{section.title}</Ur>
-                </View>
+              {/* The section's own title, in whichever script it is written
+                  in. Only Urdu titles used to show, so an English chapter
+                  never named its sections. Skipped when the section opens
+                  with the same words as a heading, so it is not said twice. */}
+              {section.title && !(section.blocks[0]?.kind === 'h' && section.blocks[0].text.trim() === section.title.trim()) ? (
+                isUrduScript(section.title) ? (
+                  <View style={{ marginBottom: S.sm }}>
+                    <Ur size={19}>{section.title}</Ur>
+                  </View>
+                ) : (
+                  <H2
+                    style={{
+                      marginBottom: S.sm,
+                      fontFamily: F.latin.display,
+                      fontSize: 21 * scale,
+                      lineHeight: Math.round(27 * scale),
+                      textAlign: 'left',
+                    }}
+                  >
+                    {section.title}
+                  </H2>
+                )
               ) : null}
               {section.blocks.map((b, i) => (
                 <BlockView
@@ -328,46 +421,53 @@ export default function Reader() {
           </View>
         ) : null}
 
-        <Row
-          style={{
-            paddingHorizontal: S.lg,
-            paddingTop: S.md,
-            paddingBottom: Math.max(insets.bottom, S.md),
-            borderTopWidth: 1,
-            borderTopColor: C.line,
-            backgroundColor: C.card,
-          }}
-          gap={S.md}
-        >
-          <View style={{ opacity: idx === 0 ? 0.4 : 1 }}>
-            <IconButton icon="back" tone="card" onPress={() => advance(-1)} />
-          </View>
-          <Text style={{ flex: 1, textAlign: 'center', fontFamily: F.bodyBold, fontSize: 13, color: C.ink2 }}>
-            {t('reader.section', { a: idx + 1, b: total })}
-          </Text>
-          {idx + 1 >= total ? (
-            <Btn
-              title={t('reader.finish')}
-              sm
-              onPress={() => {
-                if (section) actions.markSectionRead(section.id, id, idx);
-                toast(t('reader.progressSaved'));
-                router.back();
-              }}
-            />
-          ) : (
-            <Tap onPress={() => advance(1)}>
-              <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
-                <Chevron size={19} color={C.onBrand} />
-              </View>
-            </Tap>
-          )}
-        </Row>
+        {/* No paging and no Finish over a chapter with nothing in it. */}
+        {section ? (
+          <Row
+            style={{
+              paddingHorizontal: S.lg,
+              paddingTop: S.md,
+              paddingBottom: Math.max(insets.bottom, S.md),
+              borderTopWidth: 1,
+              borderTopColor: C.line,
+              backgroundColor: C.card,
+            }}
+            gap={S.md}
+          >
+            <View style={{ opacity: idx === 0 ? 0.4 : 1 }}>
+              <IconButton icon="back" tone="card" onPress={() => advance(-1)} />
+            </View>
+            <Text style={{ flex: 1, textAlign: 'center', fontFamily: F.bodyBold, fontSize: 13, color: C.ink2 }}>
+              {t('reader.section', { a: idx + 1, b: total })}
+            </Text>
+            {idx + 1 >= total ? (
+              <Btn
+                title={t('reader.finish')}
+                sm
+                onPress={() => {
+                  actions.markSectionRead(section.id, id, idx);
+                  toast(t('reader.progressSaved'));
+                  router.back();
+                }}
+              />
+            ) : (
+              <Tap onPress={() => advance(1)}>
+                <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
+                  <Chevron size={19} color={C.onBrand} />
+                </View>
+              </Tap>
+            )}
+          </Row>
+        ) : null}
       </Screen>
 
       <Sheet visible={askOpen} onClose={() => setAskOpen(false)} title={t('reader.askAiTitle')}>
         <Row gap={S.sm} style={{ marginBottom: S.md, flexWrap: 'wrap' }}>
-          {chapter ? <Pill tone="teal">{chapterName(chapter, lang)}</Pill> : null}
+          {chapter ? (
+            <Pill tone="teal" lines={1}>
+              {chapterName(chapter, lang)}
+            </Pill>
+          ) : null}
           <Pill tone={aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: aiLeft })}</Pill>
         </Row>
         <View style={{ gap: S.sm }}>
@@ -403,7 +503,9 @@ export default function Reader() {
               sm
               onPress={() => {
                 setAskOpen(false);
-                router.push(`/tutor/chat?chapter=${id}${asked ? `&q=${encodeURIComponent(asked)}` : ''}`);
+                // The thread this answer is already in. Re-sending the
+                // question through ?q= asked it twice and spent two.
+                router.push(`/tutor/chat?chapter=${id}${threadId ? `&thread=${threadId}` : ''}`);
               }}
             />
           </Card>

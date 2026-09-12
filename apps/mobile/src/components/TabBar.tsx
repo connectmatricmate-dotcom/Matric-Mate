@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { Pressable, View, useWindowDimensions } from 'react-native';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconName } from './Icon';
 import { TabGlyph } from './TabGlyph';
-import { Tap } from './ui';
+import { Tap, Text } from './ui';
 import { useKeyboardOverlap } from '../core/keyboard';
 import { C, F, R, isRTL, isWeb, rowDir } from '../theme';
 

@@ -129,42 +129,55 @@ export const F = {
   /** Always Nastaliq, for Urdu content inside an English interface. */
   urdu: fonts.urdu,
   urduBold: fonts.urduBold,
+  /**
+   * Always the Latin faces, for English content inside an Urdu interface: an
+   * English-medium question, an AI answer written in English. Drawn in the
+   * Nastaliq face its Latin letters sit on a 2.5em line box, so any Latin line
+   * height pushed them to the bottom of the line and cut their descenders.
+   */
+  latin: { display: fonts.display, body: fonts.body, bodyBold: fonts.bodyBold, bodyReg: fonts.bodyReg },
 };
 
 /**
  * Nastaliq slopes steeply and its ink hangs well below the baseline, so it
  * needs roughly twice the leading of Latin at the same size. Pinning the Latin
  * line heights would clip every descender in the app.
+ *
+ * Derived from the type size, not from the Latin line height. It used to be
+ * the Latin value scaled up, which landed headings at about 1.6 times their
+ * size against the 2.1 the Urdu helper below uses: Android shares a short
+ * line box out evenly above and below the text and then crops to it, so the
+ * tails of ے and ی on the last line of every Urdu heading were cut off.
  */
-const lead = (latin: number) => (urduUi ? Math.round(latin * URDU_LINE_HEIGHT * 0.62) : latin);
+const lead = (latin: number, size: number) => (urduUi ? Math.round(size * URDU_LINE_HEIGHT) : latin);
 
 export const T: Record<string, TextStyle> = {
   get h1() {
-    return { fontFamily: F.display, fontSize: fontSize.h1, lineHeight: lead(32), color: C.ink, textAlign: textStart() };
+    return { fontFamily: F.display, fontSize: fontSize.h1, lineHeight: lead(32, fontSize.h1), color: C.ink, textAlign: textStart() };
   },
   get h2() {
-    return { fontFamily: F.display, fontSize: fontSize.h2, lineHeight: lead(27), color: C.ink, textAlign: textStart() };
+    return { fontFamily: F.display, fontSize: fontSize.h2, lineHeight: lead(27, fontSize.h2), color: C.ink, textAlign: textStart() };
   },
   get h3() {
-    return { fontFamily: F.display, fontSize: fontSize.h3, lineHeight: lead(23), color: C.ink, textAlign: textStart() };
+    return { fontFamily: F.display, fontSize: fontSize.h3, lineHeight: lead(23, fontSize.h3), color: C.ink, textAlign: textStart() };
   },
   get body() {
-    return { fontFamily: F.body, fontSize: fontSize.body, lineHeight: lead(23), color: C.ink, textAlign: textStart() };
+    return { fontFamily: F.body, fontSize: fontSize.body, lineHeight: lead(23, fontSize.body), color: C.ink, textAlign: textStart() };
   },
   get read() {
-    return { fontFamily: F.bodyReg, fontSize: fontSize.read, lineHeight: lead(27), color: C.ink, textAlign: textStart() };
+    return { fontFamily: F.bodyReg, fontSize: fontSize.read, lineHeight: lead(27, fontSize.read), color: C.ink, textAlign: textStart() };
   },
   get small() {
-    return { fontFamily: F.body, fontSize: fontSize.small, lineHeight: lead(19), color: C.ink2, textAlign: textStart() };
+    return { fontFamily: F.body, fontSize: fontSize.small, lineHeight: lead(19, fontSize.small), color: C.ink2, textAlign: textStart() };
   },
   get tiny() {
-    return { fontFamily: F.bodyBold, fontSize: fontSize.tiny, lineHeight: lead(15), color: C.ink2, textAlign: textStart() };
+    return { fontFamily: F.bodyBold, fontSize: fontSize.tiny, lineHeight: lead(15, fontSize.tiny), color: C.ink2, textAlign: textStart() };
   },
   get label() {
     return {
       fontFamily: F.bodyBold,
       fontSize: fontSize.tiny,
-      lineHeight: lead(15),
+      lineHeight: lead(15, fontSize.tiny),
       letterSpacing: 0.8,
       // Nastaliq is cursive: there is no upper case to switch to, and asking
       // for one only breaks the joins.

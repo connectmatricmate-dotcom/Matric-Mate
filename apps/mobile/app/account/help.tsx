@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Linking, Text, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { SUPPORT_EMAIL } from '@matricmate/core';
-import { Body, Btn, Card, Header, Screen, SectionTitle, Small, Spacer, useToast } from '../../src/components/ui';
+import { Body, Btn, Card, Header, Screen, SectionTitle, Small, Spacer, Text, useToast } from '../../src/components/ui';
 import { Icon } from '../../src/components/Icon';
 import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
-import { C, F, S, rowDir } from '../../src/theme';
+import { C, F, S, isRTL, rowDir } from '../../src/theme';
 
 const FAQ: [StringKey, StringKey][] = [
   ['account.faq1Q', 'account.faq1A'],
@@ -42,7 +42,11 @@ export default function Help() {
         {FAQ.map(([q, a], i) => (
           <Card key={q} flat onPress={() => setOpen(open === i ? null : i)}>
             <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.sm }}>
-              <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 13.5, lineHeight: 20, color: C.ink }}>{t(q)}</Text>
+              {/* Nastaliq's leading in the Urdu interface: at 20 an Urdu
+                  question's lines ran into each other and the last was cropped. */}
+              <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 13.5, lineHeight: isRTL() ? 30 : 20, color: C.ink }}>
+                {t(q)}
+              </Text>
               <Icon name={open === i ? 'close' : 'plus'} size={16} color={C.ink3} />
             </View>
             {open === i ? <Body style={{ marginTop: 8, fontSize: 13.5, color: C.ink2 }}>{t(a)}</Body> : null}

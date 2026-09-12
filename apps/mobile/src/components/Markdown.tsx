@@ -5,9 +5,10 @@
  * website draws, from the same rules. Urdu-aware: a block in Arabic script
  * gets the Nastaliq treatment and flips its bullet to the right.
  */
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { type MdSpan, isUrduScript, parseMarkdown } from '@matricmate/core';
 import { C, F, urdu } from '../theme';
+import { Text } from './ui';
 
 function spanText(spans: MdSpan[]): string {
   return spans.map((s) => s.text).join('');
@@ -30,10 +31,12 @@ function Block({
   face?: 'body' | 'bodyBold' | 'display';
 }) {
   const rtl = isUrduScript(spanText(spans));
+  // An English block stays in the Latin faces in the Urdu interface too: in
+  // Nastaliq, this Latin line height cut the descenders off (see F.latin).
   const base = rtl
     ? urdu(size)
     : {
-        fontFamily: face === 'display' ? F.display : face === 'bodyBold' ? F.bodyBold : F.body,
+        fontFamily: face === 'display' ? F.latin.display : face === 'bodyBold' ? F.latin.bodyBold : F.latin.body,
         fontSize: size,
         lineHeight: Math.round(size * 1.55),
       };
@@ -44,7 +47,7 @@ function Block({
           key={i}
           style={
             s.bold
-              ? { fontFamily: rtl ? F.urduBold : F.bodyBold, color: C.ink }
+              ? { fontFamily: rtl ? F.urduBold : F.latin.bodyBold, color: C.ink }
               : s.italic
                 ? { fontStyle: 'italic' }
                 : s.code
@@ -112,7 +115,16 @@ export function Markdown({
                       key={j}
                       style={{ flexDirection: rtl ? 'row-reverse' : 'row', alignItems: 'flex-start', gap: 8 }}
                     >
-                      <Text style={{ fontFamily: F.bodyBold, fontSize: size - 1.5, color: C.teal, marginTop: 2 }}>
+                      {/* In the face of the line it numbers, so it sits on
+                          the same baseline. */}
+                      <Text
+                        style={{
+                          fontFamily: rtl ? F.bodyBold : F.latin.bodyBold,
+                          fontSize: size - 1.5,
+                          color: C.teal,
+                          marginTop: 2,
+                        }}
+                      >
                         {b.start + j}.
                       </Text>
                       <View style={{ flex: 1, minWidth: 0 }}>

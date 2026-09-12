@@ -1,16 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Image, Text, View } from 'react-native';
+import type { ReactNode } from 'react';
+import { ActivityIndicator, Image, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
 import { Icon } from '../../../src/components/Icon';
-import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, useToast } from '../../../src/components/ui';
-import { api, chapterById, chapterName, pickAudioTrack } from '@matricmate/core';
+import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, Text } from '../../../src/components/ui';
+import { api, chapterById, chapterName, isOneLanguageSubject, pickAudioTrack, subjectMedium } from '@matricmate/core';
+import type { Medium } from '@matricmate/core';
 import { Equalizer } from '../../../src/components/celebration';
+import { useChapterDownload } from '../../../src/components/ChapterDownload';
 import { audioSource } from '../../../src/core/audio';
+import { useOnline } from '../../../src/core/connectivity';
 import { localAudioTrack, localAudioUri, localChapter } from '../../../src/core/downloads';
 import { useAsync } from '../../../src/core/useAsync';
 import { useT } from '../../../src/i18n';
+import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
 
@@ -33,6 +38,21 @@ const lessonTitle = (chapterId: string, lang: string): string =>
   chapterName(chapterById(chapterId) ?? localChapter(chapterId) ?? undefined, lang);
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
+/** "Urdu narration" or "English narration", for the recording actually playing. */
+const narration = (medium: Medium): StringKey => (medium === 'ur' ? 'audio.narrationUr' : 'audio.narrationEn');
+
+/**
+ * The line under the player. A language subject is recorded once, in its own
+ * language, so "if your medium has no recording, the English one plays" was
+ * a promise about a track that is never coming for an Urdu lesson.
+ */
+const lessonNote = (chapterId: string, board: string | undefined): StringKey =>
+  isOneLanguageSubject(chapterId, board === 'punjab' ? 'punjab' : 'fbise')
+    ? subjectMedium(chapterId, board === 'punjab' ? 'punjab' : 'fbise', 'en') === 'ur'
+      ? 'audio.oneLanguageUr'
+      : 'audio.oneLanguageEn'
+    : 'audio.sampleNote';
+
 /** Everything visual. Both the real player and the fallback render through this. */
 function PlayerChrome({
   title,
@@ -50,6 +70,7 @@ function PlayerChrome({
   offlineAudio,
   busy,
   onToggleDownload,
+  confirm,
 }: {
   title: string;
   subtitle: string;
@@ -72,6 +93,8 @@ function PlayerChrome({
   offlineAudio: boolean;
   busy?: boolean;
   onToggleDownload: () => void;
+  /** The confirm sheet a removal asks through. */
+  confirm?: ReactNode;
 }) {
   const t = useT();
   return (
@@ -93,6 +116,7 @@ function PlayerChrome({
           )
         }
       />
+      {confirm}
 
       <View style={{ alignItems: 'center', marginTop: S.md }}>
         <View style={{ width: 210, height: 210, borderRadius: 24, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
@@ -100,7 +124,9 @@ function PlayerChrome({
         </View>
         <Row gap={8} style={{ marginTop: S.md, alignItems: 'center' }}>
           <Equalizer playing={playing} color={C.teal} />
-          <H2 style={{ textAlign: 'center' }}>{title}</H2>
+          {/* Wraps between the two equalizers; a chapter name that could not
+              shrink pushed the right one, and its own end, off the screen. */}
+          <H2 style={{ textAlign: 'center', flexShrink: 1 }}>{title}</H2>
           <Equalizer playing={playing} color={C.teal} />
         </Row>
         <Small style={{ textAlign: 'center' }}>{subtitle}</Small>
@@ -123,7 +149,8 @@ function PlayerChrome({
           <View
             testID="audio-play"
             accessibilityRole="button"
-            accessibilityLabel={playing ? 'Pause' : 'Play'}
+            // Read aloud in the app's language, not always English.
+            accessibilityLabel={playing ? t('audio.pause') : t('audio.play')}
             style={{
               width: 76,
               height: 76,
@@ -143,7 +170,7 @@ function PlayerChrome({
         </Tap>
       </Row>
 
-      <Row style={{ justifyContent: 'center', marginTop: S.md }} gap={S.sm}>
+      <Row style={{ justifyContent: 'center', marginTop: S.md, flexWrap: 'wrap' }} gap={S.sm}>
         <Pill tone="grey" onPress={disabled ? undefined : onSpeed}>
           {t('audio.speed', { n: SPEEDS[speed] })}
         </Pill>
@@ -161,12 +188,15 @@ function PlayerChrome({
 
 /** Real playback. Throws on a build that predates expo-audio, see the boundary below. */
 function RealPlayer({ id }: { id: string }) {
-  const { state, actions } = useApp();
+  const { state, actions, contentKey } = useApp();
   const t = useT();
-  const toast = useToast();
+  const online = useOnline();
+  const download = useChapterDownload(id);
 
-  const medium = state.settings.contentMedium;
-  const { data: tracks, loading: tracksLoading, error: tracksError } = useAsync(() => api.getAudioTracks(id), [id]);
+  // The recording to ask for is in the subject's own language: an Urdu or
+  // Punjab Islamiyat lesson is Urdu for every student, English is English.
+  const medium = subjectMedium(id, state.onboarding?.board, state.settings.contentMedium);
+  const { data: tracks, loading: tracksLoading, error: tracksError } = useAsync(() => api.getAudioTracks(id), [id, contentKey]);
   // Membership, not the array: this is what actually decides whether files
   // exist on disk, and it changes exactly when a download lands or is removed.
   const isDownloaded = state.downloads.includes(id);
@@ -198,8 +228,6 @@ function RealPlayer({ id }: { id: string }) {
 
   const status = useAudioPlayerStatus(player);
   const [speed, setSpeed] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const downloaded = state.downloads.includes(id);
 
   useEffect(() => {
     setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(() => {});
@@ -238,7 +266,8 @@ function RealPlayer({ id }: { id: string }) {
   return (
     <PlayerChrome
       title={lessonTitle(id, state.settings.language)}
-      subtitle={medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
+      // The language of the recording actually playing, not the student's.
+      subtitle={t(narration(picked?.medium ?? medium))}
       position={position}
       duration={duration}
       playing={status.playing}
@@ -264,24 +293,20 @@ function RealPlayer({ id }: { id: string }) {
        */
       note={
         track
-          ? t('audio.sampleNote')
+          ? t(lessonNote(id, state.onboarding?.board))
           : tracksLoading
             ? t('common.loading')
-            : tracksError
+            : // Offline the track list cannot be read, which is not the same
+              // as a chapter with no recording.
+              tracksError || !online
               ? t('audio.loadFailed')
               : t('audio.noTrackNote')
       }
-      downloaded={downloaded}
+      downloaded={download.readable}
       offlineAudio={!!offlineUri}
-      busy={busy}
-      onToggleDownload={async () => {
-        setBusy(true);
-        const result = await actions.toggleDownload(id);
-        setBusy(false);
-        if (result === 'downloaded') toast(t('study.saveOffline'));
-        else if (result === 'removed') toast(t('study.removedOffline'));
-        else toast(t('downloads.saveFailed'));
-      }}
+      busy={download.busy}
+      onToggleDownload={download.press}
+      confirm={download.confirm}
     />
   );
 }
@@ -292,9 +317,10 @@ function RealPlayer({ id }: { id: string }) {
  * module was added keeps every other screen usable.
  */
 function PreviewPlayer({ id }: { id: string }) {
-  const { state, actions } = useApp();
+  const { state } = useApp();
   const t = useT();
-  const toast = useToast();
+  const download = useChapterDownload(id);
+  const medium = subjectMedium(id, state.onboarding?.board, state.settings.contentMedium);
 
   // This boundary only exists for binaries that predate expo-audio, and it
   // cannot play anything. A made-up "14 minutes" was worse than saying so.
@@ -303,8 +329,9 @@ function PreviewPlayer({ id }: { id: string }) {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [busy, setBusy] = useState(false);
-  const downloaded = state.downloads.includes(id);
+  // Any lesson on disk, in either language slot. Asked by the recording's
+  // medium, an Urdu lesson saved by an English-medium student read as absent.
+  const onDisk = useMemo(() => download.listed && localAudioTrack(id, medium) !== null, [download.listed, id, medium]);
 
   useEffect(() => {
     if (playing) timer.current = setInterval(() => setPosition((p) => Math.min(duration, p + SPEEDS[speed])), 1000);
@@ -317,7 +344,7 @@ function PreviewPlayer({ id }: { id: string }) {
   return (
     <PlayerChrome
       title={lessonTitle(id, state.settings.language)}
-      subtitle={state.settings.contentMedium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
+      subtitle={t(narration(medium))}
       position={position}
       duration={duration}
       playing={playing}
@@ -326,17 +353,11 @@ function PreviewPlayer({ id }: { id: string }) {
       onSeek={(d) => setPosition((p) => Math.max(0, Math.min(duration, p + d)))}
       onSpeed={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
       note={t('audio.needsNewBuild')}
-      downloaded={downloaded}
-      offlineAudio={!!localAudioUri(id, state.settings.contentMedium)}
-      busy={busy}
-      onToggleDownload={async () => {
-        setBusy(true);
-        const result = await actions.toggleDownload(id);
-        setBusy(false);
-        if (result === 'downloaded') toast(t('study.saveOffline'));
-        else if (result === 'removed') toast(t('study.removedOffline'));
-        else toast(t('downloads.saveFailed'));
-      }}
+      downloaded={download.readable}
+      offlineAudio={onDisk}
+      busy={download.busy}
+      onToggleDownload={download.press}
+      confirm={download.confirm}
     />
   );
 }

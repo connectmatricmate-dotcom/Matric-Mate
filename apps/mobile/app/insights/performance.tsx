@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import Svg, { Circle, Polyline, Rect } from 'react-native-svg';
-import { Bar, Card, Header, Item, Label, Row, Screen, SectionTitle, Seg, Small, Spacer } from '../../src/components/ui';
+import { Bar, Card, Header, Item, Label, Row, Screen, SectionTitle, Seg, Small, Spacer, Text } from '../../src/components/ui';
 import { accuracy, confidenceBreakdown, formatDate } from '@matricmate/core';
+import { resultTitle } from '../../src/components/resultTitle';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
@@ -111,12 +112,16 @@ export default function Performance() {
                 />
               </Svg>
             </View>
-            <Row style={{ justifyContent: 'space-between' }}>
+            {/* A plain row, not the mirrored one: the chart line runs from
+                the oldest day on the left to today on the right in both
+                languages, so its labels have to as well. Mirrored, "today"
+                sat under the oldest point in Urdu. */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>
                 {t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}
               </Small>
               <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>{todayLabel}</Small>
-            </Row>
+            </View>
           </>
         ) : (
           <Small style={{ marginTop: S.sm }}>{t('progress.notEnoughData')}</Small>
@@ -139,7 +144,8 @@ export default function Performance() {
                   width={bw}
                   height={Math.max(2, h)}
                   rx={4}
-                  fill={i >= trend.length - 2 ? C.orange : '#B9D2DB'}
+                  // A theme colour, so dark mode gets a dark-mode bar.
+                  fill={i >= trend.length - 2 ? C.orange : C.tealTint2}
                 />
               );
             })}
@@ -155,7 +161,7 @@ export default function Performance() {
             <View key={r.confidence}>
               <Row style={{ justifyContent: 'space-between' }}>
                 <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.ink }}>{confLabels[r.confidence]}</Text>
-                <Small style={{ fontFamily: F.bodyBold }}>
+                <Small style={{ fontFamily: F.bodyBold, flexShrink: 1 }}>
                   {r.said ? t('progress.saidTimes', { n: r.accuracy, times: r.said }) : t('progress.notUsed')}
                 </Small>
               </Row>
@@ -177,7 +183,8 @@ export default function Performance() {
           {state.results.slice(0, 6).map((r, i) => (
             <Item
               key={r.id}
-              title={r.label}
+              // Rebuilt in today's language, not the one it was saved in.
+              title={resultTitle(r, lang)}
               sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
               icon={r.mode === 'exam' ? 'clock' : 'target'}
               tone={r.mode === 'exam' ? 'orange' : 'teal'}

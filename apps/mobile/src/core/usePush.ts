@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { router } from 'expo-router';
@@ -49,9 +49,14 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function register(userId: string): Promise<void> {
+/**
+ * Claims this phone's push token for the signed-in student, asking the OS for
+ * permission first when `ask` is set and asking could show a dialog. Resolves
+ * true once the token is claimed, false when push cannot arrive here.
+ */
+async function register(userId: string, ask = true): Promise<boolean> {
   // An emulator has no push service to register with, and asking throws.
-  if (!Device.isDevice) return;
+  if (!Device.isDevice) return false;
 
   if (Platform.OS === 'android') {
     /*
@@ -81,13 +86,13 @@ async function register(userId: string): Promise<void> {
      * launch forever". The second is how apps get their notifications turned
      * off in Settings and never turned back on.
      */
-    if (!existing.canAskAgain) return;
+    if (!ask || !existing.canAskAgain) return false;
     status = (await Notifications.requestPermissionsAsync()).status;
   }
-  if (status !== 'granted') return;
+  if (status !== 'granted') return false;
 
   const token = (await Notifications.getDevicePushTokenAsync()).data;
-  if (typeof token !== 'string' || !token) return;
+  if (typeof token !== 'string' || !token) return false;
 
   /*
    * claim_push_token, not an upsert.
@@ -104,6 +109,7 @@ async function register(userId: string): Promise<void> {
   // Worth a line in the log rather than another silent failure: without a row
   // here the student is simply never pushed to, and nothing else would say so.
   if (error) console.warn('push: could not claim this device', error.message);
+  return !error;
 }
 
 /**
@@ -159,17 +165,53 @@ export function takePendingNotificationRoute(): string | null {
 
 export function usePush(userId: string | null) {
   const registeredFor = useRef<string | null>(null);
+  /** Whether this launch has actually claimed the token for `registeredFor`. */
+  const claimed = useRef(false);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      // Signed out. Sign-out handed this phone's row back (releasePushToken),
+      // so the next sign-in has to claim it again, even as the same student.
+      // Remembering who registered last skipped exactly that, and a student
+      // who signed out and back in got no push until the app was restarted.
+      registeredFor.current = null;
+      claimed.current = false;
+      return;
+    }
     // Once per signed-in user per launch. Re-running on every render would
     // hammer both the permission API and the table.
     if (registeredFor.current === userId) return;
     registeredFor.current = userId;
+    claimed.current = false;
 
     // Never allowed to break startup: a phone with no Play Services, or a
     // blocked network, must still get an app.
-    void register(userId).catch(() => {});
+    void register(userId)
+      .then((ok) => {
+        if (registeredFor.current === userId) claimed.current = ok;
+      })
+      .catch(() => {});
+  }, [userId]);
+
+  /**
+   * Notifications switched back on in Settings, noticed on the way back.
+   *
+   * Registration used to be once per launch, so a student who had refused and
+   * later allowed notifications in Settings stayed unreachable until the app
+   * was killed. Never asks here: returning to the app is not the moment for a
+   * dialog, and if permission is still missing this is a silent no-op.
+   */
+  useEffect(() => {
+    if (!userId) return;
+    const sub = AppState.addEventListener('change', (status) => {
+      if (status !== 'active' || claimed.current || registeredFor.current !== userId) return;
+      void register(userId, false)
+        .then((ok) => {
+          if (ok && registeredFor.current === userId) claimed.current = true;
+        })
+        .catch(() => {});
+    });
+    return () => sub.remove();
   }, [userId]);
 
   /** A tap on a notification opens the screen it is about, while the app runs. */
@@ -184,4 +226,72 @@ export function usePush(userId: string | null) {
     });
     return () => sub.remove();
   }, []);
+}
+
+/** Whether the system lets this app notify. 'unavailable': an emulator, or no push service. */
+export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unavailable';
+
+type PermissionRead = { status: PushPermission | null; canAskAgain: boolean };
+
+/**
+ * Whether push can actually reach this phone, for the screen that offers it.
+ *
+ * The account's push switch read "On this phone" after the system permission
+ * had been refused, which is a promise nothing can keep: register() stops
+ * quietly at the refusal and no notification ever arrives. This is the
+ * phone's half of the answer, read on mount and again on every return to the
+ * app, so a change made in Settings shows up. `status` is null until the first
+ * read lands.
+ *
+ * `ask` shows the system dialog when Android still allows one (canAskAgain),
+ * claims the token on a yes, and resolves with the new status. Once a student
+ * has refused, Android shows nothing more, and the only way back is the app's
+ * page in Settings (Linking.openSettings()).
+ */
+export function usePushPermission(userId: string | null): PermissionRead & { ask: () => Promise<PushPermission> } {
+  const [read, setRead] = useState<PermissionRead>({ status: null, canAskAgain: false });
+
+  useEffect(() => {
+    let alive = true;
+    const check = () =>
+      void readPermission().then((next) => {
+        if (alive) setRead(next);
+      });
+    check();
+    const sub = AppState.addEventListener('change', (status) => {
+      if (status === 'active') check();
+    });
+    return () => {
+      alive = false;
+      sub.remove();
+    };
+  }, []);
+
+  const ask = useCallback(async (): Promise<PushPermission> => {
+    try {
+      if (userId) await register(userId, true);
+      else if (Device.isDevice) await Notifications.requestPermissionsAsync();
+    } catch {
+      // The status read below says what actually happened.
+    }
+    const next = await readPermission();
+    setRead(next);
+    return next.status ?? 'unavailable';
+  }, [userId]);
+
+  return { ...read, ask };
+}
+
+async function readPermission(): Promise<PermissionRead> {
+  try {
+    const p = Device.isDevice ? await Notifications.getPermissionsAsync() : null;
+    if (!p) return { status: 'unavailable', canAskAgain: false };
+    return {
+      status: p.status === 'granted' ? 'granted' : p.status === 'denied' ? 'denied' : 'undetermined',
+      canAskAgain: p.canAskAgain,
+    };
+  } catch {
+    // An older binary without the module: push cannot arrive, so say so.
+    return { status: 'unavailable', canAskAgain: false };
+  }
 }

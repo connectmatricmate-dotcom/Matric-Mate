@@ -1,24 +1,30 @@
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
-import { Bar, Card, Item, Kpi, Pill, Ring, Row, Screen, ScriptText, SectionTitle, Small, Spacer, Tap } from '../../src/components/ui';
+import { Bar, Card, Item, Kpi, Pill, Ring, Row, Screen, ScriptText, SectionTitle, Small, Spacer, Tap, Text } from '../../src/components/ui';
 import { accuracy, formatDate, grade, last14, overallPct, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
 
 export default function Progress() {
-  const { state, derived } = useApp();
+  const { state, derived, contentKey } = useApp();
   const t = useT();
   const { lang } = useLang();
 
   const overall = useMemo(
     () => overallPct(derived.subjects, state.readSections, state.attempts),
-    [derived.subjects, state.readSections, state.attempts]
+    // contentKey is not read here and has to be listed: the percentages read
+    // the chapter index, and the first session after sign-in or a switch
+    // showed 0% (or an inflated figure) until something else re-rendered.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [derived.subjects, state.readSections, state.attempts, contentKey]
   );
   const days = useMemo(() => last14(state.activeDays), [state.activeDays]);
-  const weak = useMemo(() => weakTopics(state.attempts).slice(0, 4), [state.attempts]);
+  // Same reason: weakTopics holds answers to the syllabus the index knows.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const weak = useMemo(() => weakTopics(state.attempts).slice(0, 4), [state.attempts, contentKey]);
   const acc = accuracy(state.attempts);
   // Pinned once on mount rather than read during render: a render must be
   // repeatable, and the month label has no business changing mid-screen.
@@ -74,16 +80,26 @@ export default function Progress() {
       </Card>
 
       <Spacer h={S.md} />
-      <Row gap={S.sm}>
-        <Kpi value={`${state.attempts.length}`} label={t('dash.questions')} small />
-        <Kpi value={`${acc}%`} label={t('dash.accuracy')} small />
-        <Kpi value={String(state.activeDays.length)} label={t('dash.activeDays')} small />
-        <Kpi value={`${state.results.length}`} label={t('progress.tests')} small />
-      </Row>
+      {/* Two rows of two. Four across left each label about 56dp on a 360dp
+          phone, so "Active days" was cut short and, at a large font,
+          "Questions" broke in the middle of the word. */}
+      <View style={{ gap: S.sm }}>
+        <Row gap={S.sm}>
+          <Kpi value={`${state.attempts.length}`} label={t('dash.questions')} small />
+          <Kpi value={`${acc}%`} label={t('dash.accuracy')} small />
+        </Row>
+        <Row gap={S.sm}>
+          <Kpi value={String(state.activeDays.length)} label={t('dash.activeDays')} small />
+          <Kpi value={`${state.results.length}`} label={t('progress.tests')} small />
+        </Row>
+      </View>
 
       <SectionTitle action={link(t('common.details'), '/insights/performance')}>{t('progress.bySubject')}</SectionTitle>
+      {/* Every subject. Six was the cut, which kept Maths to Pakistan Studies
+          and one elective, so Chemistry, Biology and Computer Science never
+          showed at all. */}
       <Card flat style={{ gap: S.md }}>
-        {derived.subjects.slice(0, 6).map((sid) => {
+        {derived.subjects.map((sid) => {
           const pct = subjectPct(sid, state.readSections, state.attempts);
           return (
             <Tap key={sid} onPress={() => router.push('/insights/performance')}>
@@ -108,7 +124,8 @@ export default function Progress() {
         <Card flat style={{ paddingVertical: 0 }}>
           {weak.map((w, i) => (
             <Item
-              key={w.topic}
+              // Two subjects can share a topic's name; weakTopics keys them apart.
+              key={`${w.subjectId}|${w.topic}`}
               title={w.topic}
               sub={subjectName(subjectById(w.subjectId), lang)}
               icon="alert"
@@ -127,7 +144,10 @@ export default function Progress() {
           <Text style={{ fontSize: 26 }}>🎓</Text>
           <View style={{ flex: 1 }}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t('progress.reportCard', { month })}</Text>
-            <Small>{t('progress.reportCardSub', { grade: grade(acc) })}</Small>
+            {/* No answers, no grade: a brand-new student was told "Overall F". */}
+            <Small>
+              {state.attempts.length ? t('progress.reportCardSub', { grade: grade(acc) }) : t('progress.reportCardSubNone')}
+            </Small>
           </View>
           <Pill tone="orange">{t('progress.open')}</Pill>
         </Row>

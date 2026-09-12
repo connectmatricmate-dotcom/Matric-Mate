@@ -1,9 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Card, Empty, Header, Item, Screen, SectionTitle } from '../src/components/ui';
 import { Notification, NotificationTarget } from '@matricmate/core';
 import { useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
+import { C } from '../src/theme';
 
 /** Shared destinations, in this app's route names. See NotificationTarget. */
 const ROUTE: Record<NotificationTarget, string> = {
@@ -27,6 +29,13 @@ const ICON: Record<Notification['kind'], { emoji: string; tone: 'orange' | 'teal
 export default function Notifications() {
   const { state, actions } = useApp();
   const t = useT();
+  /**
+   * What was unread when the inbox opened, kept for as long as it is open.
+   * Everything is marked read a moment after opening, and with nothing
+   * holding on to which ones were new, a new notice looked exactly like one
+   * from last month.
+   */
+  const [fresh] = useState(() => new Set(state.notifications.filter((n) => !n.read).map((n) => n.id)));
 
   useEffect(() => {
     const timer = setTimeout(() => actions.readNotifications(), 400);
@@ -52,7 +61,15 @@ export default function Notifications() {
         emoji={meta.emoji}
         tone={meta.tone}
         last={last}
+        // A read notice steps back a little; a new one keeps full strength
+        // and a dot, so the two can be told apart.
+        dim={!fresh.has(n.id)}
         onPress={n.target ? () => router.push(ROUTE[n.target!] as never) : undefined}
+        right={
+          fresh.has(n.id) ? (
+            <View style={{ width: 9, height: 9, borderRadius: 99, backgroundColor: C.orange }} />
+          ) : undefined
+        }
       />
     );
   };

@@ -1,9 +1,9 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { BILLING_SITE } from '@matricmate/core';
 import { useAuth } from '../store/auth';
 import { useT } from '../i18n';
 import { C, F, S } from '../theme';
-import { Body, Btn, Card, H2, Screen, Small, Spacer } from './ui';
+import { Body, Btn, Card, H2, Screen, Small, Spacer, Text } from './ui';
 import { Icon } from './Icon';
 
 /**
@@ -45,7 +45,7 @@ export function StaffAccount() {
       <Spacer h={S.lg} />
       <Card flat tint={C.tealTint}>
         <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.teal }}>
-          {role === 'admin' ? 'Administrator' : 'Referral partner'}
+          {t(role === 'admin' ? 'auth.roleAdmin' : 'auth.rolePartner')}
         </Text>
         <Small style={{ marginTop: 2 }}>{t('auth.staffStudentNote')}</Small>
       </Card>

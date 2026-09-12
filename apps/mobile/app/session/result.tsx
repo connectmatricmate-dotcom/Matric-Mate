@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
-import { Btn, Card, H2, Pill, Ring, Row, Screen, ScriptText, Small, Spacer } from '../../src/components/ui';
+import { Btn, Card, H2, Pill, Ring, Row, Screen, ScriptText, Small, Spacer, Text } from '../../src/components/ui';
 import { Confetti, Pop } from '../../src/components/celebration';
 import { cheer } from '../../src/core/haptics';
 import { Icon } from '../../src/components/Icon';
-import { accuracy, grade , chapterById, level, xpForAttempt } from '@matricmate/core';
+import { accuracy, grade, level, xpForAttempt } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -64,14 +64,24 @@ export default function Result() {
   }, [pct]);
 
   const myAverage = accuracy(state.attempts);
+  /**
+   * The topic most of the wrong answers came from, and the chapter to study
+   * it in: the chapter of a question on that topic. "Study it now" used to
+   * open the first question's chapter, which in a mixed set is often another
+   * chapter entirely, and for a generated question with no chapter it opened
+   * /learn/chapter/undefined.
+   */
   const weakest = useMemo(() => {
-    const topics = answers
+    const wrong = answers
       .filter((a) => !a.correct)
-      .map((a) => s?.mcqs.find((m) => m.id === a.mcqId)?.topic)
-      .filter(Boolean) as string[];
+      .map((a) => s?.mcqs.find((m) => m.id === a.mcqId))
+      .filter((m): m is NonNullable<typeof m> => !!m?.topic?.trim());
     const counts = new Map<string, number>();
-    topics.forEach((topic) => counts.set(topic, (counts.get(topic) ?? 0) + 1));
-    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    wrong.forEach((m) => counts.set(m.topic, (counts.get(m.topic) ?? 0) + 1));
+    const topic = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+    if (!topic) return null;
+    const chapterId = wrong.find((m) => m.topic === topic && m.chapterId)?.chapterId ?? s?.chapterId ?? '';
+    return { topic, chapterId };
   }, [answers, s]);
 
   if (!s) {
@@ -157,15 +167,19 @@ export default function Result() {
           <Spacer h={S.lg} />
           <Card flat tint={C.redTint} border={C.red}>
             {/* The line names a topic, which is Urdu on an Urdu-medium account. */}
-            <ScriptText text={t('session.weakSpot', { topic: weakest })} face="bodyBold" size={13.5} color={C.red} />
+            <ScriptText text={t('session.weakSpot', { topic: weakest.topic })} face="bodyBold" size={13.5} color={C.red} />
             <Small style={{ marginTop: 2 }}>{t('session.weakSpotSub')}</Small>
-            <Spacer h={S.md} />
-            <Btn
-              title={t('session.studyNow')}
-              variant="danger"
-              sm
-              onPress={() => router.replace(`/learn/chapter/${s.chapterId ?? chapterById(s.mcqs[0].chapterId)?.id}`)}
-            />
+            {weakest.chapterId ? (
+              <>
+                <Spacer h={S.md} />
+                <Btn
+                  title={t('session.studyNow')}
+                  variant="danger"
+                  sm
+                  onPress={() => router.replace(`/learn/chapter/${weakest.chapterId}`)}
+                />
+              </>
+            ) : null}
           </Card>
         </>
       ) : null}

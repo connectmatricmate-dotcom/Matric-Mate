@@ -33,11 +33,36 @@ const OnlineContext = createContext(true);
  * Going offline reroutes the student to the downloaded library, so a one second
  * dip in a lift should not do it. Coming back is applied immediately: there is
  * no cost to being online again.
+ *
+ * Measured from the first reading that saw no signal, and followed by a second
+ * reading exactly then. It used to wait for the next poll, so going offline
+ * took up to eleven seconds to register: a first reading at up to eight, and
+ * the confirming one eight after that.
  */
 const SETTLE_MS = 3000;
 
-/** How often to re-read, when the OS gives us no change events. */
+/** How often to re-read, as a backstop to the OS's change events. */
 const POLL_MS = 8000;
+
+/**
+ * Subscribes to the OS's own network change events, when this build has them.
+ *
+ * expo-network already ships in the app for the reads below; its listener is
+ * the same native module, so this needs no new build. Defensive in the same
+ * way as reachable(): a module that cannot answer costs the events, and the
+ * poll carries on alone. Returns the unsubscribe, or null.
+ */
+function onNetworkChange(listener: () => void): (() => void) | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Network = require('expo-network');
+    if (typeof Network.addNetworkStateListener !== 'function') return null;
+    const sub = Network.addNetworkStateListener(listener);
+    return () => sub?.remove?.();
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Reads expo-network lazily and defensively.
@@ -63,6 +88,7 @@ export function ConnectivityProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let alive = true;
+    let settle: ReturnType<typeof setTimeout> | undefined;
 
     async function check() {
       const up = await reachable();
@@ -72,17 +98,34 @@ export function ConnectivityProvider({ children }: { children: ReactNode }) {
       // hides itself because one module would not answer.
       if (up !== false) {
         offlineSince.current = null;
+        if (settle) clearTimeout(settle);
+        settle = undefined;
         setOnline(true);
         return;
       }
 
       const since = offlineSince.current ?? Date.now();
       offlineSince.current = since;
-      if (Date.now() - since >= SETTLE_MS) setOnline(false);
+      const waited = Date.now() - since;
+      if (waited >= SETTLE_MS) {
+        setOnline(false);
+        return;
+      }
+      // Still inside the settle window: look again the moment it closes
+      // rather than whenever the poll next comes round.
+      if (!settle) {
+        settle = setTimeout(() => {
+          settle = undefined;
+          void check();
+        }, SETTLE_MS - waited);
+      }
     }
 
     void check();
     const timer = setInterval(check, POLL_MS);
+    // Airplane mode, Wi-Fi dropping, data running out: read the moment the OS
+    // says something changed, not up to eight seconds later.
+    const unlisten = onNetworkChange(() => void check());
     // Coming back to the app is the moment the answer matters most, and the
     // one time a student will not wait out the poll interval.
     const sub = AppState.addEventListener('change', (s) => {
@@ -92,6 +135,8 @@ export function ConnectivityProvider({ children }: { children: ReactNode }) {
     return () => {
       alive = false;
       clearInterval(timer);
+      if (settle) clearTimeout(settle);
+      unlisten?.();
       sub.remove();
     };
   }, []);

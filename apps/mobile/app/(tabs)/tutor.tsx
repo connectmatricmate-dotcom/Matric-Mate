@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { ChapterPicker } from '../../src/components/ChapterPicker';
@@ -17,6 +17,7 @@ import {
   SectionTitle,
   Small,
   Spacer,
+  Text,
   TileGrid,
   Tiny,
 } from '../../src/components/ui';
@@ -103,7 +104,14 @@ export default function Tutor() {
             <Pill tone="grey">{t('billing.statusFree')}</Pill>
           ) : (
             <Ring pct={usedPct} size={46} stroke={6} color={low ? C.orange : C.teal}>
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: C.ink }}>
+              {/* Shrinks to the 34dp inside the stroke rather than crossing it,
+                  which "50/50" did at any font a little above the default. */}
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.6}
+                style={{ fontFamily: F.bodyBold, fontSize: 10.5, color: C.ink, maxWidth: 34, textAlign: 'center' }}
+              >
                 {left}/{limit}
               </Text>
             </Ring>

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../src/components/LanguageToggle';
 import { markWelcomeSeen } from '../src/lib/first-run';
-import { Body, Btn, H1, Screen, Tap, Wordmark } from '../src/components/ui';
+import { Body, Btn, H1, Screen, Tap, Text, Wordmark } from '../src/components/ui';
 import { useT } from '../src/i18n';
 import type { StringKey } from '../src/i18n';
 import { C, S, rowDir } from '../src/theme';
@@ -27,8 +27,12 @@ export default function Welcome() {
   const last = i === SLIDES.length - 1;
 
   return (
+    // Scrolls, and grows to the screen so the slide still centres: fixed, on
+    // a short phone in Urdu or at a large font, the slide ran up over the
+    // wordmark row and down under the buttons.
     <Screen
-      scroll={false}
+      grow
+      padded={false}
       footer={
         <View style={{ gap: S.sm }}>
           {last ? (

@@ -1,12 +1,26 @@
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
-import { Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Wordmark, useToast } from '../../src/components/ui';
+import { View } from 'react-native';
+import { Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Text, Wordmark, useToast } from '../../src/components/ui';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { WORDMARK_DATA_URI, accuracy, boardName, formatDate, grade, mediumName, reportHtml, subjectById, subjectName } from '@matricmate/core';
+import {
+  WORDMARK_DATA_URI,
+  accuracy,
+  boardName,
+  formatDate,
+  grade,
+  mediumName,
+  reportHtml,
+  subjectById,
+  subjectName,
+  testsThisMonth,
+} from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, textEnd } from '../../src/theme';
+
+/** The Karachi calendar month an instant falls in, "2026-09": the month the app counts days in. */
+const pktMonth = (ms: number): string => new Date(ms + 5 * 3600_000).toISOString().slice(0, 7);
 
 export default function Report() {
   const { state, derived } = useApp();
@@ -16,13 +30,28 @@ export default function Report() {
 
   const [now] = useState(() => Date.now());
   const month = formatDate(now, lang, { month: 'long', year: 'numeric' });
-  const overallAcc = accuracy(state.attempts);
   const printedOn = formatDate(now, lang, { day: 'numeric', month: 'long', year: 'numeric' });
+
+  /**
+   * This month's work only, which is what the card says it is: "Monthly
+   * report", "grades come from your accuracy this month". Grades, accuracy
+   * and counts all came from every answer ever; only the active days were
+   * the month's. In Karachi's calendar, like the days themselves.
+   */
+  const thisMonth = pktMonth(now);
+  const monthAttempts = useMemo(
+    () => state.attempts.filter((a) => Number.isFinite(a.at) && pktMonth(a.at) === thisMonth),
+    [state.attempts, thisMonth],
+  );
+  const monthResults = useMemo(() => testsThisMonth(state.results), [state.results]);
+  const overallAcc = accuracy(monthAttempts);
+  // No answers, no grade: a new student, or a new month, was graded "F".
+  const overallGrade = monthAttempts.length ? grade(overallAcc) : t('progress.gradeNone');
 
   const rows = useMemo(
     () =>
       derived.subjects.map((sid) => {
-        const set = state.attempts.filter((a) => a.subjectId === sid);
+        const set = monthAttempts.filter((a) => a.subjectId === sid);
         // Zero when unattempted. The old fallback graded syllabus coverage
         // as if it were accuracy, and the row hides unattempted subjects
         // anyway, so it could only ever have misled.
@@ -34,10 +63,12 @@ export default function Report() {
         const trend = delta > 4 ? '↑' : delta < -4 ? '↓' : '→';
         return { sid, acc, trend, attempted: set.length };
       }),
-    [derived.subjects, state.attempts]
+    [derived.subjects, monthAttempts]
   );
 
-  const activeDays = state.activeDays.filter((d) => d.slice(0, 7) === new Date().toISOString().slice(0, 7)).length;
+  // Day keys are Karachi dates, so the month is too. It was UTC, and the
+  // count went wrong before five in the morning on the first.
+  const activeDays = state.activeDays.filter((d) => d.slice(0, 7) === thisMonth).length;
 
   const [busy, setBusy] = useState(false);
 
@@ -51,15 +82,15 @@ export default function Report() {
         medium: mediumName(state.onboarding?.medium, lang),
       }),
       month,
-      overallGrade: grade(overallAcc),
+      overallGrade,
       overallAccuracy: overallAcc,
-      questions: state.attempts.length,
+      questions: monthAttempts.length,
       activeDays,
       rtl: lang === 'ur',
       logoDataUri: WORDMARK_DATA_URI,
       rows: rows.map((r) => ({
         subject: subjectName(subjectById(r.sid), lang) || r.sid,
-        grade: r.attempted ? grade(r.acc) : 'n/a',
+        grade: r.attempted ? grade(r.acc) : t('progress.gradeNone'),
         accuracy: r.acc,
         attempted: r.attempted,
         trend: r.trend,
@@ -128,7 +159,7 @@ export default function Report() {
               justifyContent: 'center',
             }}
           >
-            <Text style={{ fontFamily: F.display, fontSize: 24, color: C.orangeDark }}>{grade(overallAcc)}</Text>
+            <Text style={{ fontFamily: F.display, fontSize: 24, color: C.orangeDark }}>{overallGrade}</Text>
           </View>
         </Row>
 
@@ -149,7 +180,7 @@ export default function Report() {
             >
               <ScriptText text={subjectName(subjectById(r.sid), lang)} size={13.5} style={{ flex: 1 }} />
               <Text style={{ fontFamily: F.display, fontSize: 15, color: C.ink, width: 44, textAlign: textEnd() }}>
-                {r.attempted ? grade(r.acc) : 'n/a'}
+                {r.attempted ? grade(r.acc) : t('progress.gradeNone')}
               </Text>
               <Text
                 style={{
@@ -168,8 +199,8 @@ export default function Report() {
 
         <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
           <Pill tone="teal">{t('progress.activeDays', { n: activeDays })}</Pill>
-          <Pill tone="teal">{`${state.attempts.length} ${t('common.questions')}`}</Pill>
-          <Pill tone="orange">{`${state.results.length} ${t('progress.tests')}`}</Pill>
+          <Pill tone="teal">{`${monthAttempts.length} ${t('common.questions')}`}</Pill>
+          <Pill tone="orange">{`${monthResults.length} ${t('progress.tests')}`}</Pill>
           <Pill tone="grey">{t('account.levelLine', { xp: state.xp, level: derived.level })}</Pill>
         </Row>
       </Card>

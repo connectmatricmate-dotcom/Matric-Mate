@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { useState } from 'react';
-import { Linking, Text, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   Bar,
@@ -17,12 +17,25 @@ import {
   Sheet,
   Small,
   Spacer,
+  Text,
   Toggle,
   useToast,
 } from '../../src/components/ui';
-import { GRADE_10_READY, Language, REMINDER_TIMES, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
+import {
+  GRADE_10_READY,
+  Language,
+  REMINDER_TIMES,
+  boardName,
+  formatDate,
+  levelProgress,
+  mediumName,
+  reminderHour,
+  xpToNextLevel,
+} from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
+import { needsDownloadIn } from '../../src/core/downloads';
+import { usePushPermission } from '../../src/core/usePush';
 import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { SITE_URL } from '../../src/lib/site';
@@ -47,11 +60,22 @@ export default function Account() {
   const [confirmClass, setConfirmClass] = useState<9 | 10 | null>(null);
   const [pickTime, setPickTime] = useState(false);
   const [switching, setSwitching] = useState(false);
+  /** After a language switch that left downloads unreadable offline: say so once. */
+  const [downloadsNote, setDownloadsNote] = useState(false);
   const setup = state.onboarding;
   const classLevel = setup?.classLevel ?? 9;
   const s = state.settings;
   const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
   const unreadCount = state.notifications.filter((n) => !n.read).length;
+  /**
+   * Whether push can actually reach this phone. The switch is the student's
+   * wish; the phone's own setting is the permission. With the permission
+   * refused the switch still read "On this phone" over nothing arriving.
+   */
+  const push = usePushPermission(state.user?.id ?? null);
+  const pushBlocked = push.status !== null && push.status !== 'granted';
+  /** "7:00 PM" in English, "شام 7 بجے" in Urdu: the stored value is the English label. */
+  const timeLabel = (value: string) => t('account.reminderTimeLabel', { h: ((reminderHour(value) + 11) % 12) + 1 });
 
   return (
     <>
@@ -119,7 +143,7 @@ export default function Account() {
                 <Bar pct={levelProgress(state.xp)} />
               </View>
             </View>
-            <Small style={{ fontFamily: F.bodyBold }}>{t('account.toNextLevel', { n: xpToNextLevel(state.xp) })}</Small>
+            <Small style={{ fontFamily: F.bodyBold, flexShrink: 1 }}>{t('account.toNextLevel', { n: xpToNextLevel(state.xp) })}</Small>
           </Row>
         </Card>
 
@@ -147,10 +171,20 @@ export default function Account() {
             sub={t('lang.oneSwitchSub')}
             icon="book2"
             right={
-              <View style={{ width: 118 }}>
+              // Room for "English" in its half at a large font; at 118 each
+              // half was 54dp and the word broke in the middle.
+              <View style={{ width: 140 }}>
                 <Seg<Language>
                   value={s.language}
-                  onChange={(next) => actions.setLanguage(next)}
+                  onChange={(next) => {
+                    // Counted before the switch: downloads are saved in the
+                    // language they were made in, and the ones the new
+                    // language cannot open are said out loud, not found out
+                    // later with no signal.
+                    const stranded = next !== s.language && needsDownloadIn(state.downloads, next).length > 0;
+                    actions.setLanguage(next);
+                    if (stranded) setDownloadsNote(true);
+                  }}
                   options={[
                     { value: 'en', label: t('lang.english') },
                     { value: 'ur', label: t('lang.urdu'), urdu: true },
@@ -186,7 +220,7 @@ export default function Account() {
               made to itself: every student saw 7:00 PM whatever suited them. */}
           <Item
             title={t('account.studyReminder')}
-            sub={t('account.studyReminderSub', { time: s.reminderTime })}
+            sub={t('account.studyReminderSub', { time: timeLabel(s.reminderTime) })}
             icon="bell"
             onPress={s.reminders ? () => setPickTime(true) : undefined}
             right={<Toggle on={s.reminders} onPress={() => actions.setSettings({ reminders: !s.reminders })} />}
@@ -203,9 +237,33 @@ export default function Account() {
               nudge on their phone and not in their inbox. */}
           <Item
             title={t('account.channelPush')}
-            sub={t('account.channelPushSub')}
+            sub={pushBlocked ? t('account.channelPushOff') : t('account.channelPushSub')}
             icon="bell"
-            right={<Toggle on={s.channelPush} onPress={() => actions.setSettings({ channelPush: !s.channelPush })} />}
+            // With the phone refusing notifications the switch shows off, and
+            // turning it on asks the phone: again if it still may, else by
+            // opening the settings where the student can allow it.
+            onPress={
+              pushBlocked
+                ? () => {
+                    if (push.canAskAgain) void push.ask();
+                    else void Linking.openSettings().catch(() => toast(t('common.openLinkError')));
+                  }
+                : undefined
+            }
+            right={
+              <Toggle
+                on={s.channelPush && !pushBlocked}
+                onPress={() => {
+                  if (pushBlocked) {
+                    if (push.canAskAgain) void push.ask();
+                    else void Linking.openSettings().catch(() => toast(t('common.openLinkError')));
+                    if (!s.channelPush) actions.setSettings({ channelPush: true });
+                    return;
+                  }
+                  actions.setSettings({ channelPush: !s.channelPush });
+                }}
+              />
+            }
           />
           <Item
             title={t('account.channelEmail')}
@@ -288,7 +346,7 @@ export default function Account() {
           {REMINDER_TIMES.map((time, i) => (
             <Item
               key={time}
-              title={time}
+              title={timeLabel(time)}
               icon={time === s.reminderTime ? 'check' : 'clock'}
               tone={time === s.reminderTime ? 'green' : 'grey'}
               last={i === REMINDER_TIMES.length - 1}
@@ -339,6 +397,20 @@ export default function Account() {
       />
 
       <Confirm
+        visible={downloadsNote}
+        onClose={() => setDownloadsNote(false)}
+        title={t('downloads.title')}
+        body={t('downloads.languageNote')}
+        confirmLabel={t('account.manageDownloads')}
+        cancelLabel={t('common.close')}
+        tone="primary"
+        onConfirm={() => {
+          setDownloadsNote(false);
+          router.push('/learn/downloads');
+        }}
+      />
+
+      <Confirm
         visible={confirmClass !== null}
         onClose={() => setConfirmClass(null)}
         title={t('tutor.classWarnTitle', { n: confirmClass ?? 10 })}
@@ -354,7 +426,9 @@ export default function Account() {
             setConfirmClass(null);
             if (r === 'ok') {
               toast(t('tutor.classChanged', { n: confirmClass }));
-              router.replace('/(tabs)');
+              // Back down to the home screen already underneath, rather than
+              // a second one stacked over this screen.
+              router.dismissTo('/(tabs)');
             } else {
               toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
             }

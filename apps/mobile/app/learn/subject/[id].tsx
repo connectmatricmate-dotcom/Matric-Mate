@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Icon } from '../../../src/components/Icon';
 import {
@@ -17,25 +17,39 @@ import {
   Skeleton,
   Small,
   Spacer,
+  Text,
   Ur,
 } from '../../../src/components/ui';
 import { LockedNotice } from '../../../src/components/LockedNotice';
-import { api , chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
+import { api, chapterBlurb, chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectById, subjectName, subjectPct } from '@matricmate/core';
+import type { Chapter } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
 import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
-import { C, F, S } from '../../../src/theme';
+import { C, F, S, isRTL } from '../../../src/theme';
 
 export default function Chapters() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { state } = useApp();
+  const { state, contentKey, contentLoading } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const { data: subject } = useAsync(() => api.getSubject(id), [id]);
-  const { data: chapters, loading, error, reload } = useAsync(() => api.getChapters(id), [id]);
+  // contentKey: a language, class or board switch reaches an open list.
+  const { data: subject } = useAsync(() => api.getSubject(id), [id, contentKey]);
+  const { data: chapters, loading, reload } = useAsync(() => api.getChapters(id), [id, contentKey]);
   const [showLocked, setShowLocked] = useState(false);
 
   const pct = subjectPct(id, state.readSections, state.attempts);
+  /**
+   * Whether a row's zero counts mean "nothing in it".
+   *
+   * Only a live row can say so. The bundled catalogue, which answers when the
+   * read fails or is slow, carries zeroes for every chapter and no board, and
+   * treating those as empty greyed out every FBISE Class 9 chapter offline
+   * and made none of them tappable. And an account without a plan sees zero
+   * counts on everything under row level security, which is a locked chapter,
+   * not an empty one.
+   */
+  const emptyRow = (c: Chapter) => c.board !== undefined && state.premium.active && !hasStudyMaterial(c);
 
   return (
     <Screen
@@ -49,16 +63,17 @@ export default function Chapters() {
       }
     >
       <Header
-        title={subject?.name ?? ''}
+        // In the app's language: this was the English name in the Urdu UI.
+        title={subjectName(subject ?? subjectById(id), lang)}
         sub={
-          chapters
+          chapters?.length
             ? `${t('study.chapterCount', { n: chapters.length })} · ${t('study.percentComplete', { n: pct })}`
             : ' '
         }
         back
       />
 
-      {loading ? (
+      {(loading || contentLoading) && !chapters?.length ? (
         <View style={{ gap: S.sm }}>
           {[0, 1, 2, 3, 4].map((i) => (
             <Card key={i} flat>
@@ -72,13 +87,17 @@ export default function Chapters() {
             </Card>
           ))}
         </View>
-      ) : error && !(chapters ?? []).length ? (
+      ) : !(chapters ?? []).length ? (
+        // The chapter read never throws, so a failed or empty list used to
+        // show "0 chapters" and nothing under it, with no way to try again.
         <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
       ) : (
         <View style={{ gap: S.sm }}>
           {(chapters ?? []).map((c) => {
-            const empty = !hasStudyMaterial(c);
-            const p = empty ? 0 : chapterPct(c.id, state.readSections, state.attempts);
+            const empty = emptyRow(c);
+            // No figure for a row whose counts are not known: divided by
+            // nothing, one read section came out as most of a chapter.
+            const p = empty || (c.board === undefined && !hasStudyMaterial(c)) ? 0 : chapterPct(c.id, state.readSections, state.attempts);
             const locked = c.premium && !state.premium.active;
             const current = c.id === state.lastChapterId;
             const done = p >= 100;
@@ -111,13 +130,23 @@ export default function Chapters() {
                     {/* One language at a time: the app language picks the
                         title, both never stack. */}
                     <ScriptText text={chapterName(c, lang)} face="bodyBold" size={14} />
-                    {empty ? null : (
+                    {/* Under the title, not beside it: at the end of the row
+                        this pill took about 150dp and left the chapter name
+                        four or five words wide, and at a large font it ran
+                        out of the card. */}
+                    {empty ? (
+                      <Pill tone="grey" style={{ marginTop: 4, alignSelf: isRTL() ? 'flex-end' : 'flex-start' }}>
+                        {t('study.notOnPaper')}
+                      </Pill>
+                    ) : c.board === undefined && !hasStudyMaterial(c) ? null : (
                       <Small numberOfLines={1}>
                         {/* Only what the row actually knows. audioMinutes is
                             always zero here; the real length lives on the
                             audio_tracks row and belongs to the chapter hub.
                             The share leads: it is the number the board itself
-                            publishes and the one that decides study order. */}
+                            publishes and the one that decides study order.
+                            A row with no counts to give says nothing rather
+                            than "0 questions · 0 sections". */}
                         {c.examShare ? `${t('study.examShare', { n: c.examShare })} · ` : ''}
                         {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.sectionsSub', { n: c.sectionCount })}
                       </Small>
@@ -128,14 +157,14 @@ export default function Chapters() {
                       </View>
                     ) : null}
                   </View>
-                  {empty ? (
-                    <Pill tone="grey">{t('study.notOnPaper')}</Pill>
-                  ) : locked ? (
-                    <Pill tone="grey" icon="lock">
+                  {empty ? null : locked ? (
+                    <Pill tone="grey" icon="lock" style={{ maxWidth: '40%' }}>
                       {t('study.premiumChapter')}
                     </Pill>
                   ) : current ? (
-                    <Pill tone="orange">{t('common.continue')}</Pill>
+                    <Pill tone="orange" style={{ maxWidth: '40%' }}>
+                      {t('common.continue')}
+                    </Pill>
                   ) : (
                     <Chevron size={18} color={C.ink3} />
                   )}
@@ -146,10 +175,11 @@ export default function Chapters() {
                   // cramped ribbon (client screenshot). Urdu blurbs keep the
                   // Urdu treatment, Latin ones stay Small.
                   <View style={{ marginTop: S.sm }}>
-                    {isUrduScript(c.blurb) ? (
-                      <Ur size={13} style={{ color: C.ink2 }}>{c.blurb}</Ur>
+                    {/* The Urdu blurb in the Urdu interface, where one exists. */}
+                    {isUrduScript(chapterBlurb(c, lang)) ? (
+                      <Ur size={13} style={{ color: C.ink2 }}>{chapterBlurb(c, lang)}</Ur>
                     ) : (
-                      <Small>{c.blurb}</Small>
+                      <Small>{chapterBlurb(c, lang)}</Small>
                     )}
                   </View>
                 ) : null}

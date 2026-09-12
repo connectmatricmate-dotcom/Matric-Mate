@@ -10,8 +10,8 @@
  * running test must not leak the score. Beyond 16 items segments would
  * shrink into noise, so it falls back to the continuous bar.
  */
-import { Text, View } from 'react-native';
-import { Bar, IconButton } from './ui';
+import { View } from 'react-native';
+import { Bar, IconButton, Text } from './ui';
 import { C, F, isRTL, rowDir } from '../theme';
 
 const MAX_SEGMENTS = 16;
@@ -83,7 +83,10 @@ export function SessionHeader({
           {label}
         </Text>
       </View>
-      {right}
+      {/* Capped, so a long topic pill cannot squeeze the progress strip to
+          nothing and then run off the screen: the middle column starts from
+          zero width and only gets what this leaves. */}
+      {right ? <View style={{ flexShrink: 1, maxWidth: '45%' }}>{right}</View> : null}
     </View>
   );
 }

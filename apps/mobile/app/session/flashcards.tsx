@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Animated, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, Tap, Ur } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, H2, Header, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, Tap, Text, Ur } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
-import { api, chaptersFor, fetchAiSession, normalizeAiCards } from '@matricmate/core';
+import { api, fetchAiSession, itemKey, normalizeAiCards } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
+import { PickPracticeChapter, PracticeChapterBar, usePracticeChapter } from '../../src/components/PracticeChapter';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -13,21 +14,24 @@ import { C, F, S, alpha, isWeb } from '../../src/theme';
 
 export default function Flashcards() {
   const { chapter, ai } = useLocalSearchParams<{ chapter?: string; ai?: string }>();
-  const { state, actions } = useApp();
-  // Arriving with no chapter param used to mean Physics chapter 3 for
-  // everyone. Follow the student instead: the chapter they last studied,
-  // else the first chapter of their first subject.
-  const chapterId = chapter ?? state.lastChapterId ?? chaptersFor(state.onboarding?.subjects?.[0] ?? 'phy')[0]?.id ?? 'phy-1';
+  const { state, actions, contentKey } = useApp();
+  // No chapter in the link: one of the student's own chapters that has
+  // cards, or a picker. See PracticeChapter.
+  const practice = usePracticeChapter(chapter, 'cards');
+  const chapterId = practice.chapterId;
   const t = useT();
   // An ?ai= id swaps the bank for a set the student asked the AI to build.
   const { data: cards, loading, error, reload } = useAsync(async () => {
     if (ai) {
       const s = await fetchAiSession(ai);
       if (!s) throw new Error('missing session');
-      return normalizeAiCards(s.items as Parameters<typeof normalizeAiCards>[0], s.chapterId ?? chapterId);
+      // The set's own id in every card's id, so card 0 of this set is not
+      // card 0 of every other set.
+      return normalizeAiCards(s.items as Parameters<typeof normalizeAiCards>[0], s.chapterId ?? chapterId ?? '', ai);
     }
-    return api.getFlashcards(chapterId);
-  }, [chapterId, ai ?? '']);
+    return chapterId ? api.getFlashcards(chapterId) : [];
+    // contentKey: a language, class or board switch reaches an open screen.
+  }, [chapterId ?? '', ai ?? '', contentKey]);
 
   const [i, setI] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -43,14 +47,38 @@ export default function Flashcards() {
     Animated.timing(spin, { toValue: flipped ? 1 : 0, duration: 260, useNativeDriver: !isWeb }).start();
   }, [flipped, spin]);
 
-  const deck = round ? (cards ?? []).filter((c) => round.includes(c.id)) : (cards ?? []);
+  /**
+   * Cards not yet known first, which is what "repeats come back first next
+   * time" promises: a card sent to Repeat is un-known, so next time it leads
+   * the deck. Read against what was known when the screen opened, so the
+   * order does not reshuffle under the student as they mark cards, and once
+   * per card whatever medium it was known in.
+   */
+  const [knownAtStart] = useState(() => new Set(state.cardsKnown.map(itemKey)));
+  const ordered = useMemo(
+    () => (cards ? [...cards].sort((a, b) => Number(knownAtStart.has(itemKey(a.id))) - Number(knownAtStart.has(itemKey(b.id)))) : []),
+    [cards, knownAtStart],
+  );
+  const deck = round ? ordered.filter((c) => round.includes(c.id)) : ordered;
   const card = deck[i];
-  const done = !!cards && i >= deck.length;
+  // Not done with nothing to do: an empty deck used to fire the finish cheer.
+  const done = !!cards?.length && i >= deck.length;
 
   useEffect(() => {
     if (done) cheer();
   }, [done]);
 
+
+  // Which chapter, before anything about its cards: none of theirs has any
+  // yet, or the chapter index is still on its way.
+  if (!ai && !chapterId) {
+    return (
+      <Screen>
+        <Header title={t('study.flashcards')} back />
+        {practice.waiting ? <Skeleton h={320} style={{ borderRadius: 22 }} /> : <PickPracticeChapter kind="cards" />}
+      </Screen>
+    );
+  }
 
   // A failed fetch is not an empty chapter, and an empty chapter is not a
   // finished session. Without these two branches, a network error rendered a
@@ -60,6 +88,7 @@ export default function Flashcards() {
     return (
       <Screen>
         <Header title={t('study.flashcards')} back />
+        {ai ? null : <PracticeChapterBar kind="cards" chapter={practice.chapter} />}
         <Spacer h={S.lg} />
         <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
       </Screen>
@@ -69,6 +98,8 @@ export default function Flashcards() {
     return (
       <Screen>
         <Header title={t('study.flashcards')} back />
+        {/* The way out of an empty chapter is another chapter. */}
+        {ai ? null : <PracticeChapterBar kind="cards" chapter={practice.chapter} />}
         <Spacer h={S.lg} />
         <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
       </Screen>
@@ -92,7 +123,9 @@ export default function Flashcards() {
     setI(i + 1);
   }
 
-  if (loading) {
+  // Only before the first deck lands. A refetch after a language switch keeps
+  // the student on their card instead of flashing the whole screen away.
+  if (loading && !cards?.length) {
     return (
       <Screen>
         <Header title={t('study.flashcards')} back />
@@ -124,7 +157,9 @@ export default function Flashcards() {
           />
         ) : null}
         <Spacer h={S.sm} />
-        <Btn title={t('session.backToChapter')} variant="line" onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+        {chapterId ? (
+          <Btn title={t('session.backToChapter')} variant="line" onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+        ) : null}
       </Screen>
     );
   }
@@ -143,15 +178,25 @@ export default function Flashcards() {
       }
     >
       <Header title={t('study.flashcards')} sub={t('session.cardOf', { a: i + 1, b: total })} back />
+      {ai ? null : <PracticeChapterBar kind="cards" chapter={practice.chapter} />}
       <SegmentTrack segments={Array.from({ length: total }, (_, j) => (j < i ? 'done' : j === i ? 'current' : 'todo'))} />
       <Spacer h={S.lg} />
 
       <Tap onPress={() => setFlipped((f) => !f)}>
-        <View style={{ height: 320 }}>
+        {/*
+          Both faces share one space that is as tall as the taller of them,
+          and never less than 320. The second face is pulled back over the
+          first with a negative margin rather than positioned absolutely, so
+          it still counts towards the height, and the row stretches both to
+          match. The card used to be a fixed 320 with the faces absolute
+          inside it: a long definition, or the Urdu line under it, spilled
+          out above and below, and white text on the white page hid it. A
+          card taller than the screen now scrolls with the page.
+        */}
+        <View style={{ flexDirection: 'row', minHeight: 320 }}>
           <Animated.View
             style={{
-              position: 'absolute',
-              inset: 0,
+              width: '100%',
               backfaceVisibility: 'hidden',
               opacity: frontOpacity,
               transform: [{ perspective: 1000 }, { rotateY: frontRotate }],
@@ -174,8 +219,10 @@ export default function Flashcards() {
 
           <Animated.View
             style={{
-              position: 'absolute',
-              inset: 0,
+              width: '100%',
+              // Start, not left: it lands back on the first face whichever way
+              // the system lays rows out.
+              marginStart: '-100%',
               backfaceVisibility: 'hidden',
               opacity: backOpacity,
               transform: [{ perspective: 1000 }, { rotateY: backRotate }],
@@ -201,7 +248,7 @@ export default function Flashcards() {
       </Tap>
 
       <Spacer h={S.md} />
-      <Row gap={S.sm} style={{ justifyContent: 'center' }}>
+      <Row gap={S.sm} style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
         <Pill tone="green">{t('session.knownCount', { n: known.length })}</Pill>
         <Pill tone="orange">{t('session.repeatCount', { n: repeats.length })}</Pill>
       </Row>

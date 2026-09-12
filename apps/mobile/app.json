@@ -32,7 +32,7 @@
       "shortName": "MatricMate",
       "themeColor": "#096A8B",
       "backgroundColor": "#FAFBF7",
-      "description": "Board exams, sorted. FBISE Class 9 study, practice and AI tutor."
+      "description": "Board exams, sorted. FBISE and Punjab Board Class 9 and 10 study, practice and AI tutor."
     },
     "plugins": [
       "expo-router",

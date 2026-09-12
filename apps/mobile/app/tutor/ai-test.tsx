@@ -1,15 +1,20 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { View } from 'react-native';
 import { router } from 'expo-router';
-import { Btn, Card, Check, Header, Item, Pill, Row, Screen, SectionTitle, Seg, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, Check, Header, Item, Pill, Row, Screen, SectionTitle, Seg, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
 import { AiWorking } from '../../src/components/AiWorking';
+import { aiFailureKey } from '../../src/components/aiFailure';
 import {
+  api,
+  chapterById,
   chapterName,
-  chaptersFor,
   fetchAiSession,
   fetchAiSessions,
   generateAiSession,
+  inSyllabus,
   normalizeAiMcqs,
   subjectById,
+  subjectMedium,
   subjectName,
   weakTopics,
 } from '@matricmate/core';
@@ -34,14 +39,23 @@ const KINDS: { value: AiSessionKind; label: StringKey }[] = [
  * student's account so it opens on the website too.
  */
 export default function AiBuilder() {
-  const { state, derived } = useApp();
+  const { state, derived, contentKey, contentLoading } = useApp();
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
+  const board = state.onboarding?.board ?? 'fbise';
 
   const [kind, setKind] = useState<AiSessionKind>('mcq');
-  const [subjectId, setSubjectId] = useState(derived.subjects[0] ?? 'phy');
-  const chapters = useMemo(() => chaptersFor(subjectId), [subjectId]);
+  const [subjectId, setSubjectId] = useState(derived.plan[0]?.subjectId ?? derived.subjects[0] ?? 'phy');
+  /**
+   * The subject's chapters, read for this screen.
+   *
+   * This was a memo over the synchronous index that never looked again, so a
+   * Class 10 or Punjab student who opened it before the index had loaded got
+   * an empty list and a "Make my set" button that silently did nothing.
+   */
+  const list = useAsync(() => api.getChapters(subjectId), [subjectId, contentKey]);
+  const chapters = list.data ?? [];
   const [chapterTouched, setChapterTouched] = useState<string | null>(null);
   const chapterId = chapterTouched ?? state.lastChapterId ?? chapters[0]?.id ?? '';
   const chapterInSubject = chapters.some((c) => c.id === chapterId) ? chapterId : (chapters[0]?.id ?? '');
@@ -50,10 +64,19 @@ export default function AiBuilder() {
   /** Held while a build is in flight so the wait screen can call it off. */
   const cancel = useRef<AbortController | null>(null);
 
-  const weak = useMemo(() => weakTopics(state.attempts).slice(0, 3), [state.attempts]);
+  const weak = weakTopics(state.attempts).slice(0, 3);
 
   async function build() {
-    if (!chapterInSubject || busy) return;
+    if (busy) return;
+    // Said, not swallowed: the button used to return without a word.
+    if (!chapterInSubject) {
+      toast(t('tutor.noChapters'));
+      return;
+    }
+    if (!inSyllabus(chapterInSubject, state.onboarding?.classLevel ?? 9, board)) {
+      toast(t('tutor.notInSyllabus'));
+      return;
+    }
     setBusy(true);
     const controller = new AbortController();
     cancel.current = controller;
@@ -62,7 +85,9 @@ export default function AiBuilder() {
         kind,
         chapterId: chapterInSubject,
         count: Number(count),
-        medium: state.settings.contentMedium,
+        // The subject's own language: English is written in English and Urdu
+        // in Urdu whatever the student reads in.
+        medium: subjectMedium(chapterInSubject, board, state.settings.contentMedium),
       },
       controller.signal,
     );
@@ -72,15 +97,7 @@ export default function AiBuilder() {
     // and saves either way, so there is nothing to report as a failure.
     if (controller.signal.aborted) return;
     if (!res.ok) {
-      const note = {
-        offline: t('tutor.offline'),
-        quota: t('tutor.limitToast'),
-        rate: t('tutor.slowDown'),
-        plan: t('tutor.planNeeded'),
-        refused: t('tutor.refused'),
-        error: t('tutor.errorReply'),
-      }[res.reason];
-      toast(note);
+      toast(t(aiFailureKey(res.reason)));
       return;
     }
     openSet(kind, res.sessionId, res.items, chapterInSubject);
@@ -94,7 +111,15 @@ export default function AiBuilder() {
         label: t('tutor.aiMade'),
         subjectId: forChapter.split('-')[0],
         chapterId: forChapter,
-        mcqs: normalizeAiMcqs(items as Parameters<typeof normalizeAiMcqs>[0], forChapter),
+        // The set's id in every question's id, so no two sets share one, and
+        // the chapter's name as the topic, so a wrong answer becomes a named
+        // weak topic rather than a blank one.
+        mcqs: normalizeAiMcqs(
+          items as Parameters<typeof normalizeAiMcqs>[0],
+          forChapter,
+          chapterName(chapterById(forChapter), subjectMedium(forChapter, board, state.settings.contentMedium)) || undefined,
+          sessionId,
+        ),
         aiGenerated: true,
       });
       router.replace('/session/mcq');
@@ -122,7 +147,18 @@ export default function AiBuilder() {
   }
 
   return (
-    <Screen footer={<Btn title={t('tutor.buildIt')} variant="orange" icon="spark" loading={busy} onPress={build} />}>
+    <Screen
+      footer={
+        <Btn
+          title={t('tutor.buildIt')}
+          variant="orange"
+          icon="spark"
+          loading={busy}
+          disabled={!list.loading && !chapterInSubject}
+          onPress={build}
+        />
+      }
+    >
       {/* Writing a fresh set is twenty seconds of real work, so it gets the
           whole screen rather than a button that dims. See AiWorking. */}
       <AiWorking
@@ -146,18 +182,30 @@ export default function AiBuilder() {
       </Row>
 
       <SectionTitle>{t('tutor.pickChapter')}</SectionTitle>
-      <Card flat style={{ paddingVertical: 0 }}>
-        {chapters.map((c, i) => (
-          <Item
-            key={c.id}
-            title={`${c.number}. ${chapterName(c, lang)}`}
-            icon="book"
-            last={i === chapters.length - 1}
-            onPress={() => setChapterTouched(c.id)}
-            right={<Check on={c.id === chapterInSubject} />}
-          />
-        ))}
-      </Card>
+      {(list.loading || contentLoading) && !chapters.length ? (
+        <View style={{ gap: S.sm }}>
+          <Skeleton h={52} />
+          <Skeleton h={52} />
+          <Skeleton h={52} />
+        </View>
+      ) : !chapters.length ? (
+        <Card flat>
+          <Small>{t('tutor.noChapters')}</Small>
+        </Card>
+      ) : (
+        <Card flat style={{ paddingVertical: 0 }}>
+          {chapters.map((c, i) => (
+            <Item
+              key={c.id}
+              title={`${c.number}. ${chapterName(c, lang)}`}
+              icon="book"
+              last={i === chapters.length - 1}
+              onPress={() => setChapterTouched(c.id)}
+              right={<Check on={c.id === chapterInSubject} />}
+            />
+          ))}
+        </Card>
+      )}
 
       <SectionTitle>{t('tutor.pickKind')}</SectionTitle>
       <Seg
@@ -194,7 +242,11 @@ export default function AiBuilder() {
           <Card
             onPress={() =>
               router.push(
-                `/session/exam-intro?ai=1&topics=${encodeURIComponent(weak.map((w) => w.topic).join('|'))}&count=15&difficulty=board`,
+                // The topics' own chapters ride along, so the test and its
+                // padding stay inside them instead of drawing from anywhere.
+                `/session/exam-intro?ai=1&topics=${encodeURIComponent(weak.map((w) => w.topic).join('|'))}&chapters=${encodeURIComponent(
+                  weak.map((w) => w.chapterId).filter(Boolean).join('|'),
+                )}&count=15&difficulty=board`,
               )
             }
             border={C.orange}
@@ -214,7 +266,11 @@ export default function AiBuilder() {
 /** The shelf of saved AI sets, so a set built yesterday is one tap away. */
 function RecentSets({ onOpen }: { onOpen: (id: string, kind: string, chapterId: string | null) => void }) {
   const t = useT();
-  const { data: sets } = useAsync(() => fetchAiSessions().then((rows) => rows.filter((r) => r.kind !== 'paper')), []);
+  const { state } = useApp();
+  const { data: sets } = useAsync(
+    () => fetchAiSessions().then((rows) => rows.filter((r) => r.kind !== 'paper')),
+    [state.user?.id ?? ''],
+  );
 
   if (!sets?.length) return null;
   return (

@@ -13,13 +13,13 @@ import {
   ScrollView,
   StyleProp,
   StyleSheet,
-  Text,
-  TextInput,
+  Text as NativeText,
+  TextInput as NativeTextInput,
   TextStyle,
   View,
   ViewStyle,
 } from 'react-native';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import type { NativeScrollEvent, NativeSyntheticEvent, TextInputProps, TextProps as NativeTextProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useReducedMotion } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
@@ -30,6 +30,31 @@ import { colors, isUrduScript } from '@matricmate/core';
 import { Icon, IconName } from './Icon';
 
 /* ------------------------------------------------------------------ text */
+
+/**
+ * How far a student's system font size may enlarge the app's text.
+ *
+ * Android's largest setting doubles every size, and nothing here was ever
+ * built for that: labels broke mid-word, pills pushed their neighbours off
+ * the screen and Nastaliq outgrew the boxes drawn for it. 1.3 still honours
+ * the setting for somebody who needs it and keeps every row on the screen.
+ */
+export const FONT_SCALE_CAP = 1.3;
+
+/**
+ * React Native's Text and TextInput with the cap applied. Every screen imports
+ * these instead of the ones in react-native: React 19 ignores defaultProps on
+ * function components, so there is no single switch to flip, and a Text that
+ * skips this wrapper scales without limit. A caller can still pass its own
+ * maxFontSizeMultiplier, or allowFontScaling={false} for a glyph in a fixed box.
+ */
+export function Text(props: NativeTextProps & { ref?: React.Ref<NativeText> }) {
+  return <NativeText maxFontSizeMultiplier={FONT_SCALE_CAP} {...props} />;
+}
+
+export function TextInput(props: TextInputProps & { ref?: React.Ref<NativeTextInput> }) {
+  return <NativeTextInput maxFontSizeMultiplier={FONT_SCALE_CAP} {...props} />;
+}
 
 export const H1 = (p: TextProps) => <Txt {...p} style={[T.h1, p.style]} />;
 export const H2 = (p: TextProps) => <Txt {...p} style={[T.h2, p.style]} />;
@@ -49,8 +74,22 @@ function Txt({ children, style, numberOfLines }: TextProps) {
 }
 
 /** Urdu text. Nastaliq, RTL, generous line-height. */
-export function Ur({ children, size = 16, style }: { children: React.ReactNode; size?: number; style?: StyleProp<TextStyle> }) {
-  return <Text style={[urdu(size), style]}>{children}</Text>;
+export function Ur({
+  children,
+  size = 16,
+  lines,
+  style,
+}: {
+  children: React.ReactNode;
+  size?: number;
+  lines?: number;
+  style?: StyleProp<TextStyle>;
+}) {
+  return (
+    <Text numberOfLines={lines} style={[urdu(size), style]}>
+      {children}
+    </Text>
+  );
 }
 
 /**
@@ -84,7 +123,9 @@ export function ScriptText({
       </Text>
     );
   }
-  const fontFamily = face === 'display' ? F.display : face === 'bodyBold' ? F.bodyBold : F.body;
+  // The Latin faces even in the Urdu interface: this text is not Urdu, and in
+  // Nastaliq a Latin line height cut off its descenders (see F.latin).
+  const fontFamily = face === 'display' ? F.latin.display : face === 'bodyBold' ? F.latin.bodyBold : F.latin.body;
   return (
     <Text
       numberOfLines={lines}
@@ -143,6 +184,11 @@ export function Wordmark({ width = 210, height = 40 }: { width?: number; height?
  * practice every input in the app was typed at blind, behind the keyboard. A
  * screen with no input never sees a keyboard event, so handling it here costs
  * those screens two idle listeners and changes nothing else.
+ *
+ * `grow`, for a screen that centres its content in the space it has. The
+ * content fills the screen when it is short and still scrolls when it is not:
+ * a centred stack on a fixed screen ran under the footer on a short phone once
+ * the text was Urdu or the font was large.
  */
 export function Screen({
   children,
@@ -150,12 +196,14 @@ export function Screen({
   footer,
   padded = true,
   tabbed = false,
+  grow = false,
 }: {
   children: React.ReactNode;
   scroll?: boolean;
   footer?: React.ReactNode;
   padded?: boolean;
   tabbed?: boolean;
+  grow?: boolean;
 }) {
   const insets = useSafeAreaInsets();
   const keyboard = useKeyboardOverlap();
@@ -190,7 +238,7 @@ export function Screen({
    */
   useEffect(() => {
     if (!scroll || keyboard <= 0) return;
-    const input = TextInput.State.currentlyFocusedInput();
+    const input = NativeTextInput.State.currentlyFocusedInput();
     if (!input) return;
     // One frame for the padding below to land, or we measure the old, taller
     // scroll area and the answer is always "nothing needs to move".
@@ -214,6 +262,7 @@ export function Screen({
       style={{ flex: 1 }}
       contentContainerStyle={[
         { paddingHorizontal: padded ? S.lg : 0, paddingBottom: bottomGap },
+        grow && { flexGrow: 1 },
         isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
       ]}
       onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -449,9 +498,16 @@ export function TileGrid({ tiles }: { tiles: { key: string; full?: boolean; node
 export function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   /* Section headings are often a subject name, which is Urdu for an Urdu
      student, and Nunito has no Urdu glyphs. Detected here rather than at every
-     call site, the same way Header, Item and Pill already do it. */
+     call site, the same way Header, Item and Pill already do it. It shrinks
+     and wraps, so a long heading cannot push the action off the screen. */
   const heading =
-    typeof children === 'string' && isUrduScript(children) ? <Ur size={17}>{children}</Ur> : <H3>{children}</H3>;
+    typeof children === 'string' && isUrduScript(children) ? (
+      <Ur size={17} style={{ flexShrink: 1 }}>
+        {children}
+      </Ur>
+    ) : (
+      <H3 style={{ flexShrink: 1 }}>{children}</H3>
+    );
   return (
     <View style={[st.sectionTitle, { flexDirection: rowDir() }]}>
       {heading}
@@ -682,7 +738,11 @@ export function Btn({
         ) : (
           <>
             {icon ? <Icon name={icon} size={sm ? 16 : 18} color={fg} /> : null}
-            <Text style={{ fontFamily: F.display, fontSize: sm ? 14 : 16, color: fg }}>{title}</Text>
+            {/* Shrinks beside the icon and wraps centred, rather than running
+                out of the button when the label is long or the font is large. */}
+            <Text style={{ fontFamily: F.display, fontSize: sm ? 14 : 16, color: fg, flexShrink: 1, textAlign: 'center' }}>
+              {title}
+            </Text>
           </>
         )}
       </View>
@@ -697,12 +757,16 @@ export function Pill({
   icon,
   onPress,
   style,
+  lines,
 }: {
   children?: React.ReactNode;
   tone?: Tone;
   icon?: IconName;
   onPress?: () => void;
   style?: ViewStyle;
+  /** Truncate after this many lines, for a pill that has to stay one row
+   *  tall. Without it a long label wraps inside the pill. */
+  lines?: number;
 }) {
   const map: Record<Tone, [string, string]> = {
     teal: [C.tealTint, C.teal],
@@ -714,17 +778,22 @@ export function Pill({
   const [bg, fg] = map[tone];
   // Anything that isn't already an element (string, number, or an interpolated
   // array of them) must be wrapped in <Text>, a bare text node inside a View
-  // is invalid in React Native.
+  // is invalid in React Native. The label shrinks, and the pill with it:
+  // pills carry topics and chapter names, and at full width one of those
+  // pushed everything beside it off the screen.
   const body = (
     <View style={[st.pill, { flexDirection: rowDir(), backgroundColor: bg }, style]}>
       {icon ? <Icon name={icon} size={12} color={fg} strokeWidth={2.4} /> : null}
       {children == null || React.isValidElement(children) ? (
         children
       ) : isUrduScript(String(children)) ? (
-        // Pills carry topics and chapter names, not only fixed labels.
-        <Ur size={12} style={{ color: fg }}>{String(children)}</Ur>
+        <Ur size={12} lines={lines} style={{ color: fg, flexShrink: 1 }}>
+          {String(children)}
+        </Ur>
       ) : (
-        <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: fg }}>{children}</Text>
+        <Text numberOfLines={lines} style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: fg, flexShrink: 1 }}>
+          {children}
+        </Text>
       )}
     </View>
   );
@@ -732,7 +801,7 @@ export function Pill({
   // a control: playback speed, review filters, chat feedback. `hit` pads the
   // touchable area out to something a thumb can actually land on.
   return onPress ? (
-    <Tap onPress={onPress} hit>
+    <Tap onPress={onPress} hit style={st.pillTap}>
       {body}
     </Tap>
   ) : (
@@ -757,9 +826,15 @@ export function Seg<Tv extends string>({
         const on = o.value === value;
         return (
           <Tap key={o.value} onPress={() => onChange(o.value)} style={[st.segBtn, on && { backgroundColor: C.card }]}>
-            {/* One line height for both scripts; see LanguageToggle for why. */}
+            {/* One line height for both scripts; see LanguageToggle for why.
+                One line, shrinking a little to fit: every slot is an equal
+                share of the width, and at a large font "English" broke in the
+                middle of the word and doubled the control's height. */}
             {o.urdu ? (
               <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
                 style={{
                   fontFamily: F.urduBold,
                   fontSize: 14,
@@ -773,6 +848,9 @@ export function Seg<Tv extends string>({
               </Text>
             ) : (
               <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
                 style={{
                   fontFamily: F.bodyBold,
                   fontSize: 13,
@@ -947,7 +1025,9 @@ export function Kpi({ value, label, small }: { value: string; label: string; sma
       >
         {value}
       </Text>
-      <Text style={{ fontFamily: F.bodyBold, fontSize: small ? 10.5 : 11.5, color: C.ink2 }} numberOfLines={1}>
+      {/* Two lines: in a row of narrow tiles, and at a large font, one line
+          cut "Active days" down to "Active d…". */}
+      <Text style={{ fontFamily: F.bodyBold, fontSize: small ? 10.5 : 11.5, color: C.ink2 }} numberOfLines={2}>
         {label}
       </Text>
     </View>
@@ -1188,6 +1268,9 @@ export function Empty({
 const ToastCtx = createContext<(msg: string) => void>(() => {});
 export const useToast = () => useContext(ToastCtx);
 
+/** What the toast is showing right now, for every layer that draws it. */
+const ToastShownCtx = createContext<{ msg: string | null; op: Animated.Value } | null>(null);
+
 export function ToastHost({ children }: { children: React.ReactNode }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [op] = useState(() => new Animated.Value(0));
@@ -1207,46 +1290,133 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
   );
 
   const value = useMemo(() => show, [show]);
+  const shown = useMemo(() => ({ msg, op }), [msg, op]);
   return (
     <ToastCtx.Provider value={value}>
-      {children}
-      {msg ? (
-        <Animated.View pointerEvents="none" style={[st.toast, { opacity: op, backgroundColor: C.ink }]}>
-          <Text style={{ color: C.paper, fontFamily: F.bodyBold, fontSize: 13, textAlign: 'center' }}>{msg}</Text>
-        </Animated.View>
-      ) : null}
+      <ToastShownCtx.Provider value={shown}>
+        {children}
+        <ToastLayer />
+      </ToastShownCtx.Provider>
     </ToastCtx.Provider>
   );
 }
 
-/** Bottom sheet used for paywall, confirmations, Ask AI. */
+/**
+ * The toast itself, near the top of the screen.
+ *
+ * It sat 100dp off the bottom, which on a phone with three-button navigation
+ * is on top of the tab bar, over a screen's footer button, and behind the
+ * keyboard in chat. The top of the screen has none of those.
+ *
+ * Drawn by the host and again inside every open Sheet, at the same spot. A
+ * Sheet is a window of its own on Android, above the one the host draws in,
+ * so "link copied" from inside the locked-content sheet was being shown
+ * underneath it where nobody could see it.
+ */
+function ToastLayer() {
+  const shown = useContext(ToastShownCtx);
+  const insets = useSafeAreaInsets();
+  if (!shown?.msg) return null;
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[st.toast, { top: insets.top + 56, opacity: shown.op, backgroundColor: C.ink }]}
+    >
+      <Text style={{ color: C.paper, fontFamily: F.bodyBold, fontSize: 13, textAlign: 'center' }}>{shown.msg}</Text>
+    </Animated.View>
+  );
+}
+
+/** Space above an open sheet, below the status bar, so it still reads as a sheet over the page. */
+const SHEET_TOP_GAP = 56;
+
+/**
+ * Bottom sheet used for paywall, confirmations, Ask AI.
+ *
+ * Everything below the title scrolls. The panel used to be capped at 82% of
+ * the screen with no way to scroll, so a long Ask AI answer, the chapter
+ * picker's last rows and, in Urdu on a short phone, the last reminder times
+ * ran off the bottom edge where nobody could reach them.
+ *
+ * `scroll={false}` is for content that brings its own scroller and wants to
+ * keep something above it pinned, as the chapter picker keeps its search box.
+ */
 export function Sheet({
   visible,
   onClose,
   children,
   title,
+  scroll = true,
 }: {
   visible: boolean;
   onClose: () => void;
   children: React.ReactNode;
   title?: string;
+  scroll?: boolean;
 }) {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={st.sheetBack} onPress={onClose}>
-        <Pressable style={[st.sheet, { backgroundColor: C.paper }]} onPress={() => {}}>
-          <View style={[st.grab, { backgroundColor: C.mute }]} />
-          {title ? (
-            isUrduScript(title) ? (
-              <Ur size={19} style={{ marginBottom: S.sm }}>{title}</Ur>
-            ) : (
-              <H2 style={{ marginBottom: S.sm }}>{title}</H2>
-            )
-          ) : null}
-          {children}
-        </Pressable>
-      </Pressable>
+      <SheetPanel onClose={onClose} title={title} scroll={scroll}>
+        {children}
+      </SheetPanel>
+      <ToastLayer />
     </Modal>
+  );
+}
+
+/**
+ * The panel, split out so its listeners only exist while a sheet is open: a
+ * screen can hold several closed sheets, and Modal renders nothing for those.
+ */
+function SheetPanel({
+  onClose,
+  children,
+  title,
+  scroll,
+}: {
+  onClose: () => void;
+  children: React.ReactNode;
+  title?: string;
+  scroll: boolean;
+}) {
+  const insets = useSafeAreaInsets();
+  const keyboard = useKeyboardOverlap();
+  /**
+   * The modal is drawn edge to edge, under the status bar and the navigation
+   * bar, so it has to clear both itself. A fixed 28dp at the bottom left the
+   * last button half under the system buttons on a three-button phone. When
+   * the keyboard is up it covers the navigation bar, so the panel sits on the
+   * keys instead: the chapter picker's search box and its results used to be
+   * hidden behind them.
+   */
+  const bottom = keyboard > 0 ? keyboard + S.md : Math.max(insets.bottom, S.md) + S.lg;
+  return (
+    <Pressable style={[st.sheetBack, { paddingTop: insets.top + SHEET_TOP_GAP }]} onPress={onClose}>
+      <Pressable style={[st.sheet, { backgroundColor: C.paper, paddingBottom: bottom }]} onPress={() => {}}>
+        <View style={[st.grab, { backgroundColor: C.mute }]} />
+        {title ? (
+          isUrduScript(title) ? (
+            <Ur size={19} style={{ marginBottom: S.sm }}>{title}</Ur>
+          ) : (
+            <H2 style={{ marginBottom: S.sm }}>{title}</H2>
+          )
+        ) : null}
+        {scroll ? (
+          // Hugs its content until the panel reaches the top gap, then
+          // scrolls. flexShrink is what lets it give way; the panel above
+          // shrinks to fit the screen and this is the part that absorbs it.
+          <ScrollView
+            style={{ flexGrow: 0, flexShrink: 1 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
+          </ScrollView>
+        ) : (
+          children
+        )}
+      </Pressable>
+    </Pressable>
   );
 }
 
@@ -1265,6 +1435,7 @@ const st = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
+    gap: S.sm,
     marginTop: S.lg,
     marginBottom: S.sm,
   },
@@ -1304,7 +1475,12 @@ const st = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: R.pill,
     alignSelf: 'flex-start',
+    flexShrink: 1,
+    maxWidth: '100%',
   },
+  // The touchable around a pressable pill is what sits in the row, so it has
+  // to be the thing that gives way.
+  pillTap: { flexShrink: 1, maxWidth: '100%' },
   seg: { flexDirection: 'row', borderRadius: 13, padding: 3, gap: 3 },
   // overflow hidden clips Android's ripple layer to the radius; without it the
   // pressed and selected states could paint a square outside the corners. The
@@ -1314,7 +1490,15 @@ const st = StyleSheet.create({
   // leading of Latin and its ink hangs below the baseline, so a 36px box with
   // `overflow: hidden` cut the descenders off its own Urdu label. (The same
   // clip is what made example boxes render blank on Android.)
-  segBtn: { flex: 1, minHeight: 36, paddingVertical: 4, justifyContent: 'center', borderRadius: R.sm, alignItems: 'center' },
+  segBtn: {
+    flex: 1,
+    minHeight: 36,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+    justifyContent: 'center',
+    borderRadius: R.sm,
+    alignItems: 'center',
+  },
   field: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1343,9 +1527,9 @@ const st = StyleSheet.create({
     borderBottomWidth: 1,
   },
   itemIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  // `top` is set where it is drawn, from the status-bar inset.
   toast: {
     position: 'absolute',
-    bottom: 100,
     alignSelf: 'center',
     maxWidth: 320,
     paddingVertical: 10,
@@ -1353,12 +1537,13 @@ const st = StyleSheet.create({
     borderRadius: R.pill,
   },
   sheetBack: { flex: 1, backgroundColor: 'rgba(11,46,58,0.45)', justifyContent: 'flex-end' },
+  // No height cap of its own: the backdrop's top padding is the cap, and
+  // flexShrink lets the panel give way to it instead of running off the top.
   sheet: {
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
     padding: S.lg,
-    paddingBottom: S.xxl,
-    maxHeight: '82%',
+    flexShrink: 1,
     width: '100%',
     ...(isWeb ? { maxWidth: 520, alignSelf: 'center' } : null),
   },

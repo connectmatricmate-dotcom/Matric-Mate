@@ -126,10 +126,14 @@ function Working({ title, onCancel }: { title: string; onCancel?: () => void }) 
       <View style={{ height: S.xl }} />
       <H2 style={{ textAlign: 'center' }}>{title}</H2>
 
-      {/* Fixed height, so a longer line does not shove the heading up the
-          screen every time the stage changes. */}
-      <View style={{ height: 52, justifyContent: 'center' }}>
-        <Body style={{ textAlign: 'center', color: C.ink2 }}>{t(STAGES[stage])}</Body>
+      {/* A floor, so a longer line does not shove the heading up the screen
+          every time the stage changes. Only a floor: two lines of Urdu, or a
+          large system font, are taller than 52 and spilled over the pill
+          below when this was a fixed height. */}
+      <View style={{ minHeight: 52, justifyContent: 'center' }}>
+        <Body numberOfLines={2} style={{ textAlign: 'center', color: C.ink2 }}>
+          {t(STAGES[stage])}
+        </Body>
       </View>
 
       <View

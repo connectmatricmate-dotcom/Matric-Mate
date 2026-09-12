@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { Stack, router, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -13,7 +13,7 @@ import { AuthProvider } from '../src/store/auth';
 import { AppProvider, useApp } from '../src/store/app';
 import { useQuotaRealtime } from '../src/core/useQuota';
 import { usePush } from '../src/core/usePush';
-import { Btn, ToastHost } from '../src/components/ui';
+import { Btn, Text, ToastHost } from '../src/components/ui';
 import { C, F, isRTL } from '../src/theme';
 import { en, ur } from '@matricmate/core';
 
@@ -41,7 +41,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   const s = isRTL() ? ur : en;
   return (
     <View style={{ flex: 1, backgroundColor: C.paper, alignItems: 'center', justifyContent: 'center', padding: 28, gap: 12 }}>
-      <Text style={{ fontFamily: F.display, fontSize: 21, lineHeight: isRTL() ? 40 : 28, color: C.ink, textAlign: 'center' }}>
+      <Text style={{ fontFamily: F.display, fontSize: 21, lineHeight: isRTL() ? 44 : 28, color: C.ink, textAlign: 'center' }}>
         {s.states.crashTitle}
       </Text>
       <Text style={{ fontFamily: F.body, fontSize: 14, lineHeight: isRTL() ? 32 : 22, color: C.ink2, textAlign: 'center' }}>

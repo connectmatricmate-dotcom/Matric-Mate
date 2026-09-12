@@ -6,7 +6,7 @@ import { useLang, useT } from '../../src/i18n';
 import { AVATARS, boardName } from '@matricmate/core';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { useApp } from '../../src/store/app';
-import { useAuth } from '../../src/store/auth';
+import { isAuthErrorKey, useAuth } from '../../src/store/auth';
 import { C, S } from '../../src/theme';
 
 
@@ -29,13 +29,18 @@ export default function EditProfile() {
       footer={
         <Btn
           title={t('common.save')}
+          // A blank name is not saved, so it is not reported as saved either.
+          disabled={!name.trim()}
           onPress={async () => {
             try {
               await updateName(name);
               toast(t('account.profileSaved'));
               router.back();
             } catch (e) {
-              toast(e instanceof Error ? e.message : t('states.errorBody'));
+              // The store hands back a message key, not a sentence: shown raw
+              // it read "auth.errNetwork" on the screen.
+              const msg = e instanceof Error ? e.message : '';
+              toast(isAuthErrorKey(msg) ? t(msg) : t('states.errorBody'));
             }
           }}
         />
@@ -72,24 +77,29 @@ export default function EditProfile() {
 
       <SectionTitle>{t('account.studySetup')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>
+        {/* Each opens its own step in edit mode: it saves and comes back here.
+            They used to run the whole first-run chain from that step on and
+            end by stacking a second home screen over this one, so changing
+            the medium meant choosing subjects again, and back from home went
+            into onboarding. */}
         <Item
           title={t('account.classAndBoard')}
           sub={t('tutor.classRowValue', { n: setup?.classLevel ?? 9, board: boardName(setup?.board, lang) })}
           icon="book"
-          onPress={() => router.push('/onboarding/class')}
+          onPress={() => router.push('/onboarding/class?edit=1')}
         />
         <Item
           title={t('account.medium')}
           sub={setup?.medium === 'ur' ? t('onboarding.mediumUr') : t('onboarding.mediumEn')}
           icon="book2"
-          onPress={() => router.push('/onboarding/medium')}
+          onPress={() => router.push('/onboarding/medium?edit=1')}
         />
         <Item
           title={t('account.mySubjects')}
           sub={t('account.subjectsCount', { n: setup?.subjects.length ?? 0 })}
           icon="cards"
           last
-          onPress={() => router.push('/onboarding/subjects')}
+          onPress={() => router.push('/onboarding/subjects?edit=1')}
         />
       </Card>
       <Spacer h={S.md} />

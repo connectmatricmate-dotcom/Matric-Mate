@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ChoiceCard, StepScreen } from '../../src/components/OnboardingStep';
 import { Confirm, useToast } from '../../src/components/ui';
 import { GRADE_10_READY } from '@matricmate/core';
@@ -10,19 +10,27 @@ export default function ChooseClass() {
   const { state, actions } = useApp();
   const t = useT();
   const toast = useToast();
+  /** Reached from Edit profile rather than the first run. See the board step. */
+  const { edit } = useLocalSearchParams<{ edit?: string }>();
+  const editing = edit === '1';
   /**
    * The class already on the account, if there is one. This screen is two
    * screens: step one of a first run, and the editor reached from the profile.
    * Picking a class you do not have yet is free; changing one you do costs the
    * student their progress and starts a seven day cooldown, and only
    * switchClass knows how to do that safely.
+   *
+   * "Have" means a signed-in student who has finished choosing. A first-run
+   * student who picked Class 9, went on, came back and picked 10 has nothing
+   * to lose, and used to meet the progress warning and then an error they
+   * could not get past.
    */
-  const current = state.onboarding?.classLevel;
-  const [value, setValue] = useState<9 | 10>(current ?? 9);
+  const current = state.user && state.onboarding?.subjects?.length ? state.onboarding.classLevel : undefined;
+  const [value, setValue] = useState<9 | 10>(state.onboarding?.classLevel ?? 9);
   const [confirming, setConfirming] = useState(false);
   const [switching, setSwitching] = useState(false);
 
-  const forward = () => router.push('/onboarding/board');
+  const forward = () => router.push(editing ? '/onboarding/board?edit=1' : '/onboarding/board');
 
   /**
    * Changing an existing class goes through switchClass, exactly as the
@@ -61,6 +69,7 @@ export default function ChooseClass() {
             setConfirming(true);
             return;
           }
+          // Before an account has chosen, a change is only a choice.
           actions.setOnboarding({ classLevel: value });
           forward();
         }}

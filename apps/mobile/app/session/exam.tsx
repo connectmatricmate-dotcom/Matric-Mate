@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { BackHandler, Text, View } from 'react-native';
+import { AppState, BackHandler, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Btn, Card, Confirm, H3, IconButton, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, useToast } from '../../src/components/ui';
+import { Btn, Card, Confirm, H3, IconButton, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, Text, useToast } from '../../src/components/ui';
 import { isUrduScript } from '@matricmate/core';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { useT } from '../../src/i18n';
@@ -22,10 +22,28 @@ export default function Exam() {
   const [confirm, setConfirm] = useState(false);
   const submitted = useRef(false);
 
+  /**
+   * Wall time, not ticks.
+   *
+   * The countdown took a second off per interval, and Android does not run
+   * intervals for an app in the background, so switching to WhatsApp stopped
+   * the clock and the test ran long. It is read off the start time instead,
+   * every tick and on the way back to the foreground, where a test that ran
+   * out meanwhile submits.
+   */
   useEffect(() => {
-    const timer = setInterval(() => setLeft((l) => Math.max(0, l - 1)), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    if (!s) return;
+    const endsAt = s.startedAt + (s.durationSec ?? 1800) * 1000;
+    const read = () => setLeft(Math.max(0, Math.round((endsAt - Date.now()) / 1000)));
+    const timer = setInterval(read, 1000);
+    const sub = AppState.addEventListener('change', (status) => {
+      if (status === 'active') read();
+    });
+    return () => {
+      clearInterval(timer);
+      sub.remove();
+    };
+  }, [s]);
 
   /**
    * Hardware back held every answer in local state and simply popped the
@@ -63,7 +81,9 @@ export default function Exam() {
         actions.recordAttempt({
           mcqId: m.id,
           chapterId: m.chapterId,
-          subjectId: s.subjectId,
+          // Each answer under its own chapter's subject. The exam's subject
+          // filed every answer of a weak-topic test under Mathematics.
+          subjectId: m.chapterId ? m.chapterId.split('-')[0] : s.subjectId,
           topic: m.topic,
           correct,
           confidence: null,
@@ -144,8 +164,9 @@ export default function Exam() {
             <Tap key={n} onPress={() => setAnswers((a) => ({ ...a, [mcq.id]: n }))}>
               <View
                 style={{
-                  // The letter key sits on the side the option starts from.
-                  flexDirection: isUrduScript(opt) ? 'row-reverse' : 'row',
+                  // The letter key sits on the side the question reads from,
+                  // the same side for every option: see the practice screen.
+                  flexDirection: isUrduScript(mcq.q) ? 'row-reverse' : 'row',
                   alignItems: 'center',
                   gap: S.md,
                   backgroundColor: sel ? C.tealTint : C.card,
@@ -168,7 +189,8 @@ export default function Exam() {
                     justifyContent: 'center',
                   }}
                 >
-                  <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: sel ? C.onBrand : C.ink2 }}>
+                  {/* A key in a fixed box, not reading text: it stays the size of its box. */}
+                  <Text allowFontScaling={false} style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: sel ? C.onBrand : C.ink2 }}>
                     {String.fromCharCode(65 + n)}
                   </Text>
                 </View>

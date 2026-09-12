@@ -33,25 +33,31 @@ export default function TopperPapers() {
     <Screen>
       <Header title={t('session.toppersTitle')} sub={t('session.toppersSub')} back />
 
-      <Card border={C.tealTint2}>
-        <Row gap={S.md} style={{ alignItems: 'flex-start' }}>
-          <View
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 12,
-              backgroundColor: C.tealTint,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Icon name="award" size={18} color={C.teal} />
-          </View>
-          <Small style={{ flex: 1, lineHeight: 19 }}>{t('session.toppersIntro')}</Small>
-        </Row>
-      </Card>
+      {/* FBISE's own wording, so not for a Punjab student who arrives by a
+          link: the empty state below says why there are none for them. */}
+      {punjab ? null : (
+        <>
+          <Card border={C.tealTint2}>
+            <Row gap={S.md} style={{ alignItems: 'flex-start' }}>
+              <View
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 12,
+                  backgroundColor: C.tealTint,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon name="award" size={18} color={C.teal} />
+              </View>
+              <Small style={{ flex: 1 }}>{t('session.toppersIntro')}</Small>
+            </Row>
+          </Card>
 
-      <Spacer h={S.md} />
+          <Spacer h={S.md} />
+        </>
+      )}
 
       {groups.length === 0 ? (
         <Empty
@@ -101,11 +107,16 @@ export default function TopperPapers() {
         </View>
       )}
 
-      <Spacer h={S.md} />
       {/* Which examination these are from. Without it a Class 10 student reads
-          a list of scripts with no year or level on it as their own. */}
-      <Small>{t('session.toppersSource', { year: topperYears()[0] ?? '' })}</Small>
-      <Small style={{ marginTop: 2 }}>{t('session.toppersFootnote')}</Small>
+          a list of scripts with no year or level on it as their own. Not
+          said over the Punjab empty state, where there are no scripts. */}
+      {punjab ? null : (
+        <>
+          <Spacer h={S.md} />
+          <Small>{t('session.toppersSource', { year: topperYears()[0] ?? '' })}</Small>
+          <Small style={{ marginTop: 2 }}>{t('session.toppersFootnote')}</Small>
+        </>
+      )}
     </Screen>
   );
 }

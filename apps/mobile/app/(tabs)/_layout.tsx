@@ -42,8 +42,11 @@ export default function TabLayout() {
   const online = useOnline();
   const t = useT();
 
-  // Deep-linking to a tab while signed out sends you to the welcome flow.
-  if (hydrated && !state.user) return <Redirect href="/welcome" />;
+  // Signed out on a tab (a session that expired, a staff sign-out) goes back
+  // to the splash, which knows the difference between somebody new, who gets
+  // the welcome slides, and somebody returning, who gets the login form. This
+  // sent everyone through the slides.
+  if (hydrated && !state.user) return <Redirect href="/" />;
 
   /**
    * No signal: swap the five tabs for the downloaded library.

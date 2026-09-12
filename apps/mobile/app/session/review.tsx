@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
-import { Body, Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer } from '../../src/components/ui';
+import { Body, Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Text } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
 import { session } from '../../src/store/session';
 import { C, S, isRTL } from '../../src/theme';
@@ -19,11 +19,14 @@ export default function Review() {
     if (!s) return [];
     return s.mcqs
       .map((m) => ({ mcq: m, a: s.answers[m.id] }))
-      .filter(({ a }) => (filter === 'all' ? true : filter === 'wrong' ? a && !a.correct : a?.flagged))
+      // Unanswered counts as wrong, as it does on the result screen's score:
+      // closing a practice set early left those questions out of this list
+      // while the score counted them against the student.
+      .filter(({ a }) => (filter === 'all' ? true : filter === 'wrong' ? !a?.correct : a?.flagged))
       .sort((x, y) => Number(!!x.a?.correct) - Number(!!y.a?.correct));
   }, [s, filter]);
 
-  const wrongCount = s ? Object.values(s.answers).filter((a) => !a.correct).length : 0;
+  const wrongCount = s ? s.mcqs.filter((m) => !s.answers[m.id]?.correct).length : 0;
   const flagCount = s ? Object.values(s.answers).filter((a) => a.flagged).length : 0;
 
   if (!s) {
@@ -102,25 +105,31 @@ export default function Review() {
                     <Label style={{ color: C.teal }}>{t('session.why')}</Label>
                     <View style={{ marginTop: 2 }}><Markdown text={mcq.explanation} size={13.5} /></View>
                     <Spacer h={S.sm} />
-                    <Row gap={S.sm}>
+                    {/* Wraps, so at a large font the second button drops to a
+                        line of its own instead of running out of the card. */}
+                    <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
                       <Btn
                         title={t('session.askAi')}
                         variant="line"
                         sm
                         onPress={() => {
+                          // In the student's own language: it is sent as their message.
                           const prompt =
                             a?.chosen != null && a.chosen !== mcq.answer
-                              ? `I answered "${mcq.options[a.chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
-                              : mcq.q;
-                          router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}&chapter=${mcq.chapterId}`);
+                              ? t('session.askWhyWrong', { mine: mcq.options[a.chosen], right: mcq.options[mcq.answer], q: mcq.q })
+                              : t('session.askExplain', { q: mcq.q });
+                          router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}${mcq.chapterId ? `&chapter=${mcq.chapterId}` : ''}`);
                         }}
                       />
-                      <Btn
-                        title={t('session.readInChapter')}
-                        variant="ghost"
-                        sm
-                        onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)}
-                      />
+                      {/* A generated question has no chapter to read. */}
+                      {mcq.chapterId ? (
+                        <Btn
+                          title={t('session.readInChapter')}
+                          variant="ghost"
+                          sm
+                          onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)}
+                        />
+                      ) : null}
                     </Row>
                   </>
                 ) : (

@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
-import { api , chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
+import { api, chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
+import { useOnline } from '../../src/core/connectivity';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -11,20 +12,41 @@ import { C, S, rowDir } from '../../src/theme';
 
 export default function SessionSetup() {
   const { chapter: chapterParam } = useLocalSearchParams<{ chapter?: string }>();
-  const { derived, state } = useApp();
+  const { derived, state, contentKey } = useApp();
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
+  const online = useOnline();
 
-  const initialChapter = chapterParam ? chapterById(chapterParam) : undefined;
-  const [subjectId, setSubjectId] = useState(initialChapter?.subjectId ?? derived.subjects[0] ?? 'phy');
-  const [chapterIds, setChapterIds] = useState<string[]>(initialChapter ? [initialChapter.id] : []);
+  /*
+   * A chapter from the link is kept even when the index cannot name it yet:
+   * its id carries its subject. It used to be dropped whenever the lookup
+   * missed (a cold start, offline on Class 10 or Punjab), and the session
+   * quietly became mixed Mathematics. Without a chapter, the subject today's
+   * plan is on, rather than Mathematics for everyone.
+   */
+  const [subjectId, setSubjectId] = useState(
+    (chapterParam ? (chapterById(chapterParam)?.subjectId ?? chapterParam.split('-')[0]) : undefined) ??
+      derived.plan[0]?.subjectId ??
+      derived.subjects[0] ??
+      'phy',
+  );
+  const [chapterIds, setChapterIds] = useState<string[]>(chapterParam ? [chapterParam] : []);
   const [count, setCount] = useState<'10' | '20' | '50'>('10');
   const [busy, setBusy] = useState(false);
 
-  const { data: chapterList, loading: chaptersLoading } = useAsync(() => api.getChapters(subjectId), [subjectId]);
+  // contentKey: a language, class or board switch reaches an open setup.
+  const { data: chapterList, loading: chaptersLoading } = useAsync(() => api.getChapters(subjectId), [subjectId, contentKey]);
   const chapters = useMemo(
-    () => (chapterList ?? []).filter((c) => !c.premium || state.premium.active),
+    () =>
+      (chapterList ?? []).filter(
+        (c) =>
+          (!c.premium || state.premium.active) &&
+          // A chapter the database says has no questions is not offered: it
+          // could only end in "No questions". A row with no board is the
+          // bundle, whose zeroes mean "not known", so it stays.
+          !(c.board !== undefined && c.mcqCount === 0),
+      ),
     [chapterList, state.premium.active]
   );
 
@@ -62,14 +84,16 @@ export default function SessionSetup() {
     }
     setBusy(false);
     if (!mcqs.length) {
-      toast(t('session.noQuestions'));
+      // Offline, "no questions" is not true: they are on the server.
+      toast(online ? t('session.noQuestions') : t('states.offline'));
       return;
     }
+    const one = chapterIds.length === 1 ? (chapters.find((c) => c.id === chapterIds[0]) ?? chapterById(chapterIds[0])) : undefined;
     session.start({
       mode: 'practice',
       label:
         chapterIds.length === 1
-          ? chapterName(chapterById(chapterIds[0]), lang)
+          ? chapterName(one, lang)
           : `${subjectName(subjectById(subjectId), lang)} · ${t('session.mixed')}`,
       subjectId,
       chapterId: chapterIds.length === 1 ? chapterIds[0] : null,

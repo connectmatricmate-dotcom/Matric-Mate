@@ -1,37 +1,41 @@
 import { useEffect, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, Text, TextInput, useToast } from '../../src/components/ui';
 import { SegmentTrack } from '../../src/components/SessionHeader';
-import { api, chapterById, chaptersFor, checkAnswerLive, fetchAiSession, normalizeAiShortQs } from '@matricmate/core';
+import { api, checkAnswerLive, fetchAiSession, isUrduScript, normalizeAiShortQs, subjectMedium } from '@matricmate/core';
 import type { AiCheckVerdict } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
+import { PickPracticeChapter, PracticeChapterBar, usePracticeChapter } from '../../src/components/PracticeChapter';
+import { aiFailureKey } from '../../src/components/aiFailure';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
-import { C, F, S, isWeb, textStart } from '../../src/theme';
+import { C, F, S, isRTL, isWeb, textStart } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 type Mark = 'got' | 'partial' | 'missed';
 
 export default function ShortQuestions() {
   const { chapter, ai } = useLocalSearchParams<{ chapter?: string; ai?: string }>();
-  const { state, actions } = useApp();
-  // Arriving with no chapter param used to mean Physics chapter 3 for
-  // everyone. Follow the student instead: the chapter they last studied,
-  // else the first chapter of their first subject.
-  const chapterId = chapter ?? state.lastChapterId ?? chaptersFor(state.onboarding?.subjects?.[0] ?? 'phy')[0]?.id ?? 'phy-1';
+  const { state, actions, contentKey } = useApp();
+  // No chapter in the link: one of the student's own chapters that has
+  // notes, or a picker. See PracticeChapter.
+  const practice = usePracticeChapter(chapter, 'shortq');
+  const chapterId = practice.chapterId;
   const t = useT();
   // An ?ai= id swaps the bank for a set the student asked the AI to build.
   const { data: content, loading, error, reload } = useAsync(async () => {
     if (ai) {
       const s = await fetchAiSession(ai);
       if (!s) throw new Error('missing session');
-      return { shortQs: normalizeAiShortQs(s.items as Parameters<typeof normalizeAiShortQs>[0], s.chapterId ?? chapterId) };
+      // The set's own id in every question's id: see normalizeAiShortQs.
+      return { shortQs: normalizeAiShortQs(s.items as Parameters<typeof normalizeAiShortQs>[0], s.chapterId ?? chapterId ?? '', ai) };
     }
-    return api.getChapterContent(chapterId);
-  }, [chapterId, ai ?? '']);
+    return chapterId ? api.getChapterContent(chapterId) : { shortQs: [] };
+    // contentKey: a language, class or board switch reaches an open screen.
+  }, [chapterId ?? '', ai ?? '', contentKey]);
 
   const [i, setI] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -44,12 +48,23 @@ export default function ShortQuestions() {
 
   const items = content?.shortQs ?? [];
   const item = items[i];
-  const done = !!content && i >= items.length;
+  // Not done with nothing to do: an empty set used to fire the finish cheer.
+  const done = items.length > 0 && i >= items.length;
 
   useEffect(() => {
     if (done) cheer();
   }, [done]);
 
+  // Which chapter, before anything about its questions: none of theirs has
+  // notes yet, or the chapter index is still on its way.
+  if (!ai && !chapterId) {
+    return (
+      <Screen>
+        <Header title={t('practice.shortQ')} back />
+        {practice.waiting ? <Skeleton h={140} /> : <PickPracticeChapter kind="shortq" />}
+      </Screen>
+    );
+  }
 
   // A failed fetch is not an empty chapter, and an empty chapter is not a
   // finished session. Without these two branches, a network error rendered a
@@ -59,6 +74,7 @@ export default function ShortQuestions() {
     return (
       <Screen>
         <Header title={t('practice.shortQ')} back />
+        {ai ? null : <PracticeChapterBar kind="shortq" chapter={practice.chapter} />}
         <Spacer h={S.lg} />
         <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
       </Screen>
@@ -68,11 +84,16 @@ export default function ShortQuestions() {
     return (
       <Screen>
         <Header title={t('practice.shortQ')} back />
+        {/* The way out of an empty chapter is another chapter. */}
+        {ai ? null : <PracticeChapterBar kind="shortq" chapter={practice.chapter} />}
         <Spacer h={S.lg} />
         <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
       </Screen>
     );
   }
+  // Every item carries its chapter: an AI set's own, or the chapter chosen.
+  const itemChapter = item?.chapterId || chapterId || '';
+
   /** Send the written answer to the AI examiner; reveal comes with marks. */
   async function checkMine() {
     if (!item || !written.trim() || checking) return;
@@ -83,22 +104,20 @@ export default function ShortQuestions() {
       points: item.points,
       marks: item.marks,
       answer: written.trim(),
-      medium: state.settings.contentMedium,
+      // Marked in the language the subject is written in: an Urdu answer to
+      // an Urdu question from an English-medium student, and the reverse.
+      medium: itemChapter
+        ? subjectMedium(itemChapter, state.onboarding?.board, state.settings.contentMedium)
+        : state.settings.contentMedium,
     });
     setChecking(false);
     if (!res.ok) {
-      const note = {
-        offline: t('tutor.offline'),
-        quota: t('tutor.limitToast'),
-        rate: t('tutor.slowDown'),
-        plan: t('tutor.planNeeded'),
-        refused: t('tutor.refused'),
-        error: t('tutor.errorReply'),
-      }[res.reason];
-      toast(note);
+      toast(t(aiFailureKey(res.reason)));
       return;
     }
-    setVerdict(res.verdict);
+    // Only the fields the card draws, checked: a reply without a list of
+    // missed points once took this screen down to the error boundary.
+    setVerdict({ ...res.verdict, missed: Array.isArray(res.verdict.missed) ? res.verdict.missed : [] });
     setRevealed(true);
   }
 
@@ -107,13 +126,12 @@ export default function ShortQuestions() {
     setMarks((prev) => [...prev, m]);
     actions.recordAttempt({
       mcqId: item.id,
-      chapterId,
-      subjectId: chapterId.split('-')[0],
-      // The chapter's own title, not the name of the exercise. This used
-      // to store the translated UI label, so Weak topics listed
-      // "Fill in the blanks" as a syllabus topic, and switching language
-      // forked it into a second one.
-      topic: chapterById(chapterId)?.title ?? chapterId,
+      chapterId: itemChapter,
+      // Filed under its own chapter's subject, whatever screen it came from.
+      subjectId: itemChapter.split('-')[0],
+      // The chapter's own name, not the name of the exercise, in the language
+      // its questions are in. Never the raw id: see blanks.
+      topic: practice.topic,
       correct: m === 'got',
       confidence: null,
       mode: 'shortq',
@@ -124,7 +142,7 @@ export default function ShortQuestions() {
     setI(i + 1);
   }
 
-  if (loading) {
+  if (loading && !items.length) {
     return (
       <Screen>
         <Header title={t('practice.shortQ')} back />
@@ -146,7 +164,9 @@ export default function ShortQuestions() {
         </Card>
         </Pop>
         <Spacer h={S.lg} />
-        <Btn title={t('session.backToChapter')} onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+        {chapterId ? (
+          <Btn title={t('session.backToChapter')} onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+        ) : null}
       </Screen>
     );
   }
@@ -154,6 +174,7 @@ export default function ShortQuestions() {
   return (
     <Screen>
       <Header title={t('practice.shortQ')} sub={t('session.shortQOf', { a: i + 1, b: items.length })} back />
+      {ai ? null : <PracticeChapterBar kind="shortq" chapter={practice.chapter} />}
       <SegmentTrack
         segments={items.map((_, j) =>
           // 'partial' still earned something, so it reads as done, not wrong.
@@ -188,6 +209,9 @@ export default function ShortQuestions() {
               style={[
                 // A written answer reads the way the rest of the screen reads.
                 { fontFamily: F.body, fontSize: 14, lineHeight: 22, color: C.ink, minHeight: 96, textAlignVertical: 'top', textAlign: textStart() },
+                // Typed in Urdu, it gets Nastaliq and its leading: at 22 the
+                // lines of an Urdu answer overlapped and were cropped.
+                isRTL() || isUrduScript(written) ? { fontFamily: F.urdu, lineHeight: 30 } : null,
                 isWeb && ({ outlineStyle: 'none' } as object),
               ]}
             />
@@ -248,7 +272,12 @@ export default function ShortQuestions() {
             title={t('session.askAi')}
             variant="line"
             sm
-            onPress={() => router.push(`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item?.q ?? ''}`)}&chapter=${chapterId}`)}
+            onPress={() =>
+              router.push(
+                // In the student's own language, not an English line they never wrote.
+                `/tutor/chat?q=${encodeURIComponent(t('session.askExplain', { q: item?.q ?? '' }))}${itemChapter ? `&chapter=${itemChapter}` : ''}`,
+              )
+            }
           />
 
           <Spacer h={S.lg} />

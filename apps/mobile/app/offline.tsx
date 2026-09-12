@@ -11,13 +11,14 @@
  * from disk through core's local-content hook. Building offline copies of those
  * screens would mean maintaining two of everything and fixing every bug twice.
  */
+import { useState } from 'react';
 import { View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
-import { Card, Empty, Header, Item, Screen, SectionTitle, Small, Spacer, Tap } from '../src/components/ui';
+import { Card, Confirm, Empty, Header, Item, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../src/components/ui';
 import { useOnline } from '../src/core/connectivity';
-import { chapterDownloadBytes, formatBytes, localChapter } from '../src/core/downloads';
+import { chapterDownloadBytes, formatBytes, localAudioTrack, localChapter, readableOffline, savedMediums } from '../src/core/downloads';
 import { useLang, useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { C, S } from '../src/theme';
@@ -27,6 +28,8 @@ export default function Offline() {
   const online = useOnline();
   const t = useT();
   const { lang } = useLang();
+  const toast = useToast();
+  const [removing, setRemoving] = useState<string | null>(null);
 
   // Signal is back, so there is no reason to keep the student in a reduced app.
   if (online) return <Redirect href="/(tabs)" />;
@@ -41,6 +44,8 @@ export default function Offline() {
    * that moment. The row saved beside each download answers without a network.
    */
   const chapters = state.downloads.map((id) => localChapter(id) ?? chapterById(id)).filter(Boolean);
+  const medium = state.settings.contentMedium;
+  const langName = (id: string) => (savedMediums(id)[0] === 'ur' ? t('lang.mediumUrdu') : t('lang.mediumEnglish'));
 
   return (
     <Screen>
@@ -62,22 +67,34 @@ export default function Offline() {
           <View key={subjectId}>
             <SectionTitle>{subjectName(subjectById(subjectId), lang)}</SectionTitle>
             <Card flat style={{ paddingVertical: 0 }}>
-              {list.map((c, i) => (
-                <Item
-                  key={c!.id}
-                  title={chapterName(c, lang)}
-                  sub={t('downloads.perChapter', { n: formatBytes(chapterDownloadBytes(c!.id)) })}
-                  icon="check"
-                  tone="green"
-                  last={i === list.length - 1}
-                  onPress={() => router.push(`/learn/chapter/${c!.id}`)}
-                  right={
-                    <Tap onPress={() => actions.toggleDownload(c!.id)} hit>
-                      <Icon name="trash" size={19} color={C.red} />
-                    </Tap>
-                  }
-                />
-              ))}
+              {list.map((c, i) => {
+                // Whether this copy opens in the language the app is in now.
+                // After a switch a two-language chapter is saved in the other
+                // one, and a tick on it promised notes that are not there.
+                const readable = readableOffline(c!.id, medium);
+                return (
+                  <Item
+                    key={c!.id}
+                    title={chapterName(c, lang)}
+                    sub={
+                      readable
+                        ? t(localAudioTrack(c!.id, medium) ? 'downloads.perChapter' : 'downloads.perChapterNoAudio', {
+                            n: formatBytes(chapterDownloadBytes(c!.id)),
+                          })
+                        : t('downloads.savedIn', { lang: langName(c!.id) })
+                    }
+                    icon={readable ? 'check' : 'download'}
+                    tone={readable ? 'green' : 'grey'}
+                    last={i === list.length - 1}
+                    onPress={() => router.push(`/learn/chapter/${c!.id}`)}
+                    right={
+                      <Tap onPress={() => setRemoving(c!.id)} hit>
+                        <Icon name="trash" size={19} color={C.red} />
+                      </Tap>
+                    }
+                  />
+                );
+              })}
             </Card>
           </View>
         ))
@@ -85,6 +102,22 @@ export default function Offline() {
 
       <Spacer h={S.lg} />
       <Small>{t('offline.footnote')}</Small>
+
+      {/* Asks first, and says it happened: offline, a removed chapter cannot
+          come back until there is signal again. */}
+      <Confirm
+        visible={removing !== null}
+        onClose={() => setRemoving(null)}
+        title={t('study.removeOffline')}
+        body={t('downloads.removeBody')}
+        confirmLabel={t('study.removeOffline')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={() => {
+          if (removing) actions.removeDownload(removing);
+          setRemoving(null);
+          toast(t('study.removedOffline'));
+        }}
+      />
     </Screen>
   );
 }

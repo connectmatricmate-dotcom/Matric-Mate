@@ -1,8 +1,26 @@
 import { useMemo, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { formatDate, isUrduScript } from '@matricmate/core';
-import { Card, Empty, ErrorState, Header, Item, Screen, Skeleton, Small, Spacer, Tap } from '../../src/components/ui';
+import {
+  Btn,
+  Card,
+  Confirm,
+  Empty,
+  ErrorState,
+  Field,
+  Header,
+  Item,
+  Screen,
+  Sheet,
+  Skeleton,
+  Small,
+  Spacer,
+  Tap,
+  Text,
+  TextInput,
+  useToast,
+} from '../../src/components/ui';
 import { Icon } from '../../src/components/Icon';
 import { supabase } from '../../src/lib/supabase';
 import { useAsync } from '../../src/core/useAsync';
@@ -33,7 +51,48 @@ export default function AllChats() {
   const { state } = useApp();
   const t = useT();
   const { lang } = useLang();
+  const toast = useToast();
   const [query, setQuery] = useState('');
+  /**
+   * Renaming and deleting a chat. A shared family phone is the reason: a
+   * conversation is the student's own, and there was no way to tidy or remove
+   * one. Straight to the table under the student's own row-level security,
+   * which lets an account change and delete its own threads; the messages go
+   * with a deleted thread.
+   */
+  const [editing, setEditing] = useState<ThreadRow | null>(null);
+  const [title, setTitle] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function rename() {
+    if (!editing || !title.trim() || saving) return;
+    setSaving(true);
+    const { error } = await supabase.from('chat_threads').update({ title: title.trim() }).eq('id', editing.id);
+    setSaving(false);
+    if (error) {
+      toast(t('states.errorBody'));
+      return;
+    }
+    setEditing(null);
+    toast(t('tutor.chatRenamed'));
+    threads.reload();
+  }
+
+  async function remove() {
+    if (!editing || saving) return;
+    setSaving(true);
+    const { error } = await supabase.from('chat_threads').delete().eq('id', editing.id);
+    setSaving(false);
+    setConfirmDelete(false);
+    if (error) {
+      toast(t('states.errorBody'));
+      return;
+    }
+    setEditing(null);
+    toast(t('tutor.chatDeleted'));
+    threads.reload();
+  }
 
   const threads = useAsync<ThreadRow[]>(async () => {
     const all: ThreadRow[] = [];
@@ -130,6 +189,17 @@ export default function AllChats() {
               icon="spark"
               last={i === hits.length - 1}
               onPress={() => router.push(`/tutor/chat?thread=${thread.id}`)}
+              right={
+                <Tap
+                  onPress={() => {
+                    setEditing(thread);
+                    setTitle(thread.title);
+                  }}
+                  hit
+                >
+                  <Icon name="dots" size={18} color={C.ink3} />
+                </Tap>
+              }
             />
           ))}
         </Card>
@@ -139,6 +209,24 @@ export default function AllChats() {
       <Text style={{ textAlign: 'center' }}>
         <Small>{t('tutor.disclaimer')}</Small>
       </Text>
+
+      <Sheet visible={!!editing && !confirmDelete} onClose={() => setEditing(null)} title={t('tutor.renameChat')}>
+        <Field label={t('tutor.chatName')} value={title} onChangeText={setTitle} autoCapitalize="words" />
+        <Btn title={t('common.save')} onPress={() => void rename()} loading={saving} disabled={!title.trim()} />
+        <Spacer h={S.sm} />
+        <Btn title={t('tutor.deleteChat')} variant="ghost" icon="trash" onPress={() => setConfirmDelete(true)} disabled={saving} />
+      </Sheet>
+
+      <Confirm
+        visible={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        title={t('tutor.deleteChat')}
+        body={t('tutor.deleteChatBody')}
+        confirmLabel={t('tutor.deleteChat')}
+        cancelLabel={t('common.cancel')}
+        loading={saving}
+        onConfirm={() => void remove()}
+      />
     </Screen>
   );
 }

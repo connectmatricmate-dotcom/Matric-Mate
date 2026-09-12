@@ -1,6 +1,6 @@
-import { boardName, formatDate, pastPaperYears } from '@matricmate/core';
+import { boardName, formatDate, pastPaperYears, yearSpan } from '@matricmate/core';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
 import { Icon, IconName } from '../../src/components/Icon';
@@ -16,14 +16,22 @@ import {
   Sheet,
   Small,
   Spacer,
+  Text,
   TileGrid,
 } from '../../src/components/ui';
 import { LockedNotice } from '../../src/components/LockedNotice';
+import { resultTitle } from '../../src/components/resultTitle';
 import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, rowDir } from '../../src/theme';
 
+/*
+ * Flashcards, blanks and short questions name no chapter on purpose: each
+ * screen picks one of the student's own chapters that has that practice,
+ * names it, and lets them change it (see PracticeChapter). The timed test
+ * asks for a subject on its own intro screen.
+ */
 const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; accent?: boolean }[] = [
   { label: 'practice.mcqs', sub: 'practice.mcqsSub', icon: 'target', href: '/session/setup' },
   { label: 'practice.flashcards', sub: 'practice.flashcardsSub', icon: 'cards', href: '/session/flashcards' },
@@ -63,7 +71,8 @@ export default function Practice() {
   const papersSub = years
     ? t('practice.papersSub', {
         board: boardName(board, lang),
-        years: years.from === years.to ? years.from : `${years.from} to ${years.to}`,
+        // "to" in the student's language: it sat in Urdu lines as an English word.
+        years: yearSpan(years.from, years.to, lang),
       })
     : t('practice.papersSubNone', { n: classLevel });
   const subFor = (m: (typeof MODES)[number]) => (m.href === '/session/papers' ? papersSub : t(m.sub));
@@ -138,7 +147,8 @@ export default function Practice() {
           {recent.map((r, i) => (
             <Item
               key={r.id}
-              title={r.label}
+              // Rebuilt in today's language, not the one it was saved in.
+              title={resultTitle(r, lang)}
               sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
               icon={r.mode === 'exam' ? 'clock' : 'target'}
               tone={r.mode === 'exam' ? 'orange' : 'teal'}

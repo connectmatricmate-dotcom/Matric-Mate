@@ -1,15 +1,16 @@
 import { useRef, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, ErrorState, Header, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, Header, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, Text, TextInput, useToast } from '../../src/components/ui';
 import { AiWorking } from '../../src/components/AiWorking';
-import { checkAnswerLive, fetchAiSession, generateMockPaper, subjectById, subjectName } from '@matricmate/core';
+import { aiFailureKey } from '../../src/components/aiFailure';
+import { checkAnswerLive, generateMockPaper, isUrduScript, readAiSession, subjectById, subjectMedium, subjectName } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, ShortQ } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
-import { C, F, S, isWeb, textStart } from '../../src/theme';
+import { C, F, S, isRTL, isWeb, textStart } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 /**
@@ -27,30 +28,30 @@ export default function MockPaper() {
   const [busy, setBusy] = useState(false);
   /** Held while a build is in flight so the wait screen can call it off. */
   const cancel = useRef<AbortController | null>(null);
-  const [subjectId, setSubjectId] = useState(derived.subjects[0] ?? 'phy');
+  const [subjectId, setSubjectId] = useState(derived.plan[0]?.subjectId ?? derived.subjects[0] ?? 'phy');
+  const board = state.onboarding?.board ?? 'fbise';
 
-  const paper = useAsync(async () => (id ? fetchAiSession(id) : null), [id ?? '']);
+  /* A paper that is gone and a read that did not come back used to wear one
+     face, with a Retry that could only ever help one of them. */
+  const paper = useAsync(async () => (id ? readAiSession(id) : null), [id ?? '']);
 
   async function build() {
     if (busy) return;
     setBusy(true);
     const controller = new AbortController();
     cancel.current = controller;
-    const res = await generateMockPaper({ subjectId, medium: state.settings.contentMedium }, controller.signal);
+    // Set in the subject's own language: an Urdu or Punjab Islamiyat paper in
+    // Urdu, an English paper in English, whatever the student reads in.
+    const res = await generateMockPaper(
+      { subjectId, medium: subjectMedium(subjectId, board, state.settings.contentMedium) },
+      controller.signal,
+    );
     cancel.current = null;
     setBusy(false);
     // Stopped on purpose: see the note in the AI builder.
     if (controller.signal.aborted) return;
     if (!res.ok) {
-      const note = {
-        offline: t('tutor.offline'),
-        quota: t('tutor.limitToast'),
-        rate: t('tutor.slowDown'),
-        plan: t('tutor.planNeeded'),
-        refused: t('tutor.refused'),
-        error: t('tutor.errorReply'),
-      }[res.reason];
-      toast(note);
+      toast(t(aiFailureKey(res.reason)));
       return;
     }
     router.setParams({ id: res.sessionId });
@@ -102,22 +103,42 @@ export default function MockPaper() {
       </Screen>
     );
   }
-  const items = paper.data?.items as AiPaperItems | undefined;
-  if (!paper.data || !items) {
+  const read = paper.data;
+  const row = read?.ok ? read.row : null;
+  const items = row?.items as AiPaperItems | undefined;
+  if (!row || !items) {
+    // Gone is gone: the way on is a fresh paper, not a retry.
+    const gone = !!read && !read.ok && read.reason === 'missing';
     return (
       <Screen>
         <Header title={t('tutor.paperTitle')} back />
         <Spacer h={S.lg} />
-        <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={paper.reload} />
+        {gone ? (
+          <Empty
+            emoji="📄"
+            title={t('tutor.paperGoneTitle')}
+            sub={t('tutor.paperGoneBody')}
+            cta={<Btn title={t('tutor.buildIt')} sm onPress={() => router.setParams({ id: undefined })} />}
+          />
+        ) : (
+          <ErrorState
+            title={t('tutor.paperLoadFailed')}
+            sub={t('tutor.paperLoadFailedBody')}
+            retry={t('common.retry')}
+            onRetry={paper.reload}
+          />
+        )}
       </Screen>
     );
   }
+  // Written answers are marked in the paper's own language: see subjectMedium.
+  const paperMedium = subjectMedium(row.subjectId ?? subjectId, board, state.settings.contentMedium);
 
   const startSectionA = () => {
     session.start({
       mode: 'exam',
-      label: paper.data!.title,
-      subjectId: paper.data!.subjectId ?? subjectId,
+      label: row.title,
+      subjectId: row.subjectId ?? subjectId,
       chapterId: null,
       mcqs: items.mcqs,
       durationSec: items.mcqs.length * 90,
@@ -128,7 +149,7 @@ export default function MockPaper() {
 
   return (
     <Screen>
-      <Header title={paper.data.title} sub={t('tutor.aiMade')} back />
+      <Header title={row.title} sub={t('tutor.aiMade')} back />
 
       <Card border={C.orange} style={{ gap: 6 }}>
         <Label style={{ color: C.orangeDark }}>{t('tutor.paperSectionA')}</Label>
@@ -139,12 +160,12 @@ export default function MockPaper() {
 
       <SectionTitle>{t('tutor.paperSectionB')}</SectionTitle>
       {items.shortQs.map((q, n) => (
-        <PaperQuestion key={q.id} n={n + 1} q={q} medium={state.settings.contentMedium} />
+        <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
       ))}
 
       <SectionTitle>{t('tutor.paperSectionC')}</SectionTitle>
       {items.longQs.map((q, n) => (
-        <PaperQuestion key={q.id} n={n + 1} q={q} medium={state.settings.contentMedium} />
+        <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
       ))}
       <Spacer h={S.lg} />
     </Screen>
@@ -174,7 +195,9 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
     });
     setChecking(false);
     if (!res.ok) {
-      toast(t('tutor.errorReply'));
+      // What actually happened: "not counted, try again" is wrong for a spent
+      // allowance or a missing plan, where trying again cannot work.
+      toast(t(aiFailureKey(res.reason)));
       return;
     }
     setVerdict(res.verdict);
@@ -200,6 +223,9 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
               style={[
                 // A written answer reads the way the rest of the screen reads.
                 { fontFamily: F.body, fontSize: 14, lineHeight: 22, color: C.ink, minHeight: 80, textAlignVertical: 'top', textAlign: textStart() },
+                // Typed in Urdu, it gets Nastaliq and its leading: at 22 the
+                // lines of an Urdu answer overlapped and were cropped.
+                isRTL() || isUrduScript(written) ? { fontFamily: F.urdu, lineHeight: 30 } : null,
                 isWeb && ({ outlineStyle: 'none' } as object),
               ]}
             />
@@ -250,7 +276,9 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
           ) : null}
         </>
       ) : (
-        <Small>{t('session.tapForWhy')}</Small>
+        // Tapping opens the answer box, so the card says that, not
+        // "Tap to see the explanation", which is what the review screen does.
+        <Small>{t('tutor.paperTapToAnswer')}</Small>
       )}
     </Card>
   );

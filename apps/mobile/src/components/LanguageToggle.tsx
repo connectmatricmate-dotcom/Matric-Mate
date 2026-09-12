@@ -1,7 +1,7 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useLang, useT } from '../i18n';
 import { C, F, R, rowDir } from '../theme';
-import { Tap } from './ui';
+import { Tap, Text } from './ui';
 
 /**
  * English / Urdu switch.
@@ -42,7 +42,10 @@ export function LanguageToggle({ compact }: { compact?: boolean }) {
             key={o.value}
             onPress={() => setLang(o.value)}
             style={{
-              height: compact ? 32 : 38,
+              // A floor, not a height: the label's line box grows with the
+              // system font size, and a fixed pill with the clip below cut
+              // اردو off at the top and bottom once it did.
+              minHeight: compact ? 32 : 38,
               minWidth: compact ? 62 : 88,
               paddingHorizontal: compact ? 14 : 20,
               borderRadius: R.pill,

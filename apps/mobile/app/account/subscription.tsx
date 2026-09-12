@@ -1,9 +1,9 @@
 import { formatDate } from '@matricmate/core';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
 import { LockedNotice } from '../../src/components/LockedNotice';
-import { Btn, Card, Header, Item, Pill, Row, Screen, SectionTitle, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, Header, Item, Pill, Row, Screen, SectionTitle, Small, Spacer, Text, useToast } from '../../src/components/ui';
 import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';

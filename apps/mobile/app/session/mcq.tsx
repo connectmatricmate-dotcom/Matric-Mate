@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Body, Btn, Card, H3, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Tap } from '../../src/components/ui';
+import { Body, Btn, Card, Chevron, H3, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, Text } from '../../src/components/ui';
 import { SessionHeader } from '../../src/components/SessionHeader';
 import { Confidence, XP, isUrduScript } from '@matricmate/core';
 import Animated from 'react-native-reanimated';
@@ -12,7 +12,7 @@ import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
-import { C, F, S } from '../../src/theme';
+import { C, F, S, rowDir } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
 const LEVELS: { value: Confidence; label: StringKey }[] = [
@@ -66,6 +66,8 @@ export default function McqScreen() {
   }
 
   const correct = checked && chosen === mcq.answer;
+  /** One side for every option's letter key: the side the question starts from. */
+  const keyDir = isUrduScript(mcq.q) ? 'row-reverse' : 'row';
 
   function check() {
     if (chosen == null || confidence == null) return;
@@ -83,7 +85,10 @@ export default function McqScreen() {
     actions.recordAttempt({
       mcqId: mcq!.id,
       chapterId: mcq!.chapterId,
-      subjectId: s!.subjectId,
+      // The question's own subject, from its chapter id. The session's was
+      // the subject the set was opened from, and an AI or mixed set filed a
+      // Chemistry answer under whatever that was.
+      subjectId: mcq!.chapterId ? mcq!.chapterId.split('-')[0] : s!.subjectId,
       topic: mcq!.topic,
       correct: isRight,
       confidence,
@@ -118,12 +123,14 @@ export default function McqScreen() {
                   // Tell the tutor what was picked, so the answer addresses
                   // THIS student's confusion instead of re-teaching the topic.
                   const wrong = chosen != null && chosen !== mcq.answer;
+                  // In the student's own language: this is sent as their
+                  // message, and an English one opened every Urdu chat.
                   const prompt = wrong
-                    ? `I answered "${mcq.options[chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
-                    : mcq.q;
+                    ? t('session.askWhyWrong', { mine: mcq.options[chosen], right: mcq.options[mcq.answer], q: mcq.q })
+                    : t('session.askExplain', { q: mcq.q });
                   // The chapter rides along, so the tutor answers from the very notes
                   // this question came from instead of from general memory.
-                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}&chapter=${mcq.chapterId}`);
+                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}${mcq.chapterId ? `&chapter=${mcq.chapterId}` : ''}`);
                 }}
               />
             </View>
@@ -140,7 +147,14 @@ export default function McqScreen() {
         onClose={() => (answeredCount ? router.replace('/session/result') : router.back())}
         pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100}
         label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
-        right={<Pill tone="grey">{mcq.topic}</Pill>}
+        right={
+          // No pill for a question with no topic, rather than an empty one.
+          mcq.topic?.trim() ? (
+            <Pill tone="grey" lines={1}>
+              {mcq.topic}
+            </Pill>
+          ) : undefined
+        }
         segments={s.mcqs.map((q, j) => {
           const a = s.answers[q.id];
           if (j === i && !checked) return 'current';
@@ -188,10 +202,11 @@ export default function McqScreen() {
           <Tap key={n} onPress={checked ? undefined : () => setChosen(n)}>
             <View
               style={{
-                // The letter key sits on the side the option starts from, so
-                // an Urdu choice reads A on the right rather than stranded
-                // across the row from its own text.
-                flexDirection: isUrduScript(opt) ? 'row-reverse' : 'row',
+                // The letter key sits on the side the question reads from,
+                // the same side for every option. Deciding per option put a
+                // numeric answer's letter on the left under an Urdu question
+                // whose other letters sat on the right.
+                flexDirection: keyDir,
                 alignItems: 'center',
                 gap: S.md,
                 backgroundColor: bg,
@@ -205,7 +220,10 @@ export default function McqScreen() {
               }}
             >
               <View style={{ width: 27, height: 27, borderRadius: 9, backgroundColor: keyBg, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: keyFg }}>{String.fromCharCode(65 + n)}</Text>
+                {/* A key in a fixed box, not reading text: it stays the size of its box. */}
+                <Text allowFontScaling={false} style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: keyFg }}>
+                  {String.fromCharCode(65 + n)}
+                </Text>
               </View>
               <ScriptText text={opt} size={14.5} style={{ flex: 1 }} />
               {checked && isAnswer ? <Icon name="check" size={19} color={C.green} strokeWidth={2.6} /> : null}
@@ -278,10 +296,20 @@ export default function McqScreen() {
           <Card style={{ marginTop: S.sm }}>
             <Label style={{ color: C.teal }}>{t('session.why')}</Label>
             <View style={{ marginTop: 4 }}><Markdown text={mcq.explanation} size={14} /></View>
-            <Spacer h={S.sm} />
-            <Tap onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)} hit>
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.teal }}>{t('session.readInChapter')} →</Text>
-            </Tap>
+            {/* A generated question carries no chapter, and /learn/reader/
+                with nothing after it is not a page. The arrow is the
+                chevron, which turns round in Urdu; a typed one did not. */}
+            {mcq.chapterId ? (
+              <>
+                <Spacer h={S.sm} />
+                <Tap onPress={() => router.push(`/learn/reader/${mcq.chapterId}`)} hit>
+                  <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: 4 }}>
+                    <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.teal }}>{t('session.readInChapter')}</Text>
+                    <Chevron size={15} color={C.teal} />
+                  </View>
+                </Tap>
+              </>
+            ) : null}
           </Card>
         </>
       ) : null}
