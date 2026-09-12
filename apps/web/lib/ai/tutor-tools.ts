@@ -1,5 +1,6 @@
 import 'server-only';
 import type Anthropic from '@anthropic-ai/sdk';
+import { asBoard, belongsToChapter } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -18,11 +19,15 @@ import { createAdminClient } from '@/lib/supabase/admin';
  * into passing anything, so it is never asked to. Every query below is scoped
  * by the id the route authenticated, and that scoping is the access control.
  *
- * Nothing here calls into `@matricmate/core`. Its catalogue is module-global
- * and this is a server: `buildPlan` and `chapterById` read state that the last
+ * Nothing here reads `@matricmate/core`'s catalogue. It is module-global and
+ * this is a server: `buildPlan` and `chapterById` read state that the last
  * request left behind, so a Class 10 student could be handed a Class 9 chapter
  * list belonging to whoever was served before them. Facts come from the
- * database, per request.
+ * database, per request. Core's pure rules, which hold no state, are fine.
+ *
+ * A read that fails throws, and runTutorTool turns that into "could not look
+ * that up". Read as empty, it told the model a student who had answered
+ * hundreds of questions had answered none.
  *
  * Answers are summaries, never rows. A tool result is prompt on the next turn,
  * so a thousand attempt rows would cost more than the block this replaced. Each
@@ -41,12 +46,14 @@ type Db = ReturnType<typeof createAdminClient>;
 async function allAttempts(admin: Db, userId: string) {
   const rows: { chapter_id: string | null; subject_id: string | null; topic: string | null; correct: boolean; at: string }[] = [];
   for (let from = 0; ; from += PAGE) {
-    const { data } = await admin
+    const { data, error } = await admin
       .from('attempts')
       .select('chapter_id,subject_id,topic,correct,at')
       .eq('user_id', userId)
       .order('at', { ascending: false })
+      .order('id')
       .range(from, from + PAGE - 1);
+    if (error) throw new Error(`attempts read failed: ${error.message}`);
     const page = (data ?? []) as typeof rows;
     rows.push(...page);
     if (page.length < PAGE) break;
@@ -118,11 +125,12 @@ export const TUTOR_TOOLS: Anthropic.Tool[] = [
 /* ------------------------------------------------------------- handlers */
 
 async function getProgress(admin: Db, userId: string) {
-  const [attempts, { data: dayRows }, { data: profile }] = await Promise.all([
+  const [attempts, { data: dayRows, error: dayError }, { data: profile, error: profileError }] = await Promise.all([
     allAttempts(admin, userId),
     admin.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: false }).range(0, 399),
     admin.from('profiles').select('xp,grade').eq('id', userId).maybeSingle(),
   ]);
+  if (dayError || profileError) throw new Error(`progress read failed: ${(dayError ?? profileError)?.message}`);
 
   const bySubject = new Map<string, { n: number; right: number }>();
   for (const a of attempts) {
@@ -174,12 +182,13 @@ async function getWeakTopics(admin: Db, userId: string) {
 }
 
 async function getRecentResults(admin: Db, userId: string) {
-  const { data } = await admin
+  const { data, error } = await admin
     .from('results')
     .select('label,score,total,mode,subject_id,at')
     .eq('user_id', userId)
     .order('at', { ascending: false })
     .range(0, 7);
+  if (error) throw new Error(`results read failed: ${error.message}`);
   const rows = (data ?? []) as { label: string; score: number; total: number; mode: string; subject_id: string | null; at: string }[];
   if (!rows.length) return { results: [], note: 'They have not finished a test yet.' };
   return {
@@ -198,28 +207,62 @@ async function getChapterProgress(admin: Db, userId: string, chapterId: string) 
   const id = chapterId.trim().slice(0, 40);
   if (!/^[a-z0-9-]+$/i.test(id)) return { error: 'That is not a chapter id.' };
 
-  const [{ data: chapter }, { data: sections }, { data: read }, { data: cards }, attempts] = await Promise.all([
-    admin.from('chapters').select('id,title,grade,subject_id').eq('id', id).maybeSingle(),
-    admin.from('chapter_sections').select('id', { count: 'exact', head: true }).eq('chapter_id', id),
-    admin.from('read_sections').select('section_id').eq('user_id', userId).eq('chapter_id', id).range(0, 199),
-    admin.from('cards_known').select('card_id').eq('user_id', userId).range(0, PAGE - 1),
+  const [{ data: chapter, error: chapterError }, { data: profile, error: profileError }] = await Promise.all([
+    admin.from('chapters').select('id,title,grade,board,subject_id').eq('id', id).maybeSingle(),
+    admin.from('profiles').select('grade,board,onboarding').eq('id', userId).maybeSingle(),
+  ]);
+  if (chapterError || profileError) throw new Error(`chapter read failed: ${(chapterError ?? profileError)?.message}`);
+  // The admin client skips RLS, so the one-class, one-board wall is here: a
+  // chapter from another class or board is not one they can be on.
+  const board = asBoard(profile?.board);
+  if (!chapter || chapter.grade !== (profile?.grade === 10 ? 10 : 9) || asBoard(chapter.board) !== board) {
+    return { error: 'No chapter with that id.' };
+  }
+
+  /*
+   * Sections and cards exist once per medium (phy-1-en-s1, phy-1-ur-s1), and
+   * counting both, drafts included, reported twice the sections a chapter
+   * has. Each is counted once by its place in the chapter, whichever medium
+   * it was read in, against the published sections of the medium they read.
+   * The id prefix ends in a dash so that math-1 no longer also counts math-10
+   * to math-17.
+   */
+  const medium = (profile?.onboarding as { medium?: string } | null)?.medium === 'ur' ? 'ur' : 'en';
+  const place = (rowId: string) => rowId.slice(id.length + 1).replace(/^(en|ur)-/, '');
+  const countIn = (m: string) =>
+    admin.from('chapter_sections').select('id', { count: 'exact', head: true }).eq('chapter_id', id).eq('medium', m).eq('review_status', 'published');
+  const [sections, read, cards, attempts] = await Promise.all([
+    countIn(medium),
+    admin.from('read_sections').select('section_id').eq('user_id', userId).like('section_id', `${id}-%`).range(0, 399),
+    admin.from('cards_known').select('card_id').eq('user_id', userId).like('card_id', `${id}-%`).range(0, PAGE - 1),
     allAttempts(admin, userId),
   ]);
-  if (!chapter) return { error: 'No chapter with that id.' };
+  if (sections.error || read.error || cards.error) {
+    throw new Error(`chapter progress read failed: ${(sections.error ?? read.error ?? cards.error)?.message}`);
+  }
+  let total = sections.count ?? 0;
+  if (!total && medium !== 'en') {
+    const { count, error } = await countIn('en');
+    if (error) throw new Error(`chapter progress read failed: ${error.message}`);
+    total = count ?? 0;
+  }
 
   const mine = attempts.filter((a) => a.chapter_id === id);
-  const readCount = ((read ?? []) as unknown[]).length;
-  // Sections exist per medium, so the count is doubled where a chapter has
-  // been translated. Halving would be a guess; the ratio is what matters and
-  // it is reported as a plain count either way.
-  const total = (sections as unknown as { count?: number } | null)?.count ?? 0;
+  // The LIKE above is only a coarse cut: FBISE Class 9's chem-10 is also the
+  // start of Class 10's chem-10-3. belongsToChapter parses the id exactly.
+  const ours = (rowId: string) => belongsToChapter(rowId, id);
+  const readCount = new Set(
+    ((read.data ?? []) as { section_id: string }[]).filter((r) => ours(r.section_id)).map((r) => place(r.section_id)),
+  ).size;
 
   return {
     chapter: chapter.title,
     class: chapter.grade,
     sections_read: readCount,
     sections_total: total || undefined,
-    flashcards_known: ((cards ?? []) as { card_id: string }[]).filter((c) => c.card_id.startsWith(id)).length,
+    flashcards_known: new Set(
+      ((cards.data ?? []) as { card_id: string }[]).filter((c) => ours(c.card_id)).map((c) => place(c.card_id)),
+    ).size,
     questions_answered: mine.length,
     accuracy_pct: mine.length ? pct(mine.filter((a) => a.correct).length, mine.length) : undefined,
     note: mine.length === 0 && readCount === 0 ? 'They have not started this chapter.' : undefined,
@@ -230,12 +273,14 @@ async function getToday(admin: Db, userId: string) {
   const today = dayKey();
   const since = new Date(`${today}T00:00:00+05:00`).toISOString();
 
-  const [attempts, { data: read }, { data: done }, { data: day }] = await Promise.all([
+  const [attempts, { data: read, error: readError }, { data: done, error: doneError }, { data: day, error: dayError }] = await Promise.all([
     admin.from('attempts').select('correct,chapter_id').eq('user_id', userId).gte('at', since).range(0, 499),
     admin.from('read_sections').select('section_id').eq('user_id', userId).gte('at', since).range(0, 199),
     admin.from('plan_done').select('task_id').eq('user_id', userId).eq('day', today),
     admin.from('active_days').select('day').eq('user_id', userId).eq('day', today).maybeSingle(),
   ]);
+  const failed = attempts.error ?? readError ?? doneError ?? dayError;
+  if (failed) throw new Error(`today read failed: ${failed.message}`);
 
   const rows = (attempts.data ?? []) as { correct: boolean; chapter_id: string | null }[];
   return {

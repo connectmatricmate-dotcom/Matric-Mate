@@ -3,13 +3,15 @@
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import { type AuthState, resendConfirmationAction, signUpAction } from '@/app/(auth)/actions';
+import { useTouched } from '@/components/auth/useTouched';
 import { ErrorBanner, Field, SubmitButton } from '@/components/ui/controls';
 import { Card } from '@/components/ui/primitives';
-import { useT } from '@/lib/store';
+import { useLang, useT } from '@/lib/store';
 import { isFormValid, validateEmail, validateMobile, validateName, validatePassword } from '@/lib/validation';
 
 export function SignUpForm({ next, referral }: { next?: string; referral?: string }) {
   const t = useT();
+  const { lang } = useLang();
   const [state, action] = useActionState<AuthState, FormData>(signUpAction, {});
   const [resent, resendAction] = useActionState<AuthState, FormData>(resendConfirmationAction, {});
 
@@ -17,13 +19,18 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
-  const [touched, setTouched] = useState(false);
+  const { touched, onBlur } = useTouched();
 
-  const nameError = validateName(name);
-  const emailError = validateEmail(email);
-  const passwordError = validatePassword(password);
+  const nameError = validateName(name, lang);
+  const emailError = validateEmail(email, lang);
+  const passwordError = validatePassword(password, lang);
   const mobileError = validateMobile(mobile);
   const canSubmit = isFormValid(nameError, emailError, passwordError, mobileError);
+
+  // The agreement line links its "Terms and Privacy Policy". The translated
+  // sentence is split on its placeholder so the link sits wherever each
+  // language puts it, the way the checkout does it.
+  const agreeLine = t('checkout.agreeTerms').split('{terms}');
 
   /**
    * The account exists but needs its address confirmed, so there is no session
@@ -35,7 +42,9 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
     return (
       <Card>
         <h1 className="font-display text-[24px] text-ink">{t('auth.checkInboxTitle')}</h1>
-        <p className="mt-2 text-[14.5px] leading-[1.7] text-ink2">
+        {/* wrap-anywhere: the address is one long word, and a long one ran
+            straight out of the card on a phone. */}
+        <p className="mt-2 text-[14.5px] leading-[1.7] text-ink2 wrap-anywhere rtl:leading-[1.9]">
           {t('auth.checkInboxBody', { email: state.email ?? '' })}
         </p>
         {resent.notice ? (
@@ -43,7 +52,11 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
             {t(resent.notice)}
           </p>
         ) : null}
-        {resent.error ? <div className="mt-3"><ErrorBanner message={resent.error} /></div> : null}
+        {resent.error ? (
+          <div className="mt-3">
+            <ErrorBanner key={resent.at} message={resent.error} />
+          </div>
+        ) : null}
 
         {/* Without this, an email that went to spam is a dead end: they cannot
             sign in, and signing up again answers "already registered". */}
@@ -52,7 +65,7 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
           <SubmitButton title={t('auth.resendConfirm')} variant="line" />
           <Link
             href="/login"
-            className="inline-flex h-11 items-center rounded-xl px-4 font-extrabold text-[14px] text-ink2 transition hover:text-teal"
+            className="inline-flex min-h-11 items-center rounded-xl px-4 font-extrabold text-[14px] text-ink2 transition hover:text-teal"
           >
             {t('auth.backToLogin')}
           </Link>
@@ -66,9 +79,10 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
       <h1 className="font-display text-[24px] text-ink">{t('auth.signUpTitle')}</h1>
       <p className="mb-4 mt-0.5 text-[14px] text-ink2">{t('auth.signUpSub')}</p>
 
-      {state.error ? <ErrorBanner message={state.error} /> : null}
+      {/* Keyed on the attempt, so the same failure twice shows twice. */}
+      {state.error ? <ErrorBanner key={state.at} message={state.error} /> : null}
 
-      <form action={action} onSubmit={() => setTouched(true)} noValidate>
+      <form action={action} onBlur={onBlur} noValidate>
         <input type="hidden" name="next" value={next ?? '/onboarding/class'} />
         {/* The teacher whose link brought them here. Also kept in a cookie by
             /r/CODE, so this being absent is not the end of the attribution.
@@ -88,7 +102,7 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
           icon="user"
           autoComplete="name"
           required
-          error={touched ? (nameError ?? undefined) : undefined}
+          error={touched.name ? (nameError ?? undefined) : undefined}
         />
         <Field
           label={t('auth.contact')}
@@ -100,7 +114,7 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
           type="email"
           autoComplete="email"
           required
-          error={touched ? (emailError ?? undefined) : undefined}
+          error={touched.email ? (emailError ?? undefined) : undefined}
         />
         {/* Asked here so it is never asked at checkout. Safepay will not
             create the payer record that fills their form in without a number,
@@ -116,7 +130,7 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
           type="tel"
           autoComplete="tel"
           required
-          error={touched ? (mobileError ?? undefined) : undefined}
+          error={touched.mobile ? (mobileError ?? undefined) : undefined}
         />
         <Field
           label={t('auth.password')}
@@ -128,9 +142,21 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
           type="password"
           autoComplete="new-password"
           required
-          error={touched ? (passwordError ?? undefined) : undefined}
+          error={touched.password ? (passwordError ?? undefined) : undefined}
         />
-        <p className="mb-3 text-[12px] leading-[1.6] text-ink2">{t('auth.terms')}</p>
+        {/* A new tab, so reading the terms does not cost them the form. */}
+        <p className="mb-3 text-[12px] leading-[1.6] text-ink2 rtl:leading-[1.9]">
+          {agreeLine[0]}
+          <Link
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-extrabold text-teal hover:underline"
+          >
+            {t('checkout.termsLink')}
+          </Link>
+          {agreeLine[1]}
+        </p>
         <SubmitButton
           title={t('auth.createAccount')}
           pendingTitle={t('auth.creatingAccount')}
@@ -139,9 +165,9 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
         />
       </form>
 
-      <p className="mt-3 text-center text-[13px] text-ink2">
+      <p className="mt-1 text-center text-[13px] text-ink2">
         {t('auth.haveAccountShort')}{' '}
-        <Link href="/login" className="font-extrabold text-teal hover:underline">
+        <Link href="/login" className="inline-flex min-h-11 items-center font-extrabold text-teal hover:underline">
           {t('auth.logIn')}
         </Link>
       </p>

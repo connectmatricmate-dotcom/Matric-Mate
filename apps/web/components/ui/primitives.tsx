@@ -206,10 +206,17 @@ const GLYPHS: Record<IconName, LucideIcon> = {
 
 /* ------------------------------------------------------------------ text */
 
+/** A caller that already chose an alignment keeps it. */
+const HAS_ALIGN = /(^|\s)text-(left|center|right|start|end|justify)(?=\s|$)/;
+
 /**
  * Content text that follows its own script. Urdu-medium questions, options
  * and answers arrive as Urdu strings; rendered in the Latin faces they
  * degrade into broken glyph soup. Mirrors the Android ScriptText.
+ *
+ * English gets its own direction too. Inside an Urdu account the page is
+ * right to left, and an English sentence laid out in it ends with its full
+ * stop on the wrong side.
  */
 export function ScriptText({
   text,
@@ -227,7 +234,9 @@ export function ScriptText({
       {text}
     </Ur>
   ) : (
-    <span className={`block ${className}`}>{text}</span>
+    <span dir="ltr" className={`block ${HAS_ALIGN.test(className) ? '' : 'text-start'} ${className}`}>
+      {text}
+    </span>
   );
 }
 
@@ -319,8 +328,20 @@ export function Pill({
   return (
     <span className={pillClasses(tone, false, className)}>
       {icon ? <Icon name={icon} size={12} strokeWidth={2.4} /> : null}
-      {/* Pills carry topics and chapter names, not only fixed labels. */}
-      {typeof children === 'string' && isUrduScript(children) ? <Ur>{children}</Ur> : children}
+      {/* Pills carry topics and chapter names, not only fixed labels, so a
+          string truncates rather than widening the row. Urdu is set at line
+          height 1 and Nastaliq ink reaches well outside that box, so its
+          clip box is grown by padding and given back by an equal negative
+          margin: the dots stay visible and the pill keeps its height. */}
+      {typeof children === 'string' ? (
+        isUrduScript(children) ? (
+          <Ur className="-my-[0.75em] min-w-0 truncate py-[0.75em]">{children}</Ur>
+        ) : (
+          <span className="min-w-0 truncate">{children}</span>
+        )
+      ) : (
+        children
+      )}
     </span>
   );
 }
@@ -470,16 +491,25 @@ export function Ring({
           strokeDashoffset={circ * (1 - Math.max(0, Math.min(100, pct)) / 100)}
         />
       </svg>
-      <span className="relative flex flex-col items-center leading-none">{children}</span>
+      {/* leading-none is a Latin setting; Nastaliq needs its own room. */}
+      <span className="relative flex flex-col items-center leading-none rtl:leading-normal">{children}</span>
     </div>
   );
 }
 
+/** A figure, which keeps the Latin face and order inside an Urdu account. */
+const NUMERIC = /^[\d\s.,:%/+×-]+$/;
+
 export function Kpi({ value, label }: { value: string; label: string }) {
-  /* Same rule as the Android tile: tiles that share a row share a height. */
+  /* Same rule as the Android tile: tiles that share a row share a height.
+     A figure sits in `.latin` and needs no extra leading; anything else in an
+     Urdu account is Nastaliq, which leading-tight clips under truncate. */
+  const numeric = NUMERIC.test(value);
   return (
     <div className="flex h-full min-h-[74px] flex-col justify-center rounded-[16px] border border-line bg-card px-4 py-3">
-      <div className="truncate font-display text-[22px] leading-tight tabular-nums text-ink">{value}</div>
+      <div className={`truncate font-display text-[22px] leading-tight tabular-nums text-ink ${numeric ? '' : 'rtl:leading-[1.9]'}`}>
+        {numeric ? <span className="latin">{value}</span> : value}
+      </div>
       <div className="truncate text-[11.5px] font-extrabold text-ink2">{label}</div>
     </div>
   );
@@ -531,13 +561,17 @@ export function ItemBody({
         {urduTitle || (typeof title === 'string' && isUrduScript(title)) ? (
           <Ur block>{title}</Ur>
         ) : (
-          <span className="block text-[14.5px] font-extrabold text-ink">{title}</span>
+          <span dir="ltr" className="block text-[14.5px] font-extrabold text-ink wrap-anywhere">
+            {title}
+          </span>
         )}
         {sub ? (
           typeof sub === 'string' && isUrduScript(sub) ? (
             <Ur block className="mt-0.5 text-[13px] text-ink2">{sub}</Ur>
           ) : (
-            <span className="mt-0.5 block text-[13px] text-ink2">{sub}</span>
+            <span dir="ltr" className="mt-0.5 block text-[13px] text-ink2 wrap-anywhere">
+              {sub}
+            </span>
           )
         ) : null}
         {pct != null ? (
@@ -635,20 +669,33 @@ export function Empty({
  * it keeps a light plate of its own instead. On paper that plate is the card
  * colour it is already sitting on, so nothing shows and no layout moves.
  */
+const WORDMARK_W = 629;
+const WORDMARK_H = 111;
+
 export function Wordmark({
   width = 136,
-  height = 27,
   priority,
   className = '',
 }: {
   width?: number;
+  /** Ignored: the height follows the artwork. Kept so existing callers compile. */
   height?: number;
   priority?: boolean;
   className?: string;
 }) {
   return (
     <span className={`inline-flex rounded-[10px] bg-brandplate p-1 ${className}`}>
-      <Image src="/brand/wordmark.png" alt="MatricMate" width={width} height={height} priority={priority} />
+      {/* The height follows the artwork (629 by 111), whatever a caller asks
+          for: a taller box than the art has only ever been squashed back by
+          Tailwind's `height: auto`, and Next warned about it on every page. */}
+      <Image
+        src="/brand/wordmark.png"
+        alt="MatricMate"
+        width={width}
+        height={Math.round((width * WORDMARK_H) / WORDMARK_W)}
+        priority={priority}
+        style={{ width, height: 'auto' }}
+      />
     </span>
   );
 }

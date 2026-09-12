@@ -1,42 +1,53 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { Chapter, Subject } from '@matricmate/core';
-import { chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectPct } from '@matricmate/core';
+import { chapterBlurb, chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectName, subjectPct } from '@matricmate/core';
 import { LockedNotice } from '@/components/app/LockedNotice';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
-import { UpgradeRail, WeakRail } from '@/components/app/rails';
-import { Btn } from '@/components/ui/controls';
+import { WeakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, LinkBtn, Pill, Ring, ScriptText, Ur } from '@/components/ui/primitives';
-import { Sheet } from '@/components/ui/sheet';
 import { useApp, useLang, useT } from '@/lib/store';
 
-export function ChapterList({ subject, chapters }: { subject: Subject; chapters: Chapter[] }) {
-  const { state } = useApp();
+/*
+ * No per-chapter lock decided in the browser, and no upgrade card in the rail.
+ * Every chapter is premium and the (app) layout turns away anyone without a
+ * plan, so the only student who ever saw the lock was a paying one on a cold
+ * load, before the browser had re-read their plan: every chapter greyed out,
+ * and a tap on one opened a checkout for a subscription they already had.
+ * `paid` comes from the server instead, for a plan that ran out while the app
+ * was open.
+ */
+export function ChapterList({ subject, chapters, paid }: { subject: Subject; chapters: Chapter[]; paid: boolean }) {
+  const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const [locked, setLocked] = useState<Chapter | null>(null);
 
   // One pass over the chapters per data change. The render below used to call
   // chapterPct twice per chapter (the completed count and each row) on every
   // store update; each call walks the full attempts history.
   const { pct, perChapter, completed } = useMemo(() => {
+    // Also when the chapter index lands or changes: chapterPct reads each
+    // chapter's section and question counts from it.
+    void derived.contentReady;
     const per = new Map(chapters.map((c) => [c.id, chapterPct(c.id, state.readSections, state.attempts)]));
     return {
       pct: subjectPct(subject.id, state.readSections, state.attempts),
       perChapter: per,
       completed: [...per.values()].filter((p) => p >= 100).length,
     };
-  }, [chapters, subject.id, state.readSections, state.attempts]);
+  }, [chapters, subject.id, state.readSections, state.attempts, derived.contentReady]);
+
+  const name = subjectName(subject, lang);
 
   return (
     <Page>
       <PageHead
         back="/study"
         backLabel={t('study.title')}
-        title={state.settings.language === 'ur' && subject.urduName ? subject.urduName : subject.name}
-        titleUrdu={state.settings.language === 'ur' && !!subject.urduName}
+        title={name}
+        titleUrdu={isUrduScript(name)}
         sub={`${t('study.chapterCount', { n: chapters.length })} · ${t('study.percentComplete', { n: pct })}`}
         actions={
           <LinkBtn
@@ -51,18 +62,26 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
 
       <Split>
         <Work className="flex flex-col gap-2.5">
+        {/* Without a plan, row level security reports every chapter as having
+            no material, so none is marked "not on the paper" and no counts
+            show: the notice says what is actually wrong. */}
+        {paid ? null : <LockedNotice body={t('billing.lockedBody')} cta={t('states.unlock')} />}
         {chapters.map((c) => {
-          const empty = !hasStudyMaterial(c);
+          const empty = paid && !hasStudyMaterial(c);
           const p = empty ? 0 : (perChapter.get(c.id) ?? 0);
-          const isLocked = c.premium && !state.premium.active;
           const current = c.id === state.lastChapterId;
           const done = p >= 100;
+          /* The blurb only explains an empty chapter. The translated one in
+             the Urdu interface; where there is none yet, nothing, since an
+             English sentence under an Urdu title reads as a mistake. */
+          const rawBlurb = chapterBlurb(c, lang);
+          const blurb = lang === 'ur' && !isUrduScript(rawBlurb) ? '' : rawBlurb;
 
           const body = (
             <Card
               flat={!current}
               border={current ? 'border-teal' : undefined}
-              className={`transition-colors duration-200 ${empty ? 'opacity-60' : isLocked ? 'opacity-60' : 'hover:border-teal'}`}
+              className={`transition-colors duration-200 ${empty ? 'opacity-60' : 'hover:border-teal'}`}
             >
               <span className="flex items-center gap-3">
               <span
@@ -74,8 +93,10 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
               </span>
               <span className="min-w-0 flex-1">
                 <ScriptText text={chapterName(c, lang)} className="text-[14px] font-extrabold text-ink" />
-                {empty ? null : (
-                  <span className="block truncate text-[13px] text-ink2">
+                {empty || !paid ? null : (
+                  // Wraps rather than truncating: on a phone the section count
+                  // at the end of this line was always cut off.
+                  <span className="block text-[13px] text-ink2">
                     {/* Section count, not audio length, and the same three
                         facts the Android list shows. This read audioMinutes,
                         a denormalised column nothing populates, so every
@@ -95,48 +116,45 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
                 ) : null}
               </span>
               {empty ? (
-                <Pill tone="grey">{t('study.notOnPaper')}</Pill>
-              ) : isLocked ? (
-                <Pill tone="grey" icon="lock">
-                  {t('study.premiumChapter')}
+                // Beside the title from sm up; under it on a phone, where a
+                // pill this long squeezed the title into a narrow column.
+                <Pill tone="grey" className="shrink-0 whitespace-nowrap max-sm:hidden">
+                  {t('study.notOnPaper')}
                 </Pill>
               ) : current ? (
-                <Pill tone="orange">{t('common.continue')}</Pill>
+                <Pill tone="orange" className="shrink-0 whitespace-nowrap">{t('common.continue')}</Pill>
               ) : (
                 <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
               )}
-                          </span>
+              </span>
               {empty ? (
                 // The blurb takes the card's full width below the title row;
                 // squeezed into the middle column it wrapped into a cramped
                 // ribbon (client screenshot).
                 <span className="mt-2 block">
-                  {isUrduScript(c.blurb) ? (
-                    <Ur block className="text-[13px] text-ink2">{c.blurb}</Ur>
-                  ) : (
-                    <span className="block text-[13px] text-ink2">{c.blurb}</span>
-                  )}
+                  <Pill tone="grey" className="mb-1.5 sm:hidden">
+                    {t('study.notOnPaper')}
+                  </Pill>
+                  {blurb ? (
+                    isUrduScript(blurb) ? (
+                      <Ur block className="text-[13px] text-ink2">{blurb}</Ur>
+                    ) : (
+                      <span className="block text-[13px] text-ink2">{blurb}</span>
+                    )
+                  ) : null}
                 </span>
               ) : null}
             </Card>
           );
 
-          if (empty) {
-            return <div key={c.id}>{body}</div>;
-          }
-
-          return isLocked ? (
-            <button key={c.id} type="button" onClick={() => setLocked(c)} className="text-start">
-              {body}
-            </button>
+          return empty ? (
+            <div key={c.id}>{body}</div>
           ) : (
             <Link key={c.id} href={`/learn/chapter/${c.id}`}>
               {body}
             </Link>
           );
         })}
-
-          <p className="mt-2 text-[13px] text-ink2">{t('study.premiumNote')}</p>
         </Work>
 
         <Rail>
@@ -145,23 +163,16 @@ export function ChapterList({ subject, chapters }: { subject: Subject; chapters:
               <span className="font-display text-[16px] text-ink tabular">{pct}%</span>
             </Ring>
             <div className="min-w-0 flex-1">
-              <p className="text-[13.5px] font-extrabold text-ink">{subject.name}</p>
+              {/* In the student's language, like the page title above it. */}
+              <ScriptText text={name} className="text-[13.5px] font-extrabold text-ink" urduClassName="text-[13.5px] text-ink" />
               <p className="text-[12.5px] text-ink2">
                 {t('study.chaptersDone', { done: completed, total: chapters.length })}
               </p>
             </div>
           </Card>
           <WeakRail />
-          <UpgradeRail />
         </Rail>
       </Split>
-
-      {/* The shared Sheet, not a hand-rolled overlay: it brings Escape, the
-          focus trap, the scroll lock and the closable backdrop with it. */}
-      <Sheet open={locked !== null} onClose={() => setLocked(null)} title={locked ? chapterName(locked, lang) : ''}>
-        <LockedNotice body={t('billing.lockedBody')} cta={t('states.unlock')} />
-        <Btn title={t('common.close')} variant="line" onClick={() => setLocked(null)} className="mt-3 w-full" />
-      </Sheet>
     </Page>
   );
 }

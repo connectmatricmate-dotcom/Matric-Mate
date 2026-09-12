@@ -8,12 +8,29 @@ import Link from 'next/link';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
 import { accuracy, chapterById, chapterName, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, nextAction, nextStep, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
-import type { CoachReport } from '@matricmate/core';
+import type { Attempt, CoachReport } from '@matricmate/core';
 import { Bar, Card, Icon, Label, LinkBtn, Pill, Ring, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { ScriptNumbers } from '@/components/ui/ScriptList';
 import { useApp, useLang, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
 import { Markdown } from '@/components/ui/Markdown';
+
+/**
+ * Weak topics, each with a name a student can read.
+ *
+ * Answers from AI-made sets are saved with no topic, so they grouped into one
+ * nameless row on the rail, on Progress and on Weak topics, and the coach's
+ * reports took to saying "the topic name is missing". Those fall back to their
+ * chapter's name, which is what the set was built from; anything with no name
+ * at all is left out rather than shown as a blank.
+ */
+export function namedWeakTopics(attempts: Attempt[], lang: string) {
+  const named = attempts.map((a) => ((a.topic ?? '').trim() ? a : { ...a, topic: chapterName(chapterById(a.chapterId), lang) }));
+  return weakTopics(named.filter((a) => a.topic));
+}
+
+/** A row key for a weak topic. Two subjects can share a topic name, and a bare name collided. */
+export const weakKey = (w: { subjectId: string; topic: string }) => `${w.subjectId}|${w.topic}`;
 
 /**
  * The Pakka-meter, promoted out of a sub-page.
@@ -52,11 +69,11 @@ export function ConfidenceRail() {
           ))}
         </div>
       ) : (
-        <p className="mt-2 text-[13px] leading-[1.6] text-ink2">{t('progress.confidenceEmpty')}</p>
+        <p className="mt-2 text-[13px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('progress.confidenceEmpty')}</p>
       )}
       <Link
         href="/insights/performance"
-        className="mt-3 inline-flex min-h-9 items-center gap-1 text-[12.5px] font-extrabold text-teal hover:underline"
+        className="mt-3 inline-flex min-h-10 items-center gap-1 text-[12.5px] font-extrabold text-teal hover:underline"
       >
         {t('common.details')}
         <Icon name="arrowRight" size={13} strokeWidth={2.4} />
@@ -107,16 +124,23 @@ export function SyllabusRail({ limit = 5 }: { limit?: number }) {
   return (
     <Card flat>
       <Label>{t('progress.bySubject')}</Label>
-      <div className="mt-3 flex flex-col gap-2.5">
+      {/* Each row is a 40px target with a hover wash that bleeds past the
+          text (-mx-2 px-2). The row padding now does the spacing the gap
+          used to, so the rail keeps its rhythm. */}
+      <div className="mt-1.5 flex flex-col">
         {rows.map(({ sid, pct }) => {
           return (
-            <Link key={sid} href={`/learn/subject/${sid}`} className="block">
+            <Link
+              key={sid}
+              href={`/learn/subject/${sid}`}
+              className="-mx-2 block min-h-10 rounded-[10px] px-2 py-1.5 transition-colors duration-200 hover:bg-paper"
+            >
               <span className="flex items-baseline justify-between gap-2">
                 <ScriptText
                   text={subjectName(subjectById(sid), lang)}
-                  className="truncate text-[12.5px] font-extrabold text-ink"
+                  className="min-w-0 flex-1 truncate text-[12.5px] font-extrabold text-ink"
                 />
-                <span className="text-[11.5px] font-extrabold text-ink2 tabular">{pct}%</span>
+                <span className="shrink-0 text-[11.5px] font-extrabold text-ink2 tabular">{pct}%</span>
               </span>
               <span className="mt-1 block">
                 <Bar pct={pct} tone="teal" h={5} />
@@ -133,17 +157,23 @@ export function SyllabusRail({ limit = 5 }: { limit?: number }) {
 export function WeakRail({ limit = 3 }: { limit?: number }) {
   const { state } = useApp();
   const t = useT();
-  const rows = useMemo(() => weakTopics(state.attempts).slice(0, limit), [state.attempts, limit]);
+  const { lang } = useLang();
+  const rows = useMemo(() => namedWeakTopics(state.attempts, lang).slice(0, limit), [state.attempts, lang, limit]);
 
   if (rows.length === 0) return null;
 
   return (
     <Card flat tint="bg-redtint" border="border-redtint">
       <Label className="text-red">{t('progress.weakTopics')}</Label>
-      <ul className="mt-2.5 flex flex-col gap-2">
+      {/* Same 40px rows as the syllabus rail; bg-card for the hover, since
+          paper does not show on the red tint. */}
+      <ul className="mt-1 flex flex-col">
         {rows.map((w) => (
-          <li key={w.topic}>
-            <Link href={`/session/setup?chapter=${w.chapterId}`} className="flex items-center gap-2">
+          <li key={weakKey(w)}>
+            <Link
+              href={`/session/setup?chapter=${w.chapterId}`}
+              className="-mx-2 flex min-h-10 items-center gap-2 rounded-[10px] px-2 py-1.5 transition-colors duration-200 hover:bg-card"
+            >
               {/* truncate clips the line's logical end, so an Urdu topic has
                   to carry dir="rtl" or the ellipsis eats its first word. */}
               <ScriptText
@@ -158,7 +188,7 @@ export function WeakRail({ limit = 3 }: { limit?: number }) {
       </ul>
       <Link
         href="/insights/weak"
-        className="mt-3 inline-flex min-h-9 items-center gap-1 text-[12.5px] font-extrabold text-red hover:underline"
+        className="mt-3 inline-flex min-h-10 items-center gap-1 text-[12.5px] font-extrabold text-red hover:underline"
       >
         {t('common.seeAll')}
         <Icon name="arrowRight" size={13} strokeWidth={2.4} />
@@ -212,7 +242,7 @@ export function TutorBudgetRail() {
       </Ring>
       <div className="min-w-0 flex-1">
         <p className="text-[13.5px] font-extrabold text-ink">{t('tutor.leftToday', { n: left })}</p>
-        <p className="text-[12.5px] leading-[1.5] text-ink2">
+        <p className="text-[12.5px] leading-[1.5] text-ink2 rtl:leading-[1.9]">
           {limit === 0 ? t('tutor.limitPremium') : t('tutor.limitBody', { n: limit })}
         </p>
       </div>
@@ -232,7 +262,7 @@ export function UpgradeRail() {
         <Icon name="lock" size={16} className="shrink-0 text-teal" />
         <p className="text-[13px] font-extrabold text-ink">{t('billing.statusFree')}</p>
       </div>
-      <p className="mt-1.5 text-[12.5px] leading-[1.6] text-ink2">{t('billing.freeBody')}</p>
+      <p className="mt-1.5 text-[12.5px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('billing.freeBody')}</p>
       <UpgradeButton sm className="mt-3" />
     </Card>
   );
@@ -256,6 +286,7 @@ export function CoachRail() {
     nextAction({
       subjectIds: derived.subjects,
       grade: state.onboarding?.classLevel ?? 9,
+      board: state.onboarding?.board ?? 'fbise',
       lastChapterId: state.lastChapterId,
       lastSectionIndex: state.lastSectionIndex,
       readSections: state.readSections,
@@ -344,8 +375,17 @@ export function CoachRail() {
         />
         <Label>{t('tutor.coachFirstSteps')}</Label>
         <ScriptNumbers
-          items={[t('tutor.coachStep1', { chapter: first ? chapterName(first, lang) : '' }), t('tutor.coachStep2'), t('tutor.coachStep3')]}
+          // No first step without a chapter to name. It read "Open  and read
+          // the notes" whenever the chapter index had not loaded yet.
+          items={[
+            ...(first ? [t('tutor.coachStep1', { chapter: chapterName(first, lang) })] : []),
+            t('tutor.coachStep2'),
+            t('tutor.coachStep3'),
+          ]}
           className="text-[12.5px] leading-[1.5] text-ink2"
+          // No leading here: the Latin 1.5 would override .urdu's own and
+          // stack Nastaliq lines into each other.
+          urduClassName="text-[12.5px] text-ink2"
           listClassName="flex flex-col gap-1"
         />
         {cta}
@@ -356,8 +396,8 @@ export function CoachRail() {
     <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
       <Label className="text-teal">{t('tutor.coachTitle')}</Label>
       <Markdown text={report.summary} className="text-[13px] leading-[1.6] text-ink" />
-      {report.weak.slice(0, 2).map((w) => (
-        <div key={w.topic}>
+      {report.weak.slice(0, 2).map((w, i) => (
+        <div key={`${i}-${w.topic}`}>
           <ScriptText text={w.topic} className="text-[13px] font-extrabold text-ink" urduClassName="text-[13px] text-ink" />
           <ScriptText text={w.why} className="text-[12px] leading-[1.5] text-ink2" urduClassName="text-[12px] text-ink2" />
         </div>
@@ -368,6 +408,7 @@ export function CoachRail() {
       <ScriptNumbers
         items={report.actions.slice(0, 3).map((a) => a.replace(/^\s*\d{1,2}[.)]\s*/, ''))}
         className="text-[12.5px] leading-[1.5] text-ink2"
+        urduClassName="text-[12.5px] text-ink2"
         listClassName="flex flex-col gap-1"
       />
       {cta}

@@ -5,15 +5,16 @@
  * choices, and a single forward action. Mirrors
  * apps/mobile/src/components/OnboardingStep.tsx so the two apps read the same.
  */
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useTransition } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Check, Icon, Pill, Ur } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 
 export function Steps({ step, total = 4 }: { step: number; total?: number }) {
+  const t = useT();
   return (
-    <ol className="mb-6 flex justify-center gap-1.5" aria-label={`Step ${step} of ${total}`}>
+    <ol className="mb-6 flex justify-center gap-1.5" aria-label={t('onboarding.stepOf', { n: step, total })}>
       {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
         <li
           key={n}
@@ -81,40 +82,50 @@ export function StepScreen({
   cta,
   onNext,
   disabled,
+  waiting,
   footnote,
-  back = true,
+  backHref,
 }: {
   step: number;
   title: string;
   sub: string;
   children: React.ReactNode;
   cta: string;
-  onNext: () => void;
+  /** May be async: the button keeps spinning until it settles. */
+  onNext: () => void | Promise<void>;
   disabled?: boolean;
+  /**
+   * The account's saved setup is still being read. The button waits with it:
+   * pressed now, it would save the defaults on screen over the choices the
+   * account already has.
+   */
+  waiting?: boolean;
   footnote?: string;
-  back?: boolean;
+  /**
+   * Where Back goes. A real address rather than the browser's history, which
+   * after a hard load or a link from an email is some other site, or nothing.
+   */
+  backHref?: string;
 }) {
-  const router = useRouter();
   const t = useT();
-  // Every step's forward action is a state write plus a route push. The button
-  // spins until the next step paints, otherwise a slow transition reads as a
-  // dead tap and invites a second click.
+  // Every step's forward action is a save plus a route push. The button spins
+  // until the next step paints, otherwise a slow transition reads as a dead
+  // tap and invites a second click.
   const [pending, startTransition] = useTransition();
 
   return (
     <div className="mx-auto w-full max-w-[540px] px-5 py-7">
-      {back ? (
-        <button
-          type="button"
-          onClick={() => startTransition(() => router.back())}
-          className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-[13.5px] font-extrabold text-ink2 hover:text-teal"
+      {backHref ? (
+        <Link
+          href={backHref}
+          className="-ms-1 mb-4 inline-flex min-h-11 items-center gap-1.5 pe-2 text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
         >
           <Icon name="chevron" size={18} className="rotate-180" />
           {t('common.back')}
-        </button>
+        </Link>
       ) : null}
 
-      <h1 className="font-display text-[26px] leading-tight text-ink">{title}</h1>
+      <h1 className="font-display text-[26px] leading-tight text-ink rtl:leading-[1.9]">{title}</h1>
       <p className="mb-5 mt-1 text-[14.5px] text-ink2">{sub}</p>
 
       <Steps step={step} />
@@ -124,7 +135,17 @@ export function StepScreen({
       {footnote ? <p className="mt-6 text-[12.5px] text-ink2">{footnote}</p> : null}
 
       <div className="mt-7">
-        <Btn title={cta} onClick={() => startTransition(onNext)} disabled={disabled} loading={pending} className="w-full" />
+        <Btn
+          title={cta}
+          onClick={() =>
+            startTransition(async () => {
+              await onNext();
+            })
+          }
+          disabled={disabled}
+          loading={pending || waiting}
+          className="w-full"
+        />
       </div>
     </div>
   );

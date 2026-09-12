@@ -10,7 +10,7 @@ import {
   subjectName,
   type ChapterChoice,
 } from '@matricmate/core';
-import { Icon } from '@/components/ui/primitives';
+import { Icon, ScriptText } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { createClient } from '@/lib/supabase/client';
 import { useApp, useLang, useT } from '@/lib/store';
@@ -75,9 +75,16 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
     if (level.kind !== 'topics') return;
     const forChapter = level.chapter.id;
     let alive = true;
-    fetchChapterTopics(forChapter, createClient()).then((list: string[]) => {
-      if (alive) setTopics({ forChapter, list });
-    });
+    fetchChapterTopics(forChapter, createClient())
+      .then((list: string[]) => {
+        if (alive) setTopics({ forChapter, list });
+      })
+      // A failed read still settles, as an empty list, so the student gets
+      // "no topics" and the whole-chapter row rather than a skeleton that
+      // pulses forever.
+      .catch(() => {
+        if (alive) setTopics({ forChapter, list: [] });
+      });
     return () => {
       alive = false;
     };
@@ -108,17 +115,27 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
         </button>
       ) : null}
 
-      <label className="flex items-center gap-2 rounded-full border-[1.5px] border-line bg-paper px-4 py-2.5">
+      {/* field-shell gives it the same focus ring as every other field; the
+          input inside stays bare. */}
+      <label className="field-shell flex items-center gap-2 rounded-full border-[1.5px] border-line bg-paper px-4 py-2.5 transition-[border-color,box-shadow] duration-200">
         <Icon name="search" size={17} className="shrink-0 text-ink3" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('tutor.pickSearchHint')}
           aria-label={t('tutor.pickSearchHint')}
-          className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3"
+          // 16px on phones, or iOS Safari zooms the page into the field.
+          className="min-w-0 flex-1 bg-transparent text-[16px] text-ink outline-none placeholder:text-ink3 md:text-[14px]"
         />
         {query ? (
-          <button type="button" onClick={() => setQuery('')} aria-label={t('common.cancel')} className="shrink-0 text-ink3">
+          // 40px target, tucked into the pill's padding so the pill keeps
+          // its height when the button appears.
+          <button
+            type="button"
+            onClick={() => setQuery('')}
+            aria-label={t('common.cancel')}
+            className="-my-2.5 -me-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink3 transition-colors duration-200 hover:bg-card hover:text-ink"
+          >
             <Icon name="close" size={16} />
           </button>
         ) : null}
@@ -231,9 +248,13 @@ function RowItem({
       <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px] bg-tealtint text-[12px] font-extrabold text-teal">
         {badge}
       </span>
+      {/* Chapter and subject names arrive in Urdu for an Urdu student, and
+          they need the Nastaliq face and its line height, not the Latin one. */}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[14px] font-extrabold text-ink">{title}</span>
-        {sub ? <span className="block truncate text-[11.5px] text-ink2">{sub}</span> : null}
+        <ScriptText text={title} className="truncate text-[14px] font-extrabold text-ink" urduClassName="min-w-0 truncate text-[14px] text-ink" />
+        {sub ? (
+          <ScriptText text={sub} className="truncate text-[11.5px] text-ink2" urduClassName="min-w-0 truncate text-[11.5px] text-ink2" />
+        ) : null}
       </span>
       <Icon name="chevron" size={16} className="shrink-0 text-ink3" />
     </button>

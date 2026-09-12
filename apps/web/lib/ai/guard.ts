@@ -1,6 +1,7 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { AI_QUOTA, BOARD_LABEL, SUBJECTS, asBoard, type Board } from '@matricmate/core';
+import { planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -58,7 +59,13 @@ export type Guarded = {
   /** The caller's board from profiles.board, for the same reason: RLS keeps
    *  a Punjab student's reads to Punjab chapters, and admin queries skip RLS. */
   board: Board;
+  /** The medium saved on the account, for a request that does not say which
+   *  one it wants. Null when the account has never chosen. */
+  medium: 'en' | 'ur' | null;
 };
+
+/** Not a decision about the student: the database did not answer. */
+const unavailable = () => NextResponse.json({ error: 'server_error' }, { status: 503 });
 
 /**
  * Runs the full gate. Returns the caller's identity and quota, or the exact
@@ -66,6 +73,21 @@ export type Guarded = {
  * bearer token for the app.
  */
 export async function guardAi(req: NextRequest, cost: number): Promise<Guarded | NextResponse> {
+  const g = await guardStudent(req);
+  if (g instanceof NextResponse) return g;
+  return quotaGate(g, cost) ?? g;
+}
+
+/**
+ * Who is asking and whether they have a plan, without spending a thought on
+ * quota yet.
+ *
+ * Split out for the one route that may answer for free: a cheat sheet another
+ * student already paid for costs nothing, so a student who has used up the
+ * day's allowance can still open one. Everything that calls the model goes
+ * through `guardAi`, which is this plus `quotaGate`.
+ */
+export async function guardStudent(req: NextRequest): Promise<Guarded | NextResponse> {
   let userId: string | null = null;
   const admin = createAdminClient();
 
@@ -80,10 +102,21 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
   }
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
 
-  const [{ data: ent }, { data: prof }] = await Promise.all([
+  const [ent, prof, usage] = await Promise.all([
     admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade,role,board').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade,role,board,onboarding').eq('id', userId).maybeSingle(),
+    admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
   ]);
+
+  /*
+   * A failed read is not an answer. Treated as one, a timed-out entitlements
+   * read told a paying student they had no plan, and a timed-out usage read
+   * handed them a fresh allowance. Neither is theirs to be told.
+   */
+  if (ent.error || prof.error || usage.error) {
+    console.error('[guard] read failed', (ent.error ?? prof.error ?? usage.error)?.message);
+    return unavailable();
+  }
 
   /*
    * Students only, checked before the plan.
@@ -96,41 +129,94 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
    * how things are rather than a rule, and it would stop being true the moment
    * anybody comped a staff account.
    */
-  if (prof?.role && prof.role !== 'student') {
+  const role = prof.data?.role as string | null | undefined;
+  if (role && role !== 'student') {
     return NextResponse.json({ error: 'not_a_student' }, { status: 403 });
   }
 
-  const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
-  if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
-  const grade: 9 | 10 = prof?.grade === 10 ? 10 : 9;
-  const board = asBoard(prof?.board);
+  if (!planIsActive(ent.data)) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
+  const grade: 9 | 10 = prof.data?.grade === 10 ? 10 : 9;
+  const board = asBoard(prof.data?.board);
+  const saved = (prof.data?.onboarding as { medium?: string } | null)?.medium;
 
-  const { data: usage } = await admin
+  const used = (usage.data?.used as number | undefined) ?? 0;
+  const limit = AI_QUOTA.premium;
+  const quota: QuotaState = { limit, used, remaining: Math.max(0, limit - used), resetAt: resetAt() };
+
+  return { userId, admin, quota, grade, board, medium: saved === 'ur' ? 'ur' : saved === 'en' ? 'en' : null };
+}
+
+/** The 429 for a student without `cost` left today, or null when they have it. */
+export function quotaGate(g: Guarded, cost: number): NextResponse | null {
+  if (g.quota.remaining < cost) {
+    return NextResponse.json({ error: 'quota_exhausted', quota: g.quota }, { status: 429 });
+  }
+  return null;
+}
+
+/**
+ * The student's reading medium for this request: what the app sent, or what
+ * the account has saved when it sent nothing. Callers turn this into the
+ * language of a particular subject with subjectMedium from core.
+ */
+export function studentMedium(sent: unknown, g: Pick<Guarded, 'medium'>): 'en' | 'ur' {
+  if (sent === 'ur' || sent === 'en') return sent;
+  return g.medium ?? 'en';
+}
+
+/** True when the database has not got charge_ai_usage yet (migration 0040). */
+const missingFunction = (e: { code?: string; message?: string }) =>
+  e.code === 'PGRST202' || e.code === '42883' || /charge_ai_usage/.test(e.message ?? '');
+
+/**
+ * Adds `cost` to today's count and returns the new total, or null when the
+ * write failed.
+ *
+ * One statement in the database (charge_ai_usage, migration 0040), because the
+ * old way lost charges: every route read `used` when the request arrived and
+ * wrote back `used + cost` when it finished, so two requests in flight wrote
+ * the same number, and a mock paper that took four minutes wrote back a count
+ * from before anything else the student did in those four minutes. Both ends
+ * handed quota back.
+ *
+ * Until 0040 is applied the function does not exist, and this falls back to
+ * reading the count now and writing it straight back. Still a race, but one
+ * round trip wide instead of a whole model call.
+ */
+export async function addUsage(admin: ReturnType<typeof createAdminClient>, userId: string, cost: number): Promise<number | null> {
+  const day = dayKey();
+  const { data, error } = await admin.rpc('charge_ai_usage', { p_user: userId, p_day: day, p_cost: cost });
+  if (!error && typeof data === 'number') return data;
+  if (error && !missingFunction(error)) {
+    // Not retried: a failure after the database may have applied it could
+    // charge the student twice. One uncounted answer is the better mistake.
+    console.error('[quota] charge failed', error.message);
+    return null;
+  }
+
+  const { data: row, error: readError } = await admin
     .from('ai_usage')
     .select('used')
     .eq('user_id', userId)
-    .eq('day', dayKey())
+    .eq('day', day)
     .maybeSingle();
-  const used = usage?.used ?? 0;
-  const limit = AI_QUOTA.premium;
-  const quota: QuotaState = { limit, used, remaining: Math.max(0, limit - used), resetAt: resetAt() };
-  if (quota.remaining < cost) {
-    return NextResponse.json({ error: 'quota_exhausted', quota }, { status: 429 });
+  if (readError) {
+    console.error('[quota] charge read failed', readError.message);
+    return null;
   }
-
-  return { userId, admin, quota, grade, board };
+  const used = ((row?.used as number | undefined) ?? 0) + cost;
+  const { error: writeError } = await admin.from('ai_usage').upsert({ user_id: userId, day, used }, { onConflict: 'user_id,day' });
+  if (writeError) {
+    console.error('[quota] charge write failed', writeError.message);
+    return null;
+  }
+  return used;
 }
 
 /** Charge after delivery, never before: a failed request costs nothing. */
 export async function chargeQuota(g: Guarded, cost: number): Promise<QuotaState> {
-  await g.admin
-    .from('ai_usage')
-    .upsert({ user_id: g.userId, day: dayKey(), used: g.quota.used + cost }, { onConflict: 'user_id,day' });
-  return {
-    ...g.quota,
-    used: g.quota.used + cost,
-    remaining: Math.max(0, g.quota.remaining - cost),
-  };
+  const used = (await addUsage(g.admin, g.userId, cost)) ?? g.quota.used + cost;
+  return { ...g.quota, used, remaining: Math.max(0, g.quota.limit - used) };
 }
 
 type BlockRow = { kind: string; text?: string; term?: string; caption?: string; items?: string[] };
@@ -149,10 +235,15 @@ export type Grounding = {
 /**
  * A chapter's sections flattened to plain text, the grounding for every
  * generation route. Capped so a long chapter cannot blow up the prompt.
+ *
+ * Null means the chapter is not the student's to write about: it does not
+ * exist, or it belongs to another class or board. A read that failed throws,
+ * so a slow database is not reported to the student as "not in your syllabus".
  */
 export async function chapterGrounding(
   admin: ReturnType<typeof createAdminClient>,
   chapterId: string,
+  /** The language of this subject for the student: subjectMedium in core. */
   medium: string,
   maxChars = 24_000,
   /** When given, a chapter from another class reads as not-found. */
@@ -160,32 +251,30 @@ export async function chapterGrounding(
   /** When given, a chapter from another board reads as not-found. */
   board?: Board,
 ): Promise<Grounding | null> {
-  const { data: chapter } = await admin
+  const { data: chapter, error } = await admin
     .from('chapters')
     .select('id,title,subject_id,grade,board')
     .eq('id', chapterId)
     .maybeSingle();
+  if (error) throw new Error(`chapter read failed: ${error.message}`);
   if (!chapter) return null;
   if (grade && chapter.grade !== grade) return null;
   if (board && asBoard(chapter.board) !== board) return null;
 
-  let { data: sections } = await admin
-    .from('chapter_sections')
-    .select('title,blocks')
-    .eq('chapter_id', chapterId)
-    .eq('medium', medium)
-    .eq('review_status', 'published')
-    .order('position');
-  if (!sections?.length && medium !== 'en') {
-    // Urdu grounding falls back to English rather than failing the request.
-    ({ data: sections } = await admin
+  const read = (m: string) =>
+    admin
       .from('chapter_sections')
       .select('title,blocks')
       .eq('chapter_id', chapterId)
-      .eq('medium', 'en')
+      .eq('medium', m)
       .eq('review_status', 'published')
-      .order('position'));
+      .order('position');
+  let { data: sections, error: sectionsError } = await read(medium);
+  if (!sectionsError && !sections?.length && medium !== 'en') {
+    // Urdu grounding falls back to English rather than failing the request.
+    ({ data: sections, error: sectionsError } = await read('en'));
   }
+  if (sectionsError) throw new Error(`sections read failed: ${sectionsError.message}`);
   /*
    * No chapter text. This used to be the end of the request: the route
    * returned no_content, the app turned that into "something went wrong", and
@@ -246,3 +335,13 @@ export function groundingBrief(g: Grounding, grade: 9 | 10, board: Board = 'fbis
     'policies, mark distributions or quotations from a textbook you cannot see.'
   );
 }
+
+/**
+ * How a route answers a model refusal.
+ *
+ * Not 200. The apps' shared client treats any 2xx as a result, so a refusal
+ * sent with 200 went on as one: an MCQ build threw inside the click handler, a
+ * mock paper opened `?id=undefined`, and the answer checker crashed the short
+ * question screen. 422 is "understood, but not something we can produce".
+ */
+export const refused = (quota: QuotaState) => NextResponse.json({ error: 'refused', quota }, { status: 422 });

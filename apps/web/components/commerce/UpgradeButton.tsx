@@ -31,6 +31,7 @@ export function UpgradeButton({
   icon = 'crown',
   className,
   withPrice = true,
+  full,
 }: {
   label?: string;
   variant?: 'primary' | 'orange' | 'line' | 'ghost';
@@ -39,6 +40,12 @@ export function UpgradeButton({
   className?: string;
   /** Off for tight spots where the price is already on screen beside it. */
   withPrice?: boolean;
+  /**
+   * Fill the column on a phone, content width from sm up. `className` styles
+   * the wrapper, which also holds the error line, so it cannot widen the
+   * button itself.
+   */
+  full?: boolean;
 }) {
   const t = useT();
   const router = useRouter();
@@ -79,6 +86,7 @@ export function UpgradeButton({
         icon={icon ?? undefined}
         loading={busy}
         onClick={go}
+        className={full ? 'w-full sm:w-auto' : ''}
       />
       {error ? (
         <p role="alert" className="mt-2 text-[12.5px] font-extrabold text-red">

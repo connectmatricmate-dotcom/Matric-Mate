@@ -28,10 +28,17 @@ export function McqScreen() {
   const t = useT();
   const router = useRouter();
   const s = session.current;
-  const [i, setI] = useState(0);
-  const [chosen, setChosen] = useState<number | null>(null);
-  const [confidence, setConfidence] = useState<Confidence | null>(null);
-  const [checked, setChecked] = useState(false);
+  /* Where to pick up. The position used to be component state alone, so
+     coming back from "Ask AI" restarted at question 1, and answering again
+     recorded every attempt, and its XP, a second time. The answers live in the
+     session, so the first unanswered question is where the student left off.
+     With every question answered, the last one reopens as it was checked. */
+  const resumeAt = s ? s.mcqs.findIndex((q) => !s.answers[q.id]) : 0;
+  const finished = s && s.mcqs.length > 0 && resumeAt === -1 ? s.answers[s.mcqs[s.mcqs.length - 1].id] : null;
+  const [i, setI] = useState(finished && s ? s.mcqs.length - 1 : Math.max(0, resumeAt));
+  const [chosen, setChosen] = useState<number | null>(finished?.chosen ?? null);
+  const [confidence, setConfidence] = useState<Confidence | null>(finished?.confidence ?? null);
+  const [checked, setChecked] = useState(!!finished);
   // Navigation pending state: the button spins until the next route paints,
   // so there is never a moment where a tap appears to do nothing.
   const [leaving, startLeaving] = useTransition();
@@ -51,7 +58,9 @@ export function McqScreen() {
     actions.recordAttempt({
       mcqId: mcq.id,
       chapterId: mcq.chapterId,
-      subjectId: s.subjectId,
+      // The question's own subject: a set can span chapters, and every id
+      // leads with its subject.
+      subjectId: mcq.chapterId.split('-')[0] || s.subjectId,
       topic: mcq.topic,
       correct: isRight,
       confidence,
@@ -81,7 +90,7 @@ export function McqScreen() {
         closeLabel={t('common.close')}
         pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100}
         label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
-        right={<Pill tone="grey">{mcq.topic}</Pill>}
+        right={mcq.topic ? <Pill tone="grey">{mcq.topic}</Pill> : undefined}
         segments={s.mcqs.map((q, j) => {
           const a = s.answers[q.id];
           if (j === i && !checked) return 'current';
@@ -120,7 +129,11 @@ export function McqScreen() {
               disabled={checked}
               aria-pressed={isChosen}
               onClick={() => setChosen(n)}
-              className={`flex min-h-14 w-full items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-3.5 text-start transition-colors duration-200 disabled:cursor-default ${isUrduScript(opt) ? 'flex-row-reverse' : ''} ${shell}`}
+              // The option's own direction, so the letter sits where its line
+              // starts. A reversed row was only right in an English account;
+              // in an Urdu one it put the letter at the far end.
+              dir={isUrduScript(opt) ? 'rtl' : 'ltr'}
+              className={`flex min-h-14 w-full items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-3.5 text-start transition-colors duration-200 disabled:cursor-default ${shell}`}
             >
               <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12.5px] font-extrabold ${key}`}>
                 {String.fromCharCode(65 + n)}
@@ -196,12 +209,17 @@ export function McqScreen() {
           <Card>
             <Label className="text-teal">{t('session.why')}</Label>
             <Markdown text={mcq.explanation} className="mt-1 text-[14.5px] leading-[1.6] text-ink" />
-            <Link
-              href={`/learn/reader/${mcq.chapterId}`}
-              className="mt-3 inline-block text-[12.5px] font-extrabold text-teal hover:underline"
-            >
-              {t('session.readInChapter')} →
-            </Link>
+            {/* Generated questions carry no chapter, and a link to
+                /learn/reader/ with nothing after it is a 404. */}
+            {mcq.chapterId ? (
+              <Link
+                href={`/learn/reader/${mcq.chapterId}`}
+                className="mt-2 inline-flex min-h-11 items-center gap-1 text-[12.5px] font-extrabold text-teal hover:underline"
+              >
+                {t('session.readInChapter')}
+                <Icon name="arrowRight" size={14} strokeWidth={2.4} />
+              </Link>
+            ) : null}
           </Card>
         </div>
       ) : null}
@@ -221,11 +239,11 @@ export function McqScreen() {
                   // THIS student's confusion instead of re-teaching the topic.
                   const wrong = chosen != null && chosen !== mcq.answer;
                   const prompt = wrong
-                    ? `I answered "${mcq.options[chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
+                    ? t('session.askWhyWrong', { mine: mcq.options[chosen], right: mcq.options[mcq.answer], q: mcq.q })
                     : mcq.q;
                   // The chapter rides along, so the tutor answers from the very notes
                   // this question came from instead of from general memory.
-                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}&chapter=${mcq.chapterId}`);
+                  router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}${mcq.chapterId ? `&chapter=${mcq.chapterId}` : ''}`);
                 })
               }
             />

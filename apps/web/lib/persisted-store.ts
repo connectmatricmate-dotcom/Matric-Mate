@@ -21,7 +21,17 @@ const KEY = 'mm.web.v2';
 
 export type Onboarding = {
   classLevel: 9 | 10;
-  board: 'fbise' | 'punjab';
+  /**
+   * Absent until the student has chosen one, or the account says which.
+   *
+   * It used to be filled with 'fbise' the moment the class step wrote
+   * anything, which made "has not chosen yet" and "chose FBISE" the same
+   * value. The board step then could not tell a first choice from a change,
+   * and a Punjab student whose browser had not loaded their account yet was
+   * shown FBISE and moved to it by pressing Continue. Readers default it with
+   * `?? 'fbise'`, the database's own default.
+   */
+  board?: 'fbise' | 'punjab';
   medium: Medium;
   group: Group;
   subjects: string[];
@@ -156,22 +166,46 @@ export const getSnapshot = () => state;
  * itself. The language cookie is the one piece of the preference the server
  * can see, so the server snapshot starts from it.
  *
- * Only the language is taken from the cookie. Everything else here is
- * per-device progress that has no business being guessed.
+ * Whether the account has a plan comes from the server too: the app layout
+ * has already asked, because the paywall depends on it. Without it every
+ * paying student opened the app on the free state (locked chapters, "no plan",
+ * a red 0/0 in the header) until the browser's own entitlement read came
+ * back, which on 3G is seconds and on a failed read is forever.
  *
- * Two frozen objects rather than one mutable module variable: this runs on a
- * server handling many requests at once, and a module-level "current language"
- * would let an Urdu request repaint an English one. And they must be stable by
+ * Everything else here is per-device progress that has no business being
+ * guessed.
+ *
+ * Constants rather than one mutable module variable: this runs on a server
+ * handling many requests at once, and a module-level "current language" would
+ * let an Urdu request repaint an English one. And they must be stable by
  * reference, because useSyncExternalStore compares snapshots by identity and a
  * fresh object per call never settles.
  */
-const SERVER_SNAPSHOTS: Record<'en' | 'ur', State> = {
-  en: EMPTY,
-  ur: { ...EMPTY, settings: { ...DEFAULT_SETTINGS, language: 'ur', contentMedium: 'ur' } },
+const PAID: State['premium'] = { active: true, validTill: null };
+const URDU: Settings = { ...DEFAULT_SETTINGS, language: 'ur', contentMedium: 'ur' };
+const SERVER_SNAPSHOTS: Record<'en' | 'ur', Record<'free' | 'paid', State>> = {
+  en: { free: EMPTY, paid: { ...EMPTY, premium: PAID } },
+  ur: { free: { ...EMPTY, settings: URDU }, paid: { ...EMPTY, settings: URDU, premium: PAID } },
 };
 
-export const serverSnapshotFor = (lang: 'en' | 'ur') => SERVER_SNAPSHOTS[lang];
-export const getServerSnapshot = () => SERVER_SNAPSHOTS.en;
+export const serverSnapshotFor = (lang: 'en' | 'ur', paid = false) => SERVER_SNAPSHOTS[lang][paid ? 'paid' : 'free'];
+export const getServerSnapshot = () => SERVER_SNAPSHOTS.en.free;
+
+/**
+ * Starts the browser's store from what the server rendered with, once.
+ *
+ * Called while AppProvider renders, before the first read of the store, so
+ * the first client render agrees with the server's and a paying student never
+ * sees a lock, even for a frame. Only the pristine store is touched: once
+ * anything real has been read or written, the server's hint has nothing to
+ * add. The same object as the server snapshot, so React finds nothing to
+ * re-render after hydration. Never on the server, where this module is shared
+ * by every request.
+ */
+export function seedFromServer(lang: 'en' | 'ur', paid: boolean): void {
+  if (typeof window === 'undefined' || state !== EMPTY) return;
+  state = serverSnapshotFor(lang, paid);
+}
 
 function persist() {
   if (saveTimer) clearTimeout(saveTimer);
@@ -181,8 +215,8 @@ function persist() {
        * Everything except premium. Entitlement is server truth, refreshed on
        * every load, and caching it here had two failure modes: a signed-out
        * machine kept showing the last account's plan, and an expired plan
-       * survived until the next sync. A one-render flash of the free state on
-       * reload is the honest trade.
+       * survived until the next sync. The first render takes it from the
+       * layout instead, which has just read it (see seedFromServer).
        */
       window.localStorage.setItem(KEY, JSON.stringify({ ...state, premium: EMPTY.premium }));
     } catch {
@@ -200,7 +234,14 @@ export function update(fn: (s: State) => State) {
 /** Reads the saved snapshot once, on the client. Safe to call repeatedly. */
 export function hydrate() {
   if (state.hydrated) return;
-  let restored: State = { ...EMPTY, hydrated: true };
+  /*
+   * Nothing saved (a new browser, cleared storage, a private window) starts
+   * from what the server rendered with rather than from English and no plan.
+   * Starting from EMPTY rewrote an Urdu cookie to English on the next render
+   * and flipped the page, and dropped the plan the layout had already vouched
+   * for.
+   */
+  let restored: State = { ...state, hydrated: true };
   try {
     const raw = window.localStorage.getItem(KEY);
     if (raw) {
@@ -218,8 +259,10 @@ export function hydrate() {
         ...parsed,
         settings: { ...settings, language: one, contentMedium: one },
         onboarding: parsed.onboarding ? { ...parsed.onboarding, medium: one } : (parsed.onboarding ?? null),
-        // Snapshots written before premium was excluded may still carry one.
-        premium: EMPTY.premium,
+        // Never from storage: snapshots written before premium was excluded
+        // may still carry an old one. The server's word, seeded above, stands
+        // until the browser's own read replaces it.
+        premium: state.premium,
         hydrated: true,
       };
     }

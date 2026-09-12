@@ -1,10 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { formatDate } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Empty, Icon, Item, Skeleton } from '@/components/ui/primitives';
+import { RowsSkeleton } from '@/components/app/skeletons';
+import { Btn } from '@/components/ui/controls';
+import { Card, Empty, Icon, Item } from '@/components/ui/primitives';
 import { createClient } from '@/lib/supabase/client';
 import { useApp, useLang, useT } from '@/lib/store';
 
@@ -30,6 +31,9 @@ export function AllChatsView() {
   const t = useT();
   const { lang } = useLang();
   const [rows, setRows] = useState<ThreadRow[] | null>(null);
+  /** A failed read is not an empty history. It used to show as "no chats". */
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [query, setQuery] = useState('');
 
   useEffect(() => {
@@ -43,7 +47,10 @@ export function AllChatsView() {
           .select('id,title,context_label,updated_at')
           .order('updated_at', { ascending: false })
           .range(from, from + PAGE - 1);
-        if (error) break;
+        if (error) {
+          if (alive) setFailed(true);
+          break;
+        }
         const page = (data as ThreadRow[]) ?? [];
         all.push(...page);
         if (page.length < PAGE) break;
@@ -53,7 +60,7 @@ export function AllChatsView() {
     return () => {
       alive = false;
     };
-  }, [state.user?.id]);
+  }, [state.user?.id, attempt]);
 
   const hits = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -67,17 +74,26 @@ export function AllChatsView() {
       <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.allChatsTitle')} sub={t('tutor.allChatsSub')} />
 
       {rows && rows.length > 6 ? (
-        <label className="mb-4 flex items-center gap-2 rounded-full border-[1.5px] border-line bg-card px-4 py-2.5">
+        // field-shell draws the focus ring on the pill itself; without it the
+        // global outline landed on the bare input, square, inside the round.
+        <label className="field-shell mb-4 flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-line bg-card ps-4 pe-1.5 transition-[border-color,box-shadow] duration-200">
           <Icon name="search" size={17} className="shrink-0 text-ink3" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('tutor.searchChats')}
             aria-label={t('tutor.searchChats')}
-            className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3"
+            // 16px on a phone: under that, iOS zooms the page on focus and
+            // leaves it zoomed.
+            className="min-w-0 flex-1 bg-transparent py-2 text-[16px] text-ink outline-none placeholder:text-ink3 md:text-[14px]"
           />
           {query ? (
-            <button type="button" onClick={() => setQuery('')} aria-label={t('common.cancel')} className="shrink-0 text-ink3">
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label={t('common.cancel')}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink3 transition-colors duration-200 hover:bg-paper hover:text-ink"
+            >
               <Icon name="close" size={16} />
             </button>
           ) : null}
@@ -85,11 +101,25 @@ export function AllChatsView() {
       ) : null}
 
       {rows === null ? (
-        <div className="space-y-2">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
+        <RowsSkeleton rows={3} />
+      ) : failed && rows.length === 0 ? (
+        <Empty
+          icon="alert"
+          title={t('states.errorTitle')}
+          sub={t('states.errorBody')}
+          cta={
+            <Btn
+              title={t('common.retry')}
+              sm
+              variant="line"
+              onClick={() => {
+                setRows(null);
+                setFailed(false);
+                setAttempt((n) => n + 1);
+              }}
+            />
+          }
+        />
       ) : !hits.length ? (
         <Empty
           icon="spark"
@@ -98,15 +128,17 @@ export function AllChatsView() {
         />
       ) : (
         <Card flat className="py-0">
+          {/* Item's own link, which brings its hover and chevron. A Link
+              around a static Item had neither. */}
           {hits.map((thread, i) => (
-            <Link key={thread.id} href={`/tutor/chat?thread=${thread.id}`} className="block">
-              <Item
-                title={thread.title}
-                sub={`${thread.context_label ?? ''} ${formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })}`.trim()}
-                icon="spark"
-                last={i === hits.length - 1}
-              />
-            </Link>
+            <Item
+              key={thread.id}
+              href={`/tutor/chat?thread=${thread.id}`}
+              title={thread.title}
+              sub={[thread.context_label, formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })].filter(Boolean).join(' · ')}
+              icon="spark"
+              last={i === hits.length - 1}
+            />
           ))}
         </Card>
       )}

@@ -8,7 +8,8 @@ export const metadata: Metadata = {
 
 export default async function ForgotPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   // The auth callback lands here with ?error=expired when a reset link is too
-  // old to honour; the form explains that instead of silently starting over.
+  // old to honour, and ?error=link when it failed for another reason; the form
+  // explains which instead of silently starting over.
   const { error } = await searchParams;
-  return <ForgotForm linkExpired={error === 'expired'} />;
+  return <ForgotForm linkProblem={error === 'expired' || error === 'link' ? error : undefined} />;
 }

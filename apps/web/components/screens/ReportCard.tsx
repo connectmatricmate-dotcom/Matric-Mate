@@ -1,31 +1,58 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { accuracy, boardName, formatDate, grade, mediumName, subjectById, subjectName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Icon, Label, Pill, ScriptText, Wordmark } from '@/components/ui/primitives';
-import { buttonClasses } from '@/components/ui/styles';
+import { Btn } from '@/components/ui/controls';
+import { Card, Label, Pill, ScriptText, Wordmark } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { useNow } from '@/lib/now';
 import { useApp, useLang, useT } from '@/lib/store';
+
+/**
+ * The calendar month in Karachi, as "2026-09". Pakistan keeps one offset all
+ * year, and this is the same day boundary core's streak and test counts use.
+ * The report used UTC, so a student studying before 5am on the 1st had the
+ * morning filed under the month before.
+ */
+const karachiMonth = (ms: number) => new Date(ms + 5 * 3600 * 1000).toISOString().slice(0, 7);
 
 export function ReportCard() {
   const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
+  const toast = useToast();
+  const [saving, setSaving] = useState(false);
 
   const now = useNow();
   const month = now ? formatDate(now, lang, { month: 'long', year: 'numeric' }) : '';
-  const overallAcc = accuracy(state.attempts);
+
+  /**
+   * This month only, as the title and the footnote both say. Grades, the
+   * question count and the tests were all-time while only the active days
+   * were filtered, so "September's report card" graded a student on work
+   * from the spring.
+   */
+  const thisMonth = useMemo(() => {
+    const key = now ? karachiMonth(now) : '';
+    return {
+      attempts: state.attempts.filter((a) => karachiMonth(a.at) === key),
+      results: state.results.filter((r) => karachiMonth(r.at) === key),
+      activeDays: state.activeDays.filter((d) => d.slice(0, 7) === key).length,
+    };
+  }, [state.attempts, state.results, state.activeDays, now]);
+
+  const answered = thisMonth.attempts.length > 0;
+  const overallAcc = accuracy(thisMonth.attempts);
 
   const rows = useMemo(
     () =>
       derived.subjects.map((sid) => {
-        const set = state.attempts.filter((a) => a.subjectId === sid);
+        const set = thisMonth.attempts.filter((a) => a.subjectId === sid);
         // Zero when unattempted. The old fallback graded syllabus coverage as
         // if it were accuracy, so a student who had read most of Chemistry
         // without answering a question scored a Chemistry grade for reading.
-        // The row prints "n/a" in that case anyway, so it could only ever have
-        // misled. Android fixed this; the website had not.
+        // Android fixed this; the website had not.
         const acc = set.length ? accuracy(set) : 0;
         const half = Math.floor(set.length / 2);
         const older = set.slice(0, half);
@@ -33,15 +60,42 @@ export function ReportCard() {
         const delta = older.length && recent.length ? accuracy(recent) - accuracy(older) : 0;
         return { sid, acc, trend: delta > 4 ? '↑' : delta < -4 ? '↓' : '→', attempted: set.length };
       }),
-    [derived.subjects, state.attempts]
+    [derived.subjects, thisMonth.attempts]
   );
 
-  const activeDays = state.activeDays.filter((d) => d.slice(0, 7) === new Date().toISOString().slice(0, 7)).length;
-
+  /**
+   * Fetched and checked before anything is saved. A plain download link
+   * saved whatever came back, so a failed report arrived as a file of JSON
+   * with a .pdf name and no word on screen.
+   */
+  async function savePdf() {
+    if (saving) return;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/report/pdf');
+      if (!res.ok || !(res.headers.get('content-type') ?? '').includes('application/pdf')) throw new Error('report');
+      const name = /filename="([^"]+)"/.exec(res.headers.get('content-disposition') ?? '')?.[1] ?? 'MatricMate report.pdf';
+      const url = URL.createObjectURL(await res.blob());
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = name;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      // Long enough for the browser to have taken the file.
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    } catch {
+      toast(t('progress.pdfFailed'));
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <Page width="focus">
-      <PageHead back="/progress" backLabel={t('progress.title')} title={t('progress.reportTitle')} sub={month} />
+      {/* A non-breaking space until the clock is read, so the line is already
+          there and the card does not jump when the month arrives. */}
+      <PageHead back="/progress" backLabel={t('progress.title')} title={t('progress.reportTitle')} sub={month || '\u00a0'} />
 
       <Card border="border-teal" className="border-2">
         <div className="flex items-start gap-3">
@@ -51,8 +105,14 @@ export function ReportCard() {
               <Label>{t('progress.monthlyReport', { month })}</Label>
             </div>
           </div>
-          <span className="flex h-[66px] w-[66px] shrink-0 items-center justify-center rounded-full bg-orangetint font-display text-[24px] text-orangedark">
-            {grade(overallAcc)}
+          {/* No grade before there is an answer this month: an empty month was
+              graded F. */}
+          <span
+            className={`flex h-[66px] w-[66px] shrink-0 items-center justify-center rounded-full bg-orangetint text-center font-display text-orangedark ${
+              answered ? 'text-[24px]' : 'px-1.5 text-[13px] leading-tight'
+            }`}
+          >
+            {answered ? grade(overallAcc) : t('progress.gradeNone')}
           </span>
         </div>
 
@@ -73,8 +133,8 @@ export function ReportCard() {
                 <td className="py-2.5 text-[13.5px] text-ink">
                   <ScriptText text={subjectName(subjectById(r.sid), lang)} />
                 </td>
-                <td className="w-11 py-2.5 text-end font-display text-[15px] text-ink">
-                  {r.attempted ? grade(r.acc) : 'n/a'}
+                <td className="whitespace-nowrap py-2.5 ps-3 text-end font-display text-[15px] text-ink">
+                  {r.attempted ? grade(r.acc) : <span className="text-[13px] text-ink3">{t('progress.gradeNone')}</span>}
                 </td>
                 <td
                   className={`w-7 py-2.5 text-end text-[14px] font-extrabold ${
@@ -89,9 +149,9 @@ export function ReportCard() {
         </table>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Pill tone="teal">{t('progress.activeDays', { n: activeDays })}</Pill>
-          <Pill tone="teal">{`${state.attempts.length} ${t('common.questions')}`}</Pill>
-          <Pill tone="orange">{`${state.results.length} ${t('progress.tests')}`}</Pill>
+          <Pill tone="teal">{t('progress.activeDays', { n: thisMonth.activeDays })}</Pill>
+          <Pill tone="teal">{`${thisMonth.attempts.length} ${t('common.questions')}`}</Pill>
+          <Pill tone="orange">{`${thisMonth.results.length} ${t('progress.tests')}`}</Pill>
           <Pill tone="grey">{t('account.levelLine', { xp: state.xp, level: derived.level })}</Pill>
         </div>
       </Card>
@@ -100,12 +160,8 @@ export function ReportCard() {
         {/* One action, and it is a real file. This used to be a WhatsApp share
             that sent a text summary, and a "Save as PDF" that opened the print
             dialog. Neither was a download: one sent a paragraph instead of the
-            report, and the other handed the student a menu. The link below is
-            a request that returns a PDF. */}
-        <a href="/api/report/pdf" className={buttonClasses({ className: 'w-full sm:w-auto' })} download>
-          <Icon name="download" size={18} />
-          {t('progress.savePdf')}
-        </a>
+            report, and the other handed the student a menu. */}
+        <Btn title={t('progress.savePdf')} icon="download" loading={saving} onClick={() => void savePdf()} className="w-full sm:w-auto" />
         <p className="mt-2 text-[12.5px] text-ink2">{t('progress.pdfEnglishNote')}</p>
       </div>
 

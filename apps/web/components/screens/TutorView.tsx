@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
+import { RowsSkeleton } from '@/components/app/skeletons';
 import { TutorBudgetRail, WeakRail } from '@/components/app/rails';
 import { Btn } from '@/components/ui/controls';
 import { Card, Empty, Icon, Item } from '@/components/ui/primitives';
@@ -52,7 +53,9 @@ export function TutorView() {
    * conversation, so a chat started on the phone shows up here too. RLS only
    * returns the signed-in student's own threads.
    */
-  const [threads, setThreads] = useState<ThreadRow[]>([]);
+  // Null until the read answers: an empty list before then showed "No
+  // questions yet" to a student with a month of them, then swapped it out.
+  const [threads, setThreads] = useState<ThreadRow[] | null>(null);
   /** A failed read is not an empty history: see the branch below. */
   const [threadsFailed, setThreadsFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -66,7 +69,7 @@ export function TutorView() {
       .then(({ data, error }) => {
         if (!alive) return;
         setThreadsFailed(!!error);
-        if (data) setThreads(data as ThreadRow[]);
+        setThreads((data as ThreadRow[] | null) ?? []);
       });
     return () => {
       alive = false;
@@ -79,16 +82,18 @@ export function TutorView() {
 
       <Split>
         <Work className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {/* Three across once the work column has room for three, one per
+              row below that. Two across left the third tile on its own. */}
+          <div className="grid grid-cols-1 gap-3 @xl:grid-cols-3">
             {ENTRIES.map((e) => {
               const body = (
-                <Card className="flex h-full items-start gap-3 text-start transition-colors duration-200 hover:border-teal">
+                <Card className="flex h-full items-start gap-3 text-start transition-colors duration-200 hover:border-teal @xl:flex-col">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-tealtint text-teal">
                     <Icon name={e.icon} size={20} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[14.5px] font-extrabold text-ink">{t(e.label)}</span>
-                    <span className="block text-[12.5px] leading-[1.5] text-ink2">{t(e.sub)}</span>
+                    <span className="block text-[12.5px] leading-[1.5] text-ink2 rtl:leading-[1.9]">{t(e.sub)}</span>
                   </span>
                 </Card>
               );
@@ -121,7 +126,7 @@ export function TutorView() {
           />
 
           <Link href="/tutor/ai-test" className="block">
-            <Card border="border-orange" className="flex items-center gap-3 transition-colors duration-200 hover:brightness-[0.99]">
+            <Card border="border-orange" className="flex items-center gap-3 transition-colors duration-200 hover:border-orangedark">
               <Icon name="spark" className="shrink-0 text-orangedark" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[14.5px] font-extrabold text-ink">{t('tutor.makeTest')}</span>
@@ -132,7 +137,7 @@ export function TutorView() {
           </Link>
 
           <Link href="/tutor/paper" className="block">
-            <Card border="border-teal" className="flex items-center gap-3 transition-colors duration-200 hover:brightness-[0.99]">
+            <Card border="border-teal" className="flex items-center gap-3 transition-colors duration-200 hover:border-tealdark">
               <Icon name="doc" className="shrink-0 text-teal" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[14.5px] font-extrabold text-ink">{t('tutor.paperTitle')}</span>
@@ -153,7 +158,9 @@ export function TutorView() {
 
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('tutor.recentChats')}</h2>
-            {threadsFailed && threads.length === 0 ? (
+            {threads === null ? (
+              <RowsSkeleton rows={3} />
+            ) : threadsFailed && threads.length === 0 ? (
               /* Telling a student with a month of conversations that they have
                  none, and giving them nothing to press, is the wrong half of
                  this pair. */
@@ -161,7 +168,17 @@ export function TutorView() {
                 icon="alert"
                 title={t('states.errorTitle')}
                 sub={t('states.errorBody')}
-                cta={<Btn title={t('common.retry')} sm variant="line" onClick={() => setAttempt((n) => n + 1)} />}
+                cta={
+                  <Btn
+                    title={t('common.retry')}
+                    sm
+                    variant="line"
+                    onClick={() => {
+                      setThreads(null);
+                      setAttempt((n) => n + 1);
+                    }}
+                  />
+                }
               />
             ) : threads.length === 0 ? (
               /* Was the WhatsApp glyph, left behind when that channel was
@@ -175,7 +192,7 @@ export function TutorView() {
                       key={thread.id}
                       href={`/tutor/chat?thread=${thread.id}`}
                       title={thread.title}
-                      sub={`${thread.context_label ?? ''} ${formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })}`.trim()}
+                      sub={[thread.context_label, formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })].filter(Boolean).join(' · ')}
                       icon="spark"
                       last={i === shown.length - 1}
                     />

@@ -32,6 +32,7 @@ export function LockedNotice({
           variant={variant === 'expired' ? 'orange' : 'primary'}
           icon={null}
           className="mt-3"
+          full
         />
       </div>
     </Card>

@@ -54,10 +54,14 @@ export function Sheet({
       }
     };
     document.addEventListener('keydown', onKey);
+    // Restore what was there, not ''. A sheet opened over another overlay
+    // that had already locked the page would otherwise unlock it on close.
+    // Same pattern as AiWorking.
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
+      document.body.style.overflow = previousOverflow;
       opener?.focus?.();
     };
   }, [open, onClose]);
@@ -73,7 +77,11 @@ export function Sheet({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative max-h-[88vh] w-full overflow-y-auto rounded-t-[22px] bg-card p-5 shadow-[0_-8px_30px_var(--shadow-sheet)] outline-none md:rounded-[22px] ${
+        /* dvh, not vh: on a phone vh is the height with the browser's bars
+           hidden, so an 88vh sheet ran under the address bar. The bottom
+           padding clears the home indicator on a notched phone; overscroll
+           stays in the sheet instead of scrolling the page behind it. */
+        className={`relative max-h-[88dvh] w-full overflow-y-auto overscroll-contain rounded-t-[22px] bg-card px-5 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_-8px_30px_var(--shadow-sheet)] outline-none md:rounded-[22px] md:pb-5 ${
           wide ? 'md:max-w-[640px]' : 'md:max-w-[460px]'
         }`}
       >

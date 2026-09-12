@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { chapterById, chapterName, checkAnswerLive } from '@matricmate/core';
-import type { AiCheckVerdict, ShortQ } from '@matricmate/core';
+import { chapterName, checkAnswerLive, subjectMedium } from '@matricmate/core';
+import type { AiCheckVerdict, Chapter, ShortQ } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
+import { Card, Empty, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
 import { ScriptBullets } from '@/components/ui/ScriptList';
 import { useToast } from '@/components/ui/toast';
 import { fireConfetti } from '@/lib/confetti';
@@ -15,24 +15,26 @@ import { Markdown } from '@/components/ui/Markdown';
 
 type Mark = 'got' | 'partial' | 'missed';
 
-export function ShortQScreen({
-  chapterId,
-  chapterTitle,
-  items,
-}: {
-  chapterId: string;
-  chapterTitle: string;
-  items: ShortQ[];
-}) {
+/**
+ * Whether a check-answer reply is a verdict at all. A refusal used to arrive
+ * as a success carrying `{ error }`, and reading `.missed.length` off it took
+ * the whole screen down into the error boundary, losing the student's place.
+ */
+const isVerdict = (v: unknown): v is AiCheckVerdict =>
+  !!v && typeof (v as AiCheckVerdict).score === 'number' && Array.isArray((v as AiCheckVerdict).missed);
+
+export function ShortQScreen({ chapter, items }: { chapter: Chapter; items: ShortQ[] }) {
   const { state, actions } = useApp();
   const t = useT();
   const { lang } = useLang();
   /* The name a student reads, which is not the name an attempt is filed
-     under. `chapterTitle` comes from the server in English and keeps feeding
-     `topic` so weak-topic stats do not split in two when somebody switches
-     language; the heading and the pill follow the app's language instead. */
-  const chapter = chapterById(chapterId);
-  const name = chapter ? chapterName(chapter, lang) : chapterTitle;
+     under. The chapter's own title keeps feeding `topic`, so weak-topic stats
+     do not split in two when somebody switches language; the heading follows
+     the app's language instead. Both come from the server: the client index
+     is empty on a cold load for Class 10 and Punjab, which filed every one of
+     their attempts under a blank topic. */
+  const chapterId = chapter.id;
+  const name = chapterName(chapter, lang);
   const toast = useToast();
   const [i, setI] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -43,7 +45,7 @@ export function ShortQScreen({
   const [verdict, setVerdict] = useState<AiCheckVerdict | null>(null);
 
   const item = items[i];
-  const done = i >= items.length;
+  const done = items.length > 0 && i >= items.length;
 
   // The finish deserves a bang. No-op under reduced motion.
   useEffect(() => {
@@ -60,7 +62,9 @@ export function ShortQScreen({
       points: item.points,
       marks: item.marks,
       answer: written.trim(),
-      medium: state.settings.contentMedium,
+      // The subject's own language: English answers are marked in English
+      // and Urdu ones in Urdu, whatever medium the student reads in.
+      medium: subjectMedium(chapterId, chapter.board, state.settings.contentMedium),
     });
     setChecking(false);
     if (!res.ok) {
@@ -70,9 +74,14 @@ export function ShortQScreen({
         rate: t('tutor.slowDown'),
         plan: t('tutor.planNeeded'),
         refused: t('tutor.refused'),
+        syllabus: t('tutor.notInSyllabus'),
         error: t('tutor.errorReply'),
       }[res.reason];
       toast(note);
+      return;
+    }
+    if (!isVerdict(res.verdict)) {
+      toast(t('tutor.refused'));
       return;
     }
     setVerdict(res.verdict);
@@ -90,7 +99,7 @@ export function ShortQScreen({
       // to store the translated UI label, so Weak topics listed
       // "Fill in the blanks" as a syllabus topic, and switching language
       // forked it into a second one.
-      topic: chapterTitle,
+      topic: chapter.title,
       correct: m === 'got',
       confidence: null,
       mode: 'shortq',
@@ -99,6 +108,21 @@ export function ShortQScreen({
     setWritten('');
     setVerdict(null);
     setI(i + 1);
+  }
+
+  // Nothing to answer, which is not the same as having answered it all.
+  if (!items.length) {
+    return (
+      <Page width="focus">
+        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={name} title={t('practice.shortQ')} />
+        <Empty
+          icon="quill"
+          title={t('session.noItemsTitle')}
+          sub={t('session.noItemsBody')}
+          cta={<LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} variant="line" sm />}
+        />
+      </Page>
+    );
   }
 
   if (done) {
@@ -123,7 +147,7 @@ export function ShortQScreen({
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
         backLabel={name}
-        pct={(i / Math.max(1, items.length)) * 100}
+        pct={(i / items.length) * 100}
         label={`${t('practice.shortQ')} · ${t('session.shortQOf', { a: i + 1, b: items.length })}`}
         segments={items.map((_, j) =>
           // 'partial' still earned something, so it reads as done, not wrong.
@@ -151,7 +175,9 @@ export function ShortQScreen({
               placeholder={t('tutor.checkPlaceholder')}
               aria-label={t('tutor.checkPlaceholder')}
               rows={4}
-              className="w-full resize-y bg-transparent p-4 text-[14px] leading-[1.6] text-ink outline-none placeholder:text-ink3"
+              // 16px on phones, or iOS zooms the page in on focus and leaves it
+              // there. Urdu needs Nastaliq's own leading.
+              className="w-full resize-y bg-transparent p-4 text-[16px] leading-[1.6] text-ink outline-none placeholder:text-ink3 md:text-[14px] rtl:leading-[1.9]"
             />
           </div>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
@@ -199,7 +225,7 @@ export function ShortQScreen({
               title={t('session.askAi')}
               variant="line"
               sm
-              href={`/tutor/chat?q=${encodeURIComponent(`Explain this in easy words: ${item.q}`)}&chapter=${chapterId}`}
+              href={`/tutor/chat?q=${encodeURIComponent(t('session.askExplain', { q: item.q }))}&chapter=${chapterId}`}
             />
           </div>
 

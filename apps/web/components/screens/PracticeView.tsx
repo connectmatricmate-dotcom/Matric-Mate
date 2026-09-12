@@ -1,8 +1,8 @@
 'use client';
 
-import { boardName, formatDate, pastPaperYears } from '@matricmate/core';
+import { boardName, formatDate, pastPaperYears, yearSpan } from '@matricmate/core';
 import Link from 'next/link';
-import type { IconName, StringKey } from '@matricmate/core';
+import type { Board, IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { ConfidenceRail, TutorBudgetRail, WeakRail } from '@/components/app/rails';
 import { Card, Empty, Icon, Item, Pill } from '@/components/ui/primitives';
@@ -18,11 +18,13 @@ const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; a
   { label: 'practice.exam', sub: 'practice.examSub', icon: 'clock', href: '/session/exam-intro', accent: true },
 ];
 
-export function PracticeView() {
+export function PracticeView({ board: accountBoard, grade }: { board: Board; grade: 9 | 10 }) {
   const { state } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const recent = state.results.slice(0, 5);
+  /* A result with no questions in it is not a session. An empty test used to
+     save one, and its score read "NaN%" here. */
+  const recent = state.results.filter((r) => r.total > 0).slice(0, 5);
 
   /**
    * The past papers tile says what the catalogue actually holds.
@@ -31,13 +33,17 @@ export function PracticeView() {
    * tables, over nine papers across 2023, 2024 and 2025, all Class 9. A Class
    * 10 student got the same promise above the honest empty state behind it.
    */
-  const classLevel = state.onboarding?.classLevel ?? 9;
-  const board = state.onboarding?.board ?? 'fbise';
+  // The browser's copy once it has one (it follows a switch at once), the
+  // account's from the server until then.
+  const classLevel = state.onboarding?.classLevel ?? grade;
+  const board = state.onboarding?.board ?? accountBoard;
   const years = pastPaperYears(classLevel, board);
   const papersSub = years
     ? t('practice.papersSub', {
         board: boardName(board, lang),
-        years: years.from === years.to ? years.from : `${years.from} to ${years.to}`,
+        // "2019 to 2025" in the student's language: the word "to" sat in
+        // English inside the Urdu line.
+        years: yearSpan(years.from, years.to, lang),
       })
     : t('practice.papersSubNone', { n: classLevel });
   const subFor = (m: (typeof MODES)[number]) => (m.href === '/session/papers' ? papersSub : t(m.sub));
@@ -67,7 +73,7 @@ export function PracticeView() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[14.5px] font-extrabold text-ink">{t(m.label)}</span>
-                      <span className="block text-[12.5px] leading-[1.5] text-ink2">{subFor(m)}</span>
+                      <span className="block text-[12.5px] leading-[1.5] text-ink2 rtl:leading-[1.9]">{subFor(m)}</span>
                     </span>
                     <Icon name="chevron" size={18} className="text-ink3" />
                   </Card>
@@ -79,7 +85,7 @@ export function PracticeView() {
                       <Icon name={m.icon} size={20} />
                     </span>
                     <span className="mt-0.5 text-[14.5px] font-extrabold text-ink">{t(m.label)}</span>
-                    <span className="text-[12.5px] leading-[1.5] text-ink2">{subFor(m)}</span>
+                    <span className="text-[12.5px] leading-[1.5] text-ink2 rtl:leading-[1.9]">{subFor(m)}</span>
                   </Card>
                 </Link>
               ),

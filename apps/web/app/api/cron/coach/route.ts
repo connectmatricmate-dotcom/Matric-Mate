@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildDigestFromDb, writeCoachReport } from '@/lib/ai/coach-report';
+import { planIsActive } from '@/lib/entitlement';
 import { notify, reportReady } from '@/lib/notify';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll } from '@/lib/notify/jobs';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -17,7 +19,13 @@ import { createAdminClient } from '@/lib/supabase/admin';
  *
  * Scoped to real activity on purpose. A report costs a model call, so this
  * skips anyone who has not answered a question since their last report, and
- * anyone whose report is less than a day old. Idle accounts cost nothing.
+ * anyone whose report is less than a day old. Idle accounts cost nothing, and
+ * neither do staff or accounts without a plan, who cannot see the card.
+ *
+ * Oldest report first. The list used to be ordered by latest activity, so the
+ * same most-active slice filled every night's run and the rest never got a
+ * turn. A second pg_cron entry an hour later (migration 0040) finishes what
+ * the first could not; the one-a-day rule makes running twice harmless.
  */
 
 export const maxDuration = 300;
@@ -26,67 +34,120 @@ export const maxDuration = 300;
 const MIN_AGE_MS = 20 * 60 * 60 * 1000;
 /** A ceiling per run, so one night can never turn into an unbounded bill. */
 const MAX_PER_RUN = 200;
+/** Reports written at once. One after another, a night reached about 25. */
+const CONCURRENCY = 4;
+/**
+ * When to stop starting new reports. A model call is allowed a minute and one
+ * retry (lib/ai/coach-report), so one started just before this still finishes
+ * inside the five minute limit.
+ */
+const BUDGET_MS = 170_000;
 
 export async function GET(req: NextRequest) {
   /*
-   * Vercel signs its cron calls with CRON_SECRET. Without this the route is a
+   * pg_cron signs its calls with CRON_SECRET. Without this the route is a
    * button on the open internet that spends the client's model budget.
    */
-  const secret = process.env.CRON_SECRET;
-  if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (!cronAuthorised(req)) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
+  try {
+    return await run();
+  } catch (e) {
+    console.error('[cron/coach] run failed', e instanceof Error ? e.message : e);
+    return NextResponse.json(
+      { error: 'incomplete', stage: e instanceof JobError ? e.stage : 'unknown', detail: e instanceof Error ? e.message : String(e) },
+      { status: 503 },
+    );
+  }
+}
 
+async function run(): Promise<NextResponse> {
+  const startedAt = Date.now();
   const admin = createAdminClient();
   const now = Date.now();
   const period = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date());
 
   // Students who did something in the last day. Nobody else needs a rewrite.
   const since = new Date(now - 26 * 60 * 60 * 1000).toISOString();
-  const { data: active, error } = await admin
-    .from('attempts')
-    .select('user_id,at')
-    .gte('at', since)
-    .order('at', { ascending: false })
-    .limit(5000);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  const active = await pageAll<{ user_id: string }>('attempts', (from, to, signal) =>
+    admin.from('attempts').select('user_id').gte('at', since).order('at', { ascending: false }).order('id').range(from, to).abortSignal(signal),
+  );
+  const recent = [...new Set(active.map((r) => r.user_id))];
+  if (!recent.length) return NextResponse.json({ considered: 0, written: 0, skipped: 0 });
 
-  const userIds = [...new Set((active ?? []).map((r) => r.user_id as string))].slice(0, MAX_PER_RUN);
-
-  let written = 0;
-  let skipped = 0;
-  for (const userId of userIds) {
-    const { data: last } = await admin
-      .from('coach_reports')
-      .select('period,created_at')
-      .eq('user_id', userId)
-      .order('period', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (last?.created_at && now - Date.parse(last.created_at as string) < MIN_AGE_MS) {
-      skipped++;
-      continue;
-    }
-
-    const digest = await buildDigestFromDb(admin, userId);
-    if (!digest) {
-      skipped++;
-      continue;
-    }
-    // One student's bad report must not end the run for everyone after them.
-    try {
-      if (await writeCoachReport(admin, userId, digest, period)) {
-        written++;
-        // Tell them it exists. A report nobody knows was rewritten is a report
-        // nobody reads, and the inbox's own empty state has always promised
-        // exactly this.
-        await notify(userId, reportReady());
-      } else skipped++;
-    } catch {
-      skipped++;
-    }
+  // Students with a plan, and when each was last written for.
+  const students = new Set<string>();
+  const paying = new Set<string>();
+  const lastWritten = new Map<string, number>();
+  const monthAgo = new Date(now - 30 * 864e5).toISOString();
+  for (const slice of chunks(recent)) {
+    const [profiles, plans, reports] = await Promise.all([
+      pageAll<{ id: string }>('profiles', (from, to, signal) =>
+        admin.from('profiles').select('id').in('id', slice).eq('role', 'student').order('id').range(from, to).abortSignal(signal),
+      ),
+      pageAll<{ user_id: string; active: boolean | null; valid_till: string | null }>('entitlements', (from, to, signal) =>
+        admin.from('entitlements').select('user_id,active,valid_till').in('user_id', slice).order('user_id').range(from, to).abortSignal(signal),
+      ),
+      pageAll<{ user_id: string; period: string; created_at: string }>('coach_reports', (from, to, signal) =>
+        admin
+          .from('coach_reports')
+          .select('user_id,period,created_at')
+          .in('user_id', slice)
+          .gte('created_at', monthAgo)
+          .order('user_id')
+          .order('period')
+          .range(from, to)
+          .abortSignal(signal),
+      ),
+    ]);
+    for (const p of profiles) students.add(p.id);
+    for (const e of plans) if (planIsActive(e)) paying.add(e.user_id);
+    for (const r of reports) lastWritten.set(r.user_id, Math.max(lastWritten.get(r.user_id) ?? 0, Date.parse(r.created_at)));
   }
 
-  return NextResponse.json({ considered: userIds.length, written, skipped });
+  // Never written for comes first, then the longest waiting.
+  const eligible = recent
+    .filter((id) => students.has(id) && paying.has(id))
+    .filter((id) => now - (lastWritten.get(id) ?? 0) >= MIN_AGE_MS)
+    .sort((a, b) => (lastWritten.get(a) ?? 0) - (lastWritten.get(b) ?? 0));
+  const batch = eligible.slice(0, MAX_PER_RUN);
+  const dropped = eligible.length - batch.length;
+  if (dropped) console.warn(`[cron/coach] ${dropped} students over the per-run ceiling, left for the next run`);
+
+  const stopAt = startedAt + BUDGET_MS;
+  let written = 0;
+  let skipped = 0;
+  let failed = 0;
+  const reached = await eachLimited(
+    batch,
+    CONCURRENCY,
+    async (userId) => {
+      // One student's bad report must not end the run for everyone after them.
+      try {
+        const digest = await buildDigestFromDb(admin, userId);
+        if (!digest) {
+          skipped++;
+          return;
+        }
+        if (await writeCoachReport(admin, userId, digest, period)) {
+          written++;
+          // Tell them it exists. A report nobody knows was rewritten is a
+          // report nobody reads, and the inbox's own empty state has always
+          // promised exactly this.
+          await notify(userId, reportReady());
+        } else skipped++;
+      } catch (e) {
+        failed++;
+        console.error('[cron/coach] report failed', e instanceof Error ? e.message : e);
+      }
+    },
+    () => Date.now() > stopAt,
+  );
+
+  const unfinished = batch.length - reached;
+  const summary = { considered: eligible.length, written, skipped, failed, unfinished, dropped };
+  // Not everyone reached: a non-200 so it shows, and the second run finishes.
+  if (failed || unfinished || dropped) return NextResponse.json({ error: 'incomplete', ...summary }, { status: 503 });
+  return NextResponse.json(summary);
 }

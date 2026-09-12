@@ -14,7 +14,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
   return (
     <Localized lang={lang}>
       <AppProvider initialLanguage={lang}>
-      <div className="min-h-screen">
+      <div className="min-h-dvh">
         <header className="flex justify-center border-b border-line bg-card py-3">
           <Link href="/">
             <Wordmark priority />

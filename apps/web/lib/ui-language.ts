@@ -10,9 +10,11 @@
  * moment later, on every cold load.
  *
  * So the language is mirrored into a cookie whenever it changes. The cookie is
- * a rendering hint and nothing else: it is not trusted for content, not read
- * for authorisation, and if it goes missing the page simply renders in English
- * until the store hydrates and corrects it.
+ * a preference and nothing else: it picks the interface language and, because
+ * the interface and the study medium are one switch, the medium of the notes
+ * the server renders. It is never read for authorisation, and if it goes
+ * missing the page simply renders in English until the store hydrates and
+ * corrects it.
  */
 export const UI_LANG_COOKIE = 'mm.lang';
 
@@ -20,6 +22,16 @@ export type UiLanguage = 'en' | 'ur';
 
 export function isRtlLanguage(lang: UiLanguage): boolean {
   return lang === 'ur';
+}
+
+/** Client side: what the server will render from on the next request, or null before one was ever written. */
+export function readLanguageCookie(): UiLanguage | null {
+  if (typeof document === 'undefined') return null;
+  const value = document.cookie
+    .split('; ')
+    .find((c) => c.startsWith(`${UI_LANG_COOKIE}=`))
+    ?.slice(UI_LANG_COOKIE.length + 1);
+  return value === 'ur' || value === 'en' ? value : null;
 }
 
 /** Client side: mirror the store's language into the cookie. */

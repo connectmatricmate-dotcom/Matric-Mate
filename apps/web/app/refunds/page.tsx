@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
+import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Refund and cancellation policy',
   description: 'When MatricMate refunds a payment, how to ask for one, and how long money takes to come back.',
+  alternates: { canonical: canonicalUrl('/refunds') },
 };
 
 const SECTIONS: { heading: string; paragraphs: string[] }[] = [
@@ -77,7 +79,11 @@ export default function RefundsPage() {
         <p className="mt-10 text-mk-small text-ink2">
           See also the{' '}
           <Link href="/terms" className="font-extrabold text-teal hover:underline">
-            terms and privacy policy
+            terms and conditions
+          </Link>{' '}
+          and the{' '}
+          <Link href="/privacy" className="font-extrabold text-teal hover:underline">
+            privacy policy
           </Link>
           .
         </p>

@@ -52,8 +52,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen md:flex">
-      {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-e border-line bg-card px-3 py-5 md:flex">
+      {/* desktop sidebar. data-chrome keeps the shell off paper: see the
+          print rules in globals.css. */}
+      <aside data-chrome className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-e border-line bg-card px-3 py-5 md:flex">
         <Link href="/dashboard" className="mb-7 px-2">
           <Wordmark priority />
         </Link>
@@ -98,9 +99,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span className="flex items-center gap-2.5">
             <AvatarBadge index={state.settings.avatar ?? 0} size={32} />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-extrabold text-ink">{state.user?.name ?? 'Account'}</span>
-              <span className="block text-[11.5px] text-ink2">
-                Level {derived.level} · {state.xp.toLocaleString()} XP
+              <span className="block truncate text-[13px] font-extrabold text-ink">{state.user?.name ?? t('common.student')}</span>
+              <span className="block truncate text-[11.5px] text-ink2">
+                {t('account.levelLine', { xp: state.xp.toLocaleString('en-US'), level: derived.level })}
               </span>
             </span>
           </span>
@@ -125,7 +126,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           The avatar is identity, not a control, which is the app's rule too:
           nothing marks a face as tappable, so settings live behind the gear.
         */}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
+        <header data-chrome className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
           <span className="md:hidden">
             <AvatarBadge index={state.settings.avatar ?? 0} size={34} />
           </span>
@@ -138,7 +139,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <Link
                 href="/progress"
                 title={t('progress.streakAlive', { n: derived.streak })}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-orangetint px-3 text-[13px] font-extrabold text-orangedark transition-colors duration-200 hover:brightness-95"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-orangetint px-3 text-[13px] font-extrabold text-orangedark transition-colors duration-200 hover:brightness-95"
               >
                 <span className="fx-pulse inline-flex">
                   <Icon name="flame" size={14} strokeWidth={2.4} />
@@ -153,7 +154,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Link
               href="/tutor"
               title={t('tutor.leftToday', { n: aiLeft })}
-              className={`hidden min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-extrabold transition-colors duration-200 hover:brightness-95 md:inline-flex ${
+              className={`hidden min-h-10 items-center gap-1.5 rounded-full px-3 text-[13px] font-extrabold transition-colors duration-200 hover:brightness-95 md:inline-flex ${
                 aiLeft ? 'bg-tealtint text-teal' : 'bg-redtint text-red'
               }`}
             >
@@ -186,7 +187,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* phone bottom bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav data-chrome className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
         {NAV.map((item) => {
           const on = isActive(pathname, item);
           return (

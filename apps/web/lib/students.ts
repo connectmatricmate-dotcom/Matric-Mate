@@ -31,18 +31,36 @@ export type StudentRow = {
   board: 'fbise' | 'punjab';
 };
 
+/**
+ * Paged, in a stable order. An RPC's rows are capped at a thousand like any
+ * other read, and without paging the thousand-and-first student would simply
+ * not be on the page.
+ */
+const PAGE = 1000;
+
 export const allStudents = cache(async (): Promise<StudentRow[]> => {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc('admin_student_list');
+  const rows: Record<string, unknown>[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .rpc('admin_student_list')
+      .order('joined', { ascending: false })
+      .order('id')
+      .range(from, from + PAGE - 1);
 
-  if (error) {
-    // Loud, and empty rather than a half list: a students page that silently
-    // shows nine of eleven accounts is worse than one that says it broke.
-    console.error('students: list failed', error.message);
-    throw new Error('Could not load the students.');
+    if (error) {
+      // Loud, and nothing rather than a half list: a students page that
+      // silently shows nine of eleven accounts is worse than one that says it
+      // broke.
+      console.error('students: list failed', error.message);
+      throw new Error('Could not load the students.');
+    }
+    const page = (data ?? []) as Record<string, unknown>[];
+    rows.push(...page);
+    if (page.length < PAGE) break;
   }
 
-  return (data ?? []).map((r: Record<string, unknown>) => ({
+  return rows.map((r) => ({
     id: String(r.id),
     name: String(r.name ?? ''),
     email: String(r.email ?? ''),

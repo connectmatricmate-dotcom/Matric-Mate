@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
+import { isUrduScript } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
 import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
@@ -35,7 +36,7 @@ export function ReviewScreen() {
 
   return (
     <Page width="focus">
-      <PageHead back="/practice" backLabel={t('practice.title')} title={t('session.reviewTitle')} sub={s.label} />
+      <PageHead back="/practice" backLabel={t('practice.title')} title={t('session.reviewTitle')} sub={s.label} subUrdu={isUrduScript(s.label)} />
 
       <div className="flex flex-wrap gap-2">
         <PillButton tone={filter === 'all' ? 'teal' : 'grey'} onClick={() => setFilter('all')}>
@@ -73,7 +74,7 @@ export function ReviewScreen() {
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => setOpen(isOpen ? null : mcq.id)}
-                  className="w-full text-start"
+                  className="-m-1 w-[calc(100%+0.5rem)] rounded-[12px] p-1 text-start transition-colors duration-200 hover:bg-paper"
                 >
                   <ScriptText
                     text={mcq.q}
@@ -105,13 +106,16 @@ export function ReviewScreen() {
                         title={t('session.askAi')}
                         href={`/tutor/chat?q=${encodeURIComponent(
                           a?.chosen != null && a.chosen !== mcq.answer
-                            ? `I answered "${mcq.options[a.chosen]}" but the correct answer is "${mcq.options[mcq.answer]}" for: ${mcq.q}. Why is my answer wrong?`
+                            ? t('session.askWhyWrong', { mine: mcq.options[a.chosen], right: mcq.options[mcq.answer], q: mcq.q })
                             : mcq.q,
-                        )}&chapter=${mcq.chapterId}`}
+                        )}${mcq.chapterId ? `&chapter=${mcq.chapterId}` : ''}`}
                         variant="line"
                         sm
                       />
-                      <LinkBtn title={t('session.readInChapter')} href={`/learn/reader/${mcq.chapterId}`} variant="ghost" sm />
+                      {/* Generated questions carry no chapter to read. */}
+                      {mcq.chapterId ? (
+                        <LinkBtn title={t('session.readInChapter')} href={`/learn/reader/${mcq.chapterId}`} variant="ghost" sm />
+                      ) : null}
                     </div>
                   </div>
                 ) : null}

@@ -1,39 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
-import { BOARD_WITH_ARTICLE } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chargeQuota, guardAi, weekKey } from '@/lib/ai/guard';
-import { languageRule } from '@/lib/ai/language';
+import { guardAi } from '@/lib/ai/guard';
 
 /**
- * The weekly coach: one short, personal report per student per week. The
- * client sends a compact digest of the week (accuracy by topic, streak, xp)
- * because the phone already computes all of it for the progress screens;
- * the server writes the report once and caches it in coach_reports, so the
- * dashboard card costs one model call a week, not one per visit. A cached
- * week is free and does not touch the quota.
+ * The coach card's read. Reports are written by the nightly job
+ * (/api/cron/coach) and only ever read here.
+ *
+ * There used to be a POST beside this that wrote a report on demand from a
+ * digest the client sent. Nothing has called it since the nightly job took
+ * over, but it still answered anyone who did, spending a question of quota and
+ * a model call, keyed on the week while the job keys on the day. It is gone;
+ * a POST now gets the framework's 405.
  */
-export const maxDuration = 120;
 
-const anthropic = new Anthropic();
-
-const REPORT_SCHEMA: Record<string, unknown> = {
-  type: 'object',
-  properties: {
-    summary: { type: 'string' },
-    weak: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: { topic: { type: 'string' }, why: { type: 'string' } },
-        required: ['topic', 'why'],
-        additionalProperties: false,
-      },
-    },
-    actions: { type: 'array', items: { type: 'string' } },
-  },
-  required: ['summary', 'weak', 'actions'],
-  additionalProperties: false,
-};
+/**
+ * How old a report may be and still be shown. The card reads "this week", so
+ * a report from a fortnight ago, about a week the student no longer
+ * remembers, is worse than the card's own welcome.
+ */
+const MAX_AGE_DAYS = 7;
 
 /**
  * The card reads through here and never generates.
@@ -47,79 +31,29 @@ const REPORT_SCHEMA: Record<string, unknown> = {
 export async function GET(req: NextRequest) {
   const g = await guardAi(req, 0);
   if (g instanceof NextResponse) return g;
-  const { data } = await g.admin
-    .from('coach_reports')
-    .select('body,period')
-    .eq('user_id', g.userId)
-    .order('period', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  return NextResponse.json({ report: data?.body ?? null, period: data?.period ?? null, quota: g.quota });
-}
 
-export async function POST(req: NextRequest) {
-  const g = await guardAi(req, AI_COST.coach);
-  if (g instanceof NextResponse) return g;
+  const oldest = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date(Date.now() - MAX_AGE_DAYS * 864e5));
+  const [{ data, error }, { data: profile, error: profileError }] = await Promise.all([
+    g.admin
+      .from('coach_reports')
+      .select('body,period,created_at')
+      .eq('user_id', g.userId)
+      .gte('period', oldest)
+      .order('period', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    g.admin.from('profiles').select('grade_changed_at').eq('id', g.userId).maybeSingle(),
+  ]);
+  if (error || profileError) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 503 });
 
-  const week = weekKey();
-  const { data: cached } = await g.admin
-    .from('coach_reports')
-    .select('body')
-    .eq('user_id', g.userId)
-    .eq('period', week)
-    .maybeSingle();
-  if (cached) return NextResponse.json({ report: cached.body, cached: true, quota: g.quota });
+  /*
+   * A report written before the student changed class is about the other
+   * class's chapters and topics, so it is not shown. The next night's report
+   * is about the class they are in.
+   */
+  const changedAt = Date.parse((profile?.grade_changed_at as string | null) ?? '');
+  const stale = !!data && Number.isFinite(changedAt) && Date.parse(data.created_at as string) < changedAt;
+  const report = data && !stale ? data : null;
 
-  let body: {
-    digest?: {
-      streak?: number;
-      xp?: number;
-      attemptsThisWeek?: number;
-      accuracyPct?: number;
-      topics?: { topic: string; pct: number; tries: number }[];
-      subjects?: string[];
-      language?: string;
-    };
-  };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'bad_request' }, { status: 400 });
-  }
-  const d = body.digest ?? {};
-  const topics = (d.topics ?? []).slice(0, 20).map((t) => ({
-    topic: String(t.topic).slice(0, 120),
-    pct: Math.round(Number(t.pct) || 0),
-    tries: Math.round(Number(t.tries) || 0),
-  }));
-
-  try {
-    const response = await anthropic.messages.create({
-      model: AI_MODEL,
-      max_tokens: 1200,
-      output_config: { effort: 'low', format: { type: 'json_schema', schema: REPORT_SCHEMA } },
-      system:
-        `You are a study coach for ${BOARD_WITH_ARTICLE[g.board]} Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) student in Pakistan. From their week of practice data, write: summary (2 warm, specific sentences about the week; if they did nothing, a kind nudge, never a scolding), weak (their 2 weakest topics with one plain-words sentence each on why it matters for the board paper), actions (exactly 3 short, concrete things to do this week, each doable in one sitting). Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
-        languageRule(d.language),
-      messages: [
-        {
-          role: 'user',
-          content: `This week: ${d.attemptsThisWeek ?? 0} questions attempted, ${d.accuracyPct ?? 0}% correct overall, streak ${d.streak ?? 0} days, total XP ${d.xp ?? 0}. Subjects: ${(d.subjects ?? []).join(', ') || 'unknown'}.\n\nAccuracy by topic (worst first):\n${topics.map((t) => `- ${t.topic}: ${t.pct}% over ${t.tries} tries`).join('\n') || '(no topic data yet)'}`,
-        },
-      ],
-    });
-    if (response.stop_reason === 'refusal') {
-      return NextResponse.json({ error: 'refused', quota: g.quota }, { status: 200 });
-    }
-    const block = response.content.find((b) => b.type === 'text');
-    if (!block) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
-    const report = JSON.parse(block.text);
-
-    await g.admin.from('coach_reports').upsert({ user_id: g.userId, period: week, body: report }, { onConflict: 'user_id,period' });
-    const quota = await chargeQuota(g, AI_COST.coach);
-    return NextResponse.json({ report, cached: false, quota });
-  } catch (e) {
-    console.error('[coach]', e instanceof Error ? e.message : e);
-    return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
-  }
+  return NextResponse.json({ report: report?.body ?? null, period: report?.period ?? null, quota: g.quota });
 }

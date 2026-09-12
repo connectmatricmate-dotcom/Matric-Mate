@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 import { SubmitButton } from '@/components/ui/controls';
+import { LinkBtn } from '@/components/ui/primitives';
 import { createTeacherAction, type AdminState } from '@/app/(admin)/actions';
 import { Note } from '@/components/admin/bits';
 
@@ -15,10 +16,10 @@ import { Note } from '@/components/admin/bits';
  * or a bank account into a shape a real teacher might not fit.
  *
  * Uncontrolled inputs, which is the one place this departs from the house rule
- * about keeping what was typed. A server action re-renders the same form
- * element rather than replacing it, so the browser keeps the values on a
- * failed submit by itself, and holding fourteen fields in React state to
- * achieve what the platform already does would be the wrong trade.
+ * about controlled fields. React 19 resets an uncontrolled form once its action
+ * returns, so a failed submit used to come back empty; the action now hands
+ * back what was typed and each field starts from it. Holding every field in
+ * React state to get the same result would be the wrong trade.
  */
 export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
   const [state, action] = useActionState<AdminState, FormData>(createTeacherAction, {});
@@ -40,22 +41,14 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2.5">
-          <Link
-            href="/admin/teachers"
-            className="rounded-full bg-teal px-4 py-2.5 text-[13px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110"
-          >
-            Back to teachers
-          </Link>
-          <Link
-            href="/admin/teachers/new"
-            className="rounded-full border border-line bg-card px-4 py-2.5 text-[13px] font-extrabold text-ink transition-colors duration-200 hover:bg-paper"
-          >
-            Add another
-          </Link>
+          <LinkBtn title="Back to teachers" href="/admin/teachers" sm />
+          <LinkBtn title="Add another" href="/admin/teachers/new" variant="line" sm />
         </div>
       </div>
     );
   }
+
+  const v = state.values ?? {};
 
   return (
     <form action={action} className="max-w-[640px]">
@@ -66,8 +59,8 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
       ) : null}
 
       <Group title="The account">
-        <Text name="fullName" label="Full name" required placeholder="Sana Iqbal" />
-        <Text name="email" label="Email" type="email" required placeholder="sana@example.com" />
+        <Text name="fullName" label="Full name" required placeholder="Sana Iqbal" value={v.fullName} />
+        <Text name="email" label="Email" type="email" required placeholder="sana@example.com" value={v.email} />
         <Text
           name="password"
           label="Password you will give them"
@@ -75,6 +68,7 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
           required
           placeholder="At least 8 characters"
           hint="Shown as plain text on purpose: you have to read it out. Email invites are not possible until the domain is verified."
+          value={v.password}
         />
         <Text
           name="commissionPct"
@@ -84,18 +78,31 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
           placeholder="20"
           suffix="%"
           hint="Their share of everything their students pay, for as long as they keep paying."
+          value={v.commissionPct}
         />
       </Group>
 
       <Group title="Who they are" note="All optional. For your own records.">
-        <Text name="phone" label="Phone" placeholder="+92 300 1234567" />
-        <Text name="city" label="City" placeholder="Rawalpindi" />
-        <Text name="institution" label="School or academy" placeholder="Government Model School" />
+        <Text name="phone" label="Phone" placeholder="+92 300 1234567" value={v.phone} />
+        <Text name="city" label="City" placeholder="Rawalpindi" value={v.city} />
+        <Text name="institution" label="School or academy" placeholder="Government Model School" value={v.institution} />
       </Group>
 
-      <div className="mt-6 flex items-center gap-3">
+      {/* The teacher's page shows these beside every payout. The action always
+          took them; the form never asked, so they read "not recorded". */}
+      <Group title="How they are paid" note="All optional. Shown on their page when you record a payout.">
+        <Text name="payoutMethod" label="Payout method" placeholder="JazzCash" value={v.payoutMethod} />
+        <Text name="payoutAccount" label="Account" placeholder="0300 1234567" value={v.payoutAccount} />
+        <Text name="payoutName" label="Account title" placeholder="Sana Iqbal" value={v.payoutName} />
+        <Text name="note" label="Note" placeholder="Pays on the 1st of each month" value={v.note} />
+      </Group>
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         <SubmitButton title="Create the account" pendingTitle="Creating…" />
-        <Link href="/admin/teachers" className="text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-ink">
+        <Link
+          href="/admin/teachers"
+          className="inline-flex min-h-11 items-center px-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-ink"
+        >
           Cancel
         </Link>
       </div>
@@ -121,6 +128,7 @@ function Text({
   placeholder,
   hint,
   suffix,
+  value,
 }: {
   name: string;
   label: string;
@@ -129,6 +137,8 @@ function Text({
   placeholder?: string;
   hint?: string;
   suffix?: string;
+  /** What was typed before a failed submit, so the form's reset restores it. */
+  value?: string;
 }) {
   return (
     <label className={`block ${hint ? 'sm:col-span-2' : ''}`}>
@@ -144,10 +154,13 @@ function Text({
           type={type}
           required={required}
           placeholder={placeholder}
+          defaultValue={value}
           step={type === 'number' ? '0.5' : undefined}
           min={type === 'number' ? '0' : undefined}
           max={type === 'number' ? '100' : undefined}
-          className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3"
+          // 16px on a phone: iOS Safari zooms into any smaller input and
+          // stays zoomed after it loses focus.
+          className="min-w-0 flex-1 bg-transparent text-[16px] text-ink outline-none placeholder:text-ink3 md:text-[14px]"
         />
         {suffix ? <span className="text-[13px] font-extrabold text-ink3">{suffix}</span> : null}
       </span>

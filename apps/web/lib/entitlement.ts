@@ -2,6 +2,26 @@ import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 
 /**
+ * What "has a plan" means, written once.
+ *
+ * It was written four times and they did not agree: the AI routes counted a
+ * plan with no end date as live, the paywall did not, and the admin overview
+ * counted the `active` column with no date at all. The column is written by
+ * the payment path and nothing sweeps it when a plan runs out, so the date is
+ * the part that matters, and a plan with no date is not a plan. The refund
+ * path is the only writer of a null date and it switches `active` off in the
+ * same update, so nobody who has paid is on the wrong side of this.
+ *
+ * Pure on purpose, so the proxy, the AI routes and the staff pages can all ask
+ * the same question of whatever row they already hold.
+ */
+export function planIsActive(row: { active?: boolean | null; valid_till?: string | null } | null | undefined): boolean {
+  if (!row?.active || !row.valid_till) return false;
+  const till = Date.parse(row.valid_till);
+  return Number.isFinite(till) && till > Date.now();
+}
+
+/**
  * Does this account have a plan right now.
  *
  * There is no free tier: the client's decision is that every account pays, so
@@ -13,17 +33,20 @@ import { createClient } from '@/lib/supabase/server';
  * level security is doing the work and this cannot accidentally answer for
  * somebody else's account.
  *
- * Expiry is checked here rather than trusted from the `active` column. That
- * column is written by the payment webhook and is only correct until the plan
- * runs out; nothing sweeps it afterwards, so a lapsed account would read as
- * active until its next payment.
+ * A failed read throws rather than answering "no". Answering no sent a paying
+ * student to the price list whenever the database was slow, and the proxy and
+ * this guard then bounced them between /upgrade and /dashboard until the
+ * browser gave up. An error boundary with a Try again is the honest answer to
+ * "we could not check".
  */
 export const hasActivePlan = cache(async (): Promise<boolean> => {
   const supabase = await createClient();
-  const { data } = await supabase.from('entitlements').select('active, valid_till').maybeSingle();
-  if (!data?.active) return false;
-  if (!data.valid_till) return false;
-  return new Date(data.valid_till).getTime() > Date.now();
+  const { data, error } = await supabase.from('entitlements').select('active, valid_till').maybeSingle();
+  if (error) {
+    console.error('entitlement: plan read failed', error.message);
+    throw new Error('Could not check the plan on this account.');
+  }
+  return planIsActive(data);
 });
 
 /**

@@ -51,14 +51,20 @@ export const nothingStudiedToday = (): Notice => ({
   target: 'home',
 });
 
+/**
+ * A fresh coach report. It lives in the coach card on the dashboard, so that
+ * is where a tap lands: this pointed at the monthly grade table, which is a
+ * different page that says nothing the notification promised.
+ *
+ * No email. The coach rewrites every day for anyone who studied, so this went
+ * out daily, with no report in it and no link to one: exactly the routine mail
+ * this file keeps out of the inbox a receipt has to reach.
+ */
 export const reportReady = (): Notice => ({
   kind: 'report',
   title: 'notifications.reportTitle',
   body: 'notifications.reportBody',
-  target: 'report',
-  // Email too: a report card is the thing a student shows a parent, and it
-  // reads better on a bigger screen than a notification shade.
-  also: ['email'],
+  target: 'home',
 });
 
 export const paymentReceived = (date: string): Notice => ({

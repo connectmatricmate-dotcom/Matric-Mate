@@ -47,7 +47,8 @@ export function RecordPayout({ affiliateId, outstanding }: { affiliateId: string
               step="1"
               required
               defaultValue={outstanding > 0 ? outstanding : undefined}
-              className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3"
+              // 16px on a phone, where iOS Safari zooms into anything smaller.
+              className="min-w-0 flex-1 bg-transparent text-[16px] text-ink outline-none placeholder:text-ink3 md:text-[14px]"
               placeholder="0"
             />
           </span>
@@ -59,7 +60,7 @@ export function RecordPayout({ affiliateId, outstanding }: { affiliateId: string
               name="note"
               type="text"
               placeholder="JazzCash, 19 Aug"
-              className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3"
+              className="min-w-0 flex-1 bg-transparent text-[16px] text-ink outline-none placeholder:text-ink3 md:text-[14px]"
             />
           </span>
         </label>
@@ -78,7 +79,9 @@ export function RecordPayout({ affiliateId, outstanding }: { affiliateId: string
 export function ToggleActive({ affiliateId, active }: { affiliateId: string; active: boolean }) {
   const [state, action] = useActionState<AdminState, FormData>(setTeacherActiveAction, {});
   return (
-    <form action={action} className="flex items-center gap-3">
+    // Wraps, so on a phone the status line drops under the button instead of
+    // being squeezed into a tall column beside it.
+    <form action={action} className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
       <input type="hidden" name="affiliateId" value={affiliateId} />
       <input type="hidden" name="active" value={active ? 'false' : 'true'} />
       <SubmitButton

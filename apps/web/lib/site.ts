@@ -28,15 +28,28 @@ export const SITE_URL =
   (isLocal(configured) && onVercel ? onVercel : configured) ?? onVercel ?? 'http://localhost:3000';
 
 /**
- * Search engines are kept out until the content is the client's own.
+ * Whether search engines may index the site: only when
+ * NEXT_PUBLIC_ALLOW_INDEXING is exactly 'true'.
  *
- * Right now the app runs on sample chapters and a checkout that takes no money.
- * Getting indexed in that state means Google's first impression of MatricMate
- * is a demo, and "no real payment is taken" ends up in a search snippet under
- * the brand. Set NEXT_PUBLIC_ALLOW_INDEXING=true on launch day. One variable,
- * no redeploy of anything else.
+ * Off, and that is the client's decision, made in the Vercel environment rather
+ * than here. The reason this used to give (sample chapters, a checkout that
+ * took no money) is out of date: the content and the payments are live. So the
+ * switch stays where it is, and turning it on is one variable and a redeploy.
  */
 export const ALLOW_INDEXING = process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
+
+/**
+ * The address search engines should credit with every public page.
+ *
+ * The same deployment also answers on matric-mate-web.vercel.app, and without
+ * a canonical link the two addresses would be indexed as duplicate copies of
+ * one site. A constant rather than SITE_URL on purpose: a preview deployment
+ * has to point search engines at production, never at itself.
+ */
+export const CANONICAL_ORIGIN = 'https://www.matricmate.co';
+
+/** The canonical URL for a public path, for `alternates.canonical` and the sitemap. */
+export const canonicalUrl = (path: string): string => `${CANONICAL_ORIGIN}${path}`;
 
 /**
  * The one version string every screen shows. Two screens once carried two

@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { Skeleton } from '@/components/ui/primitives';
 import { PlanToggle } from '@/components/admin/PlanToggle';
 import { allStudents } from '@/lib/students';
 
@@ -36,18 +37,18 @@ async function StudentTable() {
               <Row key={r.id}>
                 <Td>
                   <span className="block font-extrabold text-ink">{r.name}</span>
-                  <span className="block text-[12px] text-ink2">{r.email}</span>
+                  <span className="block text-[12px] text-ink2 wrap-anywhere">{r.email}</span>
                   {r.phone ? <span className="block text-[12px] text-ink3">{r.phone}</span> : null}
                 </Td>
-                <Td className="whitespace-nowrap text-ink2">
+                <Td num className="text-ink2">
                   {r.grade} · {r.board === 'punjab' ? 'Punjab' : 'FBISE'}
                 </Td>
-                <Td className="whitespace-nowrap text-ink2">{when(r.joined)}</Td>
+                <Td num className="text-ink2">{when(r.joined)}</Td>
                 <Td className="text-ink2">{r.teacher ?? '·'}</Td>
-                <Td className="whitespace-nowrap text-ink2">{r.paidTotal ? rupees(r.paidTotal) : '·'}</Td>
+                <Td num className="text-ink2">{r.paidTotal ? rupees(r.paidTotal) : '·'}</Td>
                 <Td>{r.active ? <Tag tone="green">Premium</Tag> : <Tag tone="grey">No plan</Tag>}</Td>
                 <Td className="text-end">
-                  <PlanToggle userId={r.id} active={r.active} />
+                  <PlanToggle userId={r.id} active={r.active} name={r.name} />
                 </Td>
               </Row>
             ))}
@@ -62,15 +63,19 @@ async function StudentTable() {
   );
 }
 
+/** Shaped like StudentTable: three stats, then the Panel's heading and its box. */
 function TableSkeleton() {
   return (
     <>
       <StatGrid>
         {['a', 'b', 'c'].map((k) => (
-          <div key={k} className="h-[86px] animate-pulse rounded-[16px] border border-line bg-card" />
+          <div key={k} className="h-[80px] animate-pulse rounded-[16px] border border-line bg-card" />
         ))}
       </StatGrid>
-      <div className="mt-7 h-[320px] animate-pulse rounded-[16px] border border-line bg-card" />
+      <div className="mt-7">
+        <Skeleton className="mb-2.5 h-[25px] w-24" />
+        <div className="h-[320px] animate-pulse rounded-[16px] border border-line bg-card" />
+      </div>
     </>
   );
 }

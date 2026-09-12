@@ -1,6 +1,6 @@
-import Image from 'next/image';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { AI_QUOTA, PAPER_CONTENT, contentFor } from '@matricmate/core';
+import { AI_QUOTA, BOARD_LABEL, PAPER_CONTENT, contentFor, pastPaperYears } from '@matricmate/core';
 import { AudioSample } from '@/components/landing/AudioSample';
 import { CursorGlow } from '@/components/landing/CursorGlow';
 import { HeroDemo } from '@/components/landing/HeroDemo';
@@ -9,8 +9,11 @@ import { Reveal } from '@/components/landing/Reveal';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { SubjectMarquee } from '@/components/landing/SubjectMarquee';
 import { Tilt } from '@/components/landing/Tilt';
-import { Card, Icon, LinkBtn, Pill, Ur } from '@/components/ui';
-import type { IconName } from '@matricmate/core';
+import { Card, Icon, LinkBtn, Pill, Ur, Wordmark } from '@/components/ui';
+import { canonicalUrl } from '@/lib/site';
+import type { Board, IconName } from '@matricmate/core';
+
+export const metadata: Metadata = { alternates: { canonical: canonicalUrl('/') } };
 
 /** The chapter and questions here are the ones the app ships, not marketing filler. */
 const dynamics = contentFor('phy-3');
@@ -18,6 +21,38 @@ const dynamics = contentFor('phy-3');
 const heroMcqs = dynamics.mcqs.slice(0, 4);
 /** Written by us to the board's pattern, so the card that renders it says so. */
 const physicsPaper = PAPER_CONTENT.pp1;
+
+/**
+ * What the board-paper catalogue actually holds for a board, across both
+ * classes: which classes have papers, and the first and last year.
+ *
+ * This section used to say "SSC-I papers from 2023, 2024 and 2025" and
+ * "original FBISE PDFs" as literals, long after Class 10 and Punjab Board
+ * joined the catalogue. Read from it instead, so the claim moves with it.
+ */
+function paperSpan(board: Board): string | null {
+  const found = ([9, 10] as const).flatMap((grade) => {
+    const years = pastPaperYears(grade, board);
+    return years ? [{ grade, ...years }] : [];
+  });
+  if (!found.length) return null;
+  const from = Math.min(...found.map((c) => c.from));
+  const to = Math.max(...found.map((c) => c.to));
+  const classes = found.map((c) => c.grade).join(' and ');
+  return `${BOARD_LABEL[board]} Class ${classes} papers, ${from === to ? from : `${from} to ${to}`}`;
+}
+
+/**
+ * The board papers themselves open as the boards' own PDFs. The timer, the
+ * palette and the review belong to the app's own tests and mock papers, so
+ * those claims are made about them and nothing else.
+ */
+const PAPER_POINTS = [
+  paperSpan('fbise'),
+  paperSpan('punjab'),
+  'Mock papers in the board pattern, Section A under a timer',
+  'Timed tests for double XP, reviewed question by question',
+].filter((p): p is string => p !== null);
 
 const PAINS: { icon: IconName; title: string; body: string }[] = [
   {
@@ -77,11 +112,11 @@ const FAQ = [
   },
   {
     q: 'My child studies in Urdu medium. Is the content really in Urdu?',
-    a: 'Yes. Notes, questions and the audio lesson come in the medium you choose. The app’s own buttons can be set to English or Roman Urdu separately.',
+    a: 'Yes. Notes, questions and the audio lesson come in the medium you choose. A few subjects keep one language, the way the boards set them: Urdu is taught in Urdu and English in English, and Punjab Board Islamiyat is in Urdu, the only language its textbook comes in. Choosing Urdu also puts the app’s own buttons and menus in Urdu script, so one setting covers both.',
   },
   {
     q: 'How do I pay from Pakistan?',
-    a: 'Mobile wallets, bank accounts or any debit and credit card, through a State Bank licensed payment gateway. You can also renew from a link we send on WhatsApp.',
+    a: 'Mobile wallets, bank accounts or any debit and credit card, through a State Bank licensed payment gateway. To renew, you pay again from your account page.',
   },
   {
     q: 'Can I use it on both phone and computer?',
@@ -98,7 +133,7 @@ export default function LandingPage() {
     <>
       {/* Fills across the top as the page scrolls. Pure CSS where the browser
           supports scroll-driven animation, invisible where it does not. */}
-      <div className="read-bar" aria-hidden />
+      <div data-chrome className="read-bar" aria-hidden />
       <CursorGlow />
 
       <Nav />
@@ -122,8 +157,12 @@ export default function LandingPage() {
               <div>
                 {/* One inline run for the two scripts, so vertical-align lines
                     them up. Split across flex items they each centre on their
-                    own box and the Nastaliq drops half a line. */}
-                <span className="fx-rise fx-d1 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3.5 py-1.5 text-[12.5px] font-extrabold text-tealtint">
+                    own box and the Nastaliq drops half a line.
+                    Text on the night hero is white, never tealtint: night stays
+                    dark in both themes, and tealtint turns dark navy in the
+                    dark one. The badge wraps to two lines on a phone, where a
+                    full pill would read as a lozenge. */}
+                <span className="fx-rise fx-d1 inline-flex items-center gap-2 rounded-[18px] border border-white/15 bg-white/8 px-3.5 py-1.5 text-[12.5px] font-extrabold text-white/85 sm:rounded-full">
                   <Icon name="gradCap" size={14} className="shrink-0 text-cyan" />
                   <span>
                     FBISE &amp; Punjab Board · Class 9 &amp; 10 · English &amp; <Ur>اردو</Ur>
@@ -137,7 +176,7 @@ export default function LandingPage() {
                   </span>
                 </h1>
 
-                <p className="fx-rise fx-d3 mt-4 max-w-[560px] text-mk-lead text-tealtint">
+                <p className="fx-rise fx-d3 mt-4 max-w-[560px] text-mk-lead text-white/85">
                   Chapter notes, audio lessons, past papers and a tutor that answers at midnight. Every question you
                   practise also records how sure you were, so MatricMate can show you the topics you only{' '}
                   <em>think</em> you know.
@@ -146,7 +185,10 @@ export default function LandingPage() {
                 <p className="fx-rise fx-d4 mt-3 text-[16px] font-extrabold text-cyan">Poori tayyari, aik hi jagah.</p>
 
                 <div className="fx-rise fx-d5 mt-7 flex flex-wrap gap-3">
-                  <span className="pulse-glow rounded-[16px]">
+                  {/* The glow is the wrapper's own background, blurred, so the
+                      wrapper needs one; isolate keeps the halo above whatever
+                      the button sits on. */}
+                  <span className="pulse-glow isolate inline-flex rounded-[16px] bg-orange">
                     <LinkBtn title="Get started" href="/signup" variant="orange" lg />
                   </span>
                   <Link
@@ -157,7 +199,7 @@ export default function LandingPage() {
                   </Link>
                 </div>
 
-                <p className="fx-rise fx-d6 mt-4 text-mk-small text-[color-mix(in_oklab,var(--color-tealtint)_80%,transparent)]">
+                <p className="fx-rise fx-d6 mt-4 text-mk-small text-white/70">
                   Rs 1,000/month · nothing renews on its own · JazzCash, Easypaisa or card
                 </p>
               </div>
@@ -207,7 +249,7 @@ export default function LandingPage() {
             <Reveal as="ol" stagger className="mt-9 grid gap-6 md:grid-cols-4">
               {STEPS.map((s) => (
                 <li key={s.n}>
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-teal to-cyan font-display text-[18px] text-white shadow-[0_6px_18px_rgba(10,126,164,0.35)]">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-teal to-cyan font-display text-[18px] text-onbrand shadow-[0_6px_18px_color-mix(in_srgb,var(--color-teal)_35%,transparent)]">
                     {s.n}
                   </span>
                   <h3 className="mt-3 font-display text-mk-h3 text-ink">{s.title}</h3>
@@ -227,7 +269,9 @@ export default function LandingPage() {
             </p>
           </Reveal>
 
-          <div className="mt-9 grid gap-8 md:grid-cols-[1fr_380px]">
+          {/* Two columns from lg. At md the cards beside a 380px column were
+              about 150px wide and every title wrapped to three lines. */}
+          <div className="mt-9 grid gap-8 lg:grid-cols-[1fr_380px]">
             <Reveal stagger className="grid content-start gap-4 sm:grid-cols-2">
               {INSIDE.map((f) => (
                 <Tilt key={f.title} max={5}>
@@ -282,18 +326,18 @@ export default function LandingPage() {
               <h2 className="mt-4 font-display text-mk-h2 text-white">
                 It tracks how sure you were, not just what you got right.
               </h2>
-              <p className="mt-4 text-mk-lead text-tealtint">
+              <p className="mt-4 text-mk-lead text-white/85">
                 Every answer carries a confidence tag. Over a few hundred questions that turns into something a score
                 can’t tell you: the difference between a topic you’ve genuinely learned, one you’re guessing well at,
                 and one you’re confidently wrong about, which is the kind that ruins a paper.
               </p>
-              <p className="mt-3 text-mk-lead text-tealtint">
+              <p className="mt-3 text-mk-lead text-white/85">
                 Confidently wrong answers get flagged first, because they’re the ones you’d never revise on your own.
               </p>
             </div>
 
             <Tilt max={6}>
-              <Card className="shadow-[0_24px_70px_rgba(4,34,47,0.5)]">
+              <Card className="shadow-[0_24px_70px_var(--shadow-lift)]">
                 <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">
                   How sure vs how right
                 </p>
@@ -327,16 +371,17 @@ export default function LandingPage() {
           <div className="relative grid gap-10 md:grid-cols-[1fr_1fr]">
             <Reveal>
               <h2 className="font-display text-mk-h2 text-ink">
-                Real board papers, in the board’s own shape.
+                Real board papers, and practice in the same shape.
               </h2>
               <p className="mt-4 text-mk-lead text-ink2">
-                Section A objective, Section B short answers, Section C detailed, with the marks distribution the
-                examiner actually uses. Read a paper, or sit it under a timer with a question palette and flagging.
+                Your board’s own past papers for your class, opened as the originals. Then practise the way the paper
+                is set: Section A objective, Section B short answers, Section C detailed, with a question palette and
+                flagging when the clock is running.
               </p>
               <ul className="mt-6 flex flex-col gap-3">
-                {['The board’s own SSC-I papers from 2023, 2024 and 2025', 'Attempt as a timed test with double XP', 'Answers reviewed question by question', 'Offline reading arrives with the Android app'].map((li) => (
-                  <li key={li} className="flex items-center gap-2.5 text-[15.5px] text-ink">
-                    <Icon name="check" size={18} className="text-green" strokeWidth={2.6} />
+                {PAPER_POINTS.map((li) => (
+                  <li key={li} className="flex items-start gap-2.5 text-[15.5px] text-ink">
+                    <Icon name="check" size={18} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
                     {li}
                   </li>
                 ))}
@@ -375,8 +420,8 @@ export default function LandingPage() {
                   ))}
                   <p className="text-[13px] text-ink3">…continues to Section C</p>
                   <p className="mt-2 text-[12.5px] leading-[1.55] text-ink3">
-                    Written by us so you can see the shape of it. The board’s own papers open as the original FBISE
-                    PDFs.
+                    Written by us so you can see the shape of it. Past papers in the app open as the boards’ own
+                    PDFs, FBISE and Punjab Board alike.
                   </p>
                 </Card>
               </Tilt>
@@ -394,9 +439,9 @@ export default function LandingPage() {
                 You’ll actually know whether it’s working.
               </h2>
               <p className="mt-4 text-mk-lead text-ink2">
-                At the end of every month your child can share a report card: a grade per subject, how it moved,
-                how many days they actually studied, and which topics still need work. No login needed to view it:
-                it arrives on WhatsApp like any other message.
+                At the end of every month your child can download a report card: a grade per subject, how it moved,
+                how many questions they answered and how many days they actually studied. It is a PDF they hand you
+                or send you, so there is nothing for you to log in to.
               </p>
               <p className="mt-3 text-mk-lead text-ink2">
                 One price, no upsells inside the app, and nothing your child can buy on their own.
@@ -411,7 +456,8 @@ export default function LandingPage() {
               <Card className="border-2 border-teal">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <Image src="/brand/wordmark.png" alt="" width={110} height={22} />
+                    {/* On its plate, so the teal half survives the dark card. */}
+                    <Wordmark width={110} height={22} />
                     <p className="mt-1.5 text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink2">
                       Monthly report · sample
                     </p>
@@ -436,7 +482,7 @@ export default function LandingPage() {
                       className="grid grid-cols-[1fr_44px_20px] items-center border-b border-line py-2 last:border-0"
                     >
                       <span className="text-[15px] text-ink">{subject}</span>
-                      <span className="text-right font-display text-[16px] text-ink tabular">{grade}</span>
+                      <span className="text-end font-display text-[16px] text-ink tabular">{grade}</span>
                       <span className="flex justify-end">
                         <Icon
                           name={trend === 'up' ? 'chart' : 'arrowRight'}
@@ -451,8 +497,7 @@ export default function LandingPage() {
                 </div>
                 <p className="mt-3 text-[12.5px] leading-[1.55] text-ink3">
                   <span className="font-extrabold text-ink2">A sample layout.</span> The real one carries your child’s
-                  own subjects and grades, the days they studied, the tests they sat, and the topics still costing
-                  marks.
+                  own subjects and grades, how many questions they answered and the days they studied.
                 </p>
               </Card>
             </Tilt>
@@ -470,11 +515,11 @@ export default function LandingPage() {
 
           <Reveal className="mx-auto mt-10 max-w-[560px]">
             <Tilt max={4}>
-              <Card className="relative flex h-full flex-col border-2 border-orange shadow-[0_18px_50px_rgba(255,138,0,0.16)]">
+              <Card className="relative flex h-full flex-col border-2 border-orange shadow-[0_18px_50px_color-mix(in_srgb,var(--color-orange)_16%,transparent)]">
                 <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium</p>
                 <p className="mt-1 font-display text-[52px] leading-none text-ink">
                   Rs 1,000
-                  <span className="ml-1 text-[16px] font-normal text-ink2">/ month</span>
+                  <span className="ms-1 text-[16px] font-normal text-ink2">/ month</span>
                 </p>
                 <p className="text-mk-small text-ink2">One payment · nothing renews on its own</p>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5">
@@ -492,37 +537,39 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="pulse-glow mt-6 rounded-[16px]">
+                <span className="pulse-glow isolate mt-6 flex rounded-[16px] bg-orange">
                   <LinkBtn title="Subscribe now" href="/checkout" variant="orange" className="w-full" />
                 </span>
                 <p className="mt-3 text-center text-[13px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
-                <Link href="/pricing" className="mt-2 text-center text-[13.5px] font-extrabold text-teal hover:underline">
+                <Link href="/pricing" className="mt-1 flex min-h-11 items-center justify-center text-[13.5px] font-extrabold text-teal hover:underline">
                   What the plan includes
                 </Link>
               </Card>
             </Tilt>
 
             <p className="mt-6 text-center text-mk-small text-ink2">
-              Making an account shows you the full syllabus and what every chapter contains. Studying needs the
-              plan, which opens all of it at once.
+              Make your account, pick your board, class and subjects, then pay once. The plan opens every chapter,
+              test and the tutor together, and there is nothing else to buy.
             </p>
           </Reveal>
         </section>
 
         {/* ------------------------------------------------------------- faq */}
-        <section id="faq" className="border-t border-tealtint2 bg-tealtint">
-          <div className="mx-auto max-w-[760px] scroll-mt-20 px-5 py-16 md:py-20">
+        <section id="faq" className="scroll-mt-20 border-t border-tealtint2 bg-tealtint">
+          <div className="mx-auto max-w-[760px] px-5 py-16 md:py-20">
             <Reveal>
               <h2 className="font-display text-mk-h2 text-ink">Questions parents and students ask</h2>
             </Reveal>
             <Reveal stagger className="mt-9 flex flex-col gap-3">
               {FAQ.map((f) => (
-                <details key={f.q} className="group rounded-[16px] border border-line bg-card px-5 py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-extrabold text-ink">
+                // The padding lives on the summary, so the whole row is the tap
+                // target rather than the words in the middle of it.
+                <details key={f.q} className="group rounded-[16px] border border-line bg-card">
+                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-[16px] font-extrabold text-ink [&::-webkit-details-marker]:hidden">
                     {f.q}
                     <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform duration-200 group-open:rotate-45" />
                   </summary>
-                  <p className="faq-a mt-3 text-mk-body text-ink2">{f.a}</p>
+                  <p className="faq-a px-5 pb-4 text-mk-body text-ink2">{f.a}</p>
                 </details>
               ))}
             </Reveal>
@@ -542,12 +589,12 @@ export default function LandingPage() {
               <h2 className="relative mx-auto max-w-[680px] font-display text-mk-h1 text-white">
                 The exam is a date. Start before it’s a deadline.
               </h2>
-              <p className="relative mx-auto mt-4 max-w-[520px] text-mk-lead text-tealtint">
+              <p className="relative mx-auto mt-4 max-w-[520px] text-mk-lead text-white/85">
                 Rs 1,000 a month, and nothing renews on its own. Set up in two minutes and study your first chapter
                 tonight.
               </p>
               <div className="relative mt-8 flex flex-wrap justify-center gap-3">
-                <span className="pulse-glow rounded-[16px]">
+                <span className="pulse-glow isolate inline-flex rounded-[16px] bg-orange">
                   <LinkBtn title="Get started" href="/signup" variant="orange" lg />
                 </span>
                 <Link

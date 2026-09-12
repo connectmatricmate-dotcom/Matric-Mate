@@ -1,15 +1,37 @@
 import { LanguageRefresh } from '@/components/app/LanguageRefresh';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { boardChoice } from '@matricmate/core';
 import { Localized } from '@/components/app/Localized';
+import { SetupGate, type SetupStep } from '@/components/app/SetupGate';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import { Shell } from '@/components/app/Shell';
 import { PushLive } from '@/components/app/PushLive';
-// Side-effect import: connects the shared content layer to Supabase.
-import '@/lib/content';
 import { hasActivePlan, isOpenWithoutPlan } from '@/lib/entitlement';
 import { keepStaffOut } from '@/lib/roles';
+import { createClient, getUser } from '@/lib/supabase/server';
 import { AppProvider } from '@/lib/store';
+
+/**
+ * The onboarding step an account stopped before, or null when its setup is
+ * complete: a board, a medium and at least one subject saved. Only the first
+ * missing step, so a student who has everything but their subjects answers
+ * one screen, not four. A failed read answers null, because sending a student
+ * back through setup on a database hiccup is worse than letting them in.
+ */
+async function unfinishedStep(): Promise<SetupStep | null> {
+  const user = await getUser();
+  if (!user) return null;
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('profiles').select('onboarding').eq('id', user.id).maybeSingle();
+  if (error || !data) return null;
+  const onboarding = data.onboarding as { medium?: unknown; subjects?: unknown } | null;
+  if (!onboarding) return 'class';
+  if (!boardChoice(onboarding)) return 'board';
+  if (onboarding.medium !== 'en' && onboarding.medium !== 'ur') return 'medium';
+  if (!Array.isArray(onboarding.subjects) || onboarding.subjects.length === 0) return 'subjects';
+  return null;
+}
 
 /** Renders once; child pages slot into it without rebuilding the nav. */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -41,7 +63,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
    */
   await keepStaffOut();
 
-  const paid = await hasActivePlan();
+  const [paid, unfinished] = await Promise.all([hasActivePlan(), unfinishedStep()]);
 
   if (!paid && !isOpenWithoutPlan(pathname)) redirect('/upgrade');
 
@@ -57,11 +79,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
    */
   if (paid && pathname === '/upgrade') redirect('/dashboard');
 
+  /*
+   * `paid` goes down to the store as its starting plan. The layout has just
+   * read it, and without it every paying student opened the app on the free
+   * state (every chapter locked, "no plan", a red 0/0) until the browser had
+   * asked the same question again.
+   */
   return (
     <Localized lang={lang}>
-      <AppProvider initialLanguage={lang}>
+      <AppProvider initialLanguage={lang} initialPremium={paid}>
         <LanguageRefresh />
         <PushLive />
+        <SetupGate step={unfinished} />
         <Shell>{children}</Shell>
       </AppProvider>
     </Localized>

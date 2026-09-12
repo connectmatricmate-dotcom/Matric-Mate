@@ -8,7 +8,13 @@
  *
  * Urdu-aware, like the rest of the app: a block written in Arabic script
  * gets the Nastaliq treatment and right-to-left flow, including its bullet
- * side, so an Urdu answer reads the way an Urdu answer should.
+ * side, so an Urdu answer reads the way an Urdu answer should. Each list item
+ * carries its own `dir` rather than reversing the row, because a reversed row
+ * is only right in an English account: in an Urdu one the page is already
+ * right to left, and reversing it put the bullet on the far side.
+ *
+ * `min-w-0 wrap-anywhere` because model output can carry a URL or a formula
+ * with no break opportunity, which would otherwise widen its container.
  */
 import { type MdSpan, isUrduScript, parseMarkdown } from '@matricmate/core';
 import { Ur } from './primitives';
@@ -56,7 +62,7 @@ function Block({ spans, className = '' }: { spans: MdSpan[]; className?: string 
 export function Markdown({ text, className = '' }: { text: string; className?: string }) {
   const blocks = parseMarkdown(text);
   return (
-    <div className={`flex flex-col gap-2.5 ${className}`}>
+    <div className={`flex min-w-0 flex-col gap-2.5 wrap-anywhere ${className}`}>
       {blocks.map((b, i) => {
         switch (b.kind) {
           case 'heading':
@@ -79,7 +85,7 @@ export function Markdown({ text, className = '' }: { text: string; className?: s
                 {b.items.map((item, j) => {
                   const rtl = isUrduScript(spanText(item));
                   return (
-                    <li key={j} className={`flex items-start gap-2 ${rtl ? 'flex-row-reverse' : ''}`}>
+                    <li key={j} dir={rtl ? 'rtl' : 'ltr'} className="flex items-start gap-2">
                       <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-teal" />
                       <Block spans={item} className="min-w-0 flex-1" />
                     </li>
@@ -93,7 +99,7 @@ export function Markdown({ text, className = '' }: { text: string; className?: s
                 {b.items.map((item, j) => {
                   const rtl = isUrduScript(spanText(item));
                   return (
-                    <li key={j} className={`flex items-start gap-2 ${rtl ? 'flex-row-reverse' : ''}`}>
+                    <li key={j} dir={rtl ? 'rtl' : 'ltr'} className="flex items-start gap-2">
                       <span className="mt-0.5 shrink-0 text-[12.5px] font-extrabold text-teal tabular">{b.start + j}.</span>
                       <Block spans={item} className="min-w-0 flex-1" />
                     </li>

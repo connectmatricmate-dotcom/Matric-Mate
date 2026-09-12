@@ -1,8 +1,8 @@
 'use client';
 
-import { boardName, pastPaperTitle, subjectById, subjectName, type Board, type PastPaperGroup } from '@matricmate/core';
+import { boardName, paperBoardName, pastPaperTitle, subjectById, subjectName, type Board, type PastPaperGroup } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Card, Empty, ExternalLinkBtn, Item, SectionTitle } from '@/components/ui/primitives';
+import { Card, Empty, ExternalLinkBtn, ItemBody, SectionTitle } from '@/components/ui/primitives';
 import { useLang, useT } from '@/lib/store';
 
 export function PapersScreen({ groups, board }: { groups: PastPaperGroup[]; board: Board }) {
@@ -31,15 +31,19 @@ export function PapersScreen({ groups, board }: { groups: PastPaperGroup[]; boar
             <Card flat className="py-0">
               {g.papers.map((p, i) => {
                 const hosted = p.selfHosted ? t('session.papersSelfHostedNote') : t('session.papersHostedNote', { host: p.host });
+                /* The button drops under the title on a phone. Beside it, it
+                   left the title about 135px, and a paper's name ran to three
+                   or four lines. */
                 return (
-                  <Item
+                  <div
                     key={p.key}
-                    icon="doc"
-                    title={pastPaperTitle(p, lang)}
-                    sub={p.boardName ? `${p.boardName} · ${hosted}` : hosted}
-                    last={i === g.papers.length - 1}
-                    right={<ExternalLinkBtn title={t('session.viewPaper')} href={p.url} variant="line" sm />}
-                  />
+                    className={`flex flex-wrap items-center gap-x-3 gap-y-2 py-3.5 ${i === g.papers.length - 1 ? '' : 'border-b border-line'}`}
+                  >
+                    <span className="flex min-w-0 flex-1 basis-64 items-center gap-3">
+                      <ItemBody icon="doc" title={pastPaperTitle(p, lang)} sub={p.boardName ? `${paperBoardName(p.boardName, lang)} · ${hosted}` : hosted} />
+                    </span>
+                    <ExternalLinkBtn title={t('session.viewPaper')} href={p.url} variant="line" sm className="shrink-0 max-sm:ms-[54px]" />
+                  </div>
                 );
               })}
             </Card>

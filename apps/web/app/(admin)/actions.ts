@@ -18,7 +18,27 @@ import { PLANS, THE_PLAN, planById } from '@/lib/plans';
  * internet.
  */
 
-export type AdminState = { error?: string; ok?: string; code?: string };
+export type AdminState = {
+  error?: string;
+  ok?: string;
+  code?: string;
+  /**
+   * What was typed, handed back with an error. React 19 resets an
+   * uncontrolled form once its action returns, so without this a rejected
+   * teacher form came back empty and every field had to be typed again.
+   */
+  values?: Record<string, string>;
+};
+
+/** The text fields of a submission, for handing back with an error. */
+const typed = (formData: FormData): Record<string, string> => {
+  const values: Record<string, string> = {};
+  formData.forEach((v, k) => {
+    // `$ACTION_` keys are React's own bookkeeping, not fields.
+    if (typeof v === 'string' && !k.startsWith('$')) values[k] = v;
+  });
+  return values;
+};
 
 async function requireAdmin(): Promise<{ id: string } | { error: string }> {
   const supabase = await createClient();
@@ -59,7 +79,7 @@ export async function createTeacherAction(_prev: AdminState, formData: FormData)
   if ('error' in who) return { error: who.error };
 
   const parsed = NewTeacher.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Check the form.' };
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Check the form.', values: typed(formData) };
   const t = parsed.data;
 
   const admin = createAdminClient();
@@ -72,7 +92,10 @@ export async function createTeacherAction(_prev: AdminState, formData: FormData)
   });
   if (authError || !created.user) {
     const already = /already|registered|exists/i.test(authError?.message ?? '');
-    return { error: already ? 'An account with that email already exists.' : `Could not create the account: ${authError?.message}` };
+    return {
+      error: already ? 'An account with that email already exists.' : `Could not create the account: ${authError?.message}`,
+      values: typed(formData),
+    };
   }
   const userId = created.user.id;
 
@@ -85,7 +108,7 @@ export async function createTeacherAction(_prev: AdminState, formData: FormData)
   const { data: codeRow, error: codeError } = await admin.rpc('mint_affiliate_code');
   if (codeError || !codeRow) {
     await admin.auth.admin.deleteUser(userId);
-    return { error: `Could not mint a referral code: ${codeError?.message}` };
+    return { error: `Could not mint a referral code: ${codeError?.message}`, values: typed(formData) };
   }
   const code = String(codeRow);
 
@@ -105,7 +128,7 @@ export async function createTeacherAction(_prev: AdminState, formData: FormData)
   });
   if (rowError) {
     await admin.auth.admin.deleteUser(userId);
-    return { error: `Could not save the teacher: ${rowError.message}` };
+    return { error: `Could not save the teacher: ${rowError.message}`, values: typed(formData) };
   }
 
   // Last, because it is what decides where they land when they sign in. A
@@ -115,7 +138,7 @@ export async function createTeacherAction(_prev: AdminState, formData: FormData)
   if (roleError) {
     await admin.from('affiliates').delete().eq('user_id', userId);
     await admin.auth.admin.deleteUser(userId);
-    return { error: `Could not set the role: ${roleError.message}` };
+    return { error: `Could not set the role: ${roleError.message}`, values: typed(formData) };
   }
 
   revalidatePath('/admin/teachers');
@@ -246,7 +269,7 @@ export async function revokePremiumAction(_prev: AdminState, formData: FormData)
     .eq('user_id', parsed.data.userId);
   if (error) return { error: `Could not switch it off: ${error.message}` };
 
-  await admin
+  const { error: refundError } = await admin
     .from('payments')
     .update({ status: 'refunded' })
     .eq('user_id', parsed.data.userId)
@@ -255,6 +278,14 @@ export async function revokePremiumAction(_prev: AdminState, formData: FormData)
 
   revalidatePath('/admin/students');
   revalidatePath('/admin');
+
+  // Access is already off by here, so say exactly that: a grant still counted
+  // as revenue, and towards a teacher's commission, is worth knowing about.
+  if (refundError) {
+    return {
+      error: `${check.name} no longer has Premium, but the manual payment could not be marked refunded: ${refundError.message}`,
+    };
+  }
   return { ok: `${check.name} no longer has Premium.` };
 }
 

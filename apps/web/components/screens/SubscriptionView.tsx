@@ -88,7 +88,7 @@ export function SubscriptionView() {
           {PERKS.map(([icon, key]) => (
             <li key={key} className="flex items-center gap-3">
               <Icon name={icon} size={18} className={`shrink-0 ${active ? 'text-teal' : 'text-ink3'}`} />
-              <span className={`min-w-0 flex-1 text-[14px] leading-[1.5] ${active ? 'text-ink' : 'text-ink2'}`}>{t(key)}</span>
+              <span className={`min-w-0 flex-1 text-[14px] leading-[1.5] rtl:leading-[1.9] ${active ? 'text-ink' : 'text-ink2'}`}>{t(key)}</span>
               {active ? <Icon name="check" size={16} strokeWidth={2.6} className="shrink-0 text-green" /> : null}
             </li>
           ))}
@@ -98,17 +98,17 @@ export function SubscriptionView() {
       <div className="mt-6 flex flex-col gap-2.5">
         {active ? (
           <>
-            <UpgradeButton label={t('billing.premium')} variant="orange" icon="card" />
+            <UpgradeButton label={t('billing.premium')} variant="orange" icon="card" full />
             {/* No cancel button, because there is nothing to cancel: plans are
                 paid once and never auto-charge. Offering "Cancel subscription"
                 would imply a recurring charge that does not exist, and worry
                 people into cancelling something imaginary. It comes back when
                 auto-renew does. */}
-            <p className="text-[13px] leading-[1.6] text-ink2">{t('account.noAutoCharge')}</p>
+            <p className="text-[13px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('account.noAutoCharge')}</p>
           </>
         ) : (
           <>
-            <UpgradeButton />
+            <UpgradeButton full />
           </>
         )}
       </div>

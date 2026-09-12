@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useSyncExternalStore } from 'react';
+import { Btn } from '@/components/ui/controls';
 
 /**
  * The teacher's link, and the two things they will actually do with it.
@@ -16,6 +17,7 @@ const hasShareSheet = () => typeof navigator !== 'undefined' && typeof navigator
 
 export function ShareLink({ link, code, name }: { link: string; code: string; name: string }) {
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   /* Whether the browser has a share sheet is a client-only fact, and the
      server has no `navigator` to ask. useSyncExternalStore is the way to read
      one without the server and client disagreeing about the first render:
@@ -27,11 +29,13 @@ export function ShareLink({ link, code, name }: { link: string; code: string; na
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(link);
+      setCopyFailed(false);
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
     } catch {
-      // A browser that refuses the clipboard still shows the link above, and
-      // selecting it by hand works. Nothing to say.
+      // In-app browsers and plain http refuse the clipboard. The link is on
+      // screen above, so say so rather than letting the press do nothing.
+      setCopyFailed(true);
     }
   };
 
@@ -56,23 +60,14 @@ export function ShareLink({ link, code, name }: { link: string; code: string; na
         <span className="font-mono font-extrabold text-ink">{code}</span>.
       </p>
       <div className="mt-3.5 flex flex-wrap gap-2.5">
-        <button
-          type="button"
-          onClick={copy}
-          className="rounded-full bg-teal px-4 py-2.5 text-[13px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110"
-        >
-          {copied ? 'Copied' : 'Copy link'}
-        </button>
-        {canShare ? (
-          <button
-            type="button"
-            onClick={share}
-            className="rounded-full border border-line bg-card px-4 py-2.5 text-[13px] font-extrabold text-ink transition-colors duration-200 hover:bg-paper"
-          >
-            Share
-          </button>
-        ) : null}
+        <Btn title={copied ? 'Copied' : 'Copy link'} icon={copied ? 'check' : undefined} onClick={copy} sm />
+        {canShare ? <Btn title="Share" icon="share" onClick={share} variant="line" sm /> : null}
       </div>
+      {copyFailed ? (
+        <p role="alert" className="mt-2 text-[12.5px] font-extrabold text-red">
+          This browser would not copy it. Select the link above and copy it by hand.
+        </p>
+      ) : null}
     </div>
   );
 }

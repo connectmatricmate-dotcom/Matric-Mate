@@ -64,7 +64,8 @@ function Secret({
           // A placeholder on a password field, per the house rule: an empty
           // box with no hint is the one people mistake for a disabled field.
           placeholder="••••••••"
-          className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink3"
+          // 16px on a phone, where iOS Safari zooms into anything smaller.
+          className="min-w-0 flex-1 bg-transparent text-[16px] text-ink outline-none placeholder:text-ink3 md:text-[14px]"
         />
       </span>
       {hint ? <span className="mt-1 block text-[11.5px] text-ink3">{hint}</span> : null}

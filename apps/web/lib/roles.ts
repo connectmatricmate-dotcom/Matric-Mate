@@ -47,7 +47,15 @@ export function homeFor(role: Role): string {
 export async function landingFor(role: Role): Promise<string> {
   if (role !== 'student') return homeFor(role);
   const { hasActivePlan } = await import('@/lib/entitlement');
-  return (await hasActivePlan()) ? '/dashboard' : '/upgrade';
+  // hasActivePlan throws when the entitlement read fails rather than calling
+  // the student unpaid. Signing in should not end on an error page for that:
+  // send them to the dashboard, where the (app) layout asks again and shows
+  // its own error with a retry if the database is still not answering.
+  try {
+    return (await hasActivePlan()) ? '/dashboard' : '/upgrade';
+  } catch {
+    return '/dashboard';
+  }
 }
 
 /**

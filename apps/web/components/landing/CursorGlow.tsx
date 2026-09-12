@@ -57,5 +57,6 @@ export function CursorGlow() {
     };
   }, []);
 
-  return <div ref={ref} className="cursor-glow" aria-hidden />;
+  // data-chrome: a fixed decoration, which has no business on paper.
+  return <div ref={ref} data-chrome className="cursor-glow" aria-hidden />;
 }

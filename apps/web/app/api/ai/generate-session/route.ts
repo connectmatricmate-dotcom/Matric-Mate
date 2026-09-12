@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { BOARD_LABEL } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi } from '@/lib/ai/guard';
+import { BOARD_LABEL, subjectMedium } from '@matricmate/core';
+import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi, refused, studentMedium } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -129,22 +129,26 @@ export async function POST(req: NextRequest) {
   const chapterId = (body.chapterId ?? '').slice(0, 40);
   if (!kind || !chapterId) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
   const count = Math.min(15, Math.max(3, Number(body.count) || 8));
-  const medium = body.medium === 'ur' ? 'ur' : 'en';
+  // The subject's own language: an Urdu chapter is written in Urdu and an
+  // English one in English, whichever medium the student reads in.
+  const medium = subjectMedium(chapterId, g.board, studentMedium(body.medium, g));
   const topic = (body.topic ?? '').slice(0, 120);
 
-  const grounding = await chapterGrounding(g.admin, chapterId, medium, 24_000, g.grade, g.board);
-  // Null only means the chapter does not exist, or belongs to the other class.
-  // A chapter with no text of ours still builds, from the syllabus.
-  if (!grounding) return NextResponse.json({ error: 'no_content' }, { status: 404 });
-
   try {
+    const grounding = await chapterGrounding(g.admin, chapterId, medium, 24_000, g.grade, g.board);
+    // Null only means the chapter does not exist, or belongs to another class
+    // or board. Its own reason, so the app can say that rather than "try
+    // again", which never helps. A chapter with no text of ours still builds,
+    // from the syllabus.
+    if (!grounding) return NextResponse.json({ error: 'not_in_syllabus', quota: g.quota }, { status: 404 });
+
     const response = await anthropic.messages.create({
       model: AI_MODEL,
       max_tokens: 8000,
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: ITEM_SCHEMAS[kind] } },
       system:
         `You write practice material for ${BOARD_LABEL[g.board]} Class ${g.grade} students (SSC-${g.grade === 10 ? 'II' : 'I'}, Pakistan). ${grounding.grounded ? 'Work ONLY from the chapter text the user provides: every item must be answerable from it.' : 'Follow the chapter brief the user provides.'} Match the board register. Plain text only: no markdown headings, no asterisks or bold markers. Never use an em dash; use a comma, a colon, or a new sentence. ` +
-        languageRule(medium),
+        languageRule(medium, g.grade, g.board),
       messages: [
         {
           role: 'user',
@@ -152,8 +156,12 @@ export async function POST(req: NextRequest) {
         },
       ],
     });
-    if (response.stop_reason === 'refusal') {
-      return NextResponse.json({ error: 'refused', quota: g.quota }, { status: 200 });
+    if (response.stop_reason === 'refusal') return refused(g.quota);
+    // Cut off mid-set, the JSON is unfinished and cannot be parsed. Said here
+    // so the log names the cause instead of a parse error.
+    if (response.stop_reason === 'max_tokens') {
+      console.error('[generate-session] ran out of tokens', { kind, count, medium });
+      return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
     }
     const block = response.content.find((b) => b.type === 'text');
     if (!block) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
@@ -162,14 +170,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
     }
 
-    const { data: chapterRow } = await g.admin.from('chapters').select('subject_id').eq('id', chapterId).maybeSingle();
     const { data: saved, error } = await g.admin
       .from('ai_sessions')
       .insert({
         user_id: g.userId,
         kind,
         title: topic ? `${grounding.title} · ${topic}` : grounding.title,
-        subject_id: chapterRow?.subject_id ?? null,
+        subject_id: grounding.subjectId || null,
         chapter_id: chapterId,
         topic: topic || null,
         medium,
@@ -177,7 +184,10 @@ export async function POST(req: NextRequest) {
       })
       .select('id')
       .single();
-    if (error || !saved) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 500 });
+    if (error || !saved) {
+      console.error('[generate-session] save failed', error?.message);
+      return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 500 });
+    }
 
     const quota = await chargeQuota(g, AI_COST.session);
     return NextResponse.json({ sessionId: saved.id, kind, items, quota });

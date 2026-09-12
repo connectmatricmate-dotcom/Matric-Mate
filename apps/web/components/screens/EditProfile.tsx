@@ -37,7 +37,8 @@ export function EditProfile() {
     setName(state.user.name);
   }
 
-  const nameError = validateName(name);
+  // In the student's language: the rule's message is shown under the field.
+  const nameError = validateName(name, lang);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -46,15 +47,23 @@ export function EditProfile() {
     setBusy(true);
     // Written to the profile row, not just to local state: that row is what
     // the Android app shows and what checkout puts on a receipt.
-    const { error: saveError } = await createClient().from('profiles').update({ name: name.trim() }).eq('id', state.user.id);
+    const supabase = createClient();
+    const { error: saveError } = await supabase.from('profiles').update({ name: name.trim() }).eq('id', state.user.id);
     if (saveError) {
       setBusy(false);
       setError(t('states.errorBody'));
       return;
     }
+    // Here first, so the sign-in event the next line sets off finds the new
+    // name already in place rather than the old one.
+    actions.setName(name.trim());
+    // And the sign-in record, which is where this browser read the name on
+    // every load. With only the row changed, the edit reverted on reload and
+    // the header went back to the signup name. The row is the one that
+    // matters, so a failure here is not worth an error.
+    await supabase.auth.updateUser({ data: { name: name.trim() } });
     // busy stays true through router.push, so the button cannot re-enable
     // during the route transition.
-    actions.setName(name.trim());
     toast(t('account.profileSaved'));
     router.push('/account');
   }
@@ -103,20 +112,22 @@ export function EditProfile() {
 
         <SectionTitle>{t('account.studySetup')}</SectionTitle>
         <Card flat className="py-0">
+          {/* ?edit=1: each opens its own step, saves it and comes back here,
+              instead of walking the whole of onboarding and ending on Home. */}
           <Item
-            href="/onboarding/class"
+            href="/onboarding/class?edit=1"
             title={t('account.classAndBoard')}
-            sub={`Class ${setup?.classLevel ?? 9} · ${boardName(setup?.board, lang)}`}
+            sub={t('tutor.classBadge', { n: setup?.classLevel ?? 9, board: boardName(setup?.board, lang) })}
             icon="book"
           />
           <Item
-            href="/onboarding/medium"
+            href="/onboarding/medium?edit=1"
             title={t('account.medium')}
             sub={setup?.medium === 'ur' ? t('onboarding.mediumUr') : t('onboarding.mediumEn')}
             icon="layers"
           />
           <Item
-            href="/onboarding/subjects"
+            href="/onboarding/subjects?edit=1"
             title={t('account.mySubjects')}
             sub={t('account.subjectsCount', { n: setup?.subjects.length ?? 0 })}
             icon="cards"

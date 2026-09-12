@@ -52,6 +52,7 @@
   --color-onbrand-soft: rgba(255, 255, 255, 0.7);     /* secondary text on a fill */
   --color-onbrand-line: rgba(255, 255, 255, 0.55);    /* a visible border on a fill */
   --color-onbrand-hair: rgba(255, 255, 255, 0.15);    /* a divider on a fill */
+  --color-focusring: rgba(9, 106, 139, 0.13);         /* the halo round a focused field */
 
   /* The plate the wordmark sits on. The mark is two-tone artwork, a mid-dark
      teal and an orange, and the teal half reads at about 2.4:1 on the dark
@@ -77,7 +78,10 @@
 
   --font-display: var(--font-baloo), ui-rounded, system-ui, sans-serif;
   --font-body: var(--font-nunito), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-urdu: var(--font-nastaliq), serif;
+  /* The Nastaliq face is declared for Arabic script only (unicode-range, in
+     app/layout.tsx), so a Latin letter or a digit inside Urdu text falls
+     through to Nunito rather than a resized Arial. */
+  --font-urdu: var(--font-nastaliq), var(--font-nunito), serif;
 
   --radius-card: 16px;
 
@@ -186,6 +190,8 @@ body {
   --color-onbrand-soft: rgba(4, 34, 47, 0.72);
   --color-onbrand-line: rgba(4, 34, 47, 0.55);
   --color-onbrand-hair: rgba(4, 34, 47, 0.18);
+  /* The light halo is a 13% teal that vanishes on a dark field. */
+  --color-focusring: rgba(63, 182, 220, 0.3);
   /* The one token that deliberately does not go dark: see the note above. */
   --color-brandplate: #fafbf7;
   /* `night` and `whatsapp` are deliberately absent: one is already the dark
@@ -210,12 +216,18 @@ body {
   color-scheme: dark;
 }
 
-[lang='ur'] {
-  --font-display: var(--font-urdu);
-  --font-body: var(--font-urdu);
-  --font-latin: var(--font-nunito), system-ui, sans-serif;
-  font-family: var(--font-urdu);
-  line-height: 1.9;
+/* In the base layer, under `.urdu` and `.urdu-inline` in the components layer.
+   Unlayered, this line height would beat both of those classes and every
+   Tailwind leading utility on any element carrying lang="ur", which is every
+   Ur span. */
+@layer base {
+  [lang='ur'] {
+    --font-display: var(--font-urdu);
+    --font-body: var(--font-urdu);
+    --font-latin: var(--font-nunito), system-ui, sans-serif;
+    font-family: var(--font-urdu);
+    line-height: 1.9;
+  }
 }
 
 /* Cursive scripts have no capitals to switch to: asking for them only breaks
@@ -256,31 +268,41 @@ body {
  * `.urdu` is for prose. `.urdu-inline` is for a word or two inside a Latin line:
  * normal leading, and the box is nudged up so the two scripts share an optical
  * baseline instead of a typographic one.
+ *
+ * Both sit in the components layer so a utility on the same element wins:
+ * `text-center` on an Urdu flashcard, `leading-*` where a screen wants it.
+ * Unlayered, they silently beat every utility they share a property with.
  */
-.urdu {
-  font-family: var(--font-urdu);
-  direction: rtl;
-  text-align: right;
-  line-height: 2.1;
+@layer components {
+  .urdu {
+    font-family: var(--font-urdu);
+    direction: rtl;
+    text-align: right;
+    line-height: 2.1;
+  }
+
+  .urdu-inline {
+    font-family: var(--font-urdu);
+    direction: rtl;
+    display: inline-block;
+    /* Nastaliq reads small next to Latin at the same px, and its ink hangs low in
+       the em box. Scale it up relative to whatever it sits beside, then drop the
+       box so the two scripts share an optical baseline. */
+    font-size: 1.22em;
+    line-height: 1;
+    vertical-align: -0.1em;
+  }
 }
 
-.urdu-inline {
-  font-family: var(--font-urdu);
-  direction: rtl;
-  display: inline-block;
-  /* Nastaliq reads small next to Latin at the same px, and its ink hangs low in
-     the em box. Scale it up relative to whatever it sits beside, then drop the
-     box so the two scripts share an optical baseline. */
-  font-size: 1.22em;
-  line-height: 1;
-  vertical-align: -0.1em;
-}
-
-/* Keyboard focus stays visible, for some users it's the only affordance. */
-:focus-visible {
-  outline: 2.5px solid var(--color-teal);
-  outline-offset: 2px;
-  border-radius: 6px;
+/* Keyboard focus stays visible, for some users it's the only affordance.
+   The outline follows each element's own corners; forcing a 6px radius here
+   squared off every round pill and button the moment it took focus. In the
+   base layer so a component can still style its own focus state. */
+@layer base {
+  :focus-visible {
+    outline: 2.5px solid var(--color-teal);
+    outline-offset: 2px;
+  }
 }
 
 /**
@@ -294,7 +316,7 @@ body {
 
 .field-shell:focus-within {
   border-color: var(--color-teal);
-  box-shadow: 0 0 0 3px rgb(9 106 139 / 0.13);
+  box-shadow: 0 0 0 3px var(--color-focusring);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -429,9 +451,11 @@ body {
       box-shadow 0.25s var(--fx-ease);
   }
 
+  /* Half the lift token: the same weight as before on paper, and a shadow
+     that deepens with the theme instead of a teal haze on a dark ground. */
   .lift:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 26px rgba(15, 80, 100, 0.11);
+    box-shadow: 0 12px 26px color-mix(in srgb, var(--shadow-lift) 50%, transparent);
   }
 }
 
@@ -711,16 +735,65 @@ button:disabled,
 /**
  * Printing = the report card's "Save as PDF". Only the page content belongs on
  * paper; the app chrome and the action buttons do not.
+ *
+ * The shells mark their chrome with `data-chrome`. Hiding every `header` also
+ * hid PageHead, which is a header too, so the report card printed with no
+ * title and no month.
  */
 @media print {
-  aside,
-  nav,
-  header,
+  [data-chrome],
   .no-print {
     display: none !important;
   }
   main {
     padding: 0 !important;
+  }
+
+  /* Paper is white whatever the screen was. A dark student's report card
+     would otherwise print pale ink on a navy page, or pale ink on nothing
+     when the browser drops backgrounds. The light values, from @theme. */
+  [data-theme='dark'] {
+    --color-teal: #0a7ea4;
+    --color-tealdark: #063d52;
+    --color-cyan: #22c7d6;
+    --color-tealtint: #e4f1f6;
+    --color-tealtint2: #c9e4ee;
+    --color-ink: #0f3d4c;
+    --color-ink2: #3e6473;
+    --color-ink3: #587a87;
+    --color-paper: #fafbf7;
+    --color-card: #ffffff;
+    --color-line: #d9e2dc;
+    --color-track: #eaf0ec;
+    --color-mute: #d7e0db;
+    --color-orange: #ff8a00;
+    --color-orangedark: #a85700;
+    --color-orangetint: #fff0dc;
+    --color-green: #2e9e5b;
+    --color-greentint: #e7f5ec;
+    --color-red: #d9534f;
+    --color-redtint: #fbeceb;
+    --color-grey: #eff3f0;
+    --color-onbrand: #ffffff;
+    --color-inkghost: rgba(15, 61, 76, 0.15);
+    --color-ink2ghost: rgba(62, 100, 115, 0.15);
+    --color-glass: rgba(250, 251, 247, 0.9);
+    --color-scrim: rgba(15, 61, 76, 0.4);
+    --color-onbrand-soft: rgba(255, 255, 255, 0.7);
+    --color-onbrand-line: rgba(255, 255, 255, 0.55);
+    --color-onbrand-hair: rgba(255, 255, 255, 0.15);
+    --color-focusring: rgba(9, 106, 139, 0.13);
+    --color-brandplate: var(--color-card);
+    --shadow-soft: rgba(15, 80, 100, 0.07);
+    --shadow-lift: rgba(15, 61, 76, 0.22);
+    --shadow-sheet: rgba(15, 61, 76, 0.18);
+    --shadow-ring: rgba(15, 61, 76, 0.08);
+    --glyph-under: #075b78;
+    --glyph-under-accent: #c96d00;
+    --glyph-rest: #aebeb6;
+    --glyph-rest-accent: #c6d2cb;
+
+    color-scheme: light;
   }
 }
 

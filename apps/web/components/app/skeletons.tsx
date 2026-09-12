@@ -10,12 +10,19 @@ import { Page, Rail, Split, Work } from '@/components/app/Page';
 import { Card, Skeleton } from '@/components/ui/primitives';
 
 export function PageHeadSkeleton({ back }: { back?: boolean }) {
+  /* The line boxes of PageHead's eyebrow (11.5px), title (26px at 1.15) and
+     sub (14px), with its own 2px and 4px gaps, so the header arrives without
+     moving the page. The back link is a 44px row with a short label in it. */
   return (
     <div className="mb-5">
-      {back ? <Skeleton className="mb-2 h-4 w-24" /> : null}
-      <Skeleton className="h-3 w-32" />
-      <Skeleton className="mt-2 h-8 w-64 max-w-full" />
-      <Skeleton className="mt-2 h-4 w-44 max-w-full" />
+      {back ? (
+        <div className="mb-1 flex h-11 items-center">
+          <Skeleton className="h-4 w-24" />
+        </div>
+      ) : null}
+      <Skeleton className="h-[17px] w-32" />
+      <Skeleton className="mt-0.5 h-[30px] w-64 max-w-full" />
+      <Skeleton className="mt-1 h-[21px] w-44 max-w-full" />
     </div>
   );
 }
@@ -30,6 +37,21 @@ function RowSkeleton({ last }: { last?: boolean }) {
         <Skeleton className="mt-1.5 h-3 w-56 max-w-full" />
       </div>
     </div>
+  );
+}
+
+/**
+ * A card of list rows, for a list a screen reads in the browser: recent
+ * chats, the inbox. Shaped like Item inside `Card flat py-0`, so the rows
+ * land where the bars were.
+ */
+export function RowsSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <Card flat className="py-0">
+      {Array.from({ length: rows }, (_, i) => (
+        <RowSkeleton key={i} last={i === rows - 1} />
+      ))}
+    </Card>
   );
 }
 
@@ -215,37 +237,108 @@ export function TopperPapersSkeleton() {
   );
 }
 
-/** /session/flashcards: the single big card plus its controls. */
+/**
+ * /session/flashcards: shaped like FlashcardsScreen, which opens on a
+ * SessionHeader (back, progress and its label, the chapter pill) rather than
+ * a PageHead, then the card, the two counts and two full-width buttons.
+ */
 export function FlashcardsSkeleton() {
   return (
     <Page width="focus">
-      <PageHeadSkeleton back />
-      <Skeleton className="h-[320px] w-full rounded-[16px]" />
-      <div className="mt-5 flex justify-center gap-2.5">
-        <Skeleton className="h-11 w-32 rounded-[16px]" />
-        <Skeleton className="h-11 w-32 rounded-[16px]" />
+      <div className="flex items-center gap-2.5 pt-1">
+        <Skeleton className="h-11 w-11 shrink-0 rounded-[14px]" />
+        <div className="min-w-0 flex-1">
+          <Skeleton className="h-[7px] w-full rounded-full" />
+          <Skeleton className="mt-1.5 h-3 w-32 max-w-full" />
+        </div>
+        <Skeleton className="h-[26px] w-20 shrink-0 rounded-full" />
+      </div>
+      <Skeleton className="mt-6 h-[320px] w-full rounded-[22px]" />
+      <div className="mt-4 flex justify-center gap-2">
+        <Skeleton className="h-[26px] w-24 rounded-full" />
+        <Skeleton className="h-[26px] w-24 rounded-full" />
+      </div>
+      <div className="mt-6 flex gap-2.5">
+        <Skeleton className="h-[55px] flex-1 rounded-[16px]" />
+        <Skeleton className="h-[55px] flex-1 rounded-[16px]" />
       </div>
     </Page>
   );
 }
 
-/** /session/shortq and /session/blanks: progress row, prompt, answer area. */
-export function QuestionSkeleton() {
+/**
+ * The in-session screens: the SessionHeader row (back, segments and their
+ * label, the chapter pill), the question, then the answer area in the shape
+ * the screen really has. `kind` picks it: four option bars for MCQs and the
+ * timed test, an answer box for short questions, a row of chips for blanks.
+ * The option bars used to stand in for all three, then vanish.
+ */
+export function QuestionSkeleton({ kind = 'mcq' }: { kind?: 'mcq' | 'shortq' | 'blanks' }) {
   return (
     <Page width="focus">
       <div className="flex items-center gap-2.5 pt-1">
-        <Skeleton className="h-10 w-10 rounded-[13px]" />
-        <Skeleton className="h-2 flex-1 rounded-full" />
-        <Skeleton className="h-6 w-16 rounded-full" />
+        <Skeleton className="h-11 w-11 shrink-0 rounded-[14px]" />
+        <div className="min-w-0 flex-1">
+          <Skeleton className="h-[7px] w-full rounded-full" />
+          <Skeleton className="mt-1.5 h-3 w-32 max-w-full" />
+        </div>
+        <Skeleton className="h-[26px] w-20 shrink-0 rounded-full" />
       </div>
       <Skeleton className="mt-6 h-6 w-11/12" />
       <Skeleton className="mt-2 h-6 w-3/4" />
-      <div className="mt-6 flex flex-col gap-2.5">
-        <Skeleton className="h-14 w-full rounded-[15px]" />
-        <Skeleton className="h-14 w-full rounded-[15px]" />
-        <Skeleton className="h-14 w-full rounded-[15px]" />
-        <Skeleton className="h-14 w-full rounded-[15px]" />
-      </div>
+      {kind === 'shortq' ? (
+        <Skeleton className="mt-6 h-32 w-full rounded-[16px]" />
+      ) : kind === 'blanks' ? (
+        <div className="mt-6 flex flex-wrap gap-2.5">
+          <Skeleton className="h-11 w-24 rounded-full" />
+          <Skeleton className="h-11 w-28 rounded-full" />
+          <Skeleton className="h-11 w-20 rounded-full" />
+          <Skeleton className="h-11 w-24 rounded-full" />
+        </div>
+      ) : (
+        <div className="mt-6 flex flex-col gap-2.5">
+          <Skeleton className="h-14 w-full rounded-[15px]" />
+          <Skeleton className="h-14 w-full rounded-[15px]" />
+          <Skeleton className="h-14 w-full rounded-[15px]" />
+          <Skeleton className="h-14 w-full rounded-[15px]" />
+        </div>
+      )}
     </Page>
+  );
+}
+
+/**
+ * /tutor/chat: the chat owns the viewport (see ChatScreen), a header strip,
+ * the conversation and the composer pinned under it. The generic page
+ * skeleton drew a page heading and a list at page width, then the column
+ * replaced it at a different width and height.
+ */
+export function ChatSkeleton() {
+  return (
+    <div className="-mx-4 -mb-28 -mt-6 flex h-[calc(100dvh-3.5rem-58px-env(safe-area-inset-bottom))] flex-col md:-mx-8 md:-mb-16 md:h-[calc(100dvh-3.5rem)]">
+      <div className="border-b border-line bg-paper px-4 py-2 md:px-8">
+        <div className="mx-auto flex w-full max-w-[820px] items-center gap-2.5">
+          <Skeleton className="h-11 w-11 shrink-0 rounded-[14px]" />
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="mt-1.5 h-3 w-40 max-w-full" />
+          </div>
+        </div>
+      </div>
+      <div className="min-h-0 flex-1 px-4 md:px-8">
+        <div className="mx-auto flex w-full max-w-[820px] flex-col gap-4 py-5">
+          <Skeleton className="h-14 w-3/4 self-end" />
+          <Skeleton className="h-28 w-[85%] self-start" />
+        </div>
+      </div>
+      <div className="border-t border-line bg-card px-4 py-3 md:px-8">
+        <div className="mx-auto flex w-full max-w-[820px] items-center gap-2.5">
+          <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
+          <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
+          <Skeleton className="h-11 min-w-0 flex-1 rounded-full" />
+          <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
+        </div>
+      </div>
+    </div>
   );
 }

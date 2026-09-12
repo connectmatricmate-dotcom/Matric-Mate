@@ -1,8 +1,9 @@
 import 'server-only';
 import { cache } from 'react';
-import { api, fetchAiSession } from '@matricmate/core';
+import { api, fetchAiSession, hasStudyMaterial } from '@matricmate/core';
 import type { Medium, PlayableTrack } from '@matricmate/core';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getUser } from '@/lib/supabase/server';
+import { readUiLanguage } from '@/lib/ui-language.server';
 
 /**
  * Server-side content readers, deduplicated with React.cache.
@@ -36,15 +37,13 @@ const client = cache(() => createClient());
  * request shares it. Nothing server-side ever set it, so it stayed 'en' and
  * every Urdu-medium student was served English notes on the reader, the
  * chapter hub and all three practice pages.
+ *
+ * Read from the language cookie, the same place the interface language comes
+ * from, because the two are one switch. It used to come from the profile,
+ * which the switch saves a moment after it re-fetches the page, so the notes
+ * came back in the old language while the chrome around them had flipped.
  */
-const studentMedium = cache(async (): Promise<Medium> => {
-  const supabase = await client();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return 'en';
-  const { data } = await supabase.from('profiles').select('onboarding').eq('id', auth.user.id).maybeSingle();
-  const onboarding = data?.onboarding as { medium?: Medium } | null;
-  return onboarding?.medium === 'ur' ? 'ur' : 'en';
-});
+const studentMedium = cache(async (): Promise<Medium> => readUiLanguage());
 
 /**
  * Where to start a practice session when the URL names no chapter.
@@ -56,32 +55,38 @@ const studentMedium = cache(async (): Promise<Medium> => {
  * the website did not, so the two apps sent the same tap to different places.
  *
  * Follows the student instead: the chapter they read last, else the first
- * chapter of their first subject. Falls back to the same constant only when
- * there is nothing at all to go on.
+ * chapter with something to practise in their first subject that has one.
+ * Only ever one of their own chapters, checked against the subject's list,
+ * which row level security scopes to their board and class: the last chapter
+ * read can belong to a board or class they have since left, and the tiles
+ * then opened a chapter the database would not serve. The literal fallback
+ * went for the same reason. An empty string means there is nothing to go on,
+ * and the caller decides (see app/(app)/session/practice-chapter.ts).
  */
 export const defaultChapterId = cache(async (): Promise<string> => {
+  // The request's one verified read of who is asking, not a second round trip.
+  const user = await getUser();
+  if (!user) return '';
   const supabase = await client();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return 'phy-1';
 
   // The most recently read section carries the chapter they were last in.
   const { data: last } = await supabase
     .from('read_sections')
     .select('chapter_id')
-    .eq('user_id', auth.user.id)
+    .eq('user_id', user.id)
     .order('at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (last?.chapter_id) return last.chapter_id as string;
+  const lastId = typeof last?.chapter_id === 'string' ? last.chapter_id : '';
+  if (lastId && (await getChapters(lastId.split('-')[0])).some((c) => c.id === lastId)) return lastId;
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('onboarding,grade')
-    .eq('id', auth.user.id)
-    .maybeSingle();
+  const { data: profile } = await supabase.from('profiles').select('onboarding').eq('id', user.id).maybeSingle();
   const subjects = (profile?.onboarding as { subjects?: string[] } | null)?.subjects ?? [];
-  const chapters = await api.getChapters(subjects[0] ?? 'phy', supabase);
-  return chapters[0]?.id ?? 'phy-1';
+  for (const subject of subjects) {
+    const first = (await getChapters(subject)).find(hasStudyMaterial);
+    if (first) return first.id;
+  }
+  return '';
 });
 
 export const getChapter = cache(async (id: string) => api.getChapter(id, await client()));

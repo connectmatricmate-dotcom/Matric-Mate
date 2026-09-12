@@ -1,40 +1,38 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { Flashcard } from '@matricmate/core';
-import { chapterById, chapterName } from '@matricmate/core';
+import type { Chapter, Flashcard } from '@matricmate/core';
+import { chapterName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Icon, LinkBtn, Pill, ScriptText, Ur } from '@/components/ui/primitives';
+import { Card, Empty, Icon, LinkBtn, Pill, ScriptText, Ur } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useLang, useT } from '@/lib/store';
 
-export function FlashcardsScreen({
-  chapterId,
-  chapterTitle,
-  cards,
-}: {
-  chapterId: string;
-  chapterTitle: string;
-  cards: Flashcard[];
-}) {
+export function FlashcardsScreen({ chapter, cards }: { chapter: Chapter; cards: Flashcard[] }) {
   const { actions } = useApp();
   const t = useT();
   const { lang } = useLang();
-  /* The name a student reads, which is not the name an attempt is filed
-     under. `chapterTitle` comes from the server in English and keeps feeding
-     `topic` so weak-topic stats do not split in two when somebody switches
-     language; the heading and the pill follow the app's language instead. */
-  const chapter = chapterById(chapterId);
-  const name = chapter ? chapterName(chapter, lang) : chapterTitle;
+  /* From the server, under the student's own session. The client index this
+     used to read is empty on a cold load for Class 10 and Punjab, so the
+     heading fell back to an English title. */
+  const chapterId = chapter.id;
+  const name = chapterName(chapter, lang);
+  /* The cards in play. "Review repeats" narrows it to the ones marked for
+     another go; it used to restart the whole deck, known cards and all. Kept
+     as ids over the prop rather than a copy of it, so a language switch that
+     re-fetches the cards still shows the new ones. */
+  const [reviewing, setReviewing] = useState<string[] | null>(null);
+  const review = reviewing ? cards.filter((c) => reviewing.includes(c.id)) : [];
+  const deck = review.length ? review : cards;
   const [i, setI] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [repeats, setRepeats] = useState<string[]>([]);
   const [known, setKnown] = useState<string[]>([]);
 
-  const card = cards[i];
-  const done = i >= cards.length;
+  const card = deck[i];
+  const done = deck.length > 0 && i >= deck.length;
 
   // The finish deserves a bang. No-op under reduced motion.
   useEffect(() => {
@@ -48,6 +46,22 @@ export function FlashcardsScreen({
     else setRepeats((r) => [...r, card.id]);
     setFlipped(false);
     setI(i + 1);
+  }
+
+  /* Nothing to flip. A finished-set screen with confetti over "0 known, 0 to
+     repeat" is what this used to show. */
+  if (deck.length === 0) {
+    return (
+      <Page width="focus">
+        <PageHead back={`/learn/chapter/${chapterId}`} backLabel={name} title={t('study.flashcards')} />
+        <Empty
+          icon="cards"
+          title={t('session.noItemsTitle')}
+          sub={t('session.noItemsBody')}
+          cta={<LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} variant="line" sm />}
+        />
+      </Page>
+    );
   }
 
   if (done) {
@@ -68,6 +82,7 @@ export function FlashcardsScreen({
             <Btn
               title={t('session.reviewRepeats', { n: repeats.length })}
               onClick={() => {
+                setReviewing(repeats);
                 setI(0);
                 setRepeats([]);
                 setKnown([]);
@@ -85,9 +100,9 @@ export function FlashcardsScreen({
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
         backLabel={name}
-        pct={(i / Math.max(1, cards.length)) * 100}
-        label={`${t('study.flashcards')} · ${t('session.cardOf', { a: i + 1, b: cards.length })}`}
-        segments={cards.map((_, j) => (j < i ? 'done' : j === i ? 'current' : 'todo'))}
+        pct={(i / deck.length) * 100}
+        label={`${t('study.flashcards')} · ${t('session.cardOf', { a: i + 1, b: deck.length })}`}
+        segments={deck.map((_, j) => (j < i ? 'done' : j === i ? 'current' : 'todo'))}
         right={<Pill tone="grey">{name}</Pill>}
       />
 
@@ -102,16 +117,17 @@ export function FlashcardsScreen({
             flipped ? '[transform:rotateY(180deg)]' : ''
           }`}
         >
-          {/* term */}
-          <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-y-auto rounded-[22px] border-[1.5px] border-line bg-card p-6 [backface-visibility:hidden]">
-            <span className="text-[11px] font-extrabold tracking-[0.08em] text-ink2">{t('session.cardTerm')}</span>
+          {/* term. justify-center-safe: a long definition centred in a fixed
+              box overflows upward, past the top, where no scrolling reaches. */}
+          <span className="absolute inset-0 flex flex-col items-center justify-center-safe gap-3 overflow-y-auto rounded-[22px] border-[1.5px] border-line bg-card p-6 [backface-visibility:hidden]">
+            <span className="text-[11px] font-extrabold tracking-[0.08em] text-ink2 rtl:tracking-normal">{t('session.cardTerm')}</span>
             <ScriptText text={card.front} className="text-center font-display text-[23px] text-ink" urduClassName="text-center text-[20px] text-ink" />
             <span className="text-[13px] text-ink2">{t('session.tapToFlip')}</span>
           </span>
 
           {/* definition */}
-          <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-y-auto rounded-[22px] bg-teal p-6 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <span className="text-[11px] font-extrabold tracking-[0.08em] text-onbrand-soft">{t('session.cardDefinition')}</span>
+          <span className="absolute inset-0 flex flex-col items-center justify-center-safe gap-3 overflow-y-auto rounded-[22px] bg-teal p-6 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+            <span className="text-[11px] font-extrabold tracking-[0.08em] text-onbrand-soft rtl:tracking-normal">{t('session.cardDefinition')}</span>
             <ScriptText text={card.back} className="text-center text-[16px] leading-[1.6] text-onbrand" urduClassName="text-center text-[15px] text-onbrand" />
             {card.urduBack ? <Ur block className="block text-center text-[14px] text-onbrand-soft">{card.urduBack}</Ur> : null}
           </span>

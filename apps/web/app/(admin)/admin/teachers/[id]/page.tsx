@@ -1,8 +1,7 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { affiliateByUserId, payouts, referredStudents, totalsFor } from '@/lib/affiliates';
 import { SITE_URL } from '@/lib/site';
-import { Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { BackLink, Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
 import { RecordPayout, ToggleActive } from '@/components/admin/TeacherControls';
 
 export const dynamic = 'force-dynamic';
@@ -25,16 +24,13 @@ export default async function TeacherPage({ params }: { params: Promise<{ id: st
 
   return (
     <>
-      <Link
-        href="/admin/teachers"
-        className="mb-1 inline-block text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
-      >
-        Teachers
-      </Link>
+      <BackLink href="/admin/teachers">Teachers</BackLink>
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-[26px] text-ink">{row.fullName}</h1>
-          <p className="mt-0.5 text-[13.5px] text-ink2">
+        {/* min-w-0 and wrap-anywhere: an email is one long word, and a long
+            one pushed this block past the edge of a phone screen. */}
+        <div className="min-w-0">
+          <h1 className="font-display text-[26px] text-ink wrap-anywhere">{row.fullName}</h1>
+          <p className="mt-0.5 text-[13.5px] text-ink2 wrap-anywhere">
             {row.email} · {row.commissionPct}% of everything their students pay
             {row.active ? null : (
               <span className="ms-2">
@@ -54,7 +50,10 @@ export default async function TeacherPage({ params }: { params: Promise<{ id: st
       <div className="mt-3">
         <StatGrid>
           <Stat value={String(totals.students)} label="Students joined" />
-          <Stat value={String(totals.paidStudents)} label="Paying" tone="green" />
+          {/* "Have paid", not "Paying": the count is everyone who has ever paid,
+              which is what commission is earned on, and a lapsed plan does not
+              take them off it. */}
+          <Stat value={String(totals.paidStudents)} label="Have paid" tone="green" />
           <Stat value={String(totals.students - totals.paidStudents)} label="Not paid yet" tone="orange" />
           <Stat value={rupees(totals.earned)} label={`Earned · ${row.commissionPct}% of ${rupees(totals.gross)}`} tone="teal" />
           <Stat
@@ -78,13 +77,13 @@ export default async function TeacherPage({ params }: { params: Promise<{ id: st
               <Row key={s.id}>
                 <Td>
                   {s.name}
-                  <span className="block text-[11.5px] text-ink3">{s.email}</span>
+                  <span className="block text-[11.5px] text-ink3 wrap-anywhere">{s.email}</span>
                 </Td>
-                <Td>{s.grade ? `Class ${s.grade}` : ''}</Td>
-                <Td>{when(s.joinedAt)}</Td>
-                <Td>{s.paid ? <Tag tone="green">paying</Tag> : <Tag tone="grey">not yet</Tag>}</Td>
-                <Td>{s.spend ? rupees(s.spend) : ''}</Td>
-                <Td>{s.spend ? rupees(Math.round((s.spend * row.commissionPct) / 100)) : ''}</Td>
+                <Td num>{s.grade ? `Class ${s.grade}` : ''}</Td>
+                <Td num>{when(s.joinedAt)}</Td>
+                <Td>{s.paid ? <Tag tone="green">has paid</Tag> : <Tag tone="grey">not yet</Tag>}</Td>
+                <Td num>{s.spend ? rupees(s.spend) : ''}</Td>
+                <Td num>{s.spend ? rupees(Math.round((s.spend * row.commissionPct) / 100)) : ''}</Td>
               </Row>
             ))}
           </Table>
@@ -98,9 +97,11 @@ export default async function TeacherPage({ params }: { params: Promise<{ id: st
           <Table head={['Date', 'Amount', 'Note']}>
             {history.map((p) => (
               <Row key={p.id}>
-                <Td>{when(p.at)}</Td>
-                <Td className="font-extrabold">{rupees(p.amount)}</Td>
-                <Td>{p.note ?? ''}</Td>
+                <Td num>{when(p.at)}</Td>
+                <Td num className="font-extrabold">
+                  {rupees(p.amount)}
+                </Td>
+                <Td className="wrap-anywhere">{p.note ?? ''}</Td>
               </Row>
             ))}
           </Table>
@@ -127,7 +128,8 @@ function Detail({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
       <dt className="text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink3">{label}</dt>
-      <dd className="text-[13.5px] text-ink">{value?.trim() || <span className="text-ink3">not recorded</span>}</dd>
+      {/* wrap-anywhere: an account number or a long note is otherwise cut off by the panel. */}
+      <dd className="text-[13.5px] text-ink wrap-anywhere">{value?.trim() || <span className="text-ink3">not recorded</span>}</dd>
     </div>
   );
 }

@@ -13,7 +13,7 @@
  * A demo that fights the person trying to use it is worse than no demo.
  */
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import type { Mcq } from '@matricmate/core';
+import { XP, type Confidence, type Mcq } from '@matricmate/core';
 import { Btn, Card, Icon, Pill } from '@/components/ui';
 
 const CONFIDENCE = [
@@ -119,15 +119,20 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
     // Exact height on desktop, not a minimum. Answering swaps a button for an
     // explanation; if the card could grow by a pixel the hero grid would
     // re-centre and the headline would jump under the reader's cursor.
+    // A tablet gets the same height as a floor instead: its column is about
+    // 320px wide, where four wrapped options can need more than 512px, and a
+    // card that grows is better than one whose answers spill out of it.
     // The wrapper carries the handler because Card is a server-safe primitive
     // with no event props, and one listener here beats one per control.
     <div onPointerDown={stopAuto} className="w-full max-w-[430px]">
     <Card
-      className="relative flex w-full flex-col shadow-[0_24px_70px_rgba(4,34,47,0.45)] md:h-[512px]"
+      className="relative flex w-full flex-col shadow-[0_24px_70px_rgba(4,34,47,0.45)] md:min-h-[512px] lg:h-[512px]"
     >
+      {/* What the app really awards for this answer: 12 for certain, 10 for
+          fairly sure, 5 for a guess, the same table the page quotes below. */}
       {checked && correct ? (
-        <span className="fx-xp pointer-events-none absolute -top-3 right-5 rounded-full bg-greentint px-3 py-1 text-[12px] font-extrabold text-green">
-          +10 XP
+        <span className="fx-xp pointer-events-none absolute -top-3 end-5 rounded-full bg-greentint px-3 py-1 text-[12px] font-extrabold text-green">
+          +{XP.forAnswer(true, confidence as Confidence | null)} XP
         </span>
       ) : null}
 
@@ -152,9 +157,11 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
             idle: 'border-line bg-card hover:border-tealtint2',
           }[state];
           const key = {
-            ok: 'bg-green text-white',
-            bad: 'bg-red text-white',
-            sel: 'bg-teal text-white',
+            // onbrand, not white: these fills brighten in the dark theme and
+            // white on them drops to about 2:1.
+            ok: 'bg-green text-onbrand',
+            bad: 'bg-red text-onbrand',
+            sel: 'bg-teal text-onbrand',
             idle: 'bg-grey text-ink2',
           }[state];
           return (
@@ -166,19 +173,22 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
                 stopAuto();
                 setChosen(i);
               }}
-              className={`flex items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-2.5 text-left transition-all duration-300 ${style}`}
+              className={`flex items-center gap-3 rounded-[15px] border-[1.5px] px-3.5 py-2.5 text-start transition-all duration-300 ${style}`}
             >
               <span className={`flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-[9px] text-[12px] font-extrabold transition-colors duration-300 ${key}`}>
                 {String.fromCharCode(65 + i)}
               </span>
               <span className="text-[15px] text-ink">{opt}</span>
-              {checked && isAnswer ? <Icon name="check" size={18} className="ml-auto text-green" strokeWidth={2.6} /> : null}
+              {checked && isAnswer ? <Icon name="check" size={18} className="ms-auto shrink-0 text-green" strokeWidth={2.6} /> : null}
             </button>
           );
         })}
       </div>
 
-      <div className="flex min-h-[150px] min-w-0 flex-1 flex-col justify-end md:overflow-y-auto">
+      {/* Tall enough on a phone for the longest state, the explanation, so the
+          card holds one height through the loop instead of nudging the
+          marquee below it at every step. */}
+      <div className="flex min-h-[190px] min-w-0 flex-1 flex-col justify-end lg:min-h-[150px] lg:overflow-y-auto">
         {chosen !== null && !checked ? (
           <div className="fx-rise mt-4">
             <p className="mb-2 text-[12px] font-extrabold uppercase tracking-[0.08em] text-ink2">How sure are you?</p>
@@ -216,11 +226,11 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
           />
         ) : (
           <div
-            className={`fx-rise mt-4 overflow-hidden rounded-[16px] border border-l-[3px] bg-card ${
+            className={`fx-rise mt-4 overflow-hidden rounded-[16px] border border-s-[3px] bg-card ${
               correct ? 'border-green' : 'border-red'
             }`}
           >
-            <div className={`flex items-center gap-2 px-3.5 py-2 ${correct ? 'bg-greentint' : 'bg-redtint'}`}>
+            <div className={`flex items-center gap-2 px-3.5 py-1 ${correct ? 'bg-greentint' : 'bg-redtint'}`}>
               <Icon
                 name={correct ? 'check' : 'close'}
                 size={16}
@@ -233,7 +243,7 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
               <button
                 type="button"
                 onClick={reset}
-                className="-mr-1 flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[12px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-card hover:text-teal"
+                className="-me-1.5 flex min-h-11 shrink-0 items-center gap-1 rounded-full px-3 text-[12px] font-extrabold text-ink2 transition-colors duration-200 hover:bg-card hover:text-teal"
               >
                 <Icon name="refresh" size={13} strokeWidth={2.6} />
                 Try again

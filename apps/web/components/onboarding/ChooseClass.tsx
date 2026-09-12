@@ -5,11 +5,15 @@ import { useState } from 'react';
 import { Confirm } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { GRADE_10_READY } from '@matricmate/core';
+import { createClient } from '@/lib/supabase/client';
 import { useApp, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen } from './StepScreen';
 
-export function ChooseClass() {
-  const { state, actions } = useApp();
+/** How long a class change may be corrected without the cooldown. Migration 0014. */
+const CORRECTION_MS = 30 * 60 * 1000;
+
+export function ChooseClass({ edit = false }: { edit?: boolean }) {
+  const { state, synced, actions } = useApp();
   const t = useT();
   const router = useRouter();
   const toast = useToast();
@@ -21,9 +25,37 @@ export function ChooseClass() {
    * switchClass knows how to do that safely.
    */
   const current = state.onboarding?.classLevel;
-  const [value, setValue] = useState<9 | 10>(current ?? 9);
+  /*
+   * What the student tapped, kept apart from what the account says. Seeding
+   * one state from the other on the first render read the store before it had
+   * loaded, so after a refresh a Class 10 student saw Class 9 selected and
+   * was asked to confirm switching to it.
+   */
+  const [picked, setPicked] = useState<9 | 10 | null>(null);
+  const value = picked ?? current ?? 9;
   const [confirming, setConfirming] = useState(false);
   const [switching, setSwitching] = useState(false);
+  const next = edit ? '/onboarding/board?edit=1' : '/onboarding/board';
+
+  /**
+   * A second change inside half an hour of the first is the same decision
+   * being corrected, and the server allows it without a cooldown. Before any
+   * study there is also nothing to lose, so a student who picked Class 10,
+   * walked on and came back is not shown the warning about losing progress
+   * and waiting a week, neither of which applies to them.
+   */
+  const isCorrection = async (): Promise<boolean> => {
+    const studied = state.attempts.length || state.readSections.length || state.results.length || state.cardsKnown.length;
+    if (studied || !state.user) return false;
+    const { data, error } = await createClient()
+      .from('profiles')
+      .select('grade_changed_at')
+      .eq('id', state.user.id)
+      .maybeSingle();
+    if (error || !data) return false;
+    if (!data.grade_changed_at) return true;
+    return Date.now() - Date.parse(data.grade_changed_at as string) < CORRECTION_MS;
+  };
 
   /**
    * Changing an existing class goes through switchClass, exactly as the
@@ -34,19 +66,18 @@ export function ChooseClass() {
    * app never looked, and the two disagreed until the next hydration resolved
    * it by clearing local progress. No warning before, no message after.
    */
-  const change = () => {
+  const change = async () => {
     if (switching) return;
     setSwitching(true);
-    void actions.switchClass(value).then((r) => {
-      setSwitching(false);
-      setConfirming(false);
-      if (r === 'ok') {
-        toast(t('tutor.classChanged', { n: value }));
-        router.push('/onboarding/board');
-      } else {
-        toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
-      }
-    });
+    const r = await actions.switchClass(value);
+    setSwitching(false);
+    setConfirming(false);
+    if (r === 'ok') {
+      toast(t('tutor.classChanged', { n: value }));
+      router.push(next);
+    } else {
+      toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+    }
   };
 
   return (
@@ -56,21 +87,29 @@ export function ChooseClass() {
         title={t('onboarding.classTitle')}
         sub={t('onboarding.classSub')}
         cta={t('common.continue')}
-        back={false}
-        onNext={() => {
+        backHref={edit ? '/account/edit' : undefined}
+        waiting={!synced}
+        onNext={async () => {
           if (current && value !== current) {
-            setConfirming(true);
+            if (await isCorrection()) await change();
+            else setConfirming(true);
             return;
           }
-          actions.setOnboarding({ classLevel: value });
-          router.push('/onboarding/board');
+          // Waited on, not fired and forgotten. The class is what row level
+          // security serves content by, and a lost write here left the
+          // student on Class 9 content with Class 10 on screen.
+          if (!(await actions.setOnboarding({ classLevel: value }))) {
+            toast(t('states.errorBody'));
+            return;
+          }
+          router.push(next);
         }}
       >
         <ChoiceCard
           title={t('onboarding.class9')}
           sub={t('onboarding.class9Sub')}
           selected={value === 9}
-          onClick={() => setValue(9)}
+          onClick={() => setPicked(9)}
         />
         {/* Class 10 is a real choice the day its catalogue ships. Hardcoding
             the card shut meant a Class 10 student had to sign up as Class 9
@@ -81,7 +120,7 @@ export function ChooseClass() {
           selected={value === 10}
           disabled={!GRADE_10_READY}
           disabledLabel={GRADE_10_READY ? undefined : t('onboarding.comingSoon')}
-          onClick={() => (GRADE_10_READY ? setValue(10) : toast(t('onboarding.class10Toast')))}
+          onClick={() => (GRADE_10_READY ? setPicked(10) : toast(t('onboarding.class10Toast')))}
         />
       </StepScreen>
 
@@ -96,7 +135,7 @@ export function ChooseClass() {
         cancelLabel={t('common.cancel')}
         tone="orange"
         loading={switching}
-        onConfirm={change}
+        onConfirm={() => void change()}
       />
     </>
   );

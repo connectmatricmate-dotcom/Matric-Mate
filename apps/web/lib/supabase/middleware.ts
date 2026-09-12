@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { planIsActive } from '@/lib/entitlement';
 
 /** Signed-in students only. Everything else is public or handles its own state. */
 // '/r' is deliberately absent: a teacher's referral link has to work for
@@ -169,14 +170,38 @@ export async function updateSession(request: NextRequest) {
   const needsPlan = isProtected && !starts(OPEN_WITHOUT_PLAN) && !starts(['/admin', '/affiliate']);
 
   if (user && needsPlan && !isPrefetch) {
-    const { data: ent } = await supabase.from('entitlements').select('active, valid_till').maybeSingle();
-    const paid = Boolean(ent?.active && ent.valid_till && new Date(ent.valid_till).getTime() > Date.now());
+    /*
+     * A read that failed or timed out is not an answer, so it fails open, the
+     * same way the auth call above does, and the layout's own check decides.
+     *
+     * It used to fail closed: an empty read looked like "no plan", a paying
+     * student was sent to /upgrade, the layout there read the plan fine and
+     * sent them back to /dashboard, this timed out again, and the two bounced
+     * them until the browser stopped with too many redirects. Nothing leaks by
+     * failing open: the layout's check is the authoritative one and still
+     * stands between an unpaid student and the screen.
+     */
+    let paid = false;
+    try {
+      const { data: ent, error } = await supabase.from('entitlements').select('active, valid_till').maybeSingle();
+      if (error) return response;
+      paid = planIsActive(ent);
+    } catch {
+      return response;
+    }
     if (!paid) {
       // Staff have no plan and no business here either, but they are turned
       // away by role in their own layouts; sending them to a price list is
       // the absurdity keepStaffOut() exists to prevent. Let the render decide.
-      const { data: profile } = await supabase.from('profiles').select('role').maybeSingle();
-      if (!profile?.role || profile.role === 'student') {
+      let role: string | null = null;
+      try {
+        const { data: profile, error } = await supabase.from('profiles').select('role').maybeSingle();
+        if (error) return response;
+        role = (profile?.role as string | null) ?? null;
+      } catch {
+        return response;
+      }
+      if (!role || role === 'student') {
         const upgrade = request.nextUrl.clone();
         upgrade.pathname = '/upgrade';
         upgrade.search = '';

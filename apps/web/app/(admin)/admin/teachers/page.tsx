@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { allAffiliates } from '@/lib/affiliates';
 import { CellLink, Panel, Row, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { LinkBtn } from '@/components/ui/primitives';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,12 +22,7 @@ export default async function TeachersPage() {
             {rows.length ? `${rows.length} on the programme.` : 'Nobody on the programme yet.'}
           </p>
         </div>
-        <Link
-          href="/admin/teachers/new"
-          className="shrink-0 rounded-full bg-teal px-4 py-2.5 text-[13px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110"
-        >
-          Add a teacher
-        </Link>
+        <LinkBtn title="Add a teacher" href="/admin/teachers/new" sm className="shrink-0" />
       </div>
 
       {rows.length === 0 ? (
@@ -39,14 +34,16 @@ export default async function TeachersPage() {
         </Panel>
       ) : (
         <Panel title="On the programme">
-          <Table head={['Teacher', 'Code', 'Share', 'Students', 'Paying', 'Not yet', 'Earned', 'Paid out', 'Outstanding']}>
+          {/* "Have paid" counts everyone who has ever paid, which is what the
+              commission is earned on, so it does not say "Paying". */}
+          <Table head={['Teacher', 'Code', 'Share', 'Students', 'Have paid', 'Not yet', 'Earned', 'Paid out', 'Outstanding']}>
             {rows.map(({ row, totals }) => (
               <Row key={row.userId}>
                 <Td>
                   <CellLink href={`/admin/teachers/${row.userId}`}>{row.fullName}</CellLink>
-                  <span className="block text-[11.5px] font-normal text-ink3">{row.email}</span>
+                  <span className="block text-[11.5px] font-normal text-ink3 wrap-anywhere">{row.email}</span>
                 </Td>
-                <Td>
+                <Td num>
                   <span className="font-mono text-[12.5px]">{row.code}</span>
                   {row.active ? null : (
                     <span className="ms-2">
@@ -54,13 +51,13 @@ export default async function TeachersPage() {
                     </span>
                   )}
                 </Td>
-                <Td>{row.commissionPct}%</Td>
-                <Td>{totals.students}</Td>
-                <Td>{totals.paidStudents}</Td>
-                <Td>{totals.students - totals.paidStudents}</Td>
-                <Td>{rupees(totals.earned)}</Td>
-                <Td>{rupees(totals.paidOut)}</Td>
-                <Td className="font-extrabold">
+                <Td num>{row.commissionPct}%</Td>
+                <Td num>{totals.students}</Td>
+                <Td num>{totals.paidStudents}</Td>
+                <Td num>{totals.students - totals.paidStudents}</Td>
+                <Td num>{rupees(totals.earned)}</Td>
+                <Td num>{rupees(totals.paidOut)}</Td>
+                <Td num className="font-extrabold">
                   {totals.outstanding > 0 ? (
                     <span className="text-orangedark">{rupees(totals.outstanding)}</span>
                   ) : totals.outstanding < 0 ? (

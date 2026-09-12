@@ -1,18 +1,20 @@
 import type { Metadata } from 'next';
 import { keepStaffOut } from '@/lib/roles';
 import Link from 'next/link';
-import { AI_QUOTA } from '@matricmate/core';
+import { AI_QUOTA, SUPPORT_EMAIL } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { PayMark } from '@/components/commerce/PayMark';
 import { PlanPicker } from '@/components/commerce/PlanPicker';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
 import { PAYMENT_METHODS } from '@/lib/plans';
+import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
     'Rs 1,000 a month for everything in MatricMate: every chapter, unlimited practice, past papers and the AI tutor. Nothing renews on its own.',
+  alternates: { canonical: canonicalUrl('/pricing') },
 };
 
 /** Row-by-row, so a parent can see exactly where the money goes. */
@@ -31,7 +33,7 @@ const COMPARE: { feature: string; premium: string }[] = [
 const QUESTIONS = [
   {
     q: 'What happens when my plan runs out?',
-    a: 'Nothing renews on its own. The end date sits on your account page from the day you pay, so you can see it coming; if you want to carry on, you pay then. If you don’t, your progress stays on the account and it simply stops unlocking new chapters.',
+    a: 'Nothing renews on its own. The end date sits on your account page from the day you pay, so you can see it coming; if you want to carry on, you pay then. If you don’t, the chapters, tests and tutor lock until you do, and your progress stays on the account for when you come back.',
   },
   {
     q: 'Can I pay from a mobile account?',
@@ -47,7 +49,7 @@ const QUESTIONS = [
   },
   {
     q: 'Is there a discount for a whole class or school?',
-    a: 'Yes, for ten students or more. Message us on WhatsApp and we’ll set it up.',
+    a: `Yes, for ten students or more. Write to ${SUPPORT_EMAIL} and we’ll set it up.`,
   },
 ];
 
@@ -82,14 +84,17 @@ export default async function PricingPage() {
               bigger one.
             </p>
 
+            {/* No minimum width: two short columns fit a phone, and a table
+                that scrolled sideways put "With your plan" half off-screen
+                with nothing to say it moved. */}
             <div className="mt-7 overflow-x-auto">
-              <table className="w-full min-w-[420px] border-collapse text-left">
+              <table className="w-full border-collapse text-start">
                 <thead>
                   <tr className="border-b-2 border-line">
-                    <th scope="col" className="py-3 text-[12px] font-extrabold uppercase tracking-[0.07em] text-ink3">
+                    <th scope="col" className="py-3 pe-4 text-start text-[12px] font-extrabold uppercase tracking-[0.07em] text-ink3">
                       What you get
                     </th>
-                    <th scope="col" className="w-[190px] py-3 text-[12px] font-extrabold uppercase tracking-[0.07em] text-orangedark">
+                    <th scope="col" className="w-[45%] py-3 text-start text-[12px] font-extrabold uppercase tracking-[0.07em] text-orangedark sm:w-[190px]">
                       With your plan
                     </th>
                   </tr>
@@ -97,7 +102,7 @@ export default async function PricingPage() {
                 <tbody>
                   {COMPARE.map((row) => (
                     <tr key={row.feature} className="border-b border-line">
-                      <th scope="row" className="py-3 text-[15px] font-normal text-ink">
+                      <th scope="row" className="py-3 pe-4 text-start text-[15px] font-normal text-ink">
                         {row.feature}
                       </th>
                       <td className="py-3 text-[15px] font-extrabold text-ink">{row.premium}</td>
@@ -135,12 +140,14 @@ export default async function PricingPage() {
             <h2 className="font-display text-mk-h2 text-ink">Before you pay</h2>
             <div className="mt-7 flex flex-col gap-3">
               {QUESTIONS.map((f) => (
-                <details key={f.q} className="group rounded-[16px] border border-line bg-card px-5 py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-extrabold text-ink">
+                // The padding lives on the summary, so the whole row is the tap
+                // target rather than the words in the middle of it.
+                <details key={f.q} className="group rounded-[16px] border border-line bg-card">
+                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-[16px] font-extrabold text-ink [&::-webkit-details-marker]:hidden">
                     {f.q}
                     <Icon name="plus" size={18} className="shrink-0 text-ink3 transition-transform duration-200 group-open:rotate-45" />
                   </summary>
-                  <p className="faq-a mt-3 text-mk-body text-ink2">{f.a}</p>
+                  <p className="faq-a px-5 pb-4 text-mk-body text-ink2">{f.a}</p>
                 </details>
               ))}
             </div>

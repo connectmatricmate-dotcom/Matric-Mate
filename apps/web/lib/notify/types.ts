@@ -25,6 +25,22 @@ export type NotificationTarget =
   | 'payments'
   | 'subscription';
 
+/**
+ * Where each destination is on the website. The service worker opens these
+ * and web push links to them, from this one copy. The Android app has its own
+ * route names for the same destinations.
+ */
+export const WEB_PATHS: Record<NotificationTarget, string> = {
+  home: '/dashboard',
+  study: '/study',
+  practice: '/practice',
+  progress: '/progress',
+  'session-setup': '/session/setup',
+  report: '/insights/report',
+  payments: '/account/payments',
+  subscription: '/account/subscription',
+};
+
 export type Channel = 'inbox' | 'push' | 'email';
 
 /**

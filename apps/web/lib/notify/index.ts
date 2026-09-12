@@ -1,6 +1,7 @@
 import 'server-only';
 import type { Language } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withRetry } from './jobs';
 import { inbox } from './channels/inbox';
 import { push } from './channels/push';
 import { email } from './channels/email';
@@ -37,14 +38,21 @@ const ADAPTERS: Record<Channel, ChannelAdapter> = {
   email,
 };
 
-/** Everything the channels need about a student, in one read. */
-export async function loadRecipient(userId: string): Promise<Recipient | null> {
+/**
+ * Everything the channels need about a student, in one read.
+ *
+ * The address comes from the auth admin API, a round trip of its own, so it
+ * is only fetched for a notice that can go by email. The nightly nudge never
+ * does, and was paying for that lookup once per student anyway.
+ */
+export async function loadRecipient(userId: string, opts: { email?: boolean } = {}): Promise<Recipient | null> {
   const admin = createAdminClient();
 
-  const [{ data: profile }, { data: auth }] = await Promise.all([
-    admin.from('profiles').select('settings,onboarding').eq('id', userId).maybeSingle(),
-    admin.auth.admin.getUserById(userId),
+  const [{ data: profile, error }, auth] = await Promise.all([
+    withRetry((signal) => admin.from('profiles').select('settings,onboarding').eq('id', userId).abortSignal(signal).maybeSingle()),
+    opts.email ? admin.auth.admin.getUserById(userId).then(({ data }) => data) : Promise.resolve(null),
   ]);
+  if (error) console.error('notify: recipient read failed', error.message);
   if (!profile && !auth?.user) return null;
 
   const settings = ((profile?.settings ?? {}) as Record<string, unknown>) ?? {};
@@ -66,7 +74,7 @@ export async function loadRecipient(userId: string): Promise<Recipient | null> {
 export type NotifyReport = Partial<Record<Channel, DeliveryResult>>;
 
 export async function notify(to: Recipient | string, notice: Notice): Promise<NotifyReport> {
-  const recipient = typeof to === 'string' ? await loadRecipient(to) : to;
+  const recipient = typeof to === 'string' ? await loadRecipient(to, { email: !!notice.also?.includes('email') }) : to;
   if (!recipient) return {};
 
   const report: NotifyReport = {};

@@ -19,7 +19,7 @@ export default async function AffiliateSettingsPage() {
   return (
     <>
       <h1 className="font-display text-[26px] text-ink">Settings</h1>
-      <p className="mt-0.5 mb-6 text-[13.5px] text-ink2">Signed in as {data.user?.email}.</p>
+      <p className="mt-0.5 mb-6 text-[13.5px] text-ink2 wrap-anywhere">Signed in as {data.user?.email}.</p>
 
       <Panel title="Your details">
         <dl className="divide-y divide-line">
@@ -29,9 +29,11 @@ export default async function AffiliateSettingsPage() {
             ['Commission', `${row.commissionPct}% of everything your students pay`],
             ['Link', row.active ? 'On' : 'Switched off'],
           ].map(([label, value]) => (
-            <div key={label} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-3">
-              <dt className="w-[140px] shrink-0 text-[12.5px] font-extrabold text-ink3">{label}</dt>
-              <dd className="text-[13.5px] text-ink">{value}</dd>
+            // A grid, not a wrapping row: with flex-wrap a short value sat beside
+            // its label and a long one dropped under it, so the column wandered.
+            <div key={label} className="grid gap-y-1 px-4 py-3 sm:grid-cols-[140px_1fr] sm:items-baseline sm:gap-x-4">
+              <dt className="text-[12.5px] font-extrabold text-ink3">{label}</dt>
+              <dd className="text-[13.5px] text-ink wrap-anywhere">{value}</dd>
             </div>
           ))}
         </dl>

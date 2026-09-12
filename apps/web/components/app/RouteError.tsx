@@ -15,11 +15,20 @@ import { getServerSnapshot, getSnapshot, subscribe } from '@/lib/persisted-store
 export function RouteError({
   error,
   reset,
+  unstable_retry,
   homeHref,
   homeLabelKey,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
+  /**
+   * Next's own retry, which fetches the segment again before re-rendering it.
+   * `reset` only re-renders, so a page that threw because a read failed (the
+   * chapter hub does, on purpose) threw again from the same data and "Try
+   * again" did nothing. Every error.tsx passes its props straight through, so
+   * this arrives whether or not that file names it.
+   */
+  unstable_retry?: () => void;
   homeHref?: string;
   /** A string key, not a sentence: this card renders in the student's language. */
   homeLabelKey?: StringKey;
@@ -43,7 +52,10 @@ export function RouteError({
   }, [error]);
 
   return (
-    <main className="mx-auto flex min-h-[60vh] w-full max-w-[520px] items-center px-5">
+    /* A div, not a main: inside the app it already sits in the Shell's main,
+       and its gutter too, so the side padding is only for the frames that
+       have none of their own (onboarding, checkout). */
+    <div className="mx-auto flex min-h-[60vh] w-full max-w-[520px] items-center px-5 [main_&]:px-0">
       <Card className="w-full text-center">
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-redtint text-red">
           <Icon name="alert" size={26} />
@@ -51,10 +63,10 @@ export function RouteError({
         <h1 className="mt-3 font-display text-[22px] text-ink">{t('states.crashTitle')}</h1>
         <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2">{t('states.crashBody')}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          <Btn title={t('common.retry')} onClick={reset} />
+          <Btn title={t('common.retry')} onClick={() => (unstable_retry ?? reset)()} />
           {homeHref ? <LinkBtn title={t(homeLabelKey ?? 'states.goBack')} href={homeHref} variant="line" /> : null}
         </div>
       </Card>
-    </main>
+    </div>
   );
 }

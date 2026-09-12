@@ -1,4 +1,6 @@
 import 'server-only';
+import { asBoard, type Board } from '@matricmate/core';
+import { planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -28,7 +30,12 @@ export type ReferredStudent = {
   name: string;
   email: string;
   grade: number | null;
+  /** FBISE or Punjab, from profiles.board: the same student needs different
+   *  help on each, and the class alone does not say which. */
+  board: Board;
   joinedAt: string;
+  /** On a plan right now, by the same rule as the paywall and the admin
+   *  overview. Not "has ever paid": that is what `spend` says. */
   paid: boolean;
   /** What this student has paid us in total, net of refunds. */
   spend: Money;
@@ -100,6 +107,7 @@ async function spendByStudent(admin: ReturnType<typeof createAdminClient>, ids: 
         .select('user_id, amount')
         .in('user_id', slice)
         .eq('status', COUNTS)
+        .order('id')
         .range(from, from + PAGE - 1);
       if (error) throw new Error(`payments read failed: ${error.message}`);
       const rows = (data ?? []) as { user_id: string; amount: number | null }[];
@@ -110,18 +118,48 @@ async function spendByStudent(admin: ReturnType<typeof createAdminClient>, ids: 
   return out;
 }
 
+/**
+ * Which of these students are on a plan right now.
+ *
+ * "Paying" meant three things on three screens: ever paid here, an `active`
+ * flag nothing switches off at expiry on the admin overview, and a live plan
+ * on the students page. After the first plans ran out they disagreed. This is
+ * the paywall's rule, planIsActive, so all three now say the same.
+ */
+async function payingNow(admin: ReturnType<typeof createAdminClient>, ids: string[]): Promise<Set<string>> {
+  const out = new Set<string>();
+  const PAGE = 1000;
+  for (let i = 0; i < ids.length; i += 200) {
+    const slice = ids.slice(i, i + 200);
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await admin
+        .from('entitlements')
+        .select('user_id, active, valid_till')
+        .in('user_id', slice)
+        .order('user_id')
+        .range(from, from + PAGE - 1);
+      if (error) throw new Error(`entitlements read failed: ${error.message}`);
+      const rows = (data ?? []) as { user_id: string; active: boolean | null; valid_till: string | null }[];
+      for (const r of rows) if (planIsActive(r)) out.add(r.user_id);
+      if (rows.length < PAGE) break;
+    }
+  }
+  return out;
+}
+
 /** Every student a teacher brought, with what each has paid. */
 export async function referredStudents(affiliateId: string): Promise<ReferredStudent[]> {
   const admin = createAdminClient();
 
-  const profiles: { id: string; name: string | null; contact: string | null; grade: number | null; referred_at: string | null }[] = [];
+  const profiles: { id: string; name: string | null; contact: string | null; grade: number | null; board: string | null; referred_at: string | null }[] = [];
   const PAGE = 1000;
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await admin
       .from('profiles')
-      .select('id, name, contact, grade, referred_at')
+      .select('id, name, contact, grade, board, referred_at')
       .eq('referred_by', affiliateId)
       .order('referred_at', { ascending: false })
+      .order('id')
       .range(from, from + PAGE - 1);
     if (error) throw new Error(`profiles read failed: ${error.message}`);
     const rows = data ?? [];
@@ -129,7 +167,8 @@ export async function referredStudents(affiliateId: string): Promise<ReferredStu
     if (rows.length < PAGE) break;
   }
 
-  const spend = await spendByStudent(admin, profiles.map((p) => p.id));
+  const ids = profiles.map((p) => p.id);
+  const [spend, paying] = await Promise.all([spendByStudent(admin, ids), payingNow(admin, ids)]);
 
   return profiles.map((p) => {
     const total = spend.get(p.id) ?? 0;
@@ -138,8 +177,9 @@ export async function referredStudents(affiliateId: string): Promise<ReferredStu
       name: p.name?.trim() || 'Student',
       email: p.contact ?? '',
       grade: p.grade,
+      board: asBoard(p.board),
       joinedAt: p.referred_at ?? '',
-      paid: total > 0,
+      paid: paying.has(p.id),
       spend: total,
     };
   });

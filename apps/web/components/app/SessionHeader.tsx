@@ -84,7 +84,9 @@ export function SessionHeader({
         )}
         <p className="mt-1 truncate text-[11.5px] font-extrabold text-ink2">{label}</p>
       </div>
-      {right}
+      {/* Capped, so a long chapter name in the pill truncates instead of
+          squeezing the progress bar down to nothing. */}
+      {right ? <div className="flex min-w-0 max-w-[40%] shrink-0 items-center">{right}</div> : null}
     </div>
   );
 }

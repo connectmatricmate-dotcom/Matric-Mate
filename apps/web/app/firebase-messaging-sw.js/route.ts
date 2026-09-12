@@ -1,4 +1,12 @@
 import { NextResponse } from 'next/server';
+import { WEB_PATHS } from '@/lib/notify/types';
+
+/**
+ * The version of the compat build the worker loads. Kept to the version of
+ * `firebase` the page itself runs (package.json), so the worker and the page
+ * speak the same protocol; they had drifted two majors apart.
+ */
+const FIREBASE_VERSION = '12.17.1';
 
 /**
  * The service worker that receives web push, served as a route rather than
@@ -28,8 +36,8 @@ export async function GET() {
   };
 
   const body = `
-importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-messaging-compat.js');
 
 firebase.initializeApp(${JSON.stringify(config)});
 const messaging = firebase.messaging();
@@ -37,14 +45,16 @@ const messaging = firebase.messaging();
 /**
  * A notification that arrives while no tab is focused.
  *
- * Only fires for a data-only message; a message with a \`notification\` block is
- * displayed by the browser itself, and handling it here as well would show it
- * twice. The sender uses the notification block, so this is the fallback.
+ * The Firebase SDK already shows any message that carries a \`notification\`
+ * block, and opens its \`fcm_options.link\` when tapped, and it calls this
+ * handler as well. Showing one here too is what put every web push on screen
+ * twice, the second copy dead on tap. So this only covers a data-only
+ * message, which nothing sends today but which would otherwise show nothing.
  */
 messaging.onBackgroundMessage((payload) => {
-  const title = payload.notification?.title ?? 'MatricMate';
-  self.registration.showNotification(title, {
-    body: payload.notification?.body ?? '',
+  if (payload.notification) return;
+  self.registration.showNotification(payload.data?.title ?? 'MatricMate', {
+    body: payload.data?.body ?? '',
     icon: '/icon.png',
     badge: '/icon.png',
     tag: payload.data?.kind ?? 'matricmate',
@@ -52,18 +62,13 @@ messaging.onBackgroundMessage((payload) => {
   });
 });
 
-/** Where each destination name lives on this app. Mirrors NotificationTarget. */
-const ROUTE = {
-  home: '/dashboard',
-  study: '/study',
-  practice: '/practice',
-  progress: '/progress',
-  'session-setup': '/session/setup',
-  report: '/insights/report',
-  payments: '/account/payments',
-  subscription: '/account/subscription',
-};
+/** Where each destination name lives on this app. From WEB_PATHS in lib/notify. */
+const ROUTE = ${JSON.stringify(WEB_PATHS)};
 
+/*
+ * Taps on the notifications shown above. The SDK handles taps on its own and
+ * stops them before they reach this listener.
+ */
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const path = ROUTE[event.notification.data?.target] || '/dashboard';

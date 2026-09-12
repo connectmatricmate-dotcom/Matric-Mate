@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { AI_QUOTA, BOARD_LABEL, SUBJECTS, asBoard, type Board } from '@matricmate/core';
+import { AI_QUOTA, BOARD_LABEL, SUBJECTS, asBoard, subjectMedium, translate, type Board } from '@matricmate/core';
+import { planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { chapterGrounding } from '@/lib/ai/guard';
+import { addUsage, chapterGrounding, type Grounding } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 import { TUTOR_TOOLS, runTutorTool } from '@/lib/ai/tutor-tools';
 
@@ -41,6 +42,7 @@ const TUTOR_MODEL = 'claude-sonnet-5';
 // visible answer, so this needs headroom or a hard numerical would truncate
 // mid-solution. The answers themselves stay short; the prompt sees to that.
 const MAX_ANSWER_TOKENS = 6000;
+/** Messages of history the model sees: the latest ones, never the first. */
 const HISTORY_TURNS = 12;
 const RATE_LIMIT_PER_MINUTE = 5;
 const TIMEZONE = 'Asia/Karachi';
@@ -98,7 +100,7 @@ async function buildStandingContext(admin: ReturnType<typeof createAdminClient>,
   const key = `${board}:${grade}`;
   const cached = weightageDigest.get(key);
   if (cached) return cached;
-  const { data } = await admin
+  const { data, error } = await admin
     .from('chapters')
     .select('id,subject_id,number,title,exam_share,exam_marks')
     .eq('review_status', 'published')
@@ -108,6 +110,16 @@ async function buildStandingContext(admin: ReturnType<typeof createAdminClient>,
     .eq('board', board)
     .order('subject_id')
     .order('number');
+  /*
+   * A failed read answers without the syllabus this once, and is not cached.
+   * Cached, one gateway timeout left every answer from that server without
+   * the chapter list, the weightings or a single chapter id, until it was
+   * recycled.
+   */
+  if (error) {
+    console.error('[tutor] weightage read failed', error.message);
+    return '';
+  }
   const bySubject = new Map<string, string[]>();
   for (const c of data ?? []) {
     /*
@@ -227,6 +239,9 @@ export async function POST(req: NextRequest) {
   const userId = await authenticate(req);
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
 
+  // When the question was asked, which is when the student's message is dated.
+  // The answer is dated when it lands, so the pair never shares a timestamp.
+  const askedAt = new Date().toISOString();
   const admin = createAdminClient();
   const profile = body.profile ?? {};
   const askedFrom = (body.chapterId ?? '').slice(0, 40);
@@ -241,9 +256,9 @@ export async function POST(req: NextRequest) {
    * streaming we do have was invisible: the reply looked like it arrived in
    * one piece. None of these four reads depends on any of the others.
    */
-  const [{ data: ent }, { data: prof }, usage, { count: lastMinute }, owned] = await Promise.all([
+  const [{ data: ent, error: entError }, { data: prof, error: profError }, usage, { count: lastMinute }, owned] = await Promise.all([
     admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade,role,board').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade,role,board,onboarding').eq('id', userId).maybeSingle(),
     admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
     // The abuse wall: a human student cannot ask five thoughtful questions in
     // a minute; a script can. Counted from persisted messages, so it cannot be
@@ -261,6 +276,13 @@ export async function POST(req: NextRequest) {
       : Promise.resolve({ data: null }),
   ]);
 
+  // A read that failed is not a "no". Treated as one, a slow database told a
+  // paying student they had no plan, or handed them a fresh day's allowance.
+  if (entError || profError || usage.error) {
+    console.error('[tutor] read failed', (entError ?? profError ?? usage.error)?.message);
+    return NextResponse.json({ error: 'server_error' }, { status: 503 });
+  }
+
   // Students only. This route does its own authentication rather than going
   // through guardAi, so it needs its own copy of the rule: a teacher's token
   // is a valid token, and a route handler has no page guard in front of it.
@@ -269,11 +291,28 @@ export async function POST(req: NextRequest) {
   }
 
   // Paid-only: the same wall RLS enforces on content, applied to the tutor.
-  const entitled = !!ent?.active && (!ent.valid_till || Date.parse(ent.valid_till) > Date.now());
-  if (!entitled) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
+  if (!planIsActive(ent)) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
   // The tutor teaches the student's own class: persona, weightage and all.
   const grade = prof?.grade === 10 ? 10 : 9;
   const board = asBoard(prof?.board);
+
+  /*
+   * The student's medium and language: what the app sent, else what the
+   * account has saved. The Ask AI button in the reader sends no profile at
+   * all, and without this fallback every Urdu-medium student asking from
+   * their notes was answered in English.
+   */
+  const saved = (prof?.onboarding as { medium?: string } | null)?.medium;
+  const pick = (v: unknown): 'en' | 'ur' | null => (v === 'ur' || v === 'en' ? v : null);
+  const medium = pick(profile.medium) ?? pick(saved) ?? 'en';
+  const language = pick(profile.language) ?? pick(saved) ?? medium;
+  /*
+   * Asked from a chapter of a language subject, the answer is in that
+   * subject's language: Urdu is taught in Urdu and English in English,
+   * whatever medium the student reads in. Everything else follows the
+   * account.
+   */
+  const answerIn = askedFrom ? subjectMedium(askedFrom, board, language) : language;
 
   const used = usage.data?.used ?? 0;
   const quota: QuotaState = {
@@ -290,9 +329,11 @@ export async function POST(req: NextRequest) {
   }
 
   // What the thread remembers about this turn. Photos are answered live but
-  // not stored, so the saved history marks that one was here.
-  const persistedQuestion = message || 'Photo question';
-  const savedUserText = image ? `[photo] ${persistedQuestion}` : persistedQuestion;
+  // not stored, so the saved history says one was here, in the student's own
+  // language: it becomes the thread's title and the bubble in their history.
+  const photoLabel = translate(language, 'tutor.photoQuestion');
+  const persistedQuestion = message || photoLabel;
+  const savedUserText = image && message ? `${photoLabel}: ${message}` : persistedQuestion;
 
   /*
    * The second and last round trip before the model.
@@ -318,15 +359,27 @@ export async function POST(req: NextRequest) {
           })
           .select('id')
           .single()
-          .then(({ data }) => data),
+          .then(({ data, error }) => {
+            if (error) console.error('[tutor] could not start a thread', error.message);
+            return data;
+          }),
+    /*
+     * The LATEST messages, newest first and then turned the right way round.
+     * Ascending with a limit gave the model the first six exchanges forever,
+     * so from the seventh on "simpler please" simplified an answer from the
+     * start of the thread. Role breaks a tie for pairs saved before the two
+     * sides were dated apart: newest first, the answer comes before its
+     * question.
+     */
     existing
       ? admin
           .from('chat_messages')
           .select('role,content')
           .eq('thread_id', existing)
-          .order('at', { ascending: true })
+          .order('at', { ascending: false })
+          .order('role', { ascending: true })
           .limit(HISTORY_TURNS)
-          .then(({ data }) => data)
+          .then(({ data }) => (data ?? []).reverse())
       : Promise.resolve([] as { role: string; content: string }[]),
     /*
      * When the student asks from a chapter (the Ask AI buttons on MCQs, short
@@ -334,18 +387,37 @@ export async function POST(req: NextRequest) {
      * chapter's own published notes before answering. Same wording as the
      * screen they came from, instead of a generic recital of the topic.
      */
-    askedFrom ? chapterGrounding(admin, askedFrom, profile.medium === 'ur' ? 'ur' : 'en', 12_000, grade, board) : null,
+    askedFrom
+      ? chapterGrounding(admin, askedFrom, subjectMedium(askedFrom, board, medium), 12_000, grade, board).catch((e): Grounding | null => {
+          // Answer without the notes rather than not at all.
+          console.error('[tutor] grounding failed', e instanceof Error ? e.message : e);
+          return null;
+        })
+      : null,
     buildStandingContext(admin, grade, board),
   ]);
 
   const thread = threadResult?.id ?? null;
   if (!thread) return NextResponse.json({ error: 'server_error' }, { status: 500 });
+  const newThread = !existing;
+
+  /*
+   * A thread made for this question but never answered is deleted again.
+   * Left behind, every failed first question put an empty chat in Recent
+   * chats, and every retry added another. The id never reached the student,
+   * so nothing on their screen points at it.
+   */
+  const dropEmptyThread = async () => {
+    if (!newThread) return;
+    const { error } = await admin.from('chat_threads').delete().eq('id', thread).eq('user_id', userId);
+    if (error) console.error('[tutor] could not remove an unanswered thread', error.message);
+  };
 
   const studentBlock = [
     'About this student:',
     profile.name ? `- Name: ${profile.name}` : null,
-    `- Study medium: ${profile.medium === 'ur' ? 'Urdu' : 'English'}`,
-    `- Answer them in this language: ${languageRule(profile.language)}`,
+    `- Study medium: ${medium === 'ur' ? 'Urdu' : 'English'}`,
+    `- Answer them in this language: ${languageRule(answerIn, grade, board)}`,
     profile.subjects?.length ? `- Their subjects: ${profile.subjects.join(', ')}` : null,
     /* Their weak topics used to be listed here, three of them, chosen by the
        client and pushed into every question whether it needed them or not.
@@ -372,8 +444,12 @@ export async function POST(req: NextRequest) {
   if (image) userContent.push({ type: 'image', source: { type: 'base64', ...image } });
   userContent.push({ type: 'text', text: message || 'Solve or explain what is in this photo, step by step.' });
 
+  // The window can open on an answer whose question fell outside it, and a
+  // conversation sent to the model has to start with the student.
+  const history = [...(historyRows ?? [])];
+  while (history.length && history[0].role !== 'user') history.shift();
   const turns: Anthropic.MessageParam[] = [
-    ...(historyRows ?? []).map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+    ...history.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
     { role: 'user' as const, content: userContent },
   ];
 
@@ -442,12 +518,14 @@ export async function POST(req: NextRequest) {
         }
 
         if (stopReason === 'refusal') {
+          await dropEmptyThread();
           emit({ t: 'err', reason: 'refused', quota });
           controller.close();
           return;
         }
         const answer = text.trim();
         if (!answer) {
+          await dropEmptyThread();
           emit({ t: 'err', reason: 'error', quota });
           controller.close();
           return;
@@ -467,29 +545,36 @@ export async function POST(req: NextRequest) {
          * ratable answers were ones reopened from history, which is not how
          * anybody rates anything.
          */
-        const { data: saved } = await admin
+        /*
+         * The answer is already on the student's screen, so a write that
+         * fails here is logged rather than turned into an error they would
+         * read as "your question failed". It still costs the question: it was
+         * answered.
+         */
+        const answeredAt = new Date().toISOString();
+        const { data: savedRows, error: saveError } = await admin
           .from('chat_messages')
           .insert([
-            { thread_id: thread, user_id: userId, role: 'user', content: savedUserText },
-            { thread_id: thread, user_id: userId, role: 'assistant', content: answer },
+            { thread_id: thread, user_id: userId, role: 'user', content: savedUserText, at: askedAt },
+            { thread_id: thread, user_id: userId, role: 'assistant', content: answer, at: answeredAt },
           ])
           .select('id,role');
-        const messageId = saved?.find((m) => m.role === 'assistant')?.id ?? null;
-        await admin.from('chat_threads').update({ updated_at: new Date().toISOString() }).eq('id', thread);
-        await admin.from('ai_usage').upsert(
-          { user_id: userId, day: dayKey(), used: quota.used + 1 },
-          { onConflict: 'user_id,day' },
-        );
+        if (saveError) console.error('[tutor] could not save the exchange', saveError.message);
+        const messageId = savedRows?.find((m) => m.role === 'assistant')?.id ?? null;
+        const { error: bumpError } = await admin.from('chat_threads').update({ updated_at: answeredAt }).eq('id', thread);
+        if (bumpError) console.error('[tutor] could not bump the thread', bumpError.message);
+        const usedNow = (await addUsage(admin, userId, 1)) ?? quota.used + 1;
 
         emit({
           t: 'done',
           threadId: thread,
           messageId,
-          quota: { ...quota, used: quota.used + 1, remaining: quota.remaining - 1 },
+          quota: { ...quota, used: usedNow, remaining: Math.max(0, quota.limit - usedNow) },
         });
         controller.close();
       } catch (e) {
         console.error('[tutor]', e instanceof Error ? e.message : e);
+        await dropEmptyThread();
         try {
           emit({ t: 'err', reason: 'error', quota });
           controller.close();

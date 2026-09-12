@@ -9,9 +9,9 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 import type { Chapter, PlayableTrack } from '@matricmate/core';
-import { chapterName, pickAudioTrack } from '@matricmate/core';
+import { chapterName, isOneLanguageSubject, pickAudioTrack, subjectMedium } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Bar, Card, Icon } from '@/components/ui/primitives';
+import { Bar, Card, Icon, ScriptText } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
 const SPEEDS = [1, 1.25, 1.5] as const;
@@ -30,11 +30,19 @@ export function AudioLesson({
   const audio = useRef<HTMLAudioElement>(null);
 
   const id = chapter.id;
-  const medium = state.settings.contentMedium;
+  /* The language this subject is taught in, for this student. The same as
+     their medium except for Urdu and English (and Punjab's Islamiyat), which
+     are recorded once, in their own language. */
+  const medium = subjectMedium(id, chapter.board, state.settings.contentMedium);
+  const oneLanguage = isOneLanguageSubject(id, chapter.board);
   // Was a bundled file path built from a hardcoded id, so only the one demo
   // chapter ever played. The URL now comes from the row that publishing wrote.
   const track = pickAudioTrack(tracks, medium);
   const src = track?.url ?? null;
+  /* A file that will not load. The player used to sit at 0:00 with a play
+     button that did nothing, and the string for saying so went unused. */
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const failed = !!src && failedSrc === src;
 
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(track?.durationSecs ?? 0);
@@ -66,8 +74,11 @@ export function AudioLesson({
 
   function toggle() {
     const el = audio.current;
-    if (!el || !src) return;
-    if (el.paused) void el.play();
+    if (!el || !src || failed) return;
+    // play() rejects when the browser refuses (autoplay rules, a pause that
+    // lands first) or the file cannot play. The element's own error event
+    // reports a broken file; a refusal needs nothing more than staying paused.
+    if (el.paused) el.play().catch(() => setPlaying(false));
     else el.pause();
   }
 
@@ -108,23 +119,36 @@ export function AudioLesson({
           }}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || (track?.durationSecs ?? 0))}
           onEnded={() => setPlaying(false)}
+          onError={() => {
+            setPlaying(false);
+            setFailedSrc(src);
+          }}
         />
       ) : null}
 
       <div className="flex flex-col items-center">
         <div className="flex h-[210px] w-[210px] items-center justify-center rounded-[24px] bg-teal">
-          <Image src="/brand/monogram.png" alt="" width={130} height={100} className="h-auto w-[130px] object-contain" />
+          <Image src="/brand/monogram.png" alt="" width={130} height={90} loading="eager" className="h-auto w-[130px] object-contain" />
         </div>
         {/* The chapter's own name. This was content.audioTitle, which the live
             query fills from the bundled catalogue: three chapters have one and
             the other 154 are an empty string, so the player had no title at
             all. audio_tracks.title is a machine slug, not student copy. */}
-        <h2 className="mt-4 text-center font-display text-[22px] text-ink">
-          {chapterName(chapter, state.settings.language)}
+        <h2 className="mt-4 w-full">
+          <ScriptText
+            text={chapterName(chapter, state.settings.language)}
+            className="text-center font-display text-[22px] leading-[1.3] text-ink"
+            urduClassName="text-center text-[21px] text-ink"
+          />
         </h2>
-        <p className="text-center text-[13px] text-ink2">
-          {medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
-        </p>
+        {/* What the recording is actually in. This described the student's
+            medium, so an English-medium student played the Urdu lesson under
+            "English narration". */}
+        {track ? (
+          <p className="text-center text-[13px] text-ink2">
+            {track.medium === 'ur' ? t('audio.narrationUr') : t('audio.narrationEn')}
+          </p>
+        ) : null}
       </div>
 
       <div className="mt-6">
@@ -139,16 +163,16 @@ export function AudioLesson({
         <button
           type="button"
           onClick={() => seek(-15)}
-          disabled={!src}
+          disabled={!src || failed}
           aria-label={t('audio.back15')}
-          className="flex h-[54px] w-[54px] items-center justify-center rounded-full border border-line bg-card text-[13px] font-extrabold text-ink transition-colors duration-200 hover:bg-paper disabled:opacity-40"
+          className="flex h-[54px] w-[54px] items-center justify-center rounded-full border border-line bg-card text-[13px] font-extrabold text-ink tabular transition-colors duration-200 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-40"
         >
           −15
         </button>
         <button
           type="button"
           onClick={toggle}
-          disabled={!src}
+          disabled={!src || failed}
           aria-label={playing ? t('audio.pause') : t('audio.play')}
           className="flex h-[76px] w-[76px] items-center justify-center rounded-full bg-teal text-onbrand transition-[background-color,transform] duration-200 ease-out active:scale-[0.97] hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
         >
@@ -157,9 +181,9 @@ export function AudioLesson({
         <button
           type="button"
           onClick={() => seek(15)}
-          disabled={!src}
+          disabled={!src || failed}
           aria-label={t('audio.forward15')}
-          className="flex h-[54px] w-[54px] items-center justify-center rounded-full border border-line bg-card text-[13px] font-extrabold text-ink transition-colors duration-200 hover:bg-paper disabled:opacity-40"
+          className="flex h-[54px] w-[54px] items-center justify-center rounded-full border border-line bg-card text-[13px] font-extrabold text-ink tabular transition-colors duration-200 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-40"
         >
           +15
         </button>
@@ -169,8 +193,8 @@ export function AudioLesson({
         <button
           type="button"
           onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
-          disabled={!src}
-          className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-grey px-3.5 text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-45"
+          disabled={!src || failed}
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-grey px-3.5 text-[12.5px] font-extrabold text-ink2 transition-[filter] duration-200 hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-45"
         >
           {t('audio.speed', { n: SPEEDS[speed] })}
         </button>
@@ -179,11 +203,19 @@ export function AudioLesson({
 
       <Card
         flat
-        tint={src ? 'bg-tealtint' : 'bg-orangetint'}
-        border={src ? 'border-tealtint2' : 'border-orangetint'}
+        tint={failed ? 'bg-redtint' : src ? 'bg-tealtint' : 'bg-orangetint'}
+        border={failed ? 'border-red' : src ? 'border-tealtint2' : 'border-orangetint'}
         className="mt-6"
       >
-        <p className="text-[13px] leading-[1.6] text-ink2">{src ? t('audio.sampleNote') : t('audio.noTrackNote')}</p>
+        <p role={failed ? 'alert' : undefined} className="text-[13px] leading-[1.6] text-ink2 rtl:leading-[1.9]">
+          {failed
+            ? t('audio.loadFailed')
+            : !src
+              ? t('audio.noTrackNote')
+              : oneLanguage
+                ? t(medium === 'ur' ? 'audio.oneLanguageUr' : 'audio.oneLanguageEn')
+                : t('audio.sampleNote')}
+        </p>
       </Card>
     </Page>
   );

@@ -38,12 +38,14 @@ export function HelpView() {
               type="button"
               aria-expanded={open === i}
               onClick={() => setOpen(open === i ? null : i)}
-              className="flex min-h-11 w-full items-center gap-2.5 text-start"
+              className="group flex min-h-11 w-full items-center gap-2.5 text-start"
             >
-              <span className="min-w-0 flex-1 text-[13.5px] font-extrabold leading-[1.5] text-ink">{t(q)}</span>
+              <span className="min-w-0 flex-1 text-[13.5px] font-extrabold leading-[1.5] text-ink transition-colors duration-200 group-hover:text-teal rtl:leading-[1.9]">
+                {t(q)}
+              </span>
               <Icon name={open === i ? 'close' : 'plus'} size={16} className="shrink-0 text-ink2" />
             </button>
-            {open === i ? <p className="mt-2 text-[13.5px] leading-[1.6] text-ink2">{t(a)}</p> : null}
+            {open === i ? <p className="mt-2 text-[13.5px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t(a)}</p> : null}
           </Card>
         ))}
       </div>

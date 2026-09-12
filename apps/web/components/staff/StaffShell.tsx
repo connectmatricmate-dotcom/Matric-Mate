@@ -74,8 +74,10 @@ export function StaffShell({
 
   return (
     <div className="min-h-screen md:flex">
-      {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-e border-line bg-card px-3 py-5 md:flex">
+      {/* desktop sidebar. h-dvh and its own scroll, so Log out at the bottom
+          stays reachable on a short laptop screen. data-chrome keeps the
+          shell off paper, see the print rules in globals.css. */}
+      <aside data-chrome className="sticky top-0 hidden h-dvh w-[236px] shrink-0 flex-col overflow-y-auto border-e border-line bg-card px-3 py-5 md:flex">
         <Link href={home} className="mb-1 px-2">
           <Wordmark priority />
         </Link>
@@ -117,7 +119,7 @@ export function StaffShell({
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Same h-14 contract as the student shell, so a sticky heading inside
             a page can pin itself to top-14 in either area. */}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
+        <header data-chrome className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
           <Link href={home} className="flex items-center gap-2 md:hidden">
             <Wordmark width={104} height={21} />
             <span className="text-[12.5px] font-extrabold text-ink3">{area}</span>
@@ -133,7 +135,7 @@ export function StaffShell({
       </div>
 
       {/* phone bottom bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav data-chrome className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
         {nav.map((item) => {
           const on = active === item.href;
           return (

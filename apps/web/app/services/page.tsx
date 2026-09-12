@@ -4,11 +4,13 @@ import { AI_QUOTA, BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { THE_PLAN } from '@/lib/plans';
+import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'What a plan includes',
   description:
     'Every service in a MatricMate Premium plan: chapter notes, audio lessons, practice questions, mock papers, past papers, an AI tutor, progress reports and a parent report card.',
+  alternates: { canonical: canonicalUrl('/services') },
 };
 
 /**
@@ -35,7 +37,7 @@ const SERVICES: { name: string; what: string }[] = [
   },
   {
     name: 'Mock papers',
-    what: 'Full-length papers in the board pattern, timed and marked, with a breakdown afterwards of where the marks went.',
+    what: 'Papers in the board pattern: Section A as a timed test, then Sections B and C written in the app and marked against the points an examiner looks for.',
   },
   {
     name: 'Past papers',
@@ -51,11 +53,11 @@ const SERVICES: { name: string; what: string }[] = [
   },
   {
     name: 'Parent report card',
-    what: 'A shareable summary of study time, test scores and weak topics, so a parent can follow along without needing an account.',
+    what: 'A monthly report card the student downloads as a PDF: a grade per subject, how it moved, questions answered and days studied, so a parent can follow along without an account.',
   },
   {
     name: 'Android app',
-    what: 'The same account on a phone, including downloaded chapters that keep working without a connection.',
+    what: 'Coming to Google Play: the same account on a phone, with chapters you can download and study without a connection. Until it arrives, everything above works in a phone’s browser.',
   },
 ];
 
@@ -83,9 +85,9 @@ export default function ServicesPage() {
             <h2 className="font-display text-[22px] text-ink">How the service is delivered</h2>
             <p className="mt-2 text-mk-body leading-[1.75] text-ink2">
               MatricMate is a digital service. Nothing is posted or shipped. Access opens on the account you paid
-              with, normally within a few seconds of the payment being confirmed, and is used on this website or in
-              the Android app by signing in. A plan runs for one month from the day it is paid, and the end date is
-              shown on your account.
+              with, normally within a few seconds of the payment being confirmed, and is used by signing in on this
+              website, and in the Android app once it is on Google Play. A plan runs for one month from the day it is
+              paid, and the end date is shown on your account.
             </p>
             <p className="mt-2 text-mk-body leading-[1.75] text-ink2">
               If a payment succeeds and access has not opened within a few minutes, write to {SUPPORT_EMAIL}

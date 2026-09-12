@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { TUTOR_ACTION_LABEL, TUTOR_ACTION_ROUTE, api, chapterById, chapterName, isUrduScript, parseTutorActions, rateTutorAnswer, subjectById, subjectName, type ChatMessage, type StringKey, type TutorAction, type TutorImage, weakTopics } from '@matricmate/core';
-import { PillButton } from '@/components/ui/controls';
-import { Icon, Pill, ScriptText } from '@/components/ui/primitives';
+import { TUTOR_ACTION_LABEL, TUTOR_ACTION_ROUTE, api, chapterById, chapterName, isUrduScript, parseTutorActions, rateTutorAnswer, subjectById, subjectName, type ChatMessage, type StringKey, type TutorAction, type TutorImage } from '@matricmate/core';
+import { namedWeakTopics } from '@/components/app/rails';
+import { Btn, PillButton } from '@/components/ui/controls';
+import { Empty, Icon, Pill, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { Markdown } from '@/components/ui/Markdown';
 import { useApp, useLang, useT } from '@/lib/store';
@@ -61,7 +62,7 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
 
   const starters = useMemo(() => {
     const out: string[] = [];
-    const weak = weakTopics(state.attempts)[0]?.topic;
+    const weak = namedWeakTopics(state.attempts, lang)[0]?.topic;
     const lastChapter = state.lastChapterId ? chapterName(chapterById(state.lastChapterId), lang) : undefined;
     if (weak) out.push(t('tutor.starterWeak', { topic: weak }));
     if (lastChapter) out.push(t('tutor.starterChapter', { chapter: lastChapter }));
@@ -140,10 +141,14 @@ export function ChatScreen({
   const [input, setInput] = useState(initialDraft ?? '');
   /**
    * The chapter this thread answers from, which the student can change. It
-   * starts as whatever they arrived by and is set again by the picker.
+   * starts as whatever they arrived by and is set again by the picker, or
+   * cleared (null). Until then it follows the page, so a language switch
+   * re-renders the chip with the chapter's name in the new language.
    */
-  const [groundedId, setGroundedId] = useState<string | undefined>(chapterId);
-  const [groundedLabel, setGroundedLabel] = useState<string | undefined>(chapterLabel);
+  const [picked, setPicked] = useState<{ id: string; label: string } | null | undefined>(undefined);
+  const grounded = picked === undefined ? (chapterId ? { id: chapterId, label: chapterLabel ?? '' } : null) : picked;
+  const groundedId = grounded?.id;
+  const groundedLabel = grounded ? grounded.label || chapterName(chapterById(grounded.id), lang) : undefined;
   const [picking, setPicking] = useState(false);
   const [thinking, setThinking] = useState(false);
   /** The answer growing live while the tutor writes. Cleared on completion. */
@@ -174,21 +179,43 @@ export function ChatScreen({
    * the same chat also shows up in the Android app.
    */
   const [threadId, setThreadId] = useState<string | null>(threadParam ?? null);
-  const [contextLabel, setContextLabel] = useState<string | undefined>(chapterLabel);
+  const [threadContext, setThreadContext] = useState<string | undefined>();
+  const contextLabel = chapterLabel ?? threadContext;
   const [quota, setQuota] = useTutorQuota();
   const asked = useRef(false);
 
-  /** A saved thread's history, loaded once. New chats skip this entirely. */
+  /**
+   * A saved thread's history, loaded once. New chats skip this entirely.
+   *
+   * With a state of its own, because an empty list meant three things: still
+   * loading, failed, and a new chat. The greeting and starters flashed up
+   * before every saved conversation, and a failed read stayed as a blank chat
+   * that looked like it had lost the student's history.
+   */
+  const [history, setHistory] = useState<'loading' | 'ready' | 'failed'>(threadParam ? 'loading' : 'ready');
+  const [historyAttempt, setHistoryAttempt] = useState(0);
   useEffect(() => {
     if (!threadParam) return;
     let alive = true;
     const supabase = createClient();
     (async () => {
-      const [{ data: rows }, { data: meta }] = await Promise.all([
-        supabase.from('chat_messages').select('id,role,content,at').eq('thread_id', threadParam).order('at'),
+      const [{ data: rows, error }, { data: meta }] = await Promise.all([
+        // Each question and its answer are saved in one statement with one
+        // timestamp, so `at` alone left the pair in either order. The
+        // question sorts first ('user' after 'assistant', descending).
+        supabase
+          .from('chat_messages')
+          .select('id,role,content,at')
+          .eq('thread_id', threadParam)
+          .order('at')
+          .order('role', { ascending: false }),
         supabase.from('chat_threads').select('context_label').eq('id', threadParam).maybeSingle(),
       ]);
-      if (!alive || !rows) return;
+      if (!alive) return;
+      if (error || !rows) {
+        setHistory('failed');
+        return;
+      }
       setMessages(
         rows.map((r) => ({
           id: r.id as string,
@@ -197,18 +224,21 @@ export function ChatScreen({
           at: Date.parse(r.at as string),
         }))
       );
-      if (meta?.context_label) setContextLabel((c) => c ?? (meta.context_label as string));
+      setHistory('ready');
+      if (meta?.context_label) setThreadContext(meta.context_label as string);
     })();
     return () => {
       alive = false;
     };
-  }, [threadParam]);
+  }, [threadParam, historyAttempt]);
 
   const outOfQuestions = quota !== null && quota.remaining <= 0;
 
   async function send(text: string) {
     const clean = text.trim();
-    if ((!clean && !photo) || thinking) return;
+    // Not while the history is still coming: it replaces what is on screen
+    // when it lands, and a question asked meanwhile would vanish under it.
+    if ((!clean && !photo) || thinking || history !== 'ready') return;
     if (outOfQuestions) {
       toast(t('tutor.limitToast'));
       return;
@@ -240,7 +270,7 @@ export function ChatScreen({
           medium: state.settings.contentMedium,
           language: state.settings.language,
           subjects: derived.subjects,
-          weakTopics: weakTopics(state.attempts)
+          weakTopics: namedWeakTopics(state.attempts, lang)
             .slice(0, 3)
             .map((w) => w.topic),
         },
@@ -264,6 +294,7 @@ export function ChatScreen({
         rate: t('tutor.slowDown'),
         plan: t('tutor.planNeeded'),
         refused: t('tutor.refused'),
+        syllabus: t('tutor.notInSyllabus'),
         error: t('tutor.errorReply'),
       }[res.reason];
       toast(note);
@@ -281,7 +312,21 @@ export function ChatScreen({
       at: Date.now(),
     };
     setMessages((m) => [...m, reply]);
-    if (res.threadId) setThreadId(res.threadId);
+    if (res.threadId) {
+      setThreadId(res.threadId);
+      /*
+       * Put the conversation in the address, and take the question out of it.
+       * A question that arrived as ?q= was asked again on every reload and on
+       * Back from wherever an answer's button led, which spent another of the
+       * student's fifty and started a second thread. Replaced, not pushed, and
+       * through the history API, so the page is not fetched again.
+       */
+      if (!threadParam) {
+        const params = new URLSearchParams({ thread: res.threadId });
+        if (groundedId) params.set('chapter', groundedId);
+        window.history.replaceState(null, '', `/tutor/chat?${params.toString()}`);
+      }
+    }
     if (res.quota) setQuota(res.quota);
     // Mirror into the local counter so rails stay roughly right between
     // server fetches. The server remains the authority.
@@ -367,16 +412,43 @@ export function ChatScreen({
           className={`mx-auto flex w-full max-w-[820px] flex-col gap-4 py-5 ${
             /* An empty chat has to fill the column, or there is nothing for
                the greeting and the starters to be pushed apart within. */
-            messages.length === 0 && !thinking ? 'min-h-full' : ''
+            messages.length === 0 && !thinking && history === 'ready' ? 'min-h-full' : ''
           }`}
         >
-        {messages.length === 0 && !thinking ? <EmptyChat onStarter={setInput} /> : null}
+        {history === 'loading' ? (
+          // Shaped like the conversation that is coming: a question on the
+          // right, an answer on the left.
+          <div className="flex flex-col gap-4" aria-hidden>
+            <Skeleton className="h-14 w-3/4 self-end" />
+            <Skeleton className="h-28 w-[85%] self-start" />
+            <Skeleton className="h-12 w-2/3 self-end" />
+          </div>
+        ) : history === 'failed' ? (
+          <Empty
+            icon="alert"
+            title={t('states.errorTitle')}
+            sub={t('states.errorBody')}
+            cta={
+              <Btn
+                title={t('common.retry')}
+                sm
+                variant="line"
+                onClick={() => {
+                  setHistory('loading');
+                  setHistoryAttempt((n) => n + 1);
+                }}
+              />
+            }
+          />
+        ) : messages.length === 0 && !thinking ? (
+          <EmptyChat onStarter={setInput} />
+        ) : null}
 
         {messages.map((m) =>
           m.role === 'user' ? (
             <div
               key={m.id}
-              className="max-w-[84%] self-end rounded-[18px] rounded-ee-[6px] bg-teal px-4 py-3 text-[14px] leading-[1.6] text-onbrand"
+              className="max-w-[84%] self-end rounded-[18px] rounded-ee-[6px] bg-teal px-4 py-3 text-[14px] leading-[1.6] text-onbrand wrap-anywhere"
             >
               {sentPhotos[m.id] ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -389,12 +461,14 @@ export function ChatScreen({
           ) : (
             <div
               key={m.id}
-              className="max-w-[92%] self-start rounded-[18px] rounded-es-[6px] border border-line bg-card p-4"
+              className="max-w-[92%] self-start rounded-[18px] rounded-es-[6px] border border-line bg-card p-4 wrap-anywhere"
             >
               {/* Markdown-aware: the model sometimes marks up its answer,
                   and students should read headings and lists, not asterisks. */}
-              <Markdown text={parseTutorActions(m.text).text} className="text-[13.5px] leading-[1.65] text-ink" />
-            <AnswerActions actions={parseTutorActions(m.text).actions} />
+              {/* In the student's language: the chapter names on the buttons
+                  came out English under an Urdu answer. */}
+              <Markdown text={parseTutorActions(m.text, false, lang).text} className="text-[13.5px] leading-[1.65] text-ink" />
+              <AnswerActions actions={parseTutorActions(m.text, false, lang).actions} />
               {m.steps?.length ? (
                 <ol className="mt-2 flex flex-col gap-2">
                   {m.steps.map((step, i) => (
@@ -407,7 +481,7 @@ export function ChatScreen({
                   ))}
                 </ol>
               ) : null}
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="button"
                   aria-pressed={feedback[m.id] === 'up'}
@@ -417,7 +491,7 @@ export function ChatScreen({
                     rate(m.id, 'up');
                     toast(t('tutor.helpful'));
                   }}
-                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-200 ${
+                  className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-200 md:h-10 md:w-10 ${
                     feedback[m.id] === 'up' ? 'bg-tealtint text-teal' : 'bg-grey text-ink2 hover:text-ink'
                   }`}
                 >
@@ -432,7 +506,7 @@ export function ChatScreen({
                     rate(m.id, 'down');
                     toast(t('tutor.notHelpful'));
                   }}
-                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-200 ${
+                  className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-200 md:h-10 md:w-10 ${
                     feedback[m.id] === 'down' ? 'bg-redtint text-red' : 'bg-grey text-ink2 hover:text-ink'
                   }`}
                 >
@@ -442,7 +516,7 @@ export function ChatScreen({
                     asking for Urdu on an Urdu reply spends a question to
                     get the same thing back. */}
                 {isUrduScript(m.text) ? null : (
-                  <PillButton tone="teal" className="min-h-10" onClick={() => send(t('tutor.reExplainUrdu'))}>
+                  <PillButton tone="teal" onClick={() => send(t('tutor.reExplainUrdu'))}>
                     {t('tutor.inUrdu')}
                   </PillButton>
                 )}
@@ -454,7 +528,7 @@ export function ChatScreen({
                     void navigator.clipboard?.writeText(m.text);
                     toast(t('tutor.copied'));
                   }}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-grey text-ink2 transition-colors duration-200 hover:text-ink"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-grey text-ink2 transition-colors duration-200 hover:text-ink md:h-10 md:w-10"
                 >
                   <Icon name="doc" size={16} strokeWidth={2.2} />
                 </button>
@@ -468,7 +542,7 @@ export function ChatScreen({
                     {t('tutor.askFollowUp')}
                   </span>
                   {(['followUpSimpler', 'followUpExample', 'followUpExam'] as const).map((k) => (
-                    <PillButton key={k} tone="grey" className="min-h-9" onClick={() => send(t(`tutor.${k}`))}>
+                    <PillButton key={k} tone="grey" onClick={() => send(t(`tutor.${k}`))}>
                       {t(`tutor.${k}`)}
                     </PillButton>
                   ))}
@@ -479,10 +553,10 @@ export function ChatScreen({
         )}
 
         {thinking && liveText ? (
-          <div className="max-w-[92%] self-start rounded-[18px] rounded-es-[6px] border border-line bg-card p-4">
+          <div className="max-w-[92%] self-start rounded-[18px] rounded-es-[6px] border border-line bg-card p-4 wrap-anywhere">
             {/* `true`: a tag half-written by the model must not flash as raw
                 brackets before it turns into a button. */}
-            <Markdown text={parseTutorActions(liveText, true).text} className="text-[13.5px] leading-[1.65] text-ink" />
+            <Markdown text={parseTutorActions(liveText, true, lang).text} className="text-[13.5px] leading-[1.65] text-ink" />
           </div>
         ) : thinking ? (
           <div
@@ -516,14 +590,13 @@ export function ChatScreen({
             <span className="mb-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-tealtint py-1.5 ps-2.5 pe-1.5 text-[11.5px] font-extrabold text-teal">
               <Icon name="book" size={13} className="shrink-0" />
               <span className="truncate">{t('tutor.chapterAttached', { chapter: groundedLabel ?? '' })}</span>
+              {/* A 40px target that does not make the chip taller: the negative
+                  margin gives its height back to the row. */}
               <button
                 type="button"
                 aria-label={t('tutor.chapterClear')}
-                onClick={() => {
-                  setGroundedId(undefined);
-                  setGroundedLabel(undefined);
-                }}
-                className="shrink-0"
+                onClick={() => setPicked(null)}
+                className="-my-2.5 -me-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors duration-200 hover:bg-tealtint2"
               >
                 <Icon name="close" size={13} />
               </button>
@@ -535,8 +608,7 @@ export function ChatScreen({
           onClose={() => setPicking(false)}
           onPick={({ chapter, topic }) => {
             setPicking(false);
-            setGroundedId(chapter.id);
-            setGroundedLabel(chapterName(chapter, lang));
+            setPicked({ id: chapter.id, label: chapterName(chapter, lang) });
             // A topic is a starting question; a whole chapter is only context,
             // because "explain the whole of unit 4" is not a question anybody
             // wants answered in one go.
@@ -591,7 +663,7 @@ export function ChatScreen({
         </button>
         {/* .field-shell owns the focus ring; a bare outline-none input erased it */}
         <div
-          className={`field-shell flex min-w-0 flex-1 items-center rounded-full border-[1.5px] border-line px-4 py-2.5 transition-[border-color,box-shadow] duration-200 ${
+          className={`field-shell flex min-h-11 min-w-0 flex-1 items-center rounded-full border-[1.5px] border-line px-4 py-0.5 transition-[border-color,box-shadow] duration-200 ${
             outOfQuestions ? 'bg-grey' : 'bg-paper'
           }`}
         >
@@ -622,14 +694,23 @@ export function ChatScreen({
             aria-label={t('tutor.placeholder')}
             lang={isUrduScript(input) ? 'ur' : undefined}
             dir={isUrduScript(input) ? 'rtl' : undefined}
-            className={`w-full bg-transparent text-ink outline-none placeholder:text-ink3 disabled:cursor-not-allowed ${
-              isUrduScript(input) ? 'urdu-inline text-[15px]' : 'text-[14px]'
+            /*
+             * A fixed height, so the field does not jump on the first Urdu
+             * letter, and Nastaliq at the size .urdu-inline used to give it
+             * (1.22 times the 16px around it) with room for its tall ink. Now
+             * that the class yields to utilities, the old 15px beside it won
+             * and Urdu came out smaller than the Latin it replaced. Latin is
+             * 16px on a phone, where anything smaller makes iOS zoom the page
+             * on focus and leave it zoomed.
+             */
+            className={`h-9 w-full bg-transparent text-ink outline-none placeholder:text-ink3 disabled:cursor-not-allowed ${
+              isUrduScript(input) ? 'font-urdu text-[19.5px] leading-9' : 'text-[16px] md:text-[14px]'
             }`}
           />
         </div>
         <button
           type="submit"
-          disabled={(!input.trim() && !photo) || thinking || outOfQuestions}
+          disabled={(!input.trim() && !photo) || thinking || outOfQuestions || history !== 'ready'}
           aria-label={t('tutor.send')}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-teal text-onbrand transition-colors duration-200 hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45"
         >

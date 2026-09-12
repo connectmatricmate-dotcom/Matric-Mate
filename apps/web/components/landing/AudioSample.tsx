@@ -49,7 +49,7 @@ export function AudioSample() {
             if (playing) a.pause();
             else void a.play();
           }}
-          className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full bg-teal text-white transition-colors duration-200 hover:bg-tealdark"
+          className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full bg-teal text-onbrand transition-colors duration-200 hover:bg-tealdark"
         >
           <Icon name={playing ? 'pause' : 'play'} size={24} strokeWidth={2.2} />
         </button>
@@ -81,7 +81,7 @@ export function AudioSample() {
             {TRACKS[l].name}
           </button>
         ))}
-        <span className="ml-auto text-[12.5px] text-ink3">Sample lesson</span>
+        <span className="ms-auto text-[12.5px] text-ink3">Sample lesson</span>
       </div>
 
       <audio

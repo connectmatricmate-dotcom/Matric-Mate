@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { channelStatus } from '@/lib/notify';
+import { cronAuthorised } from '@/lib/notify/jobs';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -15,8 +16,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
  * returns no values, only whether each one is present.
  */
 export async function GET(req: NextRequest) {
-  const secret = process.env.CRON_SECRET;
-  if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (!cronAuthorised(req)) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
 

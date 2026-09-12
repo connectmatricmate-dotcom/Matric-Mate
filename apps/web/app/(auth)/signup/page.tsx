@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { SignUpForm } from '@/components/auth/SignUpForm';
+import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Create your account',
-  description: 'Create a free MatricMate account and start preparing for your Class 9 or 10 board exams today.',
+  description:
+    'Create your MatricMate account for FBISE or Punjab Board, Class 9 or 10, in English or Urdu medium, and start preparing for your board exams.',
+  alternates: { canonical: canonicalUrl('/signup') },
 };
 
 export default async function SignUpPage({ searchParams }: { searchParams: Promise<{ next?: string; ref?: string }> }) {

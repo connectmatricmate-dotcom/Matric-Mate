@@ -1,11 +1,14 @@
-'use client';
-
-import { useCallback, useSyncExternalStore } from 'react';
 import { type StringKey, translate } from '@matricmate/core';
 import { Card, Icon, LinkBtn } from '@/components/ui/primitives';
-import { getServerSnapshot, getSnapshot, subscribe } from '@/lib/persisted-store';
 import { INCLUDED, THE_PLAN, rupees } from '@/lib/plans';
 
+/**
+ * The marketing pages are written in English and render outside <Localized>,
+ * so nothing here sets `lang` or `dir`. This used to read the stored UI
+ * language instead, and an Urdu account got Urdu lines in a Latin face, left
+ * to right, between the English plan copy. English, like the page around it.
+ */
+const t = (key: StringKey, params?: Record<string, string | number>) => translate('en', key, params);
 
 /**
  * The plan, on the pricing page. One product, one price, so there is nothing
@@ -13,21 +16,6 @@ import { INCLUDED, THE_PLAN, rupees } from '@/lib/plans';
  * student to do arithmetic before they could buy anything.
  */
 export function PlanPicker() {
-  /**
-   * Not useT(): that hook needs AppProvider, and /pricing renders without one.
-   * The persisted store lives outside React, so reading the language straight
-   * from it gives the same strings, follows the store wherever it is hydrated,
-   * and falls back to English on provider-less pages instead of crashing.
-   */
-  const lang = useSyncExternalStore(
-    subscribe,
-    () => getSnapshot().settings.language,
-    () => getServerSnapshot().settings.language
-  );
-  const t = useCallback(
-    (key: StringKey, params?: Record<string, string | number>) => translate(lang, key, params),
-    [lang]
-  );
   return (
     <section className="mx-auto max-w-[720px] px-5 pb-16">
       <Card className="flex flex-col gap-6 border-2 border-orange md:flex-row md:items-center">

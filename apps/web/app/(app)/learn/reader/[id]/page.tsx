@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Reader } from '@/components/screens/Reader';
 import { getChapter, getChapterContent } from '@/lib/content-readers';
+import { hasActivePlan } from '@/lib/entitlement';
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ section?: string }> };
 
@@ -13,12 +14,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ReaderPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const [chapter, content, { section }] = await Promise.all([getChapter(id), getChapterContent(id), searchParams]);
+  // The plan too: see the chapter page. No notes and no plan is the plan wall,
+  // no notes with a plan is a chapter whose notes are not written yet.
+  const [chapter, content, { section }, paid] = await Promise.all([
+    getChapter(id),
+    getChapterContent(id),
+    searchParams,
+    hasActivePlan(),
+  ]);
   if (!chapter) notFound();
 
   /* Where to open. The dashboard's "Carry on with {chapter}" button sends the
      section the student stopped at, so carrying on means carrying on rather
      than starting the chapter again. Read here rather than with
      useSearchParams so the first paint is already on the right section. */
-  return <Reader chapter={chapter} content={content} startSection={Math.max(0, Math.trunc(Number(section)) || 0)} />;
+  return <Reader chapter={chapter} content={content} paid={paid} startSection={Math.max(0, Math.trunc(Number(section)) || 0)} />;
 }

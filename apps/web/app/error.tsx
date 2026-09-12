@@ -4,6 +4,7 @@
  * Route error boundary. A designed failure, never a white screen or a raw stack.
  */
 import { useEffect } from 'react';
+import { SUPPORT_EMAIL } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon } from '@/components/ui/primitives';
 
@@ -21,7 +22,11 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         </span>
         <h1 className="mt-3 font-display text-[22px] text-ink">Something went wrong</h1>
         <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2">
-          The page couldn’t load. Try again. If it keeps happening, let us know on WhatsApp.
+          The page couldn’t load. Try again. If it keeps happening, write to{' '}
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="font-extrabold text-teal wrap-anywhere hover:underline">
+            {SUPPORT_EMAIL}
+          </a>
+          .
         </p>
         <div className="mt-5 flex justify-center gap-2">
           <Btn title="Try again" onClick={reset} />

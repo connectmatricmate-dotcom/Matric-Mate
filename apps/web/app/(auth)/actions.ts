@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import type { AuthError } from '@supabase/supabase-js';
 import { type StringKey, translate } from '@matricmate/core';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import { z } from 'zod';
@@ -22,6 +23,13 @@ import { createClient } from '@/lib/supabase/server';
 
 export type AuthState = {
   error?: string;
+  /**
+   * When that error was produced. The forms key their banner on it, so a
+   * second identical failure (the same wrong password twice, once the first
+   * banner has timed out) shows again. Keyed on the message alone, it stayed
+   * hidden and the button just stopped spinning.
+   */
+  at?: number;
   /** A link was emailed. Used by password reset, and by sign-up when the project confirms addresses. */
   sent?: boolean;
   /** Where that link went, so the page can name it rather than saying "your email". */
@@ -49,6 +57,44 @@ const SignIn = z.object({ email, password });
 
 const first = (err: z.ZodError) => (err.issues[0]?.message ?? 'auth.errForm') as StringKey;
 
+/** A failure for the form: in the student's language, and stamped so it shows every time. */
+async function fail(key: StringKey): Promise<AuthState> {
+  return { error: translate(await readUiLanguage(), key), at: Date.now() };
+}
+
+/**
+ * A Supabase auth failure, as one of our own sentences.
+ *
+ * Supabase's text is English whatever the account language, and some of it is
+ * written for developers ("For security purposes, you can only request this
+ * after 37 seconds"). The error code is stable where the wording is not, so it
+ * is matched first, then the status for rate limits. Anything unrecognised
+ * gets the generic line, and its real text goes to the server log, where
+ * somebody can act on it.
+ */
+function authErrorKey(error: AuthError, fallback: StringKey = 'auth.errGeneric'): StringKey {
+  switch (error.code) {
+    case 'invalid_credentials':
+      return 'auth.errCredentials';
+    case 'email_not_confirmed':
+      return 'auth.errNotConfirmed';
+    case 'user_already_exists':
+    case 'email_exists':
+      return 'auth.errRegistered';
+    case 'weak_password':
+      return 'auth.errWeakPassword';
+    case 'email_address_invalid':
+      return 'auth.errEmailInvalid';
+    case 'over_request_rate_limit':
+    case 'over_email_send_rate_limit':
+      return 'auth.errRateLimit';
+  }
+  if (error.status === 429) return 'auth.errRateLimit';
+  if (/already registered/i.test(error.message)) return 'auth.errRegistered';
+  console.error('auth error', error.code ?? error.status, error.message);
+  return fallback;
+}
+
 /**
  * The referral code this signup should be attributed to, if any.
  *
@@ -75,7 +121,7 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
     email: formData.get('email'),
     password: formData.get('password'),
   });
-  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
+  if (!parsed.success) return fail(first(parsed.error));
 
   const mobile = normaliseMobile(String(formData.get('mobile') ?? ''));
 
@@ -110,13 +156,17 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
     },
   });
 
-  if (error) {
-    // Supabase says "User already registered". Say something a person can act on.
-    if (/already registered/i.test(error.message)) {
-      return { error: translate(await readUiLanguage(), 'auth.errRegistered') };
-    }
-    return { error: error.message };
-  }
+  // Supabase says "User already registered", or a rate limit, in English.
+  // Say something a person can act on, in their language.
+  if (error) return fail(authErrorKey(error));
+
+  /*
+   * The code, if there was one, went to the trigger with this account. Left
+   * in place, the cookie would credit the same teacher with the next person to
+   * sign up on this browser for the rest of its thirty days: a sibling, or a
+   * classmate on a shared laptop.
+   */
+  (await cookies()).delete('mm_ref');
 
   /**
    * No session means the project is set to confirm email addresses. The account
@@ -144,7 +194,7 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
  */
 export async function resendConfirmationAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const address = String(formData.get('email') ?? '').trim();
-  if (!address) return { error: translate(await readUiLanguage(), 'auth.resendConfirmFail') };
+  if (!address) return fail('auth.resendConfirmFail');
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resend({
@@ -152,25 +202,28 @@ export async function resendConfirmationAction(_prev: AuthState, formData: FormD
     email: address,
     options: { emailRedirectTo: `${SITE_URL}/auth/callback?next=/onboarding/class` },
   });
-  if (error) return { error: translate(await readUiLanguage(), 'auth.resendConfirmFail') };
+  if (error) return fail(error.status === 429 ? 'auth.errRateLimit' : 'auth.resendConfirmFail');
   return { sent: true, email: address, notice: 'auth.resendConfirmDone' };
 }
 
 export async function signInAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = SignIn.safeParse({ email: formData.get('email'), password: formData.get('password') });
-  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
+  if (!parsed.success) return fail(first(parsed.error));
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
-    // Deliberately does not distinguish "no such account" from "wrong password".
-    // The difference tells a stranger which emails are registered here.
+    // Deliberately does not distinguish "no such account" from "wrong password":
+    // Supabase answers both with invalid_credentials, and the difference would
+    // tell a stranger which emails are registered here. What it does tell
+    // apart, an unconfirmed address or a rate limit, gets its own line, since
+    // "wrong password" for either sends somebody round in circles.
     //
     // Translated here rather than on the client: this is a server action, and
     // it can read the language cookie, so an Urdu student is not told their
     // password is wrong in English.
-    return { error: translate(await readUiLanguage(), 'auth.errCredentials') };
+    return fail(authErrorKey(error, error.status === 400 ? 'auth.errCredentials' : 'auth.errGeneric'));
   }
 
   /*
@@ -181,7 +234,8 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
    * a particular page keeps working.
    */
   const asked = safePath(formData.get('next'), '');
-  const landing = await landingFor(await currentRole());
+  const role = await currentRole();
+  const landing = await landingFor(role);
 
   /*
    * An explicit `next` wins, unless it is somewhere this account cannot go.
@@ -191,24 +245,36 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
    * link, gets bounced to log in, and is then sent back to a page the paywall
    * will bounce again. Honouring that blindly is how signing in ended on a
    * blank screen. When the landing decision says /upgrade, it wins.
+   *
+   * Staff get the same rule for anything outside their own area. A teacher
+   * or an administrator sent to /dashboard is bounced on to their own area by
+   * the student layout, which is the same double redirect (see landingFor).
    */
-  redirect(landing === '/upgrade' ? landing : asked || landing);
+  const allowed =
+    role === 'student' ? landing !== '/upgrade' : asked === landing || asked.startsWith(`${landing}/`);
+  redirect(allowed && asked ? asked : landing);
 }
 
 export async function resetPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = email.safeParse(formData.get('email'));
-  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
+  if (!parsed.success) return fail(first(parsed.error));
 
   const supabase = await createClient();
   // The link has to land on /auth/callback, which is the only place that can
   // turn the one-time code into a session. Sending it straight at /reset would
   // give the student a form with no authority to save anything.
-  await supabase.auth.resetPasswordForEmail(parsed.data, {
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
     redirectTo: `${SITE_URL}/auth/callback?next=/reset`,
   });
 
-  // Always the same answer, whether or not the account exists, for the same
-  // reason as above.
+  /*
+   * The same answer whether or not the account exists, for the same reason as
+   * above: Supabase does not report an unknown address, and neither do we.
+   * What it does report is said plainly. A rate limit, or a mail server that
+   * refused, used to come back as "Reset link sent", and the student waited
+   * for an email that was never coming.
+   */
+  if (error && error.code !== 'user_not_found') return fail(authErrorKey(error));
   return { sent: true };
 }
 
@@ -223,18 +289,22 @@ export async function setPasswordAction(_prev: AuthState, formData: FormData): P
     .object({ password, confirm: z.string() })
     .refine((v) => v.password === v.confirm, { message: 'auth.errPasswordsMatch' })
     .safeParse({ password: formData.get('password'), confirm: formData.get('confirm') });
-  if (!parsed.success) return { error: translate(await readUiLanguage(), first(parsed.error)) };
+  if (!parsed.success) return fail(first(parsed.error));
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: translate(await readUiLanguage(), 'auth.errLinkExpired') };
+  if (!user) return fail('auth.errLinkExpired');
 
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
-  if (error) return { error: error.message };
+  if (error) return fail(authErrorKey(error));
 
-  redirect('/dashboard');
+  // In one hop to wherever this account lives. /dashboard sent a teacher or
+  // an administrator through the student layout to be bounced again, and an
+  // unpaid student through the paywall: the blank-screen double redirect
+  // landingFor exists to prevent.
+  redirect(await landingFor(await currentRole()));
 }
 
 export async function signOutAction() {

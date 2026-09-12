@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { Card, Icon, LinkBtn } from '@/components/ui';
-import { SUPPORT_EMAIL } from '@matricmate/core';
+import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
+import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Delete your account',
   description: 'How to permanently delete a MatricMate account and everything stored against it.',
+  alternates: { canonical: canonicalUrl('/delete-account') },
 };
 
 /**
@@ -35,7 +37,7 @@ export default function DeleteAccountPage() {
           <h2 className="font-display text-[20px] text-ink">Ask us to delete it</h2>
           <p className="mt-2 text-mk-body text-ink2">
             There is no delete button inside MatricMate yet, so this is done by request and a person handles it. Email{' '}
-            <span className="font-extrabold text-ink">{SUPPORT_EMAIL}</span> from the address on the account, with
+            <span className="font-extrabold text-ink wrap-anywhere">{SUPPORT_EMAIL}</span> from the address on the account, with
             “delete my account” in the subject. You do not have to give a reason.
           </p>
           <p className="mt-2 text-mk-body text-ink2">
@@ -46,16 +48,16 @@ export default function DeleteAccountPage() {
             title={`Email ${SUPPORT_EMAIL}`}
             href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Delete my account')}`}
             icon="mail"
-            className="mt-4"
+            className="mt-4 w-full wrap-anywhere sm:w-auto"
           />
         </Card>
 
         <Card className="mt-4">
           <h2 className="font-display text-[20px] text-ink">If you cannot sign in</h2>
           <p className="mt-2 text-mk-body text-ink2">
-            Email <span className="font-extrabold text-ink">{SUPPORT_EMAIL}</span> from any address, or message the
-            support number, with the mobile number on the account. We verify ownership by sending a code to that
-            number, then delete it within seven days.
+            Email <span className="font-extrabold text-ink wrap-anywhere">{SUPPORT_EMAIL}</span> from any address, or
+            call {BUSINESS.phone} ({BUSINESS.hours}), with the name and mobile number on the account. We check the
+            account is really yours before anything is deleted, then delete it within seven days.
           </p>
         </Card>
 

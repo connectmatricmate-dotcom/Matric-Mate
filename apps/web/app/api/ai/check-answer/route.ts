@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { BOARD_WITH_ARTICLE } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chargeQuota, guardAi } from '@/lib/ai/guard';
+import { BOARD_WITH_ARTICLE, subjectMedium } from '@matricmate/core';
+import { AI_COST, AI_MODEL, chargeQuota, guardAi, refused, studentMedium } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -37,6 +37,10 @@ export async function POST(req: NextRequest) {
     marks?: number;
     answer?: string;
     medium?: string;
+    /** The question's chapter, or failing that its subject. Optional, and
+     *  only used to find the subject's own language. */
+    chapterId?: string;
+    subjectId?: string;
   };
   try {
     body = await req.json();
@@ -48,7 +52,14 @@ export async function POST(req: NextRequest) {
   const answer = (body.answer ?? '').trim().slice(0, 3000);
   const marks = Math.min(8, Math.max(1, Number(body.marks) || 3));
   const points = Array.isArray(body.points) ? body.points.slice(0, 8).map((p) => String(p).slice(0, 300)) : [];
-  const medium = body.medium === 'ur' ? 'ur' : 'en';
+  /*
+   * Feedback in the subject's own language. An Urdu-medium student's answer
+   * to an English grammar question was marked in Urdu, and an English-medium
+   * student's Urdu essay in English. Without a chapter or subject in the
+   * request this falls back to the student's medium, as it always did.
+   */
+  const from = String(body.chapterId || body.subjectId || '').slice(0, 40);
+  const medium = from ? subjectMedium(from, g.board, studentMedium(body.medium, g)) : studentMedium(body.medium, g);
   if (!question || !answer || !modelAnswer) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
   try {
@@ -58,7 +69,7 @@ export async function POST(req: NextRequest) {
       output_config: { effort: 'low', format: { type: 'json_schema', schema: VERDICT_SCHEMA } },
       system:
         `You are ${BOARD_WITH_ARTICLE[g.board]} Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) examiner marking a short answer. Award marks strictly by the marking points: each point earned is stated or clearly implied in the student answer. Partial credit is normal. Never award more than the maximum marks. feedback is 2 to 4 encouraging but honest sentences telling the student exactly what earned marks and what to add next time. missed lists the marking points they did not earn, empty when full marks. Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
-        languageRule(medium),
+        languageRule(medium, g.grade, g.board),
       messages: [
         {
           role: 'user',
@@ -66,9 +77,7 @@ export async function POST(req: NextRequest) {
         },
       ],
     });
-    if (response.stop_reason === 'refusal') {
-      return NextResponse.json({ error: 'refused', quota: g.quota }, { status: 200 });
-    }
+    if (response.stop_reason === 'refusal') return refused(g.quota);
     const block = response.content.find((b) => b.type === 'text');
     if (!block) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
     const verdict = JSON.parse(block.text) as { score: number; feedback: string; missed: string[] };

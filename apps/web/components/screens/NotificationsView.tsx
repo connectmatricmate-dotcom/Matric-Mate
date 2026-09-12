@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import type { Notification, NotificationTarget } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { RowsSkeleton } from '@/components/app/skeletons';
 import { Card, Empty, Item, SectionTitle } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
@@ -26,14 +27,22 @@ const ICON: Record<Notification['kind'], { icon: 'flame' | 'clock' | 'chart' | '
 };
 
 export function NotificationsView() {
-  const { state, actions } = useApp();
+  const { state, synced, actions } = useApp();
   const t = useT();
+  const unread = state.notifications.some((n) => !n.read);
 
-  // A short delay so the unread dot is still visible when the page opens.
+  /*
+   * Marked read once the account's inbox is actually here, and again for
+   * anything that arrives while the page is open. It ran once, 400ms after
+   * opening, which on a new browser was before the rows had come back: they
+   * then arrived unread and stayed that way. The short delay is so the
+   * unread dot is still visible when the page opens.
+   */
   useEffect(() => {
+    if (!unread || !synced) return;
     const timer = setTimeout(() => actions.readNotifications(), 400);
     return () => clearTimeout(timer);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [unread, synced, actions]);
 
   const { today, earlier } = useMemo(() => {
     const start = new Date().setHours(0, 0, 0, 0);
@@ -63,7 +72,11 @@ export function NotificationsView() {
     <Page width="focus">
       <PageHead back="/dashboard" backLabel={t('tabs.home')} title={t('notifications.title')} />
 
-      {state.notifications.length === 0 ? (
+      {state.notifications.length === 0 && !synced ? (
+        // Not "nothing here" before the inbox has been read: that is the
+        // wrong half of the pair for a student with receipts waiting.
+        <RowsSkeleton rows={3} />
+      ) : state.notifications.length === 0 ? (
         <Empty icon="bell" title={t('notifications.emptyTitle')} sub={t('notifications.emptyBody')} />
       ) : (
         <>

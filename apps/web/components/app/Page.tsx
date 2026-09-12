@@ -65,9 +65,11 @@ export function PageHead({
   return (
     <header className="mb-5">
       {back ? (
+        // no-print: the header itself prints (it is the report card's title),
+        // a way back to the previous screen does not.
         <Link
           href={back}
-          className="-ms-1 mb-1 inline-flex min-h-11 items-center gap-1 pe-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
+          className="no-print -ms-1 mb-1 inline-flex min-h-11 items-center gap-1 pe-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
         >
           <Icon name="chevron" size={17} className="rotate-180" />
           {backLabel ?? 'Back'}
@@ -84,7 +86,7 @@ export function PageHead({
               <Ur block className="text-[24px] leading-loose text-ink md:text-[27px]">{title}</Ur>
             </h1>
           ) : (
-            <h1 className="font-display text-[26px] leading-[1.15] text-ink md:text-[30px]">{title}</h1>
+            <h1 className="font-display text-[26px] leading-[1.15] text-ink md:text-[30px] rtl:leading-[1.8]">{title}</h1>
           )}
           {sub ? (
             subUrdu ? (
@@ -102,17 +104,31 @@ export function PageHead({
   );
 }
 
-/** Work column + rail. The rail follows the page on desktop and stacks on a phone. */
+/**
+ * Work column + rail. Side by side from xl; below that the rail stacks under
+ * the work. At lg the 236px sidebar and a 320px rail left the work column
+ * about as wide as a phone screen, on a laptop.
+ */
 export function Split({ children }: { children: React.ReactNode }) {
-  return <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">{children}</div>;
+  return <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">{children}</div>;
 }
 
+/**
+ * A size container, so what sits inside answers to the column's width rather
+ * than the window's. The window says little once a sidebar and a rail have
+ * taken their share of it.
+ */
 export function Work({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`min-w-0 ${className}`}>{children}</div>;
+  return <div className={`@container min-w-0 ${className}`}>{children}</div>;
 }
 
+/** Sticky beside the work, and scrolls on its own when it is taller than the window. */
 export function Rail({ children }: { children: React.ReactNode }) {
-  return <aside className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-[86px]">{children}</aside>;
+  return (
+    <aside className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-[86px] xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto xl:overscroll-contain">
+      {children}
+    </aside>
+  );
 }
 
 /**
@@ -137,6 +153,8 @@ export function Actions({ children, align = 'end' }: { children: React.ReactNode
 /**
  * Settings-style rows read badly when a toggle floats half a metre from its
  * label. Two columns on desktop keeps every row near its natural reading width.
+ * Keyed on the Work column it sits in (@xl, 36rem), not the viewport, so two
+ * columns only appear when each one has room.
  */
 export function CardGrid({ children, cols = 2 }: { children: React.ReactNode; cols?: 2 | 3 }) {
   /**
@@ -145,7 +163,7 @@ export function CardGrid({ children, cols = 2 }: { children: React.ReactNode; co
    * four cards of four heights instead of a grid.
    */
   return (
-    <div className={`grid items-stretch gap-4 [&>*]:h-full ${cols === 3 ? 'lg:grid-cols-3' : 'md:grid-cols-2'}`}>
+    <div className={`grid items-stretch gap-4 [&>*]:h-full ${cols === 3 ? 'lg:grid-cols-3' : '@xl:grid-cols-2'}`}>
       {children}
     </div>
   );

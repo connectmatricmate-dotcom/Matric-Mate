@@ -2,9 +2,13 @@
  * Marketing footer. `home` keeps the landing page's in-page anchors; every other
  * marketing page links back to the section on `/`, so a link never dead-ends.
  */
-import Image from 'next/image';
 import Link from 'next/link';
 import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
+import { Wordmark } from '@/components/ui/primitives';
+
+/* 44px rows on a phone, where every one of these is a thumb target; a
+   mouse gets the tighter 40px list. */
+const LINK = 'inline-flex min-h-11 items-center transition-colors duration-200 hover:text-teal md:min-h-10';
 
 const PRODUCT = [
   { href: '#inside', label: 'What’s inside' },
@@ -16,10 +20,11 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
   const to = (l: (typeof PRODUCT)[number]) => (l.absolute || home ? l.href : `/${l.href}`);
 
   return (
-    <footer className="border-t border-line bg-card">
+    // data-chrome keeps the footer off paper: see the print rules in globals.css.
+    <footer data-chrome className="border-t border-line bg-card">
       <div className="mx-auto flex max-w-[1100px] flex-col gap-6 px-5 py-10 md:flex-row md:items-start md:justify-between">
         <div className="max-w-[300px]">
-          <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} />
+          <Wordmark />
           <p className="mt-3 text-mk-small text-ink2">
             Exam preparation for FBISE and Punjab Board, Class 9 and 10, in English and Urdu medium. Built in Pakistan.
           </p>
@@ -38,10 +43,10 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
         <div className="flex gap-12">
           <div>
             <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink3">Product</p>
-            <ul className="mt-2.5 flex flex-col gap-2 text-mk-small text-ink2">
+            <ul className="mt-1.5 flex flex-col text-mk-small text-ink2">
               {PRODUCT.map((l) => (
                 <li key={l.label}>
-                  <Link className="hover:text-teal" href={to(l)}>
+                  <Link className={LINK} href={to(l)}>
                     {l.label}
                   </Link>
                 </li>
@@ -50,50 +55,50 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
           </div>
           <div>
             <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-ink3">Support</p>
-            <ul className="mt-2.5 flex flex-col gap-2 text-mk-small text-ink2">
+            <ul className="mt-1.5 flex flex-col text-mk-small text-ink2">
               <li>
-                <Link className="hover:text-teal" href={home ? '#faq' : '/#faq'}>
+                <Link className={LINK} href={home ? '#faq' : '/#faq'}>
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-teal" href="/services">
+                <Link className={LINK} href="/services">
                   What a plan includes
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-teal" href="/terms">
+                <Link className={LINK} href="/terms">
                   Terms and conditions
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-teal" href="/privacy">
+                <Link className={LINK} href="/privacy">
                   Privacy policy
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-teal" href="/refunds">
+                <Link className={LINK} href="/refunds">
                   Refunds and cancellation
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-teal" href="/delete-account">
+                <Link className={LINK} href="/delete-account">
                   Delete your account
                 </Link>
               </li>
               <li>
-                <a className="hover:text-teal" href={`mailto:${SUPPORT_EMAIL}`}>
+                <a className={`${LINK} wrap-anywhere`} href={`mailto:${SUPPORT_EMAIL}`}>
                   {SUPPORT_EMAIL}
                 </a>
               </li>
               {BUSINESS.phone ? (
                 <li>
-                  <a className="hover:text-teal" href={`tel:${BUSINESS.phone.replace(/[^+\d]/g, '')}`}>
+                  <a className={`${LINK} wrap-anywhere`} href={`tel:${BUSINESS.phone.replace(/[^+\d]/g, '')}`}>
                     {BUSINESS.phone}
                   </a>
                 </li>
               ) : null}
-              <li className="text-ink3">{BUSINESS.hours}</li>
+              <li className="pt-1.5 text-ink3">{BUSINESS.hours}</li>
             </ul>
           </div>
         </div>

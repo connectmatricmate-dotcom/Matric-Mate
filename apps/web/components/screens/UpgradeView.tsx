@@ -27,16 +27,19 @@ export function UpgradeView() {
           </span>
 
           <h1 className="mt-4 font-display text-[26px] text-ink">{t('billing.statusFree')}</h1>
-          <p className="mx-auto mt-2 max-w-[420px] text-[14.5px] leading-[1.65] text-ink2">{t('billing.freeBody')}</p>
+          <p className="mx-auto mt-2 max-w-[420px] text-[14.5px] leading-[1.65] text-ink2 rtl:leading-[1.9]">{t('billing.freeBody')}</p>
 
-          <p className="mt-6 font-display text-[38px] leading-none text-ink">{rupees(THE_PLAN.price)}</p>
+          {/* latin: a price keeps the Latin face in an Urdu account. */}
+          <p className="latin mt-6 font-display text-[38px] leading-none text-ink">{rupees(THE_PLAN.price)}</p>
           <p className="mt-1.5 text-[13.5px] font-extrabold text-ink2">{t('checkout.perMonthUnit')}</p>
 
           <div className="mt-6 flex justify-center">
-            <UpgradeButton label={t('billing.premium')} variant="orange" withPrice={false} />
+            {/* The column's width on a phone: the wrapper has to widen with
+                the button inside a centring row, or it stays content-wide. */}
+            <UpgradeButton label={t('billing.premium')} variant="orange" withPrice={false} full className="w-full sm:w-auto" />
           </div>
 
-          <p className="mt-3 text-[12.5px] leading-[1.6] text-ink2">{t('checkout.noChargeToday')}</p>
+          <p className="mt-3 text-[12.5px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('checkout.noChargeToday')}</p>
         </Card>
 
         <Card>
@@ -45,7 +48,7 @@ export function UpgradeView() {
             {perks.map((key) => (
               <li key={key} className="flex items-start gap-2.5">
                 <Icon name="check" size={17} strokeWidth={2.6} className="mt-0.5 shrink-0 text-green" />
-                <span className="text-[14px] leading-[1.6] text-ink">{t(key)}</span>
+                <span className="text-[14px] leading-[1.6] text-ink rtl:leading-[1.9]">{t(key)}</span>
               </li>
             ))}
           </ul>

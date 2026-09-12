@@ -1,6 +1,8 @@
 import 'server-only';
+import { randomUUID } from 'node:crypto';
 import { translate } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withRetry } from '../jobs';
 import type { ChannelAdapter } from '../types';
 
 /**
@@ -21,13 +23,23 @@ export const inbox: ChannelAdapter = {
   configured: () => true,
   send: async (to, notice) => {
     const admin = createAdminClient();
-    const { error } = await admin.from('notifications').insert({
+    /*
+     * The row's id is minted here so the insert can be retried. A gateway
+     * timeout does not say whether the row landed; with its own id, a retry of
+     * one that did collides on the primary key instead of putting the same
+     * message in the inbox twice, and the collision means it is there.
+     */
+    const row = {
+      id: randomUUID(),
       user_id: to.userId,
       kind: notice.kind,
       title: translate(to.lang, notice.title, notice.params),
       body: translate(to.lang, notice.body, notice.params),
       target: notice.target ?? null,
-    });
-    return error ? 'failed' : 'sent';
+    };
+    const { error } = await withRetry((signal) => admin.from('notifications').insert(row).abortSignal(signal));
+    if (!error || error.code === '23505') return 'sent';
+    console.error('notify/inbox: insert failed', error.message);
+    return 'failed';
   },
 };

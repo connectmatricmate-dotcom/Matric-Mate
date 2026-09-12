@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Privacy policy',
   description: 'What MatricMate stores about a student, why, who else sees it, and how to have it deleted.',
+  alternates: { canonical: canonicalUrl('/privacy') },
 };
 
 /**
@@ -21,7 +23,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'Who we are',
     paragraphs: [
-      `${BUSINESS.name} runs this website and the MatricMate Android app, from ${[BUSINESS.address, BUSINESS.city, BUSINESS.country].filter(Boolean).join(', ')}. We decide what is collected here and we are the people to complain to about it.`,
+      `${BUSINESS.name} runs this website and the MatricMate Android app (not yet on Google Play), from ${[BUSINESS.address, BUSINESS.city, BUSINESS.country].filter(Boolean).join(', ')}. We decide what is collected here and we are the people to complain to about it.`,
       `Write to ${SUPPORT_EMAIL}${BUSINESS.phone ? `, or call ${BUSINESS.phone}` : ''}.`,
     ],
   },
@@ -47,7 +49,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
       'The payment gateway, for the transaction itself: your name, email and mobile number are passed so the payment can be attributed and a receipt issued.',
       'Our hosting and database providers, who store the data on our behalf and may not use it for anything else.',
       'The provider of the language model behind the AI tutor, which receives the question being asked in order to answer it.',
-      'A parent or guardian you choose to share a report card with. That link is created by you, and it shows study progress, never your password or payment details.',
+      'A parent or guardian you give your monthly report card to. It is a PDF you download and pass on yourself, and it shows study progress, never your password or payment details.',
       'Nobody else, unless a Pakistani law or court requires it.',
     ],
   },
@@ -67,7 +69,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'Your choices',
     paragraphs: [
-      'You can correct your name, contact details, class and subjects at any time from Settings.',
+      `You can change your name, board, medium and subjects from your account, and your class once every seven days. To correct your email address or mobile number, write to ${SUPPORT_EMAIL} and we will change it for you.`,
       `You can have the whole account and everything attached to it deleted: use the delete account page, or write to ${SUPPORT_EMAIL}. It is done within seven days.`,
       'You can ask us for a copy of what we hold about you, and we will send it.',
     ],

@@ -5,7 +5,8 @@ import { TopperPapersScreen } from '@/components/screens/TopperPapersScreen';
 
 export const metadata: Metadata = {
   title: 'Topper papers',
-  description: 'Marked FBISE Class 9 topper answer scripts, subject by subject.',
+  // No class: the scripts carry none, see topperYears.
+  description: 'Marked FBISE topper answer scripts, subject by subject.',
 };
 
 export default async function TopperPapersPage() {

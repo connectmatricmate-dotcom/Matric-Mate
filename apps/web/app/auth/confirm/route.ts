@@ -33,8 +33,10 @@ export async function GET(request: Request) {
 
   if (error) {
     // Used once already, or expired. Both are ordinary: say so plainly rather
-    // than showing a student a failure they cannot act on.
-    return NextResponse.redirect(new URL('/login?error=expired', url.origin));
+    // than showing a student a failure they cannot act on. A recovery link
+    // goes to the reset request form, where a fresh one is a press away.
+    const failed = type === 'recovery' ? '/forgot?error=expired' : '/login?error=expired';
+    return NextResponse.redirect(new URL(failed, url.origin));
   }
 
   return NextResponse.redirect(new URL(next, url.origin));

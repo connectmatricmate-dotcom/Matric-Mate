@@ -37,12 +37,28 @@ const nunito = localFont({
 // every route for every visitor, including English-medium students who never
 // render an Urdu glyph. Without the hint the browser fetches it lazily, only
 // when Urdu text actually appears.
+//
+// The face has no Latin letters and no digits, so it is declared for Arabic
+// script only, and a "MCQ" or a "12" inside an Urdu account falls through to
+// Nunito (the next family in --font-urdu, see globals.css). The space, the
+// no-break space and the joiners stay in range: Nastaliq's space is half the
+// width of Nunito's, and taking it from Nunito would double every gap between
+// Urdu words. No metric-adjusted fallback either: next/font builds it from
+// local Arial with no unicode-range, so Latin would stop there before ever
+// reaching Nunito.
 const nastaliq = localFont({
   src: './fonts/nastaliq.woff2',
   weight: '400 700',
   display: 'swap',
   variable: '--font-nastaliq',
   preload: false,
+  adjustFontFallback: false,
+  declarations: [
+    {
+      prop: 'unicode-range',
+      value: 'U+0020, U+00A0, U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+2010-2011, U+FB50-FDFF, U+FE70-FEFF',
+    },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -84,6 +100,9 @@ export const viewport: Viewport = {
   themeColor: '#096A8B',
   width: 'device-width',
   initialScale: 1,
+  // Without it iOS reports every env(safe-area-inset-*) as 0, so the room the
+  // bottom bar, the sheets and the toasts ask for never arrives.
+  viewportFit: 'cover',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

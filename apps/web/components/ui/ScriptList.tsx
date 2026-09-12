@@ -4,8 +4,10 @@
  * These lists carry database rows and AI output, so any line can arrive in
  * Urdu. A marker typed straight into the text ("• {p}", "{i + 1}. {a}") lands
  * on the left of a right-to-left line, which reads as the marker belonging to
- * the line above. So the marker is its own element and the row flips, exactly
- * how Markdown.tsx handles its bullets and numbers blocks.
+ * the line above. So the marker is its own element and the row takes the
+ * line's own direction, exactly how Markdown.tsx handles its bullets and
+ * numbers blocks. A `dir` rather than a reversed row, so the marker lands on
+ * the right side in an Urdu account as well as an English one.
  */
 import { isUrduScript } from '@matricmate/core';
 import { ScriptText } from './primitives';
@@ -23,7 +25,7 @@ function Row({
 }) {
   const rtl = isUrduScript(text);
   return (
-    <li className={`flex items-baseline gap-2 ${rtl ? 'flex-row-reverse' : ''}`}>
+    <li dir={rtl ? 'rtl' : 'ltr'} className="flex items-baseline gap-2">
       <span aria-hidden className={`shrink-0 ${className}`}>
         {marker}
       </span>
@@ -72,7 +74,7 @@ export function ScriptNumbers({
       {items.map((a, i) => {
         const rtl = isUrduScript(a);
         return (
-          <li key={i} className={`flex items-baseline gap-2 ${rtl ? 'flex-row-reverse' : ''}`}>
+          <li key={i} dir={rtl ? 'rtl' : 'ltr'} className="flex items-baseline gap-2">
             <span aria-hidden className={`shrink-0 tabular-nums ${markerClassName ?? className}`}>
               {i + 1}.
             </span>

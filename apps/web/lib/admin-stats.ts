@@ -34,21 +34,47 @@ const dayKey = (offsetDays = 0): string =>
 
 const PAGE = 1000;
 
+/**
+ * A failed read is thrown, not counted as nothing. A page that stopped early
+ * used to end its loop as if it were the last one, and a head count that
+ * failed read as zero: a revenue figure quietly short is the worst way for
+ * this page to be wrong.
+ */
+function must<T extends { error: { message: string } | null }>(res: T, what: string): T {
+  if (res.error) {
+    console.error(`admin-stats: ${what} failed`, res.error.message);
+    throw new Error('Could not load the overview.');
+  }
+  return res;
+}
+
 export async function adminStats(): Promise<AdminStats> {
   const admin = createAdminClient();
   const HEAD = { count: 'exact' as const, head: true };
 
-  const monthStart = new Date();
-  monthStart.setUTCDate(1);
-  monthStart.setUTCHours(0, 0, 0, 0);
+  /*
+   * The month as the students and the admin live it. A UTC month began at
+   * five in the morning on the 1st in Karachi, so the first hours of every
+   * month counted towards the one before. Pakistan keeps +05:00 all year.
+   */
+  const monthStart = new Date(`${dayKey().slice(0, 7)}-01T00:00:00+05:00`);
+  /*
+   * Paying means a plan that is on and has not run out: planIsActive in
+   * lib/entitlement, written as a filter so the database can count it. The
+   * `active` column alone is never switched off when a plan expires, so it
+   * counted every student who had ever paid.
+   */
+  const nowIso = new Date().toISOString();
 
-  const [students, paidStudents, teachers, referred, today] = await Promise.all([
-    admin.from('profiles').select('*', HEAD).eq('role', 'student'),
-    admin.from('entitlements').select('*', HEAD).eq('active', true),
-    admin.from('affiliates').select('*', HEAD),
-    admin.from('profiles').select('*', HEAD).not('referred_by', 'is', null),
-    admin.from('active_days').select('*', HEAD).eq('day', dayKey()),
-  ]);
+  const [students, paidStudents, teachers, referred, today] = (
+    await Promise.all([
+      admin.from('profiles').select('*', HEAD).eq('role', 'student'),
+      admin.from('entitlements').select('*', HEAD).eq('active', true).gt('valid_till', nowIso),
+      admin.from('affiliates').select('*', HEAD),
+      admin.from('profiles').select('*', HEAD).not('referred_by', 'is', null),
+      admin.from('active_days').select('*', HEAD).eq('day', dayKey()),
+    ])
+  ).map((res, i) => must(res, `count ${i}`));
 
   /*
    * The week is distinct students, not rows. Somebody who studied on five of
@@ -57,7 +83,10 @@ export async function adminStats(): Promise<AdminStats> {
    */
   const weekUsers = new Set<string>();
   for (let from = 0; ; from += PAGE) {
-    const { data } = await admin.from('active_days').select('user_id').gte('day', dayKey(6)).range(from, from + PAGE - 1);
+    const { data } = must(
+      await admin.from('active_days').select('user_id').gte('day', dayKey(6)).order('user_id').order('day').range(from, from + PAGE - 1),
+      'active week',
+    );
     const rows = (data ?? []) as { user_id: string }[];
     for (const r of rows) weekUsers.add(r.user_id);
     if (rows.length < PAGE) break;
@@ -71,7 +100,10 @@ export async function adminStats(): Promise<AdminStats> {
   let revenue = 0;
   let revenueThisMonth = 0;
   for (let from = 0; ; from += PAGE) {
-    const { data } = await admin.from('payments').select('amount, at').eq('status', 'paid').range(from, from + PAGE - 1);
+    const { data } = must(
+      await admin.from('payments').select('amount, at').eq('status', 'paid').order('id').range(from, from + PAGE - 1),
+      'revenue',
+    );
     const rows = (data ?? []) as { amount: number | null; at: string }[];
     for (const r of rows) {
       revenue += r.amount ?? 0;
@@ -87,18 +119,25 @@ export async function adminStats(): Promise<AdminStats> {
    */
   const referredIds: string[] = [];
   for (let from = 0; ; from += PAGE) {
-    const { data } = await admin.from('profiles').select('id').not('referred_by', 'is', null).range(from, from + PAGE - 1);
+    const { data } = must(
+      await admin.from('profiles').select('id').not('referred_by', 'is', null).order('id').range(from, from + PAGE - 1),
+      'referred',
+    );
     const rows = (data ?? []) as { id: string }[];
     referredIds.push(...rows.map((r) => r.id));
     if (rows.length < PAGE) break;
   }
   let referredPaid = 0;
   for (let i = 0; i < referredIds.length; i += 200) {
-    const { count } = await admin
-      .from('entitlements')
-      .select('*', HEAD)
-      .eq('active', true)
-      .in('user_id', referredIds.slice(i, i + 200));
+    const { count } = must(
+      await admin
+        .from('entitlements')
+        .select('*', HEAD)
+        .eq('active', true)
+        .gt('valid_till', nowIso)
+        .in('user_id', referredIds.slice(i, i + 200)),
+      'referred paying',
+    );
     referredPaid += count ?? 0;
   }
 

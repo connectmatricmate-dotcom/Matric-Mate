@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { chapterById, reminderHour, weakTopics } from '@matricmate/core';
+import { reminderHour, weakTopics } from '@matricmate/core';
 import type { Attempt, Language } from '@matricmate/core';
+import { planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   awayFor,
@@ -12,7 +13,8 @@ import {
   streakMilestone,
   weakTopicNudge,
 } from '@/lib/notify';
-import type { Notice } from '@/lib/notify';
+import type { Notice, Recipient } from '@/lib/notify';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll } from '@/lib/notify/jobs';
 
 /**
  * The evening nudge, and the thing that makes two settings real.
@@ -37,8 +39,19 @@ import type { Notice } from '@/lib/notify';
  * deserves interrupting them, and only falls back to a general nudge when
  * nothing specific applies. Even that fallback rotates through four wordings.
  *
+ * Students with a plan only. Staff accounts were being told to come and study,
+ * and a student without a plan was being sent to screens that only bounce them
+ * to the price list.
+ *
+ * Safe to run twice in the same hour, and it is: a second pg_cron entry calls
+ * it again five minutes later (migration 0040). Anyone already nudged tonight
+ * is skipped, so the second run only reaches the students the first one could
+ * not, because the database timed out or the run ran out of time.
+ *
  * Costs nothing per student: no model call, a handful of rows, one insert.
  */
+
+export const maxDuration = 300;
 
 /** Only ever one nudge per student per evening, whichever kind it wins. */
 const KINDS = ['reminder', 'streak'];
@@ -62,11 +75,24 @@ const WINDOW_DAYS = 21;
  * weeks.
  */
 const HISTORY_DAYS = 400;
+/** A ceiling on one run. Anyone past it is logged, and the :05 run takes them. */
 const MAX_PER_RUN = 500;
+/** Students sent to at once. One at a time, a run reached about ninety. */
+const CONCURRENCY = 8;
+/**
+ * When to stop starting new sends. Well inside the two minutes pg_net waits
+ * for an answer, so a run that has to stop early still gets to say so.
+ */
+const BUDGET_MS = 100_000;
+/** A weak topic already named within this many days is not named again. */
+const TOPIC_REPEAT_DAYS = 3;
+/** Tasks on today's plan: buildPlan in core makes three. */
+const PLAN_TASKS = 3;
 /** Streaks worth congratulating rather than passing over in silence. */
 const MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
 
 type ProfileRow = { id: string; settings: unknown; onboarding: { medium?: string } | null; created_at: string };
+type AttemptRow = { user_id: string; chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string };
 
 const karachiDay = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(d);
 
@@ -91,12 +117,36 @@ function daysSinceLast(days: Set<string>, today: Date): number {
   return WINDOW_DAYS + 1;
 }
 
+/** One paged read per slice of ids, one slice after another. */
+async function forIds<Row>(
+  stage: string,
+  ids: string[],
+  page: (slice: string[], from: number, to: number, signal: AbortSignal) => PromiseLike<{ data: Row[] | null; error: { message: string } | null; status?: number }>,
+): Promise<Row[]> {
+  const out: Row[] = [];
+  for (const slice of chunks(ids)) out.push(...(await pageAll<Row>(stage, (from, to, signal) => page(slice, from, to, signal))));
+  return out;
+}
+
 export async function GET(req: NextRequest) {
-  const secret = process.env.CRON_SECRET;
-  if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (!cronAuthorised(req)) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
+  try {
+    return await run();
+  } catch (e) {
+    // A read that failed even after retrying. Not a 200: pg_cron records the
+    // run as succeeded whatever happens, so this status is the only trace.
+    console.error('[cron/nudge] run failed', e instanceof Error ? e.message : e);
+    return NextResponse.json(
+      { error: 'incomplete', stage: e instanceof JobError ? e.stage : 'unknown', detail: e instanceof Error ? e.message : String(e) },
+      { status: 503 },
+    );
+  }
+}
 
+async function run(): Promise<NextResponse> {
+  const startedAt = Date.now();
   const admin = createAdminClient();
   const now = new Date();
   const today = karachiDay(now);
@@ -108,163 +158,252 @@ export async function GET(req: NextRequest) {
   /*
    * Whose hour is it, asked before anything else.
    *
-   * This used to read every active_days row for the past year and filter
-   * afterwards. That was affordable once a night and is not six times, and it
-   * is the wrong way round anyway: the cheap, small table decides who is even
-   * eligible this hour, and only then do we look up their history. Paginated
-   * because select() silently stops at a thousand rows.
+   * The cheap, small table decides who is even eligible this hour, and only
+   * then do we look up their history. Students only, in a stable order so the
+   * pages neither skip nor repeat anyone.
    */
-  const profiles: ProfileRow[] = [];
-  for (let from = 0; ; from += 1000) {
-    const { data, error } = await admin.from('profiles').select('id,settings,onboarding,created_at').range(from, from + 999);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    profiles.push(...((data ?? []) as ProfileRow[]));
-    if ((data ?? []).length < 1000) break;
-  }
+  const profiles = await pageAll<ProfileRow>('profiles', (from, to, signal) =>
+    admin
+      .from('profiles')
+      .select('id,settings,onboarding,created_at')
+      .eq('role', 'student')
+      .order('id')
+      .range(from, to)
+      .abortSignal(signal),
+  );
 
-  const dueNow = profiles.filter((p) => {
+  const dueHour = profiles.filter((p) => {
     const settings = (p.settings ?? {}) as Record<string, unknown>;
     // Absent means never touched, and both default to on. Only an explicit
     // false is a student saying no.
     if (settings.reminders === false && settings.streakAlerts === false) return false;
     return reminderHour(settings.reminderTime as string | undefined) === hourNow;
   });
-  if (!dueNow.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+  if (!dueHour.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
 
-  const dueIds = dueNow.map((p) => p.id).slice(0, MAX_PER_RUN);
+  // With a plan, by the same rule as the paywall.
+  const plans = await forIds<{ user_id: string; active: boolean | null; valid_till: string | null }>(
+    'entitlements',
+    dueHour.map((p) => p.id),
+    (slice, from, to, signal) =>
+      admin.from('entitlements').select('user_id,active,valid_till').in('user_id', slice).order('user_id').range(from, to).abortSignal(signal),
+  );
+  const paying = new Set(plans.filter(planIsActive).map((e) => e.user_id));
+  const due = dueHour.filter((p) => paying.has(p.id));
+  if (!due.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+
+  /*
+   * What we have told them lately. The last 18 hours decide "already nudged
+   * this evening", so a retried or double-fired run cannot put a second
+   * sentence in the same inbox. The last few days decide whether tonight's
+   * weak topic was already named: the same "X is your weakest topic" went
+   * out four nights running to one student.
+   */
+  const lately = await forIds<{ user_id: string; title: string; body: string; at: string }>(
+    'notifications',
+    due.map((p) => p.id),
+    (slice, from, to, signal) =>
+      admin
+        .from('notifications')
+        .select('user_id,title,body,at')
+        .in('user_id', slice)
+        .in('kind', KINDS)
+        .gte('at', new Date(now.getTime() - TOPIC_REPEAT_DAYS * 864e5).toISOString())
+        .order('id')
+        .range(from, to)
+        .abortSignal(signal),
+  );
+  const tonight = now.getTime() - 18 * 60 * 60 * 1000;
+  const already = new Set(lately.filter((n) => Date.parse(n.at) >= tonight).map((n) => n.user_id));
+  const saidLately = new Map<string, string[]>();
+  for (const n of lately) saidLately.set(n.user_id, [...(saidLately.get(n.user_id) ?? []), `${n.title} ${n.body}`]);
+
+  /*
+   * The ceiling applies after the ones already nudged are set aside, so a
+   * second run carries on from where the first stopped rather than meeting
+   * the same five hundred again.
+   */
+  const pending = due.filter((p) => !already.has(p.id));
+  const batch = pending.slice(0, MAX_PER_RUN);
+  const dropped = pending.length - batch.length;
+  if (dropped) console.warn(`[cron/nudge] ${dropped} students over the per-run ceiling, left for the next run`);
+  if (!batch.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
 
   const historyStart = karachiDay(new Date(now.getTime() - HISTORY_DAYS * 864e5));
-  const { data: dayRows, error } = await admin
-    .from('active_days')
-    .select('user_id,day')
-    .in('user_id', dueIds)
-    .gte('day', historyStart)
-    .limit(100000);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
+  const dayRows = await forIds<{ user_id: string; day: string }>(
+    'active_days',
+    batch.map((p) => p.id),
+    (slice, from, to, signal) =>
+      admin
+        .from('active_days')
+        .select('user_id,day')
+        .in('user_id', slice)
+        .gte('day', historyStart)
+        .order('user_id')
+        .order('day')
+        .range(from, to)
+        .abortSignal(signal),
+  );
   const daysByUser = new Map<string, Set<string>>();
-  for (const r of (dayRows ?? []) as { user_id: string; day: string }[]) {
+  for (const r of dayRows) {
     const set = daysByUser.get(r.user_id) ?? new Set<string>();
     set.add(r.day);
     daysByUser.set(r.user_id, set);
   }
 
   /*
-   * Of those due this hour, the ones still recently active. Someone whose last
-   * day was in March is not owed a reminder; the year of history is read only
-   * so that a long streak is counted at its real length.
+   * Of those due this hour, the ones still recently active, and the ones who
+   * have never studied at all.
+   *
+   * The second group used to be invisible, because this list was built from
+   * active_days and a student with no activity has no rows in it. So the one
+   * person most in need of "come and study" was the only one who could never
+   * receive it. They join with an empty day set, and are dropped once their
+   * account is older than the window: past that, a nightly tap on the
+   * shoulder is noise to somebody who never started.
    */
-  const everyone = [...daysByUser.entries()].filter(([, days]) => daysSinceLast(days, now) <= WINDOW_DAYS);
+  const candidates: { profile: ProfileRow; days: Set<string>; neverStarted: boolean }[] = [];
+  for (const p of batch) {
+    const days = daysByUser.get(p.id);
+    if (days && daysSinceLast(days, now) <= WINDOW_DAYS) {
+      candidates.push({ profile: p, days, neverStarted: false });
+      continue;
+    }
+    const age = Math.floor((now.getTime() - Date.parse(p.created_at)) / 864e5);
+    if (!days?.size && Number.isFinite(age) && age <= WINDOW_DAYS) candidates.push({ profile: p, days: new Set(), neverStarted: true });
+  }
+  if (!candidates.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+  const ids = candidates.map((c) => c.profile.id);
 
   /*
-   * And the students who have never studied at all.
-   *
-   * They were invisible here, because this list was built from active_days and
-   * a student with no activity has no rows in it. So the one person most in
-   * need of "come and study" was the only one who could never receive it: you
-   * could install the app, leave it two days, and nothing would ever arrive.
-   *
-   * They join on the same terms as everybody else, with an empty day set, and
-   * are dropped once their account is older than the window. Past that, a
-   * nightly tap on the shoulder is noise to somebody who never started.
+   * Attempts only for the students whose message could depend on them:
+   * someone who studied today or never has gets a message that does not.
+   * Oldest first, so the last row per student really is their latest; this
+   * read had no order, and "the chapter they left halfway" was whichever row
+   * the database happened to return last.
    */
-  const started = new Set(everyone.map(([id]) => id));
-  const neverStarted = new Set<string>();
-  for (const p of dueNow) {
-    if (started.has(p.id)) continue;
-    const age = Math.floor((now.getTime() - Date.parse(p.created_at)) / 864e5);
-    if (Number.isFinite(age) && age <= WINDOW_DAYS) {
-      neverStarted.add(p.id);
-      everyone.push([p.id, new Set<string>()]);
-    }
-  }
-
-  if (!everyone.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
-  const ids = everyone.map(([id]) => id);
-
-  const [{ data: sentRecently }, { data: attemptRows }, { data: planRows }] = await Promise.all([
-    // Already nudged this evening, so a retried or double-fired cron cannot
-    // put a second sentence in the same inbox.
-    admin
-      .from('notifications')
-      .select('user_id')
-      .in('user_id', ids)
-      .in('kind', KINDS)
-      .gte('at', new Date(now.getTime() - 18 * 60 * 60 * 1000).toISOString()),
-    admin
-      .from('attempts')
-      .select('user_id,chapter_id,subject_id,topic,correct,confidence,at')
-      .in('user_id', ids)
-      .gte('at', new Date(now.getTime() - 30 * 864e5).toISOString())
-      .limit(20000),
-    admin.from('plan_done').select('user_id').in('user_id', ids).eq('day', today),
+  const needAttempts = candidates.filter((c) => !c.neverStarted && !c.days.has(today)).map((c) => c.profile.id);
+  const [attemptRows, planRows] = await Promise.all([
+    forIds<AttemptRow>('attempts', needAttempts, (slice, from, to, signal) =>
+      admin
+        .from('attempts')
+        .select('user_id,chapter_id,subject_id,topic,correct,confidence,at')
+        .in('user_id', slice)
+        .gte('at', new Date(now.getTime() - 30 * 864e5).toISOString())
+        .order('at')
+        .order('id')
+        .range(from, to)
+        .abortSignal(signal),
+    ),
+    forIds<{ user_id: string; task_id: string }>('plan_done', ids, (slice, from, to, signal) =>
+      admin
+        .from('plan_done')
+        .select('user_id,task_id')
+        .in('user_id', slice)
+        .eq('day', today)
+        .order('user_id')
+        .order('task_id')
+        .range(from, to)
+        .abortSignal(signal),
+    ),
   ]);
 
-  const already = new Set(((sentRecently ?? []) as { user_id: string }[]).map((r) => r.user_id));
-  const byId = new Map(dueNow.map((p) => [p.id, p]));
-
-  type Row = { user_id: string; chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string };
-  const attemptsByUser = new Map<string, Row[]>();
-  for (const r of (attemptRows ?? []) as Row[]) {
-    const list = attemptsByUser.get(r.user_id) ?? [];
-    list.push(r);
-    attemptsByUser.set(r.user_id, list);
-  }
+  const attemptsByUser = new Map<string, AttemptRow[]>();
+  for (const r of attemptRows) attemptsByUser.set(r.user_id, [...(attemptsByUser.get(r.user_id) ?? []), r]);
   const planDoneByUser = new Map<string, number>();
-  for (const r of (planRows ?? []) as { user_id: string }[]) {
-    planDoneByUser.set(r.user_id, (planDoneByUser.get(r.user_id) ?? 0) + 1);
-  }
+  for (const r of planRows) planDoneByUser.set(r.user_id, (planDoneByUser.get(r.user_id) ?? 0) + 1);
 
+  /*
+   * Chapter names from the chapters table. The bundled catalogue on this
+   * server knows only FBISE Class 9, so for every Class 10 and Punjab student
+   * the "resume chapter" message could never be written, and they got the
+   * weak-topic one instead, night after night.
+   */
+  const lastChapterIds = [...new Set([...attemptsByUser.values()].map((rows) => rows[rows.length - 1]?.chapter_id).filter(Boolean))];
+  const chapterRows = await forIds<{ id: string; title: string; urdu_title: string | null }>('chapters', lastChapterIds, (slice, from, to, signal) =>
+    admin.from('chapters').select('id,title,urdu_title').in('id', slice).order('id').range(from, to).abortSignal(signal),
+  );
+  const chapterById = new Map(chapterRows.map((c) => [c.id, c]));
+
+  const stopAt = startedAt + BUDGET_MS;
   let sent = 0;
+  let failed = 0;
   const picked: Record<string, number> = {};
 
-  for (const [userId, days] of everyone) {
-    if (already.has(userId)) continue;
+  const reached = await eachLimited(
+    candidates,
+    CONCURRENCY,
+    async ({ profile, days, neverStarted }) => {
+      const settings = (profile.settings ?? {}) as Record<string, unknown>;
+      /*
+       * The student's language, taken from the profile rows already loaded
+       * above rather than by asking again per student. The dispatcher
+       * translates every sentence itself; this is only for the values
+       * interpolated INTO one, which it cannot translate because they are
+       * content, not copy.
+       */
+      const lang: Language = profile.onboarding?.medium === 'ur' ? 'ur' : 'en';
+      // Absent means never touched, and both default to on. Only an explicit
+      // false is a student saying no.
+      const wantsReminder = settings.reminders !== false;
+      const wantsStreak = settings.streakAlerts !== false;
+      if (!wantsReminder && !wantsStreak) return;
 
-    const profile = byId.get(userId);
-    const settings = ((profile?.settings ?? {}) as Record<string, unknown>) ?? {};
-    /*
-     * The student's language, taken from the profile rows already loaded above
-     * rather than by asking again per student. The dispatcher translates every
-     * sentence itself; this is only for the values interpolated INTO one, which
-     * it cannot translate because they are content, not copy.
-     */
-    const lang: Language = profile?.onboarding?.medium === 'ur' ? 'ur' : 'en';
-    // Absent means never touched, and both default to on. Only an explicit
-    // false is a student saying no.
-    const wantsReminder = settings.reminders !== false;
-    const wantsStreak = settings.streakAlerts !== false;
-    if (!wantsReminder && !wantsStreak) continue;
+      const attempts = attemptsByUser.get(profile.id) ?? [];
+      const last = attempts[attempts.length - 1];
+      const chapter = last ? chapterById.get(last.chapter_id) : undefined;
+      const notice = pick({
+        studiedToday: days.has(today),
+        streakToday: streakEndingAt(days, now),
+        streakYesterday: streakEndingAt(days, yesterday),
+        awayDays: daysSinceLast(days, now),
+        attempts,
+        // The chapter's own Urdu name, not the English one dropped into an
+        // Urdu sentence. Topics stay Latin on purpose: Urdu-medium textbooks
+        // keep technical terms in English, and so does the rest of this app.
+        lastChapter: chapter ? (lang === 'ur' && chapter.urdu_title) || chapter.title : null,
+        planTicks: planDoneByUser.get(profile.id) ?? 0,
+        saidLately: saidLately.get(profile.id) ?? [],
+        wantsReminder,
+        wantsStreak,
+        dayIndex,
+        neverStarted,
+      });
+      if (!notice) return;
 
-    const studiedToday = days.has(today);
-    const notice = pick({
-      studiedToday,
-      streakToday: streakEndingAt(days, now),
-      streakYesterday: streakEndingAt(days, yesterday),
-      awayDays: daysSinceLast(days, now),
-      attempts: attemptsByUser.get(userId) ?? [],
-      planTicks: planDoneByUser.get(userId) ?? 0,
-      wantsReminder,
-      wantsStreak,
-      dayIndex,
-      lang,
-      neverStarted: neverStarted.has(userId),
-    });
-    if (!notice) continue;
+      /*
+       * The recipient from the row already in hand. Loading it per student
+       * cost a profile read and an auth lookup each, for an email address a
+       * nudge never uses.
+       */
+      const recipient: Recipient = {
+        userId: profile.id,
+        lang,
+        email: null,
+        prefs: { channelPush: settings.channelPush !== false, channelEmail: settings.channelEmail !== false },
+      };
+      // Through the dispatcher, so the same message reaches the phone and the
+      // inbox without this job knowing anything about either.
+      const report = await notify(recipient, notice);
+      if (report.inbox === 'sent') {
+        sent++;
+        const label = String(notice.title).replace('notifications.', '');
+        picked[label] = (picked[label] ?? 0) + 1;
+      } else failed++;
+    },
+    () => Date.now() > stopAt,
+  );
 
-    // Through the dispatcher, so the same message reaches the phone and the
-    // inbox without this job knowing anything about either.
-    const report = await notify(userId, notice);
-    if (report.inbox === 'sent') {
-      sent++;
-      const label = String(notice.title).replace('notifications.', '');
-      picked[label] = (picked[label] ?? 0) + 1;
-    }
-  }
-
+  const unfinished = candidates.length - reached;
   // The breakdown is the point of the logging: if every student is getting the
   // same generic nudge, the picker is not doing its job and that shows here.
-  return NextResponse.json({ hour: hourNow, considered: everyone.length, sent, picked });
+  const summary = { hour: hourNow, considered: candidates.length, sent, failed, unfinished, dropped, picked };
+  /*
+   * Anyone not reached is a run that did not finish, and it says so. The
+   * :05 run picks them up; this status is what makes it visible either way.
+   */
+  if (failed || unfinished || dropped) return NextResponse.json({ error: 'incomplete', ...summary }, { status: 503 });
+  return NextResponse.json(summary);
 }
 
 type Signals = {
@@ -272,12 +411,15 @@ type Signals = {
   streakToday: number;
   streakYesterday: number;
   awayDays: number;
-  attempts: { chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string }[];
+  attempts: AttemptRow[];
+  /** The name of the chapter they last answered a question in, ready to print. */
+  lastChapter: string | null;
   planTicks: number;
+  /** Titles and bodies of what they were sent in the last few days. */
+  saidLately: string[];
   wantsReminder: boolean;
   wantsStreak: boolean;
   dayIndex: number;
-  lang: Language;
   /** Signed up, never studied. Every history signal below is empty for them. */
   neverStarted: boolean;
 };
@@ -317,20 +459,14 @@ function pick(s: Signals): Notice | null {
 
   // 3. Today's plan, started and abandoned. Only when they actually began it:
   //    "3 tasks left" to someone who never opened the app reads as a scold.
-  if (s.planTicks > 0) return planUnfinished(Math.max(1, 5 - s.planTicks));
+  //    The plan has three tasks; this said five, so one tick read "4 left".
+  if (s.planTicks > 0 && s.planTicks < PLAN_TASKS) return planUnfinished(PLAN_TASKS - s.planTicks);
 
   // 4. A chapter left halfway. The most concrete thing we can offer.
-  const last = s.attempts.length ? s.attempts[s.attempts.length - 1] : null;
-  if (last) {
-    const chapter = chapterById(last.chapter_id);
-    // The chapter's own Urdu name, not the English one dropped into an Urdu
-    // sentence. Topics below stay Latin on purpose: FBISE Urdu-medium
-    // textbooks keep technical terms in English, and so does the rest of this
-    // app (see the `.latin` rule in globals.css).
-    if (chapter) return resumeChapter((s.lang === 'ur' && chapter.urduTitle) || chapter.title);
-  }
+  if (s.lastChapter) return resumeChapter(s.lastChapter);
 
-  // 5. Their genuinely worst topic, named, with the number.
+  // 5. Their genuinely worst topic, named, with the number. Not the same
+  //    topic as the last few nights: by the third time it is wallpaper.
   if (s.attempts.length >= 10) {
     const worst = weakTopics(
       s.attempts.map((a, i) => ({
@@ -346,7 +482,7 @@ function pick(s: Signals): Notice | null {
       })),
       3,
     )[0];
-    if (worst) return weakTopicNudge(worst.topic, worst.accuracy);
+    if (worst?.topic && !s.saidLately.some((said) => said.includes(worst.topic))) return weakTopicNudge(worst.topic, worst.accuracy);
   }
 
   // 6. Nothing specific to say, so say something general, and a different

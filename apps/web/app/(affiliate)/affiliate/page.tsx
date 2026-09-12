@@ -4,6 +4,7 @@ import { currentAffiliate } from '@/lib/affiliate-session';
 import { SITE_URL } from '@/lib/site';
 import { Panel, Row, Stat, StatGrid, Table, Td, rupees } from '@/components/admin/bits';
 import { ShareLink } from '@/components/affiliate/ShareLink';
+import { Skeleton } from '@/components/ui/primitives';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +29,9 @@ async function Money() {
           subtraction hides the only lever they have. */}
       <StatGrid>
         <Stat value={String(totals.students)} label="Students joined" />
-        <Stat value={String(totals.paidStudents)} label="Paying" tone="green" />
+        {/* "Have paid": everyone who has ever paid, which is what your share
+            is worked out from. A lapsed plan does not take them off it. */}
+        <Stat value={String(totals.paidStudents)} label="Have paid" tone="green" />
         <Stat value={String(totals.students - totals.paidStudents)} label="Not paid yet" tone="orange" />
         <Stat value={rupees(totals.earned)} label="Earned in total" tone="teal" />
       </StatGrid>
@@ -52,9 +55,11 @@ async function Money() {
           <Table head={['Date', 'Amount', 'Note']}>
             {history.map((p) => (
               <Row key={p.id}>
-                <Td>{when(p.at)}</Td>
-                <Td className="font-extrabold">{rupees(p.amount)}</Td>
-                <Td>{p.note ?? ''}</Td>
+                <Td num>{when(p.at)}</Td>
+                <Td num className="font-extrabold">
+                  {rupees(p.amount)}
+                </Td>
+                <Td className="wrap-anywhere">{p.note ?? ''}</Td>
               </Row>
             ))}
           </Table>
@@ -69,15 +74,20 @@ async function Money() {
   );
 }
 
+/** Shaped like Money: two rows of stats, the Panel's heading and box, the footnote. */
 function MoneySkeleton() {
+  const stat = (k: string) => <div key={k} className="h-[80px] animate-pulse rounded-[16px] border border-line bg-card" />;
   return (
     <>
-      <StatGrid>
-        {['a', 'b', 'c', 'd'].map((k) => (
-          <div key={k} className="h-[86px] animate-pulse rounded-[16px] border border-line bg-card" />
-        ))}
-      </StatGrid>
-      <div className="mt-7 h-[200px] animate-pulse rounded-[16px] border border-line bg-card" />
+      <StatGrid>{['a', 'b', 'c', 'd'].map(stat)}</StatGrid>
+      <div className="mt-3">
+        <StatGrid>{['e', 'f'].map(stat)}</StatGrid>
+      </div>
+      <div className="mt-7">
+        <Skeleton className="mb-2.5 h-[25px] w-40" />
+        <div className="h-[140px] animate-pulse rounded-[16px] border border-line bg-card" />
+      </div>
+      <Skeleton className="mt-6 h-[36px] w-full max-w-[640px]" />
     </>
   );
 }

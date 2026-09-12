@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { SUBJECT_ICON, accuracy, boardName, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, type IconName, type StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
-import { CoachRail, ConfidenceRail, StreakRail, UpgradeRail, WeakRail } from '@/components/app/rails';
+import { CoachRail, ConfidenceRail, StreakRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
 import { createClient } from '@/lib/supabase/client';
 import { useNow } from '@/lib/now';
@@ -112,13 +112,29 @@ export function DashboardView() {
               />
             </div>
 
+            {/* Never a bare 0/0. A plan is built from the chapters this
+                browser knows, and when it knows none yet (a new syllabus
+                still loading, a subject with nothing published) the card
+                says where to go instead of showing an empty frame. */}
+            {derived.plan.length === 0 ? (
+              <div className="border-t border-onbrand-hair pt-3">
+                <p className="text-[13.5px] font-extrabold text-onbrand rtl:leading-[1.9]">{t('dash.planEmpty')}</p>
+                <Link
+                  href="/study"
+                  className="-ms-2 mt-1 inline-flex min-h-11 items-center gap-1 rounded-[10px] px-2 text-[13px] font-extrabold text-onbrand underline-offset-4 transition-colors duration-200 hover:bg-onbrand-hair"
+                >
+                  {t('downloads.browse')}
+                  <Icon name="chevron" size={16} />
+                </Link>
+              </div>
+            ) : null}
             <ul>
               {derived.plan.map((task) => (
                 <li key={task.id} className="flex items-center gap-2 border-t border-onbrand-hair">
                   <button
                     type="button"
                     aria-pressed={task.done}
-                    aria-label={`Mark done: ${planLabel(task)}`}
+                    aria-label={t('dash.markDone', { task: planLabel(task) })}
                     onClick={() => actions.togglePlanTask(task.id)}
                     className="flex h-11 w-11 shrink-0 items-center justify-center"
                   >
@@ -131,7 +147,10 @@ export function DashboardView() {
                     </span>
                   </button>
 
-                  <Link href={taskHref(task)} className="flex min-w-0 flex-1 items-center gap-3 py-2.5">
+                  <Link
+                    href={taskHref(task)}
+                    className="-me-2 flex min-w-0 flex-1 items-center gap-3 rounded-[10px] py-2.5 pe-2 ps-1 transition-colors duration-200 hover:bg-onbrand-hair"
+                  >
                     <span className="min-w-0 flex-1">
                       <ScriptText
                         text={planLabel(task)}
@@ -149,23 +168,6 @@ export function DashboardView() {
             </ul>
           </Card>
 
-          {certCount > 0 ? (
-            <Link href="/certificates" className="block">
-              <Card
-                tint="bg-greentint"
-                border="border-green"
-                className="flex items-center gap-4 transition-colors duration-200 hover:border-teal"
-              >
-                <span className="text-[24px]">🎓</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[14.5px] font-extrabold text-ink">{t('cert.dashCard')}</span>
-                  <span className="block text-[13px] text-ink2">{t('cert.dashCardSub')}</span>
-                </span>
-                <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
-              </Card>
-            </Link>
-          ) : null}
-
           {/* Continue where you stopped */}
           {lastChapter ? (
             <Link href={`/learn/chapter/${lastChapter.id}`} className="block">
@@ -178,13 +180,20 @@ export function DashboardView() {
                   <ScriptText
                     text={chapterName(lastChapter, lang)}
                     className="mt-0.5 truncate text-[15.5px] font-extrabold text-ink"
+                    // truncate would clip Nastaliq's tall ink and cut the
+                    // title from the wrong end.
+                    urduClassName="mt-0.5 text-[15.5px] text-ink"
                   />
                   <span className="block text-[13px] text-ink2">
-                    {subjectName(subjectById(lastChapter.subjectId), lang)} ·{' '}
-                    {t('dash.sectionOf', {
-                      a: Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount),
-                      b: lastChapter.sectionCount,
-                    })}
+                    {subjectName(subjectById(lastChapter.subjectId), lang)}
+                    {/* Only with a count to go on: "Section 0 of 0" is what an
+                        unknown count used to print. */}
+                    {lastChapter.sectionCount > 0
+                      ? ` · ${t('dash.sectionOf', {
+                          a: Math.min(state.lastSectionIndex + 1, lastChapter.sectionCount),
+                          b: lastChapter.sectionCount,
+                        })}`
+                      : null}
                   </span>
                   <span className="mt-2 block max-w-[420px]">
                     <Bar pct={lastPct} />
@@ -198,7 +207,16 @@ export function DashboardView() {
           {/* Quick actions */}
           <div>
             <h2 className="mb-2 font-display text-[16px] text-ink">{t('dash.quickActions')}</h2>
-            <div className={`grid grid-cols-2 gap-3 md:grid-cols-3 ${quick.length > 4 ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}>
+            {/* Five tiles in two columns left one alone on the last row, so
+                it spans both; with four (Punjab has no topper scripts) the
+                rows come out even without it. */}
+            <div
+              className={`grid grid-cols-2 gap-3 ${
+                quick.length > 4
+                  ? 'md:grid-cols-3 xl:grid-cols-5 [&>*:last-child:nth-child(odd)]:col-span-2 md:[&>*:last-child:nth-child(odd)]:col-span-1'
+                  : 'xl:grid-cols-4'
+              }`}
+            >
               {quick.map((q) => (
                 <Link key={q.label} href={q.href} className="h-full">
                   <Card flat className="flex h-full min-h-[88px] flex-col gap-2 transition-colors duration-200 hover:border-teal">
@@ -209,6 +227,28 @@ export function DashboardView() {
               ))}
             </div>
           </div>
+
+          {/* Below the quick actions, not above Continue: it appears only once
+              its count has come back, and arriving above the fold it pushed
+              the whole page down under the student's thumb. */}
+          {certCount > 0 ? (
+            <Link href="/certificates" className="block">
+              <Card
+                tint="bg-greentint"
+                border="border-green"
+                className="flex items-center gap-4 transition-colors duration-200 hover:border-teal"
+              >
+                <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[16px] bg-card text-green">
+                  <Icon name="award" size={24} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14.5px] font-extrabold text-ink">{t('cert.dashCard')}</span>
+                  <span className="block text-[13px] text-ink2">{t('cert.dashCardSub')}</span>
+                </span>
+                <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
+              </Card>
+            </Link>
+          ) : null}
         </Work>
 
         <Rail>
@@ -216,7 +256,6 @@ export function DashboardView() {
           <StreakRail />
           <WeakRail />
           <ConfidenceRail />
-          <UpgradeRail />
         </Rail>
       </Split>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { Language } from '@matricmate/core';
 import { GRADE_10_READY, REMINDER_TIMES, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
@@ -53,7 +54,9 @@ export function AccountView() {
     void pushPermission().then(setPushState);
   }, []);
   const [switching, setSwitching] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const toast = useToast();
+  const router = useRouter();
   const classLevel = state.onboarding?.classLevel ?? 9;
   const [signingOut, setSigningOut] = useState(false);
   const setup = state.onboarding;
@@ -103,18 +106,27 @@ export function AccountView() {
           </Card>
 
           {/* The class this account studies. One class at a time, by design. */}
-          <Card className="flex items-center gap-4">
+          {/* Wraps on a phone, so the text keeps a readable width and the
+              button keeps its label on one line. */}
+          <Card className="flex flex-wrap items-center gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-tealtint text-teal">
               <Icon name="award" size={22} />
             </span>
-            <span className="min-w-0 flex-1">
+            <span className="min-w-[12rem] flex-1">
               <span className="block text-[15px] font-extrabold text-ink">{t('tutor.classRowValue', { n: classLevel, board: boardName(state.onboarding?.board, lang) })}</span>
-              <span className="block text-[13px] text-ink2">{t('tutor.classWarnBody').split('.')[0]}.</span>
+              {/* The warning's first sentence. Urdu ends its sentences with
+                  "۔", which a split on "." never found, so the whole warning
+                  printed here, with a Latin full stop after it. */}
+              <span className="block text-[13px] text-ink2">
+                {t('tutor.classWarnBody').split(/[.۔]/)[0]}
+                {lang === 'ur' ? '۔' : '.'}
+              </span>
             </span>
             <Btn
               title={t('tutor.classChange')}
               variant="line"
               sm
+              className="shrink-0"
               onClick={() => {
                 const next = classLevel === 9 ? 10 : 9;
                 if (next === 10 && !GRADE_10_READY) {
@@ -161,7 +173,7 @@ export function AccountView() {
           {/* One switch for the app and the syllabus. Two controls let a
               student sit in an English app reading Urdu notes, and the two
               apps did not even agree on which one drove the content. */}
-          <Card className="flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
+          <Card className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-[14.5px] font-extrabold text-ink">{t('lang.label')}</p>
               <p className="text-[13px] text-ink2">{t('lang.oneSwitchSub')}</p>
@@ -193,17 +205,28 @@ export function AccountView() {
                   was displayed and unchangeable, so it read as a promise the
                   app had made to itself: every student saw 7:00 PM whatever
                   suited them. */}
-              <ItemButton
+              {/* Two controls side by side, not a row button holding a switch:
+                  a button inside a button is invalid HTML, and React threw the
+                  whole server-rendered page away over it on every load. */}
+              <Item
                 title={t('account.studyReminder')}
                 sub={t('account.studyReminderSub', { time: s.reminderTime })}
                 icon="bell"
-                onClick={() => setPickTime(true)}
                 right={
-                  <Toggle
-                    on={s.reminders}
-                    label={t('account.studyReminder')}
-                    onClick={() => actions.setSettings({ reminders: !s.reminders })}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Btn
+                      title={s.reminderTime}
+                      icon="clock"
+                      variant="line"
+                      sm
+                      onClick={() => setPickTime(true)}
+                    />
+                    <Toggle
+                      on={s.reminders}
+                      label={t('account.studyReminder')}
+                      onClick={() => actions.setSettings({ reminders: !s.reminders })}
+                    />
+                  </div>
                 }
               />
               <Item
@@ -370,8 +393,12 @@ export function AccountView() {
           void actions.switchClass(confirmClass).then((r) => {
             setSwitching(false);
             setConfirmClass(null);
-            if (r === 'ok') toast(t('tutor.classChanged', { n: confirmClass }));
-            else toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+            if (r === 'ok') {
+              toast(t('tutor.classChanged', { n: confirmClass }));
+              // The store already holds the new syllabus; this brings the
+              // server-rendered parts of the page along with it.
+              router.refresh();
+            } else toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
           });
         }}
       />
@@ -383,10 +410,16 @@ export function AccountView() {
         body={t('account.resetDemoSub')}
         confirmLabel={t('account.resetDemo')}
         cancelLabel={t('common.cancel')}
-        onConfirm={() => {
-          actions.resetDemo();
+        loading={resetting}
+        onConfirm={async () => {
+          if (resetting) return;
+          // Waits for the server, and says so when it could not be cleared,
+          // rather than announcing a clean slate the next load takes back.
+          setResetting(true);
+          const ok = await actions.resetDemo();
+          setResetting(false);
           setConfirmReset(false);
-          toast(t('account.resetDone'));
+          toast(ok ? t('account.resetDone') : t('states.errorTitle'));
         }}
       />
 
@@ -405,7 +438,9 @@ export function AccountView() {
           // Before the session goes: the browser has to be handed back while
           // we can still prove who is handing it over.
           await releaseWebPush();
-          actions.signOut();
+          // Sends what is still queued first (a few seconds at most), so the
+          // answers of the last session reach the account before it goes.
+          await actions.signOut();
           try {
             await signOutAction();
           } catch {

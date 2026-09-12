@@ -3,7 +3,7 @@
 /**
  * Point the shared content layer at the browser Supabase client.
  *
- * Imported for its side effect by the app layout, and evaluated at module scope
+ * Imported for its side effect by lib/store.tsx, and evaluated at module scope
  * rather than in an effect: pages under /(app) render immediately, and a
  * chapter list that shows bundled sample content for one frame and then swaps
  * to the real rows reads as a bug rather than as a load.
@@ -25,6 +25,9 @@ if (typeof window !== 'undefined') {
   // Warm the synchronous lookups in core. Without this the browser answers
   // chapterById from the bundle, so a heading shows the old chapter name beside
   // a body full of new content. Not awaited: it is a warm-up, not a dependency.
+  // It can run before the session is known and come back empty, so the store
+  // loads the index again once it knows who is signed in, and after every
+  // class, board or language change (lib/store.tsx).
   void primeAllContent(client);
 }
 

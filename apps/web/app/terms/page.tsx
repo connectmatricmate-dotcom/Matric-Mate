@@ -3,10 +3,12 @@ import { AI_QUOTA } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
+import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Terms and conditions',
   description: 'How MatricMate works, what you are buying, and the rules both sides agree to.',
+  alternates: { canonical: canonicalUrl('/terms') },
 };
 
 const SECTIONS: { heading: string; paragraphs: string[] }[] = [
@@ -20,8 +22,8 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'Your account',
     paragraphs: [
-      'One account, one student. You are responsible for keeping your password to yourself; if you think someone else has it, change it from Profile, then Settings.',
-      'Students under 18 should have a parent or guardian read this page. Parents can see a shared report card without needing an account of their own.',
+      'One account, one student. You are responsible for keeping your password to yourself; if you think someone else has it, set a new one with “Forgot password?” on the log in page.',
+      'Students under 18 should have a parent or guardian read this page. The monthly report card is a PDF your child downloads and can hand to you, so a parent does not need an account of their own.',
     ],
   },
   {
@@ -48,7 +50,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'Deleting your account',
     paragraphs: [
-      `Message us on WhatsApp or write to ${SUPPORT_EMAIL} and we will delete the account and everything attached to it within seven days. Receipts are kept as long as tax rules require.`,
+      `Use the delete account page, or write to ${SUPPORT_EMAIL}, and we will delete the account and everything attached to it within seven days. Receipts are kept as long as tax rules require.`,
     ],
   },
   {

@@ -36,7 +36,10 @@ export async function GET(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
 
   const admin = createAdminClient();
-  const { data } = await admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle();
+  const { data, error } = await admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle();
+  // A failed read is not a fresh allowance: showing "50 left" to a student
+  // who has used them all is a promise the next question breaks.
+  if (error) return NextResponse.json({ error: 'server_error' }, { status: 503 });
   const used = data?.used ?? 0;
   const limit = AI_QUOTA.premium;
   return NextResponse.json({ limit, used, remaining: Math.max(0, limit - used), resetAt: resetAt() });

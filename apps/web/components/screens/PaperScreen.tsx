@@ -2,18 +2,37 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { checkAnswerLive, generateMockPaper, readAiSession, subjectById, subjectName } from '@matricmate/core';
-import type { AiCheckVerdict, AiPaperItems, AiSessionRead, ShortQ } from '@matricmate/core';
+import { checkAnswerLive, fetchAiSessions, generateMockPaper, isUrduScript, readAiSession, subjectById, subjectMedium, subjectName } from '@matricmate/core';
+import type { AiCheckVerdict, AiFail, AiPaperItems, AiSessionRead, AiSessionRow, ShortQ } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/client';
 import { AiWorking } from '@/components/ui/AiWorking';
 import { Page, PageHead } from '@/components/app/Page';
-import { Btn, PillButton } from '@/components/ui/controls';
+import { Btn, ItemButton, PillButton } from '@/components/ui/controls';
 import { Card, Label, Pill, ScriptText, SectionTitle, Skeleton } from '@/components/ui/primitives';
 import { ScriptBullets } from '@/components/ui/ScriptList';
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
 import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
+
+/** Every failure a marking request can come back with, in words. */
+function useFailNote() {
+  const t = useT();
+  return (reason: AiFail['reason']) =>
+    ({
+      offline: t('tutor.offline'),
+      quota: t('tutor.limitToast'),
+      rate: t('tutor.slowDown'),
+      plan: t('tutor.planNeeded'),
+      refused: t('tutor.refused'),
+      syllabus: t('tutor.notInSyllabus'),
+      error: t('tutor.errorReply'),
+    })[reason];
+}
+
+/** Whether a check-answer reply is a verdict; see ShortQScreen. */
+const isVerdict = (v: unknown): v is AiCheckVerdict =>
+  !!v && typeof (v as AiCheckVerdict).score === 'number' && Array.isArray((v as AiCheckVerdict).missed);
 
 /**
  * The board mock paper. Without an id: pick a subject and have one set.
@@ -29,8 +48,32 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
   const { lang } = useLang();
   const toast = useToast();
   const router = useRouter();
+  const failNote = useFailNote();
   const [busy, setBusy] = useState(false);
   const [subjectId, setSubjectId] = useState(derived.subjects[0] ?? 'phy');
+  /* Picked before the store has loaded, from the fallback list; moved to the
+     student's first subject when their own list arrives, unless they have
+     already tapped one. Same rule as the MCQ setup. */
+  const [seenSubjects, setSeenSubjects] = useState(derived.subjects);
+  if (seenSubjects !== derived.subjects) {
+    setSeenSubjects(derived.subjects);
+    if (derived.subjects.length && !derived.subjects.includes(subjectId)) setSubjectId(derived.subjects[0]);
+  }
+
+  /* Papers already set, so one can be opened again. The only way back to a
+     finished paper was its URL; the builder's cancel toast promised it would
+     be "in your sets", and it was nowhere. */
+  const [papers, setPapers] = useState<AiSessionRow[]>([]);
+  useEffect(() => {
+    if (paperId) return;
+    let alive = true;
+    fetchAiSessions(createClient()).then((rows) => {
+      if (alive) setPapers(rows.filter((r) => r.kind === 'paper'));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [paperId]);
 
   // Keyed by the paper id, so navigating between papers shows the loading
   // state again without a synchronous reset inside the effect.
@@ -61,21 +104,24 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
     setBusy(true);
     const controller = new AbortController();
     cancel.current = controller;
-    const res = await generateMockPaper({ subjectId, medium: state.settings.contentMedium }, controller.signal);
+    // The subject's own language: an Urdu or English paper is set in that
+    // language for every student, whatever medium they read in.
+    const res = await generateMockPaper(
+      { subjectId, medium: subjectMedium(subjectId, state.onboarding?.board, state.settings.contentMedium) },
+      controller.signal,
+    );
     cancel.current = null;
     setBusy(false);
     // Stopped on purpose: see the note in the AI builder.
     if (controller.signal.aborted) return;
     if (!res.ok) {
-      const note = {
-        offline: t('tutor.offline'),
-        quota: t('tutor.limitToast'),
-        rate: t('tutor.slowDown'),
-        plan: t('tutor.planNeeded'),
-        refused: t('tutor.refused'),
-        error: t('tutor.errorReply'),
-      }[res.reason];
-      toast(note);
+      toast(failNote(res.reason));
+      return;
+    }
+    // A refusal used to arrive looking like a success and open
+    // /tutor/paper?id=undefined, which could only ever say "Could not load".
+    if (!res.sessionId) {
+      toast(t('tutor.refused'));
       return;
     }
     router.push(`/tutor/paper?id=${res.sessionId}`);
@@ -116,15 +162,41 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
             onClick={() => void build()}
           />
         </div>
+
+        {papers.length ? (
+          <>
+            <div className="mt-6"><SectionTitle>{t('tutor.recentPapers')}</SectionTitle></div>
+            <Card flat className="py-0">
+              {papers.slice(0, 5).map((p, i, list) => (
+                <ItemButton
+                  key={p.id}
+                  title={p.title}
+                  sub={`${subjectName(subjectById(p.subjectId ?? ''), lang) || t('tutor.paperTitle')} · ${t('tutor.aiMade')}`}
+                  icon="doc"
+                  last={i === list.length - 1}
+                  onClick={() => router.push(`/tutor/paper?id=${p.id}`)}
+                />
+              ))}
+            </Card>
+          </>
+        ) : null}
       </Page>
     );
   }
 
   if (loading) {
+    // Shaped like the paper: the Section A card, a section title, then the
+    // written questions, so nothing jumps when it arrives.
     return (
       <Page width="focus">
         <PageHead back="/tutor" backLabel={t('tutor.title')} title={t('tutor.paperTitle')} />
-        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-[118px] w-full rounded-[16px]" />
+        <Skeleton className="mt-6 mb-2 h-4 w-48" />
+        <div className="flex flex-col gap-2.5">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[92px] w-full rounded-[16px]" />
+          ))}
+        </div>
       </Page>
     );
   }
@@ -157,12 +229,15 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
           {/* The reason, quietly, for the next bug report. Not a stack trace,
               one short line, and only when there is something to say. */}
           {read?.ok === false && read.detail ? (
-            <p className="mt-2 text-[11px] text-ink3">{read.detail}</p>
+            <p className="mt-2 text-[11px] text-ink3 wrap-anywhere">{read.detail}</p>
           ) : null}
         </Card>
       </Page>
     );
   }
+
+  // Marked in the paper's own subject language; see the builder above.
+  const paperMedium = subjectMedium(paper.subjectId ?? subjectId, state.onboarding?.board, state.settings.contentMedium);
 
   const startSectionA = () => {
     session.start({
@@ -179,7 +254,7 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
 
   return (
     <Page width="focus">
-      <PageHead back="/tutor" backLabel={t('tutor.title')} title={paper.title} sub={t('tutor.aiMade')} />
+      <PageHead back="/tutor" backLabel={t('tutor.title')} title={paper.title} titleUrdu={isUrduScript(paper.title)} sub={t('tutor.aiMade')} />
 
       <Card border="border-orange" className="flex flex-col gap-1.5">
         <Label className="text-orangedark">{t('tutor.paperSectionA')}</Label>
@@ -194,14 +269,14 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
       <div className="mt-5"><SectionTitle>{t('tutor.paperSectionB')}</SectionTitle></div>
       <div className="flex flex-col gap-2.5">
         {items.shortQs.map((q, n) => (
-          <PaperQuestion key={q.id} n={n + 1} q={q} medium={state.settings.contentMedium} />
+          <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
         ))}
       </div>
 
       <div className="mt-5"><SectionTitle>{t('tutor.paperSectionC')}</SectionTitle></div>
       <div className="flex flex-col gap-2.5">
         {items.longQs.map((q, n) => (
-          <PaperQuestion key={q.id} n={n + 1} q={q} medium={state.settings.contentMedium} />
+          <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
         ))}
       </div>
     </Page>
@@ -212,6 +287,7 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
 function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string }) {
   const t = useT();
   const toast = useToast();
+  const failNote = useFailNote();
   const [open, setOpen] = useState(false);
   const [written, setWritten] = useState('');
   const [checking, setChecking] = useState(false);
@@ -230,8 +306,14 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
       medium,
     });
     setChecking(false);
+    // The actual reason. Every failure used to read "something went wrong,
+    // try again", a spent daily allowance included.
     if (!res.ok) {
-      toast(t('tutor.errorReply'));
+      toast(failNote(res.reason));
+      return;
+    }
+    if (!isVerdict(res.verdict)) {
+      toast(t('tutor.refused'));
       return;
     }
     setVerdict(res.verdict);
@@ -254,7 +336,8 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
               placeholder={t('tutor.checkPlaceholder')}
               aria-label={t('tutor.checkPlaceholder')}
               rows={3}
-              className="w-full resize-y bg-transparent p-3 text-[14px] leading-[1.6] text-ink outline-none placeholder:text-ink3"
+              // 16px on phones, or iOS zooms in on focus and stays there.
+              className="w-full resize-y bg-transparent p-3 text-[16px] leading-[1.6] text-ink outline-none placeholder:text-ink3 md:text-[14px] rtl:leading-[1.9]"
             />
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -298,7 +381,7 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
           ) : null}
         </>
       ) : (
-        <button type="button" className="self-start text-[13px] font-extrabold text-teal hover:underline" onClick={() => setOpen(true)}>
+        <button type="button" className="-my-1 inline-flex min-h-11 items-center self-start text-[13px] font-extrabold text-teal hover:underline" onClick={() => setOpen(true)}>
           {t('tutor.checkTitle')}
         </button>
       )}

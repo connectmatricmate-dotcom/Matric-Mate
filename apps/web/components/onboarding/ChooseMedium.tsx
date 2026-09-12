@@ -1,49 +1,57 @@
 'use client';
 
 /**
- * Medium is which version of the FBISE syllabus the student studies, it changes
- * the content, not the interface. The app's own language is set separately.
+ * The medium the student studies in, which is also the app's language: one
+ * switch for both, so nobody ends up reading Urdu notes in an English app or
+ * the reverse.
  */
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { Medium } from '@matricmate/core';
+import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen } from './StepScreen';
 
-export function ChooseMedium() {
-  const { state, actions } = useApp();
+export function ChooseMedium({ edit = false }: { edit?: boolean }) {
+  const { state, synced, actions } = useApp();
   const t = useT();
   const router = useRouter();
-  // Opens on the medium they already study in, not always English.
-  const [value, setValue] = useState<Medium>(state.onboarding?.medium ?? 'en');
+  const toast = useToast();
+  // Opens on the medium they already study in, once the account has said
+  // which, not on whatever the first render happened to see. See ChooseClass.
+  const [picked, setPicked] = useState<Medium | null>(null);
+  const value = picked ?? state.onboarding?.medium ?? state.settings.language;
 
   return (
     <StepScreen
       step={3}
       title={t('onboarding.mediumTitle')}
       sub={t('onboarding.mediumSub')}
-      cta={t('common.continue')}
+      cta={edit ? t('common.save') : t('common.continue')}
       footnote={t('onboarding.mediumFootnote')}
-      onNext={() => {
-        // One choice, whole app: the interface and the syllabus both follow
-        // this, so a student never ends up reading Urdu notes in an English
-        // app or the reverse.
-        actions.setOnboarding({ medium: value });
-        actions.setLanguage(value);
-        router.push('/onboarding/subjects');
+      backHref={edit ? '/account/edit' : '/onboarding/board'}
+      waiting={!synced}
+      onNext={async () => {
+        // The language first, so the next screen already arrives in it.
+        if (value !== state.settings.language) actions.setLanguage(value);
+        if (!(await actions.setOnboarding({ medium: value }))) {
+          toast(t('states.errorBody'));
+          return;
+        }
+        router.push(edit ? '/account/edit' : '/onboarding/subjects');
       }}
     >
       <ChoiceCard
         title={t('onboarding.mediumEn')}
         sub={t('onboarding.mediumEnSub')}
         selected={value === 'en'}
-        onClick={() => setValue('en')}
+        onClick={() => setPicked('en')}
       />
       <ChoiceCard
         title={t('onboarding.mediumUr')}
         sub={t('onboarding.mediumUrSub')}
         selected={value === 'ur'}
-        onClick={() => setValue('ur')}
+        onClick={() => setPicked('ur')}
       />
     </StepScreen>
   );

@@ -1,23 +1,29 @@
 /**
  * One validation rule per field, shared by the form and (later) the server
  * action, so a user never round-trips to learn "min 6 characters".
+ *
+ * The messages come from the same string table as the server action's, in the
+ * language passed in, so an Urdu form is corrected in Urdu. The default keeps
+ * a caller that passes no language on English, as before.
  */
+import { type Language, translate } from '@matricmate/core';
 
 export const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-export function validateName(v: string) {
-  return v.trim().length >= 2 ? null : 'Enter your full name.';
+export function validateName(v: string, lang: Language = 'en') {
+  return v.trim().length >= 2 ? null : translate(lang, 'auth.errNameEmpty');
 }
 
-export function validateEmail(v: string) {
-  if (!v.trim()) return 'Enter your email.';
-  return EMAIL_RE.test(v.trim()) ? null : 'Use an email like hassan.ali@gmail.com.';
+export function validateEmail(v: string, lang: Language = 'en') {
+  if (!v.trim()) return translate(lang, 'auth.errEmailEmpty');
+  return EMAIL_RE.test(v.trim()) ? null : translate(lang, 'auth.errEmailInvalid');
 }
 
-export function validatePassword(v: string) {
-  return v.length >= 6 ? null : 'At least 6 characters.';
+export function validatePassword(v: string, lang: Language = 'en') {
+  return v.length >= 6 ? null : translate(lang, 'auth.errWeakPassword');
 }
 
+/** English for now: the string table has no mobile-number message to translate it with. */
 export function validateMobile(v: string) {
   const digits = v.replace(/\D/g, '');
   return /^(92)?0?3\d{9}$/.test(digits) ? null : 'Enter an 11-digit number, like 03001234567.';

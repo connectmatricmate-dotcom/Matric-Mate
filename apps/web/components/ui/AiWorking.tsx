@@ -92,10 +92,13 @@ function Working({ title, onCancel }: { title: string; onCancel?: () => void }) 
       </div>
 
       <div>
-        <h2 className="font-display text-[24px] leading-[1.15] text-ink md:text-[28px]">{title}</h2>
+        {/* Nastaliq needs far more than the Latin 1.15, or an Urdu title's
+            two lines run into each other. */}
+        <h2 className="font-display text-[24px] leading-[1.15] text-ink md:text-[28px] rtl:leading-[1.8]">{title}</h2>
         {/* Fixed height, so a longer line does not shove the heading up the
-            screen every time the stage changes. */}
-        <p className="flex h-12 items-center justify-center text-[15px] text-ink2">{t(STAGES[stage])}</p>
+            screen every time the stage changes. Taller in Urdu, whose line
+            box is taller. */}
+        <p className="flex h-12 items-center justify-center text-[15px] text-ink2 rtl:h-16">{t(STAGES[stage])}</p>
       </div>
 
       <p className="max-w-[320px] rounded-full bg-tealtint px-4 py-2.5 text-[13px] font-extrabold text-teal">

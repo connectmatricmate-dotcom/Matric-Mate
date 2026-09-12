@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { api, boardName, chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
+import { api, boardName, chapterName, isUrduScript, subjectById, subjectName, weakTopics, type Chapter, type Subject } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { useApp, useLang, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 
@@ -19,8 +20,9 @@ export function ExamIntro({
   ai,
   topics,
 }: {
-  subject?: string;
-  chapter?: string;
+  /** Checked against the student's syllabus on the server. */
+  subject?: Subject;
+  chapter?: Chapter;
   paper?: string;
   ai?: boolean;
   /** The weak topics the student ticked on the AI test screen. */
@@ -29,42 +31,77 @@ export function ExamIntro({
   const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
+  const toast = useToast();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
-  const subjectId = subject ?? (chapter ? chapterById(chapter)?.subjectId : undefined) ?? derived.subjects[0] ?? 'phy';
+  const subjectId = subject?.id ?? chapter?.subjectId ?? derived.subjects[0] ?? 'phy';
 
-  const best = state.results
-    .filter((r) => r.subjectId === subjectId && r.mode === 'exam')
-    .sort((a, b) => b.score / b.total - a.score / a.total)[0];
+  /* A weak-topic paper spans subjects, so a best score filed under one of
+     them would be some other test's. Only real paper results count, too: a
+     0/0 left by an empty test divided into NaN here. */
+  const best = ai
+    ? undefined
+    : state.results
+        .filter((r) => r.subjectId === subjectId && r.mode === 'exam' && r.total > 0)
+        .sort((a, b) => b.score / b.total - a.score / a.total)[0];
 
   const label = ai
     ? t('tutor.aiTestTitle')
     : paper
       ? `${boardName(state.onboarding?.board, lang)} ${paper}`
       : chapter
-        ? chapterName(chapterById(chapter), lang)
-        : subjectName(subjectById(subjectId), lang);
+        ? chapterName(chapter, lang)
+        : subjectName(subject ?? subjectById(subjectId), lang);
 
   async function start() {
     setBusy(true);
-    // The picked topics arrive from the AI test screen; when someone lands
-    // here directly, fall back to their actual weakest topics.
-    const focus = topics?.length ? topics : weakTopics(state.attempts).map((w) => w.topic).slice(0, 3);
+    /* The picked topics arrive from the AI test screen; when someone lands
+       here directly, fall back to their actual weakest topics. MCQ attempts
+       only: blanks and short questions are filed under a chapter's title,
+       which is never an MCQ topic, so they matched nothing and the "weak
+       topic" paper was padded out with whatever came first. */
+    const focus = topics?.length
+      ? topics
+      : weakTopics(state.attempts.filter((a) => a.mode === 'practice' || a.mode === 'exam'))
+          .map((w) => w.topic)
+          .filter(Boolean)
+          .slice(0, 3);
+    /* Where the questions may come from. A chapter's or subject's test stays
+       inside it; a weak-topic paper stays inside the chapters those topics
+       were missed in. Unscoped, the generator padded the paper out with
+       questions from anywhere in the syllabus. */
+    const focusChapters = [
+      ...new Set(state.attempts.filter((a) => a.chapterId && focus.includes(a.topic)).map((a) => a.chapterId)),
+    ];
+    const scope = chapter
+      ? { chapterIds: [chapter.id] }
+      : subject
+        ? { subjectId: subject.id }
+        : focusChapters.length
+          ? { chapterIds: focusChapters }
+          : undefined;
     const mcqs = ai
-      ? await api.generateTest(focus, COUNT)
+      ? await api.generateTest(focus, COUNT, scope)
       : await api.getMcqs({
-          chapterIds: chapter ? [chapter] : undefined,
+          chapterIds: chapter ? [chapter.id] : undefined,
           subjectId: chapter ? undefined : subjectId,
           count: COUNT,
         });
+    /* A paper with no questions is not a paper. It used to start anyway: an
+       empty screen with a 30 minute clock that then saved a 0/0 result. */
+    if (!mcqs.length) {
+      setBusy(false);
+      toast(t('session.noQuestions'));
+      return;
+    }
     // busy stays true through router.replace: re-enabling the button while the
     // route transition runs is the double-click window.
     session.start({
       mode: 'exam',
       label: `${label} · ${t('session.examTitle')}`,
       subjectId,
-      chapterId: chapter ?? null,
+      chapterId: chapter?.id ?? null,
       mcqs,
       durationSec: MINUTES * 60,
       aiGenerated: ai,
@@ -74,7 +111,7 @@ export function ExamIntro({
 
   return (
     <Page width="focus">
-      <PageHead back="/practice" backLabel={t('practice.title')} title={t('session.examTitle')} sub={label} />
+      <PageHead back="/practice" backLabel={t('practice.title')} title={t('session.examTitle')} sub={label} subUrdu={isUrduScript(label)} />
 
       <Card border="border-orange" className="flex flex-col items-center py-6 text-center">
         <Icon name="clock" size={34} className="text-orangedark" />
@@ -83,7 +120,7 @@ export function ExamIntro({
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           {best ? (
             <Pill tone="green">{t('session.best', { n: Math.round((best.score / best.total) * 100) })}</Pill>
-          ) : (
+          ) : ai ? null : (
             <Pill tone="grey">{t('session.firstAttempt')}</Pill>
           )}
           <Pill tone="orange">{t('session.pauseOnce')}</Pill>

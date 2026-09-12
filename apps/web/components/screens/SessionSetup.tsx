@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { type Chapter, api, chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
+import { type Chapter, api, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, Seg } from '@/components/ui/controls';
 import { Card, Check, Item, SectionTitle, Skeleton } from '@/components/ui/primitives';
@@ -14,7 +14,10 @@ export function SessionSetupSkeleton() {
   return (
     <Page width="focus">
       <div className="mb-5">
-        <Skeleton className="mb-3 h-3.5 w-24" />
+        {/* The back link is a 44px row, not a 14px line. */}
+        <div className="mb-1 flex h-11 items-center">
+          <Skeleton className="h-3.5 w-24" />
+        </div>
         <Skeleton className="mb-2 h-7 w-48" />
         <Skeleton className="h-4 w-64" />
       </div>
@@ -22,7 +25,7 @@ export function SessionSetupSkeleton() {
       <Skeleton className="mb-2 h-3 w-16" />
       <div className="flex flex-wrap gap-2">
         {[0, 1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-10 w-20 rounded-full" />
+          <Skeleton key={i} className="h-11 w-20 rounded-full" />
         ))}
       </div>
 
@@ -55,22 +58,28 @@ export function SessionSetup({
   chaptersBySubject: Record<string, Chapter[]>;
 }) {
   const router = useRouter();
-  const { derived, state } = useApp();
+  const { derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
 
-  const initialChapter = initialChapterId ? chapterById(initialChapterId) : undefined;
+  /* Found in the server's own lists, not the browser's chapter index, which is
+     empty on a cold load for Class 10 and Punjab: a "Practice MCQs" tap from
+     their chapter hub opened on mixed practice with nothing ticked. */
+  const initialChapter = initialChapterId
+    ? chaptersBySubject[initialChapterId.split('-')[0]]?.find((c) => c.id === initialChapterId)
+    : undefined;
   const [subjectId, setSubjectId] = useState(initialChapter?.subjectId ?? derived.subjects[0] ?? 'phy');
   const [chapterIds, setChapterIds] = useState<string[]>(initialChapter ? [initialChapter.id] : []);
   const [count, setCount] = useState<'10' | '20' | '50'>('10');
   const [busy, setBusy] = useState(false);
   const [pickedSubject, setPickedSubject] = useState(subjectId);
 
-  const chapters = useMemo(
-    () => (chaptersBySubject[subjectId] ?? []).filter((c) => !c.premium || state.premium.active),
-    [chaptersBySubject, subjectId, state.premium.active]
-  );
+  /* Every chapter. This hid premium chapters until the plan had been re-read
+     in the browser, and every chapter is premium, so a paying student met an
+     empty list on every cold load. The layout has already refused anyone
+     without a plan. */
+  const chapters = useMemo(() => chaptersBySubject[subjectId] ?? [], [chaptersBySubject, subjectId]);
 
   // The default subject is picked before the store hydrates, when the subject
   // list is still the fallback. Adjusted during render when the real list
@@ -105,7 +114,7 @@ export function SessionSetup({
     }
     // The label a student sees on the session header: one chapter's own name,
     // in their language, or the subject and "mixed" when it spans several.
-    const single = chapterIds.length === 1 ? chapterById(chapterIds[0]) : undefined;
+    const single = chapterIds.length === 1 ? chapters.find((c) => c.id === chapterIds[0]) : undefined;
     // busy stays true through router.replace: re-enabling the button while the
     // route transition runs is the double-click window.
     session.start({
@@ -135,7 +144,7 @@ export function SessionSetup({
             type="button"
             aria-pressed={sid === subjectId}
             onClick={() => setSubjectId(sid)}
-            className={`min-h-10 rounded-full px-3.5 py-2 text-[13px] font-extrabold transition-colors duration-200 ${
+            className={`min-h-11 rounded-full px-3.5 py-2 text-[13px] font-extrabold transition-[background-color,filter] duration-200 ${
               sid === subjectId ? 'bg-tealtint text-teal' : 'bg-grey text-ink2 hover:brightness-95'
             }`}
           >
@@ -191,10 +200,6 @@ export function SessionSetup({
           { value: '50' as const, label: '50' },
         ]}
       />
-
-      <p className="mt-4 text-[13px] text-ink2">
-        {state.premium.active ? t('session.premiumActive') : t('session.premiumNote')}
-      </p>
 
       <div className="mt-6">
         <Btn title={t('session.start', { n: count })} onClick={start} loading={busy} className="w-full md:w-auto" />

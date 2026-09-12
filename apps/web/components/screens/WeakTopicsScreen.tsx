@@ -1,8 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { subjectById, subjectName, weakTopics } from '@matricmate/core';
+import { subjectById, subjectName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { namedWeakTopics, weakKey } from '@/components/app/rails';
 import { Card, Empty, LinkBtn, ScriptText, SectionTitle } from '@/components/ui/primitives';
 import { useApp, useLang, useT } from '@/lib/store';
 
@@ -10,7 +11,7 @@ export function WeakTopicsScreen() {
   const { state } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const rows = useMemo(() => weakTopics(state.attempts), [state.attempts]);
+  const rows = useMemo(() => namedWeakTopics(state.attempts, lang), [state.attempts, lang]);
 
   const bySubject = rows.reduce<Record<string, typeof rows>>((acc, r) => {
     (acc[r.subjectId] ||= []).push(r);
@@ -39,7 +40,7 @@ export function WeakTopicsScreen() {
             <SectionTitle>{subjectName(subjectById(sid), lang)}</SectionTitle>
             <div className="grid gap-2.5 lg:grid-cols-2">
               {list.map((w) => (
-                <Card key={w.topic} flat>
+                <Card key={weakKey(w)} flat>
                   <div className="flex items-baseline gap-3">
                     <ScriptText
                       text={w.topic}

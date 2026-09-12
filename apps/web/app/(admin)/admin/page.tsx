@@ -61,7 +61,9 @@ async function Charts() {
   const days = await dailyStats(14);
 
   return (
-    <div className="mt-7 grid gap-3 md:grid-cols-3">
+    // Three across from lg. At md the sidebar is showing, and a third of what
+    // is left gave each chart about 148px.
+    <div className="mt-7 grid gap-3 lg:grid-cols-3">
       <TrendChart title="Signups · 14 days" points={days.map((d) => ({ day: d.day, value: d.signups }))} />
       <TrendChart
         title="Collected · 14 days"
@@ -78,11 +80,12 @@ async function Charts() {
   );
 }
 
+/** The height of a TrendChart with its best-day line, so nothing moves when the numbers land. */
 function ChartSkeleton() {
   return (
-    <div className="mt-7 grid gap-3 md:grid-cols-3">
+    <div className="mt-7 grid gap-3 lg:grid-cols-3">
       {['a', 'b', 'c'].map((k) => (
-        <div key={k} className="h-[176px] animate-pulse rounded-[16px] border border-line bg-card" />
+        <div key={k} className="h-[212px] animate-pulse rounded-[16px] border border-line bg-card" />
       ))}
     </div>
   );

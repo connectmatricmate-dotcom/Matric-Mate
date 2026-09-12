@@ -23,17 +23,24 @@ export function PerformanceScreen() {
     return state.attempts.filter((a) => a.at >= since);
   }, [state.attempts, range, now]);
 
+  /**
+   * One bar and one point per day for a week or a month, per week for all
+   * time. Month and All time both drew the same fourteen days, so the picker
+   * changed the number above the charts and nothing in them.
+   */
+  const perWeek = range === 'all';
   const trend = useMemo(() => {
-    const days = range === 'week' ? 7 : 14;
-    return Array.from({ length: days }, (_, i) => {
-      const start = new Date();
-      start.setHours(0, 0, 0, 0);
-      start.setDate(start.getDate() - (days - 1 - i));
-      const end = start.getTime() + 864e5;
-      const set = attempts.filter((a) => a.at >= start.getTime() && a.at < end);
+    const count = range === 'week' ? 7 : range === 'month' ? 30 : 12;
+    const span = (perWeek ? 7 : 1) * 864e5;
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const end = today.getTime() + 864e5;
+    return Array.from({ length: count }, (_, i) => {
+      const to = end - (count - 1 - i) * span;
+      const set = state.attempts.filter((a) => a.at >= to - span && a.at < to);
       return { acc: set.length ? accuracy(set) : null, count: set.length };
     });
-  }, [attempts, range]);
+  }, [state.attempts, range, perWeek, now]);
 
   const points = useMemo(() => {
     const w = 300;
@@ -55,8 +62,14 @@ export function PerformanceScreen() {
    * figure to give and the label says so.
    */
   const todaysBucket = trend[trend.length - 1];
-  const todayLabel =
-    todaysBucket?.acc != null ? t('progress.today', { n: todaysBucket.acc }) : t('progress.todayNone');
+  const todayLabel = perWeek
+    ? todaysBucket?.acc != null
+      ? t('progress.weekPct', { n: todaysBucket.acc })
+      : t('progress.weekNone')
+    : todaysBucket?.acc != null
+      ? t('progress.today', { n: todaysBucket.acc })
+      : t('progress.todayNone');
+  const sinceLabel = perWeek ? t('progress.weeksAgo', { n: trend.length }) : t('progress.daysAgo', { n: trend.length });
 
   const confLabels = [t('session.conf0'), t('session.conf1'), t('session.conf2')];
   const last = points ? points.split(' ').slice(-1)[0].split(',') : null;
@@ -89,38 +102,49 @@ export function PerformanceScreen() {
               an empty period draws no frame at all. */}
           {points ? (
             <>
-              <svg viewBox="0 0 300 90" className="mt-2 h-[90px] w-full" role="img" aria-label={t('progress.accuracyTrend')}>
+              {/* Scaled with its width rather than letterboxed in a fixed
+                  height, so the labels under it sit under its two ends. */}
+              <svg viewBox="0 0 300 90" className="mt-2 aspect-[10/3] h-auto w-full" role="img" aria-label={t('progress.accuracyTrend')}>
                 {[25, 50, 75].map((g) => (
                   <rect key={g} x={0} y={85 - (g / 100) * 80} width={300} height={1} fill="var(--color-grey)" />
                 ))}
                 <polyline points={points} fill="none" stroke="var(--color-teal)" strokeWidth={3} strokeLinecap="round" />
                 {last ? <circle cx={Number(last[0])} cy={Number(last[1])} r={4.5} fill="var(--color-orange)" /> : null}
               </svg>
-              <div className="flex justify-between text-[10.5px] font-extrabold text-ink2">
-                <span>{t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}</span>
+              {/* Left to right like the chart above it, which is not mirrored:
+                  in an Urdu page the row flipped and put "today" under the
+                  oldest day. */}
+              <div dir="ltr" className="flex justify-between gap-3 text-[10.5px] font-extrabold text-ink2">
+                <span>{sinceLabel}</span>
                 <span>{todayLabel}</span>
               </div>
             </>
           ) : (
-            <p className="mt-3 text-[13px] leading-[1.6] text-ink2">{t('progress.notEnoughData')}</p>
+            <p className="mt-3 text-[13px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('progress.notEnoughData')}</p>
           )}
         </Card>
 
         <Card>
-          <Label>{t('progress.questionsPerDay')}</Label>
+          <Label>{perWeek ? t('progress.questionsPerWeek') : t('progress.questionsPerDay')}</Label>
           {attempts.length ? (
-            <svg viewBox="0 0 300 70" className="mt-2 h-[70px] w-full" role="img" aria-label={t('progress.questionsPerDay')}>
+            <svg
+              viewBox="0 0 300 70"
+              className="mt-2 aspect-[30/7] h-auto w-full"
+              role="img"
+              aria-label={perWeek ? t('progress.questionsPerWeek') : t('progress.questionsPerDay')}
+            >
               {trend.map((x, i) => {
-                const bw = 300 / trend.length - 6;
+                // A fixed 6 unit gap left thirty bars nothing to be.
+                const bw = (300 / trend.length) * 0.7;
                 const h = (x.count / maxCount) * 58;
                 return (
                   <rect
                     key={i}
-                    x={(300 / trend.length) * i + 3}
+                    x={(300 / trend.length) * (i + 0.15)}
                     y={64 - h}
                     width={bw}
                     height={Math.max(2, h)}
-                    rx={4}
+                    rx={Math.min(4, bw / 2)}
                     fill={i >= trend.length - 2 ? 'var(--color-orange)' : 'var(--color-tealtint2)'}
                   />
                 );
