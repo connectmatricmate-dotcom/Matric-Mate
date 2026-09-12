@@ -185,12 +185,53 @@ export function pastPaperGroups(board: Board, grade: number, subjects?: string[]
 }
 
 /**
+ * A span of years in the student's language: "2015 to 2019", "2015 سے 2019
+ * تک", or the one year when both ends are the same. The practice tile and
+ * the Punjab compilations both wrote "to" into the middle of an Urdu line.
+ */
+export function yearSpan(from: number | string, to: number | string, lang: Language): string {
+  return String(from) === String(to) ? String(from) : translate(lang, 'practice.yearsRange', { from, to });
+}
+
+/** The Punjab boards whose papers the catalogue carries, by city. */
+const BOARD_CITY_UR: Record<string, string> = {
+  Lahore: 'لاہور',
+  Multan: 'ملتان',
+  Rawalpindi: 'راولپنڈی',
+  Sargodha: 'سرگودھا',
+  Gujranwala: 'گوجرانوالہ',
+  Faisalabad: 'فیصل آباد',
+  Bahawalpur: 'بہاولپور',
+  Sahiwal: 'ساہیوال',
+  'DG Khan': 'ڈیرہ غازی خان',
+};
+
+/**
+ * The board that set a paper, named the way the student would say it. In
+ * Urdu that is the city and the word board, "ملتان بورڈ", not "BISE Multan"
+ * in Latin letters in the middle of an Urdu line. A name this does not know
+ * is left as the catalogue wrote it.
+ */
+export function paperBoardName(name: string, lang: Language): string {
+  if (lang !== 'ur') return name;
+  const m = /^BISE\s+(.+)$/.exec(name.trim());
+  const city = m ? BOARD_CITY_UR[m[1]] : undefined;
+  return city ? `${city} بورڈ` : name;
+}
+
+/** The catalogue's own "2015 to 2019", reworded for the student's language. */
+const localYears = (years: string, lang: Language): string => {
+  const m = /^(\d{4})\s+to\s+(\d{4})$/.exec(years.trim());
+  return m ? yearSpan(m[1], m[2], lang) : years;
+};
+
+/**
  * One Punjab line's title, in the student's language: "2025 Annual · Past
  * paper with key", "2026 · Model paper". FBISE lines keep the board's title.
  */
 export function pastPaperTitle(p: PastPaperLink, lang: Language): string {
   if (p.label && !p.kind) return p.label;
-  const when = [p.years ?? (p.year ? String(p.year) : ''), p.session ? translate(lang, p.session === 'annual' ? 'session.paperAnnual' : 'session.paperSupplementary') : '']
+  const when = [p.years ? localYears(p.years, lang) : p.year ? String(p.year) : '', p.session ? translate(lang, p.session === 'annual' ? 'session.paperAnnual' : 'session.paperSupplementary') : '']
     .filter(Boolean)
     .join(' ');
   const kind =

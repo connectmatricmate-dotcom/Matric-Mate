@@ -1,4 +1,4 @@
-import { chapterById } from './content';
+import { chapterById, chapterName } from './content';
 
 /**
  * Turning "you should revise Kinematics" into a button that opens Kinematics.
@@ -76,8 +76,12 @@ const PARTIAL = /\[\[?[^[\]]*$/;
  *
  * `streaming` true also hides a half-written tag at the end. Pass false once
  * the answer is complete, or a genuine trailing bracket would be eaten.
+ *
+ * `lang` names the chapter in the student's language. Without it the button
+ * carried the English title in front of an Urdu reader, which the rest of the
+ * interface never does.
  */
-export function parseTutorActions(raw: string, streaming = false): { text: string; actions: TutorAction[] } {
+export function parseTutorActions(raw: string, streaming = false, lang = 'en'): { text: string; actions: TutorAction[] } {
   const actions: TutorAction[] = [];
   const seen = new Set<string>();
 
@@ -89,7 +93,7 @@ export function parseTutorActions(raw: string, streaming = false): { text: strin
     const chapter = KINDS.includes(kind) && !seen.has(key) ? chapterById(id) : undefined;
     if (chapter) {
       seen.add(key);
-      actions.push({ kind, chapterId: id, chapterTitle: chapter.title });
+      actions.push({ kind, chapterId: id, chapterTitle: chapterName(chapter, lang) });
     }
     return '';
   });

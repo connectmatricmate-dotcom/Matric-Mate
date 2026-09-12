@@ -28,7 +28,18 @@
  * React Native storage adapter), and this file only needs the query builder
  * shape, so it takes it structurally.
  */
-import { SUBJECTS, bundledChapters, chapterById, contentFor, primeContent, setSyllabus, subjectById } from './content';
+import {
+  SUBJECTS,
+  bumpContent,
+  chapterById,
+  chapterIsTheirs,
+  chaptersFor,
+  contentFor,
+  primeContent,
+  resetContentIndex,
+  setSyllabus,
+  subjectById,
+} from './content';
 import { AudioTrack, Blank, Board, Chapter, ChapterContent, Flashcard, Mcq, Medium, Section, ShortQ, Subject } from './types';
 
 /**
@@ -91,14 +102,56 @@ let db: ContentClient | null = null;
 let medium: Medium = 'en';
 
 /**
+ * Which "world" a read belongs to. Moves every time the cache is cleared: a
+ * new client, a new medium, a new class or board, a sign-out. A read that
+ * started in one world and lands in the next is a late answer to a question
+ * nobody is asking any more, so it is neither cached nor primed.
+ */
+let epoch = 0;
+
+/** Drops every cached answer and moves the epoch. */
+function forget(): void {
+  cache.clear();
+  epoch += 1;
+  bumpContent();
+}
+
+/**
  * Point the content layer at a database. Called once per app at startup.
  * Passing null puts it back on bundled content, which is what the tests and the
  * marketing site's demo want.
  */
 export function connectContent(client: ContentClient | null): void {
   db = client;
-  cache.clear();
+  forget();
 }
+
+/**
+ * Forget every answer this process has read, and the chapter index built from
+ * them. Call on sign-out and whenever the signed-in account changes, then call
+ * primeAllContent again once the next account is signed in.
+ *
+ * The cache is one per process and its keys carry no account, so without this
+ * the next student in the same tab or on the same phone was answered from the
+ * last one's reads: their chapters, their counts, their plan's content.
+ */
+export function clearContentCache(): void {
+  forget();
+  resetContentIndex();
+}
+
+/**
+ * A client handed in that is not the one this process connected: the web
+ * server's per-request client, built from one student's cookies.
+ *
+ * Reads through one never touch the shared cache and never fall back to the
+ * bundle. Both were shared by every request on the instance, so a read that
+ * failed, or came back empty under row level security, was answered with
+ * whatever another student's request had cached: a free account opened a
+ * subscriber's chapter, and a Class 9 account a Class 10 one. On the server an
+ * error is thrown for the page to show, and an empty answer stays empty.
+ */
+const perRequest = (client?: ContentClient): boolean => !!client && client !== db;
 
 /**
  * A chapter a student downloaded for offline use, read back off whatever this
@@ -126,11 +179,17 @@ export function connectLocalContent(provider: LocalContentProvider | null): void
   localContent = provider;
 }
 
-/** Follow the student's chosen medium. Set from the profile after sign-in. */
+/**
+ * Follow the student's chosen medium. Set from the profile after sign-in.
+ *
+ * Ignored in a process with no connected client, the web server, for the
+ * reason given at syllabusSaid below: the web store also renders there, and an
+ * Urdu request's render left the whole server counting in Urdu.
+ */
 export function setContentMedium(next: Medium): void {
-  if (next === medium) return;
+  if (next === medium || !db) return;
   medium = next;
-  cache.clear();
+  forget();
 }
 
 export const contentMedium = (): Medium => medium;
@@ -151,18 +210,36 @@ export const isLive = (): boolean => db !== null;
  */
 let grade: 9 | 10 = 9;
 let board: Board = 'fbise';
+/*
+ * Whether an app has said whose syllabus this is yet. On a device the first
+ * call always reaches setSyllabus, even when it names the defaults: an FBISE
+ * Class 9 student's store never changed either value, so the early return
+ * below kept the syllabus unset and every syllabus check waved everything
+ * through.
+ *
+ * None of these setters do anything in a process with no connected client,
+ * which is the web server. The web store renders there too, once per request,
+ * and a server that took one request's render as its syllabus (or medium)
+ * would hide every other board's and class's chapters from the pages it
+ * renders for everyone else. There is no student there to follow.
+ */
+let syllabusSaid = false;
 
 export function setContentGrade(next: 9 | 10): void {
-  if (next === grade) return;
+  if (!db || (next === grade && syllabusSaid)) return;
+  const changed = next !== grade;
   grade = next;
-  cache.clear();
+  syllabusSaid = true;
+  if (changed) forget();
   setSyllabus({ board, grade });
 }
 
 export function setContentBoard(next: Board): void {
-  if (next === board) return;
+  if (!db || (next === board && syllabusSaid)) return;
+  const changed = next !== board;
   board = next;
-  cache.clear();
+  syllabusSaid = true;
+  if (changed) forget();
   setSyllabus({ board, grade });
 }
 
@@ -224,15 +301,35 @@ async function read<T>(
   key: string,
   query: () => Promise<{ data: T | null; error: unknown }>,
   fallback: () => T | Promise<T>,
+  /**
+   * Set for a per-request client (see perRequest): what an empty answer is.
+   * None of the rules above apply there. Nothing is cached, nothing falls
+   * back, an error is thrown for the page to show, and an empty answer is the
+   * answer: under row level security it is what this student may see.
+   */
+  own?: { empty: () => T },
+  /** Whether a good answer may be cached as this key's last good answer. */
+  keep: (data: T) => boolean = () => true,
 ): Promise<T> {
   if (!client) return fallback();
+  if (own) {
+    const { data, error } = await query();
+    if (error) {
+      const message = (error as { message?: string }).message ?? String(error);
+      throw new Error(`[content] ${key}: ${message}`);
+    }
+    return data == null || (Array.isArray(data) && data.length === 0) ? own.empty() : data;
+  }
   if (!contentOnline) return (cache.get(key) as T) ?? fallback();
+  const started = epoch;
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const live = (async () => {
       const { data, error } = await query();
       if (error || data == null || (Array.isArray(data) && data.length === 0)) throw error ?? new Error('empty');
-      cache.set(key, data);
+      // A late answer from before a switch or a sign-out is not this
+      // student's last good answer, whatever its key says.
+      if (started === epoch && keep(data)) cache.set(key, data);
       return data;
     })();
     // A late success still fills the cache above; this stops a late failure
@@ -273,6 +370,7 @@ type ChapterRow = {
   title: string;
   urdu_title: string | null;
   blurb: string;
+  urdu_blurb: string | null;
   premium: boolean;
   audio_minutes: number;
 };
@@ -304,6 +402,7 @@ const toChapter = (r: ChapterRow, counts?: { mcqs: number; cards: number; sectio
   title: r.title,
   urduTitle: r.urdu_title ?? undefined,
   blurb: r.blurb,
+  urduBlurb: r.urdu_blurb ?? undefined,
   premium: r.premium,
   audioMinutes: r.audio_minutes,
   mcqCount: counts?.mcqs ?? 0,
@@ -317,6 +416,7 @@ export async function fetchSubjects(ids?: string[], client?: ContentClient): Pro
   const at = client ?? db;
   const key = `subjects:${ids?.join(',') ?? 'all'}`;
   const fallback = () => (ids?.length ? SUBJECTS.filter((s) => ids.includes(s.id)) : SUBJECTS);
+  const started = epoch;
 
   return read<Subject[]>(
     at,
@@ -329,10 +429,11 @@ export async function fetchSubjects(ids?: string[], client?: ContentClient): Pro
         (data as (SubjectRow & { chapters: { count: number }[] })[] | null)?.map((r) =>
           toSubject(r, r.chapters?.[0]?.count ?? 0),
         ) ?? null;
-      if (mapped?.length) primeContent({ subjects: mapped });
+      if (mapped?.length && started === epoch) primeContent({ subjects: mapped });
       return { error, data: mapped };
     },
     fallback,
+    perRequest(client) ? { empty: () => [] } : undefined,
   );
 }
 
@@ -348,6 +449,12 @@ export async function fetchSubjects(ids?: string[], client?: ContentClient): Pro
  * Deliberately not awaited by callers. It is a warm-up, and a screen must never
  * wait on it. Failure is silent because the bundle is already a working answer.
  *
+ * Call it again whenever the answer changes: after sign-in (the chapters table
+ * is readable only by a signed-in account, so a call before it primes
+ * nothing), after a class or board switch, and after clearContentCache. Safe
+ * to repeat and to overlap: a call that started before a switch lands as
+ * nothing, and contentVersion moves only when the index really changed.
+ *
  * THE ROW CAP. PostgREST returns at most 1000 rows unless you page, and it does
  * not tell you it truncated. Class 9 is 94 chapters so this is safe, and every
  * other query in this file is scoped to one subject or one chapter and bounded.
@@ -358,6 +465,7 @@ export async function fetchSubjects(ids?: string[], client?: ContentClient): Pro
 export async function primeAllContent(client?: ContentClient): Promise<void> {
   const at = client ?? db;
   if (!at) return;
+  const started = epoch;
   try {
     // The counts come along, exactly as fetchChapters reads them. Without
     // them toChapter defaults all three to zero, and because this runs
@@ -366,14 +474,15 @@ export async function primeAllContent(client?: ContentClient): Promise<void> {
     // and the whole app tells a paying student there is nothing to study.
     const { data, error } = await table('chapters', at)
       .select(
-        'id,subject_id,number,grade,board,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+        'id,subject_id,number,grade,board,board_unit,exam_marks,exam_share,title,urdu_title,blurb,urdu_blurb,premium,audio_minutes,' +
           'mcqs(count),flashcards(count),chapter_sections(count)',
       )
       .eq('mcqs.medium', medium)
       .eq('flashcards.medium', medium)
       .eq('chapter_sections.medium', medium)
       .order('number');
-    if (error || !data) return;
+    // Counted in the old medium, or read under the old class or board.
+    if (error || !data || started !== epoch) return;
     type Counted = ChapterRow & {
       mcqs: { count: number }[];
       flashcards: { count: number }[];
@@ -393,11 +502,13 @@ export async function primeAllContent(client?: ContentClient): Promise<void> {
 }
 
 export async function fetchSubject(id: string, client?: ContentClient): Promise<Subject | undefined> {
-  return (await fetchSubjects([id], client))[0] ?? subjectById(id);
+  const found = (await fetchSubjects([id], client))[0];
+  return found ?? (perRequest(client) ? undefined : subjectById(id));
 }
 
 export async function fetchChapters(subjectId: string, client?: ContentClient): Promise<Chapter[]> {
   const at = client ?? db;
+  const started = epoch;
   return read<Chapter[]>(
     at,
     `chapters:${subjectId}:${medium}`,
@@ -411,7 +522,7 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
       // every count doubles.
       const { data, error } = await table('chapters', at!)
         .select(
-          'id,subject_id,number,grade,board,board_unit,exam_marks,exam_share,title,urdu_title,blurb,premium,audio_minutes,' +
+          'id,subject_id,number,grade,board,board_unit,exam_marks,exam_share,title,urdu_title,blurb,urdu_blurb,premium,audio_minutes,' +
             'mcqs(count),flashcards(count),chapter_sections(count)',
         )
         .eq('subject_id', subjectId)
@@ -437,17 +548,32 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
 
       // Feed the synchronous lookups in content.ts, so every screen that reads
       // chapterById or chaptersFor gets the real chapter without becoming async.
-      if (mapped?.length) primeContent({ chapters: mapped });
+      // Not when a switch happened while this was in flight: that answer is
+      // for a question nobody is asking any more.
+      if (mapped?.length && started === epoch) primeContent({ chapters: mapped });
 
       return { error, data: mapped };
     },
-    () => bundledChapters(subjectId),
+    // The live index before the bundle: offline or past the deadline, it
+    // still holds what the last good read primed, counts and all. The bundle's
+    // counts are all zero, so every chapter read as empty and could not be
+    // opened.
+    () => chaptersFor(subjectId),
+    perRequest(client) ? { empty: () => [] } : undefined,
+    /* Not kept as this syllabus's last good answer when none of it is this
+       syllabus: row level security was still answering for the account as it
+       was before a board or class switch reached the server. Still returned,
+       because the server is the authority on what the account can read. */
+    (rows) => rows.some(chapterIsTheirs),
   );
 }
 
 export async function fetchChapter(id: string, client?: ContentClient): Promise<Chapter | undefined> {
   const subjectId = id.split('-')[0];
-  return (await fetchChapters(subjectId, client)).find((c) => c.id === id) ?? chapterById(id);
+  const found = (await fetchChapters(subjectId, client)).find((c) => c.id === id);
+  // On the server the index is shared by every request, primed by other
+  // students' reads, so it cannot vouch for a chapter this one may not see.
+  return found ?? (perRequest(client) ? undefined : chapterById(id));
 }
 
 /**
@@ -501,7 +627,10 @@ async function queryChapterContent(
   const s = pick(sections.data);
   // A chapter with no readable text is not a chapter yet. Fall back whole
   // rather than render an empty reader with working flashcards under it.
-  if (!s.length) return { error: new Error('no sections'), data: null };
+  // An empty answer, not an error: under row level security it can also mean
+  // this student may not read it, and a server has to be able to tell the two
+  // apart (see read()).
+  if (!s.length) return { error: null, data: null };
 
   return {
     error: null,
@@ -563,8 +692,10 @@ export async function fetchChapterContent(
     // Cache (above, inside read) is this session's last good answer. Below
     // that: a chapter the student downloaded on purpose, real content even if
     // it may be a little stale, which is still a better answer than the
-    // bundled sample. The bundle is the last resort, not the first fallback.
+    // bundled sample. The bundle is the last resort, not the first fallback,
+    // and contentFor only offers it to the syllabus it was written for.
     async () => (await localContent?.(chapterId, want)) ?? contentFor(chapterId),
+    perRequest(client) ? { empty: () => ({ sections: [], mcqs: [], flashcards: [], shortQs: [], blanks: [], audioTitle: '' }) } : undefined,
   );
 }
 
@@ -577,8 +708,13 @@ export async function fetchChapterContent(
  * Throws on anything short of a genuine live answer, so the caller can tell
  * the student the download failed instead of quietly saving a placeholder.
  */
-export async function fetchChapterContentLive(chapterId: string, client: ContentClient): Promise<ChapterContent> {
-  const { data, error } = await queryChapterContent(chapterId, client);
+export async function fetchChapterContentLive(
+  chapterId: string,
+  client: ContentClient,
+  /** The medium to save, so a download need not switch the whole app's medium (and clear its cache) to get it. */
+  want: Medium = medium,
+): Promise<ChapterContent> {
+  const { data, error } = await queryChapterContent(chapterId, client, want);
   if (error || !data) throw error ?? new Error(`no live content for ${chapterId}`);
   return data;
 }
@@ -595,12 +731,26 @@ export type Slo = { code: string; text: string; cognitive: string | null; assess
 
 export async function fetchSlos(
   subjectId: string,
-  opts?: { examinableOnly?: boolean },
+  opts?: { examinableOnly?: boolean; board?: Board; grade?: 9 | 10 },
   client?: ContentClient,
 ): Promise<Slo[]> {
   if (!client && !db) return [];
   try {
-    let q = table('curriculum_slos', client ?? db!).select('code,text,cognitive,assessment,domain,title').eq('subject_id', subjectId).order('code');
+    /*
+     * One board's and one class's outcomes. The table holds both boards, and
+     * a subject id alone returned FBISE's Class 9 list to a Punjab or Class 10
+     * student. FBISE's rows are not tied to chapters, and are all Class 9
+     * today; Punjab's name their chapter, whose id carries the class.
+     */
+    const b = opts?.board ?? board;
+    const g = opts?.grade ?? grade;
+    let q = table('curriculum_slos', client ?? db!)
+      .select('code,text,cognitive,assessment,domain,title')
+      .eq('subject_id', subjectId)
+      .eq('board', b)
+      .order('code');
+    if (b === 'punjab') q = q.or(`chapter_id.like.*-pj-${g}-*`);
+    else q = g === 10 ? q.or('chapter_id.like.*-10-*') : q.or('chapter_id.is.null,chapter_id.not.like.*-10-*');
     // null assessment means the source table merged the column, not that the
     // outcome is unexamined, so it stays in.
     if (opts?.examinableOnly) q = q.or('assessment.eq.summative,assessment.is.null');
@@ -611,11 +761,63 @@ export async function fetchSlos(
   }
 }
 
+/** Up to `n` items drawn at random, in random order. */
+function draw<T>(items: T[], n: number): T[] {
+  const pool = items.slice();
+  const take = Math.min(Math.max(n, 0), pool.length);
+  for (let i = 0; i < take; i += 1) {
+    const j = i + Math.floor(Math.random() * (pool.length - i));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, take);
+}
+
+const MCQ_COLUMNS = 'id,chapter_id,medium,topic,q,options,answer,explanation,difficulty,source';
+
+const toMcq = (r: Row): Mcq =>
+  ({
+    id: r.id,
+    chapterId: r.chapter_id,
+    topic: r.topic,
+    q: r.q,
+    options: r.options,
+    answer: r.answer,
+    explanation: r.explanation,
+    difficulty: r.difficulty,
+    source: r.source === 'human' ? 'human' : 'ai',
+  }) as Mcq;
+
+/**
+ * A question set for practice or an exam, drawn at random from the pool the
+ * options describe, in the student's medium.
+ *
+ * Three things this used to get wrong. It read `count * 3` rows with no medium
+ * filter and no order, then used the Urdu ones only if there were enough of
+ * them, so any Urdu shortfall served the whole set in English. With no order
+ * and no draw, every "mixed" set was the same first rows, usually from one
+ * chapter. And an Urdu set that could not be filled switched language rather
+ * than coming back short.
+ *
+ * Now the medium is in the query, and English is only the answer when the
+ * student's medium has no questions at all for that pool: a short set in
+ * their own language beats a full one in the other. A pool of a few chapters
+ * is read whole and drawn from; anything wider (a subject, a hand-picked
+ * dozen) reads ids first and then only the drawn rows, which keeps a student's
+ * data allowance out of it. Options are not shuffled here.
+ */
 export async function fetchMcqs(
-  opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] },
+  opts: {
+    chapterIds?: string[];
+    subjectId?: string;
+    count: number;
+    topics?: string[];
+    /** Server callers pass the student's medium; the device's own setting otherwise. */
+    medium?: Medium;
+  },
   client?: ContentClient,
 ): Promise<Mcq[]> {
   const at = client ?? db;
+  const want = opts.medium ?? medium;
 
   /**
    * Downloaded chapters' own MCQs, when the caller asked for specific
@@ -627,7 +829,7 @@ export async function fetchMcqs(
    */
   const localPool = async (): Promise<Mcq[] | null> => {
     if (!localContent || !opts.chapterIds?.length) return null;
-    const perChapter = await Promise.all(opts.chapterIds.map((id) => localContent!(id, medium)));
+    const perChapter = await Promise.all(opts.chapterIds.map((id) => localContent!(id, want)));
     let mcqs = perChapter.flatMap((c) => c?.mcqs ?? []);
     if (opts.topics?.length) mcqs = mcqs.filter((m) => opts.topics!.includes(m.topic));
     return mcqs.length ? mcqs : null;
@@ -643,41 +845,46 @@ export async function fetchMcqs(
    */
   const fallbackPool = async (): Promise<Mcq[]> => {
     const local = await localPool();
-    return local ? local.slice(0, opts.count) : [];
+    return local ? draw(local, opts.count) : [];
+  };
+
+  /** The pool's filters, the same for the id read and the whole-row read. */
+  const scoped = (q: Filterable, m: Medium): Filterable => {
+    let s = q.eq('medium', m);
+    if (opts.chapterIds?.length) s = s.in('chapter_id', opts.chapterIds);
+    else if (opts.subjectId) s = s.eq('subject_id', opts.subjectId);
+    if (opts.topics?.length) s = s.in('topic', opts.topics);
+    return s;
+  };
+
+  const drawIn = async (m: Medium): Promise<{ data: Mcq[] | null; error: unknown }> => {
+    // Twenty-odd questions a chapter: a few chapters are cheaper read whole.
+    if (opts.chapterIds?.length && opts.chapterIds.length <= 3) {
+      const { data, error } = await scoped(table('mcqs', at!).select(MCQ_COLUMNS), m);
+      if (error) return { error, data: null };
+      return { error: null, data: draw((data as Row[]) ?? [], opts.count).map(toMcq) };
+    }
+    const ids = await scoped(table('mcqs', at!).select('id'), m);
+    if (ids.error) return { error: ids.error, data: null };
+    const picked = draw(((ids.data as { id: string }[]) ?? []).map((r) => r.id), opts.count);
+    if (!picked.length) return { error: null, data: [] };
+    const rows = await table('mcqs', at!).select(MCQ_COLUMNS).in('id', picked);
+    if (rows.error) return { error: rows.error, data: null };
+    const byId = new Map(((rows.data as Row[]) ?? []).map((r) => [String(r.id), r]));
+    // Back in the drawn order: `in` answers in whatever order the table has.
+    return { error: null, data: picked.flatMap((id) => (byId.has(id) ? [toMcq(byId.get(id)!)] : [])) };
   };
 
   return read<Mcq[]>(
     at,
-    `mcqs:${opts.subjectId ?? ''}:${opts.chapterIds?.join(',') ?? ''}:${opts.topics?.join(',') ?? ''}:${opts.count}:${medium}`,
+    `mcqs:${opts.subjectId ?? ''}:${opts.chapterIds?.join(',') ?? ''}:${opts.topics?.join(',') ?? ''}:${opts.count}:${want}`,
     async () => {
-      let q = table('mcqs', at!).select('id,chapter_id,medium,topic,q,options,answer,explanation,difficulty,source');
-      if (opts.chapterIds?.length) q = q.in('chapter_id', opts.chapterIds);
-      else if (opts.subjectId) q = q.eq('subject_id', opts.subjectId);
-      if (opts.topics?.length) q = q.in('topic', opts.topics);
-
-      const { data, error } = await q.limit(opts.count * 3);
-      if (error) return { error, data: null };
-
-      const rows = (data as Row[]) ?? [];
-      const wanted = rows.filter((r) => r.medium === medium);
-      const pool = wanted.length >= opts.count ? wanted : rows.filter((r) => r.medium === 'en');
-
-      return {
-        error: null,
-        data: pool.slice(0, opts.count).map((r) => ({
-          id: r.id,
-          chapterId: r.chapter_id,
-          topic: r.topic,
-          q: r.q,
-          options: r.options,
-          answer: r.answer,
-          explanation: r.explanation,
-          difficulty: r.difficulty,
-          source: r.source === 'human' ? 'human' : 'ai',
-        })) as Mcq[],
-      };
+      const own = await drawIn(want);
+      if (own.error || own.data?.length || want === 'en') return own;
+      return drawIn('en');
     },
     fallbackPool,
+    perRequest(client) ? { empty: () => [] } : undefined,
   );
 }
 
@@ -690,7 +897,13 @@ export async function fetchMcqs(
  * everything from the bank, which is never wrong, only less varied.
  */
 export async function fetchGeneratedMcqs(
-  opts: { count: number; topics?: string[] },
+  opts: {
+    count: number;
+    topics?: string[];
+    /** Only this subject's questions. Without it an empty topic list meant any subject at all. */
+    subjectId?: string;
+    medium?: Medium;
+  },
   client?: ContentClient,
 ): Promise<Mcq[]> {
   const at = client ?? db;
@@ -698,7 +911,8 @@ export async function fetchGeneratedMcqs(
   try {
     let q = table('generated_mcqs', at).select('id,topic,medium,q,options,answer,explanation,difficulty');
     if (opts.topics?.length) q = q.in('topic', opts.topics);
-    const { data, error } = await q.eq('medium', medium).limit(opts.count);
+    if (opts.subjectId) q = q.eq('subject_id', opts.subjectId);
+    const { data, error } = await q.eq('medium', opts.medium ?? medium).limit(opts.count);
     if (error) return [];
     return ((data as Row[]) ?? []).map((r) => ({
       id: r.id,

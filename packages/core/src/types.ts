@@ -54,6 +54,8 @@ export type Chapter = {
   title: string;
   urduTitle?: string;
   blurb: string;
+  /** The same one-line description in Urdu, where it has been written. See chapterBlurb. */
+  urduBlurb?: string;
   premium: boolean;
   mcqCount: number;
   flashcardCount: number;

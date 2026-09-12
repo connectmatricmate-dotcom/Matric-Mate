@@ -1,8 +1,8 @@
 /**
- * App copy, in English and Roman Urdu.
+ * App copy, in English and Urdu. The Urdu is in Urdu script, not Roman Urdu.
  *
  * Register for the Urdu side: how Pakistani apps actually write: polite
- * imperative ("karein", not "karo"), Latin digits, and the English loanwords
+ * imperative ("کریں", not "کرو"), Latin digits, and the English loanwords
  * students really use (account, password, chapter, test, practice, subject).
  * No literary Urdu, no half-English sentences.
  *
@@ -49,7 +49,7 @@ export const en = {
        languages because it was written straight into the screen. */
     tagline: 'Your Class 9 and 10 study mate',
     slide1Title: 'Everything in one app',
-    slide1Body: 'Chapter-wise notes, audio lessons and examples for FBISE Class 9 and Class 10.',
+    slide1Body: 'Chapter-wise notes, audio lessons and examples for Class 9 and Class 10, FBISE and Punjab Board.',
     slide2Title: 'Practice until it sticks',
     slide2Body: 'MCQs, flashcards, past papers and timed tests, with instant explanations.',
     slide3Title: 'Your AI tutor, any time',
@@ -96,6 +96,14 @@ export const en = {
     pickTwo: 'Pick at least 2 electives',
     subjectAdded: '{name} added',
     subjectsFootnote: 'More subjects are on the way.',
+    /* The step dots' accessible name. */
+    stepOf: 'Step {n} of {total}',
+    /* Changing a board the account already has, from Edit profile. The same
+       cost as a class change, so the same kind of warning. */
+    boardWarnTitle: 'Switch to {board}?',
+    boardWarnBody:
+      'Your notes, questions and papers change to {board}, and your dashboard starts over: progress, streak, XP and study plan are cleared on every device where you use this account. Your account and your plan stay.',
+    boardChanged: 'You’re on {board} now. Fresh start!',
   },
 
   auth: {
@@ -149,7 +157,7 @@ export const en = {
     linkExpired: 'That reset link has expired. Send yourself a fresh one below.',
     logOut: 'Log out',
     logOutConfirm: 'Log out?',
-    logOutBody: 'Your progress stays saved on this device.',
+    logOutBody: 'This removes your account’s data from this device. Your progress is saved to your account and comes back when you log in again.',
     stayLoggedIn: 'Stay logged in',
 
     /* What a failed sign-in says. Deliberately never distinguishes "no such
@@ -174,6 +182,9 @@ export const en = {
     errForm: 'Check the form and try again.',
     errLinkExpired: 'That reset link has expired. Ask for a new one.',
     errPasswordsMatch: 'Both passwords need to match.',
+    /* The role line on the staff signpost, which was English in both languages. */
+    roleAdmin: 'Administrator',
+    rolePartner: 'Referral partner',
   },
 
   billing: {
@@ -328,6 +339,10 @@ export const en = {
     activeDays: 'Active days',
     streakChip: '{n} day streak',
     streakMilestone: '{n} days in a row. Keep it going!',
+    /* The tick box's accessible name on each of today's tasks. */
+    markDone: 'Mark done: {task}',
+    /* Today's plan with no chapters to plan from yet. */
+    planEmpty: 'Your plan fills in as soon as your chapters are ready. Pick one yourself in the meantime.',
   },
 
   notifications: {
@@ -465,6 +480,10 @@ export const en = {
     suggest2: 'Give an example',
     suggest3: 'Explain in Urdu',
     openChat: 'Open full chat',
+    /* A chapter with questions but no written notes yet. Not an error, and
+       never the plan wall: the student has a plan, the notes just are not in. */
+    noNotesTitle: 'No notes for this chapter yet',
+    noNotesBody: 'Its questions and flashcards are ready on the chapter page.',
   },
 
   audio: {
@@ -486,6 +505,11 @@ export const en = {
       'This copy of the app was built before audio support was added, so the transport below is a preview. Install the latest build to hear the recording.',
     upNext: 'Up next',
     nextChapter: 'Next chapter audio',
+    /* The language subjects are recorded once, in their own language, so the
+       usual "your medium or English" note would promise a track that is not
+       coming. See subjectMedium. */
+    oneLanguageUr: 'This subject is taught in Urdu, so its lesson is in Urdu for every student.',
+    oneLanguageEn: 'This subject is taught in English, so its lesson is in English for every student.',
   },
 
   downloads: {
@@ -499,6 +523,18 @@ export const en = {
     perChapter: '{n} · notes, audio, flashcards, MCQs',
     footnote: 'Downloads use Wi-Fi by default. Answers given offline sync when you reconnect.',
     saveFailed: 'Could not save this chapter. Try again.',
+    /* What a language switch does to a download, said before it surprises
+       anyone. See "what a language switch does" in the app's downloads.ts. */
+    languageNote:
+      'Each chapter is saved in the language you were using when you downloaded it. After you switch language, download it again to read it offline in the new one. English, Urdu and Punjab Board Islamiyat are written in one language, so their downloads keep working.',
+    /* On a downloaded chapter that the current language cannot open offline. {lang} is the language it was saved in. */
+    savedIn: 'Saved in {lang}. Download again to read it offline in this language.',
+    /* The footnote without the Wi-Fi promise: nothing checks the network type. */
+    footnoteSync: 'Answers given offline are kept on the phone and sync when you reconnect.',
+    /* A chapter with no audio lesson saved, so the row does not promise one. */
+    perChapterNoAudio: '{n} · notes, flashcards, MCQs',
+    removeBody: 'This chapter is deleted from your phone. You will need internet to download it again.',
+    downloadAgain: 'Download again',
   },
   offline: {
     title: 'No internet',
@@ -523,6 +559,9 @@ export const en = {
     /* Built from the catalogue, never a literal: see pastPaperYears. */
     papersSub: '{board} {years}',
     papersSubNone: 'None published for Class {n} yet',
+    /* A span of paper years, for {years} above and the Punjab compilations.
+       See yearSpan: "to" was written into Urdu lines as an English word. */
+    yearsRange: '{from} to {to}',
     toppers: 'Topper papers',
     toppersSub: 'See a full-mark answer',
     exam: 'Timed test',
@@ -644,7 +683,7 @@ export const en = {
 
     blanksItem: 'Item {a} of {b}',
     blanksCheck: 'Check',
-    blanksCorrect: 'Correct! +8 XP',
+    blanksCorrect: 'Correct! +10 XP',
     blanksWrong: 'Correct answer: {a}',
     blanksDone: '{a} / {b} correct',
     blanksDoneSub: 'Recall practice counts towards your chapter progress.',
@@ -695,6 +734,17 @@ export const en = {
     /* The scripts carry no class. Naming the examination and the year is what
        the catalogue can actually support: see topperYears. */
     toppersSource: 'From the board’s SSC {year} topper copies.',
+    /* What "Ask AI" sends as the student's own message. These were English
+       literals in the screens, so an Urdu student's chat opened on an English
+       sentence they never wrote. */
+    askWhyWrong: 'I answered “{mine}”, but the correct answer to “{q}” is “{right}”. Why is my answer wrong?',
+    askWhyBlank: 'Why does “{a}” fit here: “{before} ____ {after}”?',
+    askExplain: 'Explain this in easy words: {q}',
+    starsLabel: '{n} of 3 stars',
+    /* Flashcards, blanks and short questions opened without a chapter. */
+    changeChapter: 'Change chapter',
+    pickChapter: 'Pick a chapter',
+    pickChapterBody: 'Choose the chapter you want to practise.',
   },
 
   tutor: {
@@ -882,6 +932,20 @@ export const en = {
     aiTestNote: 'The AI writes fresh questions from your chapter, checked against the board outcomes that chapter is examined on.',
     accuracyOver: '{n}% accuracy over {total} questions',
     add: 'Add',
+    /* The builder's own refusals, worded so they do not say "try again" when
+       trying again cannot work. */
+    notInSyllabus: 'That chapter is not in your class’s syllabus. Pick one from the list.',
+    noChapters: 'No chapters for this subject yet. Pick another subject.',
+    recentPapers: 'Your mock papers',
+    /* A closed question on the mock paper opens an answer box, not an explanation. */
+    paperTapToAnswer: 'Tap to write your answer',
+    cameraDenied: 'Camera access is off. Allow it in your phone settings to take a photo.',
+    renameChat: 'Rename',
+    chatName: 'Chat name',
+    deleteChat: 'Delete chat',
+    deleteChatBody: 'This chat and its answers are removed from your account, on the app and on the website.',
+    chatDeleted: 'Chat deleted',
+    chatRenamed: 'Chat renamed',
   },
 
   progress: {
@@ -945,6 +1009,15 @@ export const en = {
     shareFailed: 'Could not open the share sheet.',
     shareToast: 'Share sheet sends the card as an image',
     pdfToast: 'Opening the print dialog. Choose “Save as PDF”.',
+    /* A subject, or the whole month, with no answers to grade yet. */
+    gradeNone: 'n/a',
+    reportCardSubNone: 'Answer a few questions to get your first grade',
+    /* The all-time chart, which counts by week. */
+    weeksAgo: '{n} weeks ago',
+    weekPct: 'this week · {n}%',
+    weekNone: 'nothing this week',
+    questionsPerWeek: 'Questions per week',
+    pdfFailed: 'Couldn’t make your PDF. Try again in a minute.',
   },
 
   account: {
@@ -973,7 +1046,7 @@ export const en = {
     medium: 'Medium',
     mySubjects: 'My subjects',
     subjectsCount: '{n} selected',
-    editFootnote: 'Changing your class clears this account\u2019s progress and starts a new syllabus. Medium and subjects can be changed freely.',
+    editFootnote: 'Changing your class or board clears this account\u2019s progress and starts a new syllabus. Medium and subjects can be changed freely.',
     profileSaved: 'Profile saved',
 
     subscriptionTitle: 'Subscription',
@@ -1060,6 +1133,10 @@ export const en = {
     reportProblem: 'Report a problem',
     reportToast: 'Opens your email app with a report draft',
     replyTime: 'We read every report. Replies go to the address you write from, and we cannot promise a fixed reply time yet.',
+    /* A reminder slot, all of which are evening hours. {h} is 4 to 9. */
+    reminderTimeLabel: '{h}:00 PM',
+    /* The push switch when the phone itself has notifications turned off. */
+    channelPushOff: 'Turned off in phone settings. Tap to turn it on.',
   },
 
   states: {
@@ -1085,6 +1162,9 @@ export const en = {
     workChecking: 'Checking every answer',
     workAlmost: 'Almost there',
     workStay: 'This takes about half a minute. Keep this screen open.',
+    /* A chapter or page id that does not exist, inside the app. */
+    notFoundTitle: 'We couldn’t find that',
+    notFoundBody: 'That chapter or page doesn’t exist. It may have moved, or the link has a typo.',
   },
 };
 
@@ -1126,7 +1206,7 @@ export const ur: typeof en = {
   welcome: {
     tagline: 'کلاس 9 اور 10 کا آپ کا ساتھی',
     slide1Title: 'سب کچھ ایک ایپ میں',
-    slide1Body: 'FBISE کلاس 9 اور کلاس 10 کے ہر باب کے نوٹس، آڈیو اسباق اور مثالیں۔',
+    slide1Body: 'FBISE اور پنجاب بورڈ، کلاس 9 اور کلاس 10 کے ہر باب کے نوٹس، آڈیو اسباق اور مثالیں۔',
     slide2Title: 'اتنی مشق کہ پکا یاد ہو جائے',
     slide2Body: 'MCQs، فلیش کارڈز، پرانے پرچے اور وقت والے ٹیسٹ، فوراً وضاحت کے ساتھ۔',
     slide3Title: 'آپ کا AI ٹیوٹر، ہر وقت',
@@ -1173,6 +1253,11 @@ export const ur: typeof en = {
     pickTwo: 'کم از کم 2 اختیاری مضامین چنیں',
     subjectAdded: '{name} شامل ہو گیا',
     subjectsFootnote: 'مزید مضامین جلد آ رہے ہیں۔',
+    stepOf: 'مرحلہ {n} از {total}',
+    boardWarnTitle: '{board} پر جائیں؟',
+    boardWarnBody:
+      'آپ کے نوٹس، سوال اور پرچے {board} کے مطابق ہو جائیں گے، اور ڈیش بورڈ نئے سرے سے شروع ہو گا: پیش رفت، تسلسل، XP اور پڑھائی کا منصوبہ اس اکاؤنٹ والے ہر آلے سے صاف ہو جائیں گے۔ آپ کا اکاؤنٹ اور پلان برقرار رہیں گے۔',
+    boardChanged: 'اب آپ {board} پر ہیں۔ نیا آغاز!',
   },
 
   auth: {
@@ -1223,7 +1308,7 @@ export const ur: typeof en = {
     linkExpired: 'یہ ری سیٹ لنک ختم ہو گیا۔ نیچے سے نیا لنک بھیجیں۔',
     logOut: 'لاگ آؤٹ کریں',
     logOutConfirm: 'لاگ آؤٹ کرنا ہے؟',
-    logOutBody: 'آپ کی پیش رفت اسی فون پر محفوظ رہے گی۔',
+    logOutBody: 'اس سے آپ کے اکاؤنٹ کا ڈیٹا اس آلے سے ہٹ جائے گا۔ آپ کی پیش رفت آپ کے اکاؤنٹ میں محفوظ ہے اور دوبارہ لاگ اِن کرنے پر واپس آ جائے گی۔',
     stayLoggedIn: 'لاگ اِن رہنے دیں',
 
     errCredentials: 'ای میل یا پاس ورڈ غلط ہے۔',
@@ -1241,6 +1326,8 @@ export const ur: typeof en = {
     errForm: 'فارم دیکھ کر دوبارہ کوشش کریں۔',
     errLinkExpired: 'یہ ری سیٹ لنک ختم ہو گیا ہے۔ نیا لنک منگوائیں۔',
     errPasswordsMatch: 'دونوں پاس ورڈ ایک جیسے ہونے چاہئیں۔',
+    roleAdmin: 'ایڈمنسٹریٹر',
+    rolePartner: 'ریفرل پارٹنر',
   },
 
   billing: {
@@ -1393,6 +1480,8 @@ export const ur: typeof en = {
     activeDays: 'سرگرم دن',
     streakChip: 'لگاتار {n} دن',
     streakMilestone: 'لگاتار {n} دن۔ ایسے ہی چلتے رہیں!',
+    markDone: 'مکمل کا نشان لگائیں: {task}',
+    planEmpty: 'آپ کے ابواب تیار ہوتے ہی منصوبہ یہاں آ جائے گا۔ تب تک خود کوئی باب چن لیں۔',
   },
 
   notifications: {
@@ -1517,6 +1606,8 @@ export const ur: typeof en = {
     suggest2: 'ایک مثال دیں',
     suggest3: 'اور تفصیل سے سمجھائیں',
     openChat: 'پوری گفتگو کھولیں',
+    noNotesTitle: 'اس باب کے نوٹس ابھی نہیں آئے',
+    noNotesBody: 'اس کے سوال اور فلیش کارڈز باب کے صفحے پر موجود ہیں۔',
   },
 
   audio: {
@@ -1538,6 +1629,8 @@ export const ur: typeof en = {
       'یہ ایپ آڈیو کی سہولت سے پہلے بنی تھی، اس لیے نیچے صرف پیش نظارہ چل رہا ہے۔ اصل ریکارڈنگ کے لیے نئی بلڈ انسٹال کریں۔',
     upNext: 'آگے',
     nextChapter: 'اگلے باب کا آڈیو',
+    oneLanguageUr: 'یہ مضمون اردو میں پڑھایا جاتا ہے، اس لیے اس کا سبق ہر طالب علم کے لیے اردو میں ہے۔',
+    oneLanguageEn: 'یہ مضمون انگریزی میں پڑھایا جاتا ہے، اس لیے اس کا سبق ہر طالب علم کے لیے انگریزی میں ہے۔',
   },
 
   downloads: {
@@ -1551,6 +1644,13 @@ export const ur: typeof en = {
     perChapter: '{n} · نوٹس، آڈیو، فلیش کارڈز، MCQs',
     footnote: 'ڈاؤن لوڈ Wi-Fi پر ہوتے ہیں۔ آف لائن دیے گئے جواب انٹرنیٹ آتے ہی سِنک ہو جاتے ہیں۔',
     saveFailed: 'باب محفوظ نہیں ہو سکا۔ دوبارہ کوشش کریں۔',
+    languageNote:
+      'ہر باب اسی زبان میں محفوظ ہوتا ہے جس میں آپ نے اسے ڈاؤن لوڈ کیا تھا۔ زبان بدلنے کے بعد نئی زبان میں آف لائن پڑھنے کے لیے اسے دوبارہ ڈاؤن لوڈ کریں۔ انگریزی، اردو اور پنجاب بورڈ کی اسلامیات ایک ہی زبان میں ہیں، اس لیے ان کے ڈاؤن لوڈ چلتے رہتے ہیں۔',
+    savedIn: '{lang} میں محفوظ ہے۔ اس زبان میں آف لائن پڑھنے کے لیے دوبارہ ڈاؤن لوڈ کریں۔',
+    footnoteSync: 'آف لائن دیے گئے جواب فون پر محفوظ رہتے ہیں اور انٹرنیٹ آتے ہی سِنک ہو جاتے ہیں۔',
+    perChapterNoAudio: '{n} · نوٹس، فلیش کارڈز، MCQs',
+    removeBody: 'یہ باب آپ کے فون سے حذف ہو جائے گا۔ دوبارہ ڈاؤن لوڈ کرنے کے لیے انٹرنیٹ چاہیے ہو گا۔',
+    downloadAgain: 'دوبارہ ڈاؤن لوڈ کریں',
   },
   offline: {
     title: 'انٹرنیٹ نہیں ہے',
@@ -1574,6 +1674,7 @@ export const ur: typeof en = {
     papers: 'پرانے پرچے',
     papersSub: '{board} {years}',
     papersSubNone: 'کلاس {n} کے لیے ابھی کوئی شائع نہیں ہوا',
+    yearsRange: '{from} سے {to} تک',
     toppers: 'ٹاپر پرچے',
     toppersSub: 'پورے نمبروں والے جواب دیکھیں',
     exam: 'وقت والا ٹیسٹ',
@@ -1691,7 +1792,7 @@ export const ur: typeof en = {
 
     blanksItem: 'سوال {a} / {b}',
     blanksCheck: 'جانچیں',
-    blanksCorrect: 'صحیح! +8 XP',
+    blanksCorrect: 'صحیح! +10 XP',
     blanksWrong: 'صحیح جواب: {a}',
     blanksDone: '{a} / {b} صحیح',
     blanksDoneSub: 'یہ مشق بھی آپ کے باب کی پیش رفت میں شامل ہوتی ہے۔',
@@ -1740,6 +1841,13 @@ export const ur: typeof en = {
     toppersCount: '{n} کاپیاں',
     toppersFootnote: 'یہ بورڈ کی اپنی ویب سائٹ پر نئے ٹیب میں کھلتے ہیں۔',
     toppersSource: 'بورڈ کی SSC {year} ٹاپر کاپیوں سے۔',
+    askWhyWrong: 'میں نے ”{mine}“ جواب دیا، لیکن ”{q}“ کا درست جواب ”{right}“ ہے۔ میرا جواب غلط کیوں ہے؟',
+    askWhyBlank: '”{before} ____ {after}“ میں ”{a}“ کیوں آتا ہے؟',
+    askExplain: 'اسے آسان لفظوں میں سمجھائیں: {q}',
+    starsLabel: '3 میں سے {n} ستارے',
+    changeChapter: 'باب بدلیں',
+    pickChapter: 'باب چنیں',
+    pickChapterBody: 'وہ باب چنیں جس کی آپ مشق کرنا چاہتے ہیں۔',
   },
 
   tutor: {
@@ -1905,6 +2013,17 @@ export const ur: typeof en = {
     aiTestNote: 'AI آپ کے باب سے نئے سوال بناتا ہے، ان بورڈ مقاصد کے مطابق جن پر وہ باب آتا ہے۔',
     accuracyOver: '{total} سوالوں میں {n}% درستگی',
     add: 'شامل کریں',
+    notInSyllabus: 'یہ باب آپ کی جماعت کے نصاب میں نہیں۔ فہرست میں سے کوئی باب چنیں۔',
+    noChapters: 'اس مضمون کے ابواب ابھی نہیں آئے۔ کوئی اور مضمون چنیں۔',
+    recentPapers: 'آپ کے نمونہ پرچے',
+    paperTapToAnswer: 'جواب لکھنے کے لیے ٹیپ کریں',
+    cameraDenied: 'کیمرے کی اجازت بند ہے۔ تصویر لینے کے لیے فون کی سیٹنگز میں اجازت دیں۔',
+    renameChat: 'نام بدلیں',
+    chatName: 'چیٹ کا نام',
+    deleteChat: 'چیٹ حذف کریں',
+    deleteChatBody: 'یہ چیٹ اور اس کے جواب آپ کے اکاؤنٹ سے ہٹ جائیں گے، ایپ پر بھی اور ویب سائٹ پر بھی۔',
+    chatDeleted: 'چیٹ حذف ہو گئی',
+    chatRenamed: 'چیٹ کا نام بدل گیا',
   },
 
   progress: {
@@ -1966,6 +2085,13 @@ export const ur: typeof en = {
     shareFailed: 'شیئر شیٹ نہیں کھل سکی۔',
     shareToast: 'شیئر شیٹ کارڈ کو تصویر بنا کر بھیجتی ہے',
     pdfToast: 'پرنٹ ڈائیلاگ کھل رہا ہے۔ ”Save as PDF“ چنیں۔',
+    gradeNone: 'ابھی نہیں',
+    reportCardSubNone: 'پہلا گریڈ پانے کے لیے کچھ سوال حل کریں',
+    weeksAgo: '{n} ہفتے پہلے',
+    weekPct: 'اس ہفتے · {n}%',
+    weekNone: 'اس ہفتے کچھ نہیں',
+    questionsPerWeek: 'ہر ہفتے کتنے سوال',
+    pdfFailed: 'آپ کی پی ڈی ایف نہیں بن سکی۔ ایک منٹ بعد دوبارہ کوشش کریں۔',
   },
 
   account: {
@@ -1994,7 +2120,7 @@ export const ur: typeof en = {
     medium: 'میڈیم',
     mySubjects: 'میرے مضامین',
     subjectsCount: '{n} چنے گئے',
-    editFootnote: 'کلاس بدلنے پر اس اکاؤنٹ کی پیش رفت ختم ہو جاتی ہے اور نیا نصاب شروع ہوتا ہے۔ میڈیم اور مضامین آپ جب چاہیں بدل سکتے ہیں۔',
+    editFootnote: 'کلاس یا بورڈ بدلنے پر اس اکاؤنٹ کی پیش رفت ختم ہو جاتی ہے اور نیا نصاب شروع ہوتا ہے۔ میڈیم اور مضامین آپ جب چاہیں بدل سکتے ہیں۔',
     profileSaved: 'پروفائل محفوظ ہو گئی',
 
     subscriptionTitle: 'سبسکرپشن',
@@ -2073,6 +2199,8 @@ export const ur: typeof en = {
     reportProblem: 'مسئلہ رپورٹ کریں',
     reportToast: 'آپ کی ای میل ایپ میں رپورٹ کا مسودہ کھلتا ہے',
     replyTime: 'ہم ہر رپورٹ پڑھتے ہیں۔ جواب اسی ای میل پر آتا ہے جہاں سے آپ لکھتے ہیں، مگر وقت کا وعدہ ابھی نہیں کر سکتے۔',
+    reminderTimeLabel: 'شام {h} بجے',
+    channelPushOff: 'فون کی سیٹنگز میں بند ہے۔ آن کرنے کے لیے ٹیپ کریں۔',
   },
 
   states: {
@@ -2093,5 +2221,7 @@ export const ur: typeof en = {
     workChecking: 'ہر جواب جانچا جا رہا ہے',
     workAlmost: 'بس تھوڑا سا اور',
     workStay: 'اس میں تقریباً آدھا منٹ لگتا ہے۔ یہ صفحہ کھلا رکھیں۔',
+    notFoundTitle: 'یہ نہیں ملا',
+    notFoundBody: 'یہ باب یا صفحہ موجود نہیں۔ ہو سکتا ہے اس کی جگہ بدل گئی ہو، یا لنک میں کوئی غلطی ہو۔',
   },
 };

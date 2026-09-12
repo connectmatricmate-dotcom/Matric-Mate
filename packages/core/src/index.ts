@@ -25,6 +25,7 @@ export * from './tutor-actions';
 export { api } from './api';
 export {
   connectContent,
+  clearContentCache,
   connectLocalContent,
   setContentMedium,
   setContentGrade,

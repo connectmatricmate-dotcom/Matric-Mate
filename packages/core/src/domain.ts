@@ -2,8 +2,8 @@
  * Domain logic. XP, streaks, progress, weak topics, quotas.
  * Pure functions so the same rules run on device, on web and (later) on the server.
  */
-import { Attempt, Chapter, Confidence, Medium, PlanTask, TestResult } from './types';
-import { chapterById, chapterName, chaptersFor, contentFor } from './content';
+import { Attempt, Board, Chapter, Confidence, Medium, PlanTask, TestResult } from './types';
+import { belongsToChapter, chapterById, chapterName, chaptersFor, contentFor, inSyllabus, itemKey } from './content';
 import { translate, type Language } from './i18n';
 
 /**
@@ -106,24 +106,36 @@ export function xpForAttempt(a: Pick<Attempt, 'correct' | 'confidence' | 'mode'>
  * session credited to the previous day: their streak broke a day early and
  * "today's plan" turned over five hours late. The server counts AI quota in
  * Asia/Karachi for the same reason.
+ *
+ * Plain arithmetic rather than Intl: Pakistan has kept UTC+5 all year since
+ * 2009 (startOfTodayMs below already relies on it), and this way the key does
+ * not depend on how a phone's JavaScript engine formats an 'en-CA' date.
  */
-const dayKey = (ms: number) =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date(ms));
+const PKT_OFFSET_MS = 5 * 3600_000;
+const DAY_MS = 864e5;
+const dayKey = (ms: number) => new Date(ms + PKT_OFFSET_MS).toISOString().slice(0, 10);
 
-/** Consecutive days with activity, counting back from today. */
+/**
+ * Consecutive days with activity, counting back from today.
+ *
+ * Steps back a whole day at a time in Karachi's fixed offset. It used to step
+ * with setDate on the device's own clock, which on a phone set to a zone with
+ * daylight saving could skip or repeat a day near midnight.
+ */
 export function streakFrom(activeDays: string[]): number {
   if (!activeDays.length) return 0;
   const set = new Set(activeDays);
+  const today = dayKey(Date.now());
   let streak = 0;
-  const d = new Date();
+  let at = Date.now();
   for (;;) {
-    const key = dayKey(d.getTime());
+    const key = dayKey(at);
     if (set.has(key)) {
       streak += 1;
-      d.setDate(d.getDate() - 1);
-    } else if (streak === 0 && key === dayKey(Date.now())) {
+      at -= DAY_MS;
+    } else if (streak === 0 && key === today) {
       // today not active yet, a streak can still be alive from yesterday
-      d.setDate(d.getDate() - 1);
+      at -= DAY_MS;
     } else break;
   }
   return streak;
@@ -132,11 +144,8 @@ export function streakFrom(activeDays: string[]): number {
 /** Last 14 days as booleans for the streak strip. */
 export function last14(activeDays: string[]): boolean[] {
   const set = new Set(activeDays);
-  return Array.from({ length: 14 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (13 - i));
-    return set.has(dayKey(d.getTime()));
-  });
+  const now = Date.now();
+  return Array.from({ length: 14 }, (_, i) => set.has(dayKey(now - (13 - i) * DAY_MS)));
 }
 
 export const accuracy = (attempts: Attempt[]) =>
@@ -165,10 +174,33 @@ export function confidenceBreakdown(attempts: Attempt[]) {
 }
 
 
-/** Topics ranked worst-first, from at least 3 attempts each. */
-export function weakTopics(attempts: Attempt[], minAttempts = 3) {
+/**
+ * Topics ranked worst-first, from at least 3 attempts each.
+ *
+ * Two kinds of answer never make a weak topic. One with no topic, which AI
+ * sets used to record: it came out as a nameless row, a "Fix ." button and a
+ * blank task on the plan. And one from a chapter outside the student's
+ * syllabus, left over from before a board or class change: its button opened
+ * a chapter their account cannot read.
+ */
+export function weakTopics(
+  attempts: Attempt[],
+  minAttempts = 3,
+  /** The syllabus to hold chapters to. Defaults to the one the app set; see inSyllabus. */
+  syllabus?: { grade?: number; board?: Board | null },
+) {
+  const fits = new Map<string, boolean>();
+  const theirs = (chapterId: string): boolean => {
+    let ok = fits.get(chapterId);
+    if (ok === undefined) {
+      ok = inSyllabus(chapterId, syllabus?.grade, syllabus?.board);
+      fits.set(chapterId, ok);
+    }
+    return ok;
+  };
   const map = new Map<string, { topic: string; subjectId: string; chapterId: string; right: number; total: number }>();
   attempts.forEach((a) => {
+    if (!a.topic?.trim() || !theirs(a.chapterId)) return;
     const k = `${a.subjectId}|${a.topic}`;
     const row = map.get(k) ?? { topic: a.topic, subjectId: a.subjectId, chapterId: a.chapterId, right: 0, total: 0 };
     row.total += 1;
@@ -188,14 +220,16 @@ export function weakTopics(attempts: Attempt[], minAttempts = 3) {
  * Counts against the chapter's own totals, not against the bundled sample.
  * Real sections are ids like `phy-1-en-s1` and the bundle's are not, so
  * matching read markers against bundled section ids found nothing and progress
- * sat at zero however much a student read. Ownership is by id prefix, which is
- * unambiguous because `chem-1-` cannot match `chem-10-en-s1`.
+ * sat at zero however much a student read. Ownership is by parsing the id (see
+ * chapterOfId), not by prefix: `chem-10-` is a prefix of Class 10's
+ * `chem-10-3-en-s1`, and Class 10 reading used to fill a Class 9 chapter. A
+ * section read in both mediums counts once.
  */
 export function chapterPct(chapterId: string, readSections: string[], attempts: Attempt[]): number {
   const chapter = chapterById(chapterId);
   const content = contentFor(chapterId);
   const totalSections = chapter?.sectionCount || content.sections.length || 1;
-  const readCount = readSections.filter((id) => id === chapterId || id.startsWith(`${chapterId}-`)).length;
+  const readCount = new Set(readSections.filter((id) => belongsToChapter(id, chapterId)).map(itemKey)).size;
   const answered = new Set(attempts.filter((a) => a.chapterId === chapterId).map((a) => a.mcqId)).size;
   const qTarget = Math.min(chapter?.mcqCount || content.mcqs.length || 1, 10);
   const readPart = (Math.min(readCount, totalSections) / totalSections) * 70;
@@ -232,15 +266,19 @@ export function overallPct(subjectIds: string[], readSections: string[], attempt
  * to say it belongs to this student's class. Returning nothing is a valid
  * answer: no plan is better than a plan pointing at another class's syllabus.
  *
- * A stored `lastChapterId` is trusted unless the catalogue knows the chapter
- * and says it is the wrong class. Not knowing it is normal offline, where the
- * live index has not primed, and is not evidence of anything.
+ * A stored `lastChapterId` is trusted only when it belongs to this student's
+ * syllabus. The catalogue decides when it knows the chapter; when it does not,
+ * which is normal offline before the live index has primed, the id's shape
+ * does. Trusting any unknown id sent a student who changed board to `phy-3`,
+ * an FBISE chapter their account cannot read, or to the bundled FBISE sample.
  */
 export function planChapterId(
   subjectIds: string[],
   grade: number,
   lastChapterId?: string,
   readSections: string[] = [],
+  /** The student's board. Without it, the one the app set (see inSyllabus). */
+  board?: Board | null,
 ): string | undefined {
   /**
    * Whether every section of a chapter has been read.
@@ -251,23 +289,31 @@ export function planChapterId(
    * student is still working through.
    */
   const finished = (c: Chapter) =>
-    c.sectionCount > 0 && readSections.filter((id) => id.startsWith(`${c.id}-`)).length >= c.sectionCount;
+    c.sectionCount > 0 && new Set(readSections.filter((id) => belongsToChapter(id, c.id)).map(itemKey)).size >= c.sectionCount;
+  const theirs = (c: Chapter) => c.grade === grade && (!board || (c.board ?? 'fbise') === board);
 
-  if (lastChapterId) {
+  if (lastChapterId && inSyllabus(lastChapterId, grade, board)) {
     const known = chapterById(lastChapterId);
-    // Unknown means offline, not wrong: trust it. Known and the other class,
-    // or known and finished, and the plan should move on.
-    if (!known) return lastChapterId;
-    if (known.grade === grade && !finished(known)) return lastChapterId;
+    // Unknown, but shaped like this syllabus's chapter: offline, trust it.
+    // Known and finished, and the plan should move on.
+    if (!known || !finished(known)) return lastChapterId;
   }
+  // Something to study and something still to do in it, in any subject,
+  // before settling for less. Stopping at the first subject's finished
+  // chapter kept the plan on it long after it was done.
   for (const subjectId of subjectIds) {
-    const chapters = chaptersFor(subjectId).filter((c) => c.grade === grade);
-    // Something to study, and something still to do in it. A chapter whose
-    // counts have not loaded yet still beats no plan at all.
-    const pick = chapters.find((c) => hasStudyMaterial(c) && !finished(c)) ?? chapters.find(hasStudyMaterial) ?? chapters[0];
+    const pick = chaptersFor(subjectId).find((c) => theirs(c) && hasStudyMaterial(c) && !finished(c));
     if (pick) return pick.id;
   }
-  return lastChapterId;
+  // All of it read: revise, rather than no plan.
+  for (const subjectId of subjectIds) {
+    const pick = chaptersFor(subjectId).find((c) => theirs(c) && hasStudyMaterial(c));
+    if (pick) return pick.id;
+  }
+  // Nothing with counts yet. Not the first chapter regardless: with the
+  // counts unknown that was Matrices, which has nothing in it. No plan until
+  // the index loads (contentVersion moves when it does).
+  return undefined;
 }
 
 /**
@@ -279,6 +325,8 @@ export function buildPlan(opts: {
   subjectIds: string[];
   /** The student's class. Required: see planChapterId. */
   grade: number;
+  /** The student's board. Optional: see planChapterId. */
+  board?: Board | null;
   lastChapterId?: string;
   attempts: Attempt[];
   /** Ticked by hand, from any device. */
@@ -286,14 +334,14 @@ export function buildPlan(opts: {
   readSections: string[];
   cardsKnown: string[];
 }): PlanTask[] {
-  const chId = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId, opts.readSections);
+  const chId = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId, opts.readSections, opts.board);
   if (!chId) return [];
   const ch = chapterById(chId);
   /* The id carries its own subject, which matters offline: the catalogue may not
      know a Class 10 chapter yet, and defaulting the chip to Physics would put
      the wrong subject on a Chemistry task. */
   const subjectId = ch?.subjectId ?? chId.split('-')[0];
-  const weak = weakTopics(opts.attempts)[0];
+  const weak = weakTopics(opts.attempts, 3, { grade: opts.grade, board: opts.board })[0];
   const weakCh = weak ? chapterById(weak.chapterId) : undefined;
   /**
    * Today's date is part of every task id, which is what makes this "today's"
@@ -366,12 +414,13 @@ export function planAutoDone(
 
   for (const task of plan) {
     const ch = chapterById(task.chapterId);
-    const forChapter = (id: string) => id === task.chapterId || id.startsWith(`${task.chapterId}-`);
+    // Parsed, not prefixed, and once per item whatever medium it was read in.
+    const forChapter = (id: string) => belongsToChapter(id, task.chapterId);
 
     if (task.kind === 'read') {
       // The whole chapter, not one section: the task says "read {chapter}".
       const total = ch?.sectionCount || contentFor(task.chapterId).sections.length || 0;
-      const read = data.readSections.filter(forChapter).length;
+      const read = new Set(data.readSections.filter(forChapter).map(itemKey)).size;
       if (total > 0 && read >= total) done.push(task.id);
       continue;
     }
@@ -391,7 +440,7 @@ export function planAutoDone(
       if (onTopic.length >= PLAN_WEAK_TARGET) done.push(task.id);
       continue;
     }
-    const known = data.cardsKnown.filter(forChapter).length;
+    const known = new Set(data.cardsKnown.filter(forChapter).map(itemKey)).size;
     if (known >= PLAN_CARDS_TARGET) done.push(task.id);
   }
 
@@ -449,8 +498,20 @@ export const grade = (pct: number) =>
  * Any text this matches must render through the Urdu type treatment
  * (Nastaliq face, RTL, extra leading); in the Latin body font it degrades
  * into the broken glyph soup the client screenshotted.
+ *
+ * Written in it, not merely containing it. One Arabic-script character used
+ * to be enough, so an English title quoting a blessing in Arabic script
+ * (Punjab's English 10, chapter 1) was set right to left in Nastaliq. A string
+ * is Urdu when its first letter is, the way a browser picks a direction for
+ * dir="auto", or when most of its letters are.
  */
-export const isUrduScript = (s: string) => /[؀-ۿ]/.test(s);
+export const isUrduScript = (s: string): boolean => {
+  const arabic = s.match(/[\u0600-\u06FF]/g)?.length ?? 0;
+  if (!arabic) return false;
+  const first = /[A-Za-z\u00C0-\u024F\u0600-\u06FF]/.exec(s)?.[0] ?? '';
+  if (/[\u0600-\u06FF]/.test(first)) return true;
+  return arabic > (s.match(/[A-Za-z\u00C0-\u024F]/g)?.length ?? 0);
+};
 
 /**
  * One language at a time: the app language picks which version of a
@@ -466,9 +527,10 @@ export function localName(language: 'en' | 'ur', en: string, ur?: string | null)
 
 export const todayKey = () => dayKey(Date.now());
 
+/** This calendar month in Karachi, this year: the month alone let last September's tests count. */
 export function testsThisMonth(results: TestResult[]) {
-  const m = new Date().getMonth();
-  return results.filter((r) => new Date(r.at).getMonth() === m);
+  const month = todayKey().slice(0, 7);
+  return results.filter((r) => Number.isFinite(r.at) && dayKey(r.at).slice(0, 7) === month);
 }
 
 /* ------------------------------------------------------------ next action */
@@ -500,6 +562,8 @@ export type NextAction =
 export function nextAction(opts: {
   subjectIds: string[];
   grade: number;
+  /** The student's board. Optional: see planChapterId. */
+  board?: Board | null;
   lastChapterId?: string;
   lastSectionIndex: number;
   readSections: string[];
@@ -507,13 +571,14 @@ export function nextAction(opts: {
   activeDays: string[];
   plan: PlanTask[];
 }): NextAction {
-  const forChapter = (id: string, chapterId: string) => id.startsWith(`${chapterId}-`);
-
   /* 1. Half way through a chapter. The most concrete thing there is: they know
-        the chapter, they know where they were, and it is already open work. */
-  const current = opts.lastChapterId ? chapterById(opts.lastChapterId) : undefined;
+        the chapter, they know where they were, and it is already open work.
+        Only a chapter of their own syllabus: after a board or class change
+        the last one read belongs to the old one. */
+  const current =
+    opts.lastChapterId && inSyllabus(opts.lastChapterId, opts.grade, opts.board) ? chapterById(opts.lastChapterId) : undefined;
   if (opts.lastChapterId && current && current.sectionCount > 0) {
-    const read = opts.readSections.filter((id) => forChapter(id, current.id)).length;
+    const read = new Set(opts.readSections.filter((id) => belongsToChapter(id, current.id)).map(itemKey)).size;
     if (read > 0 && read < current.sectionCount) {
       return {
         kind: 'continue',
@@ -524,8 +589,10 @@ export function nextAction(opts: {
   }
 
   /* 2. A weak topic. weakTopics already demands three answers and under 75%,
-        which is the "enough evidence" part: one bad guess is not a weakness. */
-  const weak = weakTopics(opts.attempts)[0];
+        which is the "enough evidence" part: one bad guess is not a weakness.
+        It also leaves out topics from chapters outside this syllabus, whose
+        button would open a chapter the account cannot read. */
+  const weak = weakTopics(opts.attempts, 3, { grade: opts.grade, board: opts.board })[0];
   if (weak) {
     return { kind: 'fix', topic: weak.topic, chapterId: weak.chapterId, accuracy: weak.accuracy };
   }
@@ -534,7 +601,7 @@ export function nextAction(opts: {
         "Read chapter one, 15 min" and "Start Physical Quantities" is the same
         instruction in the words a first morning deserves. */
   if (!opts.readSections.length && !opts.attempts.length) {
-    const first = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId, opts.readSections);
+    const first = planChapterId(opts.subjectIds, opts.grade, opts.lastChapterId, opts.readSections, opts.board);
     if (first) return { kind: 'start', chapterId: first };
   }
 

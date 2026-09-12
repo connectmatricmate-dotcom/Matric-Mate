@@ -16,7 +16,7 @@
  * because those APIs differ and core has no dependency on either.
  */
 import { Attempt, Confidence, Notification, NotificationTarget, TestResult } from './types';
-import { todayKey } from './domain';
+import { XP, todayKey, totalXp, xpForAttempt } from './domain';
 
 /**
  * The slice of a Supabase client this file needs to write with.
@@ -30,6 +30,9 @@ import { todayKey } from './domain';
 export type SyncClient = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   from(table: string): any;
+  /** Optional so a bare mock still fits; every real client has it. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rpc?(fn: string, args?: Record<string, unknown>): any;
 };
 
 /* ------------------------------------------------------------------ ops */
@@ -67,8 +70,48 @@ function randomSyncId(): string {
   });
 }
 
-export const syncAttempt = (attempt: Attempt): SyncOp => ({ id: randomSyncId(), kind: 'attempt', attempt });
-export const syncResult = (result: TestResult): SyncOp => ({ id: randomSyncId(), kind: 'result', result });
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * The id for a new attempt or result: minted once, kept on the device, and
+ * used as the row's own id in Postgres.
+ *
+ * The apps used to name an answer `a-<time>` locally while the queue sent it
+ * under a fresh uuid, so the next hydrate found two rows that did not share an
+ * id and kept both. Every synced answer came back twice: twice in the history,
+ * twice the XP, a weak topic after two real answers instead of three. One id
+ * for both places ends that; mergeHydratedState repairs devices that already
+ * hold the pairs.
+ *
+ * The platform's own uuid where there is one, which Postgres wants for these
+ * columns; the Math.random one otherwise (see randomSyncId).
+ */
+export function newRowId(): string {
+  const c = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
+  try {
+    const id = c?.randomUUID?.();
+    if (id && UUID.test(id)) return id;
+  } catch {
+    /* fall through to the portable one */
+  }
+  return randomSyncId();
+}
+
+/*
+ * An answer minted by newRowId keeps its id all the way to Postgres. One from
+ * an older build (`a-<time>`), or already sitting in a queue, is not a uuid and
+ * cannot be a row id, so it goes under the op's own id as before.
+ */
+export const syncAttempt = (attempt: Attempt): SyncOp => ({
+  id: UUID.test(attempt.id) ? attempt.id : randomSyncId(),
+  kind: 'attempt',
+  attempt,
+});
+export const syncResult = (result: TestResult): SyncOp => ({
+  id: UUID.test(result.id) ? result.id : randomSyncId(),
+  kind: 'result',
+  result,
+});
 export const syncReadSection = (sectionId: string, chapterId: string, sectionIndex: number): SyncOp => ({
   id: randomSyncId(),
   kind: 'read_section',
@@ -172,14 +215,20 @@ async function remove(client: SyncClient, table: string, match: Record<string, s
  * DNS, a dropped connection): it resolves with `status: 0` and an error
  * object built from the fetch failure, specifically so a caller does not have
  * to wrap every query in try/catch. That makes `status` the retry signal, not
- * whether this function throws. Any other status means the request reached
- * Postgres and Postgres answered, an RLS denial, a bad column, a constraint
- * that will never pass, and that answer will not change on retry, so it is
- * dropped and logged instead of jamming every op queued behind it.
+ * whether this function throws.
+ *
+ * Some answers are the server saying "not now" rather than "no": an expired
+ * token (401), a timeout (408), a rate limit (429), and anything 500 or above,
+ * which is what the database gateway returns while it is overloaded. Those
+ * used to be dropped with the rest, so a bad minute on the server permanently
+ * lost whatever was queued in it. They are retried now. Everything else means
+ * Postgres answered and will answer the same way again (an RLS denial, a bad
+ * column, a constraint that will never pass), so it is dropped and logged
+ * instead of jamming every op queued behind it.
  */
 function classify(error: unknown, status: number): SyncOutcome {
   if (!error) return 'ok';
-  if (status === 0) return 'retry';
+  if (status === 0 || status === 401 || status === 408 || status === 429 || status >= 500) return 'retry';
   if (isDev()) console.warn('[sync] write rejected, dropping from queue:', error);
   return 'drop';
 }
@@ -200,7 +249,8 @@ export async function applySyncOp(client: SyncClient, userId: string, op: SyncOp
           client,
           'attempts',
           {
-            id: op.id,
+            // The answer's own id when it has one Postgres can take; see newRowId.
+            id: UUID.test(a.id) ? a.id : op.id,
             user_id: userId,
             mcq_id: a.mcqId,
             chapter_id: a.chapterId,
@@ -221,7 +271,7 @@ export async function applySyncOp(client: SyncClient, userId: string, op: SyncOp
           client,
           'results',
           {
-            id: op.id,
+            id: UUID.test(r.id) ? r.id : op.id,
             user_id: userId,
             subject_id: r.subjectId,
             chapter_id: r.chapterId,
@@ -281,7 +331,42 @@ export async function applySyncOp(client: SyncClient, userId: string, op: SyncOp
   }
 }
 
-export type FlushResult = { remaining: SyncOp[]; flushed: number; dropped: number };
+export type FlushResult = {
+  remaining: SyncOp[];
+  flushed: number;
+  dropped: number;
+  /**
+   * Ids of the ops that have left the queue, sent or dropped. Remove exactly
+   * these from the app's queue rather than replacing it with `remaining`: an
+   * op queued while this flush was in flight is in neither list, and
+   * replacing the queue with `remaining` quietly lost it.
+   */
+  settled: string[];
+  /** True when clearSyncQueue ran while this flush was sending. Keep nothing it returns. */
+  cancelled: boolean;
+};
+
+/**
+ * Moves whenever the queue is thrown away, so a flush already in flight stops
+ * rather than sending the rest of a queue that no longer exists.
+ */
+let queueEpoch = 0;
+
+/**
+ * Throw the queue away: on sign-out, and on a class or board switch, alongside
+ * wipeStudyHistory. Returns the empty queue for the app to store in place of
+ * its own, and stops a flush that is already sending after the write it is on.
+ *
+ * Without this, a switch reset the student's state and kept the queue, so
+ * Class 9 answers still waiting to send were written after the wipe and came
+ * back in Class 10, and a signed-out student's answers were sent under the
+ * next account to sign in. Send what can be sent first (flushQueue, with a
+ * short wait) when losing it would matter, as on sign-out.
+ */
+export function clearSyncQueue(): SyncOp[] {
+  queueEpoch += 1;
+  return [];
+}
 
 /**
  * Sends queued ops in order and stops at the first one that must be retried,
@@ -291,11 +376,14 @@ export type FlushResult = { remaining: SyncOp[]; flushed: number; dropped: numbe
  * instead of paying the timeout cost of trying all five hundred.
  */
 export async function flushQueue(client: SyncClient, userId: string, queue: SyncOp[]): Promise<FlushResult> {
+  const started = queueEpoch;
   const remaining: SyncOp[] = [];
+  const settled: string[] = [];
   let flushed = 0;
   let dropped = 0;
   let blocked = false;
   for (const op of queue) {
+    if (queueEpoch !== started) return { remaining: [], flushed, dropped, settled, cancelled: true };
     if (blocked) {
       remaining.push(op);
       continue;
@@ -306,9 +394,12 @@ export async function flushQueue(client: SyncClient, userId: string, queue: Sync
     else {
       blocked = true;
       remaining.push(op);
+      continue;
     }
+    settled.push(op.id);
   }
-  return { remaining, flushed, dropped };
+  if (queueEpoch !== started) return { remaining: [], flushed, dropped, settled, cancelled: true };
+  return { remaining, flushed, dropped, settled, cancelled: false };
 }
 
 /* ------------------------------------------------------------- hydrating */
@@ -418,6 +509,11 @@ export type HydratedStudyState = {
   accountPrefs: AccountPrefs | null;
   lastChapterId?: string;
   lastSectionIndex: number;
+  /**
+   * The account's whole XP as the server sums it (study_xp, migration 0039),
+   * or null when it could not say. See hydratedXp for how to use it.
+   */
+  xp?: number | null;
 };
 
 /**
@@ -547,20 +643,40 @@ async function pageAll<T>(
   return { data: rows, error: null };
 }
 
+/**
+ * The server's own sum of the account's XP, or null when it cannot say: the
+ * function is not there yet, the client has no rpc, or the call failed. Never
+ * throws, and never fails the hydrate around it.
+ */
+async function serverXp(client: SyncClient): Promise<number | null> {
+  if (typeof client.rpc !== 'function') return null;
+  try {
+    const { data, error } = await client.rpc('study_xp');
+    return error || data == null || !Number.isFinite(Number(data)) ? null : Number(data);
+  } catch {
+    return null;
+  }
+}
+
 async function fetchStudyState(client: SyncClient, userId: string): Promise<HydratedStudyState> {
-  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, planRes, profileRes, notifsRes] = await Promise.all([
+  const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, planRes, profileRes, notifsRes, xp] = await Promise.all([
     /* Newest first, then capped. It was oldest first, so a student past a
        thousand answers rebuilt their history on a new device from their first
        thousand: months-old work, and the recent months missing entirely. */
     client.from('attempts').select('id,mcq_id,chapter_id,subject_id,topic,correct,confidence,mode,at').eq('user_id', userId).order('at', { ascending: false }).limit(1000),
     client.from('results').select('id,subject_id,chapter_id,label,score,total,xp,mode,at').eq('user_id', userId).order('at', { ascending: false }).limit(100),
+    /* A second, unique column after `at`: paging by offset over a column two
+       rows can share let a row slip between pages and never be read. */
     pageAll<{ section_id: string; chapter_id: string; section_index: number; at: string }>((from, to) =>
-      client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: false }).range(from, to),
+      client.from('read_sections').select('section_id,chapter_id,section_index,at').eq('user_id', userId).order('at', { ascending: false }).order('section_id').range(from, to),
     ),
     pageAll<{ card_id: string }>((from, to) =>
-      client.from('cards_known').select('card_id').eq('user_id', userId).order('at', { ascending: false }).range(from, to),
+      client.from('cards_known').select('card_id').eq('user_id', userId).order('at', { ascending: false }).order('card_id').range(from, to),
     ),
-    client.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: true }).limit(400),
+    /* Newest first: the cap keeps the last 400 days, the ones a streak is
+       counted from. Oldest first, a student past 400 days had no recent days
+       at all on a new device, and a streak of zero. */
+    client.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: false }).limit(400),
     // Today only: yesterday's ticks belong to yesterday's plan, and the task
     // ids carry the date anyway.
     client.from('plan_done').select('task_id').eq('user_id', userId).eq('day', todayKey()),
@@ -568,6 +684,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     // Capped at the same 50 the screens show. An inbox is a recent list, not
     // an archive, and nobody scrolls to a receipt from four months ago.
     client.from('notifications').select('id,kind,title,body,target,read,at').eq('user_id', userId).order('at', { ascending: false }).limit(50),
+    serverXp(client),
   ]);
 
   const error =
@@ -593,6 +710,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     accountPrefs: readAccountPrefs((profileRes.data as { settings?: unknown } | null)?.settings),
     lastChapterId: last?.chapter_id,
     lastSectionIndex: last?.section_index ?? 0,
+    xp,
   };
 }
 
@@ -637,23 +755,77 @@ export type SyncableState = {
  * cross-device merge: a union of both, so a queued-but-not-yet-flushed local
  * write is never erased by a hydration that ran before it landed.
  */
-export function mergeHydratedState<S extends SyncableState>(local: S, server: HydratedStudyState): S {
+export function mergeHydratedState<S extends SyncableState>(
+  local: S,
+  server: HydratedStudyState,
+  /**
+   * The ops this device has queued and not yet sent. Pass it, and known cards
+   * and plan ticks follow the server except where this device has something
+   * still on its way; leave it out and both stay a plain union, as before.
+   */
+  pending?: SyncOp[],
+): S {
   const byId = <T extends { id: string }>(a: T[], b: T[]): T[] => {
     const seen = new Set(a.map((x) => x.id));
     return [...a, ...b.filter((x) => !seen.has(x.id))];
   };
+  /*
+   * The same answer under two ids, one local and one the server's, is one
+   * answer. Before newRowId every synced attempt and result came back like
+   * that, so this also repairs devices already holding the pairs: the first
+   * (local) copy is kept.
+   */
+  const once = <T>(list: T[], key: (x: T) => string): T[] => {
+    const seen = new Set<string>();
+    return list.filter((x) => {
+      const k = key(x);
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  };
   const union = (a: string[], b: string[]): string[] => Array.from(new Set([...a, ...b]));
+
+  /*
+   * Undoable sets. A card marked unknown, or a tick taken back, on any device
+   * must stay undone here, and a union brought it back from whichever copy
+   * still had it: the card was known again forever and its XP counted back
+   * in. So the server's set, plus what this device has added and not sent,
+   * minus what it has taken away and not sent.
+   */
+  const followServer = (serverSet: string[], added: string[], removed: string[]): string[] => {
+    const out = new Set([...serverSet, ...added]);
+    removed.forEach((id) => out.delete(id));
+    return Array.from(out);
+  };
+  const cardsKnown = pending
+    ? followServer(
+        server.cardsKnown,
+        pending.flatMap((op) => (op.kind === 'card_known' ? [op.cardId] : [])),
+        pending.flatMap((op) => (op.kind === 'card_unknown' ? [op.cardId] : [])),
+      )
+    : union(local.cardsKnown, server.cardsKnown);
+  const planDone = pending
+    ? followServer(
+        server.planDone,
+        pending.flatMap((op) => (op.kind === 'plan_task' && op.done ? [op.taskId] : [])),
+        pending.flatMap((op) => (op.kind === 'plan_task' && !op.done ? [op.taskId] : [])),
+      )
+    : // A union, like the rest: ticking on the phone and on the laptop should
+      // add up rather than one device's view erasing the other's.
+      union(local.planDone, server.planDone);
 
   return {
     ...local,
     readSections: union(local.readSections, server.readSections),
-    attempts: byId(local.attempts, server.attempts).sort((a, b) => a.at - b.at),
-    results: byId(local.results, server.results).sort((a, b) => b.at - a.at),
-    cardsKnown: union(local.cardsKnown, server.cardsKnown),
+    attempts: once(byId(local.attempts, server.attempts), (a) => `${a.mcqId}|${a.at}|${a.mode}`).sort((a, b) => a.at - b.at),
+    results: once(
+      byId(local.results, server.results),
+      (r) => `${r.subjectId}|${r.chapterId ?? ''}|${r.mode}|${r.at}|${r.score}|${r.total}`,
+    ).sort((a, b) => b.at - a.at),
+    cardsKnown,
     activeDays: union(local.activeDays, server.activeDays),
-    // A union, like the rest: ticking on the phone and on the laptop should
-    // add up rather than one device's view erasing the other's.
-    planDone: union(local.planDone, server.planDone),
+    planDone,
     // The server is the only writer of notifications, so this is a straight
     // adopt rather than a union: nothing on the device can be newer. Newest
     // first, matching the order both inboxes render in.
@@ -665,6 +837,37 @@ export function mergeHydratedState<S extends SyncableState>(local: S, server: Hy
     lastChapterId: local.lastChapterId ?? server.lastChapterId,
     lastSectionIndex: local.lastChapterId ? local.lastSectionIndex : server.lastSectionIndex,
   };
+}
+
+/**
+ * The XP to show after a hydrate.
+ *
+ * Recomputing from history (totalXp) only sees the history this device holds,
+ * and both the hydrate read and the device's own store stop at a thousand
+ * answers, so past that a student's XP stalled, then fell as old answers
+ * rolled out of the window. The server can sum all of it. Its sum, plus the
+ * answers and cards this device has queued and not yet sent, is the whole
+ * total. Where the server could not say (the function not deployed yet, a
+ * failed call), this falls back to recomputing from the merged history.
+ */
+export function hydratedXp(
+  merged: Pick<SyncableState, 'attempts' | 'cardsKnown'>,
+  server: HydratedStudyState,
+  pending: SyncOp[] = [],
+): number {
+  if (server.xp == null) return totalXp(merged.attempts, merged.cardsKnown);
+  const serverCards = new Set(server.cardsKnown);
+  // A write whose reply was lost is still queued but already summed.
+  const serverRows = new Set(server.attempts.map((a) => a.id));
+  let xp = server.xp;
+  for (const op of pending) {
+    if (op.kind === 'attempt') {
+      if (!serverRows.has(UUID.test(op.attempt.id) ? op.attempt.id : op.id)) xp += xpForAttempt(op.attempt);
+    }
+    else if (op.kind === 'card_known' && !serverCards.has(op.cardId)) xp += XP.card;
+    else if (op.kind === 'card_unknown' && serverCards.has(op.cardId)) xp -= XP.card;
+  }
+  return Math.max(0, xp);
 }
 
 

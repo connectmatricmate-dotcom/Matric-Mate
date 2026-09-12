@@ -29,7 +29,7 @@ export const SUBJECTS: Subject[] = [
   { id: 'cs', name: 'Computer Science', urduName: SUBJECT_NAMES_UR['cs'], icon: 'book2', compulsory: false, group: 'science', chapterCount: 7 },
 ];
 
-const CH: Record<string, [string, string, string?][]> = {
+const CH: Record<string, [string, string, string?, string?][]> = {
   // The board's own content areas, from the Table of Specification in the SSC-I
   // Assessment Framework, not the 2006 nine-unit scheme that used to be here.
   // The two disagree, and forcing NCP 2022-23 outcomes onto the old units left
@@ -136,24 +136,24 @@ const CH: Record<string, [string, string, string?][]> = {
   // class, never on the annual paper. Appended, not inserted, so urd-1..3 keep
   // their ids. See data/fbise/chapters.json for weights.
   urd: [
-    ['پڑھنا', 'نظم و نثر کو سمجھ کر پڑھنا، اشعار کی تشریح اور رائے دینا، غزل میں مطلع و مقطع کی شناخت، اور متن پر تبصرہ۔', 'Reading.'],
-    ['لکھنا', 'املا کی درستی، خط و درخواست، تلخیص و ترجمہ، مضمون و تقریر نویسی، اور نادیدہ اقتباس کا تجزیہ۔', 'Writing.'],
-    ['قواعد / زبان شناسی', 'تذکیر و تانیث، اسم و فعل، تراکیب اور محاورات، جملوں کی درستی، اور اصنافِ سخن و علمِ بیان کی بنیادی اصطلاحات۔', 'Grammar and linguistics.'],
-    ['سننا', 'واقعات، کہانی، تقریر اور شاعری کو توجہ سے سن کر سمجھنا، اور نشریات پر رائے دینا۔ یہ مہارت صرف جماعت میں جانچی جاتی ہے، سالانہ امتحانی پرچے میں شامل نہیں۔', 'Listening.'],
-    ['بولنا', 'روزمرہ گفتگو میں مدلل بات چیت، کسی موضوع پر تقریر، اور اپنے موقف کا واضح اظہار۔ یہ مہارت صرف جماعت میں جانچی جاتی ہے، سالانہ امتحانی پرچے میں شامل نہیں۔', 'Speaking.'],
+    ['پڑھنا', 'نظم و نثر کو سمجھ کر پڑھنا، اشعار کی تشریح اور رائے دینا، غزل میں مطلع و مقطع کی شناخت، اور متن پر تبصرہ۔', 'Reading', 'Reading poetry and prose with understanding, explaining couplets and giving your view, telling the opening and closing couplets of a ghazal, and commenting on a text.'],
+    ['لکھنا', 'املا کی درستی، خط و درخواست، تلخیص و ترجمہ، مضمون و تقریر نویسی، اور نادیدہ اقتباس کا تجزیہ۔', 'Writing', 'Correct spelling, letters and applications, summary and translation, essays and speeches, and analysing an unseen passage.'],
+    ['قواعد / زبان شناسی', 'تذکیر و تانیث، اسم و فعل، تراکیب اور محاورات، جملوں کی درستی، اور اصنافِ سخن و علمِ بیان کی بنیادی اصطلاحات۔', 'Grammar and linguistics', 'Gender, nouns and verbs, compounds and idioms, correcting sentences, and the basic terms of poetic forms and rhetoric.'],
+    ['سننا', 'واقعات، کہانی، تقریر اور شاعری کو توجہ سے سن کر سمجھنا، اور نشریات پر رائے دینا۔ یہ مہارت صرف جماعت میں جانچی جاتی ہے، سالانہ امتحانی پرچے میں شامل نہیں۔', 'Listening', 'Listening closely to events, stories, speeches and poetry to understand them, and giving a view on broadcasts. Assessed in class, not on the annual paper.'],
+    ['بولنا', 'روزمرہ گفتگو میں مدلل بات چیت، کسی موضوع پر تقریر، اور اپنے موقف کا واضح اظہار۔ یہ مہارت صرف جماعت میں جانچی جاتی ہے، سالانہ امتحانی پرچے میں شامل نہیں۔', 'Speaking', 'Reasoned everyday conversation, speaking on a topic, and stating your own position clearly. Assessed in class, not on the annual paper.'],
   ],
   // The board's seven دائرہ ہائے کار (strands), not the six approximations that
   // were here. Note strand 1 covers only the introduction to the Quran and the
   // preservation of hadith: ترجمۂ قرآن مجید is a separate 50 mark paper and is
   // not part of Islamiyat compulsory at all.
   isl: [
-    ['قرآن مجید و حدیثِ نبوی ﷺ', 'تعارفِ قرآن مجید، حفاظت و تدوینِ حدیث، بیس احادیثِ مبارکہ اور سینتیس اسمائے حسنیٰ', 'Quran and Hadith.'],
-    ['ایمانیات و عبادات', 'توحید، رسالت، ملائکہ، کتبِ سماویہ، آخرت، نماز، روزہ، زکوٰۃ، حج اور قربانی', 'Beliefs and acts of worship.'],
-    ['سیرتِ رسول خاتم النبیین ﷺ', 'مدنی دور کے واقعات اور اُسوۂ رسول ﷺ کی روشنی میں عملی زندگی', 'Life of the Prophet ﷺ.'],
-    ['اخلاق و آداب', 'شکر و قناعت، امانت و دیانت، اخلاص و تقویٰ، اور بری عادات سے اجتناب', 'Morals and manners.'],
-    ['حسنِ معاملات و معاشرت', 'قسم، گواہی، ہمسایوں کے حقوق، سود کی حرمت، اسلامی ریاست اور جہاد', 'Dealings and society.'],
-    ['ہدایت کے سرچشمے اور مشاہیرِ اسلام', 'اہلِ بیت، صحابہ کرام، صحابیاتِ کرام، صوفیائے کرام اور علما و مفکرین', 'Sources of guidance and eminent figures.'],
-    ['اسلامی تعلیمات اور عصرِ حاضر کے تقاضے', 'خود اعتمادی، صحت و ریاضت، منصوبہ بندی اور اسلامی تہذیب کے امتیازات', 'Islamic teachings today.'],
+    ['قرآن مجید و حدیثِ نبوی ﷺ', 'تعارفِ قرآن مجید، حفاظت و تدوینِ حدیث، بیس احادیثِ مبارکہ اور سینتیس اسمائے حسنیٰ', 'Quran and Hadith', 'An introduction to the Holy Quran, how the Hadith was preserved and compiled, twenty selected hadith and thirty-seven of the beautiful names of Allah.'],
+    ['ایمانیات و عبادات', 'توحید، رسالت، ملائکہ، کتبِ سماویہ، آخرت، نماز، روزہ، زکوٰۃ، حج اور قربانی', 'Beliefs and acts of worship', 'Tawheed, Prophethood, angels, the revealed books and the Hereafter, with Salah, Sawm, Zakah, Hajj and sacrifice.'],
+    ['سیرتِ رسول خاتم النبیین ﷺ', 'مدنی دور کے واقعات اور اُسوۂ رسول ﷺ کی روشنی میں عملی زندگی', 'Life of the Prophet ﷺ', 'Events of the Madinan period and practical life in the light of the example of the Holy Prophet ﷺ.'],
+    ['اخلاق و آداب', 'شکر و قناعت، امانت و دیانت، اخلاص و تقویٰ، اور بری عادات سے اجتناب', 'Morals and manners', 'Gratitude and contentment, trustworthiness and honesty, sincerity and taqwa, and keeping away from bad habits.'],
+    ['حسنِ معاملات و معاشرت', 'قسم، گواہی، ہمسایوں کے حقوق، سود کی حرمت، اسلامی ریاست اور جہاد', 'Dealings and society', 'Oaths, bearing witness, the rights of neighbours, the prohibition of interest, the Islamic state and jihad.'],
+    ['ہدایت کے سرچشمے اور مشاہیرِ اسلام', 'اہلِ بیت، صحابہ کرام، صحابیاتِ کرام، صوفیائے کرام اور علما و مفکرین', 'Sources of guidance and eminent figures', 'The Ahl al-Bayt, the Companions and the women Companions, the Sufis, and eminent scholars and thinkers.'],
+    ['اسلامی تعلیمات اور عصرِ حاضر کے تقاضے', 'خود اعتمادی، صحت و ریاضت، منصوبہ بندی اور اسلامی تہذیب کے امتیازات', 'Islamic teachings today', 'Self-confidence, health and exercise, planning, and what sets Islamic civilisation apart.'],
   ],
   // Eight chapters, not four. Now follows the board's Table of Specification:
   // each chapter is a content area from the SSC-I Assessment Framework. See
@@ -203,7 +203,11 @@ export const CHAPTERS: Record<string, Chapter[]> = Object.fromEntries(
       // that is the name the chapter is actually known by. Everything else
       // looks it up, so one map covers all nine subjects.
       urduTitle: subjectId === 'urd' || subjectId === 'isl' ? r[0] : CHAPTER_TITLES_UR[`${subjectId}-${i + 1}`],
-      blurb: subjectId === 'urd' || subjectId === 'isl' ? r[1] : r[1],
+      // Urdu and Islamiyat rows are [Urdu title, Urdu blurb, English title,
+      // English blurb]. The blurb field is the English interface's line; it
+      // used to be the Urdu one, so English readers met Urdu script there.
+      blurb: subjectId === 'urd' || subjectId === 'isl' ? (r[3] ?? r[1]) : r[1],
+      urduBlurb: subjectId === 'urd' || subjectId === 'isl' ? r[1] : undefined,
       // Paid-only, the client's call after M2: there is no free chapter any
       // more, so the flag no longer varies. It stays because the apps and the
       // chapters table still carry it.
@@ -252,21 +256,122 @@ let liveChapters: Record<string, Chapter> | null = null;
 let liveBySubject: Record<string, Chapter[]> | null = null;
 let liveSubjects: Subject[] | null = null;
 
+/**
+ * A counter that moves whenever the answers above could have changed: new
+ * rows primed, a different syllabus, a different medium, a cleared cache.
+ *
+ * The lookups are synchronous module reads, so nothing re-renders when they
+ * change underneath a screen. A plan derived once at startup kept pointing at
+ * nothing after the index loaded, and a chapter list stayed on the old board
+ * after a switch. A store or a screen reads contentVersion() into its memo or
+ * fetch key, and subscribeContent tells it when to read again.
+ */
+let version = 0;
+const contentListeners = new Set<() => void>();
+let notifyQueued = false;
+
+/**
+ * Moves the counter. Not for app code: the fetch layer calls it.
+ *
+ * The number changes at once, so a render that reads it sees the new value,
+ * but listeners hear about it a moment later. The apps set the medium, class
+ * and board while rendering, and a listener that updated another component
+ * in the middle of that render is exactly what React warns about.
+ */
+export function bumpContent(): void {
+  version += 1;
+  if (notifyQueued) return;
+  notifyQueued = true;
+  void Promise.resolve().then(() => {
+    notifyQueued = false;
+    contentListeners.forEach((l) => l());
+  });
+}
+
+/** Changes whenever the chapter index, the syllabus or the medium changes. */
+export const contentVersion = (): number => version;
+
+/** Called after contentVersion moves. Returns the unsubscribe. */
+export function subscribeContent(listener: () => void): () => void {
+  contentListeners.add(listener);
+  return () => {
+    contentListeners.delete(listener);
+  };
+}
+
+/**
+ * Forget every primed chapter and subject. Not for app code: clearContentCache
+ * in db.ts calls it, on sign-out or when the account changes, so the next
+ * student never starts on the last one's index.
+ */
+export function resetContentIndex(): void {
+  if (!liveChapters && !liveBySubject && !liveSubjects) return;
+  liveChapters = null;
+  liveBySubject = null;
+  liveSubjects = null;
+  bumpContent();
+}
+
+/** Same row, same values: priming what we already hold must not move the version. */
+const sameChapter = (a: Chapter | undefined, b: Chapter): boolean =>
+  !!a && (Object.keys(b) as (keyof Chapter)[]).every((k) => a[k] === b[k]) && Object.keys(a).length === Object.keys(b).length;
+
 /** Called by the fetch layer after a successful read. Not for app code. */
 export function primeContent(next: { subjects?: Subject[]; chapters?: Chapter[] }): void {
-  if (next.subjects?.length) liveSubjects = next.subjects;
-  if (next.chapters?.length) {
-    liveChapters = { ...(liveChapters ?? {}) };
-    const bySubject: Record<string, Chapter[]> = { ...(liveBySubject ?? {}) };
-    for (const c of next.chapters) liveChapters[c.id] = c;
-    // Group only the subjects in this batch, so priming one subject does not
-    // wipe another that was primed earlier.
-    for (const subjectId of new Set(next.chapters.map((c) => c.subjectId))) {
-      bySubject[subjectId] = next.chapters.filter((c) => c.subjectId === subjectId).sort((a, b) => a.number - b.number);
+  let changed = false;
+  if (next.subjects?.length) {
+    /* Merged by id, not replaced. A screen reading one subject used to replace
+       the whole list with that one, and with screens now refetching when the
+       version moves, two screens reading different subjects would take turns
+       replacing each other's list and moving it forever. */
+    const merged = [...(liveSubjects ?? [])];
+    for (const s of next.subjects) {
+      const i = merged.findIndex((x) => x.id === s.id);
+      const had = i >= 0 ? merged[i] : undefined;
+      if (!had || (Object.keys(s) as (keyof Subject)[]).some((k) => had[k] !== s[k])) changed = true;
+      if (i >= 0) merged[i] = s;
+      else merged.push(s);
     }
+    liveSubjects = merged;
+  }
+  const chapters = next.chapters;
+  if (chapters?.length) {
+    const nextChapters = { ...(liveChapters ?? {}) };
+    const bySubject: Record<string, Chapter[]> = { ...(liveBySubject ?? {}) };
+    for (const c of chapters) {
+      if (!sameChapter(nextChapters[c.id], c)) changed = true;
+      nextChapters[c.id] = c;
+    }
+    /*
+     * Group only the subjects in this batch, so priming one subject does not
+     * wipe another that was primed earlier. And group them under the board
+     * and class the rows are from, not just the subject. A read that raced a
+     * board or class switch comes back with the old syllabus's rows, and
+     * filed under the subject alone they replaced the new syllabus's list with
+     * chapters every lookup then hid, so the plan went empty. Filed under
+     * their own syllabus they touch nothing of anyone else's, and a list
+     * primed before a switch is there the moment the syllabus it belongs to is.
+     */
+    const groups = new Map<string, Chapter[]>();
+    for (const c of chapters) {
+      for (const key of [listKey(c.board, c.grade, c.subjectId), `*:${c.subjectId}`]) groups.set(key, [...(groups.get(key) ?? []), c]);
+    }
+    for (const [key, rows] of groups) {
+      const list = rows.sort((a, b) => a.number - b.number);
+      const had = bySubject[key];
+      const moved = !had || had.length !== list.length || had.some((c, i) => c.id !== list[i].id);
+      // The unkeyed list only answers a process that has no syllabus (see chaptersFor).
+      if (moved && (!key.startsWith('*:') || !syllabus)) changed = true;
+      bySubject[key] = list;
+    }
+    liveChapters = nextChapters;
     liveBySubject = bySubject;
   }
+  if (changed) bumpContent();
 }
+
+/** Where a subject's list for one board and class is kept in the live index. */
+const listKey = (board: Board | undefined, grade: number, subjectId: string): string => `${board ?? 'fbise'}:${grade}:${subjectId}`;
 
 /**
  * The syllabus this student is on: their board and their class.
@@ -285,7 +390,9 @@ export function primeContent(next: { subjects?: Subject[]; chapters?: Chapter[] 
 let syllabus: { board: Board; grade: 9 | 10 } | null = null;
 
 export function setSyllabus(next: { board: Board; grade: 9 | 10 }): void {
+  if (syllabus && syllabus.board === next.board && syllabus.grade === next.grade) return;
   syllabus = next;
+  bumpContent();
 }
 
 /*
@@ -299,12 +406,19 @@ const bundleIsTheirs = (): boolean => !syllabus || (syllabus.board === 'fbise' &
 const isTheirs = (c: Chapter): boolean =>
   !syllabus || ((c.board ?? 'fbise') === syllabus.board && c.grade === syllabus.grade);
 
+/** Whether a chapter row is from the syllabus the app set. Always true until one is set. */
+export const chapterIsTheirs = (c: Chapter): boolean => isTheirs(c);
+
 /** The bundled chapters for a subject, when the bundle is this student's syllabus. */
 export const bundledChapters = (subjectId: string): Chapter[] => (bundleIsTheirs() ? (CHAPTERS[subjectId] ?? []) : []);
 
-/** Live chapters for a subject, or the bundled ones if nothing has loaded. */
+/**
+ * Live chapters for a subject, or the bundled ones if nothing has loaded.
+ * This syllabus's list; with none set (the web server), the last list primed.
+ */
 export const chaptersFor = (subjectId: string): Chapter[] => {
-  const live = liveBySubject?.[subjectId]?.filter(isTheirs);
+  const key = syllabus ? listKey(syllabus.board, syllabus.grade, subjectId) : `*:${subjectId}`;
+  const live = liveBySubject?.[key]?.filter(isTheirs);
   return live?.length ? live : bundledChapters(subjectId);
 };
 
@@ -313,6 +427,86 @@ export const chapterById = (id: string): Chapter | undefined => {
   if (live && isTheirs(live)) return live;
   return bundleIsTheirs() ? ALL_CHAPTERS.find((c) => c.id === id) : undefined;
 };
+
+/*
+ * Chapter ids, and what owns what.
+ *
+ * Three shapes, one per syllabus: `phy-3` is FBISE Class 9, `phy-10-3` FBISE
+ * Class 10, `phy-pj-9-3` and `phy-pj-10-3` the Punjab boards. Everything
+ * hanging off a chapter (sections, cards, questions) starts with its chapter
+ * id and then carries the medium: `phy-3-en-s1`, `phy-10-3-ur-4-f`.
+ *
+ * Ownership used to be `id.startsWith(chapterId + '-')`, which reads fine
+ * until Class 9's `chem-10` meets Class 10's `chem-10-3-en-s1`: the prefix
+ * matches, and Class 10 reading counted towards a Class 9 chapter. Parsing the
+ * id is exact, because the segment after a Class 9 chapter id is always the
+ * medium and never a number.
+ */
+const PUNJAB_ID = /^([a-z]+)-pj-(9|10)-(\d+)(?=-|$)/;
+const FBISE_10_ID = /^([a-z]+)-10-(\d+)(?=-|$)/;
+const FBISE_9_ID = /^([a-z]+)-(\d+)(?=-|$)/;
+
+/**
+ * The chapter an id belongs to: a chapter id gives itself back, and a section,
+ * card or question id gives the chapter it starts with. Null when the id names
+ * no chapter at all (an AI item, the bundled sample's `phy3-f1`).
+ */
+export function chapterOfId(id: string): string | null {
+  const pj = PUNJAB_ID.exec(id);
+  if (pj) return `${pj[1]}-pj-${pj[2]}-${pj[3]}`;
+  const ten = FBISE_10_ID.exec(id);
+  if (ten) return `${ten[1]}-10-${ten[2]}`;
+  const nine = FBISE_9_ID.exec(id);
+  return nine ? `${nine[1]}-${nine[2]}` : null;
+}
+
+/**
+ * True when `id` is the chapter itself or something inside it. The prefix
+ * test first only because it is cheap: progress sweeps call this for every
+ * read section against every chapter, and the parse settles the rest.
+ */
+export const belongsToChapter = (id: string, chapterId: string): boolean =>
+  id === chapterId || (id.startsWith(`${chapterId}-`) && chapterOfId(id) === chapterId);
+
+/**
+ * The same item whatever medium it was read in. `phy-3-en-s1` and
+ * `phy-3-ur-s1` are one section in two languages, and a student who read both
+ * has read one section, not two.
+ */
+export const itemKey = (id: string): string => id.replace(/-(?:en|ur)-(?=s?\d)/, '-');
+
+/**
+ * Whether an id has the shape of a chapter in this class, on this board. With
+ * no board, either board's shape for the class passes.
+ */
+export function chapterIdFits(id: string, grade: number, board?: Board | null): boolean {
+  if (chapterOfId(id) !== id) return false;
+  const pj = PUNJAB_ID.exec(id);
+  if (pj) return board !== 'fbise' && Number(pj[2]) === grade;
+  if (board === 'punjab') return false;
+  return grade === 10 ? FBISE_10_ID.test(id) : !FBISE_10_ID.test(id);
+}
+
+/**
+ * Whether a chapter id belongs to the syllabus a student is on, as far as
+ * this device can tell.
+ *
+ * The index is the best witness: a chapter it holds for this syllabus is
+ * theirs, and one it holds for another is not. When it has not heard of the
+ * id, which is normal offline or before it has loaded, the id's shape decides:
+ * `phy-3` is never a Punjab chapter, whatever a stale `lastChapterId` says.
+ * Board and class default to the ones the app set; with neither known, any
+ * well-formed chapter id passes.
+ */
+export function inSyllabus(chapterId: string | null | undefined, grade?: number, board?: Board | null): boolean {
+  if (!chapterId) return false;
+  const g = grade ?? syllabus?.grade;
+  const b = board ?? syllabus?.board;
+  const known = chapterById(chapterId) ?? liveChapters?.[chapterId];
+  if (known) return (g === undefined || known.grade === g) && (!b || (known.board ?? 'fbise') === b);
+  if (g === undefined) return chapterOfId(chapterId) === chapterId;
+  return chapterIdFits(chapterId, g, b);
+}
 
 export const subjectById = (id: string): Subject | undefined =>
   liveSubjects?.find((s) => s.id === id) ?? SUBJECTS.find((s) => s.id === id);
@@ -339,6 +533,12 @@ export const subjectName = (
   subject: Pick<Subject, 'name' | 'urduName'> | undefined,
   lang: string,
 ): string => (lang === 'ur' && subject?.urduName) || subject?.name || '';
+
+/** A chapter's one-line description, the same way: Urdu where it exists, else English. */
+export const chapterBlurb = (
+  chapter: Pick<Chapter, 'blurb' | 'urduBlurb'> | undefined,
+  lang: string,
+): string => (lang === 'ur' && chapter?.urduBlurb) || chapter?.blurb || '';
 
 /* ------------------------------------------------------- authored content */
 
@@ -695,7 +895,10 @@ const EMPTY_CONTENT: ChapterContent = { sections: [], mcqs: [], flashcards: [], 
  * thing.
  */
 export function contentFor(chapterId: string): ChapterContent {
-  return AUTHORED[chapterId] ?? EMPTY_CONTENT;
+  /* The samples are FBISE Class 9 chapters. A stale `phy-3` on a Punjab or
+     Class 10 account used to open FBISE's Dynamics here, recorded against an
+     id that syllabus does not have. */
+  return (bundleIsTheirs() && AUTHORED[chapterId]) || EMPTY_CONTENT;
 }
 
 // The board's own past papers and topper scripts (as listed to students in

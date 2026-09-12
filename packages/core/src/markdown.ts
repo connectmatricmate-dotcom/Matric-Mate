@@ -32,14 +32,21 @@ export type MdBlock =
 
 /**
  * House style, applied before parsing: the em dash is the tell the client
- * calls out, and models still slip one in against instructions. Between
- * words it becomes a comma; anywhere else a plain hyphen.
+ * calls out, and models still slip one in against instructions. Used as a
+ * pause between words it becomes a comma; anywhere else a plain hyphen.
+ *
+ * A range is not a pause. Three to five marks written with an en dash was
+ * coming out as "3, 5 marks", a list where the model meant a span, so a dash
+ * between two numbers, or an unspaced one inside a compound, becomes a hyphen
+ * and keeps its meaning.
  */
 function normalise(text: string): string {
   return text
     .replace(/\r\n?/g, '\n')
-    .replace(/(\w)\s*[—–]\s*(\w)/g, '$1, $2')
-    .replace(/[—–]/g, '-');
+    .replace(/(\d)\s*[\u2013\u2014]\s*(?=\d)/g, '$1-')
+    .replace(/(\w)\u2013(?=\w)/g, '$1-')
+    .replace(/(\w)\s*[\u2013\u2014]\s*(\w)/g, '$1, $2')
+    .replace(/[\u2013\u2014]/g, '-');
 }
 
 /** Inline pass: **bold**, *italic*, `code`, and __bold__ / _italic_. */

@@ -68,8 +68,8 @@ export function reportHtml(d: ReportData): string {
       <tr>
         <td style="padding:9px 10px;border-bottom:1px solid ${colors.line};text-align:${align}">${esc(r.subject)}</td>
         <td style="padding:9px 10px;border-bottom:1px solid ${colors.line};text-align:center;font-weight:800">${esc(r.grade)}</td>
-        <td style="padding:9px 10px;border-bottom:1px solid ${colors.line};text-align:center">${r.attempted ? `${r.accuracy}%` : '&mdash;'}</td>
-        <td style="padding:9px 10px;border-bottom:1px solid ${colors.line};text-align:center">${r.attempted || '&mdash;'}</td>
+        <td style="padding:9px 10px;border-bottom:1px solid ${colors.line};text-align:center">${r.attempted ? `${r.accuracy}%` : '-'}</td>
+        <td style="padding:9px 10px;border-bottom:1px solid ${colors.line};text-align:center">${r.attempted || '-'}</td>
         <td style="padding:9px 10px;border-bottom:1px solid ${colors.line};text-align:center">${esc(r.trend)}</td>
       </tr>`,
     )

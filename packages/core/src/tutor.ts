@@ -1,4 +1,4 @@
-import { setQuota } from './quota';
+import { quotaUser, setQuota } from './quota';
 /**
  * The client half of the real tutor and its sibling AI routes.
  *
@@ -32,7 +32,7 @@ export type TutorReply =
    *  non-streaming path. It is what makes an answer ratable: see the note in
    *  the tutor route about tutor_feedback sitting empty. */
   | { ok: true; text: string; threadId: string; messageId: string | null; quota: TutorQuota }
-  | { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error'; quota?: TutorQuota };
+  | { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'syllabus' | 'error'; quota?: TutorQuota };
 
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
@@ -66,10 +66,19 @@ async function headers(): Promise<Record<string, string>> {
 
 const doFetch: FetchLike = (url, init) => (config?.fetchImpl ?? fetch)(url, init);
 
-function failFrom(status: number, body: { error?: string; quota?: TutorQuota }): TutorReply {
+/**
+ * `who` is the account the request went out for (quotaUser at the start), so
+ * a reply that lands after a sign-out cannot write its count over the next
+ * student's. See setQuota.
+ */
+function failFrom(status: number, body: { error?: string; quota?: TutorQuota }, who?: string | null): TutorReply {
   // A refusal still spent the student's allowance, and the server says so.
-  setQuota(body.quota);
+  setQuota(body.quota, who);
+  if (body.error === 'refused') return { ok: false, reason: 'refused', quota: body.quota };
   if (status === 402) return { ok: false, reason: 'plan' };
+  // A chapter from outside the student's class or board: another try cannot
+  // help, so it gets its own reason and its own words.
+  if (body.error === 'not_in_syllabus') return { ok: false, reason: 'syllabus' };
   if (status === 429) return { ok: false, reason: body.error === 'rate_limited' ? 'rate' : 'quota', quota: body.quota };
   return { ok: false, reason: 'error', quota: body.quota };
 }
@@ -89,6 +98,7 @@ export async function askTutorLive(
   onDelta?: (textSoFar: string) => void,
 ): Promise<TutorReply> {
   if (!config) return { ok: false, reason: 'offline' };
+  const who = quotaUser();
   try {
     const res = await doFetch(`${config.siteUrl}/api/ai/tutor`, {
       method: 'POST',
@@ -106,7 +116,7 @@ export async function askTutorLive(
 
     if (!res.ok) {
       const body = (await res.json().catch(() => ({}))) as { error?: string; quota?: TutorQuota };
-      return failFrom(res.status, body);
+      return failFrom(res.status, body, who);
     }
 
     // The walls answer as plain JSON; only a live model turn streams NDJSON.
@@ -117,11 +127,11 @@ export async function askTutorLive(
         quota?: TutorQuota;
         error?: string;
       };
-      if (body.text && body.threadId && body.quota) {
-        setQuota(body.quota);
+      if (!body.error && body.text && body.threadId && body.quota) {
+        setQuota(body.quota, who);
         return { ok: true, text: body.text, threadId: body.threadId, messageId: null, quota: body.quota };
       }
-      return failFrom(res.status, body);
+      return failFrom(res.status, body, who);
     }
 
     let text = '';
@@ -138,10 +148,11 @@ export async function askTutorLive(
         text += msg.text;
         onDelta?.(text);
       } else if (msg.t === 'done' && msg.threadId && msg.quota) {
-        setQuota(msg.quota);
+        setQuota(msg.quota, who);
         finale = { ok: true, text: text.trim(), threadId: msg.threadId, messageId: msg.messageId ?? null, quota: msg.quota };
       } else if (msg.t === 'err') {
-        finale = { ok: false, reason: (msg.reason as 'refused' | 'error') ?? 'error', quota: msg.quota };
+        setQuota(msg.quota, who);
+        finale = { ok: false, reason: msg.reason === 'refused' ? 'refused' : 'error', quota: msg.quota };
       }
     };
 
@@ -171,11 +182,12 @@ export async function askTutorLive(
 
 export async function fetchTutorQuota(): Promise<TutorQuota | null> {
   if (!config) return null;
+  const who = quotaUser();
   try {
     const res = await doFetch(`${config.siteUrl}/api/ai/quota`, { headers: await headers(), credentials: 'include' });
     if (!res.ok) return null;
     const quota = (await res.json()) as TutorQuota;
-    setQuota(quota);
+    setQuota(quota, who);
     return quota;
   } catch {
     return null;
@@ -184,7 +196,7 @@ export async function fetchTutorQuota(): Promise<TutorQuota | null> {
 
 /* ------------------------------------------------------------- AI actions */
 
-export type AiFail = { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error'; quota?: TutorQuota };
+export type AiFail = { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'syllabus' | 'error'; quota?: TutorQuota };
 
 /**
  * How long one of these may hang before the client stops waiting.
@@ -221,6 +233,25 @@ async function withDeadline(url: string, init: RequestInit, signal?: AbortSignal
 }
 
 /**
+ * A reply as the screens should see it. An `error` in the body is a failure
+ * whatever the status: the routes send a model's refusal as a 200 carrying
+ * `{error:'refused'}`, and treating that as success handed screens a body with
+ * no set, no paper and no verdict in it. The short-question screen crashed on
+ * `verdict.missed`, an MCQ build threw inside its click handler, and a mock
+ * paper opened `?id=undefined`.
+ */
+function settle<T>(res: Response, body: T & { error?: string; quota?: TutorQuota }, who: string | null | undefined): { ok: true; data: T } | AiFail {
+  if (res.ok && !body.error) {
+    // The server's count rides on success too, and nothing else recorded it:
+    // the number only moved when the realtime broadcast happened to arrive.
+    setQuota(body.quota, who);
+    return { ok: true, data: body };
+  }
+  const fail = failFrom(res.status, body, who);
+  return { ok: false, reason: fail.ok ? 'error' : fail.reason, quota: fail.ok ? undefined : fail.quota };
+}
+
+/**
  * Shared POST for the non-chat AI routes (session builder, answer checker,
  * mock paper, coach, cheat sheet). They all answer plain JSON and share the
  * same failure vocabulary as the tutor.
@@ -232,6 +263,7 @@ export async function aiPost<T>(
   signal?: AbortSignal,
 ): Promise<{ ok: true; data: T } | AiFail> {
   if (!config) return { ok: false, reason: 'offline' };
+  const who = quotaUser();
   try {
     const res = await withDeadline(
       `${config.siteUrl}${path}`,
@@ -244,11 +276,7 @@ export async function aiPost<T>(
       signal,
     );
     const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
-    if (res.ok) return { ok: true, data: body };
-    setQuota(body.quota);
-    if (body.error === 'refused') return { ok: false, reason: 'refused', quota: body.quota };
-    const fail = failFrom(res.status, body);
-    return { ok: false, reason: fail.ok ? 'error' : fail.reason, quota: fail.ok ? undefined : fail.quota };
+    return settle(res, body, who);
   } catch {
     return { ok: false, reason: 'offline' };
   }
@@ -257,12 +285,11 @@ export async function aiPost<T>(
 /** GET twin of aiPost, for the AI reads that cost nothing. */
 export async function aiGet<T>(path: string): Promise<{ ok: true; data: T } | AiFail> {
   if (!config) return { ok: false, reason: 'offline' };
+  const who = quotaUser();
   try {
     const res = await withDeadline(`${config.siteUrl}${path}`, { headers: await headers(), credentials: 'include' });
     const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
-    setQuota(body.quota);
-    if (!res.ok) return { ok: false, reason: failFrom(res.status, body).ok ? 'error' : 'error' };
-    return { ok: true, data: body };
+    return settle(res, body, who);
   } catch {
     return { ok: false, reason: 'offline' };
   }

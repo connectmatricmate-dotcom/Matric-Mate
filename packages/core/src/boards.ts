@@ -33,3 +33,41 @@ export const boardChoice = (onboarding: unknown): Board | null => {
   const board = (onboarding as { board?: unknown } | null)?.board;
   return board === 'fbise' || board === 'punjab' ? board : null;
 };
+
+/**
+ * The class an account actually chose, from its saved onboarding, or null when
+ * it has not chosen one there. The same reasoning as boardChoice: profiles.grade
+ * is `not null default 9`, so a brand-new account reads as Class 9 whether or
+ * not anyone picked it, and a phone that onboarded as Class 10 before signing
+ * up was turned into Class 9 by its first sync.
+ */
+export const gradeChoice = (onboarding: unknown): 9 | 10 | null => {
+  const level = Number((onboarding as { classLevel?: unknown } | null)?.classLevel);
+  return level === 9 || level === 10 ? level : null;
+};
+
+/**
+ * The language a subject is written in, for a student reading in `medium`.
+ *
+ * Most subjects follow the student's medium. The language subjects do not:
+ * Urdu is taught in Urdu and English in English whatever medium a student
+ * reads in, and Punjab's Islamiyat is in Urdu, the only language its book
+ * exists in. Content for those is written once and filed under both mediums,
+ * so anything that asks a model for more of it, labels its narration, or
+ * decides which way its text runs has to ask this rather than the medium.
+ *
+ * Takes a subject id or a chapter id: the subject leads every chapter id, and
+ * Punjab's carry `-pj-`, so a chapter id settles the board on its own.
+ */
+export function subjectMedium(subjectOrChapterId: string, board: Board | null | undefined, medium: 'en' | 'ur'): 'en' | 'ur' {
+  const subject = subjectOrChapterId.split('-')[0];
+  const punjab = board === 'punjab' || subjectOrChapterId.includes('-pj-');
+  if (subject === 'urd') return 'ur';
+  if (subject === 'eng') return 'en';
+  if (subject === 'isl' && punjab) return 'ur';
+  return medium;
+}
+
+/** True when a subject reads in one language for every student. See subjectMedium. */
+export const isOneLanguageSubject = (subjectOrChapterId: string, board?: Board | null): boolean =>
+  subjectMedium(subjectOrChapterId, board, 'en') === subjectMedium(subjectOrChapterId, board, 'ur');

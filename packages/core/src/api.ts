@@ -53,7 +53,7 @@ export const api = {
 
   /** Question set for a practice session or exam. */
   getMcqs: (
-    opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[] },
+    opts: { chapterIds?: string[]; subjectId?: string; count: number; topics?: string[]; medium?: Medium },
     client?: ContentClient,
   ): Promise<Mcq[]> => fetchMcqs(opts, client),
 
@@ -107,7 +107,7 @@ export const api = {
     /** The row the server saved this answer as, so it can be rated. */
     messageId?: string;
     quota?: TutorQuota;
-    reason?: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'error';
+    reason?: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'syllabus' | 'error';
   }> {
     if (tutorConfigured()) {
       const res = await askTutorLive(
@@ -133,14 +133,23 @@ export const api = {
    * Builds an "AI" test: approved AI-drafted questions first (generated_mcqs
    * rows a human has published), then the curated bank, focused on the given
    * topics and padded with a mixed pool when the focus runs thin.
+   *
+   * `scope` keeps all three to one subject, or to some chapters. Without it
+   * the padding came from any subject at all, and the exam filed every answer
+   * under its own subject: chemistry answers recorded as physics.
    */
-  async generateTest(topics: string[], count: number): Promise<Mcq[]> {
-    const generated = await fetchGeneratedMcqs({ count, topics });
-    const focused = topics.length ? await fetchMcqs({ count, topics }) : [];
+  async generateTest(
+    topics: string[],
+    count: number,
+    scope?: { subjectId?: string; chapterIds?: string[] },
+  ): Promise<Mcq[]> {
+    const where = { subjectId: scope?.subjectId, chapterIds: scope?.chapterIds?.length ? scope.chapterIds : undefined };
+    const generated = await fetchGeneratedMcqs({ count, topics, subjectId: scope?.subjectId });
+    const focused = topics.length ? await fetchMcqs({ count, topics, ...where }) : [];
     const seen = new Set(generated.map((m) => m.id));
     const pool = [...generated, ...focused.filter((m) => !seen.has(m.id))];
     if (pool.length >= count) return pool.slice(0, count);
-    const mixed = await fetchMcqs({ count });
+    const mixed = await fetchMcqs({ count, ...where });
     for (const m of pool) seen.add(m.id);
     return [...pool, ...mixed.filter((m) => !seen.has(m.id))].slice(0, count);
   },
