@@ -19,6 +19,11 @@
  * and those days are real: somebody answered questions on them. This walks the
  * append-only tables that did record correctly and writes the missing rows.
  *
+ * Every kind of study the apps count as a day counts here too: questions
+ * answered, results, sections read, flashcards marked, and questions put to
+ * the AI tutor. The first version walked only the first three, so a student
+ * who revised by flashcard or by asking the tutor still had days missing.
+ *
  * Safe to run repeatedly. Every insert is an upsert on the table's own primary
  * key (user_id, day), so a second run inserts nothing.
  */
@@ -54,24 +59,34 @@ async function all(table, columns) {
   }
 }
 
-const [attempts, results, sections, existing] = await Promise.all([
+const [attempts, results, sections, cards, messages, aiDays, existing] = await Promise.all([
   all('attempts', 'user_id,at'),
   all('results', 'user_id,at'),
   all('read_sections', 'user_id,at'),
+  all('cards_known', 'user_id,at'),
+  all('chat_messages', 'user_id,at,role'),
+  all('ai_usage', 'user_id,day'),
   all('active_days', 'user_id,day'),
 ]);
+// Only what the student wrote to the tutor; its replies are not their study.
+const asked = messages.filter((m) => m.role === 'user');
 
 const have = new Set(existing.map((r) => `${r.user_id}|${r.day}`));
 const want = new Map();
-for (const r of [...attempts, ...results, ...sections]) {
-  const key = `${r.user_id}|${karachiDay(r.at)}`;
-  if (!have.has(key)) want.set(key, { user_id: r.user_id, day: karachiDay(r.at) });
+const studied = [
+  ...[...attempts, ...results, ...sections, ...cards, ...asked].map((r) => ({ user_id: r.user_id, day: karachiDay(r.at) })),
+  // ai_usage is kept per day already, on the same Karachi calendar.
+  ...aiDays.filter((r) => r.day).map((r) => ({ user_id: r.user_id, day: String(r.day).slice(0, 10) })),
+];
+for (const r of studied) {
+  const key = `${r.user_id}|${r.day}`;
+  if (!have.has(key)) want.set(key, r);
 }
 
 const rows = [...want.values()];
 const students = new Set(rows.map((r) => r.user_id)).size;
 
-console.log(`  studied days found : ${attempts.length + results.length + sections.length} rows across attempts, results and read_sections`);
+console.log(`  study found        : ${studied.length} rows across attempts, results, read_sections, cards_known, tutor questions and ai_usage`);
 console.log(`  active_days already: ${existing.length}`);
 console.log(`  missing            : ${rows.length}, across ${students} student${students === 1 ? '' : 's'}`);
 

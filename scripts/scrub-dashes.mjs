@@ -10,10 +10,15 @@
  * before it did: 720 across notes, MCQs, flashcards, short questions and
  * blanks when this was written, all FBISE.
  *
- * Same replacement as generate-content.mjs: the comma the sentence almost
- * always wanted, the Urdu comma in Urdu rows, and nothing at all at the start
- * or end of a string. Every row is saved to content/.dash-backup/ before it
- * is touched, so a change that reads badly can be put back from there.
+ * Same replacement as generate-content.mjs, from the one copy of it in
+ * content-rules.mjs: the comma the sentence almost always wanted, and nothing
+ * at all at the start or end of a string. Which comma is decided by the words
+ * either side of the dash, never by the row's medium. The first run here went
+ * by medium, and an English lesson filed under Urdu medium came out with the
+ * Urdu comma "،" inside English sentences (and an Urdu lesson under English
+ * medium with the Latin ","), which broke the copy each language subject
+ * keeps under both mediums. Every row is saved to content/.dash-backup/ before
+ * it is touched, so a change that reads badly can be put back from there.
  */
 
 import dns from 'node:dns';
@@ -21,6 +26,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import { resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
+import { dashless } from './content-rules.mjs';
 import { C, ROOT, loadEnv } from './pdf-vision.mjs';
 
 dns.setDefaultResultOrder('ipv4first');
@@ -38,23 +44,10 @@ const TABLES = {
   blanks: { text: ['before_text', 'after_text', 'answer'], json: ['options'] },
 };
 
-function dashless(value, comma) {
-  if (typeof value === 'string') {
-    return value
-      .replace(new RegExp(`^\\s*${DASH}\\s*`), '')
-      .replace(new RegExp(`\\s*${DASH}\\s*$`), '')
-      .replace(new RegExp(`\\s*${DASH}\\s*`, 'g'), comma);
-  }
-  if (Array.isArray(value)) return value.map((v) => dashless(v, comma));
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, dashless(v, comma)]));
-  }
-  return value;
-}
-
 const env = await loadEnv();
 const db = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
-const backupDir = resolve(ROOT, 'content/.dash-backup');
+// A folder per run, so a second run can never overwrite the first run's originals.
+const backupDir = resolve(ROOT, 'content/.dash-backup', new Date().toISOString().replace(/[:.]/g, '-'));
 if (!DRY) await mkdir(backupDir, { recursive: true });
 
 let changed = 0;
@@ -79,8 +72,7 @@ for (const [table, { text, json }] of Object.entries(TABLES)) {
     Array.from({ length: 8 }, async () => {
       while (queue.length) {
         const row = queue.shift();
-        const comma = row.medium === 'ur' ? '، ' : ', ';
-        const patch = Object.fromEntries(fields.filter((f) => row[f] != null).map((f) => [f, dashless(row[f], comma)]));
+        const patch = Object.fromEntries(fields.filter((f) => row[f] != null).map((f) => [f, dashless(row[f])]));
         const { error } = await db.from(table).update(patch).eq('id', row.id);
         if (error) throw new Error(`${table} ${row.id}: ${error.message}`);
         changed++;
@@ -89,4 +81,4 @@ for (const [table, { text, json }] of Object.entries(TABLES)) {
   );
 }
 
-console.log(DRY ? C.dim('\n  dry run, nothing changed\n') : `${C.green('\n  ok')} ${changed} rows cleaned, originals in content/.dash-backup/\n`);
+console.log(DRY ? C.dim('\n  dry run, nothing changed\n') : `${C.green('\n  ok')} ${changed} rows cleaned, originals in content/.dash-backup/${backupDir.split('/').pop()}/\n`);

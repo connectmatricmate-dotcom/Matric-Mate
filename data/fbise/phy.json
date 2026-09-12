@@ -237,7 +237,7 @@
         },
         {
           "code": "P-09-B-09",
-          "text": "Sketch, plot and interpret distance— time and Speed-time graphs. This includes determining from the shape of a distance-time graph when an object is: [(a) at rest, (b) moving with constant speed, (c) accelerating, (d) decelerating, Students are Also required to know how to calculate speed from gradient of a distance- object is: (a) at rest, (b) Moving with constant speed (c) moving with constant acceleration (d) moving with changing acceleration]",
+          "text": "Sketch, plot and interpret distance-time and Speed-time graphs. This includes determining from the shape of a distance-time graph when an object is: [(a) at rest, (b) moving with constant speed, (c) accelerating, (d) decelerating, Students are Also required to know how to calculate speed from gradient of a distance- object is: (a) at rest, (b) Moving with constant speed (c) moving with constant acceleration (d) moving with changing acceleration]",
           "cognitive": "application",
           "assessment": null
         },
@@ -267,7 +267,7 @@
         },
         {
           "code": "P-09-B-14",
-          "text": "Calculate acceleration from the gradient of a speed—time graph final examination.",
+          "text": "Calculate acceleration from the gradient of a speed-time graph final examination.",
           "cognitive": "application",
           "assessment": "summative"
         },
@@ -525,13 +525,13 @@
         },
         {
           "code": "P-09-B-57",
-          "text": "Sketch, plot and interpret load—extension graphs for an elastic solid and describe the associated experimental procedures (Practical Based",
+          "text": "Sketch, plot and interpret load-extension graphs for an elastic solid and describe the associated experimental procedures (Practical Based",
           "cognitive": "understanding",
           "assessment": "summative"
         },
         {
           "code": "P-09-B-58",
-          "text": "Define and use the term ‘limit of proportionality’ for a load—extension (1 period=40 minutes) graph [Including identifying this point on the graph (an understanding of the elastic limit is not required)",
+          "text": "Define and use the term ‘limit of proportionality’ for a load-extension (1 period=40 minutes) graph [Including identifying this point on the graph (an understanding of the elastic limit is not required)",
           "cognitive": "knowledge",
           "assessment": "summative"
         },

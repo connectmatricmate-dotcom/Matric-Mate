@@ -45,6 +45,15 @@ const CONTENTS = resolve(ROOT, 'data/punjab/contents');
 /** Translated Urdu names (scripts/translate-punjab-titles.mjs), the last resort after any book's. */
 const TRANSLATED = resolve(ROOT, 'data/punjab/urdu-titles.json');
 const OUTCOMES = resolve(ROOT, 'data/punjab/outcomes');
+/**
+ * Blurbs written by hand, which win over the line built from the book's
+ * topics: data/punjab/blurbs.json in English, data/urdu-blurbs.json in Urdu.
+ * The built line is empty for a lesson with no topics and only an author's
+ * name for most Urdu lessons, and a catalogue rebuild must never put those
+ * back over a written one.
+ */
+const WRITTEN_BLURBS = resolve(ROOT, 'data/punjab/blurbs.json');
+const URDU_BLURBS = resolve(ROOT, 'data/urdu-blurbs.json');
 const OUT = resolve(ROOT, 'data/punjab/catalogue.json');
 
 const readJson = async (path) => {
@@ -306,6 +315,8 @@ async function main() {
   const problems = [];
   const bookList = [];
   const translated = (await readJson(TRANSLATED))?.titles ?? {};
+  const writtenBlurbs = (await readJson(WRITTEN_BLURBS))?.blurbs ?? {};
+  const urduBlurbs = (await readJson(URDU_BLURBS))?.blurbs ?? {};
 
   for (const [, group] of [...groups].sort(([a], [b]) => a.localeCompare(b))) {
     const primary = group[0];
@@ -403,7 +414,8 @@ async function main() {
         number: ch.number,
         title,
         urduTitle,
-        blurb: lesson ? lesson.author : blurbFor(subject, topics),
+        blurb: writtenBlurbs[id] ?? (lesson ? lesson.author : blurbFor(subject, topics)),
+        urduBlurb: urduBlurbs[id] ?? null,
         source: { file: primary.outcomes.source, pdfStart: ch.pdfStart, pdfEnd: ch.pdfEnd, printedPage: entry?.page ?? null },
         sloHeading: read.sloHeading ?? null,
         topics,

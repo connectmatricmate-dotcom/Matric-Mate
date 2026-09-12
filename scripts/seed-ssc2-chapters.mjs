@@ -20,6 +20,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import { weightsFor } from './exam-weights.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DRY = process.argv.includes('--dry-run');
@@ -43,6 +44,9 @@ const spec = JSON.parse(await readFile(resolve(ROOT, 'data/fbise/chapters-ssc2.j
 
 const chapters = [];
 for (const [subjectId, s] of Object.entries(spec.subjects)) {
+  // 0 for a chapter the board does not examine, null where it publishes no
+  // weight, never one lone share: the rules in exam-weights.mjs.
+  const weights = weightsFor(s);
   for (const ch of s.chapters) {
     chapters.push({
       id: `${subjectId}-10-${ch.number}`,
@@ -50,11 +54,15 @@ for (const [subjectId, s] of Object.entries(spec.subjects)) {
       number: ch.number,
       grade: 10,
       board_unit: null,
-      exam_marks: ch.marks ?? null,
-      exam_share: ch.share ?? null,
-      title: ch.titleEn ?? ch.title,
+      exam_marks: weights.get(ch.number)?.marks ?? null,
+      exam_share: weights.get(ch.number)?.share ?? null,
+      // A chapter name is a label, not a sentence, so never a closing full stop.
+      title: (ch.titleEn ?? ch.title).replace(/\.\s*$/, ''),
       urdu_title: ch.urduTitle ?? null,
-      blurb: ch.blurb,
+      // The English interface's line. Urdu and Islamiyat chapters carry their
+      // Urdu line in `blurb` and an English one in `blurbEn`; the Urdu line is
+      // chapters.urdu_blurb, loaded from data/urdu-blurbs.json.
+      blurb: ch.blurbEn ?? ch.blurb,
       premium: true,
       audio_minutes: 0,
       review_status: 'published',

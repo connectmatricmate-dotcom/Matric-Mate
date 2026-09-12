@@ -13,10 +13,16 @@
  * CHAPTERS ARRIVE AS DRAFT, AND A RE-RUN NEVER CHANGES THAT
  *
  * The upsert names only the columns the catalogue owns: identity, title, Urdu
- * title, blurb. A new row takes every other column's default, which for
- * review_status is draft; an existing row keeps what it has, so re-seeding can
- * never unpublish a live chapter or zero an audio duration or exam weight set
- * later by another script.
+ * title, blurb and Urdu blurb. A new row takes every other column's default,
+ * which for review_status is draft; an existing row keeps what it has, so
+ * re-seeding can never unpublish a live chapter or zero an audio duration or
+ * exam weight set later by another script.
+ *
+ * A blurb is never written empty. The catalogue builds one from the book's
+ * topics, which comes out empty for a lesson with no topics; where the
+ * catalogue has none, the chapter keeps the one it already has, so a re-seed
+ * cannot wipe a line written by hand (data/punjab/blurbs.json,
+ * data/urdu-blurbs.json, loaded by scripts/load-blurbs.mjs).
  *
  * Draft matters beyond row level security. The service-key reads behind the
  * AI mock paper, the tutor's syllabus context and the content audits all
@@ -46,6 +52,7 @@ const chapters = catalogue.chapters.map((c) => ({
   title: c.title,
   urdu_title: c.urduTitle ?? null,
   blurb: c.blurb ?? '',
+  urdu_blurb: c.urduBlurb ?? null,
 }));
 
 const titleOf = new Map(catalogue.chapters.map((c) => [c.id, c.title]));
@@ -78,7 +85,14 @@ async function all(query) {
 
 console.log(C.dim(`\n  ${chapters.length} chapters, ${slos.length} outcomes in the catalogue${DRY ? ' (dry run)' : ''}\n`));
 
-const existingChapters = await all(() => db.from('chapters').select('id,review_status').eq('board', 'punjab').order('id'));
+const existingChapters = await all(() => db.from('chapters').select('id,review_status,blurb,urdu_blurb').eq('board', 'punjab').order('id'));
+// Never blank a blurb: where the catalogue has none, keep what the row has.
+const current = new Map(existingChapters.map((r) => [r.id, r]));
+for (const c of chapters) {
+  const had = current.get(c.id);
+  if (!c.blurb?.trim()) c.blurb = had?.blurb ?? '';
+  if (!c.urdu_blurb?.trim()) c.urdu_blurb = had?.urdu_blurb ?? null;
+}
 const existingCodes = await all(() => db.from('curriculum_slos').select('code').eq('board', 'punjab').order('code'));
 const have = new Set(existingChapters.map((r) => r.id));
 const fresh = chapters.filter((c) => !have.has(c.id));

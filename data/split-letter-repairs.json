@@ -1,0 +1,696 @@
+{
+ "note": "Each context holds one letter a broken stream decoder split in two, shown as a pair of U+FFFD marks, with the letter it was. Read from the surrounding words; see scripts/repair-split-letters.mjs.",
+ "letters": [
+  {
+   "context": " ہیں، یہی ثق\ufffd\ufffdفتی تنوع کا ",
+   "letter": "ا"
+  },
+  {
+   "context": "ان کے کلام م\ufffd\ufffdں لفظی اور م",
+   "letter": "ی"
+  },
+  {
+   "context": " طور پر ذمہ \ufffd\ufffdار ہو، جیسے ",
+   "letter": "د"
+  },
+  {
+   "context": "ML سے ٹیبل ا\ufffd\ufffdر فارم بنانا",
+   "letter": "و"
+  },
+  {
+   "context": " طالب علم بل\ufffd\ufffd گروپ A اور ",
+   "letter": "ڈ"
+  },
+  {
+   "context": "ور زیادہ تر \ufffd\ufffdانی دوبارہ خ",
+   "letter": "پ"
+  },
+  {
+   "context": "ی آکسائیڈ) ب\ufffd\ufffdاہ راست گیس ",
+   "letter": "ر"
+  },
+  {
+   "context": "ت عمرو بن ام\ufffd\ufffdہ رضی اللہ ت",
+   "letter": "ی"
+  },
+  {
+   "context": "میٹر\nچونکہ ع\ufffd\ufffdود وتر کو نص",
+   "letter": "م"
+  },
+  {
+   "context": " A، B اور C \ufffd\ufffdیں کہ B قوس ",
+   "letter": "ل"
+  },
+  {
+   "context": " کا رداس 3 س\ufffd\ufffdنٹی میٹر ہو ",
+   "letter": "ی"
+  },
+  {
+   "context": "ا اداس ہوتا \ufffd\ufffdے)",
+   "letter": "ہ"
+  },
+  {
+   "context": "ی کشیدگی جیس\ufffd\ufffd مسائل تعلقا",
+   "letter": "ے"
+  },
+  {
+   "context": "پانی کی \ufffd\ufffdخصوص حرارت (",
+   "letter": "م"
+  },
+  {
+   "context": " پوزیشن کے گ\ufffd\ufffdد دولن (osci",
+   "letter": "ر"
+  },
+  {
+   "context": "شاعر\ufffd\ufffd کو سن کر سم",
+   "letter": "ی"
+  },
+  {
+   "context": "کا ایک تاریخ\ufffd\ufffd شہر جو اپنے",
+   "letter": "ی"
+  },
+  {
+   "context": "RNA میں اور \ufffd\ufffdھر پروٹین می",
+   "letter": "پ"
+  },
+  {
+   "context": "ذبات کے اظہا\ufffd\ufffd میں الفاظ ک",
+   "letter": "ر"
+  },
+  {
+   "context": "نین\ufffd\ufffd (Nano)، علا",
+   "letter": "و"
+  },
+  {
+   "context": "ی جسم پر بیر\ufffd\ufffdنی فورس لگائ",
+   "letter": "و"
+  },
+  {
+   "context": "ی سے منتقل ہ\ufffd\ufffd گی۔",
+   "letter": "و"
+  },
+  {
+   "context": "ہر چیز، مثلا\ufffd\ufffd پانی کی بوت",
+   "letter": "ً"
+  },
+  {
+   "context": "جلنا (تندور \ufffd\ufffdا چولہے میں ",
+   "letter": "ی"
+  },
+  {
+   "context": " آپس میں جوڑ\ufffd\ufffdی اور مضبوطی",
+   "letter": "ت"
+  },
+  {
+   "context": "س لیے وہ آزا\ufffd\ufffdانہ طور پر پ",
+   "letter": "د"
+  },
+  {
+   "context": "ہیں)۔ یہی وج\ufffd\ufffd ہے کہ رات ک",
+   "letter": "ہ"
+  },
+  {
+   "context": " = 4، یعنی ع\ufffd\ufffdس شے سے چار ",
+   "letter": "ک"
+  },
+  {
+   "context": "ان والی تاری\ufffd\ufffd دھوئیں کے ذ",
+   "letter": "ں"
+  },
+  {
+   "context": ")، تصعید کے \ufffd\ufffdطلاقات اور ج",
+   "letter": "ا"
+  },
+  {
+   "context": "ائل چارجر می\ufffd\ufffd چند ملی ایم",
+   "letter": "ں"
+  },
+  {
+   "context": " حرکت میں رک\ufffd\ufffdوٹ بڑھ جاتی ",
+   "letter": "ا"
+  },
+  {
+   "context": "سے پودوں کا \ufffd\ufffdدرتی ہارمون ",
+   "letter": "ق"
+  },
+  {
+   "context": "نشا\ufffd\ufffdتہ (Starch) ",
+   "letter": "س"
+  },
+  {
+   "context": "مانے پر استع\ufffd\ufffdال کیا جاتا ",
+   "letter": "م"
+  },
+  {
+   "context": "(nuclei) کے \ufffd\ufffdپس میں مل جا",
+   "letter": "آ"
+  },
+  {
+   "context": "وس ڈیف\ufffd\ufffdنس (Vas Defe",
+   "letter": "ر"
+  },
+  {
+   "context": " ایف او اور \ufffd\ufffdقوط مشرقی پا",
+   "letter": "س"
+  },
+  {
+   "context": "وری کا انتظا\ufffd\ufffd (Memory Man",
+   "letter": "م"
+  },
+  {
+   "context": " سے کرنے کے \ufffd\ufffdیے بنائے جات",
+   "letter": "ل"
+  },
+  {
+   "context": "سافروں پر پڑ\ufffd\ufffdے والی قوت ک",
+   "letter": "ن"
+  },
+  {
+   "context": "ینے کے روزان\ufffd\ufffd درجہ حرارت ",
+   "letter": "ہ"
+  },
+  {
+   "context": "لیے اپنا وقت\ufffd\ufffd پیسہ اور مح",
+   "letter": "،"
+  },
+  {
+   "context": " خط x-محور ت\ufffd\ufffd کھینچ کر می",
+   "letter": "ک"
+  },
+  {
+   "context": "افقت پائی جا\ufffd\ufffdی ہے۔ ان نقا",
+   "letter": "ت"
+  },
+  {
+   "context": "ی میدان میں \ufffd\ufffdپنے مسائل کے",
+   "letter": "ا"
+  },
+  {
+   "context": "صوبائی اسمبل\ufffd\ufffdوں اور سینیٹ",
+   "letter": "ی"
+  },
+  {
+   "context": " مجید میں ال\ufffd\ufffdہ تعالیٰ نے ",
+   "letter": "ل"
+  },
+  {
+   "context": "ما\ufffd\ufffd باپ",
+   "letter": "ں"
+  },
+  {
+   "context": "نِ ہند کی رہ\ufffd\ufffdمائی کی۔",
+   "letter": "ن"
+  },
+  {
+   "context": "بت کرتا ہے ک\ufffd\ufffd مزاحیہ تحری",
+   "letter": "ہ"
+  },
+  {
+   "context": "کاری زندگی، \ufffd\ufffdزت کی خواہش ",
+   "letter": "ع"
+  },
+  {
+   "context": "یں ہوئی۔ بچپ\ufffd\ufffd سے ہی آپ کی",
+   "letter": "ن"
+  },
+  {
+   "context": "ر دور سے آ ک\ufffd\ufffd علم حاصل کر",
+   "letter": "ر"
+  },
+  {
+   "context": "ess): AI کے \ufffd\ufffdیصلے کسی بھی",
+   "letter": "ف"
+  },
+  {
+   "context": "ن لائن دکان \ufffd\ufffdی فروخت اچان",
+   "letter": "ک"
+  },
+  {
+   "context": "آکسیڈیشن ہوت\ufffd\ufffd ہے: Zn → Zn",
+   "letter": "ی"
+  },
+  {
+   "context": "سے متاثر نہی\ufffd\ufffd ہوتا۔",
+   "letter": "ں"
+  },
+  {
+   "context": "سائی کو مدنظ\ufffd\ufffd رکھنے کا مق",
+   "letter": "ر"
+  },
+  {
+   "context": "الی بڑے پیما\ufffd\ufffdے پر ہجرت نے",
+   "letter": "ن"
+  },
+  {
+   "context": "کیونکہ گلوکو\ufffd\ufffd کیپلریز کے ",
+   "letter": "ز"
+  },
+  {
+   "context": "اخلاق\ufffd\ufffd AI ڈیزائن",
+   "letter": "ی"
+  },
+  {
+   "context": "مات یا زبان \ufffd\ufffdی ترجیح۔ آپش",
+   "letter": "ک"
+  },
+  {
+   "context": "̄₁+z̄₂ کے سا\ufffd\ufffdھ الجھن پیدا",
+   "letter": "ت"
+  },
+  {
+   "context": "ی خارج ہوتا \ufffd\ufffdے",
+   "letter": "ہ"
+  },
+  {
+   "context": "کا اور شکن م\ufffd\ufffdاحم (wrinkle",
+   "letter": "ز"
+  },
+  {
+   "context": "امام محمد \ufffd\ufffdاقر",
+   "letter": "ب"
+  },
+  {
+   "context": " غارِ حرا می\ufffd\ufffd",
+   "letter": "ں"
+  },
+  {
+   "context": "خطے سے باہر \ufffd\ufffdے، مگر طالب ",
+   "letter": "ہ"
+  },
+  {
+   "context": "یل جول سے وج\ufffd\ufffdد میں آئی۔ د",
+   "letter": "و"
+  },
+  {
+   "context": "لغوی معنی کی\ufffd\ufffd ہے؟",
+   "letter": "ا"
+  },
+  {
+   "context": "یا جاتا ہے۔ \ufffd\ufffdپشن b میں عل",
+   "letter": "آ"
+  },
+  {
+   "context": "الی قطب، تاک\ufffd\ufffd مقناطیس کو ",
+   "letter": "ہ"
+  },
+  {
+   "context": "σ\ufffd\ufffd = Σfx / n",
+   "letter": "²"
+  },
+  {
+   "context": " تجربات کی ع\ufffd\ufffdاسی کرتا ہے۔",
+   "letter": "ک"
+  },
+  {
+   "context": " افسانہ نگار\ufffd\ufffdں میں",
+   "letter": "و"
+  },
+  {
+   "context": "ر سمجھے یاد \ufffd\ufffdرنا وہ عام غ",
+   "letter": "ک"
+  },
+  {
+   "context": "لز سے زیادہ \ufffd\ufffdکھرتی ہے بہ ",
+   "letter": "ب"
+  },
+  {
+   "context": "درجہ حرارت م\ufffd\ufffdتقل رہے اور ",
+   "letter": "س"
+  },
+  {
+   "context": " ترتیب حرکت \ufffd\ufffdی وجہ سے وہ ",
+   "letter": "ک"
+  },
+  {
+   "context": "ہیں کی جا سک\ufffd\ufffdی کہ کون سا ",
+   "letter": "ت"
+  },
+  {
+   "context": "ن کیٹالسٹ ہی\ufffd\ufffd۔ option c د",
+   "letter": "ں"
+  },
+  {
+   "context": "ولیاتی دباؤ \ufffd\ufffdم ہو گیا ہے",
+   "letter": "ک"
+  },
+  {
+   "context": "فیٹس پانی می\ufffd\ufffd طحالب (alga",
+   "letter": "ں"
+  },
+  {
+   "context": "ilizer) استع\ufffd\ufffdال ہوتا ہے؟",
+   "letter": "م"
+  },
+  {
+   "context": "پر کتنی قوت \ufffd\ufffdگاتا ہے؟",
+   "letter": "ل"
+  },
+  {
+   "context": "یر رابطے کے \ufffd\ufffdثرانداز ہوتی",
+   "letter": "ا"
+  },
+  {
+   "context": "شش قوت نہیں \ufffd\ufffdوتی",
+   "letter": "ہ"
+  },
+  {
+   "context": "اچھ\ufffd\ufffdل کی قوت ہمی",
+   "letter": "ا"
+  },
+  {
+   "context": "حرارت \ufffd\ufffdی تعریف",
+   "letter": "ک"
+  },
+  {
+   "context": "س کس حالتِ م\ufffd\ufffdدہ (state of",
+   "letter": "ا"
+  },
+  {
+   "context": "ے کا اپنی شک\ufffd\ufffd ہمیشہ برقرا",
+   "letter": "ل"
+  },
+  {
+   "context": "جوہری عد\ufffd\ufffd کی بڑھتی تر",
+   "letter": "د"
+  },
+  {
+   "context": " کی رفتار بر\ufffd\ufffdبر ہو جائے",
+   "letter": "ا"
+  },
+  {
+   "context": "وہ فوٹو \ufffd\ufffdنتھیسز (phot",
+   "letter": "س"
+  },
+  {
+   "context": "یں تنفس سے ح\ufffd\ufffdصل ہونے والی",
+   "letter": "ا"
+  },
+  {
+   "context": "دوں جیسے ٹین\ufffd\ufffd اور رال کو ",
+   "letter": "ن"
+  },
+  {
+   "context": " مقناطیسی می\ufffd\ufffdان پر کیا اث",
+   "letter": "د"
+  },
+  {
+   "context": "خو\ufffd\ufffd میں سرخ خلی",
+   "letter": "ن"
+  },
+  {
+   "context": "زیا\ufffd\ufffdہ آبپاشی اور",
+   "letter": "د"
+  },
+  {
+   "context": "چھوٹی گر\ufffd\ufffdے کی پتھری ک",
+   "letter": "د"
+  },
+  {
+   "context": "یہ نا\ufffd\ufffdی دار غدود پ",
+   "letter": "ل"
+  },
+  {
+   "context": "غا خان سوم ن\ufffd\ufffd کی جنہوں نے",
+   "letter": "ے"
+  },
+  {
+   "context": "سندھ طا\ufffd\ufffd معاہدہ",
+   "letter": "س"
+  },
+  {
+   "context": " کر پورا نتی\ufffd\ufffdہ 0 لکھ دیتے",
+   "letter": "ج"
+  },
+  {
+   "context": " (Document) \ufffd\ufffdے لیے عام طو",
+   "letter": "ک"
+  },
+  {
+   "context": "کوانٹیٹ\ufffd\ufffdٹیو تجزیہ",
+   "letter": "ی"
+  },
+  {
+   "context": "حصوں میں' غل\ufffd\ufffd ہے کیونکہ ع",
+   "letter": "ط"
+  },
+  {
+   "context": "سہولت دیتی ہ\ufffd\ufffd۔ یہ سوچنا غ",
+   "letter": "ے"
+  },
+  {
+   "context": " ہے، سرے پر \ufffd\ufffdاگو نہیں ہوت",
+   "letter": "ل"
+  },
+  {
+   "context": "قراءت کا اخت\ufffd\ufffdاف تو بعد می",
+   "letter": "ل"
+  },
+  {
+   "context": "اسلام قبول ک\ufffd\ufffdنے لگے جیسا ",
+   "letter": "ر"
+  },
+  {
+   "context": " میں یہ بات \ufffd\ufffdمایاں ہے کہ ",
+   "letter": "ن"
+  },
+  {
+   "context": "نگ میں دشمن \ufffd\ufffdی موجودگی' و",
+   "letter": "ک"
+  },
+  {
+   "context": "م\ufffd\ufffdئلہ حل ہونے ",
+   "letter": "س"
+  },
+  {
+   "context": "اخلاقی طری\ufffd\ufffdوں کا فائدہ",
+   "letter": "ق"
+  },
+  {
+   "context": "CRM \ufffd\ufffdا مقصد",
+   "letter": "ک"
+  },
+  {
+   "context": "نظام مجرموں \ufffd\ufffdو جلد سزا دل",
+   "letter": "ک"
+  },
+  {
+   "context": " اضلاع اور د\ufffd\ufffdمیانی زاویے ",
+   "letter": "ر"
+  },
+  {
+   "context": "ویوں کے مجمو\ufffd\ufffdے کے برابر ہ",
+   "letter": "ع"
+  },
+  {
+   "context": ") سے تعامل ک\ufffd\ufffd کے عمومی طو",
+   "letter": "ر"
+  },
+  {
+   "context": "g) کی ایک تک\ufffd\ufffdیک ہے جس سے ",
+   "letter": "ن"
+  },
+  {
+   "context": "\ufffd\ufffdگھلاؤ (melti",
+   "letter": "پ"
+  },
+  {
+   "context": "کہ فیصلہ ساز\ufffd\ufffd میں مدد مل ",
+   "letter": "ی"
+  },
+  {
+   "context": "گت ہے، x اشی\ufffd\ufffdء کی تعداد ہ",
+   "letter": "ا"
+  },
+  {
+   "context": "مستوی کے درم\ufffd\ufffdان زاویہ کہل",
+   "letter": "ی"
+  },
+  {
+   "context": "وم کرنا اور \ufffd\ufffdھر مکمل دائر",
+   "letter": "پ"
+  },
+  {
+   "context": "کشمیر کا مسئ\ufffd\ufffdہ پاکستان کی",
+   "letter": "ل"
+  },
+  {
+   "context": " سمت ہوتی ہے\ufffd\ufffd",
+   "letter": "۔"
+  },
+  {
+   "context": "حیا\ufffd\ufffdیاتی تنوع (B",
+   "letter": "ت"
+  },
+  {
+   "context": "G2 (نمو کا د\ufffd\ufffdسرا مرحلہ او",
+   "letter": "و"
+  },
+  {
+   "context": " سے باقی آلا\ufffd\ufffd پر اثر نہ پ",
+   "letter": "ت"
+  },
+  {
+   "context": "سرکہ کی \ufffd\ufffdیاری میں کون",
+   "letter": "ت"
+  },
+  {
+   "context": "نقطہ معلوم ک\ufffd\ufffdتے وقت قوس م",
+   "letter": "ر"
+  },
+  {
+   "context": "ستان کی سب س\ufffd\ufffd اہم غذائی ف",
+   "letter": "ے"
+  },
+  {
+   "context": "یں کیسے گرای\ufffd\ufffd گیا؟",
+   "letter": "ا"
+  },
+  {
+   "context": "دیا\ufffd\ufffdت کسے کہتے ہ",
+   "letter": "ن"
+  },
+  {
+   "context": "+ + 4e- (آکس\ufffd\ufffdڈیشن)",
+   "letter": "ی"
+  },
+  {
+   "context": "s 200° ≥ 180\ufffd\ufffd, so subtrac",
+   "letter": "°"
+  },
+  {
+   "context": "اں ہوتی ہیں \ufffd\ufffdو پیشاب کو ا",
+   "letter": "ج"
+  },
+  {
+   "context": " دو سال، اون\ufffd\ufffd پانچ سال) ا",
+   "letter": "ٹ"
+  },
+  {
+   "context": "ئیں کون زیاد\ufffd\ufffd مستقل مزاج ",
+   "letter": "ہ"
+  },
+  {
+   "context": " کوئی چار نم\ufffd\ufffdیاں خصوصیات ",
+   "letter": "ا"
+  },
+  {
+   "context": "گلے کی طرف د\ufffd\ufffdکیلتی ہے",
+   "letter": "ھ"
+  },
+  {
+   "context": "میسو\ufffd\ufffdل خلیہ پتے م",
+   "letter": "ف"
+  },
+  {
+   "context": "یلاؤ اور مصن\ufffd\ufffdعی پھیلاؤ می",
+   "letter": "و"
+  },
+  {
+   "context": "کی مختصر تعر\ufffd\ufffdف کریں۔",
+   "letter": "ی"
+  },
+  {
+   "context": "ا ہے۔ بٹ ڈیٹ\ufffd\ufffd کی سب سے چھ",
+   "letter": "ا"
+  },
+  {
+   "context": "مساوا\ufffd\ufffd ایٹموں کے ل",
+   "letter": "ت"
+  },
+  {
+   "context": "زندہ تار \ufffd\ufffdور خول کے در",
+   "letter": "ا"
+  },
+  {
+   "context": "تر 17 سینٹی \ufffd\ufffdیٹر ہے۔ sinθ",
+   "letter": "م"
+  },
+  {
+   "context": "فارمو\ufffd\ufffdا M=((x1+x2)",
+   "letter": "ل"
+  },
+  {
+   "context": "معیاری چ\ufffd\ufffdرے اور تربیت",
+   "letter": "ا"
+  },
+  {
+   "context": "حضرت اما\ufffd\ufffd زین العابدی",
+   "letter": "م"
+  },
+  {
+   "context": "ریم ﷺ اور صح\ufffd\ufffdبہ کرام رضی ",
+   "letter": "ا"
+  },
+  {
+   "context": "مٌ مِّنْ قَو\ufffd\ufffdمٍ\" کا بامحا",
+   "letter": "ْ"
+  },
+  {
+   "context": "اسسٹنٹ سے سو\ufffd\ufffdل پوچھنا اور",
+   "letter": "ا"
+  },
+  {
+   "context": "بے ترتیب \ufffd\ufffdرزِ زندگی",
+   "letter": "ط"
+  },
+  {
+   "context": "ر اور تاثیر \ufffd\ufffdیدا ہوتی ہے۔",
+   "letter": "پ"
+  },
+  {
+   "context": "ر لوگوں کا د\ufffd\ufffdسروں پر انحص",
+   "letter": "و"
+  },
+  {
+   "context": "\ufffd\ufffdمبائی",
+   "letter": "ل"
+  },
+  {
+   "context": " کہلاتا ہے\ufffd\ufffd",
+   "letter": "۔"
+  },
+  {
+   "context": "\ufffd\ufffdمیر",
+   "letter": "ا"
+  },
+  {
+   "context": "رت امام زید \ufffd\ufffdن علی رحمۃ ا",
+   "letter": "ب"
+  },
+  {
+   "context": "ہوتی ہ\ufffd\ufffd۔",
+   "letter": "ے"
+  },
+  {
+   "context": "اعداد تلاش ک\ufffd\ufffdے جاتے ہیں ج",
+   "letter": "ی"
+  },
+  {
+   "context": "متواز\ufffd\ufffd الاضلاع کے ",
+   "letter": "ی"
+  },
+  {
+   "context": "ک\ufffd\ufffdا جاتا ہے۔",
+   "letter": "ہ"
+  },
+  {
+   "context": "اساتذ\ufffd\ufffd",
+   "letter": "ہ"
+  },
+  {
+   "context": "دربا\ufffd\ufffdی",
+   "letter": "ر"
+  },
+  {
+   "context": "وسلم اور صحا\ufffd\ufffdہ کرام رضی ا",
+   "letter": "ب"
+  }
+ ],
+ "whole": [
+  {
+   "broken": "R2 = 4 k\ufffddecisive Ω",
+   "fixed": "R2 = 4 kΩ",
+   "why": "a stray mark and a stray word inside a unit; the question states 4 kΩ everywhere else"
+  }
+ ]
+}

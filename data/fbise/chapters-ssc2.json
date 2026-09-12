@@ -598,6 +598,10 @@
    ]
   },
   "eng": {
+   "notExamined": [
+    1
+   ],
+   "_notExamined": "Oral Communication Skills is judged in class, not on the annual paper: share 0, which the apps and the mock paper read as not examined. The other three wait for a readable SSC-II ToS.",
    "chapters": [
     {
      "number": 1,
@@ -643,34 +647,37 @@
      "number": 1,
      "title": "پڑھنا",
      "urduTitle": "پڑھنا",
-     "titleEn": "Reading.",
+     "titleEn": "Reading",
      "slos": [
       "C"
      ],
      "share": null,
-     "blurb": "نظم و نثر کی تفہیم، اشعار کی تشریح اور متن پر رائے۔ سالانہ پرچے کا بنیادی حصہ۔"
+     "blurb": "نظم و نثر کی تفہیم، اشعار کی تشریح اور متن پر رائے۔ سالانہ پرچے کا بنیادی حصہ۔",
+     "blurbEn": "Understanding poetry and prose, explaining couplets and giving a view on a text: the core of the annual paper."
     },
     {
      "number": 2,
      "title": "لکھنا",
      "urduTitle": "لکھنا",
-     "titleEn": "Writing.",
+     "titleEn": "Writing",
      "slos": [
       "D"
      ],
      "share": null,
-     "blurb": "مضمون نویسی، خط و درخواست، تلخیص اور ترجمہ: پرچے کا سب سے وزنی حصہ۔"
+     "blurb": "مضمون نویسی، خط و درخواست، تلخیص اور ترجمہ: پرچے کا سب سے وزنی حصہ۔",
+     "blurbEn": "Essays, letters and applications, summary and translation: the heaviest part of the paper."
     },
     {
      "number": 3,
      "title": "قواعد / زبان شناسی",
      "urduTitle": "قواعد / زبان شناسی",
-     "titleEn": "Grammar and linguistics.",
+     "titleEn": "Grammar and linguistics",
      "slos": [
       "E"
      ],
      "share": null,
-     "blurb": "قواعد، تراکیب، محاورات اور اصنافِ سخن کی بنیادی اصطلاحات۔"
+     "blurb": "قواعد، تراکیب، محاورات اور اصنافِ سخن کی بنیادی اصطلاحات۔",
+     "blurbEn": "Grammar, compounds, idioms and the basic terms of poetic forms."
     }
    ]
   },
@@ -680,78 +687,85 @@
      "number": 1,
      "title": "قرآن مجید و حدیثِ نبوی ﷺ",
      "urduTitle": "قرآن مجید و حدیثِ نبوی ﷺ",
-     "titleEn": "Quran and Hadith.",
+     "titleEn": "Quran and Hadith",
      "slos": [
       "A"
      ],
      "share": null,
-     "blurb": "منتخب آیات و احادیث کا مطالعہ، ترجمہ اور تشریح۔"
+     "blurb": "منتخب آیات و احادیث کا مطالعہ، ترجمہ اور تشریح۔",
+     "blurbEn": "Selected verses and hadith: their study, translation and explanation."
     },
     {
      "number": 2,
      "title": "ایمانیات و عبادات",
      "urduTitle": "ایمانیات و عبادات",
-     "titleEn": "Beliefs and worship.",
+     "titleEn": "Beliefs and worship",
      "slos": [
       "B"
      ],
      "share": null,
-     "blurb": "ایمانیات کی بنیادیں اور عبادات کے احکام و حکمتیں۔"
+     "blurb": "ایمانیات کی بنیادیں اور عبادات کے احکام و حکمتیں۔",
+     "blurbEn": "The foundations of faith, and the rules and wisdom of worship."
     },
     {
      "number": 3,
      "title": "سیرتِ رسول ﷺ",
      "urduTitle": "سیرتِ رسول ﷺ",
-     "titleEn": "Seerah.",
+     "titleEn": "Seerah",
      "slos": [
       "C"
      ],
      "share": null,
-     "blurb": "رسول اکرم ﷺ کی حیاتِ طیبہ کے اہم پہلو اور ان سے ملنے والے اسباق۔"
+     "blurb": "رسول اکرم ﷺ کی حیاتِ طیبہ کے اہم پہلو اور ان سے ملنے والے اسباق۔",
+     "blurbEn": "Key aspects of the blessed life of the Holy Prophet ﷺ and the lessons they teach."
     },
     {
      "number": 4,
      "title": "اخلاق و آداب",
      "urduTitle": "اخلاق و آداب",
-     "titleEn": "Ethics and manners.",
+     "titleEn": "Ethics and manners",
      "slos": [
       "D"
      ],
      "share": null,
-     "blurb": "اسلامی اخلاق، آداب اور کردار سازی۔"
+     "blurb": "اسلامی اخلاق، آداب اور کردار سازی۔",
+     "blurbEn": "Islamic ethics, manners and building good character."
     },
     {
      "number": 5,
      "title": "حسنِ معاملات و معاشرت",
      "urduTitle": "حسنِ معاملات و معاشرت",
-     "titleEn": "Social conduct.",
+     "titleEn": "Social conduct",
      "slos": [
       "E"
      ],
      "share": null,
-     "blurb": "معاملات، حقوق العباد اور معاشرتی زندگی کے اسلامی اصول۔"
+     "blurb": "معاملات، حقوق العباد اور معاشرتی زندگی کے اسلامی اصول۔",
+     "blurbEn": "Islamic principles for dealings, the rights of others and life in society."
     },
     {
      "number": 6,
      "title": "ہدایت کے سرچشمے",
      "urduTitle": "ہدایت کے سرچشمے",
-     "titleEn": "Sources of guidance.",
+     "titleEn": "Sources of guidance",
      "slos": [
       "F"
      ],
      "share": null,
-     "blurb": "قرآن، سنت اور اجماع: ہدایت کے بنیادی ماخذ اور مشاہیرِ اسلام۔"
+     "blurb": "قرآن، سنت اور اجماع: ہدایت کے بنیادی ماخذ اور مشاہیرِ اسلام۔",
+     "blurbEn": "The Quran, the Sunnah and consensus as the basic sources of guidance, and eminent figures of Islam."
     },
     {
      "number": 7,
      "title": "اسلامی تعلیمات اور عصرِ حاضر",
      "urduTitle": "اسلامی تعلیمات اور عصرِ حاضر",
-     "titleEn": "Islam and the modern age.",
+     "titleEn": "Islam and the modern age",
      "slos": [
       "G"
      ],
      "share": null,
-     "blurb": "عصرِ حاضر کے مسائل پر اسلامی تعلیمات کا اطلاق۔"
+     "blurb": "عصرِ حاضر کے مسائل پر اسلامی تعلیمات کا اطلاق۔",
+     "blurbEn": "Applying Islamic teachings to the issues of today."
     }
    ]
   }

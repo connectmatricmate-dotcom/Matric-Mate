@@ -1,0 +1,140 @@
+{
+ "note": "MCQs whose explanation names an option in a way scripts/content-rules.mjs will not decide alone, settled by reading them. Applied by scripts/place-answers.mjs only while the explanation still reads exactly as it did (was); a hand-written explanation only when the answer lands in the slot it was written for (to).",
+ "settled": {
+  "bio-pj-9-6-en-13-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "A triglyceride is built from one glycerol backbone joined to three fatty acid chains. Amino acids (b) build proteins, glucose (c) builds carbohydrates, and nucleotides (d) build nucleic acids, each biomolecule has its own distinct building blocks."
+  },
+  "bio-pj-9-6-en-15-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "DNA is a double helix, two strands of nucleotides twisted around each other like a twisted ladder. A single strand (b) describes RNA, not DNA, and amino acid chains (c) describe proteins, not nucleic acids."
+  },
+  "chem-10-1-ur-1-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "صحیح جواب (a) ہے کیونکہ حالت کی تبدیلی کے دوران دی گئی حرارت (پوشیدہ حرارت/latent heat) ذرات کی حرکی توانائی بڑھانے کی بجائے ان کے درمیان کشش کی قوتوں کو کمزور کرنے میں خرچ ہوتی ہے، اس لیے درجہ حرارت مستقل رہتا ہے۔ طلبہ اکثر (b) منتخب کرتے ہیں یہ سوچ کر کہ حرارت 'ضائع' ہو رہی ہے، لیکن حقیقت میں حرارت اندرونی توانائی (internal energy) بڑھانے میں ہی استعمال ہو رہی ہوتی ہے۔"
+  },
+  "chem-10-1-ur-11-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "صحیح جواب (a) ہے کیونکہ diffusion ذرات کی بے ترتیب حرکت کا نتیجہ ہے جو ارتکاز کے فرق کی وجہ سے ہوتی ہے، کسی خارجی دباؤ کی ضرورت نہیں پڑتی جیسا کہ (b) میں غلط بیان کیا گیا ہے۔"
+  },
+  "cs-pj-10-2-en-5-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "A restore point saves the current system settings so you can revert if the new software causes problems. Formatting the drive (d) is an extreme, unnecessary step that destroys all data, not a precaution taken beforehand."
+  },
+  "cs-pj-9-12-en-10-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "An e-commerce platform with a payment gateway can handle orders, inventory, and digital payments together. A word processor (a) cannot manage transactions, a photo editor (c) only edits images, and a paper spreadsheet (d) is not digital at all."
+  },
+  "eng-pj-9-4-en-5-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "A good reader revises predictions when text evidence contradicts them. Ignoring evidence (b) shows poor reading skill; rewriting the story (c) is not a reader's job; stopping reading (d) defeats the purpose of checking predictions."
+  },
+  "eng-pj-9-4-ur-5-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "A good reader revises predictions when text evidence contradicts them. Ignoring evidence (b) shows poor reading skill; rewriting the story (c) is not a reader's job; stopping reading (d) defeats the purpose of checking predictions."
+  },
+  "math-13-en-2-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "6+7=13>10, 6+10=16>7, 7+10=17>6, all three checks pass, so a triangle is possible. In (a) 3+4=7<8 fails; in (b) 5+4=9 which only equals the third side (not greater) so it's degenerate, a trap for students who think 'equal' is enough; in (d) 2+3=5<6 fails."
+  },
+  "math-pj-10-11-en-11-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "The line of best fit approximates the overall trend of scattered points so we can estimate or predict values; it does not need to pass through every point, which rules out (a)."
+  },
+  "math-pj-10-11-en-3-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "CF(20-30) = 4+6+10 = 20. Option (a) 10 is the cumulative frequency of the previous class (10-20). Option (c) 28 belongs to the next class (30-40), and (d) 30 is the grand total n."
+  },
+  "math-pj-10-11-en-5-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "Q3 position = 3n/4 = 60. Option (a) 20 is n/4 (Q1), (b) 40 is n/2 (median), and (d) 80 is n, the total frequency."
+  },
+  "pst-10-1-en-4-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "Imposing one language on a linguistically diverse population without consultation caused resentment and division, contributing later to political separation. Bengali speakers were actually the majority in undivided Pakistan, so (d) is a common misreading, and Bengali was later recognized (making b false)."
+  },
+  "pst-10-5-en-8-q": {
+   "labels": true,
+   "why": "the letters the rules were unsure of are option labels",
+   "was": "Afghanistan's non-recognition of the Durand Line as a formal international border is a long-standing real issue. Gwadar (b) lies within Pakistan's Balochistan and is not disputed with Afghanistan. Siachen (c) is a Pakistan-India dispute, not Pakistan-Afghanistan. OIC membership (d) is not a point of contention between the two countries."
+  },
+  "cs-pj-9-3-en-5-q": {
+   "labels": false,
+   "why": "the letters the rules were unsure of are quantities, units or points, not options",
+   "was": "This is the absorption law, where the term A.B is 'absorbed' into A. Distributive law instead expands A.(B+C) into A.B + A.C, a different rule."
+  },
+  "math-10-9-en-2-q": {
+   "labels": false,
+   "why": "the letters the rules were unsure of are quantities, units or points, not options",
+   "was": "The theorem states that a line from the centre which bisects a non-diameter chord is perpendicular to it, so ∠OMA = 90°. 45° and 60° come from guessing a 'nice' angle without applying the theorem; 180° would mean O, M, A are collinear, which is wrong since OM meets AB at a right angle, not along it."
+  },
+  "math-pj-10-3-en-10-q": {
+   "labels": false,
+   "why": "the letters the rules were unsure of are quantities, units or points, not options",
+   "was": "det(A) = 2(2) − 4(1) = 4 − 4 = 0. Since division by zero is undefined, the inverse formula (1/det)[...] breaks down, so no inverse exists. A is in fact a square (2×2) matrix, so that option is wrong, and the determinant is 0, not 4 or negative."
+  },
+  "phy-10-8-en-4-q": {
+   "labels": false,
+   "why": "the letters the rules were unsure of are quantities, units or points, not options",
+   "was": "By convention, the larger top number (A) is the nucleon/mass number (protons+neutrons) and the lower number (Z) is the proton/atomic number. Option (b) simply swaps the two definitions, a very common slip when reading nuclide notation quickly."
+  },
+  "phy-pj-10-15-en-1-q": {
+   "labels": false,
+   "why": "the letters the rules were unsure of are quantities, units or points, not options",
+   "was": "Charge is measured in coulombs (C). Students often pick ampere because current = charge/time (I = Q/t), but ampere is the unit of current, not charge. Volt measures potential difference and newton measures force."
+  },
+  "phy-pj-10-15-ur-1-q": {
+   "labels": false,
+   "why": "the letters the rules were unsure of are quantities, units or points, not options",
+   "was": "چارج کی SI اکائی کولمب (C) ہے۔ ایمپیئر کرنٹ کی اکائی ہے، اسی لیے طالب علم اکثر اسے چارج کی اکائی سمجھ کر غلطی کرتے ہیں۔"
+  },
+  "phy-pj-10-20-ur-5-q": {
+   "labels": false,
+   "why": "the letters the rules were unsure of are quantities, units or points, not options",
+   "was": "آاسوٹوپس ایک ہی عنصر کی وہ شکلیں ہیں جن کا پروٹون نمبر (Z) ایک جیسا رہتا ہے مگر نیوٹرونز کی تعداد، اور اس وجہ سے نیوکلون نمبر (A)، مختلف ہوتا ہے۔ دوسرا آپشن اصل میں 'ایزوبار' (isobars) کی تعریف ہے جہاں A تو یکساں ہے مگر Z مختلف، جو اکثر آاسوٹوپ سے الجھایا جاتا ہے۔"
+  },
+  "bio-10-8-ur-6-q": {
+   "to": 3,
+   "explanation": "داد ایک فنگل انفیکشن ہے جو جلد پر گول دھبے پیدا کرتا ہے۔ باقی تینوں بالترتیب پلازموڈیم، وائرس اور بیکٹیریا سے ہوتی ہیں۔",
+   "why": "the other three, in the new order, are malaria, measles and TB",
+   "was": "داد ایک فنگل انفیکشن ہے جو جلد پر گول دھبے پیدا کرتا ہے۔ باقی تینوں بالترتیب وائرس، بیکٹیریا اور پلازموڈیم سے ہوتی ہیں۔"
+  },
+  "chem-pj-9-5-en-2-q": {
+   "to": 3,
+   "explanation": "Surroundings are everything outside the system. Zinc, HCl, and the hydrogen gas produced are all part of the system, not the surroundings, so A, B and C are wrong.",
+   "why": "a bare list of letters the rules read only in part",
+   "was": "Surroundings are everything outside the system. Zinc, HCl, and the hydrogen gas produced are all part of the system, not the surroundings, so B, C and D are wrong."
+  },
+  "cs-pj-9-5-ur-11-q": {
+   "to": 3,
+   "explanation": "ورڈ پروسیسنگ سافٹ ویئر جیسے مائیکروسافٹ ورڈ تحریری دستاویزات بنانے، ترمیم کرنے اور فارمیٹ کرنے کے لیے استعمال ہوتا ہے۔ باقی اختیارات بالترتیب اسپریڈ شیٹ، گرافک ڈیزائن اور پریزنٹیشن سافٹ ویئر کے کام ہیں۔",
+   "why": "the other three, in the new order, are spreadsheet, graphic design and presentation",
+   "was": "ورڈ پروسیسنگ سافٹ ویئر جیسے مائیکروسافٹ ورڈ تحریری دستاویزات بنانے، ترمیم کرنے اور فارمیٹ کرنے کے لیے استعمال ہوتا ہے۔ باقی اختیارات بالترتیب اسپریڈ شیٹ، پریزنٹیشن اور گرافک ڈیزائن سافٹ ویئر کے کام ہیں۔"
+  },
+  "isl-6-ur-2-q": {
+   "to": 2,
+   "explanation": "الصحیفہ السجادیہ امام زین العابدین رضی اللہ تعالیٰ عنہ کی دعاؤں کا مجموعہ ہے۔ باقی تینوں کتابیں بالترتیب عبدالرحمن جامی، امام شاطبی اور شیخ ابن عربی کی تصانیف ہیں جن کا امام زین العابدین سے تعلق نہیں۔",
+   "why": "the other three, in the new order, are by Jami, Shatibi and Ibn Arabi",
+   "was": "الصحیفہ السجادیہ امام زین العابدین رضی اللہ تعالیٰ عنہ کی دعاؤں کا مجموعہ ہے۔ باقی تینوں کتابیں بالترتیب امام شاطبی، عبدالرحمن جامی اور شیخ ابن عربی کی تصانیف ہیں جن کا امام زین العابدین سے تعلق نہیں۔"
+  },
+  "phy-pj-9-6-ur-13-q": {
+   "to": 3,
+   "explanation": "ونڈ ٹربائن میں ہوا کی کائی نیٹک انرجی پروں کو گھما کر مکینیکل انرجی پیدا کرتی ہے، جسے جنریٹر برقی انرجی میں بدل دیتا ہے۔ باقی آپشنز بالترتیب نیوکلیئر، سولر اور فوسل فیول توانائی کے عمل بیان کرتے ہیں۔",
+   "why": "the other three, in the new order, are nuclear, solar and fossil fuel",
+   "was": "ونڈ ٹربائن میں ہوا کی کائی نیٹک انرجی پروں کو گھما کر مکینیکل انرجی پیدا کرتی ہے، جسے جنریٹر برقی انرجی میں بدل دیتا ہے۔ باقی آپشنز بالترتیب سولر، فوسل فیول اور نیوکلیئر توانائی کے عمل بیان کرتے ہیں۔"
+  }
+ }
+}

@@ -302,6 +302,7 @@
    "title": "Human Digestive System",
    "urduTitle": "انسان کا ڈائجیسٹو سسٹم",
    "blurb": "Nutrition and its Importance, Human Digestive System and Disorders of the Digestive System.",
+   "urduBlurb": "غذائیت اور اس کی اہمیت، انسان کا نظامِ ہاضمہ اور اس کی خرابیاں۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 5,
@@ -344,6 +345,7 @@
    "title": "Human Respiratory System",
    "urduTitle": "انسان کا ریسپریٹری سسٹم",
    "blurb": "Human Respiratory System, The Mechanism of Breathing and Respiratory Disorders.",
+   "urduBlurb": "انسان کا نظامِ تنفس، سانس لینے کا عمل اور تنفس کی بیماریاں۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 16,
@@ -391,6 +393,7 @@
    "title": "Human Blood Circulatory System",
    "urduTitle": "انسان کا بلڈسرکولیٹری سسٹم",
    "blurb": "Blood and its Components, Human Heart, Blood Vessels, Arterial and Venous Systems and Cardiovascular Disorders.",
+   "urduBlurb": "خون اور اس کے اجزا، انسانی دل، خون کی نالیاں، شریانی اور وریدی نظام، اور دل اور خون کی نالیوں کی بیماریاں۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 28,
@@ -444,6 +447,7 @@
    "title": "Human Urinary System",
    "urduTitle": "انسان کا ایوریزی سسٹم",
    "blurb": "Human Urinary System, Functioning of the Kidney and Disorders of Kidney.",
+   "urduBlurb": "انسان کا نظامِ اخراج، گردوں کا کام اور گردوں کی بیماریاں۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 42,
@@ -496,6 +500,7 @@
    "title": "Coordination",
    "urduTitle": "کوآرڈی نیشن",
    "blurb": "Neurons – the Units of Nervous System, Divisions of the Nervous System and Endocrine System.",
+   "urduBlurb": "عصبی خلیے بطور اعصابی نظام کی اکائی، اعصابی نظام کے حصے اور غدودی نظام۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 52,
@@ -541,6 +546,7 @@
    "title": "Reproduction",
    "urduTitle": "ریپروڈکشن",
    "blurb": "Formation of Gametes and Fertilization, Role of Hormones in Sexual Development, Reproductive Systems and Sexually Transmitted Diseases.",
+   "urduBlurb": "جنسی خلیوں کا بننا اور بارآوری، جنسی نشوونما میں ہارمونز کا کردار، تولیدی نظام اور جنسی طور پر منتقل ہونے والی بیماریاں۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 68,
@@ -586,6 +592,7 @@
    "title": "Inheritance",
    "urduTitle": "وراثت",
    "blurb": "Structure of Chromosome, DNA and RNA and Mendel's Laws of Inheritance.",
+   "urduBlurb": "کروموسوم کی ساخت، ڈی این اے اور آر این اے، اور مینڈل کے قوانینِ وراثت۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 77,
@@ -628,6 +635,7 @@
    "title": "Biotechnology",
    "urduTitle": "بائیوٹیکنالوجی",
    "blurb": "Introduction of Biotechnology, Genetic Engineering, Applications of Biotechnology and Potential Risks of Biotechnology.",
+   "urduBlurb": "بائیوٹیکنالوجی کا تعارف، جینیاتی انجینئرنگ، بائیوٹیکنالوجی کے اطلاقات اور اس کے ممکنہ خطرات۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 90,
@@ -682,7 +690,8 @@
    "number": 9,
    "title": "Diseases and Immunity",
    "urduTitle": "بیماریاں اور قوت مدافعت",
-   "blurb": "Disease, Pathogens and Immunity.",
+   "blurb": "Infectious and non-infectious diseases, diseases passed on by animals and by insects, and allergies and their common types.",
+   "urduBlurb": "متعدی اور غیر متعدی امراض، جانوروں اور کیڑوں سے پھیلنے والی بیماریاں، اور الرجی اور اس کی عام اقسام۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 100,
@@ -731,6 +740,7 @@
    "title": "Evolution",
    "urduTitle": "ارتقا",
    "blurb": "Darwin's Observations, Theory of Evolution by Natural Selection, Species and Speciation, Sources of Variation and Evidences of Evolution.",
+   "urduBlurb": "ڈارون کے مشاہدات، قدرتی انتخاب کے ذریعے ارتقا کا نظریہ، نوع اور نئی انواع کا بننا، تغیرات کے ذرائع اور ارتقا کے شواہد۔",
    "source": {
     "file": "content/punjab/textbooks/bio-10.pdf",
     "pdfStart": 110,
@@ -790,6 +800,7 @@
    "title": "The Science of Biology",
    "urduTitle": "بائیولوجی کا تعارف",
    "blurb": "Biology and its Branches, Relation of Biology with Other Sciences, Careers in Biology, Quranic Instructions to Reveal the Study of Life and more.",
+   "urduBlurb": "حیاتیات اور اس کی شاخیں، دوسرے علوم سے اس کا تعلق، حیاتیات میں پیشہ ورانہ مواقع، اور زندگی کے مطالعے کے بارے میں قرآنی ہدایات۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 5,
@@ -861,6 +872,7 @@
    "title": "Biodiversity",
    "urduTitle": "بائیوڈائیورسٹی (تنوع حیات)",
    "blurb": "Biodiversity, Classification, Taxonomic Ranks, History of Classification, Domains of Living Organisms, Classification of Domain Eukarya and more.",
+   "urduBlurb": "حیاتیاتی تنوع، جانداروں کی درجہ بندی، درجہ بندی کے مدارج اور اس کی تاریخ، جانداروں کے ڈومین اور یوکیریا ڈومین کی درجہ بندی۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 25,
@@ -928,6 +940,7 @@
    "title": "The Cell",
    "urduTitle": "سیل",
    "blurb": "Cell, Structure of Cell, Structural Advantages of Plant and Animal Cells, Cell Specialization and Stem Cells.",
+   "urduBlurb": "خلیہ اور اس کی ساخت، نباتاتی اور حیوانی خلیوں کی ساختی خوبیاں، خلیوں کی تخصیص اور اسٹیم سیل۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 41,
@@ -980,6 +993,7 @@
    "title": "Cell Cycle",
    "urduTitle": "سیل سائیکل",
    "blurb": "Cell Cycle, Mitosis, Meiosis and Comparison between Meiosis and Mitosis.",
+   "urduBlurb": "خلوی چکر، مائٹوسس اور میوسس، اور دونوں کا موازنہ۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 63,
@@ -1038,6 +1052,7 @@
    "title": "Tissues, Organs, and Organ Systems",
    "urduTitle": "ٹشوز، اعضاء اور اعضائی نظام",
    "blurb": "Levels of Organization, Organs and Organ Systems in Plants, Organs and Organ Systems in Humans and Homeostasis.",
+   "urduBlurb": "تنظیم کی سطحیں، پودوں اور انسانوں میں اعضا اور اعضائی نظام، اور جسم کا اندرونی توازن۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 79,
@@ -1085,6 +1100,7 @@
    "title": "Biomolecules",
    "urduTitle": "بائیو مالیکیولز",
    "blurb": "Biomolecules, Carbohydrates, Proteins, Lipids, Nucleic Acids and The Working of DNA and RNA.",
+   "urduBlurb": "حیاتیاتی سالمات یعنی کاربوہائیڈریٹ، پروٹین، لپڈ اور نیوکلیک ایسڈ، اور ڈی این اے اور آر این اے کا کام۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 93,
@@ -1157,6 +1173,7 @@
    "title": "Enzymes",
    "urduTitle": "انزائمز",
    "blurb": "Metabolism, Enzymes, Mechanism of Enzyme Action, Factors That Affect the Activity of Enzymes and Enzyme Inhibition.",
+   "urduBlurb": "استحالہ، خامرے اور ان کے عمل کا طریقہ، خامروں کی سرگرمی پر اثر ڈالنے والے عوامل اور خامروں کی روک تھام۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 109,
@@ -1209,6 +1226,7 @@
    "title": "Bioenergetics",
    "urduTitle": "بائیو انرجٹکس",
    "blurb": "ATP: The Cell's Energy Currency, Photosynthesis and Cellular Respiration.",
+   "urduBlurb": "اے ٹی پی بطور خلیے کی توانائی کی کرنسی، ضیائی تالیف اور خلوی تنفس۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 119,
@@ -1272,6 +1290,7 @@
    "title": "Plant Physiology",
    "urduTitle": "پلانٹ فزیالوجی",
    "blurb": "Nutrition in Plants, Transport in Plants, Transpiration, Transport of Water in Plants, Translocation of Food in Plants, Gaseous Exchange in Plants and more.",
+   "urduBlurb": "پودوں میں غذائیت اور ترسیل، عملِ تبخیر، پانی کی ترسیل، غذا کی منتقلی اور گیسوں کا تبادلہ۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 133,
@@ -1359,6 +1378,7 @@
    "title": "Reproduction in Plants",
    "urduTitle": "پودوں میں ری پروڈکشن",
    "blurb": "Types of Asexual Reproduction, Artificial Propagation and Sexual Reproduction in Plants.",
+   "urduBlurb": "غیر جنسی تولید کی اقسام، مصنوعی افزائش اور پودوں میں جنسی تولید۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 151,
@@ -1421,6 +1441,7 @@
    "title": "Biostatistics",
    "urduTitle": "بائیو سٹیٹسٹکس",
    "blurb": "Introduction of Biostatistics, Mean, Median, and Mode and Bar Chart.",
+   "urduBlurb": "حیاتیاتی شماریات کا تعارف، اوسط، وسطانیہ، عادہ اور بار چارٹ۔",
    "source": {
     "file": "content/punjab/textbooks/bio-9.pdf",
     "pdfStart": 167,
@@ -1462,6 +1483,7 @@
    "title": "States of Matter and Phase Changes",
    "urduTitle": "مادہ کی حالتیں اور ان میں تبدیلیاں",
    "blurb": "Internal Energy, Interconversion of Physical States, Heating and Cooling Curves, Evaporation and Boiling, Sublimation, Applications of Sublimation and more.",
+   "urduBlurb": "اندرونی توانائی، طبعی حالتوں کی باہمی تبدیلی، گرم اور ٹھنڈا ہونے کے خم، تبخیر اور ابال، اور تصعید اور اس کے اطلاقات۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 4,
@@ -1553,6 +1575,7 @@
    "title": "Stoichiometry",
    "urduTitle": "سٹائیکیومیٹری",
    "blurb": "Molar Volume, Concentration of a solution, Calculate the Concentration of a Solution in Titration using Empirical Data and more.",
+   "urduBlurb": "مولر حجم، محلول کا ارتکاز، اور تجرباتی ڈیٹا سے ٹائٹریشن میں محلول کے ارتکاز کا حساب۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 19,
@@ -1628,6 +1651,7 @@
    "title": "Electrochemistry",
    "urduTitle": "الیکٹروکیمسٹری",
    "blurb": "Oxidation Number of Atoms in compounds and Ions, Writing Chemical Formulas of Ionic Compounds by applying Oxidation Numbers and more.",
+   "urduBlurb": "مرکبات اور آئنوں میں ایٹموں کا تکسیدی عدد، اور تکسیدی عدد کی مدد سے آئنی مرکبات کے فارمولے لکھنا۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 34,
@@ -1755,6 +1779,7 @@
    "title": "Reaction Kinetics",
    "urduTitle": "ری ایکشن کائی نیٹکس",
    "blurb": "Collision Theory of Reaction Rate, Change in Mass during a Chemical Reaction, Change in Temperature during a Chemical Reaction and more.",
+   "urduBlurb": "تعامل کی رفتار کا تصادمی نظریہ، اور کیمیائی تعامل کے دوران کمیت اور درجۂ حرارت میں تبدیلی۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 58,
@@ -1806,6 +1831,7 @@
    "title": "Salts",
    "urduTitle": "سالٹس",
    "blurb": "Arrangement of Ions in Salts, Melting Points of Ionic Compounds, Conduction of Electricity by Ionic Compounds, Soluble and Insoluble Salts and more.",
+   "urduBlurb": "نمکیات میں آئنوں کی ترتیب، آئنی مرکبات کے نقطۂ پگھلاؤ اور ان میں برقی ایصال، اور حل پذیر اور ناحل پذیر نمکیات۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 70,
@@ -1860,6 +1886,7 @@
    "title": "Nitrogen and Sulphur",
    "urduTitle": "نائٹروجن اور سلفر",
    "blurb": "Ammonia, Sulphuric Acid, Oxides, Metals, Reactivity Series of metals and Role of oxides of nitrogen in spreading air pollution.",
+   "urduBlurb": "امونیا، سلفیورک ایسڈ، آکسائیڈ، دھاتیں اور ان کی تعامل پذیری کی ترتیب، اور فضائی آلودگی میں نائٹروجن کے آکسائیڈز کا کردار۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 77,
@@ -1936,6 +1963,7 @@
    "title": "Water",
    "urduTitle": "پانی",
    "blurb": "Water, Purity of Water, Difference between distilled water and tap water, Substances present in water obtained from natural sources and more.",
+   "urduBlurb": "پانی اور اس کی خالصیت، کشید شدہ اور نل کے پانی کا فرق، اور قدرتی ذرائع کے پانی میں موجود اشیا۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 90,
@@ -2017,6 +2045,7 @@
    "title": "Organic Chemistry",
    "urduTitle": "آرگینک کیمسٹری",
    "blurb": "Classifications of Organic Compounds, Structural Formula, Homologous Series, Isomerism, Functional Group and Naming Organic Compounds.",
+   "urduBlurb": "نامیاتی مرکبات کی درجہ بندی، ساختی فارمولا، ہم ترتیب سلسلہ، آئسومرازم، فعلی گروہ اور نامیاتی مرکبات کے نام۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 102,
@@ -2102,6 +2131,7 @@
    "title": "Hydrocarbons",
    "urduTitle": "ہائیڈروکاربنز",
    "blurb": "Alkenes, Important Reactions of Alkenes, Alkynes, Sources of organic compounds and Refining of Petroleum.",
+   "urduBlurb": "الکینز اور ان کے اہم تعاملات، الکائنز، نامیاتی مرکبات کے ذرائع اور پیٹرولیم کی صفائی۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 119,
@@ -2161,6 +2191,7 @@
    "title": "Monohydroxy Alkanes or Alcohols",
    "urduTitle": "مونو ہائیڈروکسی الکینز یا الکوحلز",
    "blurb": "Manufacture of Ethyl Alcohol (CH3-CH2-OH), Combustion of Alcohols, Applications of Alcohols as Fuels, Role of Ethanol in Industries and more.",
+   "urduBlurb": "ایتھائل الکوحل کی تیاری، الکوحل کا احتراق، بطور ایندھن الکوحل کا استعمال، اور صنعتوں میں ایتھانول کا کردار۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 129,
@@ -2220,6 +2251,7 @@
    "title": "Carboxylic Acids",
    "urduTitle": "کاربوکسلک ایسڈز",
    "blurb": "Preparation of Acetic Acid or Ethanoic Acid, Reactions of Carboxylic Acids as Acids, Reaction of Carboxylic Acids with Alcohols (Esterification) and more.",
+   "urduBlurb": "ایسیٹک ایسڈ کی تیاری، کاربوکسلک ایسڈز کے بطور تیزاب تعاملات، اور الکوحل کے ساتھ ان کا تعامل یعنی ایسٹر سازی۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 137,
@@ -2281,6 +2313,7 @@
    "title": "Biochemistry",
    "urduTitle": "بائیوکیمسٹری",
    "blurb": "The Importance of Nutrition, Carbohydrates, Proteins, Lipids, Vitamins, Nucleic Acids and Applications of Biochemistry.",
+   "urduBlurb": "غذائیت کی اہمیت، کاربوہائیڈریٹ، پروٹین، لپڈ، وٹامن اور نیوکلیک ایسڈ، اور بائیوکیمسٹری کے اطلاقات۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 145,
@@ -2365,6 +2398,7 @@
    "title": "Polymers",
    "urduTitle": "پولیمرز",
    "blurb": "Types of Polymers, Structure of Monomer from Polymer, Plastics, Importance of Polymers in Textile Industry and Adverse Effects of Plastics.",
+   "urduBlurb": "پولیمرز کی اقسام، پولیمر سے مونومر کی ساخت، پلاسٹک، کپڑے کی صنعت میں پولیمرز کی اہمیت اور پلاسٹک کے نقصانات۔",
    "source": {
     "file": "content/punjab/textbooks/chem-10.pdf",
     "pdfStart": 156,
@@ -2420,6 +2454,7 @@
    "title": "States of Matter and Phase Changes",
    "urduTitle": "مادہ کی حالتیں اور ان میں تبدیلیاں",
    "blurb": "What is Chemistry?, States of Matter, Element, Compound and Mixture, Allotropic Forms of Substances and more.",
+   "urduBlurb": "کیمیا کیا ہے، مادے کی حالتیں، عنصر، مرکب اور آمیزہ، اور اشیا کی ہم شکل صورتیں۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 5,
@@ -2489,6 +2524,7 @@
    "title": "Atomic Structure",
    "urduTitle": "ایٹم کی ساخت",
    "blurb": "Structure of Atom, Atomic Number and Mass Number, Isotopes and their Masses and Relative Atomic Mass.",
+   "urduBlurb": "ایٹم کی ساخت، ایٹمی عدد اور کمیتی عدد، ہم جا اور ان کی کمیت، اور نسبتی ایٹمی کمیت۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 21,
@@ -2562,6 +2598,7 @@
    "title": "Chemical Bonding",
    "urduTitle": "کیمیائی بندش",
    "blurb": "Why do atoms form chemical bonds?, Chemical Bond, Metallic Bond, Electropositive Character of Metals, Electronegative character of Non-metals and more.",
+   "urduBlurb": "ایٹم کیمیائی بندش کیوں بناتے ہیں، کیمیائی اور دھاتی بندش، اور دھاتوں کی برقی مثبت اور غیر دھاتوں کی برقی منفی خصوصیت۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 36,
@@ -2649,6 +2686,7 @@
    "title": "Stoichiometry",
    "urduTitle": "سٹائیکیومیٹری",
    "blurb": "Chemical formula, Empirical Formula, Chemical Formulas of Binary Ionic Compounds, Chemical Formulas of Compounds and more.",
+   "urduBlurb": "کیمیائی فارمولا، سادہ ترین فارمولا، اور ثنائی آئنی مرکبات اور دیگر مرکبات کے فارمولے۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 56,
@@ -2723,7 +2761,8 @@
    "number": 5,
    "title": "Energetics",
    "urduTitle": "اینرجیٹکس",
-   "blurb": "System and Surounding, Enthalpy, Exothermic and Endothermic Reactions, How does a Reaction take place? and Aerobic and Anaerobic Respiration.",
+   "blurb": "System and surroundings, enthalpy, exothermic and endothermic reactions, how a reaction takes place, and aerobic and anaerobic respiration.",
+   "urduBlurb": "نظام اور ماحول، اینتھالپی، حرارت خارج اور جذب کرنے والے تعاملات، تعامل کیسے ہوتا ہے، اور ہوائی اور غیر ہوائی تنفس۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 71,
@@ -2779,6 +2818,7 @@
    "title": "Equilibria",
    "urduTitle": "ایکوئلبریا",
    "blurb": "Reversible and Irreversible Changes, Dynamic Equilibrium and Changing the Physical Conditions of a Chemical Reaction.",
+   "urduBlurb": "قابلِ واپسی اور ناقابلِ واپسی تبدیلیاں، متحرک توازن، اور کیمیائی تعامل کے طبعی حالات بدلنے کا اثر۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 87,
@@ -2817,6 +2857,7 @@
    "title": "Acid Base Chemistry",
    "urduTitle": "ایسڈ بیس کیمسٹری",
    "blurb": "Acids and Bases, Different Concepts of Acids and Bases, Bronsted – Lowry concepts of Acids and Bases, Properties of Acids and Bases and more.",
+   "urduBlurb": "تیزاب اور اساس، ان کے مختلف تصورات بشمول برونسٹڈ لوری تصور، اور تیزابوں اور اساسوں کے خواص۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 97,
@@ -2871,6 +2912,7 @@
    "title": "Periodic Table and Periodicity",
    "urduTitle": "پیریاڈک ٹیبل اور خصوصیات کی پیریاڈیسٹی",
    "blurb": "Modern Periodic Table, Salient Features of Modern Periodic Table, Similarities in the Chemical Properties of Elements in the Same Group and more.",
+   "urduBlurb": "جدید جدولِ دوری اور اس کی نمایاں خصوصیات، اور ایک گروپ کے عناصر کے کیمیائی خواص میں مماثلت۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 109,
@@ -2924,6 +2966,7 @@
    "title": "Group Properties and Elements",
    "urduTitle": "گروپ خواص اور عناصر",
    "blurb": "Properties of Group 1 Elements, Properties of Group 17 Elements, Group Properties of Transition elements, Properties of Noble Gases and more.",
+   "urduBlurb": "گروپ ایک اور گروپ سترہ کے عناصر، عبوری عناصر اور نوبل گیسوں کے خواص۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 123,
@@ -2982,6 +3025,7 @@
    "title": "Environmental Chemistry",
    "urduTitle": "ماحولیاتی کیمسٹری",
    "blurb": "Composition Of Atmosphere, Air Pollutants, Acid Rain, Global Warming (Greenhouse Effect) and Strategies to Reduce Environmental Issues.",
+   "urduBlurb": "فضا کی ترکیب، فضائی آلودگی، تیزابی بارش، عالمی حدت (گرین ہاؤس اثر) اور ماحولیاتی مسائل کم کرنے کی حکمتِ عملیاں۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 133,
@@ -3049,7 +3093,8 @@
    "number": 11,
    "title": "Hydrocarbons",
    "urduTitle": "ہائیڈروکاربنز",
-   "blurb": "Hyrocarbons, Alkanes, Preparation of Alkanes and Important Reactions.",
+   "blurb": "Hydrocarbons, alkanes, how alkanes are prepared, and their important reactions.",
+   "urduBlurb": "ہائیڈروکاربن، الکین، الکین کی تیاری اور ان کے اہم تعاملات۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 149,
@@ -3094,6 +3139,7 @@
    "title": "Empirical Data Collection and Analysis",
    "urduTitle": "تجرباتی معلومات کا حصول اور تجزیہ",
    "blurb": "SI Units in Chemistry, Tools and Techniques to Manage Accuracy and Precision and Accuracy and Precision.",
+   "urduBlurb": "کیمیا میں ایس آئی اکائیاں، اور پیمائش کی درستی اور صحت برقرار رکھنے کے آلات اور طریقے۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 161,
@@ -3159,6 +3205,7 @@
    "title": "Laboratory and Practical Skills",
    "urduTitle": "لیبارٹری اور عملی مہارتیں",
    "blurb": "Chemical Hazards in the Laboratory, Hazard Signs, Personal Protective Equipment (PPE) in the Laboratory, Location of Fire Extinguisher and more.",
+   "urduBlurb": "تجربہ گاہ میں کیمیائی خطرات، خطرے کی علامات، ذاتی حفاظتی سامان اور آگ بجھانے والے آلے کی جگہ۔",
    "source": {
     "file": "content/punjab/textbooks/chem-9.pdf",
     "pdfStart": 170,
@@ -3239,6 +3286,7 @@
    "title": "Operating Systems: Structure and Services",
    "urduTitle": "آپریٹنگ سسٹمز: ساخت اور خدمات",
    "blurb": "Introduction to Operating System (OS), Architecture of an Operating System, Process Management in Operating System (OS), Memory, Processes vs Threads and more.",
+   "urduBlurb": "آپریٹنگ سسٹم کا تعارف اور ساخت، اس میں پراسیس اور میموری کا انتظام، اور پراسیس اور تھریڈ کا فرق۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 1,
@@ -3427,6 +3475,7 @@
    "title": "System Recovery and Advanced Maintenance",
    "urduTitle": "سسٹم ریکوری اینڈ مینٹیننس",
    "blurb": "Introduction to Post-Troubleshooting, Using Built-in Diagnostic Tools, System Recovery Options, BIOS/UEFI and Boot Process Awareness and more.",
+   "urduBlurb": "خرابی دور کرنے کے بعد کی دیکھ بھال، کمپیوٹر کے اندرونی تشخیصی آلات، سسٹم کی بحالی کے طریقے، اور بائیوس اور بوٹ کا عمل۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 19,
@@ -3595,6 +3644,7 @@
    "title": "Introduction to Python Programming",
    "urduTitle": "تعارف برائے پائتھن پروگرامنگ",
    "blurb": "Introduction to Python Programming, Basic Python Syntax and Structure and Operators and Expressions.",
+   "urduBlurb": "پائتھن پروگرامنگ کا تعارف، اس کے بنیادی قواعد اور ڈھانچہ، اور آپریٹرز اور اظہار۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 38,
@@ -3668,6 +3718,7 @@
    "title": "Control Structures in Python",
    "urduTitle": "پائتھن میں کنٹرول اسٹرکچر +",
    "blurb": "Decision Making, Looping Constructs, Libraries in Python, Lists in Python and Testing and Debugging in Python.",
+   "urduBlurb": "پائتھن میں فیصلہ سازی، لوپ، لائبریریاں، فہرستیں اور ٹیسٹنگ اور ڈی بگنگ۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 52,
@@ -3789,6 +3840,7 @@
    "title": "Introduction to Data Science",
    "urduTitle": "ڈیٹا سائنس کا تعارف",
    "blurb": "Introduction to Data Science, Overview of the Data Science Life Cycle, Tools for Visualization and Databases and Storing Data.",
+   "urduBlurb": "ڈیٹا سائنس کا تعارف، ڈیٹا سائنس کے عمل کے مراحل، بصری پیشکش کے آلات، اور ڈیٹا بیس اور ڈیٹا کو محفوظ کرنا۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 66,
@@ -3891,6 +3943,7 @@
    "title": "Introduction Artificial Intelligence (AI), and Machine Learning (ML)",
    "urduTitle": "مصنوعی ذہانت (AI) اور مشین لرننگ (ML) کا تعارف",
    "blurb": "AI, ML and Overview, Machine Learning Types, Practical Applications of AI/ML, Supervised and Unsupervised Algorithms and Evaluating Model Performance.",
+   "urduBlurb": "مصنوعی ذہانت اور مشین لرننگ کا جائزہ، مشین لرننگ کی اقسام، ان کے عملی استعمال، نگرانی والے اور بغیر نگرانی کے الگورتھم، اور ماڈل کی کارکردگی جانچنا۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 84,
@@ -3999,6 +4052,7 @@
    "title": "Applications of AI",
    "urduTitle": "مصنوعی ذہانت (AI) کے اطلاقات",
    "blurb": "Introduction to Artificial Intelligence (AI), Data and AI, Real-World Applications of AI, Benefits and Challenges of AI Applications and more.",
+   "urduBlurb": "مصنوعی ذہانت کا تعارف، ڈیٹا اور مصنوعی ذہانت، حقیقی دنیا میں اس کے استعمال، اور اس کے فوائد اور چیلنج۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 97,
@@ -4127,6 +4181,7 @@
    "title": "Digital Entrepreneurship",
    "urduTitle": "ڈیجیٹل انٹرپرینیورشپ",
    "blurb": "From Basics to Advanced Entrepreneurship, Problem-Solving & Adaptability, Ethical Business Practices & Digital Ethics, Legal Framework & Compliance and more.",
+   "urduBlurb": "ڈیجیٹل کاروبار کی بنیادوں سے آگے، مسئلہ حل کرنا اور حالات سے ہم آہنگی، اخلاقی کاروباری طریقے اور ڈیجیٹل اخلاقیات، اور قانونی ضوابط کی پابندی۔",
    "source": {
     "file": "content/punjab/textbooks/cs-10.pdf",
     "pdfStart": 111,
@@ -4235,6 +4290,7 @@
    "title": "Introduction to Systems",
    "urduTitle": "سسٹمز کا تعارف",
    "blurb": "Theory of Systems, Types of Systems, System and Science, Computer as a System, The Architecture of von Neumann Computers and Computing Systems.",
+   "urduBlurb": "نظاموں کا نظریہ اور اقسام، نظام اور سائنس، کمپیوٹر بطور نظام، اور وان نیومن کمپیوٹر کی ساخت۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 4,
@@ -4502,6 +4558,7 @@
    "title": "Number Systems",
    "urduTitle": "نمبر سسٹمز",
    "blurb": "Numbering Systems, Data Representation in Computing Systems, Storing Real Values in Computer Memory, Binary Arithmetic Operations and more.",
+   "urduBlurb": "عددی نظام، کمپیوٹنگ نظاموں میں ڈیٹا کی نمائندگی، حقیقی قدریں میموری میں محفوظ کرنا، اور ثنائی حسابی عمل۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 27,
@@ -4719,6 +4776,7 @@
    "title": "Digital Systems and Logic Design",
    "urduTitle": "ڈیجیٹل سسٹمز اور لاجک ڈیزائن",
    "blurb": "Basics of Digital Systems, Boolean Algebra and Logic Gates, Simplification of Boolean Functions, Creating Logic Diagrams and Application of Digital Logic.",
+   "urduBlurb": "ڈیجیٹل نظاموں کی بنیادیں، بولین الجبرا اور لاجک گیٹس، بولین تفاعل کی سادگی، لاجک ڈایاگرام بنانا اور ڈیجیٹل منطق کے اطلاقات۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 52,
@@ -4839,6 +4897,7 @@
    "title": "System Troubleshooting",
    "urduTitle": "سسٹم ٹربل شوٹنگ",
    "blurb": "System Troubleshooting and Troubleshooting Strategies.",
+   "urduBlurb": "نظام میں خرابی کی تشخیص اور اسے دور کرنے کی حکمتِ عملیاں۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 72,
@@ -5059,6 +5118,7 @@
    "title": "Software System",
    "urduTitle": "سافٹ ویئر سسٹم",
    "blurb": "Software, Introduction to System Software and Application Software.",
+   "urduBlurb": "سافٹ ویئر، اور سسٹم سافٹ ویئر اور ایپلیکیشن سافٹ ویئر کا تعارف۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 90,
@@ -5199,6 +5259,7 @@
    "title": "Introduction to Computer Networks",
    "urduTitle": "کمپیوٹر نیٹ ورکس کا تعارف",
    "blurb": "Network as a System, Fundamental Concepts in Data Communication, Networking Devices, Network Topologies, Transmission Modes, The OSI Networking Model and more.",
+   "urduBlurb": "نیٹ ورک بطور نظام، ڈیٹا کی ترسیل کے بنیادی تصورات، نیٹ ورکنگ آلات، ٹوپولوجیز، ترسیل کے طریقے اور او ایس آئی ماڈل۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 102,
@@ -5459,6 +5520,7 @@
    "title": "Computational Thinking",
    "urduTitle": "کمپیوٹیشنل تھنکنگ",
    "blurb": "Definition of Computational Thinking, Principles of Computational Thinking, Algorithm Design Methods, Algorithmic Activities, Dry Run and more.",
+   "urduBlurb": "کمپیوٹیشنل تھنکنگ کی تعریف اور اصول، الگورتھم ڈیزائن کے طریقے، الگورتھمی سرگرمیاں اور ڈرائی رن۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 126,
@@ -5648,6 +5710,7 @@
    "title": "Web Development with HTML, CSS and JavaScript",
    "urduTitle": "ایچ ٹی ایم ایل، سی ایس ایس اور جاوا سکرپٹ کے ساتھ ویب ڈویلپمنٹ",
    "blurb": "Web Development, Basic Components of Web Development, Getting Started with HTML, HTML Basic Structure, Creating Content with HTML, Styling with CSS and more.",
+   "urduBlurb": "ویب ڈویلپمنٹ اور اس کے بنیادی اجزا، ایچ ٹی ایم ایل سے صفحے کا ڈھانچہ اور مواد بنانا، اور سی ایس ایس سے اسے سجانا۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 154,
@@ -5943,6 +6006,7 @@
    "title": "Data Science and Data Gathering",
    "urduTitle": "ڈیٹا سائنس اور ڈیٹا گیدرنگ",
    "blurb": "Data, Data Types, Organising and Analysing Data, Data Types, Data Storage Techniques, Data Visualization, Data Pre-Processing and Analysis and more.",
+   "urduBlurb": "ڈیٹا اور اس کی اقسام، ڈیٹا کی ترتیب اور تجزیہ، اسے محفوظ کرنے کے طریقے، بصری پیشکش اور ڈیٹا کی ابتدائی تیاری۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 182,
@@ -6190,6 +6254,7 @@
    "title": "Emerging Technologies in Computer Science",
    "urduTitle": "کمپیوٹر سائنس میں ابھرتی ہوئی ٹیکنالوجیز",
    "blurb": "Introduction to Artificial Intelligence (AI), AI Algorithms and Techniques, Introduction to Internet of Things (IoT) and more.",
+   "urduBlurb": "مصنوعی ذہانت کا تعارف، اس کے الگورتھم اور تکنیکیں، اور انٹرنیٹ آف تھنگز کا تعارف۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 214,
@@ -6307,6 +6372,7 @@
    "title": "Ethical, Social, and Legal Concerns in Computer Usage",
    "urduTitle": "کمپیوٹر کے استعمال میں اخلاقی، سماجی اور قانونی مسائل",
    "blurb": "Responsible Computer Usage, Safe and Secure Operation of Digital Platforms, Best Practices in Online Behavior, Legal and Ethical Frameworks and more.",
+   "urduBlurb": "کمپیوٹر کا ذمہ دارانہ استعمال، ڈیجیٹل پلیٹ فارموں کا محفوظ استعمال، آن لائن رویے کے بہترین طریقے، اور قانونی اور اخلاقی ضابطے۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 228,
@@ -6538,6 +6604,7 @@
    "title": "Entrepreneurship in Digital Age",
    "urduTitle": "ڈیجیٹل دور میں انٹرپرینیورشپ",
    "blurb": "Entrepreneurship, Entrepreneurship in the Digital Landscape, Digital Tools and Platforms, Business Idea Generation, Developing Business Plans and more.",
+   "urduBlurb": "انٹرپرینیورشپ اور ڈیجیٹل دنیا میں کاروبار، ڈیجیٹل آلات اور پلیٹ فارم، کاروباری خیال سوچنا اور کاروباری منصوبہ بنانا۔",
    "source": {
     "file": "content/punjab/textbooks/cs-9.pdf",
     "pdfStart": 246,
@@ -6780,7 +6847,8 @@
    "number": 1,
    "title": "Hazrat Muhammad's (صلی اللہ علیہ وآلہ وسلم) Social Reforms for the Rights of Women, Orphans and Slaves",
    "urduTitle": "حضرت محمد (صلی اللہ علیہ وآلہ وسلم) کی خواتین، یتیموں اور غلاموں کے حقوق کے لیے سماجی اصلاحات",
-   "blurb": "Ethics & Values/ Respecting self and others",
+   "blurb": "The Prophet's ﷺ reforms for the rights of women, orphans and slaves, with reading aloud, words in context, idioms of justice, and grammar.",
+   "urduBlurb": "خواتین، یتیموں اور غلاموں کے حقوق کے لیے نبی کریم ﷺ کی اصلاحات، بلند آواز سے پڑھنا، سیاق و سباق میں الفاظ، انصاف کے محاورے اور قواعد۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 5,
@@ -6840,7 +6908,8 @@
    "number": 2,
    "title": "My Beloved Pakistan (Poem)",
    "urduTitle": "میرا پیارا پاکستان (نظم)",
-   "blurb": "Patriotism/National Pride",
+   "blurb": "A poem of national pride, read for theme and structure, with word forms, dictionary skills, and drafting and editing a dialogue or presentation.",
+   "urduBlurb": "قومی فخر کی ایک نظم، اس کا موضوع اور ساخت، الفاظ کی بدلتی شکلیں، لغت کا استعمال، اور مکالمے یا پیشکش کا مسودہ اور تدوین۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 20,
@@ -6900,7 +6969,8 @@
    "number": 3,
    "title": "Digital Globalisation Transforming the English Language",
    "urduTitle": "ڈیجیٹل گلوبلائزیشن اور بدلتی ہوئی انگریزی زبان",
-   "blurb": "Impact of digital globalisation on the English Language",
+   "blurb": "How digital globalisation is changing English, with how a text is organised, connotation and figurative language, and paragraph and narrative writing.",
+   "urduBlurb": "ڈیجیٹل گلوبلائزیشن انگریزی زبان کو کیسے بدل رہی ہے، متن کی ترتیب، لفظوں کے ضمنی معنی اور مجازی زبان، اور پیراگراف اور بیانیہ تحریر۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 30,
@@ -6960,7 +7030,8 @@
    "number": 4,
    "title": "The Earth: Act Now for Tomorrow",
    "urduTitle": "زمین: کل کے لیے آج عمل کریں",
-   "blurb": "SDG-Millenium Development Goals/ Climate action",
+   "blurb": "A call to act on climate change now, with viewpoint and prediction, word choice, figures of speech, and building a narrative around a problem.",
+   "urduBlurb": "موسمیاتی تبدیلی کے خلاف ابھی عمل کی پکار، نقطۂ نظر اور پیش گوئی، الفاظ کا انتخاب، صنائع و بدائع، اور کسی مسئلے کے گرد کہانی بُننا۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 42,
@@ -7020,7 +7091,8 @@
    "number": 5,
    "title": "The Happy Prince",
    "urduTitle": "خوش باش شہزادہ",
-   "blurb": "Innovation, Creativity and Success",
+   "blurb": "Oscar Wilde's The Happy Prince, read for purpose and point of view, with fact and opinion, rhetorical questions, and writing vivid detail.",
+   "urduBlurb": "آسکر وائلڈ کی کہانی دی ہیپی پرنس، اس کا مقصد اور نقطۂ نظر، حقیقت اور رائے، ریٹوریکل سوالات، اور جاندار تفصیل لکھنا۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 52,
@@ -7081,7 +7153,8 @@
    "number": 6,
    "title": "Drug Abuse",
    "urduTitle": "منشیات کا استعمال",
-   "blurb": "Prevention of Drugs",
+   "blurb": "A play on the dangers of drugs, used to study plot and story elements, subordinating and correlative conjunctions, and informative writing.",
+   "urduBlurb": "منشیات کے نقصانات پر ایک ڈراما، جس سے پلاٹ اور کہانی کے عناصر، ماتحت اور جوڑی دار حروفِ ربط، اور معلوماتی تحریر سیکھی جاتی ہے۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 67,
@@ -7140,7 +7213,8 @@
    "number": 7,
    "title": "Time (Poem)",
    "urduTitle": "وقت (نظم)",
-   "blurb": "Soft Skills/ Time Management",
+   "blurb": "A poem on the value of time, with summaries and mind maps, precis writing, and the capitals, punctuation and spelling of standard English.",
+   "urduBlurb": "وقت کی قدر پر ایک نظم، خلاصہ اور مائنڈ میپ، خلاصہ نویسی، اور معیاری انگریزی کے بڑے حروف، رموزِ اوقاف اور ہجے۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 76,
@@ -7200,7 +7274,8 @@
    "number": 8,
    "title": "Pollution-Free Pakistan with Greenery All Around",
    "urduTitle": "چاروں طرف سبزے کے ساتھ آلودگی سے پاک پاکستان",
-   "blurb": "Nature and Natural Resources/ Environment Matters",
+   "blurb": "A pollution-free, green Pakistan, with tenses, spelling and punctuation, and a persuasive essay built on claims and counterclaims.",
+   "urduBlurb": "آلودگی سے پاک سرسبز پاکستان، زمانے، ہجے اور رموزِ اوقاف، اور دعوے اور جوابی دعوے پر مبنی ترغیبی مضمون۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 84,
@@ -7261,7 +7336,8 @@
    "number": 9,
    "title": "The Road Not Taken (Poem)",
    "urduTitle": "وہ راستہ جو نہ لیا گیا (نظم)",
-   "blurb": "Literature & Poetry/ Bravery",
+   "blurb": "Robert Frost's poem The Road Not Taken, on choice and courage, paraphrased stanza by stanza, with inference, complex sentences and precis writing.",
+   "urduBlurb": "رابرٹ فراسٹ کی نظم دی روڈ ناٹ ٹیکن، انتخاب اور ہمت کے بارے میں، بند بہ بند مفہوم، نتیجہ اخذ کرنا، پیچیدہ جملے اور خلاصہ نویسی۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 95,
@@ -7322,7 +7398,8 @@
    "number": 10,
    "title": "The Three Questions",
    "urduTitle": "تین سوالات",
-   "blurb": "Literature & Poetry/ Spiritualism",
+   "blurb": "Leo Tolstoy's fable The Three Questions, with giving your own opinion, direct and indirect speech, free writing and proofreading.",
+   "urduBlurb": "لیو ٹالسٹائی کی حکایت دی تھری کویسچنز، اپنی رائے دینا، بالواسطہ اور بلاواسطہ کلام، آزاد تحریر اور پروف ریڈنگ۔",
    "source": {
     "file": "content/punjab/textbooks/eng-10.pdf",
     "pdfStart": 107,
@@ -7377,7 +7454,8 @@
    "number": 1,
    "title": "The Saviour of Mankind",
    "urduTitle": "انسانیت کا نجات دہندہ",
-   "blurb": "Ethics and Values/ Justice, Handling of Trust/ Self-discipline",
+   "blurb": "A text on the Prophet ﷺ as the saviour of mankind, used to find a main idea, discuss and argue, study parts of speech and plan informative writing.",
+   "urduBlurb": "نبی کریم ﷺ بطور نجات دہندۂ انسانیت پر ایک سبق، جس کے ذریعے مرکزی خیال تلاش کرنا، گفتگو اور دلیل، اجزائے کلام اور معلوماتی تحریر کی منصوبہ بندی سیکھی جاتی ہے۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 5,
@@ -7434,7 +7512,8 @@
    "number": 2,
    "title": "Patriotism",
    "urduTitle": "حب الوطنی",
-   "blurb": "Patriotism/ Practising Patriotism",
+   "blurb": "A text on patriotism, used to practise discussion and role play, reading aloud, telling fact from opinion, and writing an argument of your own.",
+   "urduBlurb": "حب الوطنی پر ایک سبق، جس کے ذریعے گفتگو اور کردار نگاری، بلند آواز سے پڑھنا، حقیقت اور رائے میں فرق، اور اپنی دلیل پر مبنی تحریر کی مشق ہوتی ہے۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 20,
@@ -7490,7 +7569,8 @@
    "number": 3,
    "title": "Daffodils (Poem)",
    "urduTitle": "ڈیفوڈلز (نظم)",
-   "blurb": "Nature and Natural Resources/ Wonder Green",
+   "blurb": "Wordsworth's poem Daffodils, its figurative language, compound prepositions, paraphrasing the poem and writing an objective summary.",
+   "urduBlurb": "ورڈز ورتھ کی نظم ڈیفوڈلز، اس کی مجازی زبان، مرکب حروفِ جار، نظم کو نثر میں بیان کرنا اور معروضی خلاصہ لکھنا۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 35,
@@ -7546,7 +7626,8 @@
    "number": 4,
    "title": "Hazrat Asma (may Allah be pleased with her)",
    "urduTitle": "Hazrat Asma (رضی اللہ تعالٰی عنہا)",
-   "blurb": "Handling of Trust/ Self-discipline/ Respecting Self and Others",
+   "blurb": "The story of Hazrat Asma (may Allah be pleased with her), with predicting a story, tenses, gerunds, infinitives and participles, and narrative writing.",
+   "urduBlurb": "حضرت اسماء رضی اللہ عنہا کا واقعہ، کہانی کا اندازہ لگانا، زمانے، گیرنڈ، انفینیٹو اور پارٹیسپل، اور بیانیہ تحریر۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 53,
@@ -7600,7 +7681,8 @@
    "number": 5,
    "title": "Women Empowerment through Entrepreneurship",
    "urduTitle": "انٹرپرینیورشپ کے ذریعے خواتین کو بااختیار بنانا",
-   "blurb": "Entrepreneurship/ Success Stories of Entrepreneurs/ Women Empowerment",
+   "blurb": "Women who built their own businesses, used to study rhetorical questions, point of view, biography and autobiography, idioms, and formal letters.",
+   "urduBlurb": "اپنا کاروبار کھڑا کرنے والی خواتین، جن کے ذریعے ریٹوریکل سوالات، نقطۂ نظر، سوانح اور خود نوشت، محاورے اور رسمی خطوط سیکھے جاتے ہیں۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 62,
@@ -7656,7 +7738,8 @@
    "number": 6,
    "title": "The Value of Time",
    "urduTitle": "وقت کی قدر",
-   "blurb": "Soft Skills/ Time Management",
+   "blurb": "A story about the value of time, used to study plot stages, setting, character and point of view, and the draft, edit and proofread cycle.",
+   "urduBlurb": "وقت کی قدر پر ایک کہانی، جس کے ذریعے پلاٹ کے مراحل، ماحول، کردار اور نقطۂ نظر، اور مسودہ، تدوین اور پروف ریڈنگ کا عمل سیکھا جاتا ہے۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 76,
@@ -7715,7 +7798,8 @@
    "number": 7,
    "title": "If (Poem)",
    "urduTitle": "اگر (نظم)",
-   "blurb": "Literature and Poetry/ Bravery/ Freedom/ Nature",
+   "blurb": "Rudyard Kipling's poem If, its figurative language, an objective summary, and subordinating and correlative conjunctions.",
+   "urduBlurb": "رڈیارڈ کپلنگ کی نظم اِف، اس کی مجازی زبان، معروضی خلاصہ، اور ماتحت اور جوڑی دار حروفِ ربط۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 90,
@@ -7771,7 +7855,8 @@
    "number": 8,
    "title": "The Impact of Globalisation on Culture and Economy",
    "urduTitle": "ثقافت اور معیشت پر گلوبلائزیشن کے اثرات",
-   "blurb": "Digital Globalisation/ Impact on Culture and Economy",
+   "blurb": "How globalisation changes culture and the economy, with asking and answering questions, complex sentences, precis writing and proofreading.",
+   "urduBlurb": "گلوبلائزیشن ثقافت اور معیشت کو کیسے بدلتی ہے، اس کے ساتھ سوال و جواب، پیچیدہ جملے، خلاصہ نویسی اور پروف ریڈنگ۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 97,
@@ -7827,7 +7912,8 @@
    "number": 9,
    "title": "Quality Education: A Key to Success",
    "urduTitle": "معیاری تعلیم: کامیابی کی کنجی",
-   "blurb": "SDG-Millenium Development Goals/ Quality Education",
+   "blurb": "Quality education as the key to success, with summarising, paraphrasing and inference, reading visual information, and writing a book review.",
+   "urduBlurb": "معیاری تعلیم بطور کامیابی کی کنجی، خلاصہ، مفہوم اور نتیجہ اخذ کرنا، بصری معلومات پڑھنا اور کتاب پر تبصرہ لکھنا۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 110,
@@ -7885,7 +7971,8 @@
    "number": 10,
    "title": "The Silent Predator and the Majestic Prey– Snow Leopard and Markhor",
    "urduTitle": "خاموش شکاری اور شاندار شکار: برفانی چیتا اور مارخور",
-   "blurb": "Nature and Natural Resources/ Wildlife Vignette",
+   "blurb": "The snow leopard and the markhor of Pakistan's mountains, with connotation and denotation, hyphens, and descriptive writing.",
+   "urduBlurb": "پاکستان کے پہاڑوں کے برفانی چیتے اور مارخور، لفظوں کے لغوی اور ضمنی معنی، ہائفن کا استعمال اور توصیفی تحریر۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 124,
@@ -7942,7 +8029,8 @@
    "number": 11,
    "title": "The Dear Departed (one-act play)",
    "urduTitle": "مرحوم عزیز (یک بابی ڈرامہ)",
-   "blurb": "Literature & Poetry/ Human Relationships",
+   "blurb": "Stanley Houghton's one-act play The Dear Departed, its characters and themes, direct and indirect speech, and writing dialogue.",
+   "urduBlurb": "اسٹینلے ہیوٹن کا یک بابی ڈراما دی ڈیئر ڈیپارٹڈ، اس کے کردار اور موضوعات، بالواسطہ اور بلاواسطہ کلام اور مکالمہ نویسی۔",
    "source": {
     "file": "content/punjab/textbooks/eng-9.pdf",
     "pdfStart": 136,
@@ -7998,6 +8086,7 @@
    "title": "The Holy Quran and the Hadith of the Prophet ﷺ",
    "urduTitle": "قرآن مجید و حدیثِ نبوی ﷺ",
    "blurb": "Translation of the Holy Quran, Preservation and compilation of Hadith (First period) and Ahadith of the Prophet ﷺ.",
+   "urduBlurb": "قرآن مجید کا ترجمہ، حدیث کی حفاظت و تدوین (دورِ اول) اور احادیثِ نبوی ﷺ۔",
    "source": {
     "file": "content/punjab/textbooks/isl-10.pdf",
     "pdfStart": 6,
@@ -8042,6 +8131,7 @@
    "title": "Beliefs and Worship",
    "urduTitle": "ایمانیات و عبادات",
    "blurb": "Beliefs: Angels, The Revealed Books (Heavenly Books), Belief in the Hereafter, Worship: Zakat and Hajj and Sacrifice.",
+   "urduBlurb": "ایمانیات میں فرشتے، آسمانی کتابیں اور آخرت پر ایمان، اور عبادات میں زکوٰۃ، حج اور قربانی۔",
    "source": {
     "file": "content/punjab/textbooks/isl-10.pdf",
     "pdfStart": 13,
@@ -8099,6 +8189,7 @@
    "title": "The Life of the Prophet ﷺ",
    "urduTitle": "سیرتِ نبوی ﷺ",
    "blurb": "The months and years of the Prophet's era (Madinan period): The Holy Prophet ﷺ as a social reformer, The Battle of Tabuk, The Farewell Pilgrimage and more.",
+   "urduBlurb": "عہدِ نبوی کے ماہ و سال (مدنی دور): نبی کریم ﷺ بطور سماجی مصلح، غزوۂ تبوک اور حجۃ الوداع۔",
    "source": {
     "file": "content/punjab/textbooks/isl-10.pdf",
     "pdfStart": 31,
@@ -8174,6 +8265,7 @@
    "title": "Morals and Manners",
    "urduTitle": "اَخلاق و آداب",
    "blurb": "Sincerity and piety, Concealing faults, Lying, Backbiting and slander and Magic, omens and superstition.",
+   "urduBlurb": "اخلاص و تقویٰ، پردہ پوشی، جھوٹ، غیبت اور بہتان، اور جادو، بدشگونی اور توہم پرستی۔",
    "source": {
     "file": "content/punjab/textbooks/isl-10.pdf",
     "pdfStart": 54,
@@ -8232,6 +8324,7 @@
    "title": "Good Social Conduct and Dealings",
    "urduTitle": "حسنِ معاشرت و معاملات",
    "blurb": "Prohibition of interest, The Islamic state and Jihad in the way of Allah.",
+   "urduBlurb": "سود کی حرمت، اسلامی ریاست اور جہاد فی سبیل اللہ۔",
    "source": {
     "file": "content/punjab/textbooks/isl-10.pdf",
     "pdfStart": 71,
@@ -8277,6 +8370,7 @@
    "title": "Sources of Guidance and Eminent Personalities of Islam",
    "urduTitle": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
    "blurb": "Hazrat Imam Zaid bin Ali (RA), Hazrat Amr bin al-Aas (RA), Hazrat Jabir bin Abdullah (RA), Hazrat Anas bin Malik (RA), The female Companions (RA) and more.",
+   "urduBlurb": "حضرت امام زید بن علی رحمۃ اللہ علیہ، صحابہ کرام حضرت عمرو بن العاص، حضرت جابر بن عبداللہ اور حضرت انس بن مالک رضی اللہ عنہم، اور صحابیاتِ کرام۔",
    "source": {
     "file": "content/punjab/textbooks/isl-10.pdf",
     "pdfStart": 83,
@@ -8343,7 +8437,8 @@
    "number": 7,
    "title": "Islamic Teachings and the Demands of the Present Age",
    "urduTitle": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
-   "blurb": "",
+   "blurb": "Planning for the future: its meaning and importance, examples from the Prophet's ﷺ life, its limits in Shariah, and what today's world demands.",
+   "urduBlurb": "مستقبل کی منصوبہ بندی کا مفہوم اور اہمیت، اسوۂ نبوی ﷺ سے مثالیں، اس کی شرعی حدود، اور عصرِ حاضر کے تقاضے۔",
    "source": {
     "file": "content/punjab/textbooks/isl-10.pdf",
     "pdfStart": 106,
@@ -8383,6 +8478,7 @@
    "title": "The Holy Quran and the Hadith of the Prophet ﷺ",
    "urduTitle": "قرآن مجید و حدیثِ نبوی ﷺ",
    "blurb": "Compilation of the Holy Quran and its preservation, Preservation and compilation of Hadith (First era) and Ahadith of the Prophet ﷺ.",
+   "urduBlurb": "قرآن مجید کی تدوین و حفاظت، حدیث کی حفاظت و تدوین (دورِ اول) اور احادیثِ نبوی ﷺ۔",
    "source": {
     "file": "content/punjab/textbooks/isl-9.pdf",
     "pdfStart": 5,
@@ -8425,7 +8521,8 @@
    "number": 2,
    "title": "Beliefs and Worship",
    "urduTitle": "ایمانیات و عبادات",
-   "blurb": "Beliefs and Worship.",
+   "blurb": "Tawheed, its meaning, kinds and importance, and shirk, its kinds and the harm it does, in the light of the Quran and Sunnah.",
+   "urduBlurb": "توحید کا معنی، اقسام اور اہمیت، اور شرک، اس کی اقسام اور نقصانات، قرآن و سنت کی روشنی میں۔",
    "source": {
     "file": "content/punjab/textbooks/isl-9.pdf",
     "pdfStart": 16,
@@ -8518,6 +8615,7 @@
    "title": "Life of the Prophet ﷺ",
    "urduTitle": "سیرتِ نبوی ﷺ",
    "blurb": "The months and years of the Prophet's era (Madani period) and The example of the Messenger ﷺ and our life.",
+   "urduBlurb": "عہدِ نبوی کے ماہ و سال (مدنی دور) اور اسوۂ رسول ﷺ اور ہماری زندگی۔",
    "source": {
     "file": "content/punjab/textbooks/isl-9.pdf",
     "pdfStart": 45,
@@ -8630,7 +8728,8 @@
    "number": 4,
    "title": "Morals and Manners",
    "urduTitle": "اَخلاق و آداب",
-   "blurb": "Avoiding bad habits.",
+   "blurb": "Gratitude and contentment, trust and honesty, sincerity and God-consciousness, and covering others' faults, with examples from the Prophet's ﷺ life.",
+   "urduBlurb": "شکر و قناعت، امانت و دیانت، اخلاص و تقویٰ اور پردہ پوشی، سیرتِ نبوی ﷺ کی مثالوں کے ساتھ۔",
    "source": {
     "file": "content/punjab/textbooks/isl-9.pdf",
     "pdfStart": 83,
@@ -8719,7 +8818,8 @@
    "number": 5,
    "title": "Good Dealings and Social Conduct",
    "urduTitle": "حسنِ معاملات و معاشرت",
-   "blurb": "",
+   "blurb": "Oaths: their meaning and kinds, the difference between qasam and half, their rulings in the Quran and Sunnah, and keeping one's word.",
+   "urduBlurb": "قسم کا معنی اور اقسام، قسم اور حلف کا فرق، قرآن و سنت کی روشنی میں اس کے احکام، اور قول کی پاسداری۔",
    "source": {
     "file": "content/punjab/textbooks/isl-9.pdf",
     "pdfStart": 98,
@@ -8784,6 +8884,7 @@
    "title": "Sources of Guidance and Eminent Personalities of Islam",
    "urduTitle": "ہدایت کے سرچشمے اور مشاہیرِ اسلام",
    "blurb": "The pure household of the Prophet, The noble Companions, The female Companions, The noble Sufis and Scholars and thinkers.",
+   "urduBlurb": "اہلِ بیتِ اطہار، صحابہ کرام، صحابیاتِ کرام، صوفیائے کرام اور علما و مفکرین۔",
    "source": {
     "file": "content/punjab/textbooks/isl-9.pdf",
     "pdfStart": 116,
@@ -8886,7 +8987,8 @@
    "number": 7,
    "title": "Islamic Teachings and the Demands of the Present Age",
    "urduTitle": "اسلامی تعلیمات اور عصرِ حاضر کے تقاضے",
-   "blurb": "",
+   "blurb": "Self-confidence and self-reliance: what they mean, why they matter, examples from the Prophet's ﷺ life, and how to build them today.",
+   "urduBlurb": "خود اعتمادی اور خود انحصاری کا مفہوم اور اہمیت، اسوۂ نبوی ﷺ سے مثالیں، اور آج کے دور میں انہیں پیدا کرنے کے طریقے۔",
    "source": {
     "file": "content/punjab/textbooks/isl-9.pdf",
     "pdfStart": 156,
@@ -8938,6 +9040,7 @@
    "title": "Complex Numbers",
    "urduTitle": "کمپلیکس اعداد",
    "blurb": "Complex Numbers, Algebraic Operations on Complex Numbers, Complex or Argand Plane, Modulus of a Complex Number and more.",
+   "urduBlurb": "مختلط اعداد، ان پر الجبری عمل، مختلط یا آرگنڈ مستوی اور مختلط عدد کا مقیاس۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 3,
@@ -9056,6 +9159,7 @@
    "title": "Quadratic Equations and Inequalities",
    "urduTitle": "دو درجی مساواتیں اور غیر مساواتیں",
    "blurb": "Quadratic Equation, Finding Intersection Point(s) Graphically, Relationship Between the Roots and Coefficients of a Quadratic Equation and more.",
+   "urduBlurb": "دو درجی مساوات، گراف سے نقاطِ تقاطع معلوم کرنا، اور دو درجی مساوات کی جڑوں اور عددی سروں کا تعلق۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 24,
@@ -9158,6 +9262,7 @@
    "title": "Matrices and Determinants",
    "urduTitle": "قالب اور قالبوں کا مقطع",
    "blurb": "Matrices, Types of Matrices, Algebraic Operations on Matrices, Multiplication of Matrices, Multiplicative Inverse of a Matrix and more.",
+   "urduBlurb": "قالب اور ان کی اقسام، قالبوں پر الجبری عمل اور ضرب، اور قالب کا ضربی معکوس۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 49,
@@ -9330,6 +9435,7 @@
    "title": "Functions and Graphs",
    "urduTitle": "تفاعل اور گراف",
    "blurb": "Function, Graphs of Absolute Valued Functions, Solution of Absolute Valued Linear Equation in One Variable and more.",
+   "urduBlurb": "تفاعل، مطلق قیمت والے تفاعل کے گراف، اور ایک متغیر میں مطلق قیمت والی یک درجی مساوات کا حل۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 83,
@@ -9412,6 +9518,7 @@
    "title": "Algebraic Fractions",
    "urduTitle": "الجبری کسور",
    "blurb": "Algebraic Fraction, Manipulation of Rational Expressions, Solution of Equations Reducible to Quadratic Equations and Real World Problems.",
+   "urduBlurb": "الجبری کسور، ناطق اظہار پر عمل، دو درجی میں بدلنے والی مساوات کا حل اور حقیقی دنیا کے مسائل۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 99,
@@ -9478,6 +9585,7 @@
    "title": "Vectors in Plane",
    "urduTitle": "مستوی میں ویکٹرز",
    "blurb": "Rectangular Coordinate Plane, Scalars and Vectors, Addition of Vectors, Difference of Two Vectors and more.",
+   "urduBlurb": "قائم الزاویہ محدداتی مستوی، غیر سمتی اور سمتی مقداریں، سمتیوں کا جمع اور دو سمتیوں کا فرق۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 113,
@@ -9573,6 +9681,7 @@
    "title": "Trigonometry",
    "urduTitle": "تکونیات",
    "blurb": "Trigonometric Ratios or Functions, Oblique Triangles, Solve Simple Trigonometric Problems in Three Dimensions, Concept of Trigonometry in Real Life and more.",
+   "urduBlurb": "تکونیاتی نسبتیں یا تفاعل، غیر قائمہ مثلثیں، سہ جہتی تکونیاتی سوالات، اور روزمرہ زندگی میں تکونیات۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 127,
@@ -9659,7 +9768,8 @@
    "number": 8,
    "title": "Chords and Arcs of a Circle",
    "urduTitle": "دائرہ کے وتر اور قوسیں",
-   "blurb": "Theorems (Properties) of a Circle.",
+   "blurb": "The circle theorems on chords and arcs: the circle through three points, perpendiculars from the centre, and equal chords, arcs and central angles.",
+   "urduBlurb": "دائرے کے وتر اور قوسوں کے مسئلے: تین نقاط سے گزرنے والا دائرہ، مرکز سے وتر پر عمود، اور مساوی وتر، قوسیں اور مرکزی زاویے۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 145,
@@ -9741,6 +9851,7 @@
    "title": "Tangent and Angles of a Circle",
    "urduTitle": "دائرہ کے مماس اور زاویے",
    "blurb": "Tangent to a Circle and Area of Sector and Arc Length of a Circle.",
+   "urduBlurb": "دائرے کا مماس، قطاع کا رقبہ اور قوس کی لمبائی۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 157,
@@ -9820,6 +9931,7 @@
    "title": "Practical Geometry of Circles",
    "urduTitle": "دائروں کی عملی جیومیٹری",
    "blurb": "Construction of a Circle and Tangent to a Circle.",
+   "urduBlurb": "دائرہ اور دائرے کا مماس بنانا۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 170,
@@ -9892,6 +10004,7 @@
    "title": "Information Handling",
    "urduTitle": "معلوماتی معاملات",
    "blurb": "Construction of Cumulative Frequencies, Box-and-Whisker Plot, Scatter Diagram and Measures of Dispersion.",
+   "urduBlurb": "مجموعی تعدد کی تیاری، باکس اینڈ وسکر پلاٹ، منتشر خاکہ اور انتشار کی پیمائشیں۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 178,
@@ -9971,6 +10084,7 @@
    "title": "Probability",
    "urduTitle": "احتمال",
    "blurb": "Probability, Addition Law of Probability and Multiplication Law of Probability.",
+   "urduBlurb": "احتمال، اور احتمال کے جمع اور ضرب کے قوانین۔",
    "source": {
     "file": "content/punjab/textbooks/math-10.pdf",
     "pdfStart": 198,
@@ -10059,6 +10173,7 @@
    "title": "Real Numbers",
    "urduTitle": "حقیقی اعداد",
    "blurb": "Introduction to Real Numbers, Radical Expressions and Application of Real Numbers in Daily Life.",
+   "urduBlurb": "حقیقی اعداد کا تعارف، جذری اظہار، اور روزمرہ زندگی میں حقیقی اعداد کا استعمال۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 3,
@@ -10149,6 +10264,7 @@
    "title": "Logarithms",
    "urduTitle": "لوگارتھم",
    "blurb": "Scientific Notation, Logarithm, Common Logarithm and Laws of Logarithm.",
+   "urduBlurb": "سائنسی اندازِ تحریر، لوگارتھم، عام لوگارتھم اور لوگارتھم کے قوانین۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 23,
@@ -10232,6 +10348,7 @@
    "title": "Set and Functions",
    "urduTitle": "سیٹ اور تفاعل",
    "blurb": "Mathematics as the Study of Patterns, Structures and Relationships, Operations on Sets and Binary Relations.",
+   "urduBlurb": "ریاضی بطور نمونوں، ساختوں اور رشتوں کا مطالعہ، سیٹوں پر عمل اور ثنائی تعلقات۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 39,
@@ -10322,6 +10439,7 @@
    "title": "Factorization and Algebraic Manipulation",
    "urduTitle": "تجزی اور الجبری مہارت",
    "blurb": "Identifying Common Factors and Trinomials Concretely, Pictorially and Symbolically and more.",
+   "urduBlurb": "مشترک اجزائے ضربی اور سہ رکنی اظہار کی ٹھوس، تصویری اور علامتی طریقوں سے تجزی۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 67,
@@ -10397,6 +10515,7 @@
    "title": "Linear Equations and Inequalities",
    "urduTitle": "یک درجی مساوات اور غیر مساوات",
    "blurb": "Linear Equation, Linear Inequalities and Feasible Solution.",
+   "urduBlurb": "یک درجی مساوات، یک درجی غیر مساوات اور قابلِ عمل حل۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 84,
@@ -10456,6 +10575,7 @@
    "title": "Trigonometry",
    "urduTitle": "تکونیات",
    "blurb": "Identifying Angles in Standard Position (Degrees and Radians), Trigonometric Ratios, Trigonometric Identities and more.",
+   "urduBlurb": "معیاری حالت میں زاویے درجوں اور ریڈین میں، تکونیاتی نسبتیں اور تکونیاتی مماثلتیں۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 99,
@@ -10541,6 +10661,7 @@
    "title": "Coordinate Geometry",
    "urduTitle": "محدداتی جیومیٹری",
    "blurb": "Coordinate Plane, Equations of Straight Lines and Applications of Coordinate Geometry in Real life Situations.",
+   "urduBlurb": "محدداتی مستوی، خطِ مستقیم کی مساواتیں اور روزمرہ زندگی میں محدداتی جیومیٹری کا استعمال۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 125,
@@ -10624,7 +10745,8 @@
    "number": 8,
    "title": "Logic",
    "urduTitle": "منطق",
-   "blurb": "Statement.",
+   "blurb": "Mathematical statements and proofs, the difference between an axiom, a conjecture and a theorem, and how to write simple deductive proofs.",
+   "urduBlurb": "ریاضیاتی بیان اور اس کا ثبوت، مسلمہ، قیاس اور نظریے کا فرق، اور سادہ استخراجی ثبوت لکھنا۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 149,
@@ -10678,6 +10800,7 @@
    "title": "Similar Figures",
    "urduTitle": "متشابہ اشکال",
    "blurb": "Similarity of Polygons, Area of Similar Figures, Volume of Similar Solids and Geometrical Properties of Polygon and their Applications.",
+   "urduBlurb": "کثیر الاضلاع کی مشابہت، مشابہ اشکال کے رقبے، مشابہ ٹھوس اجسام کے حجم، اور کثیر الاضلاع کے جیومیٹریائی خواص اور ان کا استعمال۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 163,
@@ -10751,6 +10874,7 @@
    "title": "Graphs of Functions",
    "urduTitle": "تفاعل کے گراف",
    "blurb": "Functions and their Graphs and Exponential Growth / Decay of a Practical Phenomenon through its Graph.",
+   "urduBlurb": "تفاعل اور ان کے گراف، اور گراف کے ذریعے کسی عملی مظہر میں قوت نمائی اضافہ یا کمی۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 187,
@@ -10826,6 +10950,7 @@
    "title": "Loci and Construction",
    "urduTitle": "لوسائی اور بناوٹ",
    "blurb": "Construction of Triangles, Perpendicular Bisectors and Medians of a Triangle, Angle Bisector of a Triangle, Altitudes of Triangle and more.",
+   "urduBlurb": "مثلثیں بنانا، اور مثلث کے عمودی منصف، وسطانیے، زاویہ منصف اور ارتفاع۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 202,
@@ -10891,6 +11016,7 @@
    "title": "Information Handling",
    "urduTitle": "معلوماتی معاملات",
    "blurb": "Ungrouped and Grouped Data and Measures of Location (Central Tendency).",
+   "urduBlurb": "غیر گروہی اور گروہی ڈیٹا، اور مرکزی رجحان کی پیمائشیں۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 217,
@@ -10969,6 +11095,7 @@
    "title": "Probability",
    "urduTitle": "احتمال",
    "blurb": "Probability of Single Event, Probability of an Event Not Occurring, Real Life Problems Involving Probability and more.",
+   "urduBlurb": "کسی ایک واقعے کا احتمال، کسی واقعے کے نہ ہونے کا احتمال، اور احتمال پر مبنی روزمرہ مسائل۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 245,
@@ -11029,6 +11156,7 @@
    "title": "Thermal Physics",
    "urduTitle": "تھرمل فزکس",
    "blurb": "Thermal Expansion, Specific Heat Capacity, Change in State, Evaporation, Latent Heat and Superconductivity.",
+   "urduBlurb": "حرارتی پھیلاؤ، مخصوص حرارتی گنجائش، حالت کی تبدیلی، تبخیر، مخفی حرارت اور سپر کنڈکٹیوٹی۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 4,
@@ -11114,6 +11242,7 @@
    "title": "Transfer of Thermal Energy",
    "urduTitle": "حرارتی توانائی کی منتقلی",
    "blurb": "Conduction, Convection in liquids and Gases, Heat Transfer through Radiation and Greenhouse Effect.",
+   "urduBlurb": "ایصال، مائعات اور گیسوں میں حمل، اشعاع کے ذریعے حرارت کی منتقلی اور گرین ہاؤس اثر۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 22,
@@ -11164,6 +11293,7 @@
    "title": "Waves",
    "urduTitle": "ویوز",
    "blurb": "Waves and Nature of Waves, Types of Waves, Terms and Parameters of Waves, Properties of Waves and Seismic and Tsunami Waves.",
+   "urduBlurb": "موجیں اور ان کی نوعیت، اقسام، اصطلاحات اور پیمانے، موجوں کے خواص، اور زلزلے اور سونامی کی موجیں۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 35,
@@ -11221,6 +11351,7 @@
    "title": "Sound",
    "urduTitle": "ساؤنڈ",
    "blurb": "Production and Propagation of sound, Speed of Sound, Characteristics of Sound, Reflection of Sound (Echo), Refraction and Diffraction of Sound and more.",
+   "urduBlurb": "آواز کا پیدا ہونا اور پھیلنا، آواز کی رفتار اور خصوصیات، آواز کا انعکاس یعنی بازگشت، اور آواز کا انعطاف اور انحراف۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 49,
@@ -11295,6 +11426,7 @@
    "title": "Light",
    "urduTitle": "روشنی",
    "blurb": "Reflection of Light, Refraction of Light, Optical Fibre, Thin lenses, Optical devices, Image Formation in a Normal Eye and more.",
+   "urduBlurb": "روشنی کا انعکاس اور انعطاف، آپٹیکل فائبر، پتلے عدسے، بصری آلات، اور تندرست آنکھ میں عکس کا بننا۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 65,
@@ -11378,6 +11510,7 @@
    "title": "Electrostatics",
    "urduTitle": "الیکٹرو سٹیٹکس",
    "blurb": "Electric Charge, Electrostatic induction, Applications of Electrostatics, Coulomb's Law, Electric Field, Conduction of Electric Charges and more.",
+   "urduBlurb": "برقی چارج، برق سکونی امالہ، برق سکونیات کے اطلاقات، کولمب کا قانون، برقی میدان اور چارج کا ایصال۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 91,
@@ -11470,6 +11603,7 @@
    "title": "Electricity",
    "urduTitle": "کرنٹ الیکٹریسٹی",
    "blurb": "Electric Current, Electromotive Force and Potential Difference, Ohm's Law, Combination of Resistances, Electrical Resistivity and more.",
+   "urduBlurb": "برقی کرنٹ، برقی محرکہ قوت اور مخفی فرق، اوہم کا قانون، مزاحمتوں کا ملاپ اور مزاحمیت۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 107,
@@ -11573,6 +11707,7 @@
    "title": "Electromagnetism",
    "urduTitle": "الیکٹرومیگنیٹزم",
    "blurb": "Magnetic Effects of Steady Current, Force on a Current-Carrying Conductor in a Magnetic Field and more.",
+   "urduBlurb": "مستقل کرنٹ کے مقناطیسی اثرات، اور مقناطیسی میدان میں کرنٹ بردار موصل پر قوت۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 129,
@@ -11641,6 +11776,7 @@
    "title": "Electromagnetic Induction and Electromagnetic Waves",
    "urduTitle": "الیکٹرومیگنیٹک انڈکشن اور الیکٹرومیگنیٹک ویوز",
    "blurb": "Electromagnetic Induction, A.C. Generator, Transformer, Deflection of Electron Beam in Electric and Magnetic Fields, Waveform on Oscilloscope and more.",
+   "urduBlurb": "برقی مقناطیسی امالہ، اے سی جنریٹر، ٹرانسفارمر، برقی اور مقناطیسی میدان میں الیکٹرون شعاع کا انحراف، اور آسیلوسکوپ پر لہر کی شکل۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 141,
@@ -11709,6 +11845,7 @@
    "title": "Electronics",
    "urduTitle": "بنیادی الیکٹرونکس",
    "blurb": "Semiconductors, Analog and Digital Electronics, Boolean Logic, Logic Gates and Applications of Logic Gates.",
+   "urduBlurb": "نیم موصل، اینالاگ اور ڈیجیٹل الیکٹرانکس، بولین منطق، لاجک گیٹس اور ان کے اطلاقات۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 156,
@@ -11778,6 +11915,7 @@
    "title": "Atomic and Nuclear Physics",
    "urduTitle": "اٹامک اینڈ نیوکلیئر فزکس",
    "blurb": "Atomic Structure, Atomic Nucleus, Isotopes, Radioactivity, Radioactive Decay, Nuclear Reactions, Interconversion of Matter and Energy, Half-Life and more.",
+   "urduBlurb": "ایٹم کی ساخت، ایٹمی مرکزہ، ہم جا، تابکاری اور تابکار انحطاط، نیوکلیائی تعاملات، مادے اور توانائی کی باہمی تبدیلی، اور نصف عمر۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 169,
@@ -11862,6 +12000,7 @@
    "title": "Space and Environment",
    "urduTitle": "خلا اور ماحول",
    "blurb": "Sun and Planetary Data, Global Warming and Geothermal Activity and Radiation Exposure.",
+   "urduBlurb": "سورج اور سیاروں کے اعداد و شمار، عالمی حدت، ارضی حرارتی سرگرمی، اور تابکاری سے واسطہ۔",
    "source": {
     "file": "content/punjab/textbooks/phy-10.pdf",
     "pdfStart": 189,
@@ -11916,6 +12055,7 @@
    "title": "Physical Quantities and Measurement",
    "urduTitle": "طبیعی مقداریں اور پیمائش",
    "blurb": "Introduction To Physics, Physical Quantities, International System of Units, Prefixes, Scientific Notation, Measuring Instruments and Significant Figures.",
+   "urduBlurb": "طبیعیات کا تعارف، طبعی مقداریں، بین الاقوامی نظامِ اکائیات، سابقے، سائنسی اندازِ تحریر، پیمائشی آلات اور بامعنی ہندسے۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 5,
@@ -11980,6 +12120,7 @@
    "title": "Kinematics",
    "urduTitle": "کائینامیٹکس",
    "blurb": "Rest and Motion, Types of Motion, Scalars and Vectors, Terms Associated with Motion, Graphical Analysis of Motion, Equations of Motion and more.",
+   "urduBlurb": "سکون اور حرکت، حرکت کی اقسام، غیر سمتی اور سمتی مقداریں، حرکت کی اصطلاحات، حرکت کا گرافی تجزیہ اور حرکت کی مساواتیں۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 30,
@@ -12073,6 +12214,7 @@
    "title": "Dynamics",
    "urduTitle": "ڈائنامکس",
    "blurb": "Force, Inertia and Momentum, Newton's Laws of Motion, Friction and Circular Motion.",
+   "urduBlurb": "قوت، جمود اور معیارِ حرکت، نیوٹن کے قوانینِ حرکت، رگڑ اور دائروی حرکت۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 58,
@@ -12125,6 +12267,7 @@
    "title": "Turning Effect of Forces",
    "urduTitle": "فورسز کا گھمانے کا اثر",
    "blurb": "Like and Unlike Parallel Forces, Resultant of Forces, Resolution of Forces, Torque or Moment of a Force, Principle of Moments, Centre of Mass, Couple and more.",
+   "urduBlurb": "یکساں اور غیر یکساں متوازی قوتیں، قوتوں کا حاصل اور تحلیل، قوت کا معیارِ اثر، معیارِ اثر کا اصول، مرکزِ کمیت اور جفت قوت۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 88,
@@ -12205,6 +12348,7 @@
    "title": "Gravitation",
    "urduTitle": "گریوی ٹیشن",
    "blurb": "Force of Gravitation, Mass of the Earth, Variation of g with Altitude and Artificial Satellites.",
+   "urduBlurb": "کششِ ثقل کی قوت، زمین کی کمیت، بلندی کے ساتھ ثقلی اسراع میں تبدیلی اور مصنوعی سیارے۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 113,
@@ -12253,6 +12397,7 @@
    "title": "Work and Energy",
    "urduTitle": "ورک اور انرجی",
    "blurb": "Work, Energy, Kinetic Energy, Potential Energy, Forms of Energy, Interconversion of Energy, Major Sources of Energy, Efficiency and Power.",
+   "urduBlurb": "کام، توانائی، حرکی اور مخفی توانائی، توانائی کی صورتیں اور ان کی باہمی تبدیلی، توانائی کے بڑے ذرائع، کارکردگی اور طاقت۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 124,
@@ -12325,6 +12470,7 @@
    "title": "Properties of Matter",
    "urduTitle": "مادہ کی خصوصیات",
    "blurb": "Kinetic Molecular Model of Matter, Density, Pressure, Atmospheric Pressure, Pressure in Liquids, Principle of Floatation, Elasticity and Hooke's Law.",
+   "urduBlurb": "مادے کا حرکی سالماتی ماڈل، کثافت، دباؤ، فضائی دباؤ، مائعات میں دباؤ، تیرنے کا اصول، لچک اور ہک کا قانون۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 153,
@@ -12405,6 +12551,7 @@
    "title": "Thermal Properties of Matter",
    "urduTitle": "مادہ کی حرارتی خصوصیات",
    "blurb": "Temperature and Heat, Thermometer, Specific Heat Capacity, Change of State, Latent Heat of Fusion, Latent Heat of Vaporization, The Evaporation and more.",
+   "urduBlurb": "درجۂ حرارت اور حرارت، تھرمامیٹر، مخصوص حرارتی گنجائش، حالت کی تبدیلی، پگھلاؤ اور تبخیر کی مخفی حرارت، اور عملِ تبخیر۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 179,
@@ -12479,6 +12626,7 @@
    "title": "Transfer of Heat",
    "urduTitle": "انتقال حرارت",
    "blurb": "Transfer of Heat, Conduction, Convection, Radiation and Applications and Consequences of Radiations.",
+   "urduBlurb": "حرارت کی منتقلی، ایصال، حمل اور اشعاع، اور اشعاع کے اطلاقات اور اثرات۔",
    "source": {
     "file": "content/punjab/textbooks/phy-9-ur.pdf",
     "pdfStart": 208,
@@ -12533,7 +12681,8 @@
    "number": 1,
    "title": "Ideological Basis of Pakistan",
    "urduTitle": "پاکستان کی نظریاتی اساس",
-   "blurb": "Ideology, Ideology of Pakistan, Important Sources of Ideology of Pakistan, 1. Common Religion, 2. Common Political Objectives and more.",
+   "blurb": "Ideology and the ideology of Pakistan, and its main sources, from a common religion to common political aims.",
+   "urduBlurb": "نظریہ اور نظریۂ پاکستان، اور اس کے اہم ماخذ، مشترک مذہب سے مشترک سیاسی مقاصد تک۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 3,
@@ -12710,6 +12859,7 @@
    "title": "Pakistan Movement",
    "urduTitle": "تحریک پاکستان اور پاکستان کا قیام",
    "blurb": "Background of the Pakistan Movement, British Colonialism and Its Impacts on Various Aspects of Life in the Sub-continent and more.",
+   "urduBlurb": "تحریکِ پاکستان کا پس منظر، اور برطانوی نوآبادیات اور برصغیر کی زندگی کے مختلف پہلوؤں پر اس کے اثرات۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 15,
@@ -12930,7 +13080,8 @@
    "number": 3,
    "title": "History of Pakistan (1947-Uptill Now) and Constitutional Development in Pakistan",
    "urduTitle": "تاریخ پاکستان (1947 تا حال) اور پاکستان میں آئینی ترقی",
-   "blurb": "Initial Challenges Confronted by Pakistan, (i) Distribution of Factories and Banks, ii) Distribution of Military Assets, iii) River Water Dispute and more.",
+   "blurb": "The challenges Pakistan faced after 1947, from dividing assets and river waters onward, and its constitutional development to the present.",
+   "urduBlurb": "1947ء کے بعد پاکستان کو درپیش ابتدائی مسائل، اثاثوں اور دریائی پانی کی تقسیم سے لے کر، اور آج تک پاکستان کا آئینی ارتقا۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 30,
@@ -13797,6 +13948,7 @@
    "title": "Geography of Pakistan",
    "urduTitle": "جغرافیہ پاکستان",
    "blurb": "Introduction, Location of Pakistan, Significance of Pakistan's Geographical Location in Terms of Its Geo-Political and Economic Importance and more.",
+   "urduBlurb": "پاکستان کا محلِ وقوع، اور جغرافیائی سیاسی اور معاشی لحاظ سے اس کی اہمیت۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 66,
@@ -13979,6 +14131,7 @@
    "title": "Pakistan and International Affairs",
    "urduTitle": "پاکستان اور بین الاقوامی امور",
    "blurb": "Foreign Policy of Pakistan, Importance of Foreign Policy of Pakistan, Guiding Principles of Foreign Policy, Objectives of Pakistan's Foreign Policy and more.",
+   "urduBlurb": "پاکستان کی خارجہ پالیسی، اس کی اہمیت، رہنما اصول اور مقاصد۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 89,
@@ -14115,6 +14268,7 @@
    "title": "Resources and Economic Development of Pakistan",
    "urduTitle": "پاکستان کی معاشی ترقی",
    "blurb": "Agriculture, Importance of Agriculture, Problems of Agriculture, Modernization in Pakistan's Agriculture and more.",
+   "urduBlurb": "زراعت اور اس کی اہمیت، زراعت کے مسائل اور پاکستان کی زراعت کو جدید بنانا۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 105,
@@ -14238,6 +14392,7 @@
    "title": "Population, Society and Cultural Diversity in Pakistan",
    "urduTitle": "پاکستان میں آبادی، معاشرہ اور ثقافتی تنوع",
    "blurb": "Growth and Distribution of Population in Pakistan, Population Growth Rate, Province-wise Density of Population and more.",
+   "urduBlurb": "پاکستان میں آبادی کا اضافہ اور تقسیم، آبادی میں اضافے کی شرح اور صوبہ وار گنجانی۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 115,
@@ -14424,6 +14579,7 @@
    "title": "Women Empowerment in Pakistan",
    "urduTitle": "خواتین کو بااختیار بنانا",
    "blurb": "Women's Rights in Islam in the light of Qur'an and Sunnah, Women's Role in Pakistan Movement and more.",
+   "urduBlurb": "قرآن و سنت کی روشنی میں اسلام میں خواتین کے حقوق، اور تحریکِ پاکستان میں خواتین کا کردار۔",
    "source": {
     "file": "content/punjab/textbooks/pst-10.pdf",
     "pdfStart": 143,
@@ -14500,6 +14656,7 @@
    "title": "Ideological Basis of Pakistan",
    "urduTitle": "پاکستان کی نظریاتی اساس",
    "blurb": "Definition, Sources and Significance of Ideology, Ideology, Sources of Ideology, Importance of Ideology, Meanings of Ideology of Pakistan and more.",
+   "urduBlurb": "نظریے کی تعریف، ماخذ اور اہمیت، اور نظریۂ پاکستان کا مفہوم۔",
    "source": {
     "file": "content/punjab/textbooks/pst-9.pdf",
     "pdfStart": 3,
@@ -14615,6 +14772,7 @@
    "title": "Pakistan Movement and Emergence of Pakistan",
    "urduTitle": "تحریک پاکستان اور پاکستان کا قیام",
    "blurb": "Background of Pakistan Movement, Aligarh Movement and Sir Syed Ahmad Khan, Partition of Bengal 1905, Simla Deputation 1906 and more.",
+   "urduBlurb": "تحریکِ پاکستان کا پس منظر، علی گڑھ تحریک اور سر سید احمد خان، تقسیمِ بنگال 1905ء اور شملہ وفد 1906ء۔",
    "source": {
     "file": "content/punjab/textbooks/pst-9.pdf",
     "pdfStart": 20,
@@ -14974,6 +15132,7 @@
    "title": "Land and Environment",
    "urduTitle": "زمین اور ماحول",
    "blurb": "Location of Pakistan, Importance of Location, Physical Features of Pakistan, Northern Mountain Ranges, Karakoram Range, Himalayan Range and more.",
+   "urduBlurb": "پاکستان کا محلِ وقوع اور اس کی اہمیت، طبعی خدوخال، اور شمالی پہاڑی سلسلے قراقرم اور ہمالیہ۔",
    "source": {
     "file": "content/punjab/textbooks/pst-9.pdf",
     "pdfStart": 61,
@@ -15243,6 +15402,7 @@
    "title": "Women's Empowerment",
    "urduTitle": "خواتین کو بااختیار بنانا",
    "blurb": "Women's Rights in Islam in the light of Qur'an and Sunnah, Women's Role in Pakistan Movement and more.",
+   "urduBlurb": "قرآن و سنت کی روشنی میں اسلام میں خواتین کے حقوق، اور تحریکِ پاکستان میں خواتین کا کردار۔",
    "source": {
     "file": "content/punjab/textbooks/pst-9.pdf",
     "pdfStart": 97,
@@ -15318,7 +15478,8 @@
    "number": 1,
    "title": "Hamd",
    "urduTitle": "حمد",
-   "blurb": "",
+   "blurb": "A hamd by Amir Minai on the oneness and attributes of Allah, and the kinds of devotional poem: hamd, naat, manqabat and munajat.",
+   "urduBlurb": "امیر مینائی کی حمد جو اللہ تعالیٰ کی وحدانیت اور صفات بیان کرتی ہے، اور نظم کی مذہبی اصناف: حمد، نعت، منقبت اور مناجات۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 6,
@@ -15342,7 +15503,8 @@
    "number": 2,
    "title": "Naat",
    "urduTitle": "نعت",
-   "blurb": "",
+   "blurb": "The naat, its meaning, tradition and growth, love and obedience of the Prophet ﷺ, and the parts of a poem: misra, sher, qafia and radeef.",
+   "urduBlurb": "نعت کا مفہوم، روایت اور ارتقا، رسول اکرم ﷺ سے محبت اور اطاعت، اور نظم کے اجزا: مصرع، شعر، قافیہ اور ردیف۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 11,
@@ -15365,7 +15527,8 @@
    "number": 3,
    "title": "Akhlaq-e-Nabawi (ﷺ)",
    "urduTitle": "اخلاقِ نبوی خَاتَمُ النَّبِیّٖنَ صَلَّی اللهُ عَلَیْہِ وَعَلٰی اٰلِہٖ وَاَصْحَابِہٖ وَسَلَّم",
-   "blurb": "",
+   "blurb": "Allama Shibli Nomani on the character of the Prophet ﷺ, his art as a seerat writer, regular and broken plurals, and essay writing.",
+   "urduBlurb": "علامہ شبلی نعمانی کے قلم سے اخلاقِ نبوی ﷺ، ان کی سیرت نگاری کا فن، جمع سالم، جمع مکسر اور جمع الجمع، اور مضمون نویسی۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 16,
@@ -15389,7 +15552,8 @@
    "number": 4,
    "title": "Sir Syed's Childhood",
    "urduTitle": "سرسیّد کا بچپن",
-   "blurb": "",
+   "blurb": "The early life of Sir Syed Ahmad Khan, his family, schooling and the events that shaped him, and how to read a biography.",
+   "urduBlurb": "سر سید احمد خاں کی ابتدائی زندگی، ان کا خاندان، تعلیم اور وہ واقعات جنہوں نے ان کی شخصیت بنائی، اور سوانح عمری پڑھنے کا طریقہ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 23,
@@ -15412,7 +15576,8 @@
    "number": 5,
    "title": "Mohsin-e-Mohalla",
    "urduTitle": "مُحسِن مَحلّہ",
-   "blurb": "",
+   "blurb": "A short story about a neighbourhood's benefactor, the social questions it raises, its style and characters, with the gender of nouns and parts of speech.",
+   "urduBlurb": "محلے کے ایک محسن پر افسانہ، اس میں اٹھائے گئے سماجی سوال، اس کا اسلوب اور کردار، اور تذکیر و تانیث اور اسم، فعل اور حرف کی پہچان۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 32,
@@ -15436,7 +15601,8 @@
    "number": 6,
    "title": "Kaffara",
    "urduTitle": "کفّارہ",
-   "blurb": "",
+   "blurb": "Premchand's short story Kaffara, its plot, characters and moral lesson, and kinds of particles.",
+   "urduBlurb": "پریم چند کا افسانہ کفارہ، اس کا پلاٹ، کردار اور اخلاقی سبق، اور حروف کی اقسام۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 39,
@@ -15459,7 +15625,8 @@
    "number": 7,
    "title": "Sawere Jo Kal Aankh Meri Khuli",
    "urduTitle": "سویرے جو کل آنکھ میری کھلی",
-   "blurb": "",
+   "blurb": "Patras Bukhari's humorous essay about one early morning, the craft of Urdu humour, and the social criticism behind the laughter.",
+   "urduBlurb": "پطرس بخاری کا ایک صبح کے بارے میں مزاحیہ مضمون، اردو مزاح نگاری کا فن، اور ہنسی کے پیچھے چھپی معاشرتی تنقید۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 52,
@@ -15481,7 +15648,8 @@
    "number": 8,
    "title": "The Fruit of Friendship",
    "urduTitle": "دوستی کا پھل",
-   "blurb": "",
+   "blurb": "A Punjabi folk tale of friendship, its words and idioms, plot, characters and moral, with kinds of letters and summary writing.",
+   "urduBlurb": "دوستی کے بارے میں پنجابی لوک کہانی، اس کے الفاظ اور محاورات، پلاٹ، کردار اور اخلاقی سبق، اور خط کی اقسام اور تلخیص نگاری۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 61,
@@ -15504,7 +15672,8 @@
    "number": 9,
    "title": "My Village",
    "urduTitle": "میرا گاؤں",
-   "blurb": "",
+   "blurb": "A novel extract on village life during the 1965 war, its themes and characters, rural society and culture, and the novel's style.",
+   "urduBlurb": "1965ء کی جنگ کے دنوں میں گاؤں کی زندگی پر ایک ناول کا حصہ، اس کے موضوعات اور کردار، دیہی معاشرت و ثقافت، اور ناول کا اسلوب۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 70,
@@ -15528,7 +15697,8 @@
    "number": 10,
    "title": "The Ruins of Babylon",
    "urduTitle": "بابل کے کھنڈر",
-   "blurb": "",
+   "blurb": "Jamiluddin Aali's account of the ruins of ancient Babylon, the history of its civilisation, and why historic places and heritage matter.",
+   "urduBlurb": "جمیل الدین عالی کے قلم سے قدیم بابل کے کھنڈروں کا احوال، اس تہذیب کی تاریخ، اور تاریخی مقامات اور ثقافتی ورثے کی اہمیت۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 78,
@@ -15550,7 +15720,8 @@
    "number": 11,
    "title": "Old Age Home",
    "urduTitle": "اولڈ ایج ہوم",
-   "blurb": "",
+   "blurb": "A short story about the neglect and loneliness of the elderly, the decline of family values, its symbolism, and the sketch, the short story and simile.",
+   "urduBlurb": "بزرگوں کی بے قدری اور تنہائی پر ایک افسانہ، خاندانی اقدار کا زوال، اس کی علامتی معنویت، اور خاکہ، افسانہ اور تشبیہ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 87,
@@ -15573,7 +15744,8 @@
    "number": 12,
    "title": "Something on the Medium of Instruction",
    "urduTitle": "کچھ ذریعۂ تعلیم کے باب میں",
-   "blurb": "",
+   "blurb": "An essay on the language of teaching, the case for Urdu as the medium of instruction, and what Arabic, Persian and English have given Urdu.",
+   "urduBlurb": "ذریعۂ تعلیم کی زبان پر ایک مضمون، اردو کو ذریعۂ تعلیم بنانے کا مقدمہ، اور عربی، فارسی اور انگریزی کے اردو پر اثرات۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 105,
@@ -15596,7 +15768,8 @@
    "number": 13,
    "title": "Aadmi Nama",
    "urduTitle": "آدمی نامہ",
-   "blurb": "",
+   "blurb": "Nazeer Akbarabadi's poem on what makes a man, rich and poor alike, his poetry of ordinary people, and metonymy and kinaya.",
+   "urduBlurb": "نظیر اکبر آبادی کی نظم جو امیر و غریب ہر آدمی کی حقیقت بیان کرتی ہے، ان کی عوامی شاعری، اور مجاز مرسل اور کنایہ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 112,
@@ -15619,7 +15792,8 @@
    "number": 14,
    "title": "Namood-e-Subh",
    "urduTitle": "نمودِ صُبح",
-   "blurb": "",
+   "blurb": "Mir Anees's marsiya on the break of dawn, the parts of a marsiya, the spirit of martyrdom, and its similes, metaphors and figures of speech.",
+   "urduBlurb": "میر انیس کا مرثیہ جو صبح کے طلوع کا منظر پیش کرتا ہے، مرثیے کے اجزائے ترکیبی، جذبۂ شہادت، اور اس کی تشبیہات، استعارات اور صنائع و بدائع۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 118,
@@ -15642,7 +15816,8 @@
    "number": 15,
    "title": "Khitab ba Jawanan-e-Islam",
    "urduTitle": "خِطاب بہ جوانانِ اِسلام",
-   "blurb": "",
+   "blurb": "Allama Iqbal's address to young Muslims on khudi, love and action, freedom and purpose in life, with the metaphor and its parts.",
+   "urduBlurb": "علامہ اقبال کا نوجوانانِ اسلام سے خطاب، خودی، عشق اور عمل، آزادی اور مقصدِ حیات، اور استعارہ اور اس کے ارکان۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 124,
@@ -15665,7 +15840,8 @@
    "number": 16,
    "title": "Waghera",
    "urduTitle": "وغیرہ",
-   "blurb": "",
+   "blurb": "Anwar Masood's comic poem Waghera, humour and satire as a literary form, its style and technique, and how to explain a couplet.",
+   "urduBlurb": "انور مسعود کی مزاحیہ نظم وغیرہ، طنز و مزاح بطور ادبی صنف، نظم کا اسلوب اور تکنیک، اور اشعار کی تشریح کا طریقہ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 130,
@@ -15689,7 +15865,8 @@
    "number": 17,
    "title": "Bazicha-e-Atfal Hai Dunya Mere Aage",
    "urduTitle": "بازیچۂ اطفال ہے دنیا مرے آگے",
-   "blurb": "",
+   "blurb": "A ghazal by Mirza Ghalib on the world as a children's game, his thought on love, joy and grief, his place in Urdu poetry, and the parts of a ghazal.",
+   "urduBlurb": "مرزا غالب کی غزل جس میں دنیا بچوں کا کھیل دکھائی دیتی ہے، عشق، خوشی اور غم پر ان کی فکر، اردو شاعری میں ان کا مقام، اور غزل کے اجزا۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 135,
@@ -15712,7 +15889,8 @@
    "number": 18,
    "title": "Asar Us Ko Zara Nahin Hota",
    "urduTitle": "اثر اس کو ذرا نہیں ہوتا",
-   "blurb": "",
+   "blurb": "A ghazal by Momin Khan Momin, the ghazal of his age, his distinctive style and themes, and the figure of contrast.",
+   "urduBlurb": "مومن خاں مومن کی غزل، ان کے دور کی غزل، ان کا منفرد اسلوب اور موضوعات، اور صنعتِ تضاد۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 140,
@@ -15736,7 +15914,8 @@
    "number": 19,
    "title": "Hai Mashq-e-Sukhan Jari, Chakki Ki Mashaqqat Bhi",
    "urduTitle": "ہے مشقِ سخن جاری، چکّی کی مشقّت بھی",
-   "blurb": "",
+   "blurb": "A ghazal by Maulana Hasrat Mohani on writing verse through the labour of prison, his revolutionary poetry, and taghazzul, the soul of the ghazal.",
+   "urduBlurb": "مولانا حسرت موہانی کی غزل جس میں قید کی مشقت کے ساتھ شاعری بھی جاری ہے، ان کی انقلابی شاعری، اور تغزل یعنی غزل کی روح۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 145,
@@ -15759,7 +15938,8 @@
    "number": 20,
    "title": "Yun Kahne Ko Pairaya-e-Izhar Bahut Hai",
    "urduTitle": "یوں کہنے کو پیرایۂ اِظہار بہت ہے",
-   "blurb": "",
+   "blurb": "A ghazal by Zehra Nigah, the modern Urdu ghazal, and her poetry of women's feelings, independence and social injustice.",
+   "urduBlurb": "زہرا نگاہ کی غزل، جدید اردو غزل، اور خواتین کے جذبات، خودمختاری اور سماجی ناانصافی پر ان کی شاعری۔",
    "source": {
     "file": "content/punjab/textbooks/urd-10.pdf",
     "pdfStart": 150,
@@ -15782,7 +15962,8 @@
    "number": 1,
    "title": "Hamd (Nazm)",
    "urduTitle": "حمد (نظم)",
-   "blurb": "Muzaffar Warsi",
+   "blurb": "A hamd by Muzaffar Warsi on the attributes of Allah, with the kinds of devotional poem and how to write a poem's central idea.",
+   "urduBlurb": "مظفر وارثی کی حمد جو اللہ تعالیٰ کی صفات بیان کرتی ہے، نظم کی مذہبی اصناف کی پہچان اور نظم کا مرکزی خیال لکھنا۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 6,
@@ -15806,7 +15987,8 @@
    "number": 2,
    "title": "Naat (Nazm)",
    "urduTitle": "نعت (نظم)",
-   "blurb": "Maulana Zafar Ali Khan",
+   "blurb": "A naat by Maulana Zafar Ali Khan, his place in Urdu letters, and the verse terms a paper asks for: metre, qafia, radeef and explaining a couplet.",
+   "urduBlurb": "مولانا ظفر علی خاں کی نعت، اردو ادب میں ان کا مقام، اور بحر، قافیہ، ردیف اور اشعار کی تشریح جیسی شعری اصطلاحات۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 11,
@@ -15830,7 +16012,8 @@
    "number": 3,
    "title": "Akhlaq-e-Hasana",
    "urduTitle": "اخلاقِ حَسنہ",
-   "blurb": "Syed Sulaiman Nadvi",
+   "blurb": "Syed Sulaiman Nadvi on the Prophet's ﷺ character set against Arab customs before Islam, with the art of seerat writing and explaining a prose passage.",
+   "urduBlurb": "سید سلیمان ندوی کے قلم سے رسول اکرم ﷺ کے اخلاقِ حسنہ، اسلام سے پہلے کے عرب رسم و رواج کے پس منظر میں، سیرت نگاری کا فن اور نثر پارے کی تشریح۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 16,
@@ -15855,7 +16038,8 @@
    "number": 4,
    "title": "Apni Madad Aap",
    "urduTitle": "اپنی مدد آپ",
-   "blurb": "Sir Syed Ahmad Khan",
+   "blurb": "Sir Syed Ahmad Khan's essay on self-help, with word order, word groups, writing a summary and the main points of essay writing.",
+   "urduBlurb": "سر سید احمد خاں کا مضمون اپنی مدد آپ، الفاظ کی ترتیب، متلازم الفاظ، خلاصہ نویسی اور مضمون نگاری کے اہم نکات۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 24,
@@ -15879,7 +16063,8 @@
    "number": 5,
    "title": "Kaleem aur Mirza Zahir Dar Beg",
    "urduTitle": "کلیم اور مرزا ظاہر دار بیگ",
-   "blurb": "Deputy Nazir Ahmad",
+   "blurb": "An extract from Deputy Nazir Ahmad's novel Tauba-tun-Nasuh, the beginnings of the Urdu novel, and idiom and everyday usage.",
+   "urduBlurb": "ڈپٹی نذیر احمد کے ناول توبۃ النصوح کا ایک حصہ، اردو ناول نگاری کی ابتدا، اور روزمرہ اور محاورہ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 32,
@@ -15903,7 +16088,8 @@
    "number": 6,
    "title": "Nam Dev–Mali",
    "urduTitle": "نام دیو-مالی",
-   "blurb": "Maulvi Abdul Haq",
+   "blurb": "Maulvi Abdul Haq's pen portrait of a devoted gardener, the art of the sketch, the dignity of hard work, and the gender of nouns.",
+   "urduBlurb": "مولوی عبدالحق کا ایک محنتی مالی پر لکھا گیا خاکہ، خاکہ نگاری کا فن، محنت کی عظمت اور غیر حقیقی تذکیر و تانیث۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 42,
@@ -15926,7 +16112,8 @@
    "number": 7,
    "title": "Aaram o Sukoon",
    "urduTitle": "آرام و سکون",
-   "blurb": "Imtiaz Ali Taj",
+   "blurb": "Imtiaz Ali Taj's comic play about a patient in need of rest, how dialogue drives a drama, and kinds of particles, prefixes and suffixes.",
+   "urduBlurb": "امتیاز علی تاج کا مزاحیہ ڈراما جس میں ایک مریض کو آرام و سکون درکار ہے، مکالمے سے کہانی کا آگے بڑھنا، اور حروف کی اقسام اور سابقے لاحقے۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 50,
@@ -15951,7 +16138,8 @@
    "number": 8,
    "title": "Katba",
    "urduTitle": "کتبہ",
-   "blurb": "Ghulam Abbas",
+   "blurb": "Ghulam Abbas's short story about a clerk's dream of a nameplate, his realist style, a proverb on planning and fate, and office life.",
+   "urduBlurb": "غلام عباس کا افسانہ جس میں ایک کلرک نام کی تختی کا خواب دیکھتا ہے، ان کا حقیقت پسندانہ اسلوب، تدبیر اور تقدیر پر ایک ضرب المثل، اور دفتری زندگی۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 62,
@@ -15975,7 +16163,8 @@
    "number": 9,
    "title": "Ibtidai Hisab",
    "urduTitle": "ابتدائی حساب",
-   "blurb": "Ibn-e-Insha",
+   "blurb": "Ibn-e-Insha's humorous parody of an old primer, the place of humour in Urdu prose, simile and metaphor, and punctuation marks.",
+   "urduBlurb": "ابنِ انشا کی ایک پرانی ابتدائی کتاب کی مزاحیہ تحریف، اردو نثر میں طنز و مزاح کی اہمیت، تشبیہ و استعارہ اور رموزِ اوقاف۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 74,
@@ -15999,7 +16188,8 @@
    "number": 10,
    "title": "Larhi mein Piroye Hue Manzar",
    "urduTitle": "لڑی میں پروئے ہوئے منظر",
-   "blurb": "Raza Ali Abidi",
+   "blurb": "Raza Ali Abidi's travelogue along the Grand Trunk Road, the Urdu travelogue tradition, easily confused words and punctuation.",
+   "urduBlurb": "رضا علی عابدی کا جرنیلی سڑک کا سفرنامہ، اردو میں سفرنامے کی روایت، مشتبہ الفاظ اور رموزِ اوقاف۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 82,
@@ -16022,7 +16212,8 @@
    "number": 11,
    "title": "Bherhiya",
    "urduTitle": "بھیڑیا",
-   "blurb": "Farooq Sarwar",
+   "blurb": "The Wolf, a symbolic Pashto story in Farooq Sarwar's Urdu translation, with the languages of Pakistan, the principles of translation and more particles.",
+   "urduBlurb": "پشتو کا علامتی افسانہ بھیڑیا، فاروق سرور کے اردو ترجمے میں، پاکستان کی زبانیں، ترجمہ نگاری کے اصول اور حروف کی مزید اقسام۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 91,
@@ -16046,7 +16237,8 @@
    "number": 12,
    "title": "Mehnat ki Barkat (Nazm)",
    "urduTitle": "محنت کی برکات (نظم)",
-   "blurb": "Maulana Hali",
+   "blurb": "Maulana Hali's poem on the blessings of hard work, his Musaddas, the forms of Urdu poetry, and words with two meanings.",
+   "urduBlurb": "مولانا حالی کی نظم محنت کی برکات، مسدسِ حالی، اصنافِ نظم اور ذو معنی الفاظ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 99,
@@ -16070,7 +16262,8 @@
    "number": 13,
    "title": "Javed ke Naam (Nazm)",
    "urduTitle": "جاوید کے نام (نظم)",
-   "blurb": "Allama Muhammad Iqbal",
+   "blurb": "Allama Iqbal's poem to his young son Javed, written during the Second Round Table Conference, and his collection Bang-e-Dara.",
+   "urduBlurb": "علامہ اقبال کی وہ نظم جو انہوں نے دوسری گول میز کانفرنس کے دنوں میں اپنے کم سن بیٹے جاوید کے نام لکھی، اور ان کا مجموعہ بانگِ درا۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 107,
@@ -16091,7 +16284,8 @@
    "number": 14,
    "title": "Payam-e-Lateef (Nazm)",
    "urduTitle": "پیامِ لطیفؔ (نظم)",
-   "blurb": "Shaikh Ayaz, translator",
+   "blurb": "Shah Abdul Latif Bhitai's message in Shaikh Ayaz's Urdu verse translation, Sufi poetry in Pakistan's languages, and figures of speech such as allusion and contrast.",
+   "urduBlurb": "شیخ ایاز کے منظوم اردو ترجمے میں شاہ عبداللطیف بھٹائی کا پیغام، پاکستانی زبانوں میں صوفیانہ شاعری، اور تلمیح اور تضاد جیسی صنعتیں۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 111,
@@ -16114,7 +16308,8 @@
    "number": 15,
    "title": "Cricket aur Mushaira (Nazm)",
    "urduTitle": "کرکٹ اور مشاعرہ (نظم)",
-   "blurb": "Dilawar Figar",
+   "blurb": "Dilawar Figar's comic poem, the tradition of humorous Urdu verse, everyday words borrowed from other languages, and nominal and verbal sentences.",
+   "urduBlurb": "دلاور فگار کی مزاحیہ نظم، اردو کی ظریفانہ شاعری کی روایت، دوسری زبانوں کے عام فہم الفاظ کا استعمال، اور جملہ اسمیہ اور جملہ فعلیہ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 116,
@@ -16139,7 +16334,8 @@
    "number": 16,
    "title": "Faqirana Aaye Sada Kar Chale (Ghazal)",
    "urduTitle": "فقیرانہ آئے صدا کر چلے (غزل)",
-   "blurb": "Mir Taqi Mir",
+   "blurb": "A ghazal by Mir Taqi Mir, his place in the history of the ghazal, his style, and sahl-e-mumtana, verse that looks easy but is hard to write.",
+   "urduBlurb": "میر تقی میر کی غزل، غزل کی تاریخ میں ان کا مقام، ان کا اندازِ بیان، اور سہلِ ممتنع یعنی ایسا شعر جو آسان لگے مگر کہنا مشکل ہو۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 123,
@@ -16162,7 +16358,8 @@
    "number": 17,
    "title": "Sun to Sahi Jahan mein Hai Tera Afsana Kya (Ghazal)",
    "urduTitle": "سن تو سہی جہاں میں ہے تیر افسانہ کیا (غزل)",
-   "blurb": "Khwaja Haider Ali Aatish",
+   "blurb": "A ghazal by Khwaja Haider Ali Aatish, the ghazal's language of hint and allusion, its growth up to his time, and how to explain a couplet.",
+   "urduBlurb": "خواجہ حیدر علی آتش کی غزل، غزل کی اشارے اور کنائے کی زبان، ان کے دور تک غزل کا ارتقا، اور شعر کی تشریح کا طریقہ۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 127,
@@ -16186,7 +16383,8 @@
    "number": 18,
    "title": "Gham Hai ya Khushi Hai Tu (Ghazal)",
    "urduTitle": "غم ہے یا خوشی ہے تُو (غزل)",
-   "blurb": "Nasir Kazmi",
+   "blurb": "A ghazal by Nasir Kazmi, the modern Urdu ghazal, his style, and sahl-e-mumtana, the art of hard-won simplicity.",
+   "urduBlurb": "ناصر کاظمی کی غزل، اردو غزل کا جدید دور، ان کا اسلوب، اور سہلِ ممتنع یعنی محنت سے حاصل ہونے والی سادگی۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 132,
@@ -16209,7 +16407,8 @@
    "number": 19,
    "title": "Kaash Toofan mein Safeeney ko Utara Hota (Ghazal)",
    "urduTitle": "کاش طوفاں میں سفینے کو اتارا ہوتا (غزل)",
-   "blurb": "Parveen Shakir",
+   "blurb": "A ghazal by Parveen Shakir, her poetry of women's feelings and the women poets of her time, and the qafia, radeef and key phrases of the ghazal.",
+   "urduBlurb": "پروین شاکر کی غزل، نسائی جذبات کی ان کی شاعری اور ان کی ہم عصر شاعرات، اور غزل کے قافیے، ردیف اور اہم تراکیب۔",
    "source": {
     "file": "content/punjab/textbooks/urd-9.pdf",
     "pdfStart": 136,
@@ -23906,7 +24105,7 @@
   },
   {
    "code": "PJ-ISL-10-C3-S05",
-   "text": "نبی کریم خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم اور صحا��ہ کرام رضی اللہ تعالی عنہم کے کلمۃ اللہ (غلبہ اسلام) کے لیے قربانی کا جذبہ پیدا کرسکیں۔",
+   "text": "نبی کریم خاتم النبیین صلی اللہ علیہ وعلی آلہ واصحابہ وسلم اور صحابہ کرام رضی اللہ تعالی عنہم کے کلمۃ اللہ (غلبہ اسلام) کے لیے قربانی کا جذبہ پیدا کرسکیں۔",
    "origin": "textbook_slo",
    "subject": "isl",
    "grade": 10,

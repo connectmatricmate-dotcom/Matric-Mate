@@ -168,9 +168,13 @@ export async function askJson(env, { system, images = [], prompt, maxTokens = 32
   let stopReason = null;
   let usage = {};
   let buffer = '';
+  // One streaming decoder, never a chunk decoded on its own: a two-byte Urdu
+  // letter split across two network chunks otherwise comes out as two U+FFFD
+  // marks, which is how a Punjab outcome lost the ب of "صحابہ کرام".
+  const decoder = new TextDecoder('utf-8');
   try {
     for await (const piece of res.body) {
-      buffer += Buffer.from(piece).toString('utf8');
+      buffer += decoder.decode(piece, { stream: true });
       const frames = buffer.split('\n\n');
       buffer = frames.pop() ?? '';
       for (const frame of frames) {

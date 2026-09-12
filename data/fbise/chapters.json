@@ -504,7 +504,11 @@
           "marks": 44,
           "share": 52
         }
-      ]
+      ],
+      "notExamined": [
+        1
+      ],
+      "_notExamined": "Oral Communication Skills is \"part of regular teaching and learning... It will not be assessed in Annual Examinations\" (framework-eng.txt lines 222-253): share 0."
     },
     "isl": {
       "totalMarks": 100,
@@ -579,6 +583,12 @@
       "totalMarks": 135,
       "sourcePage": "Table of Specification, Model Question Paper Mathematics - Grade IX (SSC-I), content/fbise/text/framework-math.txt lines 1011-1036 (PDF page 26 of framework-math.pdf)",
       "chapters": [],
+      "notExamined": [
+        1,
+        10,
+        13
+      ],
+      "_notExamined": "Chapters 1 (Matrices), 10 (Congruent Triangles) and 13 (Sides and Angles of a Triangle) are in older textbooks but not in the current Class 9 syllabus, so the board sets nothing on them. Their share is 0, which the apps and the mock paper read as \"not on the annual paper\"; null would mean \"weight unknown\".",
       "_note": "The board's Table of Specification for Class 9 Mathematics gives marks per DOMAIN (Numbers and Algebra 41, Geometry 71, Information Handling 23), not per chapter. Those three rows used to sit here with number 1, 2 and 3, and the ingest matches on number, so they landed on Matrices, Sets and Logarithms and told students those chapters were 30%, 53% and 17% of the paper. Matrices is not even examined. Until the board publishes a per-chapter split, Maths carries no weight and the app shows none."
     },
     "pst": {
@@ -708,7 +718,12 @@
           "marks": null,
           "share": null
         }
-      ]
+      ],
+      "notExamined": [
+        4,
+        5
+      ],
+      "_notExamined": "Listening (سننا) and speaking (بولنا) are formative, judged in class and never on the written paper: share 0."
     }
   }
 }

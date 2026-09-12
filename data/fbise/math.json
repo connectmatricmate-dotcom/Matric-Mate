@@ -323,7 +323,7 @@
         },
         {
           "code": "M-09-B-15",
-          "text": "Formulate simple deductive proofs [algebraic proofs that require showing the LHS to be equal to the RHS. E.g., showing (𝒙 − 𝟑)𝟐 + 𝟓 = 𝒙𝟐 — 𝟔𝒙",
+          "text": "Formulate simple deductive proofs [algebraic proofs that require showing the LHS to be equal to the RHS. E.g., showing (𝒙 − 𝟑)𝟐 + 𝟓 = 𝒙𝟐 − 𝟔𝒙",
           "cognitive": "knowledge",
           "assessment": "formative"
         },

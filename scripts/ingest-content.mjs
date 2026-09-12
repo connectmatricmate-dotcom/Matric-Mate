@@ -37,6 +37,7 @@ import { spawn } from 'node:child_process';
 import { readFile, readdir, rm } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { weightsFor } from './exam-weights.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BUILD = resolve(ROOT, 'content/.core-build');
@@ -192,9 +193,12 @@ async function main() {
     }
   }
 
+  // Shares by the rules in exam-weights.mjs: 0 for a chapter the board does
+  // not examine, null where it publishes no weight, never one lone share.
+  const weights = Object.fromEntries(Object.entries(spec).map(([id, s]) => [id, weightsFor(s)]));
   const chapters = ALL_CHAPTERS.map((c) => {
     const units = curriculum[c.subjectId]?.examUnits?.units;
-    const weight = spec[c.subjectId]?.chapters?.find((x) => x.number === c.number);
+    const weight = weights[c.subjectId]?.get(c.number);
     return {
       id: c.id,
       subject_id: c.subjectId,
@@ -202,7 +206,9 @@ async function main() {
       board_unit: units?.[c.number - 1]?.number ?? null,
       exam_marks: weight?.marks ?? null,
       exam_share: weight?.share ?? null,
-      title: c.title,
+      // A chapter name is a label, not a sentence: packages/core still ends
+      // the Islamiyat and Urdu names with a full stop, and every list showed it.
+      title: c.title.replace(/\.\s*$/, ''),
       urdu_title: c.urduTitle ?? null,
       blurb: c.blurb,
       premium: c.premium,

@@ -47,6 +47,7 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dashless, hasBrokenChar, mediumFree, orderBlankOptions, placeAnswer, splitAtGap } from './content-rules.mjs';
 
 // This network advertises IPv6 it cannot route, and a connection that tries
 // it first fails as a bare "fetch failed". IPv4 only.
@@ -238,12 +239,19 @@ async function ask(env, { system, prompt, maxTokens = 8000, attempt = 1, netAtte
   let text = '';
   let stopReason = null;
   let buffer = '';
+  // One decoder for the whole stream, told more is coming. An Urdu letter is
+  // two bytes, and the network splits the stream wherever it likes; decoding
+  // each chunk on its own turned a letter cut in half into two U+FFFD marks,
+  // and 204 student-facing rows lost a letter that way ("ذمہ دار" lost its د)
+  // before it was found. A streaming decoder holds the first half back until
+  // the second arrives.
+  const decoder = new TextDecoder('utf-8');
 
   try {
     for await (const piece of res.body) {
-      buffer += Buffer.from(piece).toString('utf8');
+      buffer += decoder.decode(piece, { stream: true });
       // SSE frames are separated by a blank line. Keep the trailing partial
-      // frame in the buffer: a multi-byte character can straddle two chunks.
+      // frame in the buffer until the rest of it arrives.
       const frames = buffer.split('\n\n');
       buffer = frames.pop() ?? '';
       for (const frame of frames) {
@@ -403,7 +411,14 @@ Every wrong option must be a mistake a real student makes: the formula
 rearranged wrongly, the unit unconverted, the common misreading. Never use
 filler options. The explanation must say why the right answer is right AND why
 the most tempting wrong one is wrong, because that is where the learning is.
-Exactly four options. Exactly one correct.
+Exactly four options. Exactly one correct. In the explanation, name a wrong
+option by quoting its words, never by a letter or a position ("option b", "the
+second option"): the app decides the order the options appear in.
+
+FILL IN THE BLANKS
+Give the sentence in two halves, the words before the missing one and the words
+after it. Never write underscores or any other mark for the gap; the app draws
+it between the halves.
 
 QUESTION MIX
 Follow the cognitive level given for each outcome:
@@ -586,13 +601,16 @@ function sift(out, slos) {
     }
   }
   const dropped = [];
-  const keepIf = (ok, label) => {
-    if (!ok) dropped.push(label);
-    return ok;
+  // A broken character (U+FFFD) means half a letter was lost on the way in.
+  // The reader no longer loses them, but nothing with one in it is written.
+  const keepIf = (ok, label, item) => {
+    const fine = ok && !hasBrokenChar(item);
+    if (!fine) dropped.push(label);
+    return fine;
   };
 
   const sections = (out.sections ?? []).filter(
-    (s, i) => keepIf(s.title?.trim() && Array.isArray(s.blocks) && s.blocks.length, `section ${i}`),
+    (s, i) => keepIf(s.title?.trim() && Array.isArray(s.blocks) && s.blocks.length, `section ${i}`, s),
   );
 
   const mcqs = (out.mcqs ?? []).filter((m, i) => {
@@ -610,18 +628,26 @@ function sift(out, slos) {
         Boolean(m.explanation?.trim()) &&
         (!m.slo_code || codes.has(m.slo_code)),
       `mcq ${i}`,
+      m,
     );
   });
 
-  const flashcards = (out.flashcards ?? []).filter((f, i) => keepIf(Boolean(f.front?.trim() && f.back?.trim()), `card ${i}`));
+  const flashcards = (out.flashcards ?? []).filter((f, i) => keepIf(Boolean(f.front?.trim() && f.back?.trim()), `card ${i}`, f));
 
-  const shortQs = (out.shortQs ?? []).filter((q, i) => keepIf(Boolean(q.q?.trim() && q.answer?.trim()), `shortQ ${i}`));
+  const shortQs = (out.shortQs ?? []).filter((q, i) => keepIf(Boolean(q.q?.trim() && q.answer?.trim()), `shortQ ${i}`, q));
 
   const blanks = (out.blanks ?? []).filter((b, i) => {
     const opts = Array.isArray(b.options) ? b.options.map((o) => String(o).trim()) : [];
     return keepIf(
-      Boolean(b.answer?.trim()) && (!opts.length || opts.includes(String(b.answer).trim())),
+      Boolean(b.answer?.trim()) &&
+        (!opts.length || opts.includes(String(b.answer).trim())) &&
+        // The same chip twice is two right answers. Chips that differ only in
+        // case stay: "Lahore" beside "lahore" is how a capitalisation question
+        // is asked, "gR²/G" beside "GR²/g" is two different formulas, and the
+        // apps compare a tapped chip with the answer exactly.
+        new Set(opts).size === opts.length,
       `blank ${i}`,
+      b,
     );
   });
 
@@ -645,30 +671,48 @@ function sift(out, slos) {
   return { clean: { sections, mcqs, flashcards, shortQs, blanks }, dropped, fatal };
 }
 
-/**
- * No em dash reaches a student. The repo's rule for every line of copy, and
- * the one the model breaks most: 248 of FBISE's first 4,283 MCQs carry one.
- * Asking in the prompt lowers the count; this makes it zero. Replaced with the
- * comma the sentence almost always wanted, the Urdu comma in Urdu, and
- * dropped outright at the start or end of a string.
+/*
+ * No em dash reaches a student: dashless() in content-rules.mjs, shared with
+ * scrub-dashes.mjs. It picks the comma from the words either side of each
+ * dash, not from the medium, so an English lesson filed under Urdu medium
+ * keeps English commas.
  */
-function dashless(value, comma) {
-  if (typeof value === 'string') {
-    return value
-      .replace(/^\s*\u2014\s*/, '')
-      .replace(/\s*\u2014\s*$/, '')
-      .replace(/\s*\u2014\s*/g, comma);
-  }
-  if (Array.isArray(value)) return value.map((v) => dashless(v, comma));
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, dashless(v, comma)]));
-  }
-  return value;
-}
-const commaFor = (medium) => (medium === 'ur' ? '، ' : ', ');
 
 /* -------------------------------------------------------------- to tables */
 
+/**
+ * MCQs that kept the model's order because their explanation names an option
+ * in a way the placement rules will not settle alone (content-rules.mjs).
+ * Counted once per question, whichever medium it is filed under.
+ */
+const keptOrder = new Set();
+
+/**
+ * Explanations already read by hand for place-answers.mjs. A --from-disk
+ * rewrite of those chapters then lands them exactly where the repair did,
+ * instead of leaving them in the model's order. Each verdict applies only to
+ * the explanation it was given for.
+ */
+const REVIEWED = await readFile(resolve(ROOT, 'data/mcq-placement-review.json'), 'utf8')
+  .then((t) => JSON.parse(t).settled ?? {})
+  .catch(() => ({}));
+const settledFor = (id, explanation) => {
+  const r = REVIEWED[id];
+  if (!r || r.was !== explanation) return null;
+  return r.explanation ? { explanation: r.explanation, to: r.to } : r.labels;
+};
+
+/**
+ * Rows for the database, with the placement rules applied on the way.
+ *
+ * The model puts the right answer first two times in three, so every MCQ's
+ * right option goes to the slot its id draws and the explanation's letters
+ * follow it, and every blank's chips go in an order drawn the same way. A
+ * blank the model wrote whole, with its own "____" in it, is cut at that gap.
+ * All of it comes from content-rules.mjs, the same code that repaired the rows
+ * written before these rules, and all of it is deterministic, so a one-language
+ * subject's two copies still come out identical.
+ */
 const rows = (out, { chapter, subject, medium, status }) => {
   const base = { chapter_id: chapter.id, medium, review_status: status, source: 'ai' };
   const n = (i) => `${chapter.id}-${medium}-${i + 1}`;
@@ -682,18 +726,23 @@ const rows = (out, { chapter, subject, medium, status }) => {
       blocks: s.blocks,
       slo_codes: s.slo_codes ?? [],
     })),
-    mcqs: (out.mcqs ?? []).map((m, i) => ({
-      ...base,
-      id: `${n(i)}-q`,
-      subject_id: subject.subject,
-      topic: m.topic ?? chapter.title,
-      q: m.q,
-      options: m.options,
-      answer: m.answer,
-      explanation: m.explanation,
-      difficulty: ['easy', 'medium', 'hard'].includes(m.difficulty) ? m.difficulty : 'medium',
-      slo_code: m.slo_code ?? null,
-    })),
+    mcqs: (out.mcqs ?? []).map((m, i) => {
+      const id = `${n(i)}-q`;
+      const placed = placeAnswer({ q: m.q, options: m.options, answer: m.answer, explanation: m.explanation }, id, settledFor(id, m.explanation));
+      if (placed.held) keptOrder.add(mediumFree(id));
+      return {
+        ...base,
+        id,
+        subject_id: subject.subject,
+        topic: m.topic ?? chapter.title,
+        q: m.q,
+        options: placed.options,
+        answer: placed.answer,
+        explanation: placed.explanation,
+        difficulty: ['easy', 'medium', 'hard'].includes(m.difficulty) ? m.difficulty : 'medium',
+        slo_code: m.slo_code ?? null,
+      };
+    }),
     flashcards: (out.flashcards ?? []).map((f, i) => ({
       ...base,
       id: `${n(i)}-f`,
@@ -710,15 +759,19 @@ const rows = (out, { chapter, subject, medium, status }) => {
       points: s.points ?? [],
       slo_code: s.slo_code ?? null,
     })),
-    blanks: (out.blanks ?? []).map((b, i) => ({
-      ...base,
-      id: `${n(i)}-b`,
-      before_text: b.before ?? '',
-      after_text: b.after ?? '',
-      answer: b.answer,
-      options: b.options ?? [],
-      slo_code: b.slo_code ?? null,
-    })),
+    blanks: (out.blanks ?? []).map((b, i) => {
+      const id = `${n(i)}-b`;
+      const halves = splitAtGap(b.before ?? '', b.after ?? '');
+      return {
+        ...base,
+        id,
+        before_text: halves.before,
+        after_text: halves.after,
+        answer: b.answer,
+        options: orderBlankOptions(id, b.options ?? [], b.answer),
+        slo_code: b.slo_code ?? null,
+      };
+    }),
   };
 };
 
@@ -826,7 +879,7 @@ async function insertFromDisk(db, doc, chapters, slos, mapping, STATUS) {
       const label = `${chapter.id}/${medium}`;
       let raw;
       try {
-        raw = dashless(JSON.parse(await readFile(file, 'utf8')), commaFor(medium));
+        raw = dashless(JSON.parse(await readFile(file, 'utf8')));
       } catch {
         continue; // not written yet, which is normal mid-run
       }
@@ -1031,7 +1084,7 @@ async function main() {
   const runJob = async ({ doc, chapter, mine, medium }) => {
     const label = `${chapter.id}/${medium}`;
     try {
-      const raw = dashless(await generateChapter(env, { subject: doc, chapter, slos: mine, medium }), commaFor(medium));
+      const raw = dashless(await generateChapter(env, { subject: doc, chapter, slos: mine, medium }));
       const { clean, dropped: bad, fatal } = sift(raw, mine);
 
       if (fatal) {
@@ -1089,6 +1142,7 @@ async function main() {
   await Promise.all(Array.from({ length: Math.max(1, CONCURRENCY) }, worker));
 
   console.log(C.bold(`\n  ${written} chapter-media written, ${dropped} dropped${DRY ? ' (dry run, nothing saved)' : ''}`));
+  if (keptOrder.size) console.log(C.yellow(`  ${keptOrder.size} MCQs kept the model's option order: their explanation names an option ambiguously (see scripts/place-answers.mjs)`));
   console.log(C.dim(`  ${spent.input.toLocaleString()} tokens in, ${spent.output.toLocaleString()} out, about $${costSoFar().toFixed(2)} at list price\n`));
   if (capped) console.log(C.yellow(`  ${capped} chapter-media not started: the $${MAX_SPEND} ceiling was reached. Re-run with --missing to continue.\n`));
 }

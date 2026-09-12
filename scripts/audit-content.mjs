@@ -12,7 +12,7 @@
  * page that reads the bundled sample instead of the database compiles cleanly,
  * runs without error, and renders confident nonsense.
  *
- * Four checks, each one a bug that actually shipped:
+ * Checks, each one a bug that actually shipped:
  *
  *   1. A server component calling `api.*` directly. With no client the fetch
  *      layer silently falls through to the bundle. This is what made the
@@ -23,12 +23,15 @@
  *   3. Placeholder prose that reached published rows in the database.
  *   4. A published chapter missing a content type, which renders as an empty
  *      practice screen.
+ *   5. Letters lost to a broken stream decoder (U+FFFD), blanks showing two
+ *      gaps, and right answers bunched into one slot.
  */
 
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import { hasBrokenChar, splitAtGap } from './content-rules.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -251,6 +254,66 @@ async function main() {
     const why = INTENTIONALLY_EMPTY[id];
     if (why) console.log(`${C.dim('    --')} ${id.padEnd(8)} ${C.dim(`empty on purpose: ${why}`)}`);
     else console.log(`${C.red('  fail')} ${id.padEnd(8)} holds no content and no reason is recorded`);
+  }
+
+  /*
+   * Three more that shipped, all found by reading the database rather than the
+   * code, on 12 September: letters lost to a stream decoder, blanks showing two
+   * gaps, and right answers piled into slot A. The writer now prevents each
+   * one (generate-content.mjs with content-rules.mjs); these keep it honest.
+   */
+  console.log(C.bold('\n  broken letters, doubled gaps and answer placement\n'));
+  const everything = async (t, cols) => {
+    const rows = [];
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await db.from(t).select(cols).eq('review_status', 'published').order('id').range(from, from + 999);
+      if (error) throw new Error(`${t}: ${error.message}`);
+      rows.push(...data);
+      if (data.length < 1000) break;
+    }
+    return rows;
+  };
+  const byChapter = new Map((await db.from('chapters').select('id,board,grade,subject_id').range(0, 999)).data?.map((c) => [c.id, c]) ?? []);
+  const group = (r) => {
+    const c = byChapter.get(r.chapter_id);
+    return c ? `${c.board} ${c.grade} ${c.subject_id}` : r.chapter_id;
+  };
+
+  let broken = 0;
+  for (const [t, cols] of Object.entries(textCols)) {
+    const rows = await everything(t, `id,chapter_id,${cols}${t === 'mcqs' ? ',options' : ''}${t === 'blanks' ? ',answer,options' : ''}`);
+    const hits = rows.filter((r) => hasBrokenChar(r));
+    broken += hits.length;
+    if (hits.length) console.log(`${C.red('  fail')} ${t.padEnd(18)} ${hits.length} rows carry U+FFFD ${C.dim(hits.slice(0, 4).map((h) => h.id).join(', '))}`);
+  }
+  if (broken) problems.push(`${broken} published rows carry a broken letter (U+FFFD); see scripts/repair-split-letters.mjs`);
+  else console.log(`${C.green('    ok')} no broken letters`);
+
+  const blanks = await everything('blanks', 'id,chapter_id,before_text,after_text,answer,options');
+  const doubled = blanks.filter((b) => splitAtGap(b.before_text, b.after_text).changed);
+  if (doubled.length) {
+    problems.push(`${doubled.length} blanks show a second gap; see scripts/split-blank-gaps.mjs`);
+    console.log(`${C.red('  fail')} ${doubled.length} blanks carry their own "____" ${C.dim(doubled.slice(0, 4).map((b) => b.id).join(', '))}`);
+  } else console.log(`${C.green('    ok')} one gap per blank`);
+
+  // No slot may hold much more than its quarter of a subject's right answers.
+  const spread = {};
+  for (const m of await everything('mcqs', 'id,chapter_id,answer')) (spread[group(m)] ??= [0, 0, 0, 0])[m.answer]++;
+  const chips = {};
+  for (const b of blanks) {
+    const at = (b.options ?? []).indexOf(b.answer);
+    if (at >= 0 && at < 4) (chips[group(b)] ??= [0, 0, 0, 0])[at]++;
+  }
+  const lopsided = (counts) =>
+    Object.entries(counts)
+      .map(([g, c]) => ({ g, top: Math.max(...c) / (c.reduce((a, b) => a + b, 0) || 1), n: c.reduce((a, b) => a + b, 0) }))
+      .filter((x) => x.n >= 20 && x.top > 0.4);
+  for (const [what, counts] of [['MCQ answers', spread], ['blank chips', chips]]) {
+    const bad = lopsided(counts);
+    if (bad.length) {
+      problems.push(`${what} bunch into one slot in ${bad.length} subjects; see scripts/place-answers.mjs`);
+      console.log(`${C.red('  fail')} ${what}: ${bad.map((x) => `${x.g} ${Math.round(x.top * 100)}%`).join(', ')}`);
+    } else console.log(`${C.green('    ok')} ${what} spread over every slot`);
   }
 
   console.log('');
