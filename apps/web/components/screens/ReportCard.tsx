@@ -58,7 +58,8 @@ export function ReportCard() {
         const older = set.slice(0, half);
         const recent = set.slice(half);
         const delta = older.length && recent.length ? accuracy(recent) - accuracy(older) : 0;
-        return { sid, acc, trend: delta > 4 ? '↑' : delta < -4 ? '↓' : '→', attempted: set.length };
+        // No answers this month, no direction: an arrow beside "n/a" said nothing.
+        return { sid, acc, trend: !set.length ? '' : delta > 4 ? '↑' : delta < -4 ? '↓' : '→', attempted: set.length };
       }),
     [derived.subjects, thisMonth.attempts]
   );

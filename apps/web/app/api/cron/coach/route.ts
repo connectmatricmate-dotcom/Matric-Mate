@@ -52,7 +52,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
   try {
-    return await run();
+    /*
+     * `?user=<id>` rewrites that one student's report now, whether or not the
+     * nightly rules would, and nobody else's. For support ("my coach card is
+     * empty") and for testing a change without writing, and pushing, reports
+     * for every student who studied today.
+     */
+    const only = req.nextUrl.searchParams.get('user');
+    return await run(only && /^[0-9a-f-]{36}$/i.test(only) ? only : null);
   } catch (e) {
     console.error('[cron/coach] run failed', e instanceof Error ? e.message : e);
     return NextResponse.json(
@@ -62,11 +69,18 @@ export async function GET(req: NextRequest) {
   }
 }
 
-async function run(): Promise<NextResponse> {
+async function run(only: string | null = null): Promise<NextResponse> {
   const startedAt = Date.now();
   const admin = createAdminClient();
   const now = Date.now();
   const period = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date());
+
+  if (only) {
+    const digest = await buildDigestFromDb(admin, only);
+    const written = digest ? await writeCoachReport(admin, only, digest, period) : false;
+    if (written) await notify(only, reportReady());
+    return NextResponse.json({ user: only, digest: Boolean(digest), written });
+  }
 
   // Students who did something in the last day. Nobody else needs a rewrite.
   const since = new Date(now - 26 * 60 * 60 * 1000).toISOString();

@@ -60,7 +60,8 @@ export default function Report() {
         const older = set.slice(0, half);
         const recent = set.slice(half);
         const delta = older.length && recent.length ? accuracy(recent) - accuracy(older) : 0;
-        const trend = delta > 4 ? '↑' : delta < -4 ? '↓' : '→';
+        // No answers this month, no direction: an arrow beside "n/a" said nothing.
+        const trend = !set.length ? '' : delta > 4 ? '↑' : delta < -4 ? '↓' : '→';
         return { sid, acc, trend, attempted: set.length };
       }),
     [derived.subjects, monthAttempts]
@@ -198,9 +199,13 @@ export default function Report() {
         </View>
 
         <Row gap={S.sm} style={{ marginTop: S.md, flexWrap: 'wrap' }}>
-          <Pill tone="teal">{t('progress.activeDays', { n: activeDays })}</Pill>
-          <Pill tone="teal">{`${monthAttempts.length} ${t('common.questions')}`}</Pill>
-          <Pill tone="orange">{`${monthResults.length} ${t('progress.tests')}`}</Pill>
+          {/* One of each reads "1 active day", not "1 active days": the
+              website had these forms and this card never used them. */}
+          <Pill tone="teal">{t(activeDays === 1 ? 'progress.activeDaysOne' : 'progress.activeDays', { n: activeDays })}</Pill>
+          <Pill tone="teal">
+            {t(monthAttempts.length === 1 ? 'progress.questionsOne' : 'progress.questionsMany', { n: monthAttempts.length })}
+          </Pill>
+          <Pill tone="orange">{t(monthResults.length === 1 ? 'progress.testsOne' : 'progress.testsMany', { n: monthResults.length })}</Pill>
           <Pill tone="grey">{t('account.levelLine', { xp: state.xp, level: derived.level })}</Pill>
         </Row>
       </Card>

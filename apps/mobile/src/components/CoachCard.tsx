@@ -38,7 +38,12 @@ export function CoachCard() {
   /* Read again when the class, board or language changes, not only per
      account: a report written for last month's syllabus, or in the other
      language, used to sit under "This week" until the app was restarted. */
-  const { data, loading } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '', grade, board, lang]);
+  /* And again when a new report lands. Every report arrives with a "report
+     ready" notice in the inbox, which reaches the app live; the card only read
+     on its first render, so a student who opened the app on that notice saw
+     yesterday's card, or the welcome, until they restarted it. */
+  const reportNotice = state.notifications.find((n) => n.kind === 'report')?.id ?? '';
+  const { data, loading } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '', grade, board, lang, reportNotice]);
 
   /* The one thing to do next, chosen in core so the browser picks the same
      thing for the same student. Null when there is genuinely nothing: a

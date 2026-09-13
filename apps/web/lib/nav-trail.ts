@@ -29,13 +29,32 @@ const toPath = (url?: string | URL | null) => {
   const u = new URL(String(url), window.location.href);
   return u.pathname + u.search;
 };
+/**
+ * Listeners hear about a move a moment later, not inside the history call.
+ *
+ * Next.js writes history from inside a React insertion effect, and a back link
+ * re-rendering right there is an update React forbids: every router.push
+ * logged "useInsertionEffect must not schedule updates" (Start Section A on a
+ * mock paper was where it showed). canGoBack() and previousPath() still read
+ * the new place straight away; only the re-render waits for the microtask.
+ */
+let notifyQueued = false;
+const notify = () => {
+  if (notifyQueued) return;
+  notifyQueued = true;
+  queueMicrotask(() => {
+    notifyQueued = false;
+    listeners.forEach((l) => l());
+  });
+};
+
 const save = () => {
   try {
     sessionStorage.setItem(KEY, JSON.stringify(trail.slice(0, idx + 1)));
   } catch {
     // Private windows can refuse storage; the trail still works until reload.
   }
-  listeners.forEach((l) => l());
+  notify();
 };
 
 function install() {

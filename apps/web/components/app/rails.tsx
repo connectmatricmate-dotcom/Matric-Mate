@@ -310,6 +310,11 @@ export function CoachRail() {
   const userId = state.user?.id ?? '';
   const loading = settled?.userId !== userId;
   const report = settled?.userId === userId ? settled.report : null;
+  /* Read again when a new report lands: every report arrives with a "report
+     ready" notice, which reaches the inbox live. The card only read once, so
+     the report the notice announced did not appear until a reload. The old
+     card stays up while the new one loads. */
+  const reportNotice = state.notifications.find((n) => n.kind === 'report')?.id ?? '';
 
   useEffect(() => {
     if (!userId) return;
@@ -328,7 +333,7 @@ export function CoachRail() {
     return () => {
       alive = false;
     };
-  }, [userId]);
+  }, [userId, reportNotice]);
 
   /**
    * A skeleton while the report is in flight, not the welcome card.

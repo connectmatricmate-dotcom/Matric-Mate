@@ -48,6 +48,8 @@ const OFFLINE_GRACE_MS = 30 * 24 * 60 * 60 * 1000;
  * screen that cannot decide what it is.
  */
 const ENTITLEMENT_TIMEOUT_MS = 8000;
+/** Re-reads after a failed or timed-out entitlement read with nothing cached. */
+const ENTITLEMENT_RETRIES = 3;
 
 /**
  * The same bound for the profile read (name and role), which the splash waits
@@ -245,7 +247,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /** When the signed-in account was last re-checked, for SAME_USER_RECHECK_MS. */
   const checkedAt = useRef(0);
 
-  const loadEntitlement = useCallback(async (userId: string) => {
+  const loadEntitlement = useCallback(async function load(userId: string, attempt = 0): Promise<void> {
     setChecking(true);
     try {
       /*
@@ -271,6 +273,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // rather than telling a paying student their plan has gone.
         const cached = await readCachedEntitlement(userId);
         if (cached && currentUserId.current === userId) setEntitlement(cached);
+        /*
+         * And ask again, a few times, a little further apart each time. With
+         * nothing cached (a first sign-in on this phone) a slow connection
+         * timed out into "no plan", and a paying student sat on the upgrade
+         * screen until they found "Check again". The upgrade screen sends
+         * them into the app by itself the moment a later read finds the plan.
+         */
+        if (!cached && attempt < ENTITLEMENT_RETRIES) {
+          setTimeout(() => {
+            if (currentUserId.current === userId) void load(userId, attempt + 1);
+          }, 3000 * (attempt + 1));
+        }
         return;
       }
 
