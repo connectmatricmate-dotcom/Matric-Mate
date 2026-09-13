@@ -10,7 +10,7 @@ import { Wordmark } from '@/components/ui/primitives';
    mouse gets the tighter 40px list. */
 const LINK = 'inline-flex min-h-11 items-center transition-colors duration-200 hover:text-teal md:min-h-10';
 
-/** Who built the site: a profile link, deliberately without a personal name. */
+/** Who built the site: the studio's name, linking to its Upwork profile. */
 const DEVELOPER_URL = 'https://www.upwork.com/freelancers/~0193f3975eff0003a8';
 
 const PRODUCT = [
@@ -29,7 +29,7 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
         <div className="max-w-[300px]">
           <Wordmark />
           <p className="mt-3 text-mk-small text-ink2">
-            Exam preparation for FBISE and Punjab Board, Class 9 and 10, in English and Urdu medium. Built in Pakistan.
+            Exam preparation for FBISE and Punjab Board, Class 9 and 10, in English and Urdu medium.
           </p>
           {/* The registered office. Rendered only when it is filled in: a blank
               line reads as an oversight, an invented address is worse. */}
@@ -106,23 +106,32 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
           </div>
         </div>
       </div>
-      {/* Copyright on the left, the developer credit on the right; on a phone
-          the credit wraps to its own line under the copyright. */}
+      {/* Copyright on the left, the credit on the right; on a phone the credit
+          wraps to its own line under the copyright. */}
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 px-5 py-2 text-[12.5px] text-ink3">
           <p className="py-2">© {new Date().getFullYear()} MatricMate</p>
-          <p>
-            Developed by{' '}
-            <a
-              className={`${LINK} text-ink2`}
-              href={DEVELOPER_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Developed by a freelancer on Upwork (opens in a new tab)"
+          {/* The whole line is the link, with the studio's name set a little
+              heavier. The heart is green for the flag, and grows a little when
+              the line is pointed at, unless the visitor has asked for less
+              motion. */}
+          <a
+            className={`group ${LINK} gap-1.5 text-ink2`}
+            href={DEVELOPER_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Built in Pakistan by nusync.co. Opens nusync.co's Upwork profile in a new tab"
+          >
+            <span>
+              Built in Pakistan by <span className="font-bold">nusync.co</span>
+            </span>
+            <span
+              aria-hidden="true"
+              className="inline-block transition-transform duration-200 ease-out motion-safe:group-hover:scale-125 motion-safe:group-focus-visible:scale-125"
             >
-              a freelancer on Upwork
-            </a>
-          </p>
+              💚
+            </span>
+          </a>
         </div>
       </div>
     </footer>
