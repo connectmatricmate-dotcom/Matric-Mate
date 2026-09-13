@@ -3,6 +3,7 @@ import { payouts, totalsFor } from '@/lib/affiliates';
 import { currentAffiliate } from '@/lib/affiliate-session';
 import { SITE_URL } from '@/lib/site';
 import { Panel, Row, Stat, StatGrid, Table, Td, rupees } from '@/components/admin/bits';
+import { ShareQr } from '@/components/affiliate/ShareQr';
 import { ShareLink } from '@/components/affiliate/ShareLink';
 import { Skeleton } from '@/components/ui/primitives';
 
@@ -115,6 +116,12 @@ export default async function AffiliateDashboard() {
       )}
 
       <ShareLink link={`${SITE_URL}/r/${row.code}`} code={row.code} name={row.fullName} />
+      {/* A switched-off link has nothing to scan into. */}
+      {row.active ? (
+        <div className="mt-3">
+          <ShareQr link={`${SITE_URL}/r/${row.code}`} code={row.code} />
+        </div>
+      ) : null}
 
       <div className="mt-4">
         <Suspense fallback={<MoneySkeleton />}>
