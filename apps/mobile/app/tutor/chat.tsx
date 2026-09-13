@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Image, ScrollView, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,6 +35,10 @@ import { useApp } from '../../src/store/app';
 import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 import { useQuota } from '../../src/core/useQuota';
+
+/** The longest side of a photo sent to the tutor: the size Claude reads images
+ *  at best, and a few hundred kilobytes once saved at 70%. */
+const PHOTO_LONG_SIDE = 1568;
 
 /** "21:00" style local clock time out of the server's reset instant. */
 const clock = (iso: string) =>
@@ -459,8 +464,8 @@ export default function Chat() {
     actions.consumeAi();
   }
 
-  /** Snap or pick a photo of a question. Compressed by the picker; the
-   *  server enforces the hard size wall. */
+  /** Snap or pick a photo of a question, scaled to the size the tutor reads
+   *  (see PHOTO_LONG_SIDE); the server enforces the hard size wall. */
   async function attachPhoto(fromCamera: boolean) {
     try {
       if (fromCamera) {
@@ -473,12 +478,24 @@ export default function Chat() {
         }
       }
       const result = fromCamera
-        ? await ImagePicker.launchCameraAsync({ quality: 0.6, base64: true })
-        : await ImagePicker.launchImageLibraryAsync({ quality: 0.6, base64: true, mediaTypes: 'images' });
+        ? await ImagePicker.launchCameraAsync({ quality: 1 })
+        : await ImagePicker.launchImageLibraryAsync({ quality: 1, mediaTypes: 'images' });
       const asset = result.assets?.[0];
-      if (result.canceled || !asset?.base64) return;
-      const mediaType = asset.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
-      setPhoto({ data: asset.base64, mediaType, uri: asset.uri });
+      if (result.canceled || !asset?.uri) return;
+      /* Scaled down before it is sent. A phone photo straight from the camera
+         at 60% quality was several megabytes of base64, past the 4.5 MB a
+         request to the website may carry, so the question never arrived. */
+      const context = ImageManipulator.manipulate(asset.uri);
+      if (Math.max(asset.width, asset.height) > PHOTO_LONG_SIDE) {
+        context.resize(asset.width >= asset.height ? { width: PHOTO_LONG_SIDE } : { height: PHOTO_LONG_SIDE });
+      }
+      const image = await context.renderAsync();
+      const saved = await image.saveAsync({ compress: 0.7, format: SaveFormat.JPEG, base64: true });
+      // Both hold native memory until released, a full-size photo's worth.
+      image.release();
+      context.release();
+      if (!saved.base64) return;
+      setPhoto({ data: saved.base64, mediaType: 'image/jpeg', uri: saved.uri });
     } catch {
       toast(t('states.errorTitle'));
     }
