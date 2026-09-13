@@ -19,6 +19,15 @@ const ROUTE: Record<NotificationTarget, string> = {
   subscription: '/account/subscription',
 };
 
+/**
+ * The targets that are tabs. Those are reached by going back down to the tabs
+ * this inbox was opened from: pushed, they stacked a second set of tabs on top
+ * of it, and back from that home screen came out on the inbox again.
+ */
+const TAB_TARGETS = new Set<NotificationTarget>(['home', 'study', 'practice', 'progress']);
+const openTarget = (target: NotificationTarget) =>
+  TAB_TARGETS.has(target) ? router.dismissTo(ROUTE[target] as never) : router.push(ROUTE[target] as never);
+
 const ICON: Record<Notification['kind'], { emoji: string; tone: 'orange' | 'teal' | 'green' | 'grey' }> = {
   streak: { emoji: '🔥', tone: 'orange' },
   reminder: { emoji: '⏰', tone: 'teal' },
@@ -64,7 +73,7 @@ export default function Notifications() {
         // A read notice steps back a little; a new one keeps full strength
         // and a dot, so the two can be told apart.
         dim={!fresh.has(n.id)}
-        onPress={n.target ? () => router.push(ROUTE[n.target!] as never) : undefined}
+        onPress={n.target ? () => openTarget(n.target!) : undefined}
         right={
           fresh.has(n.id) ? (
             <View style={{ width: 9, height: 9, borderRadius: 99, backgroundColor: C.orange }} />

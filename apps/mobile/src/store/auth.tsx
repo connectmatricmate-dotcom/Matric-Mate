@@ -451,7 +451,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (uid) {
           const { data: prof } = await supabase.from('profiles').select('role').eq('id', uid).maybeSingle();
           if (prof?.role === 'affiliate' || prof?.role === 'admin') {
-            await supabase.auth.signOut();
+            // This phone's session only: the default signs the account out
+            // everywhere, and a teacher who tried the app would lose the
+            // website session they actually work in.
+            await supabase.auth.signOut({ scope: 'local' });
             throw new Error('auth.errStaffApp');
           }
         }
@@ -511,7 +514,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // student to sign in on this device inherits the last one's push.
         // Bounded too: fetching the device token can hang with no signal.
         await settle(releasePushToken(), PUSH_RELEASE_MS);
-        await supabase.auth.signOut();
+        // This phone only, as the website does: the default ends the session on
+        // every device, so signing out here signed the student out of their
+        // laptop too, which is not what "sign out" on one phone means.
+        await supabase.auth.signOut({ scope: 'local' });
         const id = currentUserId.current;
         // Drop the cached entitlement with the session. Leaving it behind would
         // hand the next person to sign in on this phone somebody else's plan.

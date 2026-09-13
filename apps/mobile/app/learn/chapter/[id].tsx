@@ -26,7 +26,7 @@ import { cheer } from '../../../src/core/haptics';
 import { useAsync } from '../../../src/core/useAsync';
 import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
-import { C, F, S, alpha } from '../../../src/theme';
+import { C, F, S, alpha, isRTL } from '../../../src/theme';
 
 /** A row whose counts mean something: a live row, or one with counts in it. The bundled catalogue has zeroes and no board. */
 const countsKnown = (c: Chapter): boolean => c.board !== undefined || hasStudyMaterial(c);
@@ -331,13 +331,16 @@ export default function ChapterHub() {
         )}
         {/* The board's own weighting, front and centre: it is the single most
             useful planning number a student can have. Hidden when the table
-            of specification gave none, never shown as a zero. */}
+            of specification gave none, never shown as a zero. On its own
+            tint, not as orange type on the teal: that pairing measured under
+            2:1 and the number was the hardest thing on the card to read. It
+            starts where the title does, which is the right edge in Urdu. */}
         {chapter?.examShare ? (
-          <Text style={{ fontFamily: F.bodyBold, fontSize: 12.5, color: C.orange, marginTop: 6 }}>
+          <Pill tone="orange" style={{ marginTop: 8, alignSelf: isRTL() ? 'flex-end' : 'flex-start' }}>
             {chapter.examMarks
               ? t('study.examShareLong', { n: chapter.examShare, m: chapter.examMarks })
               : t('study.examShare', { n: chapter.examShare })}
-          </Text>
+          </Pill>
         ) : null}
         {isUrduScript(blurb) ? (
           <Ur size={13} style={{ color: alpha(C.onBrand, 0.92), marginTop: 4 }}>{blurb}</Ur>

@@ -30,6 +30,17 @@ export default function Progress() {
   // repeatable, and the month label has no business changing mid-screen.
   const [now] = useState(() => Date.now());
   const month = formatDate(now, lang, { month: 'long' });
+  /**
+   * This month's answers, for the report card row. The row names this
+   * month's report, and the report grades this month alone, but the row
+   * graded every answer ever: on the first of a month it said "Overall B"
+   * over a report with no answers in it. Karachi's calendar, as the report's.
+   */
+  const monthAttempts = useMemo(() => {
+    const pktMonth = (ms: number) => new Date(ms + 5 * 3600_000).toISOString().slice(0, 7);
+    const current = pktMonth(now);
+    return state.attempts.filter((a) => Number.isFinite(a.at) && pktMonth(a.at) === current);
+  }, [state.attempts, now]);
 
   const link = (label: string, href: string) => (
     <Tap onPress={() => router.push(href as never)} hit>
@@ -146,7 +157,9 @@ export default function Progress() {
             <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t('progress.reportCard', { month })}</Text>
             {/* No answers, no grade: a brand-new student was told "Overall F". */}
             <Small>
-              {state.attempts.length ? t('progress.reportCardSub', { grade: grade(acc) }) : t('progress.reportCardSubNone')}
+              {monthAttempts.length
+                ? t('progress.reportCardSub', { grade: grade(accuracy(monthAttempts)) })
+                : t('progress.reportCardSubNone')}
             </Small>
           </View>
           <Pill tone="orange">{t('progress.open')}</Pill>

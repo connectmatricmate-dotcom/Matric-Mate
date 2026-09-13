@@ -115,7 +115,7 @@ export default function Downloads() {
             emoji="📭"
             title={t('downloads.emptyTitle')}
             sub={t('downloads.emptyBody')}
-            cta={<Btn title={t('downloads.browse')} sm variant="line" onPress={() => router.push('/(tabs)/study')} />}
+            cta={<Btn title={t('downloads.browse')} sm variant="line" onPress={() => router.dismissTo('/(tabs)/study')} />}
           />
         </>
       ) : (

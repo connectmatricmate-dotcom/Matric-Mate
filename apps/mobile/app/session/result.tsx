@@ -63,7 +63,14 @@ export default function Result() {
     return () => clearInterval(timer);
   }, [pct]);
 
-  const myAverage = accuracy(state.attempts);
+  /**
+   * The average this session is compared with: the answers from before it.
+   * Counting the session's own answers pulled the average towards the score,
+   * so the very first session always read "+0% vs your average". Null when
+   * there is no earlier answer, and then there is nothing to compare with.
+   */
+  const earlier = state.attempts.filter((a) => a.at < (s?.startedAt ?? 0));
+  const myAverage = earlier.length ? accuracy(earlier) : null;
   /**
    * The topic most of the wrong answers came from, and the chapter to study
    * it in: the chapter of a question on that topic. "Study it now" used to
@@ -97,7 +104,7 @@ export default function Result() {
   }
 
   const good = pct >= 70;
-  const diff = pct - myAverage;
+  const diff = myAverage === null ? null : pct - myAverage;
   /**
    * 1 to 3 stars, the scale a nine-year-old already understands: one for
    * finishing, two for a pass, three for excellent. Zero would just be mean.
@@ -157,9 +164,11 @@ export default function Result() {
             {s.mode === 'exam' ? t('session.xpDoubled', { n: xp }) : t('session.xpEarned', { n: xp })}
           </Pill>
         </Pop>
-        <Pop delay={600}>
-          <Pill tone="grey">{t('session.vsAverage', { n: `${diff >= 0 ? '+' : ''}${diff}` })}</Pill>
-        </Pop>
+        {diff !== null ? (
+          <Pop delay={600}>
+            <Pill tone="grey">{t('session.vsAverage', { n: `${diff >= 0 ? '+' : ''}${diff}` })}</Pill>
+          </Pop>
+        ) : null}
       </Row>
 
       {weakest ? (
@@ -176,7 +185,9 @@ export default function Result() {
                   title={t('session.studyNow')}
                   variant="danger"
                   sm
-                  onPress={() => router.replace(`/learn/chapter/${weakest.chapterId}`)}
+                  // The chapter already underneath when the set was opened
+                  // from it, instead of a second copy stacked over it.
+                  onPress={() => router.dismissTo(`/learn/chapter/${weakest.chapterId}`)}
                 />
               </>
             ) : null}
@@ -194,7 +205,10 @@ export default function Result() {
             title={t('common.done')}
             onPress={() => {
               session.clear();
-              router.replace('/(tabs)/practice');
+              // Down to the tabs already at the bottom of the stack. Replace
+              // put a second set of tabs on top of the chapter and subject
+              // screens, and back from Practice walked into them.
+              router.dismissTo('/(tabs)/practice');
             }}
           />
         </View>

@@ -222,7 +222,11 @@ export function usePush(userId: string | null) {
       if (response.notification.request.identifier === consumedResponseId) return;
       const target = response.notification.request.content.data?.target;
       const route = typeof target === 'string' ? ROUTE[target as NotificationTarget] : undefined;
-      if (route) router.push(route as never);
+      if (!route) return;
+      // A tab is gone back down to, not pushed: over a stacked screen a push
+      // put a second set of tabs on top of it (see app/notifications.tsx).
+      if (route.startsWith('/(tabs)')) router.dismissTo(route as never);
+      else router.push(route as never);
     });
     return () => sub.remove();
   }, []);

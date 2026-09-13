@@ -22,13 +22,14 @@ import { Label, Wordmark } from '../src/components/ui';
  * using it for a month and made them swipe through it to reach a password
  * field.
  *
- * Waits for all three answers. `hydrated` is the local study cache, `loading`
- * is the stored Supabase session being read back off the device, and `seen` is
- * this flag. Routing on any one alone bounces a signed-in student through the
- * wrong screen for a frame on every cold start.
+ * Waits for all three answers. `accountReady` is the local study cache, read
+ * for the account now signed in, `loading` is the stored Supabase session
+ * being read back off the device, and `seen` is this flag. Routing on any one
+ * alone bounces a signed-in student through the wrong screen for a frame on
+ * every cold start.
  */
 export default function Splash() {
-  const { state, hydrated } = useApp();
+  const { state, accountReady } = useApp();
   const t = useT();
   const { loading, role, roleReady } = useAuth();
   const [seen, setSeen] = useState<boolean | null>(null);
@@ -38,7 +39,10 @@ export default function Splash() {
   }, []);
 
   useEffect(() => {
-    if (!hydrated || loading || seen === null) return;
+    // accountReady, not hydrated: the store is already hydrated for the
+    // signed-out login screen, and routing on that sent a returning student
+    // whose account had not been read yet into onboarding.
+    if (!accountReady || loading || seen === null) return;
     /*
      * A signed-in account also waits for its role. Routing on the 'student'
      * default sent an administrator into "Which class are you in?", because
@@ -73,7 +77,7 @@ export default function Splash() {
       if (opened) router.push(opened as never);
     }, 300);
     return () => clearTimeout(t);
-  }, [hydrated, loading, seen, state.user, state.onboarding, role, roleReady]);
+  }, [accountReady, loading, seen, state.user, state.onboarding, role, roleReady]);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.paper, alignItems: 'center', justifyContent: 'center', gap: S.lg }}>

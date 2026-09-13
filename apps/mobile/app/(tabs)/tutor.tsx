@@ -230,7 +230,9 @@ export default function Tutor() {
               <Item
                 key={thread.id}
                 title={thread.title}
-                sub={`${thread.context_label ?? ''} ${formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })}`.trim()}
+                // A middot between the two, as on the website: run together they
+                // read as one phrase, "Physics 12 Sept".
+                sub={[thread.context_label, formatDate(thread.updated_at, lang, { day: 'numeric', month: 'short' })].filter(Boolean).join(' · ')}
                 icon="spark"
                 last={i === shown.length - 1}
                 onPress={() => router.push(`/tutor/chat?thread=${thread.id}`)}

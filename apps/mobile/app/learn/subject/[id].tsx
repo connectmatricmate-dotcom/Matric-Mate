@@ -139,7 +139,9 @@ export default function Chapters() {
                         {t('study.notOnPaper')}
                       </Pill>
                     ) : c.board === undefined && !hasStudyMaterial(c) ? null : (
-                      <Small numberOfLines={1}>
+                      // Two lines, not one: on a 390dp phone one line cut the
+                      // sections count off every row ("5 sec...").
+                      <Small numberOfLines={2}>
                         {/* Only what the row actually knows. audioMinutes is
                             always zero here; the real length lives on the
                             audio_tracks row and belongs to the chapter hub.

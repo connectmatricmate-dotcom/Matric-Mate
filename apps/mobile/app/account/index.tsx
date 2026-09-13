@@ -30,6 +30,7 @@ import {
   levelProgress,
   mediumName,
   reminderHour,
+  translate,
   xpToNextLevel,
 } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
@@ -40,6 +41,20 @@ import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { SITE_URL } from '../../src/lib/site';
 import { C, F, S } from '../../src/theme';
+
+/**
+ * This app's page in the phone's settings, where a refused notification
+ * permission is given back. Guarded, because the web build has no such page:
+ * there the call is not a rejected promise but a missing function, and it
+ * threw on the account screen instead of saying the link could not open.
+ */
+function openPhoneSettings(onFail: () => void) {
+  try {
+    void Linking.openSettings().catch(onFail);
+  } catch {
+    onFail();
+  }
+}
 
 /**
  * The ONE settings surface. There used to be two: the avatar opened
@@ -65,7 +80,11 @@ export default function Account() {
   const setup = state.onboarding;
   const classLevel = setup?.classLevel ?? 9;
   const s = state.settings;
-  const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
+  // The words are lower case for the reader's "Text size: medium" toast; on
+  // their own under the row title they read as a typo, so capitalised here.
+  // Urdu has no case and is unchanged.
+  const sizeWord = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
+  const sizeLabel = sizeWord.charAt(0).toUpperCase() + sizeWord.slice(1);
   const unreadCount = state.notifications.filter((n) => !n.read).length;
   /**
    * Whether push can actually reach this phone. The switch is the student's
@@ -185,9 +204,11 @@ export default function Account() {
                     actions.setLanguage(next);
                     if (stranded) setDownloadsNote(true);
                   }}
+                  // Each language named in its own script, as on the
+                  // welcome screen's toggle.
                   options={[
-                    { value: 'en', label: t('lang.english') },
-                    { value: 'ur', label: t('lang.urdu'), urdu: true },
+                    { value: 'en', label: translate('en', 'lang.english') },
+                    { value: 'ur', label: translate('ur', 'lang.urdu'), urdu: true },
                   ]}
                 />
               </View>
@@ -246,7 +267,7 @@ export default function Account() {
               pushBlocked
                 ? () => {
                     if (push.canAskAgain) void push.ask();
-                    else void Linking.openSettings().catch(() => toast(t('common.openLinkError')));
+                    else openPhoneSettings(() => toast(t('common.openLinkError')));
                   }
                 : undefined
             }
@@ -256,7 +277,7 @@ export default function Account() {
                 onPress={() => {
                   if (pushBlocked) {
                     if (push.canAskAgain) void push.ask();
-                    else void Linking.openSettings().catch(() => toast(t('common.openLinkError')));
+                    else openPhoneSettings(() => toast(t('common.openLinkError')));
                     if (!s.channelPush) actions.setSettings({ channelPush: true });
                     return;
                   }

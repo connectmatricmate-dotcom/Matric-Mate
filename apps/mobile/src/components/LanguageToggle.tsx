@@ -1,5 +1,6 @@
 import { View } from 'react-native';
-import { useLang, useT } from '../i18n';
+import { translate } from '@matricmate/core';
+import { useLang } from '../i18n';
 import { C, F, R, rowDir } from '../theme';
 import { Tap, Text } from './ui';
 
@@ -18,10 +19,13 @@ import { Tap, Text } from './ui';
  */
 export function LanguageToggle({ compact }: { compact?: boolean }) {
   const { lang, setLang } = useLang();
-  const t = useT();
+  // Each name from its own language's dictionary, whatever the app is in now:
+  // read through the current one, the English app offered "Urdu" set in the
+  // Nastaliq face, a Latin word in a script font, and never the "اردو" a
+  // student who cannot read English is looking for.
   const options: { value: 'en' | 'ur'; label: string; urdu?: boolean }[] = [
-    { value: 'en', label: t('lang.english') },
-    { value: 'ur', label: t('lang.urdu'), urdu: true },
+    { value: 'en', label: translate('en', 'lang.english') },
+    { value: 'ur', label: translate('ur', 'lang.urdu'), urdu: true },
   ];
 
   return (

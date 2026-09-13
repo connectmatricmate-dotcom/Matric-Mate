@@ -157,8 +157,9 @@ export default function Flashcards() {
           />
         ) : null}
         <Spacer h={S.sm} />
+        {/* Down to the chapter underneath rather than a second copy on top. */}
         {chapterId ? (
-          <Btn title={t('session.backToChapter')} variant="line" onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+          <Btn title={t('session.backToChapter')} variant="line" onPress={() => router.dismissTo(`/learn/chapter/${chapterId}`)} />
         ) : null}
       </Screen>
     );

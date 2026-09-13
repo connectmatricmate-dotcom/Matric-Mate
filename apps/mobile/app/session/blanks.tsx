@@ -135,8 +135,11 @@ export default function Blanks() {
         </Card>
         </Pop>
         <Spacer h={S.lg} />
+        {/* Back down to the chapter underneath, not a second copy of it on
+            top: replace stacked one, and back from it opened the same
+            chapter again. */}
         {chapterId ? (
-          <Btn title={t('session.backToChapter')} onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+          <Btn title={t('session.backToChapter')} onPress={() => router.dismissTo(`/learn/chapter/${chapterId}`)} />
         ) : null}
       </Screen>
     );

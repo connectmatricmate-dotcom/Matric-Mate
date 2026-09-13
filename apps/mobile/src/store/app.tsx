@@ -375,6 +375,15 @@ type Actions = {
 type Ctx = {
   state: State;
   hydrated: boolean;
+  /**
+   * Hydrated for the account signed in right now. False from a sign-in until
+   * that account's own state has been read (or this device's has been found
+   * to be enough), which is what the splash has to wait for before deciding
+   * between onboarding and the app: `hydrated` alone was already true from
+   * the login screen, so a sign-in on a slow connection was routed on the
+   * empty signed-out state and a returning student was sent into onboarding.
+   */
+  accountReady: boolean;
   actions: Actions;
   derived: {
     streak: number;
@@ -415,6 +424,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<State>(EMPTY);
   const [localLoaded, setLocalLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  /**
+   * Which account `hydrated` was last reached for: the user id, or null for
+   * signed out. `hydrated` itself stays true from the login screen on, so on
+   * its own it cannot say whether the account that has just signed in has
+   * been read yet. See accountReady.
+   */
+  const [readyFor, setReadyFor] = useState<string | null | undefined>(undefined);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /** Read by actions so they can decide what to queue without `state` in their deps (see `actions` below, memoised once). */
@@ -709,6 +725,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       if (syncedForRef.current === uid) {
         setHydrated(true);
+        setReadyFor(uid);
         return;
       }
       syncedForRef.current = uid;
@@ -759,6 +776,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         queueGenRef.current += 1;
         queueRef.current = [];
         setHydrated(true);
+        setReadyFor(null);
         return;
       }
 
@@ -775,9 +793,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
        * app felt slow, and on a dead network it held the splash indefinitely.
        *
        * A fresh device still waits, because rendering before the server
-       * answers would seed demo data over a real account's history. It waits
-       * six seconds at most: a student installing on a dead network gets an
-       * empty but working app now and their history on the next good signal.
+       * answers would seed demo data over a real account's history, and
+       * without the account's choices the splash would send a returning
+       * student into onboarding. See the read below for how long it waits.
        */
       const apply = async (server: HydratedStudyState | null): Promise<void> => {
         if (stale() || !server) return;
@@ -902,6 +920,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       if (deviceHasState) {
         setHydrated(true);
+        setReadyFor(uid);
         void hydrateStudyState(supabase, uid).then(async (server) => {
           await apply(server);
           if (!stale()) void flush(uid);
@@ -909,13 +928,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const server = await Promise.race([
-        hydrateStudyState(supabase, uid),
-        new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000)),
-      ]);
+      /*
+       * No race of its own any more. It used to give up after six seconds and
+       * throw away the answer that arrived at seven, and nothing ever read it
+       * again: on a slow connection a returning student signing in on a new
+       * phone was sent through "Which class are you in?" as if the account
+       * were new, with none of their progress, and choosing again wrote the
+       * half-finished choices over the account's real ones. The read has its
+       * own eight second cap, and this runs moments after a sign-in that
+       * reached the server, so a link that slow is likelier than a dead one:
+       * one more try before falling back to an empty app.
+       */
+      let server = await hydrateStudyState(supabase, uid);
+      if (!server && !stale()) server = await hydrateStudyState(supabase, uid);
       await apply(server);
       if (stale()) return;
       setHydrated(true);
+      setReadyFor(uid);
       void flush(uid);
     })();
 
@@ -1477,6 +1506,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [state, user, premium]
   );
 
+  const accountReady = hydrated && readyFor === (authUser?.id ?? null);
+
   const derived = useMemo(() => {
     const aiLimit = view.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
     const usedToday = view.ai.day === todayKey() ? view.ai.used : 0;
@@ -1511,7 +1542,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [view, indexVersion, primed.version]);
 
   return (
-    <AppCtx.Provider value={{ state: view, hydrated, actions, derived, contentKey, contentLoading }}>
+    <AppCtx.Provider value={{ state: view, hydrated, accountReady, actions, derived, contentKey, contentLoading }}>
       {children}
     </AppCtx.Provider>
   );

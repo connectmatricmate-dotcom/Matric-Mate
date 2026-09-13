@@ -164,8 +164,9 @@ export default function ShortQuestions() {
         </Card>
         </Pop>
         <Spacer h={S.lg} />
+        {/* Down to the chapter underneath rather than a second copy on top. */}
         {chapterId ? (
-          <Btn title={t('session.backToChapter')} onPress={() => router.replace(`/learn/chapter/${chapterId}`)} />
+          <Btn title={t('session.backToChapter')} onPress={() => router.dismissTo(`/learn/chapter/${chapterId}`)} />
         ) : null}
       </Screen>
     );

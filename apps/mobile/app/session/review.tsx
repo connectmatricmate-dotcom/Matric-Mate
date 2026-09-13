@@ -43,7 +43,7 @@ export default function Review() {
 
   return (
     <Screen>
-      <Header title={t('session.reviewTitle')} sub={s.label} back onBack={() => router.replace('/(tabs)/practice')} />
+      <Header title={t('session.reviewTitle')} sub={s.label} back onBack={() => router.dismissTo('/(tabs)/practice')} />
 
       <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
         <Pill tone={filter === 'all' ? 'teal' : 'grey'} onPress={() => setFilter('all')}>
@@ -145,7 +145,8 @@ export default function Review() {
         title={t('common.done')}
         onPress={() => {
           session.clear();
-          router.replace('/(tabs)/practice');
+          // The tabs underneath, not a second set of them; see the result screen.
+          router.dismissTo('/(tabs)/practice');
         }}
       />
     </Screen>

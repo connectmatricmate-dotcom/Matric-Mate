@@ -35,8 +35,11 @@ export function AppHeader({
       <AvatarBadge index={state.settings.avatar ?? 0} size={42} />
 
       <View style={{ flex: 1, minWidth: 0 }}>
+        {/* Up to two lines: the study tab's is the whole setup, and "Class 9
+            · Punjab Board · English medium" lost its medium to an ellipsis on
+            a 390dp phone. */}
         {eyebrow ? (
-          <Small numberOfLines={1} style={{ fontFamily: F.bodyBold, fontSize: 12 }}>
+          <Small numberOfLines={2} style={{ fontFamily: F.bodyBold, fontSize: 12 }}>
             {eyebrow}
           </Small>
         ) : null}
