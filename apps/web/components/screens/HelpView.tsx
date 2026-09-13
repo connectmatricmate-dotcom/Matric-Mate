@@ -8,9 +8,12 @@ import { Card, Icon } from '@/components/ui/primitives';
 import { SectionTitle } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
 
+/* The first two answers are the website's own: the shared ones are written for
+   the Android app, and here they told a student already on the website to go
+   and renew on the website, and promised downloads it does not offer. */
 const FAQ: [StringKey, StringKey][] = [
-  ['account.faq1Q', 'account.faq1A'],
-  ['account.faq2Q', 'account.faq2A'],
+  ['account.faq1Q', 'account.faq1AWeb'],
+  ['account.faq2Q', 'account.faq2AWeb'],
   ['account.faq3Q', 'account.faq3A'],
   ['account.faq4Q', 'account.faq4A'],
 ];

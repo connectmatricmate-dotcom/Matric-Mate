@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { affiliateByUserId, payouts, referredStudents, totalsFor } from '@/lib/affiliates';
+import { requireAdmin } from '@/lib/roles';
 import { SITE_URL } from '@/lib/site';
 import { BackLink, Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
 import { RecordPayout, ToggleActive } from '@/components/admin/TeacherControls';
@@ -10,6 +11,9 @@ const when = (iso: string) =>
   iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 
 export default async function TeacherPage({ params }: { params: Promise<{ id: string }> }) {
+  // Before any read: these readers use the service key, and a student who had
+  // a teacher's id was sent their code, earnings and students.
+  await requireAdmin();
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 

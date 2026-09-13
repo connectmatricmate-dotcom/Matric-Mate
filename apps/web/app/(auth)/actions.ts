@@ -10,6 +10,7 @@ import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
 import { normaliseMobile } from '@matricmate/core';
 
+import { isOpenWithoutPlan } from '@/lib/entitlement';
 import { currentRole, landingFor } from '@/lib/roles';
 import { createClient } from '@/lib/supabase/server';
 
@@ -244,14 +245,19 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
    * away, so the commonest value by far is /dashboard: a student follows a
    * link, gets bounced to log in, and is then sent back to a page the paywall
    * will bounce again. Honouring that blindly is how signing in ended on a
-   * blank screen. When the landing decision says /upgrade, it wins.
+   * blank screen. When the landing decision says /upgrade, it wins, except
+   * for the pages the paywall leaves open (the account screens): those do not
+   * bounce, and a student without a plan who followed a link to their
+   * receipts or their subscription was otherwise dropped on the price list.
    *
    * Staff get the same rule for anything outside their own area. A teacher
    * or an administrator sent to /dashboard is bounced on to their own area by
    * the student layout, which is the same double redirect (see landingFor).
    */
   const allowed =
-    role === 'student' ? landing !== '/upgrade' : asked === landing || asked.startsWith(`${landing}/`);
+    role === 'student'
+      ? landing !== '/upgrade' || isOpenWithoutPlan(asked)
+      : asked === landing || asked.startsWith(`${landing}/`);
   redirect(allowed && asked ? asked : landing);
 }
 
@@ -309,6 +315,12 @@ export async function setPasswordAction(_prev: AuthState, formData: FormData): P
 
 export async function signOutAction() {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  /*
+   * This browser only, which is what the confirm sheet promises ("removes your
+   * account's data from this device"). The default scope is global: it ended
+   * every session the account had, so a student who bought a plan on a family
+   * laptop and logged out there was signed out of the app on their phone too.
+   */
+  await supabase.auth.signOut({ scope: 'local' });
   redirect('/');
 }

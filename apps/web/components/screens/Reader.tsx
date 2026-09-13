@@ -153,7 +153,7 @@ export function Reader({
   const toast = useToast();
   const [rawIdx, setIdx] = useState(startSection);
   const [askOpen, setAskOpen] = useState(false);
-  const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
+  const [answer, setAnswer] = useState<{ text: string; steps?: string[]; threadId?: string } | null>(null);
   const [asking, setAsking] = useState(false);
   /** The last question asked in the sheet, so "continue in chat" opens on it
    *  instead of an empty thread that forgets what was being discussed. */
@@ -230,7 +230,7 @@ export function Reader({
       toast(note);
       return;
     }
-    setAnswer({ text: res.text, steps: res.steps });
+    setAnswer({ text: res.text, steps: res.steps, threadId: res.threadId });
     // Keep the local counter roughly in step with the server's.
     actions.consumeAi();
   }
@@ -395,8 +395,16 @@ export function Reader({
                 </li>
               ))}
             </ol>
+            {/* To the conversation this answer was saved in. It passed the
+                question on as `q`, which the chat sends by itself on arrival,
+                so carrying on in the chat asked the same thing a second time:
+                one more of the day's fifty spent, and a duplicate thread. */}
             <Link
-              href={`/tutor/chat?chapter=${id}${asked ? `&q=${encodeURIComponent(asked)}` : ''}`}
+              href={
+                answer.threadId
+                  ? `/tutor/chat?thread=${answer.threadId}&chapter=${id}`
+                  : `/tutor/chat?chapter=${id}${asked ? `&draft=${encodeURIComponent(asked)}` : ''}`
+              }
               className="mt-2 inline-flex min-h-11 items-center text-[13px] font-extrabold text-teal hover:underline"
             >
               {t('reader.openChat')}

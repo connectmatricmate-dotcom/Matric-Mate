@@ -2,6 +2,7 @@ import 'server-only';
 import { asBoard, type Board } from '@matricmate/core';
 import { planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/roles';
 
 /**
  * The referral programme, server side.
@@ -245,8 +246,10 @@ export async function totalsFor(affiliateId: string, commissionPct: number): Pro
   };
 }
 
-/** Every teacher, with their numbers, for the admin panel. */
+/** Every teacher, with their numbers, for the admin panel. Administrators only,
+ *  checked here as well as on the page: see requireAdmin. */
 export async function allAffiliates(): Promise<{ row: AffiliateRow; totals: AffiliateTotals }[]> {
+  await requireAdmin();
   const admin = createAdminClient();
   const { data, error } = await admin.from('affiliates').select('*').order('created_at', { ascending: false }).range(0, 499);
   if (error) throw new Error(`affiliates read failed: ${error.message}`);

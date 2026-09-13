@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { adminStats, dailyStats } from '@/lib/admin-stats';
+import { requireAdmin } from '@/lib/roles';
 import { TrendChart } from '@/components/admin/TrendChart';
 import { Stat, StatGrid, rupees } from '@/components/admin/bits';
 
@@ -13,6 +14,8 @@ import { Stat, StatGrid, rupees } from '@/components/admin/bits';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminOverview() {
+  // Before any read: see requireAdmin for why the layout's check is not enough.
+  await requireAdmin();
   const s = await adminStats();
   const conversion = s.students ? Math.round((s.paidStudents / s.students) * 100) : 0;
   const referredConversion = s.referredStudents ? Math.round((s.referredPaid / s.referredStudents) * 100) : 0;

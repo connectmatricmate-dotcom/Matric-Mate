@@ -4,7 +4,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { Language } from '@matricmate/core';
-import { GRADE_10_READY, REMINDER_TIMES, boardName, formatDate, levelProgress, mediumName, xpToNextLevel } from '@matricmate/core';
+import {
+  GRADE_10_READY,
+  REMINDER_TIMES,
+  boardName,
+  formatDate,
+  levelProgress,
+  mediumName,
+  reminderHour,
+  xpToNextLevel,
+} from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
 import { planName } from '@/lib/plans';
 import { APP_VERSION } from '@/lib/site';
@@ -62,6 +71,12 @@ export function AccountView() {
   const setup = state.onboarding;
   const s = state.settings;
   const sizeLabel = [t('reader.small'), t('reader.medium'), t('reader.large')][s.fontScale];
+  /*
+   * The stored value is '7:00 PM', a key the server's reminder job parses,
+   * not a label. Shown as it was, an Urdu account read "PM" in three places on
+   * this screen; the Android app has always put it through this string.
+   */
+  const timeLabel = (value: string) => t('account.reminderTimeLabel', { h: ((reminderHour(value) + 11) % 12) + 1 });
   const unreadCount = state.notifications.filter((n) => !n.read).length;
 
   return (
@@ -210,12 +225,12 @@ export function AccountView() {
                   whole server-rendered page away over it on every load. */}
               <Item
                 title={t('account.studyReminder')}
-                sub={t('account.studyReminderSub', { time: s.reminderTime })}
+                sub={t('account.studyReminderSub', { time: timeLabel(s.reminderTime) })}
                 icon="bell"
                 right={
                   <div className="flex items-center gap-2">
                     <Btn
-                      title={s.reminderTime}
+                      title={timeLabel(s.reminderTime)}
                       icon="clock"
                       variant="line"
                       sm
@@ -366,7 +381,7 @@ export function AccountView() {
           {REMINDER_TIMES.map((time, i) => (
             <ItemButton
               key={time}
-              title={time}
+              title={timeLabel(time)}
               icon={time === s.reminderTime ? 'check' : 'clock'}
               tone={time === s.reminderTime ? 'green' : 'grey'}
               last={i === REMINDER_TIMES.length - 1}

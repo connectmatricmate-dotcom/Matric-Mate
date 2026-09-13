@@ -1,4 +1,5 @@
 import { allAffiliates } from '@/lib/affiliates';
+import { requireAdmin } from '@/lib/roles';
 import { CellLink, Panel, Row, Table, Tag, Td, rupees } from '@/components/admin/bits';
 import { LinkBtn } from '@/components/ui/primitives';
 
@@ -11,6 +12,8 @@ export const dynamic = 'force-dynamic';
  * where the eye lands, and it is the only one that changes colour.
  */
 export default async function TeachersPage() {
+  // Before any read: see requireAdmin for why the layout's check is not enough.
+  await requireAdmin();
   const rows = await allAffiliates();
 
   return (

@@ -149,9 +149,18 @@ export function ReportCard() {
         </table>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Pill tone="teal">{t('progress.activeDays', { n: thisMonth.activeDays })}</Pill>
-          <Pill tone="teal">{`${thisMonth.attempts.length} ${t('common.questions')}`}</Pill>
-          <Pill tone="orange">{`${thisMonth.results.length} ${t('progress.tests')}`}</Pill>
+          {/* One of anything is singular: a first report read "1 active days". */}
+          <Pill tone="teal">
+            {t(thisMonth.activeDays === 1 ? 'progress.activeDaysOne' : 'progress.activeDays', { n: thisMonth.activeDays })}
+          </Pill>
+          <Pill tone="teal">
+            {t(thisMonth.attempts.length === 1 ? 'progress.questionsOne' : 'progress.questionsMany', {
+              n: thisMonth.attempts.length,
+            })}
+          </Pill>
+          <Pill tone="orange">
+            {t(thisMonth.results.length === 1 ? 'progress.testsOne' : 'progress.testsMany', { n: thisMonth.results.length })}
+          </Pill>
           <Pill tone="grey">{t('account.levelLine', { xp: state.xp, level: derived.level })}</Pill>
         </div>
       </Card>

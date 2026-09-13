@@ -2,7 +2,18 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { api, boardName, chapterName, isUrduScript, subjectById, subjectName, weakTopics, type Chapter, type Subject } from '@matricmate/core';
+import {
+  api,
+  boardName,
+  chapterById,
+  chapterName,
+  isUrduScript,
+  subjectById,
+  subjectName,
+  weakTopics,
+  type Chapter,
+  type Subject,
+} from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
@@ -45,6 +56,17 @@ export function ExamIntro({
     : state.results
         .filter((r) => r.subjectId === subjectId && r.mode === 'exam' && r.total > 0)
         .sort((a, b) => b.score / b.total - a.score / a.total)[0];
+
+  /*
+   * How many questions the test will really have. A chapter test is drawn
+   * from that chapter alone, and a chapter with ten questions was promised
+   * "20 questions" here and then handed ten. The browser's chapter index knows
+   * the count in the student's medium; until it has loaded, or for a subject
+   * or weak-topic paper, the standard size stands. The store re-renders this
+   * screen when the index arrives, so the number corrects itself.
+   */
+  const inChapter = chapter ? chapterById(chapter.id)?.mcqCount : undefined;
+  const count = inChapter ? Math.min(COUNT, inChapter) : COUNT;
 
   const label = ai
     ? t('tutor.aiTestTitle')
@@ -115,7 +137,7 @@ export function ExamIntro({
 
       <Card border="border-orange" className="flex flex-col items-center py-6 text-center">
         <Icon name="clock" size={34} className="text-orangedark" />
-        <h2 className="mt-2.5 font-display text-[21px] text-ink">{t('session.examRules', { n: COUNT, min: MINUTES })}</h2>
+        <h2 className="mt-2.5 font-display text-[21px] text-ink">{t('session.examRules', { n: count, min: MINUTES })}</h2>
         <p className="mt-0.5 text-[13px] text-ink2">{t('session.examRulesSub')}</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           {best ? (

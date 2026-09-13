@@ -1,8 +1,10 @@
 import { SITE_URL } from '@/lib/site';
 import { BackLink } from '@/components/admin/bits';
 import { NewTeacherForm } from '@/components/admin/NewTeacherForm';
+import { requireAdmin } from '@/lib/roles';
 
-export default function NewTeacherPage() {
+export default async function NewTeacherPage() {
+  await requireAdmin();
   return (
     <>
       <BackLink href="/admin/teachers">Teachers</BackLink>

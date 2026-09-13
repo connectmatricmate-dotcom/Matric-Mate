@@ -3,6 +3,7 @@ import { Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components
 import { Skeleton } from '@/components/ui/primitives';
 import { PlanToggle } from '@/components/admin/PlanToggle';
 import { allStudents } from '@/lib/students';
+import { requireAdmin } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +81,9 @@ function TableSkeleton() {
   );
 }
 
-export default function StudentsPage() {
+export default async function StudentsPage() {
+  // Before any read: see requireAdmin for why the layout's check is not enough.
+  await requireAdmin();
   return (
     <>
       <h1 className="font-display text-[26px] text-ink">Students</h1>

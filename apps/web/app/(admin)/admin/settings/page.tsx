@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { ChangePassword } from '@/components/admin/ChangePassword';
+import { requireAdmin } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminAccountPage() {
+  await requireAdmin();
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
 

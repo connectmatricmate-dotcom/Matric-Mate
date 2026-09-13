@@ -1,5 +1,6 @@
 import 'server-only';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/roles';
 
 /**
  * The numbers on the admin overview.
@@ -49,6 +50,9 @@ function must<T extends { error: { message: string } | null }>(res: T, what: str
 }
 
 export async function adminStats(): Promise<AdminStats> {
+  // The service key reads every account's money, so the caller is checked
+  // here as well as on the page: see requireAdmin.
+  await requireAdmin();
   const admin = createAdminClient();
   const HEAD = { count: 'exact' as const, head: true };
 

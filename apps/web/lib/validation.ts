@@ -23,10 +23,9 @@ export function validatePassword(v: string, lang: Language = 'en') {
   return v.length >= 6 ? null : translate(lang, 'auth.errWeakPassword');
 }
 
-/** English for now: the string table has no mobile-number message to translate it with. */
-export function validateMobile(v: string) {
+export function validateMobile(v: string, lang: Language = 'en') {
   const digits = v.replace(/\D/g, '');
-  return /^(92)?0?3\d{9}$/.test(digits) ? null : 'Enter an 11-digit number, like 03001234567.';
+  return /^(92)?0?3\d{9}$/.test(digits) ? null : translate(lang, 'auth.errMobileInvalid');
 }
 
 /**

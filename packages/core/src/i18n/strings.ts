@@ -182,6 +182,8 @@ export const en = {
     errForm: 'Check the form and try again.',
     errLinkExpired: 'That reset link has expired. Ask for a new one.',
     errPasswordsMatch: 'Both passwords need to match.',
+    /* The signup form's mobile number rule, which was English in both languages. */
+    errMobileInvalid: 'Enter an 11-digit number, like 03001234567.',
     /* The role line on the staff signpost, which was English in both languages. */
     roleAdmin: 'Administrator',
     rolePartner: 'Referral partner',
@@ -439,7 +441,10 @@ export const en = {
     emptyChapterBody: 'No notes, audio, flashcards or questions for this chapter.',
     sections: 'What’s inside',
     examShare: '{n}% of the paper',
-    examShareLong: 'About {n}% of the annual paper · {m} marks',
+    // No marks figure: the board's table of specification counts both halves of
+    // every either/or question, so its marks run past the real paper total
+    // (Islamiyat's table adds up to 180 on a 100 mark paper). The share is right.
+    examShareLong: 'About {n}% of the annual paper',
     notes: 'Notes and examples',
     notesSub: '{n} sections · {read} read',
     audio: 'Audio lesson',
@@ -994,6 +999,13 @@ export const en = {
     reportTitle: 'Report card',
     monthlyReport: 'Monthly report · {month}',
     activeDays: '{n} active days',
+    /* The report card's counts when there is exactly one, which read
+       "1 active days", "1 questions" and "1 tests" on a first report. */
+    activeDaysOne: '{n} active day',
+    questionsOne: '{n} question',
+    testsOne: '{n} test',
+    questionsMany: '{n} questions',
+    testsMany: '{n} tests',
     share: 'Share',
     savePdf: 'Save PDF',
     /* Said before the tap, not discovered after it. A standard PDF font
@@ -1124,6 +1136,13 @@ export const en = {
       'Plans are managed on our website, matricmate.co, never inside the app. Renew there with the same account you use here, then open Profile → Subscription and tap Check again.',
     faq2Q: 'Does it work without internet?',
     faq2A: 'Downloaded chapters, audio and MCQs work offline. The AI tutor and timed tests need a connection.',
+    /* The website's own answers to the two questions above. The ones above are
+       written for the Android app: on the website they sent the student to
+       "our website" to renew, and promised downloads the website does not have. */
+    faq1AWeb:
+      'Open Settings → Subscription and pay for a new plan there. A plan is one payment for a fixed period and never renews on its own, so nothing is charged until you choose to. The Android app picks the new plan up on the same account.',
+    faq2AWeb:
+      'The website needs an internet connection. Downloading chapters, audio and MCQs to use offline is part of the Android app.',
     faq3Q: 'Why is the AI limited each day?',
     faq3A: 'The AI tutor has a daily limit of 50 questions, which keeps MatricMate affordable for everyone.',
     faq4Q: 'Can my parents see my progress?',
@@ -1326,6 +1345,7 @@ export const ur: typeof en = {
     errForm: 'فارم دیکھ کر دوبارہ کوشش کریں۔',
     errLinkExpired: 'یہ ری سیٹ لنک ختم ہو گیا ہے۔ نیا لنک منگوائیں۔',
     errPasswordsMatch: 'دونوں پاس ورڈ ایک جیسے ہونے چاہئیں۔',
+    errMobileInvalid: '11 ہندسوں کا نمبر لکھیں، جیسے 03001234567۔',
     roleAdmin: 'ایڈمنسٹریٹر',
     rolePartner: 'ریفرل پارٹنر',
   },
@@ -1565,7 +1585,7 @@ export const ur: typeof en = {
     emptyChapterBody: 'اس باب کے لیے کوئی نوٹس، آڈیو، فلیش کارڈز یا سوال نہیں ہیں۔',
     sections: 'اس باب میں کیا ہے',
     examShare: 'پرچے کا {n}%',
-    examShareLong: 'سالانہ پرچے کا تقریباً {n}% · {m} نمبر',
+    examShareLong: 'سالانہ پرچے کا تقریباً {n}%',
     notes: 'نوٹس اور مثالیں',
     notesSub: '{n} حصے · {read} پڑھ لیے',
     audio: 'آڈیو سبق',
@@ -2072,6 +2092,11 @@ export const ur: typeof en = {
     reportTitle: 'رپورٹ کارڈ',
     monthlyReport: 'ماہانہ رپورٹ · {month}',
     activeDays: '{n} دن پڑھا',
+    activeDaysOne: '{n} دن پڑھا',
+    questionsOne: '{n} سوال',
+    testsOne: '{n} ٹیسٹ',
+    questionsMany: '{n} سوالات',
+    testsMany: '{n} ٹیسٹ',
     share: 'بانٹیں',
     savePdf: 'PDF محفوظ کریں',
     pdfEnglishNote: 'پی ڈی ایف انگریزی میں ہوگی۔',
@@ -2190,6 +2215,9 @@ export const ur: typeof en = {
       'پلان ہماری ویب سائٹ matricmate.co پر منظم ہوتے ہیں، ایپ میں کبھی نہیں۔ وہاں اسی اکاؤنٹ سے تجدید کریں جو یہاں استعمال کرتے ہیں، پھر پروفائل ← سبسکرپشن کھول کر ”دوبارہ چیک کریں“ دبائیں۔',
     faq2Q: 'کیا بغیر انٹرنیٹ چلتا ہے؟',
     faq2A: 'ڈاؤن لوڈ کیے ابواب، آڈیو اور MCQs آف لائن چلتے ہیں۔ AI ٹیوٹر اور وقت والے ٹیسٹ کے لیے انٹرنیٹ چاہیے۔',
+    faq1AWeb:
+      'ترتیبات ← سبسکرپشن کھولیں اور وہیں نیا پلان لیں۔ پلان ایک مقررہ مدت کے لیے ایک ہی ادائیگی ہے اور خود بخود تجدید نہیں ہوتا، اس لیے جب تک آپ خود نہ چاہیں کوئی پیسے نہیں کٹتے۔ اینڈرائیڈ ایپ بھی اسی اکاؤنٹ پر نیا پلان خود لے لیتی ہے۔',
+    faq2AWeb: 'ویب سائٹ کے لیے انٹرنیٹ چاہیے۔ ابواب، آڈیو اور MCQs کو آف لائن استعمال کے لیے ڈاؤن لوڈ کرنا اینڈرائیڈ ایپ میں ہے۔',
     faq3Q: 'AI کی روز کی حد کیوں ہے؟',
     faq3A: 'AI ٹیوٹر کی حد روز 50 سوال ہے، جس سے ایپ سب کے لیے سستی رہتی ہے۔',
     faq4Q: 'کیا والدین میری پیش رفت دیکھ سکتے ہیں؟',

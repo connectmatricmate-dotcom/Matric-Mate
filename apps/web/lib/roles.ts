@@ -1,6 +1,6 @@
 import 'server-only';
 import { cache } from 'react';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -77,6 +77,28 @@ export function emailAllowedAsAdmin(email: string | null | undefined): boolean {
   const allowed = raw.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
   return !!email && allowed.includes(email.toLowerCase());
 }
+
+/**
+ * The admin door, checked again where the data is read.
+ *
+ * The (admin) layout already turns everyone else away, and that is not
+ * enough on its own: Next renders a layout and the page under it at the same
+ * time, so the page's service-key reads ran for a student too and its output
+ * was streamed out with the 404. A signed-in student asking for /admin was
+ * sent the revenue figures, and /admin/teachers sent every teacher's email
+ * address and earnings. Every admin page calls this before it reads anything,
+ * and so does every reader that uses the service key for the admin area.
+ *
+ * Same two locks as the layout, and the same answer: not found, never a hint
+ * that the address means anything. `React.cache`, so a page and the readers
+ * under it cost one check between them.
+ */
+export const requireAdmin = cache(async (): Promise<void> => {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) redirect('/login');
+  if ((await currentRole()) !== 'admin' || !emailAllowedAsAdmin(data.user.email)) notFound();
+});
 
 /**
  * Turn staff away from a student screen, and send them to their own.

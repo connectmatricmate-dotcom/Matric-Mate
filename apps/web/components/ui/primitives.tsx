@@ -255,8 +255,14 @@ export function Ur({
   className?: string;
   block?: boolean;
 }) {
+  /* `block` has to mean a block. `.urdu` sets the face, the leading and the
+     alignment but not the display, so this was an inline span: every row with
+     an Urdu title and an Urdu sub-line set the two side by side instead of one
+     under the other (the notification inbox, the settings rows), and the
+     dashboard's chapter title ran on after its "Continue learning" label. The
+     English half of each of those is already a block. */
   return (
-    <span lang="ur" dir="rtl" className={`${block ? 'urdu' : 'urdu-inline'} ${className}`}>
+    <span lang="ur" dir="rtl" className={`${block ? 'urdu block' : 'urdu-inline'} ${className}`}>
       {children}
     </span>
   );
@@ -683,18 +689,22 @@ export function Wordmark({
   priority?: boolean;
   className?: string;
 }) {
+  const height = Math.round((width * WORDMARK_H) / WORDMARK_W);
   return (
     <span className={`inline-flex rounded-[10px] bg-brandplate p-1 ${className}`}>
       {/* The height follows the artwork (629 by 111), whatever a caller asks
-          for: a taller box than the art has only ever been squashed back by
-          Tailwind's `height: auto`, and Next warned about it on every page. */}
+          for, and it is pinned in the style rather than left to `auto`. With
+          `auto` the box took its height from whichever resized copy the
+          optimiser served, whose own height is rounded: 104 wide came out 19
+          tall against an attribute of 18, and Next warned about it on every
+          page with the phone header. */}
       <Image
         src="/brand/wordmark.png"
         alt="MatricMate"
         width={width}
-        height={Math.round((width * WORDMARK_H) / WORDMARK_W)}
+        height={height}
         priority={priority}
-        style={{ width, height: 'auto' }}
+        style={{ width, height }}
       />
     </span>
   );

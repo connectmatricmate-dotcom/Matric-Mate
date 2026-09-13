@@ -24,7 +24,7 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
   const nameError = validateName(name, lang);
   const emailError = validateEmail(email, lang);
   const passwordError = validatePassword(password, lang);
-  const mobileError = validateMobile(mobile);
+  const mobileError = validateMobile(mobile, lang);
   const canSubmit = isFormValid(nameError, emailError, passwordError, mobileError);
 
   // The agreement line links its "Terms and Privacy Policy". The translated
