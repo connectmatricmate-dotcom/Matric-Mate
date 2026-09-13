@@ -672,8 +672,9 @@ export function Empty({
  * sits at roughly 2.4:1 on the dark theme's card: half the logo disappears
  * from the nav, the onboarding header and the top of the report card.
  * Recolouring it was tried and rejected by the client (handoff, section 6), so
- * it keeps a light plate of its own instead. On paper that plate is the card
- * colour it is already sitting on, so nothing shows and no layout moves.
+ * it keeps a light plate of its own instead, on the dark theme only. On paper
+ * the plate is transparent, so the mark sits on whatever is behind it (the
+ * glass header included), and its padding stays so no layout moves.
  */
 const WORDMARK_W = 629;
 const WORDMARK_H = 111;
