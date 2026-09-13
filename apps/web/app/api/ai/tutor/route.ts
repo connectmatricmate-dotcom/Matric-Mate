@@ -110,18 +110,22 @@ const escapeRe = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
  * in front is how the tag is read, and longer ids go first so phy-10-1 is
  * never read as phy-1 followed by "0-1".
  */
-function nameChapters(text: string, titles: Map<string, string> | undefined): string {
+function nameChapters(text: string, titles: Map<string, string> | undefined, bareOnly = false): string {
   if (!titles?.size) return text;
   let out = text;
   for (const id of [...titles.keys()].sort((a, b) => b.length - a.length)) {
     if (!out.includes(id)) continue;
     const title = titles.get(id)!;
     const bare = `(?<![\\w:-])${escapeRe(id)}(?![\\w-])`;
-    out = out
-      // "phy-3 (Dynamics, 22%)" reads "Dynamics (22%)", not "Dynamics (Dynamics, 22%)".
-      .replace(new RegExp(`${bare} \\(${escapeRe(title)}, `, 'g'), () => `${title} (`)
-      .replace(new RegExp(`${bare} \\(${escapeRe(title)}\\)`, 'g'), () => title)
-      .replace(new RegExp(bare, 'g'), () => title);
+    // "phy-3 (Dynamics, 22%)" reads "Dynamics (22%)", not "Dynamics (Dynamics,
+    // 22%)". Left out while streaming (bareOnly), where it depends on text not
+    // yet written; the finished answer, sent with the last line, has it.
+    if (!bareOnly) {
+      out = out
+        .replace(new RegExp(`${bare} \\(${escapeRe(title)}, `, 'g'), () => `${title} (`)
+        .replace(new RegExp(`${bare} \\(${escapeRe(title)}\\)`, 'g'), () => title);
+    }
+    out = out.replace(new RegExp(bare, 'g'), () => title);
   }
   return out;
 }
@@ -502,6 +506,25 @@ export async function POST(req: NextRequest) {
          * an answer needs none or one.
          */
         let stopReason: string | null = null;
+        /*
+         * What the student watches arrive, with chapter ids already turned
+         * into titles. The prompt forbids ids in prose and the model still
+         * writes one now and then, which showed as "math-4" for the seconds
+         * the answer took. Each delta sends the cleaned text so far, less the
+         * word still being written (an id can arrive in two pieces), and the
+         * rest goes out when the model stops. Swapping a bare id is local to
+         * that word, so what has been sent never changes afterwards.
+         */
+        const titles = chapterTitles.get(`${board}:${grade}`);
+        let sent = 0;
+        const streamClean = (flush = false) => {
+          const hold = flush ? 0 : (text.match(/[\w-]*$/)?.[0].length ?? 0);
+          const clean = nameChapters(text.slice(0, text.length - hold), titles, true);
+          if (clean.length > sent) {
+            emit({ t: 'delta', text: clean.slice(sent) });
+            sent = clean.length;
+          }
+        };
         for (let round = 0; round < 5; round++) {
           const s = anthropic.messages.stream({
             model: TUTOR_MODEL,
@@ -519,7 +542,7 @@ export async function POST(req: NextRequest) {
           });
           s.on('text', (delta) => {
             text += delta;
-            emit({ t: 'delta', text: delta });
+            streamClean();
           });
           const final = await s.finalMessage();
           stopReason = final.stop_reason;
@@ -548,6 +571,8 @@ export async function POST(req: NextRequest) {
           if (stopReason !== 'pause_turn') break;
           turns.push({ role: 'assistant', content: final.content });
         }
+
+        streamClean(true);
 
         if (stopReason === 'refusal') {
           await dropEmptyThread();
