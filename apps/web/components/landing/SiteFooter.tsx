@@ -10,6 +10,9 @@ import { Wordmark } from '@/components/ui/primitives';
    mouse gets the tighter 40px list. */
 const LINK = 'inline-flex min-h-11 items-center transition-colors duration-200 hover:text-teal md:min-h-10';
 
+/** Who built the site: a profile link, deliberately without a personal name. */
+const DEVELOPER_URL = 'https://www.upwork.com/freelancers/~0193f3975eff0003a8';
+
 const PRODUCT = [
   { href: '#inside', label: 'What’s inside' },
   { href: '#papers', label: 'Past papers' },
@@ -103,10 +106,24 @@ export function SiteFooter({ home = false }: { home?: boolean }) {
           </div>
         </div>
       </div>
+      {/* Copyright on the left, the developer credit on the right; on a phone
+          the credit wraps to its own line under the copyright. */}
       <div className="border-t border-line">
-        <p className="mx-auto max-w-[1100px] px-5 py-4 text-[12.5px] text-ink3">
-          © {new Date().getFullYear()} MatricMate
-        </p>
+        <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 px-5 py-2 text-[12.5px] text-ink3">
+          <p className="py-2">© {new Date().getFullYear()} MatricMate</p>
+          <p>
+            Developed by{' '}
+            <a
+              className={`${LINK} text-ink2`}
+              href={DEVELOPER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Developed by a freelancer on Upwork (opens in a new tab)"
+            >
+              a freelancer on Upwork
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
