@@ -54,8 +54,9 @@ function AnswerActions({ actions }: { actions: TutorAction[] }) {
  * the tips repeated what the body copy already said.
  *
  * The starters are built from what we know about this student: the topic they
- * keep getting wrong, the chapter they had open last. Tapping one fills the
- * box and stops. Nothing we compose spends one of their fifty by itself.
+ * keep getting wrong, the chapter they had open last. Tapping one asks it,
+ * the way a follow-up chip does: the tap is the student choosing to spend one
+ * of their fifty, and nothing is sent without one.
  */
 function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const t = useT();
@@ -238,7 +239,10 @@ export function ChatScreen({
   const outOfQuestions = quota !== null && quota.remaining <= 0;
 
   async function send(text: string) {
-    const clean = text.trim();
+    // Without the invisible direction marks translate() puts round a name
+    // from the other script: right for display, but a starter or a topic
+    // draft carried them into the question, the saved thread and the prompt.
+    const clean = text.replace(/[\u2066-\u2069]/g, '').trim();
     // Not while the history is still coming: it replaces what is on screen
     // when it lands, and a question asked meanwhile would vanish under it.
     if ((!clean && !photo) || thinking || history !== 'ready') return;
@@ -451,7 +455,10 @@ export function ChatScreen({
             }
           />
         ) : messages.length === 0 && !thinking ? (
-          <EmptyChat onStarter={setInput} />
+          // Asked on the tap, like the follow-up chips and the Android app. It
+          // only filled the box, so a card with an arrow looked like it had
+          // done nothing.
+          <EmptyChat onStarter={(line) => void send(line)} />
         ) : null}
 
         {messages.map((m) =>
@@ -622,7 +629,7 @@ export function ChatScreen({
             // A topic is a starting question; a whole chapter is only context,
             // because "explain the whole of unit 4" is not a question anybody
             // wants answered in one go.
-            if (topic) setInput((current) => (current.trim() ? current : t('tutor.explainDraft', { chapter: topic })));
+            if (topic) setInput((current) => (current.trim() ? current : t('tutor.explainDraft', { chapter: topic }).replace(/[\u2066-\u2069]/g, '')));
           }}
         />
         <div className="mx-auto flex w-full max-w-[820px] items-center gap-2.5">

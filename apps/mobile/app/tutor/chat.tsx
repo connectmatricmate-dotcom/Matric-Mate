@@ -142,8 +142,10 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
    * "Help me fix Momentum, where do I keep going wrong" is the question that
    * turns a tutor into a tutor.
    *
-   * Tapping one fills the box. It does not send. Same rule as everywhere else
-   * on this screen: nothing we compose spends one of their fifty by itself.
+   * Tapping one asks it, the way a follow-up chip does: the tap is the
+   * student choosing to spend one of their fifty. Nothing is ever sent without
+   * a tap. It used to only fill the box, which on a one-line field showed the
+   * last few words, so the card looked like it had done nothing.
    */
   const starters = useMemo(() => {
     const out: string[] = [];
@@ -168,9 +170,9 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
    * left-aligned list, which read as broken: two alignments in one block with
    * nothing between them, and then half a screen of nothing above the
    * composer. The greeting belongs in the space at the top. The things you can
-   * tap belong at the bottom, next to the thumb and next to the box they fill
-   * in. The three tips that used to sit in the middle are gone: the body copy
-   * already said all three, so they were the same sentence twice.
+   * tap belong at the bottom, next to the thumb and the composer. The three
+   * tips that used to sit in the middle are gone: the body copy already said
+   * all three, so they were the same sentence twice.
    */
   return (
     <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: S.lg }}>
@@ -390,7 +392,10 @@ export default function Chat() {
   const outOfQuestions = quota !== null && quota.remaining <= 0;
 
   async function send(text: string) {
-    const clean = text.trim();
+    // Without the invisible direction marks translate() puts round a name
+    // from the other script: right for display, but a starter or a topic
+    // draft carried them into the question, the saved thread and the prompt.
+    const clean = text.replace(/[\u2066-\u2069]/g, '').trim();
     if ((!clean && !photo) || thinking) return;
     if (outOfQuestions) {
       // Kept in the box, not dropped: a question that arrived from another
@@ -608,7 +613,10 @@ export default function Chat() {
             </Pill>
           </View>
         ) : messages.length === 0 && !thinking ? (
-          <EmptyChat onStarter={setInput} />
+          // Asked on the tap, like the follow-up chips. It only filled the
+          // box, which on a one-line field showed the last few words, so a
+          // card with an arrow on it looked like it had done nothing.
+          <EmptyChat onStarter={(line) => void send(line)} />
         ) : null}
 
         {messages.map((m) =>
@@ -804,7 +812,7 @@ export default function Chat() {
           // A topic is a starting question; a whole chapter is only context,
           // because "explain the whole of Chemistry unit 4" is not a question
           // anybody wants answered in one go.
-          if (topic) setInput((current) => (current.trim() ? current : t('tutor.explainDraft', { chapter: topic })));
+          if (topic) setInput((current) => (current.trim() ? current : t('tutor.explainDraft', { chapter: topic }).replace(/[\u2066-\u2069]/g, '')));
         }}
       />
       <Row

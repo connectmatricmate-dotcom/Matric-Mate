@@ -24,7 +24,17 @@ import type { Board } from '@matricmate/core';
 export function languageRule(language: string | undefined, grade?: 9 | 10, board?: Board): string {
   const reader = grade ? `a Class ${grade} student` : 'a matric student';
   if (language !== 'ur') {
-    return `Write in simple English, the way a good Pakistani teacher explains to ${reader}.`;
+    /*
+     * The chat's "In Urdu" button asks for Urdu from an English account. With
+     * only "write in English" to go on, the model met it halfway in Roman
+     * Urdu, which is the one form of Urdu the client has ruled out.
+     */
+    return (
+      `Write in simple English, the way a good Pakistani teacher explains to ${reader}. ` +
+      'Only when the student explicitly asks you to explain in Urdu, answer that message in Urdu script, never in Roman Urdu ' +
+      '(Urdu spelled in English letters), keeping technical terms, formulae and numbers in Latin as an Urdu-medium textbook does. ' +
+      'A student simply writing in Urdu is not that request: otherwise stay in English.'
+    );
   }
   const teacher = board === 'punjab' ? 'an Urdu-medium teacher in Punjab' : board === 'fbise' ? 'an Urdu-medium teacher in Islamabad' : 'an Urdu-medium teacher';
   return (

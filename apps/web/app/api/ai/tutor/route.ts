@@ -95,6 +95,36 @@ type QuotaState = { limit: number; used: number; remaining: number; resetAt: str
  * price. The per-student block goes AFTER this, never inside it.
  */
 const weightageDigest = new Map<string, string>();
+/** Chapter titles by id, per board and class, filled with the digest above. */
+const chapterTitles = new Map<string, Map<string, string>>();
+
+const escapeRe = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Chapter ids written into an answer's text, turned back into titles.
+ *
+ * The ids are handed to the model for its action tags, and it copied them into
+ * its prose: "start with phy-3 (Dynamics, 22%)", "math-4, math-5". Students
+ * have never seen an id. The prompt now forbids it; this catches what slips
+ * through. Ids inside a tag (`[[read:phy-3]]`) are left alone, since the colon
+ * in front is how the tag is read, and longer ids go first so phy-10-1 is
+ * never read as phy-1 followed by "0-1".
+ */
+function nameChapters(text: string, titles: Map<string, string> | undefined): string {
+  if (!titles?.size) return text;
+  let out = text;
+  for (const id of [...titles.keys()].sort((a, b) => b.length - a.length)) {
+    if (!out.includes(id)) continue;
+    const title = titles.get(id)!;
+    const bare = `(?<![\\w:-])${escapeRe(id)}(?![\\w-])`;
+    out = out
+      // "phy-3 (Dynamics, 22%)" reads "Dynamics (22%)", not "Dynamics (Dynamics, 22%)".
+      .replace(new RegExp(`${bare} \\(${escapeRe(title)}, `, 'g'), () => `${title} (`)
+      .replace(new RegExp(`${bare} \\(${escapeRe(title)}\\)`, 'g'), () => title)
+      .replace(new RegExp(bare, 'g'), () => title);
+  }
+  return out;
+}
 
 async function buildStandingContext(admin: ReturnType<typeof createAdminClient>, grade: number, board: Board): Promise<string> {
   const key = `${board}:${grade}`;
@@ -121,6 +151,7 @@ async function buildStandingContext(admin: ReturnType<typeof createAdminClient>,
     return '';
   }
   const bySubject = new Map<string, string[]>();
+  chapterTitles.set(key, new Map((data ?? []).map((c) => [c.id, c.title])));
   for (const c of data ?? []) {
     /*
      * The id goes in, not just the number and title. It is what lets an answer
@@ -196,10 +227,11 @@ Sending them to the right part of the app:
     [[shortq:<id>]]      short questions
     [[blanks:<id>]]      fill in the blanks
 - Use only an id that appears in the list below, exactly as written. Never invent one, and never guess at one for a chapter you cannot find: an answer with no tag is completely fine.
+- Ids exist only for these tags. Students never see them and do not know them, so in your own words always call a chapter by its title: write "Dynamics", never "phy-3", and "chapters 4 to 7" rather than "math-4 to math-7".
 - At most two, and only when they genuinely help. Most answers need none. A tag on every answer is nagging.
 - Never mention the tag, describe it, or write "click below". It becomes a button they can see.
 
-Chapter weightage from the board's assessment frameworks (share of the annual paper), each line starting with the chapter id:
+Chapter weightage from the board's assessment frameworks (share of the annual paper), each line starting with the chapter id (for tags only, never for your text):
 
 `;
 
@@ -523,7 +555,7 @@ export async function POST(req: NextRequest) {
           controller.close();
           return;
         }
-        const answer = text.trim();
+        const answer = nameChapters(text.trim(), chapterTitles.get(`${board}:${grade}`));
         if (!answer) {
           await dropEmptyThread();
           emit({ t: 'err', reason: 'error', quota });
@@ -567,6 +599,9 @@ export async function POST(req: NextRequest) {
 
         emit({
           t: 'done',
+          // The finished answer, which can differ from the streamed pieces:
+          // see nameChapters. Both apps show this in place of what streamed.
+          text: answer,
           threadId: thread,
           messageId,
           quota: { ...quota, used: usedNow, remaining: Math.max(0, quota.limit - usedNow) },

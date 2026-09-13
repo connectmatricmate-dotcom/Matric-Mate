@@ -149,7 +149,11 @@ export async function askTutorLive(
         onDelta?.(text);
       } else if (msg.t === 'done' && msg.threadId && msg.quota) {
         setQuota(msg.quota, who);
-        finale = { ok: true, text: text.trim(), threadId: msg.threadId, messageId: msg.messageId ?? null, quota: msg.quota };
+        // The server's finished text when it sends one: it tidies the answer
+        // after streaming (chapter ids back into titles), and the tidy copy
+        // is the one saved to history.
+        const final = typeof msg.text === 'string' && msg.text.trim() ? msg.text.trim() : text.trim();
+        finale = { ok: true, text: final, threadId: msg.threadId, messageId: msg.messageId ?? null, quota: msg.quota };
       } else if (msg.t === 'err') {
         setQuota(msg.quota, who);
         finale = { ok: false, reason: msg.reason === 'refused' ? 'refused' : 'error', quota: msg.quota };

@@ -82,6 +82,10 @@ export async function POST(req: NextRequest) {
     if (!block) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
     const verdict = JSON.parse(block.text) as { score: number; feedback: string; missed: string[] };
     verdict.score = Math.min(marks, Math.max(0, verdict.score));
+    // Full marks with a point listed as missed, which the model sometimes
+    // returns for a nitpick, printed "Marks you missed" under "2 of 2 marks".
+    // The nitpick is already in the feedback.
+    if (verdict.score >= marks) verdict.missed = [];
 
     const quota = await chargeQuota(g, AI_COST.check);
     return NextResponse.json({ ...verdict, maxMarks: marks, quota });
