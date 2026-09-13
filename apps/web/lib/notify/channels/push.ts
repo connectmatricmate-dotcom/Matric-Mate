@@ -1,5 +1,5 @@
 import 'server-only';
-import { createSign } from 'node:crypto';
+import { createHash, createPrivateKey, createSign } from 'node:crypto';
 import { translate } from '@matricmate/core';
 import { SITE_URL } from '@/lib/site';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -31,7 +31,12 @@ const clientEmail = () => process.env.FIREBASE_CLIENT_EMAIL ?? '';
  * way it was pasted, because the failure is a signature error at send time and
  * nowhere near the paste.
  */
-const privateKey = () => (process.env.FIREBASE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n');
+const privateKey = () =>
+  (process.env.FIREBASE_PRIVATE_KEY ?? '')
+    .trim()
+    // Pasted with the quotes from the JSON file still around it.
+    .replace(/^["']|["']$/g, '')
+    .replace(/\\n/g, '\n');
 
 const b64 = (v: string | object) => Buffer.from(typeof v === 'string' ? v : JSON.stringify(v)).toString('base64url');
 
@@ -42,8 +47,12 @@ const b64 = (v: string | object) => Buffer.from(typeof v === 'string' ? v : JSON
  */
 let cached: { token: string; expires: number } | null = null;
 
+/** Why the last attempt to get an access token failed, for the health check. */
+let lastTokenError: string | null = null;
+
 async function accessToken(): Promise<string | null> {
   if (cached && cached.expires > Date.now() + 60_000) return cached.token;
+  lastTokenError = null;
 
   const now = Math.floor(Date.now() / 1000);
   const claim = {
@@ -60,7 +69,8 @@ async function accessToken(): Promise<string | null> {
     assertion = `${input}.${createSign('RSA-SHA256').update(input).sign(privateKey()).toString('base64url')}`;
   } catch (e) {
     // Almost always a key whose newlines did not survive being pasted.
-    console.error('notify/push: could not sign with FIREBASE_PRIVATE_KEY', e instanceof Error ? e.message : e);
+    lastTokenError = `sign: ${e instanceof Error ? e.message : String(e)}`;
+    console.error('notify/push: could not sign with FIREBASE_PRIVATE_KEY', lastTokenError);
     return null;
   }
 
@@ -70,7 +80,8 @@ async function accessToken(): Promise<string | null> {
     body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion }),
   });
   if (!res.ok) {
-    console.error('notify/push: token exchange refused', res.status, (await res.text()).slice(0, 200));
+    lastTokenError = `exchange ${res.status}: ${(await res.text()).slice(0, 200)}`;
+    console.error('notify/push: token exchange refused', lastTokenError);
     return null;
   }
   const json = (await res.json()) as { access_token: string; expires_in: number };
@@ -185,3 +196,61 @@ export const push: ChannelAdapter = {
     return results.length ? 'skipped' : 'skipped';
   },
 };
+
+const fingerprint = (v: string) => (v ? createHash('sha256').update(v).digest('hex').slice(0, 10) : null);
+
+/**
+ * What stands between this deployment and a delivered push, step by step.
+ *
+ * `configured` only says the three variables exist, and for a month that was
+ * all anyone could see: every scheduled push failed at the login to Google
+ * while the in-app copy was written as normal, so nothing looked wrong. This
+ * walks the same path a real send takes and reports where it stops.
+ *
+ * Nothing secret leaves: the key is described by its shape, the project and
+ * the service account by a short hash to compare against a known-good copy.
+ * Each registered device is checked with `validate_only`, so Firebase judges
+ * the request and delivers nothing.
+ */
+export async function diagnosePush(): Promise<Record<string, unknown>> {
+  const raw = process.env.FIREBASE_PRIVATE_KEY ?? '';
+  let parses = false;
+  try {
+    createPrivateKey(privateKey());
+    parses = true;
+  } catch {
+    // Reported as parses: false.
+  }
+  const report: Record<string, unknown> = {
+    projectId: fingerprint(projectId()),
+    clientEmail: fingerprint(clientEmail()),
+    key: {
+      length: raw.length,
+      quoted: /^\s*["']/.test(raw),
+      escapedNewlines: raw.includes('\\n'),
+      realNewlines: raw.includes('\n'),
+      pkcs8Header: raw.includes('BEGIN PRIVATE KEY'),
+      parses,
+    },
+  };
+
+  cached = null;
+  const token = await accessToken();
+  report.login = token ? 'ok' : lastTokenError;
+  if (!token) return report;
+
+  const admin = createAdminClient();
+  const { data: devices } = await admin.from('push_tokens').select('token');
+  const verdicts: Record<string, number> = {};
+  for (const { token: device } of (devices ?? []) as { token: string }[]) {
+    const res = await fetch(`https://fcm.googleapis.com/v1/projects/${projectId()}/messages:send`, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ validate_only: true, message: { token: device, notification: { title: 'check', body: 'check' } } }),
+    });
+    const key = res.ok ? 'valid' : `${res.status} ${((await res.text()).match(/"status":\s*"([A-Z_]+)"/) ?? [])[1] ?? ''}`.trim();
+    verdicts[key] = (verdicts[key] ?? 0) + 1;
+  }
+  report.devices = verdicts;
+  return report;
+}

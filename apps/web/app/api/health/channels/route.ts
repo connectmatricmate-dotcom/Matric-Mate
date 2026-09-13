@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { channelStatus } from '@/lib/notify';
+import { diagnosePush } from '@/lib/notify/channels/push';
 import { cronAuthorised } from '@/lib/notify/jobs';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -25,6 +26,8 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     channels: channelStatus(),
+    // `?push=check` walks a real send without delivering anything: see diagnosePush.
+    ...(req.nextUrl.searchParams.get('push') === 'check' ? { push: await diagnosePush() } : {}),
     registeredDevices: count ?? 0,
     // Named so a missing one is obvious at a glance rather than inferred from
     // a channel being off.
