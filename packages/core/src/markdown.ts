@@ -82,7 +82,11 @@ export function parseMarkdown(input: string): MdBlock[] {
 
   const flushPara = () => {
     if (!para.length) return;
-    blocks.push({ kind: 'para', spans: parseInline(para.join(' ').trim()) });
+    // Joined on a line break, not a space. Standard markdown folds single
+    // newlines away, but a model writes one on purpose ("Formula: W = mg"
+    // then "W = weight (N), m = mass (kg)" on the next line), and folded they
+    // ran together as "W = mg W = weight".
+    blocks.push({ kind: 'para', spans: parseInline(para.join('\n').trim()) });
     para = [];
   };
 

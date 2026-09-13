@@ -1433,10 +1433,14 @@ function SheetPanel({
           // Hugs its content until the panel reaches the top gap, then
           // scrolls. flexShrink is what lets it give way; the panel above
           // shrinks to fit the screen and this is the part that absorbs it.
+          // The scrollbar stays on screen whenever there is more below. It was
+          // hidden, so a long answer cut off at the bottom edge looked like
+          // text overflowing the sheet, with nothing to say it would scroll.
           <ScrollView
             style={{ flexGrow: 0, flexShrink: 1 }}
             keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator
+            persistentScrollbar
           >
             {children}
           </ScrollView>

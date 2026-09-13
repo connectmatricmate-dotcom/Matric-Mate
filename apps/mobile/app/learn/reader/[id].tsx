@@ -26,7 +26,7 @@ import {
   Ur,
   useToast,
 } from '../../../src/components/ui';
-import { api, Block, chapterName, isUrduScript, subjectMedium, weakTopics } from '@matricmate/core';
+import { api, Block, chapterName, isUrduScript, parseTutorActions, subjectMedium, weakTopics } from '@matricmate/core';
 import { aiFailureKey } from '../../../src/components/aiFailure';
 import { LockedNotice } from '../../../src/components/LockedNotice';
 import { useAsync } from '../../../src/core/useAsync';
@@ -207,6 +207,8 @@ export default function Reader() {
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
   const [asking, setAsking] = useState(false);
+  /** Which suggestion the answer on show is for, so its chip can say so. */
+  const [askedKey, setAskedKey] = useState<StringKey | null>(null);
   /** The server's thread for questions asked from this reader, once there is one. */
   const [threadId, setThreadId] = useState<string | null>(null);
   // True while this screen is mounted; ask() checks it before setState after
@@ -253,9 +255,18 @@ export default function Reader() {
     // happened to re-read, losing their real position.
     if (section && dir === 1) actions.markSectionRead(section.id, id, next);
     setIdx(next);
+    // An answer belongs to the section it was asked about. Kept, it opened on
+    // the next section still explaining the previous one.
+    setAnswer(null);
+    setAskedKey(null);
   }
 
-  async function ask(prompt: string) {
+  async function ask(key: StringKey) {
+    // One question at a time: a second tap while the first was out sent it
+    // again and spent a second one of the day's allowance.
+    if (asking) return;
+    const prompt = `${t(key)}: ${section?.title ?? ''}`;
+    setAskedKey(key);
     setAsking(true);
     setAnswer(null);
     try {
@@ -471,15 +482,35 @@ export default function Reader() {
           ) : null}
           <Pill tone={aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: aiLeft })}</Pill>
         </Row>
-        <View style={{ gap: S.sm }}>
-          {SUGGESTIONS.map((key) => (
-            <Tap key={key} onPress={() => ask(`${t(key)}: ${section?.title ?? ''}`)}>
-              <Card flat style={{ paddingVertical: 14 }}>
-                <Body>{t(key)}</Body>
-              </Card>
-            </Tap>
-          ))}
-        </View>
+        {/*
+         * Before a question: three big choices. After one: the same three as
+         * a row of chips, and the answer straight under them.
+         *
+         * The answer used to land below the three full-size cards, which on a
+         * phone put its first lines at the bottom edge and cut the rest off
+         * mid-sentence. It did scroll, but nothing said so, and it read as
+         * text overflowing the sheet. Now it starts in view, and the chips
+         * stay at the top where a second question is one tap away.
+         */}
+        {asking || answer ? (
+          <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+            {SUGGESTIONS.map((key) => (
+              <Pill key={key} tone={key === askedKey ? 'teal' : 'grey'} onPress={asking ? undefined : () => ask(key)}>
+                {t(key)}
+              </Pill>
+            ))}
+          </Row>
+        ) : (
+          <View style={{ gap: S.sm }}>
+            {SUGGESTIONS.map((key) => (
+              <Tap key={key} onPress={() => ask(key)}>
+                <Card flat style={{ paddingVertical: 14 }}>
+                  <Body>{t(key)}</Body>
+                </Card>
+              </Tap>
+            ))}
+          </View>
+        )}
         {asking ? (
           <Card flat style={{ marginTop: S.md, gap: 8 }}>
             <Skeleton w="70%" h={13} />
@@ -488,7 +519,11 @@ export default function Reader() {
           </Card>
         ) : answer ? (
           <Card flat style={{ marginTop: S.md }}>
-            <Markdown text={answer.text} size={14} />
+            {/* The tutor ends some answers with button tags ([[practice:phy-3]]).
+                The chat turns them into buttons; here they printed as code,
+                so they are taken out, and "Open full chat" shows them as
+                buttons in the same thread. */}
+            <Markdown text={parseTutorActions(answer.text, false, lang).text} size={14} />
             {answer.steps?.map((step, i) => (
               <Row key={i} gap={S.sm} style={{ marginTop: S.sm, alignItems: 'flex-start' }}>
                 <View style={{ width: 20, height: 20, borderRadius: 99, backgroundColor: C.tealTint, alignItems: 'center', justifyContent: 'center' }}>

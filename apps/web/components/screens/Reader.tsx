@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { api, chapterName, isOneLanguageSubject, isUrduScript } from '@matricmate/core';
+import { api, chapterName, isOneLanguageSubject, isUrduScript, parseTutorActions } from '@matricmate/core';
 import type { Block, Chapter, ChapterContent, StringKey } from '@matricmate/core';
-import { Btn, IconButton } from '@/components/ui/controls';
+import { Btn, IconButton, PillButton } from '@/components/ui/controls';
 import { Card, Empty, Label, Pill, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
@@ -157,9 +157,18 @@ export function Reader({
   const [askOpen, setAskOpen] = useState(false);
   const [answer, setAnswer] = useState<{ text: string; steps?: string[]; threadId?: string } | null>(null);
   const [asking, setAsking] = useState(false);
+  /**
+   * The conversation questions from this reader go into, once the first one
+   * has made it. Without it every question started a thread of its own, so
+   * three taps left three one-line chats in Recent questions. The Android
+   * reader has always carried it.
+   */
+  const [threadId, setThreadId] = useState<string | null>(null);
   /** The last question asked in the sheet, so "continue in chat" opens on it
    *  instead of an empty thread that forgets what was being discussed. */
   const [asked, setAsked] = useState<string | null>(null);
+  /** Which suggestion the answer on show is for, so its chip can say so. */
+  const [askedKey, setAskedKey] = useState<StringKey | null>(null);
   const router = useRouter();
   const [retrying, startRetry] = useTransition();
 
@@ -197,9 +206,15 @@ export function Reader({
     if (section && dir === 1) actions.markSectionRead(section.id, id, next);
     setIdx(next);
     window.scrollTo({ top: 0 });
+    // An answer belongs to the section it was asked about.
+    setAnswer(null);
+    setAskedKey(null);
   }
 
-  async function ask(prompt: string) {
+  async function ask(key: StringKey) {
+    if (asking) return;
+    const prompt = `${t(key)}: ${section?.title ?? ''}`;
+    setAskedKey(key);
     setAsked(prompt);
     setAsking(true);
     setAnswer(null);
@@ -211,6 +226,7 @@ export function Reader({
     const res = await api.askTutor(prompt, {
       context: chapter.title,
       chapterId: id,
+      threadId,
       profile: {
         name: state.user?.name,
         medium: state.settings.contentMedium,
@@ -233,6 +249,7 @@ export function Reader({
       return;
     }
     setAnswer({ text: res.text, steps: res.steps, threadId: res.threadId });
+    if (res.threadId) setThreadId(res.threadId);
     // Keep the local counter roughly in step with the server's.
     actions.consumeAi();
   }
@@ -364,23 +381,31 @@ export function Reader({
           <Pill tone={aiLeft ? 'grey' : 'red'}>{t('tutor.leftToday', { n: aiLeft })}</Pill>
         </div>
 
-        <div className="flex flex-col gap-2">
-          {/* Off while a question is out: a second tap used to send a second
-              question and spend a second one of the day's allowance. */}
-          {SUGGESTIONS.map((key) => (
-            <button
-              key={key}
-              type="button"
-              disabled={asking}
-              onClick={() => ask(`${t(key)}: ${section?.title ?? ''}`)}
-              className="w-full text-start disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <Card flat className="py-3.5 transition-colors duration-200 hover:border-teal">
-                <span className="text-[14.5px] text-ink">{t(key)}</span>
-              </Card>
-            </button>
-          ))}
-        </div>
+        {/*
+         * Before a question: three big choices. After one: the same three as a
+         * row of chips, and the answer straight under them. The answer used
+         * to land below the three full-size cards, so on a phone it started
+         * at the bottom edge and read as text running out of the sheet.
+         */}
+        {asking || answer ? (
+          <div className="flex flex-wrap gap-2">
+            {SUGGESTIONS.map((key) => (
+              <PillButton key={key} tone={key === askedKey ? 'teal' : 'grey'} onClick={() => void ask(key)}>
+                {t(key)}
+              </PillButton>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {SUGGESTIONS.map((key) => (
+              <button key={key} type="button" onClick={() => void ask(key)} className="w-full text-start">
+                <Card flat className="py-3.5 transition-colors duration-200 hover:border-teal">
+                  <span className="text-[14.5px] text-ink">{t(key)}</span>
+                </Card>
+              </button>
+            ))}
+          </div>
+        )}
 
         {asking ? (
           <Card flat className="mt-4 flex flex-col gap-2">
@@ -390,7 +415,9 @@ export function Reader({
           </Card>
         ) : answer ? (
           <Card flat className="mt-4">
-            <Markdown text={answer.text} className="text-[14.5px] leading-[1.65] text-ink" />
+            {/* Button tags ([[practice:phy-3]]) printed as code here; the chat
+                this links to shows them as buttons. */}
+            <Markdown text={parseTutorActions(answer.text, false, lang).text} className="text-[14.5px] leading-[1.65] text-ink" />
             <ol className="mt-2 flex flex-col gap-2">
               {answer.steps?.map((step, i) => (
                 <li key={i} dir={isUrduScript(step) ? 'rtl' : 'ltr'} className="flex items-start gap-2.5">

@@ -47,14 +47,16 @@ function Spans({ spans }: { spans: MdSpan[] }) {
 
 /** One block, in the right script. */
 function Block({ spans, className = '' }: { spans: MdSpan[]; className?: string }) {
+  // pre-line: a paragraph keeps the line breaks the model wrote (see
+  // parseMarkdown in core) and still wraps and collapses spaces as normal.
   if (isUrduScript(spanText(spans))) {
     return (
-      <Ur block className={className}>
+      <Ur block className={`whitespace-pre-line ${className}`}>
         <Spans spans={spans} />
       </Ur>
     );
   }
-  return <span className={`block ${className}`}>
+  return <span className={`block whitespace-pre-line ${className}`}>
     <Spans spans={spans} />
   </span>;
 }

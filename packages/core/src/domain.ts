@@ -505,16 +505,53 @@ export const grade = (pct: number) =>
  * is Urdu when its first letter is, the way a browser picks a direction for
  * dir="auto", or when most of its letters are.
  */
+/**
+ * Urdu's grammatical words: postpositions, the verb "to be", conjunctions.
+ * A sentence built on these is Urdu however many English nouns it carries.
+ */
+const URDU_GRAMMAR = new Set([
+  'ہے', 'ہیں', 'تھا', 'تھی', 'تھے', 'ہو', 'ہوتا', 'ہوتی', 'ہوتے', 'کا', 'کی', 'کے', 'میں', 'سے', 'پر', 'کو',
+  'اور', 'یہ', 'وہ', 'جو', 'لیے', 'بھی', 'نہیں', 'کر', 'کرتا', 'کرتی', 'کرتے', 'جاتا', 'جاتی', 'ساتھ',
+  'کریں', 'کرو', 'کیجیے', 'ہوں', 'گا', 'گی', 'گے',
+]);
+
+/** Latin letters, without × and ÷, which sit inside the Latin-1 block. */
+const LATIN = 'A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F';
+const LETTER = new RegExp(`[${LATIN}\u0600-\u06FF]`);
+const WORD = new RegExp(`[${LATIN}]+|[\u0600-\u06FF]+`, 'g');
+
 export const isUrduScript = (text: string): boolean => {
   // A name set apart in an isolate (see translate) is not the sentence's
   // language: judge the sentence by the words around it, unless it is all name.
   const around = text.replace(/\u2068[^\u2069]*\u2069/g, '');
-  const s = /[A-Za-z\u00C0-\u024F\u0600-\u06FF]/.test(around) ? around : text;
-  const arabic = s.match(/[\u0600-\u06FF]/g)?.length ?? 0;
-  if (!arabic) return false;
-  const first = /[A-Za-z\u00C0-\u024F\u0600-\u06FF]/.exec(s)?.[0] ?? '';
+  const s = LETTER.test(around) ? around : text;
+  if (!/[\u0600-\u06FF]/.test(s)) return false;
+  const first = LETTER.exec(s)?.[0] ?? '';
   if (/[\u0600-\u06FF]/.test(first)) return true;
-  return arabic > (s.match(/[A-Za-z\u00C0-\u024F]/g)?.length ?? 0);
+  /*
+   * Counted in words, not letters, with Urdu's grammar words given weight.
+   *
+   * Urdu-medium teaching keeps technical terms in English, and so does the
+   * tutor, so an Urdu sentence often opens with one: "Gravitational field
+   * کسی دوسرے mass وہ جگہ ہے جہاں...". Counted in letters the English won
+   * (its words are longer), the line was laid out left to right in the
+   * English face, and the Urdu read in the wrong order. Counted in words it
+   * is Urdu, and so is a line whose skeleton is Urdu postpositions and verbs
+   * around English nouns ("Earth کے g پر calibrated").
+   */
+  const words = s.match(WORD) ?? [];
+  const urdu = words.filter((w) => /[\u0600-\u06FF]/.test(w));
+  const english = words.length - urdu.length;
+  if (urdu.length > english) return true;
+  const grammar = urdu.filter((w) => URDU_GRAMMAR.has(w)).length;
+  if (grammar >= 2 && urdu.length * 4 >= words.length) return true;
+  // Urdu puts its verb last: "10 MCQs کریں" is an instruction in Urdu.
+  if (URDU_GRAMMAR.has(words[words.length - 1] ?? '')) return true;
+  if (urdu.length < english) return false;
+  // A tie: "AI ٹیوٹر" is an Urdu label with an acronym in it, "Inertia (جمود)"
+  // an English term glossed in Urdu. The longer script decides, as it did.
+  const letters = (re: RegExp) => s.match(re)?.length ?? 0;
+  return letters(/[\u0600-\u06FF]/g) > letters(new RegExp(`[${LATIN}]`, 'g'));
 };
 
 /**
