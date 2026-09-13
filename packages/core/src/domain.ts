@@ -505,7 +505,11 @@ export const grade = (pct: number) =>
  * is Urdu when its first letter is, the way a browser picks a direction for
  * dir="auto", or when most of its letters are.
  */
-export const isUrduScript = (s: string): boolean => {
+export const isUrduScript = (text: string): boolean => {
+  // A name set apart in an isolate (see translate) is not the sentence's
+  // language: judge the sentence by the words around it, unless it is all name.
+  const around = text.replace(/\u2068[^\u2069]*\u2069/g, '');
+  const s = /[A-Za-z\u00C0-\u024F\u0600-\u06FF]/.test(around) ? around : text;
   const arabic = s.match(/[\u0600-\u06FF]/g)?.length ?? 0;
   if (!arabic) return false;
   const first = /[A-Za-z\u00C0-\u024F\u0600-\u06FF]/.exec(s)?.[0] ?? '';

@@ -171,9 +171,15 @@ export default function Dashboard() {
           <H3 style={{ color: C.onBrand, flex: 1 }}>{t('dash.todayPlan')}</H3>
           {derived.plan.length ? (
             <View style={{ backgroundColor: alpha(C.onBrand, 0.18), paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 }}>
-              <Text style={{ fontFamily: F.bodyBold, fontSize: 11.5, color: C.onBrand }}>
-                {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
-              </Text>
+              {/* In the script's own face and on one line: set in the Latin
+                  face, "2/3 مکمل" wrapped and the word was cut off below. */}
+              <ScriptText
+                text={t('dash.doneCount', { a: planDone, b: derived.plan.length })}
+                face="bodyBold"
+                size={11.5}
+                color={C.onBrand}
+                lines={1}
+              />
             </View>
           ) : null}
         </Row>

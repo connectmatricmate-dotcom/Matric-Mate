@@ -33,7 +33,24 @@ export function translate(
 ): string {
   const raw = lookup(lang, key);
   if (!params) return raw;
-  return raw.replace(/\{(\w+)\}/g, (_, p: string) => String(params[p] ?? `{${p}}`));
+  return raw.replace(/\{(\w+)\}/g, (_, p: string) => (p in params ? isolate(lang, params[p]) : `{${p}}`));
+}
+
+/**
+ * A value in the other script from the sentence it goes into, set apart.
+ *
+ * An English topic in an Urdu sentence ("Fundamental forces دہرائیں · ابھی تک
+ * 0%") or an Urdu chapter name in an English one ("Read قوت اور حرکت · 15 min")
+ * made the line start with the wrong script, so the whole line was laid out in
+ * that direction and the words around the name came out in the wrong order.
+ * Wrapped in a first-strong isolate (U+2068 ... U+2069, invisible), the name
+ * keeps its own direction as one piece and the sentence keeps the direction of
+ * its language. isUrduScript reads past isolated names for the same reason.
+ */
+function isolate(lang: Language, value: string | number): string {
+  const text = String(value);
+  const foreign = lang === 'ur' ? /[A-Za-z]/.test(text) : /[\u0600-\u06FF]/.test(text);
+  return foreign ? `\u2068${text}\u2069` : text;
 }
 
 /**

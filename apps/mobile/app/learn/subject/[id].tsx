@@ -149,8 +149,16 @@ export default function Chapters() {
                             publishes and the one that decides study order.
                             A row with no counts to give says nothing rather
                             than "0 questions · 0 sections". */}
-                        {c.examShare ? `${t('study.examShare', { n: c.examShare })} · ` : ''}
-                        {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.sectionsSub', { n: c.sectionCount })}
+                        {/* Each figure held to its word, so the line breaks at a
+                            dot and never leaves "sections" alone on the next. */}
+                        {[
+                          c.examShare ? t('study.examShare', { n: c.examShare }) : '',
+                          t('study.mcqsSub', { n: c.mcqCount }),
+                          t('study.sectionsSub', { n: c.sectionCount }),
+                        ]
+                          .filter(Boolean)
+                          .map((part) => part.replace(/ /g, '\u00A0'))
+                          .join(' · ')}
                       </Small>
                     )}
                     {!empty && p > 0 && p < 100 ? (

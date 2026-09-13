@@ -92,8 +92,10 @@ export function ChapterHub({
         ? t('study.continueReading')
         : t('study.startReading');
   const knownCards = content.flashcards.filter((f) => state.cardsKnown.includes(f.id)).length;
+  // A best from a real set: one closed after a single right answer is "1/1",
+  // a perfect score it did not earn.
   const best = state.results
-    .filter((r) => r.chapterId === id && r.total > 0)
+    .filter((r) => r.chapterId === id && r.total >= 5)
     .sort((a, b) => b.score / b.total - a.score / a.total)[0];
 
   return (

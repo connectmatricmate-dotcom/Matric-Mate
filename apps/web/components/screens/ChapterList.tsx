@@ -105,8 +105,16 @@ export function ChapterList({ subject, chapters, paid }: { subject: Subject; cha
                         the real length. The share leads: it is the number the
                         board itself publishes and the one that decides study
                         order. */}
-                    {c.examShare ? `${t('study.examShare', { n: c.examShare })} · ` : ''}
-                    {t('study.mcqsSub', { n: c.mcqCount })} · {t('study.sectionsSub', { n: c.sectionCount })}
+                    {/* Each figure held to its word, so a narrow row breaks at a
+                        dot and never leaves "sections" alone on the next line. */}
+                    {[
+                      c.examShare ? t('study.examShare', { n: c.examShare }) : '',
+                      t('study.mcqsSub', { n: c.mcqCount }),
+                      t('study.sectionsSub', { n: c.sectionCount }),
+                    ]
+                      .filter(Boolean)
+                      .map((part) => part.replace(/ /g, '\u00A0'))
+                      .join(' · ')}
                   </span>
                 )}
                 {!empty && p > 0 && p < 100 ? (

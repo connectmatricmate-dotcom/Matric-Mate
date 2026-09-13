@@ -259,7 +259,11 @@ export default function ChapterHub() {
 
   // Read in either medium counts once, as it does for progress everywhere else.
   const readCount = content ? content.sections.filter((s) => readKeys.has(itemKey(s.id))).length : 0;
-  const best = state.results.filter((r) => r.chapterId === id).sort((a, b) => (b.total ? b.score / b.total : 0) - (a.total ? a.score / a.total : 0))[0];
+  // A best from a real set: one closed after a single right answer is "1/1",
+  // a perfect score it did not earn.
+  const best = state.results
+    .filter((r) => r.chapterId === id && r.total >= 5)
+    .sort((a, b) => b.score / b.total - a.score / a.total)[0];
   const knownKeys = new Set(state.cardsKnown.map(itemKey));
   const knownCards = content ? content.flashcards.filter((f) => knownKeys.has(itemKey(f.id))).length : 0;
   const noNotes = !!content && content.sections.length === 0;
