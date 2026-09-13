@@ -15,6 +15,7 @@ import {
   planDone,
   planUnfinished,
   resumeChapter,
+  startSubject,
   streakAtRiskTiered,
   streakMilestone,
   weakTopicNudge,
@@ -408,7 +409,9 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
        */
       const onboarding = (profile.onboarding ?? {}) as { subjects?: string[] };
       const list = Array.isArray(onboarding.subjects) && onboarding.subjects.length ? onboarding.subjects : compulsory;
-      const subjectId = last?.subject_id ?? (list.length ? list[Math.abs(dayIndex) % list.length] : undefined);
+      // Offset per student, so a whole class is not sent the same subject on the same night.
+      const offset = [...profile.id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 0);
+      const subjectId = last?.subject_id ?? (list.length ? list[Math.abs(dayIndex + offset) % list.length] : undefined);
       const subjectRow = subjectId ? subjectById.get(subjectId) : undefined;
       const notice = pick({
         studiedToday: days.has(today),
@@ -547,7 +550,7 @@ function pick(s: Signals): Notice | null {
    * named every third evening, before the ladder below: "away for 7 days" is
    * measured from a visit they never made.
    */
-  if (s.neverStarted) return s.subject && s.dayIndex % 3 === 0 ? awaySubject(s.subject) : comeBack(s.dayIndex);
+  if (s.neverStarted) return s.subject && s.dayIndex % 3 === 0 ? startSubject(s.subject) : comeBack(s.dayIndex);
 
   // 2. Gone for exactly three, seven or fourteen days: the win-back rungs.
   const rung = awayFor(s.awayDays);

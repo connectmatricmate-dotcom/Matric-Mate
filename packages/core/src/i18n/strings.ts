@@ -431,6 +431,8 @@ export const en = {
     comeback8Body: 'A quick ten-question test shows exactly which chapters need you.',
     awaySubjectTitle: 'One {subject} chapter tonight',
     awaySubjectBody: 'Fifteen minutes is enough to get going again. Your progress is right where you left it.',
+    startSubjectTitle: 'Start with one {subject} chapter',
+    startSubjectBody: 'Fifteen minutes is enough for your first one. The app keeps track from there.',
 
     /* For a student who has already studied today: something true about the
        day so far, and one reason to do a little more. */
@@ -1669,6 +1671,8 @@ export const ur: typeof en = {
     comeback8Body: 'دس سوالوں کا مختصر ٹیسٹ بتا دے گا کہ کن ابواب کو آپ کی ضرورت ہے۔',
     awaySubjectTitle: 'آج رات {subject} کا ایک باب',
     awaySubjectBody: 'دوبارہ شروع کرنے کے لیے پندرہ منٹ کافی ہیں۔ آپ کی پیش رفت وہیں محفوظ ہے۔',
+    startSubjectTitle: '{subject} کے ایک باب سے آغاز کریں',
+    startSubjectBody: 'پہلے باب کے لیے پندرہ منٹ کافی ہیں۔ آگے کا حساب ایپ رکھے گی۔',
 
     bestDayTitle: 'اس ہفتے کا آپ کا بہترین دن',
     bestDayBody: 'اب تک {n} سوال۔ سونے سے پہلے دس سوال اور؟',

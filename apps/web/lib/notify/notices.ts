@@ -179,6 +179,15 @@ export const awaySubject = (subject: string): Notice => ({
   target: 'study',
 });
 
+/** The same, for a student who has never studied: there is nothing to go back to yet. */
+export const startSubject = (subject: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.startSubjectTitle',
+  body: 'notifications.startSubjectBody',
+  params: { subject },
+  target: 'study',
+});
+
 /* ------------------------------------------- for a student who studied today */
 
 /** Today is already their best day this week, with the count to prove it. */
