@@ -521,7 +521,7 @@
             "A"
           ],
           "marks": 33,
-          "share": null
+          "share": 18.3
         },
         {
           "number": 2,
@@ -530,7 +530,7 @@
             "B"
           ],
           "marks": 28,
-          "share": null
+          "share": 15.6
         },
         {
           "number": 3,
@@ -539,7 +539,7 @@
             "C"
           ],
           "marks": 24,
-          "share": null
+          "share": 13.3
         },
         {
           "number": 4,
@@ -548,7 +548,7 @@
             "D"
           ],
           "marks": 26,
-          "share": null
+          "share": 14.4
         },
         {
           "number": 5,
@@ -557,7 +557,7 @@
             "E"
           ],
           "marks": 25,
-          "share": null
+          "share": 13.9
         },
         {
           "number": 6,
@@ -566,7 +566,7 @@
             "F"
           ],
           "marks": 22,
-          "share": null
+          "share": 12.2
         },
         {
           "number": 7,
@@ -575,9 +575,10 @@
             "G"
           ],
           "marks": 22,
-          "share": null
+          "share": 12.2
         }
-      ]
+      ],
+      "_weights": "Shares are each strand's marks over the ToS total (180), which counts both branches of either/or questions: relative weight, as for Class 10."
     },
     "math": {
       "totalMarks": 135,
@@ -610,8 +611,8 @@
           "slos": [
             "B1"
           ],
-          "marks": null,
-          "share": null
+          "marks": 7,
+          "share": 8.2
         },
         {
           "number": 3,
@@ -619,8 +620,8 @@
           "slos": [
             "B2"
           ],
-          "marks": null,
-          "share": null
+          "marks": 10,
+          "share": 10.9
         },
         {
           "number": 4,
@@ -628,8 +629,8 @@
           "slos": [
             "B3"
           ],
-          "marks": null,
-          "share": null
+          "marks": 10,
+          "share": 10.9
         },
         {
           "number": 5,
@@ -637,8 +638,8 @@
           "slos": [
             "C1"
           ],
-          "marks": null,
-          "share": null
+          "marks": 8,
+          "share": 9
         },
         {
           "number": 6,
@@ -646,8 +647,8 @@
           "slos": [
             "C2"
           ],
-          "marks": null,
-          "share": null
+          "marks": 8,
+          "share": 9
         },
         {
           "number": 7,
@@ -655,8 +656,8 @@
           "slos": [
             "C3"
           ],
-          "marks": null,
-          "share": null
+          "marks": 11,
+          "share": 12
         },
         {
           "number": 8,
@@ -664,10 +665,11 @@
           "slos": [
             "C4"
           ],
-          "marks": null,
-          "share": null
+          "marks": 16,
+          "share": 17.9
         }
-      ]
+      ],
+      "_weights": "Domain totals from the board ToS (History 20, Geography 27, Resources 43 of 90: 22.2%, 30%, 47.8%), spread over each domain's chapters by learning-outcome count, the method chapters-ssc2.json uses for Class 10. Relative weight, not per-chapter board marks."
     },
     "urd": {
       "totalMarks": 75,

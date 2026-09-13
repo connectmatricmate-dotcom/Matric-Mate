@@ -265,6 +265,15 @@ function matchUrduChapters(english, urduChapters, sameEdition) {
 }
 
 /**
+ * A chapter's Urdu name as it should read, where the contents page was read
+ * with a letter missing. By chapter id, and it wins over every other source.
+ */
+const CHAPTER_URDU_TITLE_FIXES = {
+  // The contents row dropped the الف of تیرا; the lesson's own heading has it.
+  'urd-pj-9-17': 'سن تو سہی جہاں میں ہے تیرا افسانہ کیا (غزل)',
+};
+
+/**
  * Misreads confirmed by eye against the page image, where reading again did
  * not fix them. Keyed by Urdu-medium book and its own chapter number. Kept
  * short on purpose: an entry here is a claim someone looked at the page.
@@ -387,7 +396,11 @@ async function main() {
       // A book's name first, printed or Urdu-medium; a translation only where
       // no book gives one, so a book that arrives later wins by itself.
       const urduTitle =
-        lesson?.urdu ?? (printedIsUrdu ? printed.replace(/\s{2,}/g, ' ') : urduFromBook) ?? translated[`${subject}-pj-${grade}-${ch.number}`] ?? null;
+        CHAPTER_URDU_TITLE_FIXES[`${subject}-pj-${grade}-${ch.number}`] ??
+        lesson?.urdu ??
+        (printedIsUrdu ? printed.replace(/\s{2,}/g, ' ') : urduFromBook) ??
+        translated[`${subject}-pj-${grade}-${ch.number}`] ??
+        null;
 
       const topics = read.headings?.length ? topicsFrom(ch, read) : contentsTopics(entry);
       const id = `${subject}-pj-${grade}-${ch.number}`;
