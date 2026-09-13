@@ -17,6 +17,8 @@ const ROUTE: Record<NotificationTarget, string> = {
   report: '/insights/report',
   payments: '/account/payments',
   subscription: '/account/subscription',
+  // Only the fallback: a chapter target carries its id, see openTarget.
+  chapter: '/(tabs)/study',
 };
 
 /**
@@ -25,8 +27,11 @@ const ROUTE: Record<NotificationTarget, string> = {
  * of it, and back from that home screen came out on the inbox again.
  */
 const TAB_TARGETS = new Set<NotificationTarget>(['home', 'study', 'practice', 'progress']);
-const openTarget = (target: NotificationTarget) =>
-  TAB_TARGETS.has(target) ? router.dismissTo(ROUTE[target] as never) : router.push(ROUTE[target] as never);
+const openTarget = (target: NotificationTarget, chapterId?: string) => {
+  if (target === 'chapter' && chapterId) router.push(`/learn/chapter/${chapterId}` as never);
+  else if (TAB_TARGETS.has(target)) router.dismissTo(ROUTE[target] as never);
+  else router.push(ROUTE[target] as never);
+};
 
 const ICON: Record<Notification['kind'], { emoji: string; tone: 'orange' | 'teal' | 'green' | 'grey' }> = {
   streak: { emoji: '🔥', tone: 'orange' },
@@ -73,7 +78,7 @@ export default function Notifications() {
         // A read notice steps back a little; a new one keeps full strength
         // and a dot, so the two can be told apart.
         dim={!fresh.has(n.id)}
-        onPress={n.target ? () => openTarget(n.target!) : undefined}
+        onPress={n.target ? () => openTarget(n.target!, n.chapterId) : undefined}
         right={
           fresh.has(n.id) ? (
             <View style={{ width: 9, height: 9, borderRadius: 99, backgroundColor: C.orange }} />

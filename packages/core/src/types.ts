@@ -182,7 +182,9 @@ export type NotificationTarget =
   | 'session-setup'
   | 'report'
   | 'payments'
-  | 'subscription';
+  | 'subscription'
+  /** One chapter's page, named by `chapterId`. Stored as `chapter:<id>`. */
+  | 'chapter';
 
 export type Notification = {
   id: string;
@@ -191,5 +193,35 @@ export type Notification = {
   body: string;
   at: number;
   target?: NotificationTarget;
+  /** The chapter a `chapter` target opens. */
+  chapterId?: string;
   read: boolean;
 };
+
+/**
+ * A stored or pushed target, split into the destination and its chapter.
+ *
+ * The notifications column and the push payload are plain text, so a chapter
+ * travels as `chapter:<id>`. Anything neither app can route comes back empty,
+ * and a `chapter` with no id is not a destination either.
+ */
+export function parseNotificationTarget(raw: unknown): { target?: NotificationTarget; chapterId?: string } {
+  if (typeof raw !== 'string' || !raw) return {};
+  if (raw.startsWith('chapter:')) {
+    const chapterId = raw.slice('chapter:'.length);
+    return chapterId ? { target: 'chapter', chapterId } : {};
+  }
+  return (NOTIFICATION_TARGETS as readonly string[]).includes(raw) && raw !== 'chapter' ? { target: raw as NotificationTarget } : {};
+}
+
+export const NOTIFICATION_TARGETS: readonly NotificationTarget[] = [
+  'home',
+  'study',
+  'practice',
+  'progress',
+  'session-setup',
+  'report',
+  'payments',
+  'subscription',
+  'chapter',
+];

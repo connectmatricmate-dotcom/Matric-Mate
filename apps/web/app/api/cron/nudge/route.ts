@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { reminderHour, weakTopics } from '@matricmate/core';
+import { reminderHour, translate, weakTopics } from '@matricmate/core';
 import type { Attempt, Language } from '@matricmate/core';
 import { planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   awayFor,
+  awaySubject,
+  bestDay,
   comeBack,
+  keepGoing,
+  moreSet,
+  moreToday,
   notify,
+  planDone,
   planUnfinished,
   resumeChapter,
   streakAtRiskTiered,
@@ -37,7 +43,8 @@ import { JobError, chunks, cronAuthorised, eachLimited, pageAll } from '@/lib/no
  * student stops seeing by the second week, and then turns off. So the job asks
  * what is actually true about this person tonight, in order of how much it
  * deserves interrupting them, and only falls back to a general nudge when
- * nothing specific applies. Even that fallback rotates through four wordings.
+ * nothing specific applies. Even that fallback rotates through eight wordings
+ * and their own subjects.
  *
  * Students with a plan only. Staff accounts were being told to come and study,
  * and a student without a plan was being sent to screens that only bounce them
@@ -56,12 +63,11 @@ export const maxDuration = 300;
 /** Only ever one nudge per student per evening, whichever kind it wins. */
 const KINDS = ['reminder', 'streak'];
 /**
- * How long since their last activity a student can be and still be nudged.
- *
- * Wider than it used to be, because the win-back ladder has to reach students
- * who have stopped, and by definition they have no recent activity. It stops
- * at three weeks: past that the ladder is done and a nightly tap on the
- * shoulder is noise to somebody who has already left.
+ * How far back "days since they last studied" is counted. Past this it only
+ * matters that it is a long time: every student with a plan and reminders on
+ * hears from us every evening, however long they have been away. This used to
+ * be a cut-off, and three weeks of silence was exactly when a student who had
+ * drifted off needed a reason to come back.
  */
 const WINDOW_DAYS = 21;
 /**
@@ -90,6 +96,10 @@ const TOPIC_REPEAT_DAYS = 3;
 const PLAN_TASKS = 3;
 /** Streaks worth congratulating rather than passing over in silence. */
 const MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
+/** Past this many questions short of their best day, the gap reads as a scold rather than a target. */
+const MAX_GAP = 30;
+/** Enough questions for "best day this week" to be worth saying. */
+const BEST_DAY_MIN = 10;
 
 type ProfileRow = { id: string; settings: unknown; onboarding: { medium?: string } | null; created_at: string };
 type AttemptRow = { user_id: string; chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string };
@@ -133,7 +143,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
   try {
-    return await run();
+    /*
+     * `?dry=1` works out tonight's message for everyone due and returns it,
+     * sending and recording nothing, and ignoring who was already nudged.
+     * `&hour=19` previews another hour's students.
+     */
+    const params = req.nextUrl.searchParams;
+    const dry = params.get('dry') === '1';
+    const hour = dry && params.get('hour') ? Number(params.get('hour')) : null;
+    return await run(dry, Number.isInteger(hour) ? hour : null);
   } catch (e) {
     // A read that failed even after retrying. Not a 200: pg_cron records the
     // run as succeeded whatever happens, so this status is the only trace.
@@ -145,7 +163,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-async function run(): Promise<NextResponse> {
+async function run(dry = false, hourOverride: number | null = null): Promise<NextResponse> {
   const startedAt = Date.now();
   const admin = createAdminClient();
   const now = new Date();
@@ -153,7 +171,8 @@ async function run(): Promise<NextResponse> {
   const yesterday = new Date(now.getTime() - 864e5);
   /** Rotates the general nudge, so it is a different sentence each night. */
   const dayIndex = Math.floor(now.getTime() / 864e5);
-  const hourNow = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Karachi', hour: '2-digit', hour12: false }).format(now));
+  const hourNow =
+    hourOverride ?? Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Karachi', hour: '2-digit', hour12: false }).format(now));
 
   /*
    * Whose hour is it, asked before anything else.
@@ -223,7 +242,7 @@ async function run(): Promise<NextResponse> {
    * second run carries on from where the first stopped rather than meeting
    * the same five hundred again.
    */
-  const pending = due.filter((p) => !already.has(p.id));
+  const pending = dry ? due : due.filter((p) => !already.has(p.id));
   const batch = pending.slice(0, MAX_PER_RUN);
   const dropped = pending.length - batch.length;
   if (dropped) console.warn(`[cron/nudge] ${dropped} students over the per-run ceiling, left for the next run`);
@@ -252,27 +271,20 @@ async function run(): Promise<NextResponse> {
   }
 
   /*
-   * Of those due this hour, the ones still recently active, and the ones who
-   * have never studied at all.
+   * Everyone due this hour: the active, the ones who have drifted off, and the
+   * ones who have never studied at all.
    *
-   * The second group used to be invisible, because this list was built from
-   * active_days and a student with no activity has no rows in it. So the one
-   * person most in need of "come and study" was the only one who could never
-   * receive it. They join with an empty day set, and are dropped once their
-   * account is older than the window: past that, a nightly tap on the
-   * shoulder is noise to somebody who never started.
+   * The last group used to be invisible, because this list was built from
+   * active_days and a student with no activity has no rows in it. Then both
+   * of the other two were cut off after three weeks. A student who stopped
+   * got three messages and then nothing, and one who signed up and never
+   * started got three weeks of them. Now nobody drops out while their plan
+   * and their reminder switch are on.
    */
-  const candidates: { profile: ProfileRow; days: Set<string>; neverStarted: boolean }[] = [];
-  for (const p of batch) {
-    const days = daysByUser.get(p.id);
-    if (days && daysSinceLast(days, now) <= WINDOW_DAYS) {
-      candidates.push({ profile: p, days, neverStarted: false });
-      continue;
-    }
-    const age = Math.floor((now.getTime() - Date.parse(p.created_at)) / 864e5);
-    if (!days?.size && Number.isFinite(age) && age <= WINDOW_DAYS) candidates.push({ profile: p, days: new Set(), neverStarted: true });
-  }
-  if (!candidates.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+  const candidates = batch.map((p) => {
+    const days = daysByUser.get(p.id) ?? new Set<string>();
+    return { profile: p, days, neverStarted: days.size === 0 };
+  });
   const ids = candidates.map((c) => c.profile.id);
 
   /*
@@ -283,7 +295,13 @@ async function run(): Promise<NextResponse> {
    * the database happened to return last.
    */
   const needAttempts = candidates.filter((c) => !c.neverStarted && !c.days.has(today)).map((c) => c.profile.id);
-  const [attemptRows, planRows] = await Promise.all([
+  /*
+   * For the ones who studied today, only how many questions they answered on
+   * each of the last seven days: tonight's message is about today against
+   * the best day this week, and the rest of their history cannot change it.
+   */
+  const studiedToday = candidates.filter((c) => c.days.has(today)).map((c) => c.profile.id);
+  const [attemptRows, planRows, weekRows, subjectRows] = await Promise.all([
     forIds<AttemptRow>('attempts', needAttempts, (slice, from, to, signal) =>
       admin
         .from('attempts')
@@ -306,7 +324,30 @@ async function run(): Promise<NextResponse> {
         .range(from, to)
         .abortSignal(signal),
     ),
+    forIds<{ user_id: string; at: string }>('attempts-week', studiedToday, (slice, from, to, signal) =>
+      admin
+        .from('attempts')
+        .select('user_id,at')
+        .in('user_id', slice)
+        .gte('at', new Date(now.getTime() - 7 * 864e5).toISOString())
+        .order('id')
+        .range(from, to)
+        .abortSignal(signal),
+    ),
+    pageAll<{ id: string; name: string; urdu_name: string | null }>('subjects', (from, to, signal) =>
+      admin.from('subjects').select('id,name,urdu_name').order('id').range(from, to).abortSignal(signal),
+    ),
   ]);
+
+  /** Questions answered per Karachi day this week, per student who studied today. */
+  const weekByUser = new Map<string, Map<string, number>>();
+  for (const r of weekRows) {
+    const perDay = weekByUser.get(r.user_id) ?? new Map<string, number>();
+    const day = karachiDay(new Date(r.at));
+    perDay.set(day, (perDay.get(day) ?? 0) + 1);
+    weekByUser.set(r.user_id, perDay);
+  }
+  const subjectById = new Map(subjectRows.map((r) => [r.id, r]));
 
   const attemptsByUser = new Map<string, AttemptRow[]>();
   for (const r of attemptRows) attemptsByUser.set(r.user_id, [...(attemptsByUser.get(r.user_id) ?? []), r]);
@@ -328,7 +369,11 @@ async function run(): Promise<NextResponse> {
   const stopAt = startedAt + BUDGET_MS;
   let sent = 0;
   let failed = 0;
+  /** What reached a phone, which the inbox count above says nothing about. */
+  let pushed = 0;
+  let pushFailed = 0;
   const picked: Record<string, number> = {};
+  const preview: { user: string; title: string; body: string; target: string }[] = [];
 
   const reached = await eachLimited(
     candidates,
@@ -352,6 +397,17 @@ async function run(): Promise<NextResponse> {
       const attempts = attemptsByUser.get(profile.id) ?? [];
       const last = attempts[attempts.length - 1];
       const chapter = last ? chapterById.get(last.chapter_id) : undefined;
+      const perDay = weekByUser.get(profile.id);
+      const bestBefore = perDay ? Math.max(0, ...[...perDay].filter(([d]) => d !== today).map(([, n]) => n)) : 0;
+      /*
+       * The subject to name for a student who has been away: the one they last
+       * worked in, else the first on their list. Rotated by day through their
+       * list when there is no history, so it is not Mathematics every time.
+       */
+      const onboarding = (profile.onboarding ?? {}) as { subjects?: string[] };
+      const list = Array.isArray(onboarding.subjects) ? onboarding.subjects : [];
+      const subjectId = last?.subject_id ?? (list.length ? list[Math.abs(dayIndex) % list.length] : undefined);
+      const subjectRow = subjectId ? subjectById.get(subjectId) : undefined;
       const notice = pick({
         studiedToday: days.has(today),
         streakToday: streakEndingAt(days, now),
@@ -362,6 +418,10 @@ async function run(): Promise<NextResponse> {
         // Urdu sentence. Topics stay Latin on purpose: Urdu-medium textbooks
         // keep technical terms in English, and so does the rest of this app.
         lastChapter: chapter ? (lang === 'ur' && chapter.urdu_title) || chapter.title : null,
+        lastChapterId: chapter?.id ?? null,
+        subject: subjectRow ? (lang === 'ur' && subjectRow.urdu_name) || subjectRow.name : null,
+        todayCount: perDay?.get(today) ?? 0,
+        bestBefore,
         planTicks: planDoneByUser.get(profile.id) ?? 0,
         saidLately: saidLately.get(profile.id) ?? [],
         wantsReminder,
@@ -376,6 +436,15 @@ async function run(): Promise<NextResponse> {
        * cost a profile read and an auth lookup each, for an email address a
        * nudge never uses.
        */
+      if (dry) {
+        preview.push({
+          user: profile.id.slice(0, 8),
+          title: translate(lang, notice.title, notice.params),
+          body: translate(lang, notice.body, notice.params),
+          target: notice.target === 'chapter' ? `chapter:${notice.chapterId}` : (notice.target ?? 'home'),
+        });
+        return;
+      }
       const recipient: Recipient = {
         userId: profile.id,
         lang,
@@ -390,19 +459,24 @@ async function run(): Promise<NextResponse> {
         const label = String(notice.title).replace('notifications.', '');
         picked[label] = (picked[label] ?? 0) + 1;
       } else failed++;
+      if (report.push === 'sent') pushed++;
+      else if (report.push === 'failed' || report.push === 'unconfigured') pushFailed++;
     },
     () => Date.now() > stopAt,
   );
 
+  if (dry) return NextResponse.json({ dry: true, hour: hourNow, considered: candidates.length, preview });
   const unfinished = candidates.length - reached;
   // The breakdown is the point of the logging: if every student is getting the
   // same generic nudge, the picker is not doing its job and that shows here.
-  const summary = { hour: hourNow, considered: candidates.length, sent, failed, unfinished, dropped, picked };
+  const summary = { hour: hourNow, considered: candidates.length, sent, failed, pushed, pushFailed, unfinished, dropped, picked };
   /*
    * Anyone not reached is a run that did not finish, and it says so. The
    * :05 run picks them up; this status is what makes it visible either way.
+   * A push that could not go out counts too: for a month every one of them
+   * failed at the login to Firebase while this answered 200.
    */
-  if (failed || unfinished || dropped) return NextResponse.json({ error: 'incomplete', ...summary }, { status: 503 });
+  if (failed || pushFailed || unfinished || dropped) return NextResponse.json({ error: 'incomplete', ...summary }, { status: 503 });
   return NextResponse.json(summary);
 }
 
@@ -414,6 +488,12 @@ type Signals = {
   attempts: AttemptRow[];
   /** The name of the chapter they last answered a question in, ready to print. */
   lastChapter: string | null;
+  lastChapterId: string | null;
+  /** One of their subjects, named in their language, for a student who has been away. */
+  subject: string | null;
+  /** Questions answered today, and on their best other day in the last week. */
+  todayCount: number;
+  bestBefore: number;
   planTicks: number;
   /** Titles and bodies of what they were sent in the last few days. */
   saidLately: string[];
@@ -432,13 +512,27 @@ type Signals = {
  * cannot wait until tomorrow, so it outranks everything. Below that, anything
  * naming a specific thing they left unfinished beats a general "come and
  * study", because it answers "and do what?" before they have to ask it.
+ *
+ * Everybody with the reminder switch on gets something every evening. A
+ * student who has already studied is told something true about their day and
+ * given a reason to do a little more; one who has not is given a reason to
+ * start, however long it has been.
  */
 function pick(s: Signals): Notice | null {
-  // Studied today: nothing to nudge, but a milestone is worth marking. This is
-  // the only message here that is good news, and it is why the job does not
-  // simply skip everyone who has already been active.
   if (s.studiedToday) {
-    return s.wantsStreak && MILESTONES.includes(s.streakToday) ? streakMilestone(s.streakToday) : null;
+    // A streak reached is the one piece of news that beats everything.
+    if (s.wantsStreak && MILESTONES.includes(s.streakToday)) return streakMilestone(s.streakToday);
+    if (!s.wantsReminder) return null;
+    // Today already beats the rest of the week, and by enough to mention.
+    if (s.todayCount >= BEST_DAY_MIN && s.todayCount > s.bestBefore) return bestDay(s.todayCount);
+    if (s.planTicks >= PLAN_TASKS) return planDone();
+    // Started today's plan and left it. The plan has three tasks.
+    if (s.planTicks > 0) return planUnfinished(PLAN_TASKS - s.planTicks);
+    // Read or listened, but answered nothing.
+    if (s.todayCount === 0) return keepGoing();
+    // Close enough to their best day to make it a target; past that, just one more set.
+    const gap = s.bestBefore - s.todayCount + 1;
+    return gap > 0 && gap <= MAX_GAP ? moreToday(s.todayCount, gap) : moreSet(s.todayCount);
   }
 
   // 1. A live streak, tonight, with hours left to save it.
@@ -447,23 +541,25 @@ function pick(s: Signals): Notice | null {
   if (!s.wantsReminder) return null;
 
   /*
-   * Never studied. Straight to the rotating general nudge, before the ladder
-   * below: "away for 21 days" is measured from a last visit they never made,
-   * so the win-back rungs would either say something false or, once past the
-   * top rung, say nothing at all.
+   * Never studied. The rotating general nudge, with one of their own subjects
+   * named every third evening, before the ladder below: "away for 7 days" is
+   * measured from a visit they never made.
    */
-  if (s.neverStarted) return comeBack(s.dayIndex);
+  if (s.neverStarted) return s.subject && s.dayIndex % 3 === 0 ? awaySubject(s.subject) : comeBack(s.dayIndex);
 
-  // 2. Gone for days. The win-back ladder, which runs out after a fortnight.
-  if (s.awayDays >= 3) return awayFor(s.awayDays);
+  // 2. Gone for exactly three, seven or fourteen days: the win-back rungs.
+  const rung = awayFor(s.awayDays);
+  if (rung) return rung;
 
   // 3. Today's plan, started and abandoned. Only when they actually began it:
   //    "3 tasks left" to someone who never opened the app reads as a scold.
-  //    The plan has three tasks; this said five, so one tick read "4 left".
   if (s.planTicks > 0 && s.planTicks < PLAN_TASKS) return planUnfinished(PLAN_TASKS - s.planTicks);
 
-  // 4. A chapter left halfway. The most concrete thing we can offer.
-  if (s.lastChapter) return resumeChapter(s.lastChapter);
+  // 4. A chapter left halfway, while it is still fresh, and not the same
+  //    chapter as the last few nights.
+  if (s.lastChapter && s.awayDays <= 7 && !s.saidLately.some((said) => said.includes(s.lastChapter!))) {
+    return resumeChapter(s.lastChapter, s.lastChapterId ?? undefined);
+  }
 
   // 5. Their genuinely worst topic, named, with the number. Not the same
   //    topic as the last few nights: by the third time it is wallpaper.
@@ -486,6 +582,7 @@ function pick(s: Signals): Notice | null {
   }
 
   // 6. Nothing specific to say, so say something general, and a different
-  //    something from last night.
-  return comeBack(s.dayIndex);
+  //    something from last night: one of their subjects every third evening,
+  //    the rotating pool on the others.
+  return s.subject && s.dayIndex % 3 === 0 ? awaySubject(s.subject) : comeBack(s.dayIndex);
 }

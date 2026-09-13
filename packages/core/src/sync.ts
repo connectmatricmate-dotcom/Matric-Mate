@@ -15,7 +15,7 @@
  * foreground, browser online event, right after enqueuing) are per-app,
  * because those APIs differ and core has no dependency on either.
  */
-import { Attempt, Confidence, Notification, NotificationTarget, TestResult } from './types';
+import { Attempt, Confidence, Notification, TestResult, parseNotificationTarget } from './types';
 import { XP, todayKey, totalXp, xpForAttempt } from './domain';
 
 /**
@@ -467,15 +467,13 @@ type NotificationRow = {
 };
 
 /** The column is free text; only the destinations both apps can route to survive. */
-const TARGETS: NotificationTarget[] = ['home', 'study', 'practice', 'progress', 'session-setup', 'report', 'payments', 'subscription'];
-
 const fromNotificationRow = (r: NotificationRow): Notification => ({
   id: r.id,
   kind: r.kind as Notification['kind'],
   title: r.title,
   body: r.body ?? '',
   at: Date.parse(r.at),
-  target: TARGETS.includes(r.target as NotificationTarget) ? (r.target as NotificationTarget) : undefined,
+  ...parseNotificationTarget(r.target),
   read: r.read,
 });
 

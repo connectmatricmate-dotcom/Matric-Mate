@@ -32,7 +32,16 @@ const ROUTE: Record<NotificationTarget, string> = {
   report: '/insights/report',
   payments: '/account/payments',
   subscription: '/account/subscription',
+  // Only the fallback: a chapter push carries the id in `data.chapter`.
+  chapter: '/(tabs)/study',
 };
+
+/** The route a push opens: its chapter when it names one, else its destination. */
+function routeFor(data: Record<string, unknown> | undefined): string | undefined {
+  const target = data?.target;
+  if (target === 'chapter' && typeof data?.chapter === 'string' && data.chapter) return `/learn/chapter/${data.chapter}`;
+  return typeof target === 'string' ? ROUTE[target as NotificationTarget] : undefined;
+}
 
 /**
  * A notification arriving while the app is open should still be seen. Without
@@ -154,8 +163,7 @@ export function takePendingNotificationRoute(): string | null {
     if (!response) return null;
     consumedResponseId = response.notification.request.identifier;
     Notifications.clearLastNotificationResponse();
-    const target = response.notification.request.content.data?.target;
-    return (typeof target === 'string' ? ROUTE[target as NotificationTarget] : undefined) ?? null;
+    return routeFor(response.notification.request.content.data) ?? null;
   } catch {
     // An older binary without the API, or no notification at all. Launching
     // normally is the right answer either way.
@@ -220,8 +228,7 @@ export function usePush(userId: string | null) {
       // The launch tap belongs to the splash, which has already routed for it.
       // Without this the target would be pushed twice on a cold start.
       if (response.notification.request.identifier === consumedResponseId) return;
-      const target = response.notification.request.content.data?.target;
-      const route = typeof target === 'string' ? ROUTE[target as NotificationTarget] : undefined;
+      const route = routeFor(response.notification.request.content.data);
       if (!route) return;
       // A tab is gone back down to, not pushed: over a stacked screen a push
       // put a second set of tabs on top of it (see app/notifications.tsx).

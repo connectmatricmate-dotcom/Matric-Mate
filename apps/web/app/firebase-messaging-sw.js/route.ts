@@ -58,7 +58,7 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/icon.png',
     badge: '/icon.png',
     tag: payload.data?.kind ?? 'matricmate',
-    data: { target: payload.data?.target ?? 'home' },
+    data: { target: payload.data?.target ?? 'home', chapter: payload.data?.chapter },
   });
 });
 
@@ -71,7 +71,11 @@ const ROUTE = ${JSON.stringify(WEB_PATHS)};
  */
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const path = ROUTE[event.notification.data?.target] || '/dashboard';
+  const data = event.notification.data ?? {};
+  const path =
+    data.target === 'chapter' && data.chapter
+      ? '/learn/chapter/' + encodeURIComponent(data.chapter)
+      : ROUTE[data.target] || '/dashboard';
   event.waitUntil(
     // Focus a tab that is already open rather than piling up new ones.
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((all) => {

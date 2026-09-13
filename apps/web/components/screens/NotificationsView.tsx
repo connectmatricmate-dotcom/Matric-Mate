@@ -17,7 +17,12 @@ const ROUTE: Record<NotificationTarget, string> = {
   report: '/insights/report',
   payments: '/account/payments',
   subscription: '/account/subscription',
+  chapter: '/study',
 };
+
+/** A chapter target opens that chapter; the table above is its fallback. */
+const hrefFor = (n: Notification): string | undefined =>
+  n.target === 'chapter' && n.chapterId ? `/learn/chapter/${encodeURIComponent(n.chapterId)}` : n.target ? ROUTE[n.target] : undefined;
 
 const ICON: Record<Notification['kind'], { icon: 'flame' | 'clock' | 'chart' | 'receipt'; tone: 'orange' | 'teal' | 'green' | 'grey' }> = {
   streak: { icon: 'flame', tone: 'orange' },
@@ -58,7 +63,7 @@ export function NotificationsView() {
     return (
       <Item
         key={n.id}
-        href={n.target ? ROUTE[n.target] : undefined}
+        href={hrefFor(n)}
         title={n.title}
         sub={n.body}
         icon={meta.icon}

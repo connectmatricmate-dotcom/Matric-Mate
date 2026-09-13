@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { translate } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { withRetry } from '../jobs';
-import type { ChannelAdapter } from '../types';
+import { storedTarget, type ChannelAdapter } from '../types';
 
 /**
  * The in-app inbox: a row in public.notifications, which both apps read and
@@ -35,7 +35,7 @@ export const inbox: ChannelAdapter = {
       kind: notice.kind,
       title: translate(to.lang, notice.title, notice.params),
       body: translate(to.lang, notice.body, notice.params),
-      target: notice.target ?? null,
+      target: storedTarget(notice),
     };
     const { error } = await withRetry((signal) => admin.from('notifications').insert(row).abortSignal(signal));
     if (!error || error.code === '23505') return 'sent';

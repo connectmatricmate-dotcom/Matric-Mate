@@ -23,7 +23,8 @@ export type NotificationTarget =
   | 'session-setup'
   | 'report'
   | 'payments'
-  | 'subscription';
+  | 'subscription'
+  | 'chapter';
 
 /**
  * Where each destination is on the website. The service worker opens these
@@ -39,7 +40,17 @@ export const WEB_PATHS: Record<NotificationTarget, string> = {
   report: '/insights/report',
   payments: '/account/payments',
   subscription: '/account/subscription',
+  // Only the fallback: a chapter target carries its id, see webPath.
+  chapter: '/study',
 };
+
+/** The website path a notice opens, including the chapter a `chapter` target names. */
+export const webPath = (target: NotificationTarget, chapterId?: string): string =>
+  target === 'chapter' && chapterId ? `/learn/chapter/${encodeURIComponent(chapterId)}` : WEB_PATHS[target];
+
+/** The target as the notifications column and the push payload store it. */
+export const storedTarget = (notice: Pick<Notice, 'target' | 'chapterId'>): string | null =>
+  notice.target === 'chapter' ? (notice.chapterId ? `chapter:${notice.chapterId}` : 'study') : (notice.target ?? null);
 
 export type Channel = 'inbox' | 'push' | 'email';
 
@@ -58,6 +69,8 @@ export type Notice = {
   /** Interpolated into both title and body. */
   params?: Record<string, string | number>;
   target?: NotificationTarget;
+  /** The chapter a `chapter` target opens. */
+  chapterId?: string;
   /**
    * Channels BEYOND the two every notice gets.
    *

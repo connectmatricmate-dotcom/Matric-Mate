@@ -4,7 +4,7 @@ import { translate } from '@matricmate/core';
 import { SITE_URL } from '@/lib/site';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { withRetry } from '../jobs';
-import { WEB_PATHS, type ChannelAdapter } from '../types';
+import { webPath, type ChannelAdapter } from '../types';
 
 /**
  * Firebase Cloud Messaging, to the Android app and to the browser.
@@ -117,6 +117,9 @@ export const push: ChannelAdapter = {
     const body = translate(to.lang, notice.body, notice.params);
     const url = `https://fcm.googleapis.com/v1/projects/${projectId()}/messages:send`;
     const target = notice.target ?? 'home';
+    // A chapter travels as its own field, so an app that predates chapter
+    // targets reads an unknown destination and simply opens normally.
+    const chapter = target === 'chapter' && notice.chapterId ? { chapter: notice.chapterId } : {};
 
     const results = await Promise.all(
       (devices as { token: string; platform: string }[]).map(async ({ token: device, platform }) => {
@@ -131,7 +134,10 @@ export const push: ChannelAdapter = {
                 // A destination name, not a URL: the two apps spell the same
                 // screen differently. See NotificationTarget in core. Values
                 // must be strings, which FCM enforces.
-                data: { target, kind: notice.kind },
+                data: { target, kind: notice.kind, ...chapter },
+                // The channel the app creates before it registers, so every
+                // push wears the same name and importance in Settings.
+                ...(platform === 'android' ? { android: { notification: { channel_id: 'default' } } } : {}),
                 /*
                  * In a browser the Firebase worker shows a message that has a
                  * notification block by itself, and opens this link when it
@@ -146,7 +152,7 @@ export const push: ChannelAdapter = {
                       webpush: {
                         notification: { icon: `${SITE_URL}/icon.png`, tag: notice.kind },
                         ...(SITE_URL.startsWith('https://')
-                          ? { fcm_options: { link: new URL(WEB_PATHS[target] ?? '/dashboard', SITE_URL).toString() } }
+                          ? { fcm_options: { link: new URL(webPath(target, notice.chapterId), SITE_URL).toString() } }
                           : {}),
                       },
                     }
@@ -154,7 +160,7 @@ export const push: ChannelAdapter = {
               },
             }),
           });
-          if (res.ok) return true;
+          if (res.ok) return 'sent' as const;
 
           /*
            * Deleted only when Firebase says the TOKEN is the problem: 404
@@ -178,22 +184,24 @@ export const push: ChannelAdapter = {
           if (deadToken) {
             const { error: pruneError } = await admin.from('push_tokens').delete().eq('token', device);
             if (pruneError) console.error('notify/push: could not prune a dead device', pruneError.message);
-          } else {
-            console.error('notify/push: send refused', res.status, text.slice(0, 160));
+            return 'dead' as const;
           }
-          return false;
+          console.error('notify/push: send refused', res.status, text.slice(0, 160));
+          return 'failed' as const;
         } catch (e) {
           // One device's network failure must not lose the others.
           console.error('notify/push: send failed', e instanceof Error ? e.message : e);
-          return false;
+          return 'failed' as const;
         }
       }),
     );
 
     // One live device is a delivered notification. All of them dead is the
-    // same as having none, which is a skip rather than a failure.
-    if (results.some(Boolean)) return 'sent';
-    return results.length ? 'skipped' : 'skipped';
+    // same as having none, which is a skip rather than a failure. Anything
+    // else is a real failure and is reported as one: the jobs count these, and
+    // a push that could not go out must not read as a student without a phone.
+    if (results.includes('sent')) return 'sent';
+    return results.includes('failed') ? 'failed' : 'skipped';
   },
 };
 
