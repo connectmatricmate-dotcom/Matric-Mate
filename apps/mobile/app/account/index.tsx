@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import * as Updates from 'expo-updates';
 import { useState } from 'react';
 import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
@@ -357,7 +358,16 @@ export default function Account() {
               }
             }}
           />
-          <Item title={t('account.version', { v: Constants.expoConfig?.version ?? '' })} icon="help" />
+          {/* The version and the over-the-air update this phone is running.
+              "Same issue after updating" once turned out to be a phone that
+              had never received the fix, and the version alone could not
+              show that. */}
+          <Item
+            title={t('account.version', {
+              v: `${Constants.expoConfig?.version ?? ''}${Updates.updateId ? ` · ${Updates.updateId.slice(0, 8)}` : ''}`,
+            })}
+            icon="help"
+          />
           <Item title={t('auth.logOut')} icon="logout" tone="red" last onPress={() => setConfirmOut(true)} right={<View />} />
         </Card>
 

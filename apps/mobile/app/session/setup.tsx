@@ -68,6 +68,20 @@ export default function SessionSetup() {
     setChapterIds([]);
   }
 
+  /*
+   * Opened from a chapter, the set is that chapter's and nothing else.
+   *
+   * The screen used to arrive with the chapter ticked but still show every
+   * subject, "Mixed, all chapters" and the whole chapter list, which asked a
+   * student who had just picked a chapter to pick again. The client's words:
+   * we already chose the chapter, only that chapter should be there. The
+   * pickers stay for the Practice tab and the home screen's quick action,
+   * where nothing has been chosen yet.
+   */
+  const fixed = chapterParam
+    ? (chapters.find((c) => c.id === chapterParam) ?? chapterById(chapterParam) ?? null)
+    : null;
+
   async function start() {
     setBusy(true);
     let mcqs;
@@ -104,75 +118,106 @@ export default function SessionSetup() {
 
   return (
     <Screen footer={<Btn title={t('session.start', { n: count })} onPress={start} loading={busy} />}>
-      <Header title={t('session.setupTitle')} sub={t('session.setupSub')} back />
+      <Header
+        title={t('session.setupTitle')}
+        sub={chapterParam ? subjectName(subjectById(subjectId), lang) || t('session.setupSub') : t('session.setupSub')}
+        back
+      />
 
-      <SectionTitle>{t('session.subject')}</SectionTitle>
-      <View style={{ flexDirection: rowDir(), flexWrap: 'wrap', gap: S.sm }}>
-        {derived.subjects.map((sid) => (
-          <Pill
-            key={sid}
-            tone={sid === subjectId ? 'teal' : 'grey'}
-            onPress={() => setSubjectId(sid)}
-            style={{ paddingVertical: 9, paddingHorizontal: 14 }}
-          >
-            {subjectName(subjectById(sid), lang) || sid}
-          </Pill>
-        ))}
-      </View>
-
-      <SectionTitle
-        action={<Small>{chapterIds.length ? t('session.selected', { n: chapterIds.length }) : t('session.allChapters')}</Small>}
-      >
-        {t('session.chapters')}
-      </SectionTitle>
-      <Card flat style={{ paddingVertical: 0 }}>
-        <Item
-          title={t('session.mixed')}
-          sub={t('session.mixedSub')}
-          icon="cards"
-          tone={chapterIds.length === 0 ? 'teal' : 'grey'}
-          onPress={() => setChapterIds([])}
-          right={<Check on={chapterIds.length === 0} round />}
-        />
-        {chaptersLoading
-          ? [0, 1, 2].map((i) => (
-              <View
-                key={i}
-                style={{
-                  flexDirection: rowDir(),
-                  alignItems: 'center',
-                  gap: S.md,
-                  paddingVertical: 14,
-                  minHeight: 62,
-                  borderBottomWidth: i === 2 ? 0 : 1,
-                  borderBottomColor: C.line,
-                }}
-              >
+      {chapterParam ? (
+        <>
+          <SectionTitle>{t('session.chapter')}</SectionTitle>
+          <Card flat style={{ paddingVertical: 0 }}>
+            {fixed ? (
+              <Item
+                title={chapterName(fixed, lang)}
+                sub={'mcqCount' in fixed && fixed.mcqCount ? t('study.mcqsSub', { n: fixed.mcqCount }) : undefined}
+                icon="book"
+                tone="teal"
+                last
+              />
+            ) : (
+              <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.md, paddingVertical: 14, minHeight: 62 }}>
                 <Skeleton w={42} h={42} style={{ borderRadius: 13 }} />
                 <View style={{ flex: 1, gap: 7 }}>
                   <Skeleton w="55%" h={13} />
                   <Skeleton w="35%" h={10} />
                 </View>
               </View>
-            ))
-          : null}
-        {!chaptersLoading &&
-          chapters.map((c, i) => {
-          const on = chapterIds.includes(c.id);
-          return (
+            )}
+          </Card>
+        </>
+      ) : (
+        <>
+          <SectionTitle>{t('session.subject')}</SectionTitle>
+          <View style={{ flexDirection: rowDir(), flexWrap: 'wrap', gap: S.sm }}>
+            {derived.subjects.map((sid) => (
+              <Pill
+                key={sid}
+                tone={sid === subjectId ? 'teal' : 'grey'}
+                onPress={() => setSubjectId(sid)}
+                style={{ paddingVertical: 9, paddingHorizontal: 14 }}
+              >
+                {subjectName(subjectById(sid), lang) || sid}
+              </Pill>
+            ))}
+          </View>
+
+          <SectionTitle
+            action={<Small>{chapterIds.length ? t('session.selected', { n: chapterIds.length }) : t('session.allChapters')}</Small>}
+          >
+            {t('session.chapters')}
+          </SectionTitle>
+          <Card flat style={{ paddingVertical: 0 }}>
             <Item
-              key={c.id}
-              title={chapterName(c, lang)}
-              sub={t('study.mcqsSub', { n: c.mcqCount })}
-              icon="book"
-              tone={on ? 'teal' : 'grey'}
-              last={i === chapters.length - 1}
-              onPress={() => setChapterIds((p) => (on ? p.filter((x) => x !== c.id) : [...p, c.id]))}
-              right={<Check on={on} />}
+              title={t('session.mixed')}
+              sub={t('session.mixedSub')}
+              icon="cards"
+              tone={chapterIds.length === 0 ? 'teal' : 'grey'}
+              onPress={() => setChapterIds([])}
+              right={<Check on={chapterIds.length === 0} round />}
             />
-          );
-        })}
-      </Card>
+            {chaptersLoading
+              ? [0, 1, 2].map((i) => (
+                  <View
+                    key={i}
+                    style={{
+                      flexDirection: rowDir(),
+                      alignItems: 'center',
+                      gap: S.md,
+                      paddingVertical: 14,
+                      minHeight: 62,
+                      borderBottomWidth: i === 2 ? 0 : 1,
+                      borderBottomColor: C.line,
+                    }}
+                  >
+                    <Skeleton w={42} h={42} style={{ borderRadius: 13 }} />
+                    <View style={{ flex: 1, gap: 7 }}>
+                      <Skeleton w="55%" h={13} />
+                      <Skeleton w="35%" h={10} />
+                    </View>
+                  </View>
+                ))
+              : null}
+            {!chaptersLoading &&
+              chapters.map((c, i) => {
+              const on = chapterIds.includes(c.id);
+              return (
+                <Item
+                  key={c.id}
+                  title={chapterName(c, lang)}
+                  sub={t('study.mcqsSub', { n: c.mcqCount })}
+                  icon="book"
+                  tone={on ? 'teal' : 'grey'}
+                  last={i === chapters.length - 1}
+                  onPress={() => setChapterIds((p) => (on ? p.filter((x) => x !== c.id) : [...p, c.id]))}
+                  right={<Check on={on} />}
+                />
+              );
+            })}
+          </Card>
+        </>
+      )}
 
       <SectionTitle>{t('session.howMany')}</SectionTitle>
       <Seg

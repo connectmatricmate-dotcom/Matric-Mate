@@ -133,61 +133,85 @@ export function SessionSetup({
         back="/practice"
         backLabel={t('practice.title')}
         title={t('session.setupTitle')}
-        sub={t('session.setupSub')}
+        sub={initialChapter ? subjectName(subjectById(initialChapter.subjectId), lang) || t('session.setupSub') : t('session.setupSub')}
       />
 
-      <SectionTitle>{t('session.subject')}</SectionTitle>
-      <div className="flex flex-wrap gap-2">
-        {derived.subjects.map((sid) => (
-          <button
-            key={sid}
-            type="button"
-            aria-pressed={sid === subjectId}
-            onClick={() => setSubjectId(sid)}
-            className={`min-h-11 rounded-full px-3.5 py-2 text-[13px] font-extrabold transition-[background-color,filter] duration-200 ${
-              sid === subjectId ? 'bg-tealtint text-teal' : 'bg-grey text-ink2 hover:brightness-95'
-            }`}
-          >
-            {subjectName(subjectById(sid), lang) || sid}
-          </button>
-        ))}
-      </div>
-
-      <SectionTitle
-        action={
-          <span className="text-[13px] text-ink2">
-            {chapterIds.length ? t('session.selected', { n: chapterIds.length }) : t('session.allChapters')}
-          </span>
-        }
-      >
-        {t('session.chapters')}
-      </SectionTitle>
-      <Card flat className="py-0">
-        <ItemButton
-          title={t('session.mixed')}
-          sub={t('session.mixedSub')}
-          icon="cards"
-          tone={chapterIds.length === 0 ? 'teal' : 'grey'}
-          onClick={() => setChapterIds([])}
-          right={<Check on={chapterIds.length === 0} round />}
-        />
-        {chapters.map((c, i) => {
-          const on = chapterIds.includes(c.id);
-          return (
-            <ItemButton
-              key={c.id}
-              title={chapterName(c, lang)}
-              sub={t('study.mcqsSub', { n: c.mcqCount })}
+      {/*
+       * Opened from a chapter, the set is that chapter's and nothing else. The
+       * screen used to arrive with the chapter ticked but still offer every
+       * subject, "Mixed, all chapters" and the whole list, asking a student
+       * who had just picked a chapter to pick again. The pickers stay for the
+       * Practice page, where nothing has been chosen yet.
+       */}
+      {initialChapter ? (
+        <>
+          <SectionTitle>{t('session.chapter')}</SectionTitle>
+          <Card flat className="py-0">
+            <Item
+              title={chapterName(initialChapter, lang)}
+              sub={initialChapter.mcqCount ? t('study.mcqsSub', { n: initialChapter.mcqCount }) : undefined}
               icon="book"
-              tone={on ? 'teal' : 'grey'}
-              last={i === chapters.length - 1}
-              onClick={() => setChapterIds((p) => (on ? p.filter((x) => x !== c.id) : [...p, c.id]))}
-              right={<Check on={on} />}
+              tone="teal"
+              last
             />
-          );
-        })}
-        {chapters.length === 0 ? <Item title={t('session.noQuestions')} last /> : null}
-      </Card>
+          </Card>
+        </>
+      ) : (
+        <>
+          <SectionTitle>{t('session.subject')}</SectionTitle>
+          <div className="flex flex-wrap gap-2">
+            {derived.subjects.map((sid) => (
+              <button
+                key={sid}
+                type="button"
+                aria-pressed={sid === subjectId}
+                onClick={() => setSubjectId(sid)}
+                className={`min-h-11 rounded-full px-3.5 py-2 text-[13px] font-extrabold transition-[background-color,filter] duration-200 ${
+                  sid === subjectId ? 'bg-tealtint text-teal' : 'bg-grey text-ink2 hover:brightness-95'
+                }`}
+              >
+                {subjectName(subjectById(sid), lang) || sid}
+              </button>
+            ))}
+          </div>
+
+          <SectionTitle
+            action={
+              <span className="text-[13px] text-ink2">
+                {chapterIds.length ? t('session.selected', { n: chapterIds.length }) : t('session.allChapters')}
+              </span>
+            }
+          >
+            {t('session.chapters')}
+          </SectionTitle>
+          <Card flat className="py-0">
+            <ItemButton
+              title={t('session.mixed')}
+              sub={t('session.mixedSub')}
+              icon="cards"
+              tone={chapterIds.length === 0 ? 'teal' : 'grey'}
+              onClick={() => setChapterIds([])}
+              right={<Check on={chapterIds.length === 0} round />}
+            />
+            {chapters.map((c, i) => {
+              const on = chapterIds.includes(c.id);
+              return (
+                <ItemButton
+                  key={c.id}
+                  title={chapterName(c, lang)}
+                  sub={t('study.mcqsSub', { n: c.mcqCount })}
+                  icon="book"
+                  tone={on ? 'teal' : 'grey'}
+                  last={i === chapters.length - 1}
+                  onClick={() => setChapterIds((p) => (on ? p.filter((x) => x !== c.id) : [...p, c.id]))}
+                  right={<Check on={on} />}
+                />
+              );
+            })}
+            {chapters.length === 0 ? <Item title={t('session.noQuestions')} last /> : null}
+          </Card>
+        </>
+      )}
 
       <SectionTitle>{t('session.howMany')}</SectionTitle>
       <Seg
