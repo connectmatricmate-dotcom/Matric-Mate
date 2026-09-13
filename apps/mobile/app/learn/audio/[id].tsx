@@ -21,6 +21,9 @@ import { C, F, S } from '../../../src/theme';
 
 const SPEEDS = [1, 1.25, 1.5] as const;
 
+/** The app icon on the lock screen. Offline it simply does not load, and the controls still work. */
+const LOCK_SCREEN_ART = 'https://www.matricmate.co/brand/icon-512.png';
+
 /**
  * What the player is playing.
  *
@@ -228,10 +231,41 @@ function RealPlayer({ id }: { id: string }) {
 
   const status = useAudioPlayerStatus(player);
   const [speed, setSpeed] = useState(0);
+  const title = lessonTitle(id, state.settings.language);
 
+  // 'doNotMix' because the lock-screen controls below only attach to a player
+  // that holds audio focus on its own.
   useEffect(() => {
-    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(() => {});
+    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true, interruptionMode: 'doNotMix' }).catch(() => {});
   }, []);
+
+  /**
+   * Lock-screen controls, which are also what keeps a lesson playing.
+   *
+   * Without them Android stops background audio after about three minutes, so
+   * a student who locked the phone lost the lesson a few minutes in. Switched
+   * on at the first play rather than on open, so opening a lesson does not
+   * post a notification for audio nobody started. A new player (another
+   * medium, or the downloaded copy) starts unregistered, and releasing the
+   * old one on the way out takes its controls with it.
+   */
+  const onLockScreen = useRef(false);
+  useEffect(() => {
+    onLockScreen.current = false;
+  }, [player]);
+  useEffect(() => {
+    if (!status.playing || onLockScreen.current) return;
+    onLockScreen.current = true;
+    try {
+      player.setActiveForLockScreen(
+        true,
+        { title, artist: 'MatricMate', artworkUrl: LOCK_SCREEN_ART },
+        { showSeekBackward: true, showSeekForward: true },
+      );
+    } catch {
+      // A binary without the playback service still plays in the foreground.
+    }
+  }, [status.playing, player, title]);
 
   // A new player starts at 1x, but the speed pill keeps its state across a
   // source switch. Re-applied whenever either changes, so they cannot drift.
@@ -265,7 +299,7 @@ function RealPlayer({ id }: { id: string }) {
 
   return (
     <PlayerChrome
-      title={lessonTitle(id, state.settings.language)}
+      title={title}
       // The language of the recording actually playing, not the student's.
       subtitle={t(narration(picked?.medium ?? medium))}
       position={position}
