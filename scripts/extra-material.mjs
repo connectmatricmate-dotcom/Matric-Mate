@@ -4,7 +4,7 @@
  *
  *   node scripts/extra-material.mjs plan  [--board fbise|punjab] [--grade 9|10] [--chapter a,b]
  *   node scripts/extra-material.mjs check <chapter> [<chapter> ...]
- *   node scripts/extra-material.mjs load  [--dry-run] [--chapter a,b]
+ *   node scripts/extra-material.mjs load  [--dry-run] [--force] [--chapter a,b | a b]
  *
  * The first pass wrote a small bank per chapter: seven to twenty-five MCQs,
  * six flashcards, six short questions and six blanks, so a student who
@@ -57,7 +57,14 @@ const flag = (name) => {
   return i === -1 ? null : rest[i + 1];
 };
 const DRY = rest.includes('--dry-run');
-const ONLY = flag('chapter')?.split(',').map((s) => s.trim()) ?? null;
+const FORCE = rest.includes('--force');
+/*
+ * `--chapter a,b`, or the chapter ids given bare. A bare id used to be
+ * ignored by load, which then loaded every chapter there is.
+ */
+const VALUED = new Set(['--chapter', '--board', '--grade']);
+const bare = rest.filter((a, i) => !a.startsWith('--') && !VALUED.has(rest[i - 1]));
+const ONLY = flag('chapter')?.split(',').map((s) => s.trim()) ?? (bare.length ? bare : null);
 
 /** The language a subject is written in, or null when it follows the medium. See subjectMedium in core. */
 const oneLanguage = (subject, board) =>
@@ -483,11 +490,28 @@ async function skipped() {
   }
 }
 
+/**
+ * Chapters whose new rows were corrected in the database after they were
+ * loaded (a term put right across a whole chapter, say). Their files are now
+ * behind the database, so loading one again would put the old wording back.
+ */
+async function editedInDb() {
+  try {
+    return new Set(JSON.parse(await readFile(resolve(DIR, 'edited.json'), 'utf8')).chapters ?? []);
+  } catch {
+    return new Set();
+  }
+}
+
 async function load() {
   const planned = await loadPlan();
   const skip = await skipped();
+  const edited = await editedInDb();
   const files = new Set((await readdir(DIR)).filter((f) => f.endsWith('.json') && f !== 'plan.json'));
-  const ready = planned.chapters.filter((c) => (!ONLY || ONLY.includes(c.id)) && c.languages.every((l) => files.has(`${c.id}-${l}.json`)));
+  const wanted = planned.chapters.filter((c) => (!ONLY || ONLY.includes(c.id)) && c.languages.every((l) => files.has(`${c.id}-${l}.json`)));
+  const refused = FORCE ? [] : wanted.filter((c) => edited.has(c.id));
+  for (const c of refused) console.log(`${C.yellow('  refused')} ${c.id}: corrected in the database since it was loaded (edited.json); --force to overwrite`);
+  const ready = wanted.filter((c) => !refused.includes(c));
   const results = await checkChapters(ready.map((c) => c.id), { quiet: true });
   const totals = { mcqs: 0, flashcards: 0, short_questions: 0, blanks: 0 };
   let loaded = 0;
@@ -532,6 +556,6 @@ else if (cmd === 'check') {
   process.exit(r.every((x) => x.ok) ? 0 : 1);
 } else if (cmd === 'load') await load();
 else {
-  console.log('usage: node scripts/extra-material.mjs plan|check <chapter...>|load [--dry-run] [--chapter a,b] [--board b] [--grade g]');
+  console.log('usage: node scripts/extra-material.mjs plan|check <chapter...>|load [--dry-run] [--force] [--chapter a,b | a b] [--board b] [--grade g]');
   process.exit(1);
 }
