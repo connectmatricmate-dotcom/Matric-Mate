@@ -140,12 +140,12 @@ function PlayerChrome({
       </Row>
 
       <Row style={{ justifyContent: 'center', marginTop: S.lg }} gap={S.xl}>
-        <Tap onPress={() => onSeek(-15)} disabled={disabled}>
+        <Tap onPress={() => onSeek(-15)} disabled={disabled} label={t('audio.back15')}>
           <View style={[ctl(), disabled && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>−15</Text>
           </View>
         </Tap>
-        <Tap onPress={onPlay} disabled={disabled}>
+        <Tap onPress={onPlay} disabled={disabled} label={playing ? t('audio.pause') : t('audio.play')}>
           <View
             testID="audio-play"
             accessibilityRole="button"
@@ -163,7 +163,7 @@ function PlayerChrome({
             <Icon name={playing ? 'pause' : 'play'} size={30} color={C.onBrand} strokeWidth={2.2} />
           </View>
         </Tap>
-        <Tap onPress={() => onSeek(15)} disabled={disabled}>
+        <Tap onPress={() => onSeek(15)} disabled={disabled} label={t('audio.forward15')}>
           <View style={[ctl(), disabled && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>+15</Text>
           </View>

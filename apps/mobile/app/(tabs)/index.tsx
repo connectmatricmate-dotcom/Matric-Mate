@@ -223,7 +223,7 @@ export default function Dashboard() {
               borderTopColor: alpha(C.onBrand, 0.14),
             }}
           >
-            <Tap onPress={() => actions.togglePlanTask(task.id)} hit>
+            <Tap onPress={() => actions.togglePlanTask(task.id)} hit role="checkbox" checked={task.done} label={t('a11y.markDone')}>
               <View
                 style={{
                   width: 24,

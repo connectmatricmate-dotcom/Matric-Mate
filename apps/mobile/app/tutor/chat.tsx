@@ -855,7 +855,7 @@ export default function Chat() {
             ]}
           />
         </View>
-        <Tap onPress={() => send(input)}>
+        <Tap onPress={() => send(input)} label={t('tutor.send')}>
           <View
             style={{
               width: 44,

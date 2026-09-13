@@ -20,7 +20,11 @@ export default function Result() {
 
   const answers = useMemo(() => (s ? Object.values(s.answers) : []), [s]);
   const score = answers.filter((a) => a.correct).length;
-  const total = s?.mcqs.length ?? 0;
+  /* As the website marks it: a practice set ended early is marked on what was
+     answered, so three right out of three tried is not 3/10 and an F, and the
+     two apps no longer record the same set two different ways. A timed paper
+     counts every question, answered or not, the way a real one does. */
+  const total = s ? (s.mode === 'exam' ? s.mcqs.length : answers.length) : 0;
   const pct = total ? Math.round((score / total) * 100) : 0;
 
   /* Through core's own rule, so the figure shown here is exactly what the
@@ -31,7 +35,8 @@ export default function Result() {
   );
 
   useEffect(() => {
-    if (!s || saved.current) return;
+    // Nothing answered is not a result: it would sit on the Practice tab as 0/0.
+    if (!s || !total || saved.current) return;
     saved.current = true;
     actions.addResult({
       subjectId: s.subjectId,
@@ -203,13 +208,8 @@ export default function Result() {
         <View style={{ flex: 1 }}>
           <Btn
             title={t('common.done')}
-            onPress={() => {
-              session.clear();
-              // Down to the tabs already at the bottom of the stack. Replace
-              // put a second set of tabs on top of the chapter and subject
-              // screens, and back from Practice walked into them.
-              router.dismissTo('/(tabs)/practice');
-            }}
+            // Back to where the set was started: see session.leave.
+            onPress={() => session.leave()}
           />
         </View>
       </Row>

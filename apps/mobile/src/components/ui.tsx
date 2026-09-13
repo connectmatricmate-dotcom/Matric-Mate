@@ -26,7 +26,8 @@ import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
 import { useKeyboardOverlap } from '../core/keyboard';
 import { C, F, R, S, T, WEB_MAX, isDark, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
-import { colors, isUrduScript } from '@matricmate/core';
+import { colors, isUrduScript, type StringKey } from '@matricmate/core';
+import { useT } from '../i18n';
 import { Icon, IconName } from './Icon';
 
 /* ------------------------------------------------------------------ text */
@@ -566,18 +567,29 @@ export function Tap({
   style,
   disabled,
   hit,
+  label,
+  role,
+  checked,
 }: {
   children: React.ReactNode;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
   hit?: boolean;
+  /** What a screen reader says for a control with no words on it (an icon,
+   *  a switch). A control with text needs none: the text is read. */
+  label?: string;
+  role?: 'button' | 'switch' | 'checkbox' | 'link';
+  checked?: boolean;
 }) {
   const interactive = !!onPress && !disabled;
   return (
     <Pressable
       onPress={onPress}
       disabled={!interactive}
+      accessibilityLabel={label}
+      accessibilityRole={role ?? (onPress ? 'button' : undefined)}
+      accessibilityState={checked === undefined ? { disabled: !interactive } : { disabled: !interactive, checked }}
       hitSlop={hit ? 12 : undefined}
       android_ripple={interactive && !hit ? { color: 'rgba(9,106,139,0.10)', foreground: true } : undefined}
       style={({ pressed }) => [
@@ -635,24 +647,40 @@ export function Check({
 }
 
 /** Circular icon button used in headers, 44dp target, per platform guidance. */
+/** The spoken name of an icon button when its caller gives none. */
+const ICON_LABEL: Partial<Record<IconName, StringKey>> = {
+  back: 'common.back',
+  close: 'common.close',
+  gear: 'account.settingsTitle',
+  bell: 'account.notifications',
+  edit: 'a11y.editProfile',
+  camera: 'a11y.addPhoto',
+  book: 'a11y.pickChapter',
+};
+
 export function IconButton({
   icon,
   onPress,
   tone = 'plain',
   badge,
   size = 44,
+  label,
 }: {
   icon: IconName;
   onPress?: () => void;
   tone?: 'plain' | 'card' | 'active';
   badge?: boolean;
   size?: number;
+  /** Read out instead of the icon's default name; see ICON_LABEL. */
+  label?: string;
 }) {
+  const t = useT();
+  const named = label ?? (ICON_LABEL[icon] ? t(ICON_LABEL[icon]!) : undefined);
   const bg = tone === 'card' ? C.card : tone === 'active' ? C.greenTint : 'transparent';
   const border = tone === 'card' ? C.line : tone === 'active' ? C.green : 'transparent';
   const color = tone === 'active' ? C.green : C.ink;
   return (
-    <Tap onPress={onPress}>
+    <Tap onPress={onPress} label={named}>
       <View
         style={{
           width: size,
@@ -723,7 +751,7 @@ export function Btn({
   // brighter fills. Same rule as the web button recipe.
   const fg = variant === 'ghost' || variant === 'line' ? C.teal : C.onBrand;
   return (
-    <Tap onPress={onPress} disabled={disabled || loading} style={[{ opacity: disabled ? 0.45 : 1 }, style]}>
+    <Tap onPress={onPress} disabled={disabled || loading} label={title} style={[{ opacity: disabled ? 0.45 : 1 }, style]}>
       <View
         style={[
           st.btn,
@@ -927,10 +955,10 @@ export function Field({
   );
 }
 
-export function Toggle({ on, onPress }: { on: boolean; onPress?: () => void }) {
+export function Toggle({ on, onPress, label }: { on: boolean; onPress?: () => void; label?: string }) {
   // The track is 26px tall; `hit` pads the touchable to a real target.
   return (
-    <Tap onPress={onPress} hit>
+    <Tap onPress={onPress} hit role="switch" checked={on} label={label}>
       {/* The off track and the knob are tokens now. Written as literals they
           kept their light values after dark, so a settings screen at night had
           a row of bright grey-green pills on it. */}

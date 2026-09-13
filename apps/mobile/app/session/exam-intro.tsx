@@ -171,7 +171,9 @@ export default function ExamIntro() {
       <Card flat>
         <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.ink }}>{t('session.beforeStart')}</Text>
         <View style={{ gap: 8, marginTop: 10 }}>
-          <Small>• {t('session.beforeStart1', { min: minutes })}</Small>
+          {/* Only once the paper is known: while it loads, minutes is the
+              floor of one, and the tip read "1 minute of focus". */}
+          {count ? <Small>• {t('session.beforeStart1', { min: minutes })}</Small> : null}
           <Small>• {t('session.beforeStart2')}</Small>
         </View>
       </Card>

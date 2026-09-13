@@ -310,6 +310,7 @@ export default function Reader() {
             </View>
           </View>
           <Tap
+            label={t('a11y.textSize')}
             onPress={() => {
               const next = ((state.settings.fontScale + 1) % 3) as 0 | 1 | 2;
               actions.setSettings({ fontScale: next });
@@ -435,7 +436,7 @@ export default function Reader() {
             gap={S.md}
           >
             <View style={{ opacity: idx === 0 ? 0.4 : 1 }}>
-              <IconButton icon="back" tone="card" onPress={() => advance(-1)} />
+              <IconButton icon="back" tone="card" label={t('a11y.previousSection')} onPress={() => advance(-1)} />
             </View>
             <Text style={{ flex: 1, textAlign: 'center', fontFamily: F.bodyBold, fontSize: 13, color: C.ink2 }}>
               {t('reader.section', { a: idx + 1, b: total })}
@@ -451,7 +452,7 @@ export default function Reader() {
                 }}
               />
             ) : (
-              <Tap onPress={() => advance(1)}>
+              <Tap onPress={() => advance(1)} label={t('a11y.nextSection')}>
                 <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: C.teal, alignItems: 'center', justifyContent: 'center' }}>
                   <Chevron size={19} color={C.onBrand} />
                 </View>

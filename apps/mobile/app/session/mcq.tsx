@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
-import { Body, Btn, Card, Chevron, H3, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, Text } from '../../src/components/ui';
+import { Body, Btn, Card, Chevron, Confirm, H3, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, Text } from '../../src/components/ui';
 import { SessionHeader } from '../../src/components/SessionHeader';
 import { Confidence, XP, isUrduScript } from '@matricmate/core';
 import Animated from 'react-native-reanimated';
@@ -33,6 +33,7 @@ export default function McqScreen() {
   const [chosen, setChosen] = useState<number | null>(null);
   const [confidence, setConfidence] = useState<Confidence | null>(null);
   const [checked, setChecked] = useState(false);
+  const [confirmEnd, setConfirmEnd] = useState(false);
   /**
    * Consecutive correct answers in this sitting. The pill only appears from
    * three, because "1 in a row" is not a streak, it is an answer.
@@ -144,7 +145,16 @@ export default function McqScreen() {
       }
     >
       <SessionHeader
-        onClose={() => (answeredCount ? router.replace('/session/result') : router.back())}
+        /* Nothing answered: straight back to where the set was opened. Part
+           way through: ask first, since ending is not undoable. Every question
+           answered: the result, which is where the last one leads anyway. */
+        onClose={() =>
+          !answeredCount
+            ? router.back()
+            : answeredCount < s.mcqs.length
+              ? setConfirmEnd(true)
+              : router.replace('/session/result')
+        }
         pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100}
         label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
         right={
@@ -313,6 +323,20 @@ export default function McqScreen() {
           </Card>
         </>
       ) : null}
+
+      <Confirm
+        visible={confirmEnd}
+        onClose={() => setConfirmEnd(false)}
+        title={t('session.endSetTitle')}
+        body={t('session.endSetBody', { a: answeredCount, b: s.mcqs.length })}
+        confirmLabel={t('session.endSetNow')}
+        cancelLabel={t('session.keepWorking')}
+        tone="orange"
+        onConfirm={() => {
+          setConfirmEnd(false);
+          router.replace('/session/result');
+        }}
+      />
     </Screen>
   );
 }

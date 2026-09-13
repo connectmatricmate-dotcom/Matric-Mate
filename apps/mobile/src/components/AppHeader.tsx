@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { URDU_LINE_HEIGHT, fontSize, isUrduScript } from '@matricmate/core';
 import { AvatarBadge } from './AvatarBadge';
 import { useApp } from '../store/app';
+import { useT } from '../i18n';
 import { C, F, S, rowDir } from '../theme';
 import { H2, IconButton, Pill, Small, Tap, Text } from './ui';
 
@@ -26,6 +27,7 @@ export function AppHeader({
   right?: React.ReactNode;
 }) {
   const { state, derived } = useApp();
+  const t = useT();
   const unread = state.notifications.some((n) => !n.read);
 
   return (
@@ -62,7 +64,7 @@ export function AppHeader({
       {right}
 
       {showStreak && derived.streak > 0 ? (
-        <Tap onPress={() => router.push('/(tabs)/progress')}>
+        <Tap onPress={() => router.push('/(tabs)/progress')} hit label={t('dash.streakChip', { n: derived.streak })}>
           <Pill tone="orange" style={{ paddingVertical: 7, paddingHorizontal: 12 }}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.orangeDark }}>🔥 {derived.streak}</Text>
           </Pill>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import { Stack, router, type ErrorBoundaryProps } from 'expo-router';
+import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
@@ -16,6 +16,7 @@ import { usePush } from '../src/core/usePush';
 import { Btn, Text, ToastHost } from '../src/components/ui';
 import { C, F, isRTL } from '../src/theme';
 import { en, ur } from '@matricmate/core';
+import { resetTo } from '../src/core/nav';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -53,7 +54,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
         title={s.states.goHome}
         variant="ghost"
         onPress={() => {
-          router.replace('/');
+          resetTo('/');
           void retry();
         }}
       />

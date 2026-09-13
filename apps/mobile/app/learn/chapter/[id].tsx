@@ -268,6 +268,9 @@ export default function ChapterHub() {
    * is the chapter they were last in, else the first one not yet read. It
    * always opened at section one.
    */
+  // Every section read: read again from the start, not "continue" to nothing.
+  const allRead = !!content && content.sections.length > 0 && readCount >= content.sections.length;
+  const readLabel = allRead ? t('study.readAgain') : readCount ? t('study.continueReading') : t('study.startReading');
   const resumeAt = content
     ? state.lastChapterId === id
       ? Math.min(Math.max(state.lastSectionIndex, 0), Math.max(0, content.sections.length - 1))
@@ -283,8 +286,8 @@ export default function ChapterHub() {
           <Btn title={t('study.mcqs')} onPress={() => router.push(`/session/setup?chapter=${id}`)} />
         ) : (
           <Btn
-            title={readCount ? t('study.continueReading') : t('study.startReading')}
-            onPress={() => router.push(`/learn/reader/${id}${readCount ? `?section=${resumeAt}` : ''}`)}
+            title={readLabel}
+            onPress={() => router.push(`/learn/reader/${id}${readCount && !allRead ? `?section=${resumeAt}` : ''}`)}
           />
         )
       }
@@ -369,7 +372,7 @@ export default function ChapterHub() {
           sub={content ? t('study.notesSub', { n: content.sections.length, read: readCount }) : t('common.loading')}
           icon="book"
           pct={content?.sections.length ? (readCount / content.sections.length) * 100 : 0}
-          onPress={() => router.push(`/learn/reader/${id}${readCount ? `?section=${resumeAt}` : ''}`)}
+          onPress={() => router.push(`/learn/reader/${id}${readCount && !allRead ? `?section=${resumeAt}` : ''}`)}
         />
         {audio ? (
           <Item
@@ -393,7 +396,7 @@ export default function ChapterHub() {
           title={t('study.flashcards')}
           sub={content ? t('study.flashcardsSub', { n: content.flashcards.length, known: knownCards }) : ''}
           icon="cards"
-          onPress={() => router.push(`/session/flashcards?chapter=${id}`)}
+          onPress={() => router.push(`/session/flashcards?chapter=${id}&from=chapter`)}
         />
         <Item
           title={t('study.mcqs')}
@@ -411,14 +414,14 @@ export default function ChapterHub() {
           title={t('study.shortQ')}
           sub={content ? t('study.shortQSub', { n: content.shortQs.length }) : ''}
           icon="quill"
-          onPress={() => router.push(`/session/shortq?chapter=${id}`)}
+          onPress={() => router.push(`/session/shortq?chapter=${id}&from=chapter`)}
         />
         <Item
           title={t('study.blanks')}
           sub={content ? t('study.blanksSub', { n: content.blanks.length }) : ''}
           icon="edit"
           last
-          onPress={() => router.push(`/session/blanks?chapter=${id}`)}
+          onPress={() => router.push(`/session/blanks?chapter=${id}&from=chapter`)}
         />
       </Card>
 

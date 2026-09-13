@@ -43,7 +43,7 @@ export default function Review() {
 
   return (
     <Screen>
-      <Header title={t('session.reviewTitle')} sub={s.label} back onBack={() => router.dismissTo('/(tabs)/practice')} />
+      <Header title={t('session.reviewTitle')} sub={s.label} back onBack={() => session.leave()} />
 
       <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
         <Pill tone={filter === 'all' ? 'teal' : 'grey'} onPress={() => setFilter('all')}>
@@ -143,11 +143,8 @@ export default function Review() {
       <Spacer h={S.lg} />
       <Btn
         title={t('common.done')}
-        onPress={() => {
-          session.clear();
-          // The tabs underneath, not a second set of them; see the result screen.
-          router.dismissTo('/(tabs)/practice');
-        }}
+        // Back to where the set was started: see session.leave.
+        onPress={() => session.leave()}
       />
     </Screen>
   );

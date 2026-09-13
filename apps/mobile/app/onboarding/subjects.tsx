@@ -7,6 +7,7 @@ import { SUBJECTS, subjectName } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
+import { resetTo } from '../../src/core/nav';
 
 export default function ChooseSubjects() {
   const { state, actions } = useApp();
@@ -56,8 +57,7 @@ export default function ChooseSubjects() {
             // the steps behind this one are dismissed too, so back from home
             // does not walk into onboarding.
             if (state.user) {
-              router.dismissAll();
-              router.replace('/(tabs)');
+              resetTo('/(tabs)');
             } else router.replace('/signup');
           }}
         />

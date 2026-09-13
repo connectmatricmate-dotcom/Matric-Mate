@@ -8,6 +8,7 @@ import { useApp } from '../src/store/app';
 import { useAuth } from '../src/store/auth';
 import { C, F, S } from '../src/theme';
 import { Label, Wordmark } from '../src/components/ui';
+import { resetTo } from '../src/core/nav';
 
 /**
  * Splash + route gate. Decides where a student lands on opening the app:
@@ -73,7 +74,9 @@ export default function Splash() {
     // Long enough to register the brand, short enough not to read as delay.
     // Was 550ms on top of hydration, and the whole cold start read as slow.
     const t = setTimeout(() => {
-      router.replace(to);
+      // History starts here: whatever led to this screen (the welcome
+      // carousel, the login form) is not somewhere back should go.
+      resetTo(to);
       if (opened) router.push(opened as never);
     }, 300);
     return () => clearTimeout(t);

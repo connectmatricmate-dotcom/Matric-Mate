@@ -8,6 +8,7 @@ import { Body, Btn, Card, Field, Header, Screen, Small, Spacer, useToast } from 
 import { normaliseMobile } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
 import { C, S } from '../src/theme';
+import { resetTo } from '../src/core/nav';
 
 /**
  * Creating an account, in the app, on purpose.
@@ -50,7 +51,7 @@ export default function SignUp() {
       // Onboarding runs before sign-up on this app, so anyone arriving here has
       // already chosen their class and subjects. Sending them back through it
       // would look like the account did not save.
-      else router.replace(state.onboarding?.subjects?.length ? '/(tabs)' : '/onboarding/class');
+      else resetTo(state.onboarding?.subjects?.length ? '/(tabs)' : '/onboarding/class');
     } catch (e) {
       // The auth store hands back a string key, because it has no
       // language of its own to translate with.

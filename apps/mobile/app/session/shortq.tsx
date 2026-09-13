@@ -14,16 +14,19 @@ import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, isRTL, isWeb, textStart } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
+import { leaveSet } from '../../src/core/nav';
 
 type Mark = 'got' | 'partial' | 'missed';
 
 export default function ShortQuestions() {
-  const { chapter, ai } = useLocalSearchParams<{ chapter?: string; ai?: string }>();
+  const { chapter, ai, from } = useLocalSearchParams<{ chapter?: string; ai?: string; from?: string }>();
   const { state, actions, contentKey } = useApp();
   // No chapter in the link: one of the student's own chapters that has
   // notes, or a picker. See PracticeChapter.
   const practice = usePracticeChapter(chapter, 'shortq');
   const chapterId = practice.chapterId;
+  // Opened from this chapter's hub, and still on that chapter: see leaveSet.
+  const fromChapter = from === 'chapter' && chapter === chapterId;
   const t = useT();
   // An ?ai= id swaps the bank for a set the student asked the AI to build.
   const { data: content, loading, error, reload } = useAsync(async () => {
@@ -166,7 +169,10 @@ export default function ShortQuestions() {
         <Spacer h={S.lg} />
         {/* Down to the chapter underneath rather than a second copy on top. */}
         {chapterId ? (
-          <Btn title={t('session.backToChapter')} onPress={() => router.dismissTo(`/learn/chapter/${chapterId}`)} />
+          <Btn
+            title={fromChapter ? t('session.backToChapter') : t('common.done')}
+            onPress={() => leaveSet(fromChapter, chapterId)}
+          />
         ) : null}
       </Screen>
     );

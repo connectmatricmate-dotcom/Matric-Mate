@@ -55,7 +55,7 @@ export default function Chapters() {
     <Screen
       footer={
         <Btn
-          title={t('study.chapterTest')}
+          title={t('study.subjectTest')}
           variant="orange"
           icon="clock"
           onPress={() => router.push(`/session/exam-intro?subject=${id}`)}

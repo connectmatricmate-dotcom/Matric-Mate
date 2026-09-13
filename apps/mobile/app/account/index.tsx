@@ -41,6 +41,7 @@ import { useApp } from '../../src/store/app';
 import { useAuth } from '../../src/store/auth';
 import { SITE_URL } from '../../src/lib/site';
 import { C, F, S } from '../../src/theme';
+import { resetTo } from '../../src/core/nav';
 
 /**
  * This app's page in the phone's settings, where a refused notification
@@ -230,7 +231,7 @@ export default function Account() {
             sub={t('account.darkModeSub')}
             icon="moon"
             last
-            right={<Toggle on={s.dark} onPress={() => actions.setSettings({ dark: !s.dark })} />}
+            right={<Toggle on={s.dark} label={t('account.darkMode')} onPress={() => actions.setSettings({ dark: !s.dark })} />}
           />
         </Card>
 
@@ -244,14 +245,14 @@ export default function Account() {
             sub={t('account.studyReminderSub', { time: timeLabel(s.reminderTime) })}
             icon="bell"
             onPress={s.reminders ? () => setPickTime(true) : undefined}
-            right={<Toggle on={s.reminders} onPress={() => actions.setSettings({ reminders: !s.reminders })} />}
+            right={<Toggle on={s.reminders} label={t('account.studyReminder')} onPress={() => actions.setSettings({ reminders: !s.reminders })} />}
           />
           <Item
             title={t('account.streakAlerts')}
             sub={t('account.streakAlertsSub')}
             icon="flame"
             tone="orange"
-            right={<Toggle on={s.streakAlerts} onPress={() => actions.setSettings({ streakAlerts: !s.streakAlerts })} />}
+            right={<Toggle on={s.streakAlerts} label={t('account.streakAlerts')} onPress={() => actions.setSettings({ streakAlerts: !s.streakAlerts })} />}
           />
           {/* Which notifications exist is above. This is how they reach the
               student, which is a different question: someone can want a streak
@@ -273,6 +274,7 @@ export default function Account() {
             }
             right={
               <Toggle
+                label={t('account.channelPush')}
                 on={s.channelPush && !pushBlocked}
                 onPress={() => {
                   if (pushBlocked) {
@@ -290,7 +292,7 @@ export default function Account() {
             title={t('account.channelEmail')}
             sub={t('account.channelEmailSub')}
             icon="mail"
-            right={<Toggle on={s.channelEmail} onPress={() => actions.setSettings({ channelEmail: !s.channelEmail })} />}
+            right={<Toggle on={s.channelEmail} label={t('account.channelEmail')} onPress={() => actions.setSettings({ channelEmail: !s.channelEmail })} />}
           />
           {/* The count is the only thing that makes the inbox discoverable:
               it is three taps deep and nothing else ever points at it. */}
@@ -396,7 +398,7 @@ export default function Account() {
           // already been introduced to the app; pitching it again and making
           // them swipe through three slides to reach a password field is the
           // wrong end of the funnel.
-          router.replace('/login');
+          resetTo('/login');
         }}
       />
 
