@@ -8,6 +8,7 @@ import { Card, Check, Icon, Item, SectionTitle } from '@/components/ui/primitive
 import { useToast } from '@/components/ui/toast';
 import { useApp, useLang, useT } from '@/lib/store';
 import { StepScreen } from './StepScreen';
+import { goBackTo } from '@/lib/nav-trail';
 
 /** What a first run starts with: the three sciences. */
 const STARTER = ['phy', 'chem', 'bio'];
@@ -52,6 +53,7 @@ export function ChooseSubjects({ edit = false }: { edit?: boolean }) {
       waiting={!synced}
       footnote={t('onboarding.subjectsFootnote')}
       backHref={edit ? '/account/edit' : '/onboarding/medium'}
+      edit={edit}
       onNext={async () => {
         // The last step waits for the account to have the list. Web signups'
         // subjects never reached it, so every other device, the report PDF
@@ -61,7 +63,8 @@ export function ChooseSubjects({ edit = false }: { edit?: boolean }) {
           toast(t('states.errorBody'));
           return;
         }
-        router.push(edit ? '/account/edit' : '/dashboard');
+        if (edit) goBackTo(router, '/account/edit');
+        else router.replace('/dashboard');
       }}
     >
       <SectionTitle>{t('onboarding.compulsory')}</SectionTitle>

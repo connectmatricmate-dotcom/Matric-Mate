@@ -78,7 +78,7 @@ export function StaffShell({
           stays reachable on a short laptop screen. data-chrome keeps the
           shell off paper, see the print rules in globals.css. */}
       <aside data-chrome className="sticky top-0 hidden h-dvh w-[236px] shrink-0 flex-col overflow-y-auto border-e border-line bg-card px-3 py-5 md:flex">
-        <Link href={home} className="mb-1 px-2">
+        <Link href={home} className="mb-1 flex min-h-11 items-center px-2" aria-label="MatricMate home">
           <Wordmark priority />
         </Link>
         <p className="mb-6 px-2 text-[11.5px] font-extrabold uppercase tracking-[0.08em] text-ink3">{area}</p>
@@ -120,7 +120,7 @@ export function StaffShell({
         {/* Same h-14 contract as the student shell, so a sticky heading inside
             a page can pin itself to top-14 in either area. */}
         <header data-chrome className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
-          <Link href={home} className="flex items-center gap-2 md:hidden">
+          <Link href={home} className="flex min-h-11 items-center gap-2 md:hidden" aria-label="MatricMate home">
             <Wordmark width={104} height={21} />
             <span className="text-[12.5px] font-extrabold text-ink3">{area}</span>
           </Link>

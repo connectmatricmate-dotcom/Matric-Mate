@@ -12,6 +12,8 @@ import { useToast } from '@/components/ui/toast';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
+import { LeaveSetButton } from '@/components/app/LeaveSetButton';
+import { PracticeChapterBar } from '@/components/app/PracticeChapterBar';
 
 type Mark = 'got' | 'partial' | 'missed';
 
@@ -23,7 +25,7 @@ type Mark = 'got' | 'partial' | 'missed';
 const isVerdict = (v: unknown): v is AiCheckVerdict =>
   !!v && typeof (v as AiCheckVerdict).score === 'number' && Array.isArray((v as AiCheckVerdict).missed);
 
-export function ShortQScreen({ chapter, items }: { chapter: Chapter; items: ShortQ[] }) {
+export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Chapter; items: ShortQ[]; canChangeChapter?: boolean }) {
   const { state, actions } = useApp();
   const t = useT();
   const { lang } = useLang();
@@ -119,7 +121,7 @@ export function ShortQScreen({ chapter, items }: { chapter: Chapter; items: Shor
           icon="quill"
           title={t('session.noItemsTitle')}
           sub={t('session.noItemsBody')}
-          cta={<LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} variant="line" sm />}
+          cta={<LeaveSetButton chapterId={chapterId} sm />}
         />
       </Page>
     );
@@ -137,7 +139,7 @@ export function ShortQScreen({ chapter, items }: { chapter: Chapter; items: Shor
           <h2 className="font-display text-[22px] text-ink">{t('session.shortQDone', { n: got, total: items.length })}</h2>
           <p className="text-[13px] text-ink2">{t('session.shortQDoneSub')}</p>
         </Card>
-        <LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} className="mt-6 w-full" />
+        <LeaveSetButton chapterId={chapterId} variant="primary" className="mt-6 w-full" />
       </Page>
     );
   }
@@ -155,6 +157,7 @@ export function ShortQScreen({ chapter, items }: { chapter: Chapter; items: Shor
         )}
         right={<Pill tone="grey">{t('session.marks', { n: item.marks })}</Pill>}
       />
+      {canChangeChapter ? <PracticeChapterBar kind="shortq" chapter={chapter} /> : null}
 
       {/* Same task frame as the MCQ and exam screens */}
       <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_var(--shadow-soft)]">

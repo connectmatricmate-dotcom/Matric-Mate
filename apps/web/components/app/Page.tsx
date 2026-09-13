@@ -14,8 +14,8 @@
  *
  * Server-safe: no hooks, no handlers.
  */
-import Link from 'next/link';
-import { Icon, Ur } from '@/components/ui/primitives';
+import { Ur } from '@/components/ui/primitives';
+import { BackLink } from '@/components/app/BackLink';
 
 const WIDTH = {
   page: 'max-w-[1180px]',
@@ -67,13 +67,11 @@ export function PageHead({
       {back ? (
         // no-print: the header itself prints (it is the report card's title),
         // a way back to the previous screen does not.
-        <Link
+        <BackLink
           href={back}
+          label={backLabel}
           className="no-print -ms-1 mb-1 inline-flex min-h-11 items-center gap-1 pe-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
-        >
-          <Icon name="chevron" size={17} className="rotate-180" />
-          {backLabel ?? 'Back'}
-        </Link>
+        />
       ) : null}
 
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">

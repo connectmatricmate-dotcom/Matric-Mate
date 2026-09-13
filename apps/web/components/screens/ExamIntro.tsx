@@ -22,7 +22,9 @@ import { useApp, useLang, useT } from '@/lib/store';
 import { session } from '@/lib/session';
 
 const COUNT = 20;
-const MINUTES = 30;
+/** A minute and a half a question, as the Android app allows: 30 minutes for
+ *  the usual 20, and a ten-question chapter is not given the same half hour. */
+const minutesFor = (n: number) => Math.max(1, Math.round(n * 1.5));
 
 export function ExamIntro({
   subject,
@@ -125,7 +127,7 @@ export function ExamIntro({
       subjectId,
       chapterId: chapter?.id ?? null,
       mcqs,
-      durationSec: MINUTES * 60,
+      durationSec: minutesFor(mcqs.length) * 60,
       aiGenerated: ai,
     });
     router.replace('/session/exam');
@@ -137,7 +139,7 @@ export function ExamIntro({
 
       <Card border="border-orange" className="flex flex-col items-center py-6 text-center">
         <Icon name="clock" size={34} className="text-orangedark" />
-        <h2 className="mt-2.5 font-display text-[21px] text-ink">{t('session.examRules', { n: count, min: MINUTES })}</h2>
+        <h2 className="mt-2.5 font-display text-[21px] text-ink">{t('session.examRules', { n: count, min: minutesFor(count) })}</h2>
         <p className="mt-0.5 text-[13px] text-ink2">{t('session.examRulesSub')}</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           {best ? (
@@ -153,7 +155,7 @@ export function ExamIntro({
       <Card flat className="mt-6">
         <p className="text-[13.5px] font-extrabold text-ink">{t('session.beforeStart')}</p>
         <ul className="mt-2.5 flex flex-col gap-2 text-[13px] text-ink2">
-          <li>• {t('session.beforeStart1', { min: MINUTES })}</li>
+          <li>• {t('session.beforeStart1', { min: minutesFor(count) })}</li>
           <li>• {t('session.beforeStart2')}</li>
           <li>• {t('session.beforeStart3')}</li>
         </ul>

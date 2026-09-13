@@ -7,7 +7,8 @@ import { Btn } from '@/components/ui/controls';
 import { Card, Pill, Ring, ScriptText } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useT } from '@/lib/store';
-import { session } from '@/lib/session';
+import { leaveSession, session } from '@/lib/session';
+import { canGoBack } from '@/lib/nav-trail';
 import { NoSession } from './NoSession';
 import { Page } from '@/components/app/Page';
 
@@ -175,10 +176,8 @@ export function ResultScreen() {
           title={t('common.done')}
           className="flex-1"
           loading={leaving}
-          onClick={() => {
-            session.clear();
-            startLeaving(() => router.replace('/practice'));
-          }}
+          // Back to where the set was started: see leaveSession.
+          onClick={() => startLeaving(() => leaveSession(router, canGoBack()))}
         />
       </div>
 

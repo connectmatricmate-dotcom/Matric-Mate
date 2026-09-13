@@ -12,6 +12,7 @@ import {
   levelProgress,
   mediumName,
   reminderHour,
+  translate,
   xpToNextLevel,
 } from '@matricmate/core';
 import { signOutAction } from '@/app/(auth)/actions';
@@ -198,8 +199,11 @@ export function AccountView() {
               onChange={(l: Language) => actions.setLanguage(l)}
               label={t('lang.label')}
               options={[
-                { value: 'en' as Language, label: t('lang.english') },
-                { value: 'ur' as Language, label: t('lang.urdu'), urdu: true },
+                // Each language named in its own script, as in the Android
+                // app: "Urdu" in Latin letters is no help to the student
+                // looking for it.
+                { value: 'en' as Language, label: translate('en', 'lang.english') },
+                { value: 'ur' as Language, label: translate('ur', 'lang.urdu'), urdu: true },
               ]}
             />
           </Card>

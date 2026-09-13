@@ -11,6 +11,7 @@ import type { Medium } from '@matricmate/core';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen } from './StepScreen';
+import { goBackTo } from '@/lib/nav-trail';
 
 export function ChooseMedium({ edit = false }: { edit?: boolean }) {
   const { state, synced, actions } = useApp();
@@ -30,6 +31,7 @@ export function ChooseMedium({ edit = false }: { edit?: boolean }) {
       cta={edit ? t('common.save') : t('common.continue')}
       footnote={t('onboarding.mediumFootnote')}
       backHref={edit ? '/account/edit' : '/onboarding/board'}
+      edit={edit}
       waiting={!synced}
       onNext={async () => {
         // The language first, so the next screen already arrives in it.
@@ -38,7 +40,8 @@ export function ChooseMedium({ edit = false }: { edit?: boolean }) {
           toast(t('states.errorBody'));
           return;
         }
-        router.push(edit ? '/account/edit' : '/onboarding/subjects');
+        if (edit) goBackTo(router, '/account/edit');
+        else router.replace('/onboarding/subjects');
       }}
     >
       <ChoiceCard

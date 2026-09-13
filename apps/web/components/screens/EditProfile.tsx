@@ -11,6 +11,7 @@ import { AVATARS, boardName } from '@matricmate/core';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { useApp, useLang, useT } from '@/lib/store';
 import { validateName } from '@/lib/validation';
+import { goBackTo } from '@/lib/nav-trail';
 
 
 export function EditProfile() {
@@ -65,7 +66,8 @@ export function EditProfile() {
     // busy stays true through router.push, so the button cannot re-enable
     // during the route transition.
     toast(t('account.profileSaved'));
-    router.push('/account');
+    // Back to the profile page behind this one, not a second copy of it.
+    goBackTo(router, '/account');
   }
 
   return (

@@ -7,7 +7,8 @@ import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
 import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
-import { session } from '@/lib/session';
+import { leaveSession, session } from '@/lib/session';
+import { canGoBack } from '@/lib/nav-trail';
 import { NoSession } from './NoSession';
 import { Markdown } from '@/components/ui/Markdown';
 
@@ -129,10 +130,8 @@ export function ReviewScreen() {
         title={t('common.done')}
         className="mt-6 w-full md:w-auto"
         loading={leaving}
-        onClick={() => {
-          session.clear();
-          startLeaving(() => router.replace('/practice'));
-        }}
+        // Back to where the set was started: see leaveSession.
+        onClick={() => startLeaving(() => leaveSession(router, canGoBack()))}
       />
     </Page>
   );

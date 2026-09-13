@@ -8,7 +8,9 @@ import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Label, Pill, ScriptText } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
-import { session } from '@/lib/session';
+import { leaveSession, session } from '@/lib/session';
+import { canGoBack } from '@/lib/nav-trail';
+import { Confirm } from '@/components/ui/sheet';
 import { NoSession } from './NoSession';
 import { Page } from '@/components/app/Page';
 import { Markdown } from '@/components/ui/Markdown';
@@ -39,6 +41,7 @@ export function McqScreen() {
   const [chosen, setChosen] = useState<number | null>(finished?.chosen ?? null);
   const [confidence, setConfidence] = useState<Confidence | null>(finished?.confidence ?? null);
   const [checked, setChecked] = useState(!!finished);
+  const [confirmEnd, setConfirmEnd] = useState(false);
   // Navigation pending state: the button spins until the next route paints,
   // so there is never a moment where a tap appears to do nothing.
   const [leaving, startLeaving] = useTransition();
@@ -86,7 +89,16 @@ export function McqScreen() {
   return (
     <Page width="focus">
       <SessionHeader
-        onClose={() => startLeaving(() => router.replace(answeredCount ? '/session/result' : '/practice'))}
+        /* Nothing answered: back to where the set was opened. Part way
+           through: ask first, since ending is not undoable. Every question
+           answered: the result, where the last one leads anyway. */
+        onClose={() =>
+          !answeredCount
+            ? startLeaving(() => leaveSession(router, canGoBack()))
+            : answeredCount < s.mcqs.length
+              ? setConfirmEnd(true)
+              : startLeaving(() => router.replace('/session/result'))
+        }
         closeLabel={t('common.close')}
         pct={((i + (checked ? 1 : 0)) / s.mcqs.length) * 100}
         label={t('session.questionOf', { a: i + 1, b: s.mcqs.length })}
@@ -258,6 +270,20 @@ export function McqScreen() {
           <Btn title={t('session.check')} onClick={check} disabled={chosen == null || confidence == null} className="w-full" />
         )}
       </div>
+
+      <Confirm
+        open={confirmEnd}
+        onClose={() => setConfirmEnd(false)}
+        title={t('session.endSetTitle')}
+        body={t('session.endSetBody', { a: answeredCount, b: s.mcqs.length })}
+        confirmLabel={t('session.endSetNow')}
+        cancelLabel={t('session.keepWorking')}
+        tone="orange"
+        onConfirm={() => {
+          setConfirmEnd(false);
+          startLeaving(() => router.replace('/session/result'));
+        }}
+      />
     </Page>
   );
 }

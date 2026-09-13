@@ -7,6 +7,7 @@ import { Confirm } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useLang, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen } from './StepScreen';
+import { goBackTo } from '@/lib/nav-trail';
 
 export function ChooseBoard({ edit = false }: { edit?: boolean }) {
   const { state, synced, actions } = useApp();
@@ -47,7 +48,8 @@ export function ChooseBoard({ edit = false }: { edit?: boolean }) {
       return;
     }
     toast(t('onboarding.boardChanged', { board: boardName(value, lang) }));
-    router.push(next);
+    if (edit) goBackTo(router, '/account/edit');
+    else router.replace(next);
   };
 
   return (
@@ -58,6 +60,7 @@ export function ChooseBoard({ edit = false }: { edit?: boolean }) {
         sub={t('onboarding.boardSub')}
         cta={edit ? t('common.save') : t('common.continue')}
         backHref={edit ? '/onboarding/class?edit=1' : '/onboarding/class'}
+        edit={edit}
         waiting={!synced}
         onNext={async () => {
           if (current && value !== current) {
@@ -68,7 +71,8 @@ export function ChooseBoard({ edit = false }: { edit?: boolean }) {
             toast(t('states.errorBody'));
             return;
           }
-          router.push(next);
+          if (edit) goBackTo(router, '/account/edit');
+          else router.replace(next);
         }}
       >
         <ChoiceCard

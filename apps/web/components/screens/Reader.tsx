@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react';
 import { api, chapterName, isOneLanguageSubject, isUrduScript } from '@matricmate/core';
 import type { Block, Chapter, ChapterContent, StringKey } from '@matricmate/core';
 import { Btn, IconButton } from '@/components/ui/controls';
-import { Card, Empty, Label, LinkBtn, Pill, ScriptText, Skeleton } from '@/components/ui/primitives';
+import { Card, Empty, Label, Pill, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { Sheet } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
@@ -15,6 +15,8 @@ import { Page } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Markdown } from '@/components/ui/Markdown';
 import { LockedNotice } from '@/components/app/LockedNotice';
+import { canGoBack } from '@/lib/nav-trail';
+import { LeaveSetButton } from '@/components/app/LeaveSetButton';
 
 /** A caller that already chose an alignment keeps it. */
 const HAS_ALIGN = /(^|\s)text-(left|center|right|start|end|justify)(?=\s|$)/;
@@ -291,7 +293,7 @@ export function Reader({
               icon="book"
               title={t('reader.noNotesTitle')}
               sub={t('reader.noNotesBody')}
-              cta={<LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${id}`} variant="line" sm />}
+              cta={<LeaveSetButton chapterId={id} sm />}
             />
           )
         ) : section ? (
@@ -344,6 +346,10 @@ export function Reader({
             onClick={() => {
               if (section) actions.markSectionRead(section.id, id, idx);
               toast(t('reader.progressSaved'));
+              // On to the chapter, as the Android app does: finishing used to
+              // leave the student on the last section with a toast.
+              if (canGoBack()) router.back();
+              else router.push(`/learn/chapter/${id}`);
             }}
           />
         ) : (

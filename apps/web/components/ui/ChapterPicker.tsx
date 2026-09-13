@@ -39,10 +39,14 @@ export function ChapterPicker({
   open,
   onClose,
   onPick,
+  chapterOnly,
 }: {
   open: boolean;
   onClose: () => void;
   onPick: (pick: ChapterPick) => void;
+  /** Stop at the chapter, with no topic step: for choosing which chapter a
+   *  practice set is drawn from, as the Android picker does. */
+  chapterOnly?: boolean;
 }) {
   const t = useT();
   // Mounted only while open, which is what resets it: somebody who backed out
@@ -54,16 +58,17 @@ export function ChapterPicker({
      dialog each time. */
   return (
     <Sheet open onClose={onClose} title={t('tutor.pickChapterTitle')}>
-      <Picking onPick={onPick} />
+      <Picking onPick={onPick} chapterOnly={chapterOnly} />
     </Sheet>
   );
 }
 
-function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
+function Picking({ onPick, chapterOnly }: { onPick: (pick: ChapterPick) => void; chapterOnly?: boolean }) {
   const { derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   const [level, setLevel] = useState<Level>({ kind: 'subjects' });
+  const openChapter = (c: ChapterChoice) => (chapterOnly ? onPick({ chapter: c }) : setLevel({ kind: 'topics', chapter: c }));
   const [query, setQuery] = useState('');
   /** Keyed by chapter, so "still loading" is a comparison rather than a
    *  synchronous setState the moment the level changes. */
@@ -155,7 +160,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
                 title={chapterName(c, lang)}
                 sub={lang === 'ur' ? (c.subjectUrduName ?? c.subjectName) : c.subjectName}
                 last={i === hits.length - 1}
-                onClick={() => setLevel({ kind: 'topics', chapter: c })}
+                onClick={() => openChapter(c)}
               />
             ))
           )
@@ -182,7 +187,7 @@ function Picking({ onPick }: { onPick: (pick: ChapterPick) => void }) {
                 badge={String(c.number)}
                 title={chapterName(c, lang)}
                 last={i === all.length - 1}
-                onClick={() => setLevel({ kind: 'topics', chapter: c })}
+                onClick={() => openChapter(c)}
               />
             ))
         ) : (

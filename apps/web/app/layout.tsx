@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { ToastProvider } from '@/components/ui/toast';
+import { NavTrail } from '@/components/app/NavTrail';
 import { ALLOW_INDEXING, SITE_URL } from '@/lib/site';
 import { readUiTheme } from '@/lib/ui-language.server';
 import './globals.css';
@@ -136,6 +137,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${baloo.variable} ${nunito.variable} ${nastaliq.variable}`}
     >
       <body>
+        <NavTrail />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

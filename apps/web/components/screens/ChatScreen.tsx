@@ -12,6 +12,8 @@ import { useApp, useLang, useT } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 import { quotaClock, useTutorQuota } from '@/lib/use-tutor-quota';
 import { ChapterPicker } from '@/components/ui/ChapterPicker';
+import { canGoBack } from '@/lib/nav-trail';
+import { useRouter } from 'next/navigation';
 
 /**
  * The buttons the tutor can put under an answer.
@@ -132,6 +134,7 @@ export function ChatScreen({
   threadId?: string;
 }) {
   const { state, actions, derived } = useApp();
+  const router = useRouter();
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
@@ -386,6 +389,13 @@ export function ChatScreen({
         <Link
           href="/tutor"
           aria-label={t('common.back')}
+          // Back to wherever the chat was opened (the tutor, a chapter, a
+          // wrong answer), not always the tutor: see BackLink.
+          onClick={(e) => {
+            if (!canGoBack() || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
+            router.back();
+          }}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-line bg-card text-ink hover:bg-paper"
         >
           <Icon name="back" size={20} />

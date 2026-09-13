@@ -6,11 +6,13 @@ import { chapterName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
-import { Card, Empty, Icon, LinkBtn, Pill, ScriptText, Ur } from '@/components/ui/primitives';
+import { Card, Empty, Icon, Pill, ScriptText, Ur } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useLang, useT } from '@/lib/store';
+import { LeaveSetButton } from '@/components/app/LeaveSetButton';
+import { PracticeChapterBar } from '@/components/app/PracticeChapterBar';
 
-export function FlashcardsScreen({ chapter, cards }: { chapter: Chapter; cards: Flashcard[] }) {
+export function FlashcardsScreen({ chapter, cards, canChangeChapter }: { chapter: Chapter; cards: Flashcard[]; canChangeChapter?: boolean }) {
   const { actions } = useApp();
   const t = useT();
   const { lang } = useLang();
@@ -58,7 +60,7 @@ export function FlashcardsScreen({ chapter, cards }: { chapter: Chapter; cards: 
           icon="cards"
           title={t('session.noItemsTitle')}
           sub={t('session.noItemsBody')}
-          cta={<LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} variant="line" sm />}
+          cta={<LeaveSetButton chapterId={chapterId} sm />}
         />
       </Page>
     );
@@ -89,7 +91,7 @@ export function FlashcardsScreen({ chapter, cards }: { chapter: Chapter; cards: 
               }}
             />
           ) : null}
-          <LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} variant="line" />
+          <LeaveSetButton chapterId={chapterId} />
         </div>
       </Page>
     );
@@ -103,8 +105,9 @@ export function FlashcardsScreen({ chapter, cards }: { chapter: Chapter; cards: 
         pct={(i / deck.length) * 100}
         label={`${t('study.flashcards')} · ${t('session.cardOf', { a: i + 1, b: deck.length })}`}
         segments={deck.map((_, j) => (j < i ? 'done' : j === i ? 'current' : 'todo'))}
-        right={<Pill tone="grey">{name}</Pill>}
+        right={canChangeChapter ? undefined : <Pill tone="grey">{name}</Pill>}
       />
+      {canChangeChapter ? <PracticeChapterBar kind="cards" chapter={chapter} /> : null}
 
       <button
         type="button"

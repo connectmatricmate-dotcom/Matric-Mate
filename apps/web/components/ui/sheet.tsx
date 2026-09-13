@@ -5,7 +5,8 @@
  * Android app uses for the same jobs. Escape closes it, the backdrop closes it,
  * and focus moves into the panel so a keyboard user isn't stranded behind it.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { translate } from '@matricmate/core';
 import { Icon } from './primitives';
 import { Btn } from './controls';
 
@@ -23,6 +24,15 @@ export function Sheet({
   wide?: boolean;
 }) {
   const panel = useRef<HTMLDivElement>(null);
+  /* The page's language, from the nearest element that states one: this sheet
+     also serves the admin area, which has no app store to ask. Its two close
+     controls were named "Close" to a screen reader on an Urdu page. */
+  const [closeLabel, setCloseLabel] = useState('Close');
+  useEffect(() => {
+    if (!open) return;
+    const lang = panel.current?.closest('[lang]')?.getAttribute('lang') === 'ur' ? 'ur' : 'en';
+    setCloseLabel(translate(lang, 'common.close'));
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -70,7 +80,7 @@ export function Sheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default bg-scrim" />
+      <button type="button" aria-label={closeLabel} onClick={onClose} className="absolute inset-0 cursor-default bg-scrim" />
       <div
         ref={panel}
         tabIndex={-1}
@@ -90,7 +100,7 @@ export function Sheet({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={closeLabel}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] text-ink2 transition-colors duration-200 hover:bg-paper"
           >
             <Icon name="close" size={20} />

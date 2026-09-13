@@ -84,6 +84,13 @@ export function ChapterHub({
   const track = pickAudioTrack(tracks, subjectMedium(id, chapter.board, state.settings.contentMedium));
   const pct = chapterPct(id, state.readSections, state.attempts);
   const readCount = content.sections.filter((s) => state.readSections.includes(s.id)).length;
+  // Every section read: read again, not "continue" to nothing.
+  const readLabel =
+    content.sections.length && readCount >= content.sections.length
+      ? t('study.readAgain')
+      : readCount
+        ? t('study.continueReading')
+        : t('study.startReading');
   const knownCards = content.flashcards.filter((f) => state.cardsKnown.includes(f.id)).length;
   const best = state.results
     .filter((r) => r.chapterId === id && r.total > 0)
@@ -104,7 +111,7 @@ export function ChapterHub({
             {/* From md up only: on a phone the same button closes the page,
                 and showing it in both places read as two different actions. */}
             <LinkBtn
-              title={readCount ? t('study.continueReading') : t('study.startReading')}
+              title={readLabel}
               href={`/learn/reader/${id}`}
               sm
               className="max-md:hidden"
@@ -184,7 +191,7 @@ export function ChapterHub({
 
           <Actions>
             <LinkBtn
-              title={readCount ? t('study.continueReading') : t('study.startReading')}
+              title={readLabel}
               href={`/learn/reader/${id}`}
               className="md:hidden"
             />

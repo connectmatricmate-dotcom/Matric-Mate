@@ -14,7 +14,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       <div className="flex min-h-dvh flex-col items-center px-5 py-8 md:justify-center">
         {/* The Wordmark primitive, whose plate keeps the teal half readable on
             the dark theme's paper. data-chrome keeps it off paper when printed. */}
-        <Link href="/" data-chrome className="mb-6" aria-label="MatricMate home">
+        <Link href="/" data-chrome className="mb-6 inline-flex min-h-11 items-center" aria-label="MatricMate home">
           <Wordmark priority />
         </Link>
         <div className="w-full max-w-[420px]">{children}</div>

@@ -25,7 +25,7 @@ export function Nav() {
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between gap-6 px-5 py-3.5 md:grid md:grid-cols-[1fr_auto_1fr]">
         {/* The Wordmark primitive, not the bare image: the teal half of the
             artwork disappears on the dark theme's glass without its plate. */}
-        <Link href="/" className="shrink-0 justify-self-start" aria-label="MatricMate home">
+        <Link href="/" className="inline-flex min-h-11 shrink-0 items-center justify-self-start" aria-label="MatricMate home">
           <Wordmark priority />
         </Link>
 

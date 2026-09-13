@@ -51,7 +51,7 @@ export function ChapterList({ subject, chapters, paid }: { subject: Subject; cha
         sub={`${t('study.chapterCount', { n: chapters.length })} · ${t('study.percentComplete', { n: pct })}`}
         actions={
           <LinkBtn
-            title={t('study.chapterTest')}
+            title={t('study.subjectTest')}
             href={`/session/exam-intro?subject=${subject.id}`}
             variant="orange"
             icon="clock"

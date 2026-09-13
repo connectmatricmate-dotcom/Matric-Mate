@@ -32,6 +32,19 @@ export const en = {
     student: 'Student',
   },
 
+  /** Names for controls that show only an icon, read out by screen readers.
+   *  Without them a back arrow, a switch or a play button was announced as
+   *  "button" and nothing else. */
+  a11y: {
+    editProfile: 'Edit profile',
+    addPhoto: 'Add a photo of the question',
+    pickChapter: 'Pick a chapter',
+    textSize: 'Change text size',
+    previousSection: 'Previous section',
+    nextSection: 'Next section',
+    markDone: 'Mark as done',
+  },
+
   lang: {
     label: 'Language',
     english: 'English',
@@ -433,6 +446,9 @@ export const en = {
     noMatchTitle: 'Nothing matched',
     noMatchBody: 'No subject or chapter for “{q}”.',
     chapterTest: 'Chapter test',
+    /* The timed test on a subject's chapter list, drawn from every chapter.
+       It said "Chapter test", on a screen listing nine chapters. */
+    subjectTest: 'Subject test',
     premiumChapter: 'Premium',
     premiumNote: 'Every chapter opens with the plan.',
     notOnPaper: 'Not on the annual paper',
@@ -461,6 +477,8 @@ export const en = {
     blanksSub: '{n} items',
     startReading: 'Start reading',
     continueReading: 'Continue reading',
+    /* Every section read: "Continue reading" promised more than there was. */
+    readAgain: 'Read again',
     savedOffline: 'Saved for offline',
     notDownloaded: 'Not downloaded',
     saveOffline: 'Save offline',
@@ -647,6 +665,11 @@ export const en = {
     noChangeAfter: 'You can’t change answers after submitting.',
     submitNow: 'Submit now',
     keepWorking: 'Keep working',
+    /* Closing a practice set part-way. Ending it used to happen on the tap,
+       with no way back from a mis-tap on the close button. */
+    endSetTitle: 'End this set?',
+    endSetBody: 'You’ve answered {a} of {b}. Your result counts the ones you answered.',
+    endSetNow: 'End and see result',
     jumpHint: 'Tap a number to jump · star flags a question',
     lastQuestion: 'Last question',
 
@@ -1211,6 +1234,16 @@ export const ur: typeof en = {
     student: 'طالبِ علم',
   },
 
+  a11y: {
+    editProfile: 'پروفائل میں تبدیلی',
+    addPhoto: 'سوال کی تصویر شامل کریں',
+    pickChapter: 'باب منتخب کریں',
+    textSize: 'متن کا سائز بدلیں',
+    previousSection: 'پچھلا حصہ',
+    nextSection: 'اگلا حصہ',
+    markDone: 'مکمل کا نشان لگائیں',
+  },
+
   /* Each language is named in its own script, the way every language picker
      does it, so "English" stays in Latin here and nowhere else. */
   lang: {
@@ -1577,6 +1610,7 @@ export const ur: typeof en = {
     noMatchTitle: 'کچھ نہیں ملا',
     noMatchBody: '”{q}“ کے لیے کوئی مضمون یا باب نہیں ملا۔',
     chapterTest: 'باب کا ٹیسٹ',
+    subjectTest: 'مضمون کا ٹیسٹ',
     premiumChapter: 'پریمیم',
     premiumNote: 'ہر باب پلان کے ساتھ کھلتا ہے۔',
     notOnPaper: 'سالانہ پرچے میں نہیں',
@@ -1602,6 +1636,7 @@ export const ur: typeof en = {
     blanksSub: '{n} سوال',
     startReading: 'پڑھنا شروع کریں',
     continueReading: 'پڑھنا جاری رکھیں',
+    readAgain: 'دوبارہ پڑھیں',
     savedOffline: 'آف لائن محفوظ ہو گیا',
     notDownloaded: 'ڈاؤن لوڈ نہیں ہوا',
     saveOffline: 'آف لائن محفوظ کریں',
@@ -1771,6 +1806,9 @@ export const ur: typeof en = {
     noChangeAfter: 'جمع کرانے کے بعد جواب نہیں بدل سکتے۔',
     submitNow: 'اب جمع کرائیں',
     keepWorking: 'ابھی کرنے دیں',
+    endSetTitle: 'یہ سیٹ ختم کرنا ہے؟',
+    endSetBody: 'آپ نے {b} میں سے {a} سوال حل کیے ہیں۔ نتیجہ صرف حل کیے گئے سوالوں پر بنے گا۔',
+    endSetNow: 'ختم کر کے نتیجہ دیکھیں',
     jumpHint: 'نمبر دبائیں تو اس سوال پر جائیں · ستارہ نشان زد کرتا ہے',
     lastQuestion: 'آخری سوال',
 

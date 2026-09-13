@@ -55,7 +55,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* desktop sidebar. data-chrome keeps the shell off paper: see the
           print rules in globals.css. */}
       <aside data-chrome className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-e border-line bg-card px-3 py-5 md:flex">
-        <Link href="/dashboard" className="mb-7 px-2">
+        <Link href="/dashboard" className="mb-7 flex min-h-11 items-center px-2" aria-label="MatricMate home">
           <Wordmark priority />
         </Link>
 
@@ -130,7 +130,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span className="md:hidden">
             <AvatarBadge index={state.settings.avatar ?? 0} size={34} />
           </span>
-          <Link href="/dashboard" className="md:hidden">
+          <Link href="/dashboard" className="inline-flex min-h-11 items-center md:hidden" aria-label="MatricMate home">
             <Wordmark width={104} height={21} />
           </Link>
 

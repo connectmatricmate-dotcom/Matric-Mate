@@ -74,7 +74,8 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
     setConfirming(false);
     if (r === 'ok') {
       toast(t('tutor.classChanged', { n: value }));
-      router.push(next);
+      if (edit) router.push(next);
+      else router.replace(next);
     } else {
       toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
     }
@@ -88,6 +89,7 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
         sub={t('onboarding.classSub')}
         cta={t('common.continue')}
         backHref={edit ? '/account/edit' : undefined}
+        edit={edit}
         waiting={!synced}
         onNext={async () => {
           if (current && value !== current) {
@@ -102,7 +104,8 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
             toast(t('states.errorBody'));
             return;
           }
-          router.push(next);
+          if (edit) router.push(next);
+          else router.replace(next);
         }}
       >
         <ChoiceCard

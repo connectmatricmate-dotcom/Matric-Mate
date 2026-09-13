@@ -18,6 +18,8 @@
 import Link from 'next/link';
 import { IconButton } from '@/components/ui/controls';
 import { Bar, Icon } from '@/components/ui/primitives';
+import { useRouter } from 'next/navigation';
+import { canGoBack } from '@/lib/nav-trail';
 
 const MAX_SEGMENTS = 16;
 
@@ -45,6 +47,7 @@ export function SessionHeader({
   /** One mark per item. Omit (or exceed 16) to keep the continuous bar. */
   segments?: SegmentMark[];
 }) {
+  const router = useRouter();
   const segmented = segments && segments.length > 1 && segments.length <= MAX_SEGMENTS;
   return (
     <div className="flex items-center gap-2.5 pt-1">
@@ -54,6 +57,13 @@ export function SessionHeader({
         <Link
           href={backHref}
           aria-label={backLabel}
+          // Back to where the student came from when that is a page of ours,
+          // so the page they leave is not left in history: see BackLink.
+          onClick={(e) => {
+            if (!canGoBack() || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
+            router.back();
+          }}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-ink2 transition-colors duration-200 hover:bg-paper hover:text-ink"
         >
           <Icon name="back" size={20} />

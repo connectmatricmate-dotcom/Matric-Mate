@@ -9,8 +9,10 @@ import { Btn } from '@/components/ui/controls';
 import { Card, Empty, Icon, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
 import { fireConfetti } from '@/lib/confetti';
 import { useApp, useLang, useT } from '@/lib/store';
+import { LeaveSetButton } from '@/components/app/LeaveSetButton';
+import { PracticeChapterBar } from '@/components/app/PracticeChapterBar';
 
-export function BlanksScreen({ chapter, items }: { chapter: Chapter; items: Blank[] }) {
+export function BlanksScreen({ chapter, items, canChangeChapter }: { chapter: Chapter; items: Blank[]; canChangeChapter?: boolean }) {
   const { actions } = useApp();
   const t = useT();
   const { lang } = useLang();
@@ -68,7 +70,7 @@ export function BlanksScreen({ chapter, items }: { chapter: Chapter; items: Blan
           icon="edit"
           title={t('session.noItemsTitle')}
           sub={t('session.noItemsBody')}
-          cta={<LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} variant="line" sm />}
+          cta={<LeaveSetButton chapterId={chapterId} sm />}
         />
       </Page>
     );
@@ -89,7 +91,7 @@ export function BlanksScreen({ chapter, items }: { chapter: Chapter; items: Blan
           <p className="font-display text-[21px] text-ink">{t('session.blanksDone', { a: right, b: items.length })}</p>
           <p className="text-[13px] text-ink2">{t('session.blanksDoneSub')}</p>
         </Card>
-        <LinkBtn title={t('session.backToChapter')} href={`/learn/chapter/${chapterId}`} className="mt-6 w-full" />
+        <LeaveSetButton chapterId={chapterId} variant="primary" className="mt-6 w-full" />
       </Page>
     );
   }
@@ -104,8 +106,9 @@ export function BlanksScreen({ chapter, items }: { chapter: Chapter; items: Blan
         pct={(i / items.length) * 100}
         label={`${t('practice.blanks')} · ${t('session.blanksItem', { a: i + 1, b: items.length })}`}
         segments={items.map((_, j) => marks[j] ?? (j === i && !checked ? 'current' : 'todo'))}
-        right={<Pill tone="grey">{name}</Pill>}
+        right={canChangeChapter ? undefined : <Pill tone="grey">{name}</Pill>}
       />
+      {canChangeChapter ? <PracticeChapterBar kind="blanks" chapter={chapter} /> : null}
 
       {/* Same task frame as the MCQ and exam screens */}
       <div className="mt-4 md:rounded-[22px] md:border md:border-line md:bg-card md:p-7 md:shadow-[0_5px_14px_var(--shadow-soft)]">

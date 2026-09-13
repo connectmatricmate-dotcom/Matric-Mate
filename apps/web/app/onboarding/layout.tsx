@@ -16,7 +16,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
       <AppProvider initialLanguage={lang}>
       <div className="min-h-dvh">
         <header className="flex justify-center border-b border-line bg-card py-3">
-          <Link href="/">
+          <Link href="/" className="inline-flex min-h-11 items-center" aria-label="MatricMate home">
             <Wordmark priority />
           </Link>
         </header>

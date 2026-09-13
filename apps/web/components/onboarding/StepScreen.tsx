@@ -6,6 +6,8 @@
  * apps/mobile/src/components/OnboardingStep.tsx so the two apps read the same.
  */
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { canGoBack } from '@/lib/nav-trail';
 import { useTransition } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Check, Icon, Pill, Ur } from '@/components/ui/primitives';
@@ -85,6 +87,7 @@ export function StepScreen({
   waiting,
   footnote,
   backHref,
+  edit,
 }: {
   step: number;
   title: string;
@@ -106,8 +109,11 @@ export function StepScreen({
    * after a hard load or a link from an email is some other site, or nothing.
    */
   backHref?: string;
+  /** Opened from Edit profile: Back is history back, to the profile. */
+  edit?: boolean;
 }) {
   const t = useT();
+  const router = useRouter();
   // Every step's forward action is a save plus a route push. The button spins
   // until the next step paints, otherwise a slow transition reads as a dead
   // tap and invites a second click.
@@ -118,6 +124,16 @@ export function StepScreen({
       {backHref ? (
         <Link
           href={backHref}
+          replace={!edit}
+          /* First run: the steps replace one another, so the whole setup is
+             one history entry and finishing it leaves nothing for the
+             browser's back button to reopen. From Edit profile: back to the
+             profile itself, wherever it is behind. */
+          onClick={(e) => {
+            if (!edit || !canGoBack() || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
+            router.back();
+          }}
           className="-ms-1 mb-4 inline-flex min-h-11 items-center gap-1.5 pe-2 text-[13.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
         >
           <Icon name="chevron" size={18} className="rotate-180" />

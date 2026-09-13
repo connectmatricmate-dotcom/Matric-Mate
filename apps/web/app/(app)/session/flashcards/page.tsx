@@ -21,5 +21,5 @@ export default async function FlashcardsPage({ searchParams }: { searchParams: P
   /* A read that fails throws, for the route's Try again; an empty answer is
      what this student may see, and the screen says there is nothing here. */
   const content = await getChapterContent(chapter.id);
-  return <FlashcardsScreen key={chapter.id} chapter={chapter} cards={content.flashcards} />;
+  return <FlashcardsScreen key={chapter.id} chapter={chapter} cards={content.flashcards} canChangeChapter />;
 }

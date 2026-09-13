@@ -21,5 +21,5 @@ export default async function BlanksPage({ searchParams }: { searchParams: Promi
   /* A read that fails throws, for the route's Try again; an empty answer is
      what this student may see, and the screen says there is nothing here. */
   const content = await getChapterContent(chapter.id);
-  return <BlanksScreen key={chapter.id} chapter={chapter} items={content.blanks} />;
+  return <BlanksScreen key={chapter.id} chapter={chapter} items={content.blanks} canChangeChapter />;
 }
