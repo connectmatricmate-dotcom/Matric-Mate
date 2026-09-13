@@ -270,13 +270,16 @@ const SUBJECT_TIPS: Record<string, StringKey[]> = {
  * sent, so neither list repeats before it has been worked through.
  */
 export const examTip = (subjectId: string | null, subject: string, turn: number, target: 'study' | 'home'): Notice => {
-  const own = (subjectId && SUBJECT_TIPS[subjectId]) || [];
+  const own = (subject && subjectId && SUBJECT_TIPS[subjectId]) || [];
   const t = Math.abs(turn);
-  const useOwn = own.length > 0 && subject && t % 2 === 0;
+  const useOwn = own.length > 0 && t % 2 === 0;
+  // With no subject tips to alternate with, the general list steps every
+  // time; halving the turn repeated each tip on two days running.
+  const general = own.length ? Math.floor(t / 2) : t;
   return {
     kind: 'reminder',
     title: useOwn ? 'notifications.tipTitle' : 'notifications.tipTitleGeneral',
-    body: useOwn ? own[Math.floor(t / 2) % own.length] : GENERAL_TIPS[Math.floor(t / 2) % GENERAL_TIPS.length],
+    body: useOwn ? own[Math.floor(t / 2) % own.length] : GENERAL_TIPS[general % GENERAL_TIPS.length],
     params: { subject },
     target,
   };

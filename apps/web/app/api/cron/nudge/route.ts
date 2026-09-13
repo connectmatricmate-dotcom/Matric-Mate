@@ -334,8 +334,8 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
         .range(from, to)
         .abortSignal(signal),
     ),
-    pageAll<{ id: string; name: string; urdu_name: string | null }>('subjects', (from, to, signal) =>
-      admin.from('subjects').select('id,name,urdu_name').order('id').range(from, to).abortSignal(signal),
+    pageAll<{ id: string; name: string; urdu_name: string | null; compulsory: boolean }>('subjects', (from, to, signal) =>
+      admin.from('subjects').select('id,name,urdu_name,compulsory,sort_order').order('sort_order').range(from, to).abortSignal(signal),
     ),
   ]);
 
@@ -348,6 +348,8 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
     weekByUser.set(r.user_id, perDay);
   }
   const subjectById = new Map(subjectRows.map((r) => [r.id, r]));
+  /** For a student who never finished setting up: the subjects every student takes. */
+  const compulsory = subjectRows.filter((r) => r.compulsory).map((r) => r.id);
 
   const attemptsByUser = new Map<string, AttemptRow[]>();
   for (const r of attemptRows) attemptsByUser.set(r.user_id, [...(attemptsByUser.get(r.user_id) ?? []), r]);
@@ -405,7 +407,7 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
        * list when there is no history, so it is not Mathematics every time.
        */
       const onboarding = (profile.onboarding ?? {}) as { subjects?: string[] };
-      const list = Array.isArray(onboarding.subjects) ? onboarding.subjects : [];
+      const list = Array.isArray(onboarding.subjects) && onboarding.subjects.length ? onboarding.subjects : compulsory;
       const subjectId = last?.subject_id ?? (list.length ? list[Math.abs(dayIndex) % list.length] : undefined);
       const subjectRow = subjectId ? subjectById.get(subjectId) : undefined;
       const notice = pick({

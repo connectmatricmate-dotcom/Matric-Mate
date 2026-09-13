@@ -40,7 +40,7 @@ const BACK_MAX = 200;
 /** Chapters count as theirs when they answered something in them this recently. */
 const STUDIED_DAYS = 60;
 
-type ProfileRow = { id: string; settings: unknown; onboarding: unknown };
+type ProfileRow = { id: string; settings: unknown; onboarding: unknown; grade: number | null };
 type Onboarding = { board?: string; classLevel?: number; subjects?: string[]; medium?: string };
 type ChapterRow = { id: string; subject_id: string; board: string; grade: number; number: number };
 
@@ -81,7 +81,7 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
   const dayIndex = Math.floor(now.getTime() / 864e5) + shift;
 
   const profiles = await pageAll<ProfileRow>('profiles', (from, to, signal) =>
-    admin.from('profiles').select('id,settings,onboarding').eq('role', 'student').order('id').range(from, to).abortSignal(signal),
+    admin.from('profiles').select('id,settings,onboarding,grade').eq('role', 'student').order('id').range(from, to).abortSignal(signal),
   );
   // Absent means never touched, and it defaults to on. Only an explicit false is a no.
   const wanting = profiles.filter((p) => ((p.settings ?? {}) as Record<string, unknown>).reminders !== false);
@@ -134,8 +134,8 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
     pageAll<ChapterRow>('chapters', (from, to, signal) =>
       admin.from('chapters').select('id,subject_id,board,grade,number').eq('review_status', 'published').order('id').range(from, to).abortSignal(signal),
     ),
-    pageAll<{ id: string; name: string; urdu_name: string | null }>('subjects', (from, to, signal) =>
-      admin.from('subjects').select('id,name,urdu_name').order('id').range(from, to).abortSignal(signal),
+    pageAll<{ id: string; name: string; urdu_name: string | null; compulsory: boolean }>('subjects', (from, to, signal) =>
+      admin.from('subjects').select('id,name,urdu_name,compulsory,sort_order').order('sort_order').range(from, to).abortSignal(signal),
     ),
   ]);
 
@@ -143,6 +143,8 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
   const studiedByUser = new Map<string, Set<string>>();
   for (const r of studied) studiedByUser.set(r.user_id, (studiedByUser.get(r.user_id) ?? new Set()).add(r.chapter_id));
   const subjectById = new Map(subjects.map((r) => [r.id, r]));
+  /** For a student who never finished setting up: the subjects every student takes. */
+  const compulsory = subjects.filter((r) => r.compulsory).map((r) => r.id);
 
   const stopAt = startedAt + BUDGET_MS;
   let sent = 0;
@@ -160,7 +162,8 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
       const onboarding = (profile.onboarding ?? {}) as Onboarding;
       const lang: Language = onboarding.medium === 'ur' ? 'ur' : 'en';
       const board = onboarding.board === 'punjab' ? 'punjab' : 'fbise';
-      const grade = onboarding.classLevel === 10 ? 10 : 9;
+      // The class on the profile when setup never saved one.
+      const grade = (onboarding.classLevel ?? profile.grade) === 10 ? 10 : 9;
       const s = seed(profile.id);
       // Counts up one a day, from a different starting point for each student.
       const turn = dayIndex + s;
@@ -170,7 +173,8 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
        * An empty list (onboarding never finished) still gets a general tip.
        */
       const ownChapters = chapters.filter((c) => c.board === board && c.grade === grade);
-      const list = (Array.isArray(onboarding.subjects) ? onboarding.subjects : []).filter((id) => ownChapters.some((c) => c.subject_id === id));
+      const chosen = Array.isArray(onboarding.subjects) && onboarding.subjects.length ? onboarding.subjects : compulsory;
+      const list = chosen.filter((id) => ownChapters.some((c) => c.subject_id === id));
       const subjectId = list.length ? list[Math.floor(turn / 2) % list.length] : null;
       const subjectRow = subjectId ? subjectById.get(subjectId) : undefined;
       const subjectLabel = subjectRow ? (lang === 'ur' && subjectRow.urdu_name) || subjectRow.name : '';
@@ -207,7 +211,10 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
       }
 
       // Otherwise, or when that chapter had no card short enough, an exam tip.
-      notice ??= examTip(subjectId, subjectLabel, Math.floor(turn / 2), paying.has(profile.id) ? 'study' : 'home');
+      // A tip every day for a student who gets no flashcards, every other day
+      // for one who does, so the count of tips they have had is not the same.
+      const tipTurn = paying.has(profile.id) && subjectId ? Math.floor(turn / 2) : turn;
+      notice ??= examTip(subjectId, subjectLabel, tipTurn, paying.has(profile.id) ? 'study' : 'home');
 
       if (dry) {
         preview.push({
