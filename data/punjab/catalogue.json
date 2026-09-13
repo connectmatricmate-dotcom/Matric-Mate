@@ -10800,7 +10800,7 @@
    "title": "Similar Figures",
    "urduTitle": "متشابہ اشکال",
    "blurb": "Similarity of Polygons, Area of Similar Figures, Volume of Similar Solids and Geometrical Properties of Polygon and their Applications.",
-   "urduBlurb": "کثیر الاضلاع کی مشابہت، مشابہ اشکال کے رقبے، مشابہ ٹھوس اجسام کے حجم، اور کثیر الاضلاع کے جیومیٹریائی خواص اور ان کا استعمال۔",
+   "urduBlurb": "کثیر الاضلاع کا تشابہ، متشابہ اشکال کے رقبے، متشابہ ٹھوس اجسام کے حجم، اور کثیر الاضلاع کے جیومیٹریائی خواص اور ان کا استعمال۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 163,
@@ -10948,9 +10948,9 @@
    "grade": 9,
    "number": 11,
    "title": "Loci and Construction",
-   "urduTitle": "لوسائی اور بناوٹ",
+   "urduTitle": "مقاماتِ ہندسی اور تعمیرات",
    "blurb": "Construction of Triangles, Perpendicular Bisectors and Medians of a Triangle, Angle Bisector of a Triangle, Altitudes of Triangle and more.",
-   "urduBlurb": "مثلثیں بنانا، اور مثلث کے عمودی منصف، وسطانیے، زاویہ منصف اور ارتفاع۔",
+   "urduBlurb": "مثلثیں بنانا، اور مثلث کے عمودی ناصف، وسطانیے، زاویوں کے ناصف اور ارتفاع۔",
    "source": {
     "file": "content/punjab/textbooks/math-9.pdf",
     "pdfStart": 202,
