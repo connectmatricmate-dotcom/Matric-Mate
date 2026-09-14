@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ChapterHub } from '@/components/screens/ChapterHub';
 import { getAudioTracks, getChapter, getChapterContent } from '@/lib/content-readers';
-import { hasActivePlan } from '@/lib/entitlement';
+import { subjectOpen } from '@matricmate/core';
+import { currentAccess } from '@/lib/entitlement';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -26,15 +27,16 @@ export default async function ChapterPage({ params }: Props) {
    * The plan comes with it (the layout has already asked, so it is cached):
    * under row level security an account without one sees every chapter with
    * no material at all, and the hub has to say "this needs a plan" before it
-   * decides there is nothing here.
+   * decides there is nothing here. A free trial counts as a plan only for
+   * its own subject, which is also all the database will serve it.
    */
-  const [chapter, content, tracks, paid] = await Promise.all([
+  const [chapter, content, tracks, access] = await Promise.all([
     getChapter(id),
     getChapterContent(id),
     getAudioTracks(id),
-    hasActivePlan(),
+    currentAccess(),
   ]);
   if (!chapter) notFound();
 
-  return <ChapterHub chapter={chapter} content={content} tracks={tracks} paid={paid} />;
+  return <ChapterHub chapter={chapter} content={content} tracks={tracks} paid={subjectOpen(access, chapter.subjectId)} />;
 }

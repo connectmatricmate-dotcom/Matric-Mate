@@ -202,13 +202,24 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
   if (!dueHour.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
 
   // With a plan, by the same rule as the paywall.
-  const plans = await forIds<{ user_id: string; active: boolean | null; valid_till: string | null }>(
+  const plans = await forIds<{ user_id: string; active: boolean | null; valid_till: string | null; plan: string | null; trial_subject: string | null }>(
     'entitlements',
     dueHour.map((p) => p.id),
     (slice, from, to, signal) =>
-      admin.from('entitlements').select('user_id,active,valid_till').in('user_id', slice).order('user_id').range(from, to).abortSignal(signal),
+      admin
+        .from('entitlements')
+        .select('user_id,active,valid_till,plan,trial_subject')
+        .in('user_id', slice)
+        .order('user_id')
+        .range(from, to)
+        .abortSignal(signal),
   );
   const paying = new Set(plans.filter(planIsActive).map((e) => e.user_id));
+  /* A free trial opens one subject, so that is the only one to name: a
+     reminder to pick up Chemistry is a tap on a locked door. */
+  const trialOf = new Map(
+    plans.filter((e) => planIsActive(e) && e.plan === 'trial' && e.trial_subject).map((e) => [e.user_id, e.trial_subject as string]),
+  );
   const due = dueHour.filter((p) => paying.has(p.id));
   if (!due.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
 
@@ -411,7 +422,8 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
       const list = Array.isArray(onboarding.subjects) && onboarding.subjects.length ? onboarding.subjects : compulsory;
       // Offset per student, so a whole class is not sent the same subject on the same night.
       const offset = [...profile.id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 0);
-      const subjectId = last?.subject_id ?? (list.length ? list[Math.abs(dayIndex + offset) % list.length] : undefined);
+      const subjectId =
+        trialOf.get(profile.id) ?? last?.subject_id ?? (list.length ? list[Math.abs(dayIndex + offset) % list.length] : undefined);
       const subjectRow = subjectId ? subjectById.get(subjectId) : undefined;
       const notice = pick({
         studiedToday: days.has(today),

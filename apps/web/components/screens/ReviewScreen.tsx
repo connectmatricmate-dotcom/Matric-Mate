@@ -6,7 +6,7 @@ import { isUrduScript } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
 import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
-import { useT } from '@/lib/store';
+import { useApp, useT } from '@/lib/store';
 import { leaveSession, session } from '@/lib/session';
 import { canGoBack } from '@/lib/nav-trail';
 import { NoSession } from './NoSession';
@@ -16,6 +16,7 @@ type Filter = 'all' | 'wrong' | 'flagged';
 
 export function ReviewScreen() {
   const t = useT();
+  const { derived } = useApp();
   const router = useRouter();
   const s = session.current;
   const [filter, setFilter] = useState<Filter>('wrong');
@@ -103,6 +104,7 @@ export function ReviewScreen() {
                     <Label className="text-teal">{t('session.why')}</Label>
                     <Markdown text={mcq.explanation} className="mt-0.5 text-[13.5px] leading-[1.6] text-ink" />
                     <div className="mt-3 flex flex-wrap gap-2">
+                      {derived.access.ai ? (
                       <LinkBtn
                         title={t('session.askAi')}
                         href={`/tutor/chat?q=${encodeURIComponent(
@@ -113,6 +115,7 @@ export function ReviewScreen() {
                         variant="line"
                         sm
                       />
+                      ) : null}
                       {/* Generated questions carry no chapter to read. */}
                       {mcq.chapterId ? (
                         <LinkBtn title={t('session.readInChapter')} href={`/learn/reader/${mcq.chapterId}`} variant="ghost" sm />

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { AI_QUOTA, BOARD_LABEL, PAPER_CONTENT, contentFor, pastPaperYears } from '@matricmate/core';
+import { BOARD_LABEL, BUSINESS, PAPER_CONTENT, SUPPORT_EMAIL, contentFor, pastPaperYears } from '@matricmate/core';
 import { AudioSample } from '@/components/landing/AudioSample';
 import { CursorGlow } from '@/components/landing/CursorGlow';
 import { HeroDemo } from '@/components/landing/HeroDemo';
@@ -10,6 +10,8 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { SubjectMarquee } from '@/components/landing/SubjectMarquee';
 import { Tilt } from '@/components/landing/Tilt';
 import { Card, Icon, LinkBtn, Pill, Ur, Wordmark } from '@/components/ui';
+import { onlinePayments } from '@/lib/gateway';
+import { BASIC_INCLUDED, BASIC_PLAN, PREMIUM_INCLUDED, THE_PLAN, rupees } from '@/lib/plans';
 import { canonicalUrl } from '@/lib/site';
 import type { Board, IconName } from '@matricmate/core';
 
@@ -101,7 +103,7 @@ const CONFIDENCE_TAGS: { label: string; tone: 'green' | 'orange' | 'red'; body: 
   { label: 'Guess', tone: 'red', body: 'Tukka. 5 XP even when it lands, because a lucky answer is not knowledge.' },
 ];
 
-const FAQ = [
+const faq = (online: boolean) => [
   {
     q: 'Which board and class does this cover?',
     a: 'FBISE and Punjab Board, Class 9 and Class 10, in English and Urdu medium. Punjab covers all nine BISE boards, which set their papers from the same Punjab textbooks.',
@@ -115,8 +117,19 @@ const FAQ = [
     a: 'Yes. Notes, questions and the audio lesson come in the medium you choose. A few subjects keep one language, the way the boards set them: Urdu is taught in Urdu and English in English, and Punjab Board Islamiyat is in Urdu, the only language its textbook comes in. Choosing Urdu also puts the app’s own buttons and menus in Urdu script, so one setting covers both.',
   },
   {
+    q: 'What is the difference between Basic and Premium?',
+    a: `The AI. Basic (${rupees(BASIC_PLAN.price)} a month) opens every chapter, note, audio lesson, practice question, test and past paper, and the monthly report card. Premium (${rupees(THE_PLAN.price)} a month) adds the AI tutor, marking of written answers, AI tests, mock papers, revision sheets, a weekly coach and career guidance.`,
+  },
+  {
+    q: 'Can we try it before paying?',
+    a: 'Yes. Make an account and pick one subject: it opens for three days, notes, audio, practice and a few AI tutor questions a day included. Nothing to pay and nothing to cancel. One free trial per account.',
+  },
+  {
     q: 'How do I pay from Pakistan?',
-    a: 'Mobile wallets, bank accounts or any debit and credit card, through a State Bank licensed payment gateway. To renew, you pay again from your account page.',
+    // Said the way it works today: no gateway is live yet (onlinePayments).
+    a: online
+      ? 'Mobile wallets, bank accounts or any debit and credit card, through a State Bank licensed payment gateway. To renew, you pay again from your account page.'
+      : `Email ${SUPPORT_EMAIL} or call ${BUSINESS.phone} with your account email and the plan you want. Our team tells you how to pay and switches the plan on for your account. To renew, you do the same again.`,
   },
   {
     q: 'Can I use it on both phone and computer?',
@@ -129,6 +142,7 @@ const FAQ = [
 ];
 
 export default function LandingPage() {
+  const online = onlinePayments();
   return (
     <>
       {/* Fills across the top as the page scrolls. Pure CSS where the browser
@@ -200,7 +214,7 @@ export default function LandingPage() {
                 </div>
 
                 <p className="fx-rise fx-d6 mt-4 text-mk-small text-white/70">
-                  Rs 1,000/month · nothing renews on its own · JazzCash, Easypaisa or card
+                  From {rupees(BASIC_PLAN.price)} a month · three days free with one subject · nothing renews on its own
                 </p>
               </div>
 
@@ -444,7 +458,7 @@ export default function LandingPage() {
                 or send you, so there is nothing for you to log in to.
               </p>
               <p className="mt-3 text-mk-lead text-ink2">
-                One price, no upsells inside the app, and nothing your child can buy on their own.
+                Two plans, no upsells inside the app, and nothing your child can buy on their own.
               </p>
             </div>
 
@@ -507,30 +521,24 @@ export default function LandingPage() {
         {/* --------------------------------------------------------- pricing */}
         <section id="pricing" className="mx-auto max-w-[1100px] scroll-mt-20 px-5 py-16 md:py-20">
           <Reveal className="text-center">
-            <h2 className="font-display text-mk-h2 text-ink">One plan. Everything in it.</h2>
+            <h2 className="font-display text-mk-h2 text-ink">Two plans. The whole syllabus in both.</h2>
             <p className="mx-auto mt-3 max-w-[560px] text-mk-lead text-ink2">
-              No tiers, no per-subject charges, no surprise upgrades. Less than one hour of tuition a month.
+              Basic opens every chapter and every practice question. Premium adds the AI tutor. Either costs less
+              than one hour of tuition a month.
             </p>
           </Reveal>
 
-          <Reveal className="mx-auto mt-10 max-w-[560px]">
+          <Reveal stagger className="mx-auto mt-10 grid max-w-[900px] gap-5 md:grid-cols-2">
             <Tilt max={4}>
               <Card className="relative flex h-full flex-col border-2 border-orange shadow-[0_18px_50px_color-mix(in_srgb,var(--color-orange)_16%,transparent)]">
-                <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium</p>
+                <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-orangedark">Premium · with the AI tutor</p>
                 <p className="mt-1 font-display text-[52px] leading-none text-ink">
-                  Rs 1,000
+                  {rupees(THE_PLAN.price)}
                   <span className="ms-1 text-[16px] font-normal text-ink2">/ month</span>
                 </p>
                 <p className="text-mk-small text-ink2">One payment · nothing renews on its own</p>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5">
-                  {[
-                    'Every chapter, note and audio lesson',
-                    'Unlimited MCQs, tests and past papers',
-                    `AI tutor: ${AI_QUOTA.premium} questions a day`,
-                    'Weak topics and monthly report card',
-                    'Offline downloads in the Android app, coming to Play',
-                    'Website now, Android app next, one account',
-                  ].map((li) => (
+                  {PREMIUM_INCLUDED.map((li) => (
                     <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink">
                       <Icon name="check" size={17} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
                       {li}
@@ -538,19 +546,39 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <span className="pulse-glow isolate mt-6 flex rounded-[16px] bg-orange">
-                  <LinkBtn title="Subscribe now" href="/checkout" variant="orange" className="w-full" />
+                  <LinkBtn title="Get Premium" href={`/checkout?plan=${THE_PLAN.id}`} variant="orange" className="w-full" />
                 </span>
-                <p className="mt-3 text-center text-[13px] text-ink2">JazzCash · Easypaisa · Debit or credit card</p>
-                <Link href="/pricing" className="mt-1 flex min-h-11 items-center justify-center text-[13.5px] font-extrabold text-teal hover:underline">
-                  What the plan includes
-                </Link>
               </Card>
             </Tilt>
+            <Tilt max={4}>
+              <Card className="relative flex h-full flex-col border-2 border-tealtint2">
+                <p className="text-mk-label font-extrabold uppercase tracking-[0.08em] text-teal">Basic · without AI</p>
+                <p className="mt-1 font-display text-[52px] leading-none text-ink">
+                  {rupees(BASIC_PLAN.price)}
+                  <span className="ms-1 text-[16px] font-normal text-ink2">/ month</span>
+                </p>
+                <p className="text-mk-small text-ink2">One payment · nothing renews on its own</p>
+                <ul className="mt-5 flex flex-1 flex-col gap-2.5">
+                  {BASIC_INCLUDED.map((li) => (
+                    <li key={li} className="flex items-start gap-2.5 text-mk-body text-ink">
+                      <Icon name="check" size={17} className="mt-0.5 shrink-0 text-green" strokeWidth={2.6} />
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+                <LinkBtn title="Get Basic" href={`/checkout?plan=${BASIC_PLAN.id}`} variant="line" className="mt-6 w-full" />
+              </Card>
+            </Tilt>
+          </Reveal>
 
-            <p className="mt-6 text-center text-mk-small text-ink2">
-              Make your account, pick your board, class and subjects, then pay once. The plan opens every chapter,
-              test and the tutor together, and there is nothing else to buy.
+          <Reveal className="mx-auto mt-6 max-w-[560px] text-center">
+            <p className="text-mk-small text-ink2">
+              Not sure yet? Make your account and try one subject free for three days, with a few AI tutor questions a
+              day. No payment and nothing to cancel.
             </p>
+            <Link href="/pricing" className="mt-1 inline-flex min-h-11 items-center justify-center text-[13.5px] font-extrabold text-teal hover:underline">
+              Compare the plans
+            </Link>
           </Reveal>
         </section>
 
@@ -561,7 +589,7 @@ export default function LandingPage() {
               <h2 className="font-display text-mk-h2 text-ink">Questions parents and students ask</h2>
             </Reveal>
             <Reveal stagger className="mt-9 flex flex-col gap-3">
-              {FAQ.map((f) => (
+              {faq(online).map((f) => (
                 // The padding lives on the summary, so the whole row is the tap
                 // target rather than the words in the middle of it.
                 <details key={f.q} className="group rounded-[16px] border border-line bg-card">
@@ -590,8 +618,8 @@ export default function LandingPage() {
                 The exam is a date. Start before it’s a deadline.
               </h2>
               <p className="relative mx-auto mt-4 max-w-[520px] text-mk-lead text-white/85">
-                Rs 1,000 a month, and nothing renews on its own. Set up in two minutes and study your first chapter
-                tonight.
+                Three days free with one subject, then from {rupees(BASIC_PLAN.price)} a month, and nothing renews on
+                its own. Set up in two minutes and study your first chapter tonight.
               </p>
               <div className="relative mt-8 flex flex-wrap justify-center gap-3">
                 <span className="pulse-glow isolate inline-flex rounded-[16px] bg-orange">

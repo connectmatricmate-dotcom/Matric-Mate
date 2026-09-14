@@ -25,6 +25,7 @@ import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, S } from '../../src/theme';
+import { AiLocked } from '../../src/components/AiLocked';
 
 const KINDS: { value: AiSessionKind; label: StringKey }[] = [
   { value: 'mcq', label: 'tutor.kindMcq' },
@@ -38,7 +39,17 @@ const KINDS: { value: AiSessionKind; label: StringKey }[] = [
  * the tutor writes a fresh set from that chapter's own text, saved to the
  * student's account so it opens on the website too.
  */
-export default function AiBuilder() {
+/**
+ * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
+ * the screen's own hooks run, so it never starts a request it cannot make.
+ */
+export default function AiBuilderGate() {
+  const { derived } = useApp();
+  if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.builderTitle" />;
+  return <AiBuilder />;
+}
+
+function AiBuilder() {
   const { state, derived, contentKey, contentLoading } = useApp();
   const t = useT();
   const { lang } = useLang();

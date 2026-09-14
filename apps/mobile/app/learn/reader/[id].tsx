@@ -26,7 +26,7 @@ import {
   Ur,
   useToast,
 } from '../../../src/components/ui';
-import { api, Block, chapterName, isUrduScript, parseTutorActions, subjectMedium, weakTopics } from '@matricmate/core';
+import { api, Block, chapterName, isUrduScript, parseTutorActions, subjectMedium, subjectOpen, weakTopics } from '@matricmate/core';
 import { aiFailureKey } from '../../../src/components/aiFailure';
 import { LockedNotice } from '../../../src/components/LockedNotice';
 import { useAsync } from '../../../src/core/useAsync';
@@ -359,9 +359,11 @@ export default function Reader() {
              */
             !online ? (
               <ErrorState title={t('offline.title')} sub={t('offline.sub')} retry={t('common.retry')} onRetry={reload} />
-            ) : !state.premium.active ? (
+            ) : !state.premium.active || (derived.access.tier === 'trial' && !subjectOpen(derived.access, id.split('-')[0])) ? (
               // Without a plan the database answers with nothing, which is
-              // not the same as a chapter with no notes.
+              // not the same as a chapter with no notes. Nor on a free trial,
+              // for any subject but its own (a chapter id starts with its
+              // subject's); the notice says which one it opens.
               <LockedNotice variant="locked" />
             ) : chapter && chapter.sectionCount > 0 ? (
               <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
@@ -425,8 +427,9 @@ export default function Reader() {
           ) : null}
         </ScrollView>
 
-        {/* The tutor is the one thing on this screen that cannot work from disk. */}
-        {online ? (
+        {/* The tutor is the one thing on this screen that cannot work from
+            disk, and it is not in Basic, nor for a subject outside a trial. */}
+        {online && derived.access.ai && subjectOpen(derived.access, id.split('-')[0]) ? (
           // The far edge from where the text starts, which swaps in Urdu.
           <View style={{ position: 'absolute', ...(isRTL() ? { left: S.lg } : { right: S.lg }), bottom: 92 + insets.bottom }}>
             <Btn title={t('reader.askAi')} icon="spark" sm onPress={() => setAskOpen(true)} style={{ borderRadius: 99 }} />

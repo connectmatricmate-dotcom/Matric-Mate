@@ -21,7 +21,7 @@ import {
   Ur,
 } from '../../../src/components/ui';
 import { LockedNotice } from '../../../src/components/LockedNotice';
-import { api, chapterBlurb, chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectById, subjectName, subjectPct } from '@matricmate/core';
+import { api, chapterBlurb, chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectById, subjectName, subjectOpen, subjectPct } from '@matricmate/core';
 import type { Chapter } from '@matricmate/core';
 import { useAsync } from '../../../src/core/useAsync';
 import { useLang, useT } from '../../../src/i18n';
@@ -30,7 +30,7 @@ import { C, F, S, isRTL } from '../../../src/theme';
 
 export default function Chapters() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { state, contentKey, contentLoading } = useApp();
+  const { state, derived, contentKey, contentLoading } = useApp();
   const t = useT();
   const { lang } = useLang();
   // contentKey: a language, class or board switch reaches an open list.
@@ -49,17 +49,24 @@ export default function Chapters() {
    * counts on everything under row level security, which is a locked chapter,
    * not an empty one.
    */
-  const emptyRow = (c: Chapter) => c.board !== undefined && state.premium.active && !hasStudyMaterial(c);
+  /* A free trial opens one subject. Any other is listed, so the student can
+     see what a plan adds, but nothing in it opens and there is no test to take:
+     the database would hand either nothing at all. Its counts read zero for
+     the same reason, which is a lock, not an empty chapter. */
+  const shut = derived.access.tier === 'trial' && !subjectOpen(derived.access, id);
+  const emptyRow = (c: Chapter) => !shut && c.board !== undefined && state.premium.active && !hasStudyMaterial(c);
 
   return (
     <Screen
       footer={
-        <Btn
-          title={t('study.subjectTest')}
-          variant="orange"
-          icon="clock"
-          onPress={() => router.push(`/session/exam-intro?subject=${id}`)}
-        />
+        shut ? undefined : (
+          <Btn
+            title={t('study.subjectTest')}
+            variant="orange"
+            icon="clock"
+            onPress={() => router.push(`/session/exam-intro?subject=${id}`)}
+          />
+        )
       }
     >
       <Header
@@ -72,6 +79,13 @@ export default function Chapters() {
         }
         back
       />
+
+      {shut ? (
+        <>
+          <LockedNotice />
+          <Spacer h={S.md} />
+        </>
+      ) : null}
 
       {(loading || contentLoading) && !chapters?.length ? (
         <View style={{ gap: S.sm }}>
@@ -98,7 +112,7 @@ export default function Chapters() {
             // No figure for a row whose counts are not known: divided by
             // nothing, one read section came out as most of a chapter.
             const p = empty || (c.board === undefined && !hasStudyMaterial(c)) ? 0 : chapterPct(c.id, state.readSections, state.attempts);
-            const locked = c.premium && !state.premium.active;
+            const locked = shut || (c.premium && !state.premium.active);
             const current = c.id === state.lastChapterId;
             const done = p >= 100;
             return (
@@ -138,7 +152,7 @@ export default function Chapters() {
                       <Pill tone="grey" style={{ marginTop: 4, alignSelf: isRTL() ? 'flex-end' : 'flex-start' }}>
                         {t('study.notOnPaper')}
                       </Pill>
-                    ) : c.board === undefined && !hasStudyMaterial(c) ? null : (
+                    ) : shut || (c.board === undefined && !hasStudyMaterial(c)) ? null : (
                       // Two lines, not one: on a 390dp phone one line cut the
                       // sections count off every row ("5 sec...").
                       <Small numberOfLines={2}>
@@ -167,7 +181,9 @@ export default function Chapters() {
                       </View>
                     ) : null}
                   </View>
-                  {empty ? null : locked ? (
+                  {empty ? null : locked && shut ? (
+                    <Icon name="lock" size={17} color={C.ink3} />
+                  ) : locked ? (
                     <Pill tone="grey" icon="lock" style={{ maxWidth: '40%' }}>
                       {t('study.premiumChapter')}
                     </Pill>
@@ -201,7 +217,7 @@ export default function Chapters() {
       <Spacer h={S.md} />
       <Small>{t('study.premiumNote')}</Small>
 
-      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={t('billing.premium')}>
+      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={shut ? t('trial.lockedTitle') : t('billing.premium')}>
         <LockedNotice variant="locked" />
         <Spacer h={S.md} />
         <Btn title={t('common.close')} variant="line" onPress={() => setShowLocked(false)} />

@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { Icon } from '@/components/ui/primitives';
 import { CheckoutForm } from '@/components/commerce/CheckoutForm';
 import { THE_PLAN, planById } from '@/lib/plans';
-import { gateway } from '@/lib/gateway';
+import { gateway, onlinePayments } from '@/lib/gateway';
 import { getUser } from '@/lib/supabase/server';
 import { keepStaffOut } from '@/lib/roles';
 
 export const metadata: Metadata = {
   title: 'Checkout',
-  description: 'Start your MatricMate Premium plan. Pay by JazzCash, Easypaisa or card.',
+  description: 'Start a MatricMate plan: Premium with the AI tutor, or Basic without it.',
   robots: { index: false },
 };
 
@@ -34,10 +34,14 @@ export default async function CheckoutPage({
           <Link href="/" aria-label="MatricMate home">
             <Image src="/brand/wordmark.png" alt="MatricMate" width={136} height={27} priority />
           </Link>
-          <span className="ms-auto inline-flex items-center gap-1.5 text-[12.5px] font-extrabold text-ink2">
-            <Icon name="lock" size={14} strokeWidth={2.4} className="text-green" />
-            Secure checkout
-          </span>
+          {/* Only when there is a payment to secure: while plans are switched
+              on by hand, this page takes no money. */}
+          {onlinePayments() ? (
+            <span className="ms-auto inline-flex items-center gap-1.5 text-[12.5px] font-extrabold text-ink2">
+              <Icon name="lock" size={14} strokeWidth={2.4} className="text-green" />
+              Secure checkout
+            </span>
+          ) : null}
         </div>
       </header>
 
@@ -45,6 +49,7 @@ export default async function CheckoutPage({
         plan={planById(plan ?? THE_PLAN.id)}
         live={gateway.isLive}
         configured={gateway.isConfigured}
+        online={onlinePayments()}
         cancelled={cancelled === '1'}
         accountEmail={user?.email ?? null}
       />

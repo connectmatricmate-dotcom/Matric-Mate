@@ -1,9 +1,10 @@
 import 'server-only';
-import { formatDate } from '@matricmate/core';
+import { formatDate, tierOf } from '@matricmate/core';
 import { loadRecipient, notify, paymentReceived } from '@/lib/notify';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { gateway } from '@/lib/gateway';
-import { planById } from '@/lib/plans';
+import { gateway, onlinePayments } from '@/lib/gateway';
+import { BASIC_PLAN, THE_PLAN, planById, type Plan } from '@/lib/plans';
+import { planIsActive } from '@/lib/entitlement';
 
 /**
  * Money, written server-side only.
@@ -42,6 +43,25 @@ export async function recordPendingPayment(input: {
   // A failure here must not block the payment: the student can still pay, and
   // the webhook will tell us about it. Loud in the log, silent to the student.
   if (error) console.error('payments: could not record pending row', error.message);
+}
+
+/**
+ * What is left of the running plan, in milliseconds of the plan being bought.
+ *
+ * Renewing early adds to the plan rather than restarting it, which is what the
+ * old rule did and still does for the same plan. With two prices a change of
+ * plan carries its remainder over at its value: ten unused days of Basic
+ * (Rs 500) become five of Premium (Rs 1,000), and the other way round they
+ * double. A trial's days are free and are not carried. Anything else, a plan
+ * that has run out or no plan, starts from today.
+ */
+function carriedOver(current: { valid_till?: string | null; active?: boolean | null; plan?: string | null } | null, next: Plan): number {
+  if (!planIsActive(current)) return 0;
+  const remaining = Date.parse(current!.valid_till!) - Date.now();
+  const now = tierOf(current!.plan);
+  if (now === 'trial') return 0;
+  const perMonth = (tier: string) => (tier === 'basic' ? BASIC_PLAN.perMonth : THE_PLAN.perMonth);
+  return remaining * (perMonth(now) / perMonth(tierOf(next.id)));
 }
 
 /**
@@ -92,20 +112,18 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
 
   const plan = planById(payment.plan ?? 'monthly');
 
-  // Extend from whichever is later: an existing expiry, or now. Renewing early
-  // should add to the plan, not restart it and quietly lose the paid remainder.
   const { data: current } = await admin
     .from('entitlements')
-    .select('valid_till, active')
+    .select('valid_till, active, plan')
     .eq('user_id', payment.user_id)
     .maybeSingle();
 
-  const existing = current?.active && current.valid_till ? new Date(current.valid_till).getTime() : 0;
-  const from = Math.max(existing, Date.now());
-  const validTill = new Date(from + plan.months * 30 * 864e5).toISOString();
+  const validTill = new Date(Date.now() + carriedOver(current, plan) + plan.months * 30 * 864e5).toISOString();
 
   await admin.from('entitlements').upsert(
-    { user_id: payment.user_id, active: true, plan: plan.id, valid_till: validTill, source: 'safepay' },
+    // trial_subject cleared: a paid plan opens every subject, and a stale
+    // value would read as a trial's limit to anything that forgot the plan.
+    { user_id: payment.user_id, active: true, plan: plan.id, valid_till: validTill, trial_subject: null, source: 'safepay' },
     { onConflict: 'user_id' }
   );
 
@@ -212,6 +230,10 @@ export async function confirmWithGateway(input: { tracker: string; userId: strin
     console.warn('payments: confirm attempted by the wrong account', input.tracker);
     return { settled: false as const, reason: 'not yours' };
   }
+
+  // A test gateway's "paid" is not money: on the production site it grants
+  // nothing. See onlinePayments in lib/gateway.
+  if (!onlinePayments()) return { settled: false as const, reason: 'online payments are off' };
 
   const status = await gateway.getPaymentStatus(input.tracker);
   if (status.kind !== 'paid') return { settled: false as const, reason: status.kind };

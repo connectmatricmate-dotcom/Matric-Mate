@@ -342,8 +342,9 @@ export function Reader({
         ) : null}
       </article>
 
-      {/* ask AI: in flow at the end of the reading, never floating over it */}
-      {section ? (
+      {/* ask AI: in flow at the end of the reading, never floating over it.
+          Not on Basic, which has no AI. */}
+      {section && derived.access.ai ? (
         <div className="mt-5 flex justify-end">
           <Btn title={t('reader.askAi')} icon="spark" sm variant="line" onClick={() => setAskOpen(true)} />
         </div>

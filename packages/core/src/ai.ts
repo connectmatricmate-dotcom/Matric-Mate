@@ -269,6 +269,51 @@ export async function fetchCheatSheet(input: {
   return res.ok ? { ok: true, ...res.data } : res;
 }
 
+/* ------------------------------------------------------ career guidance */
+
+/** One subject's practice record, the numbers the guidance is read from. */
+export type CareerSubjectStat = { subject: string; answered: number; correct: number; accuracy: number };
+
+/** What the AI reads in those numbers (see /api/ai/career). */
+export type CareerReport = {
+  summary: string;
+  strengths: { subject: string; why: string }[];
+  /** Class 11 groups: FSc Pre-Medical, Pre-Engineering, ICS, I.Com, FA. */
+  streams: { name: string; why: string }[];
+  fields: { name: string; why: string }[];
+  nextSteps: string[];
+};
+
+/**
+ * The career screen's whole state, from one read.
+ *
+ * `enough` says whether two subjects have `need` answers each: guidance from
+ * three questions would be a guess dressed up as advice, so below that the
+ * screen asks for more practice and never spends a question. `nextAt` is when
+ * a fresh reading may be asked for; a report is kept for a week, and reading
+ * the same results again sooner would only say the same thing.
+ */
+export type CareerState = {
+  report: CareerReport | null;
+  createdAt: string | null;
+  stats: CareerSubjectStat[];
+  answered: number;
+  need: number;
+  enough: boolean;
+  nextAt: string | null;
+  quota?: TutorQuota;
+};
+
+/** The saved guidance and the results behind it. Free: it never calls the model. */
+export async function fetchCareer(): Promise<{ ok: true; data: CareerState } | AiFail> {
+  return aiGet<CareerState>('/api/ai/career');
+}
+
+/** Write the guidance (or return this week's, when there is one). Costs one question. */
+export async function buildCareer(language: 'en' | 'ur'): Promise<{ ok: true; data: CareerState } | AiFail> {
+  return aiPost<CareerState>('/api/ai/career', { language });
+}
+
 /**
  * A one-time link that opens the website already signed in, on the upgrade
  * page. The Android app can only be consumed from, not bought in, so this

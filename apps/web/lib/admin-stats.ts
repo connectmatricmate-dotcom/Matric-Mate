@@ -73,7 +73,8 @@ export async function adminStats(): Promise<AdminStats> {
   const [students, paidStudents, teachers, referred, today] = (
     await Promise.all([
       admin.from('profiles').select('*', HEAD).eq('role', 'student'),
-      admin.from('entitlements').select('*', HEAD).eq('active', true).gt('valid_till', nowIso),
+      // A running plan that was paid for: the free trial is not a paying student.
+      admin.from('entitlements').select('*', HEAD).eq('active', true).gt('valid_till', nowIso).or('plan.is.null,plan.neq.trial'),
       admin.from('affiliates').select('*', HEAD),
       admin.from('profiles').select('*', HEAD).not('referred_by', 'is', null),
       admin.from('active_days').select('*', HEAD).eq('day', dayKey()),

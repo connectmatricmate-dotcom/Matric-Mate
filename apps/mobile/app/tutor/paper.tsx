@@ -12,6 +12,7 @@ import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S, isRTL, isWeb, textStart } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
+import { AiLocked } from '../../src/components/AiLocked';
 
 /**
  * The board mock paper. Without an id: pick a subject and have one set.
@@ -19,7 +20,17 @@ import { Markdown } from '../../src/components/Markdown';
  * exam, Sections B and C are written right here and marked by the AI
  * examiner against each question's marking points.
  */
-export default function MockPaper() {
+/**
+ * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
+ * the screen's own hooks run, so it never starts a request it cannot make.
+ */
+export default function MockPaperGate() {
+  const { derived } = useApp();
+  if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.paperTitle" />;
+  return <MockPaper />;
+}
+
+function MockPaper() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { state, derived } = useApp();
   const t = useT();

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { gateway } from '@/lib/gateway';
+import { tierOf } from '@matricmate/core';
+import { planIsActive } from '@/lib/entitlement';
+import { gateway, onlinePayments } from '@/lib/gateway';
 import { recordPendingPayment } from '@/lib/payments';
 import { PLANS, THE_PLAN, planById } from '@/lib/plans';
 import { SITE_URL } from '@/lib/site';
@@ -31,8 +33,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Log in to start a plan.' }, { status: 401 });
   }
 
-  if (!gateway.isConfigured) {
-    return NextResponse.json({ error: 'Payments are not configured on this deployment.' }, { status: 503 });
+  // No online payment here (see onlinePayments): the page shows how to get
+  // the plan from the team, and a request that skipped the page gets the same
+  // answer as a code the buttons know.
+  if (!onlinePayments()) {
+    return NextResponse.json({ error: 'manual_activation' }, { status: 503 });
   }
 
   const parsed = Body.safeParse(await request.json().catch(() => ({})));
@@ -61,6 +66,19 @@ export async function POST(request: Request) {
    */
   if (profile?.role && profile.role !== 'student') {
     return NextResponse.json({ error: 'not_a_student' }, { status: 403 });
+  }
+
+  /*
+   * No stepping down to Basic while Premium is running: the payment would take
+   * the AI away today. The switch belongs at the end of the Premium month, and
+   * the page says so before anyone gets here; this is the same rule for a
+   * request that skipped the page.
+   */
+  if (!plan.ai) {
+    const { data: ent } = await admin.from('entitlements').select('active,valid_till,plan').eq('user_id', user.id).maybeSingle();
+    if (planIsActive(ent) && tierOf(ent?.plan) === 'premium') {
+      return NextResponse.json({ error: 'premium_running', validTill: ent?.valid_till ?? null }, { status: 409 });
+    }
   }
 
   // Unique per attempt, so a retry after a failure is its own order rather than

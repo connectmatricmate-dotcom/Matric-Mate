@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { gateway } from '@/lib/gateway';
+import { gateway, onlinePayments } from '@/lib/gateway';
 import { markPaidAndGrant, markPaymentStatus } from '@/lib/payments';
 
 /**
@@ -50,6 +50,11 @@ export async function POST(request: Request) {
   try {
     switch (event.kind) {
       case 'paid':
+        // A sandbox's "paid" on the production site is a test card, not money.
+        if (!onlinePayments()) {
+          console.warn('webhook: paid event ignored, online payments are off here', event.reference);
+          break;
+        }
         await markPaidAndGrant({ tracker: event.reference, reference: event.receipt, raw: payload });
         break;
 

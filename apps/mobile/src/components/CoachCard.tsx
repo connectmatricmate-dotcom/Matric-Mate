@@ -43,7 +43,12 @@ export function CoachCard() {
      on its first render, so a student who opened the app on that notice saw
      yesterday's card, or the welcome, until they restarted it. */
   const reportNotice = state.notifications.find((n) => n.kind === 'report')?.id ?? '';
-  const { data, loading } = useAsync(() => fetchLatestCoachReport(), [state.user?.id ?? '', grade, board, lang, reportNotice]);
+  // Basic has no AI coach: the server writes no report for it and refuses the read.
+  const ai = derived.access.ai;
+  const { data, loading } = useAsync(
+    () => (ai ? fetchLatestCoachReport() : Promise.resolve(null)),
+    [state.user?.id ?? '', grade, board, lang, reportNotice, ai],
+  );
 
   /* The one thing to do next, chosen in core so the browser picks the same
      thing for the same student. Null when there is genuinely nothing: a
@@ -64,6 +69,17 @@ export function CoachCard() {
     lang,
   );
   const cta = step ? <Btn title={step.label} variant="orange" onPress={() => router.push(step.href as never)} /> : null;
+
+  /* Without the coach, the one thing it always ends on: what to do next. */
+  if (!ai) {
+    if (!cta) return null;
+    return (
+      <Card flat tint={C.tealTint} border={C.teal} style={{ gap: 8 }}>
+        <Label style={{ color: C.teal }}>{t('study.upNext')}</Label>
+        {cta}
+      </Card>
+    );
+  }
 
   /**
    * A skeleton while the report is in flight, not the welcome card.

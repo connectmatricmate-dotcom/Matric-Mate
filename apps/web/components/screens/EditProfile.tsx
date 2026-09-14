@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ErrorBanner, Field } from '@/components/ui/controls';
 import { Card, Item, SectionTitle } from '@/components/ui/primitives';
@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { AVATARS, boardName } from '@matricmate/core';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { useApp, useLang, useT } from '@/lib/store';
-import { validateName } from '@/lib/validation';
+import { normaliseSchool, validateName, validateSchool } from '@/lib/validation';
 import { goBackTo } from '@/lib/nav-trail';
 
 
@@ -30,6 +30,27 @@ export function EditProfile() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setup = state.onboarding;
+  /* The school, optional (migration 0042). Not in the store, which has no use
+     for it anywhere else, so read from the profile row when the page opens;
+     never over what the student has started typing. */
+  const [school, setSchool] = useState('');
+  const [schoolEdited, setSchoolEdited] = useState(false);
+  const userId = state.user?.id ?? '';
+  useEffect(() => {
+    if (!userId) return;
+    let alive = true;
+    void createClient()
+      .from('profiles')
+      .select('school')
+      .eq('id', userId)
+      .maybeSingle()
+      .then(({ data }: { data: { school: string | null } | null }) => {
+        if (alive && data?.school) setSchool((now) => (now ? now : (data.school ?? '')));
+      });
+    return () => {
+      alive = false;
+    };
+  }, [userId]);
 
   // The store hydrates and auth resolves after the first render, so the
   // initial useState often runs before the user exists. Backfilled during
@@ -40,16 +61,21 @@ export function EditProfile() {
 
   // In the student's language: the rule's message is shown under the field.
   const nameError = validateName(name, lang);
+  const schoolError = validateSchool(school, lang);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    if (nameError || !state.user || busy) return;
+    if (nameError || schoolError || !state.user || busy) return;
     setBusy(true);
     // Written to the profile row, not just to local state: that row is what
-    // the Android app shows and what checkout puts on a receipt.
+    // the Android app shows and what checkout puts on a receipt. The school
+    // only when it was touched, so a slow first read cannot blank it.
     const supabase = createClient();
-    const { error: saveError } = await supabase.from('profiles').update({ name: name.trim() }).eq('id', state.user.id);
+    const { error: saveError } = await supabase
+      .from('profiles')
+      .update({ name: name.trim(), ...(schoolEdited ? { school: normaliseSchool(school) || null } : {}) })
+      .eq('id', state.user.id);
     if (saveError) {
       setBusy(false);
       setError(t('states.errorBody'));
@@ -110,6 +136,19 @@ export function EditProfile() {
           required
           error={touched ? (nameError ?? undefined) : undefined}
         />
+        <Field
+          label={t('auth.school')}
+          name="school"
+          value={school}
+          onChange={(v) => {
+            setSchoolEdited(true);
+            setSchool(v);
+          }}
+          placeholder={t('auth.schoolPlaceholder')}
+          icon="gradCap"
+          autoComplete="organization"
+          error={touched || schoolEdited ? (schoolError ?? undefined) : undefined}
+        />
 
 
         <SectionTitle>{t('account.studySetup')}</SectionTitle>
@@ -140,7 +179,7 @@ export function EditProfile() {
         <p className="mt-4 text-[13px] text-ink2">{t('account.editFootnote')}</p>
 
         <div className="mt-6">
-          <Btn title={t('common.save')} type="submit" disabled={!!nameError} className="w-full md:w-auto" loading={busy} />
+          <Btn title={t('common.save')} type="submit" disabled={!!nameError || !!schoolError} className="w-full md:w-auto" loading={busy} />
         </div>
       </form>
     </Page>

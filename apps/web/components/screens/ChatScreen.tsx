@@ -71,7 +71,8 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
     if (lastChapter) out.push(t('tutor.starterChapter', { chapter: lastChapter }));
     const subject = subjectName(subjectById(derived.subjects[0] ?? ''), lang);
     if (subject) out.push(t('tutor.starterExam', { subject }));
-    if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
+    if (derived.subjects.length === 1 && subject) out.push(t('tutor.starterPlanOne', { subject }));
+    else if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
     out.push(t('tutor.starterMarks'));
     return out.slice(0, 4);
   }, [state.attempts, state.lastChapterId, derived.subjects, lang, t]);

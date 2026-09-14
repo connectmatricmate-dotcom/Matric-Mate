@@ -7,7 +7,8 @@ import { SetupGate, type SetupStep } from '@/components/app/SetupGate';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import { Shell } from '@/components/app/Shell';
 import { PushLive } from '@/components/app/PushLive';
-import { hasActivePlan, isOpenWithoutPlan } from '@/lib/entitlement';
+import { StudyClock } from '@/components/app/StudyClock';
+import { currentAccess, isOpenWithoutPlan } from '@/lib/entitlement';
 import { keepStaffOut } from '@/lib/roles';
 import { createClient, getUser } from '@/lib/supabase/server';
 import { AppProvider } from '@/lib/store';
@@ -63,7 +64,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
    */
   await keepStaffOut();
 
-  const [paid, unfinished] = await Promise.all([hasActivePlan(), unfinishedStep()]);
+  const [access, unfinished] = await Promise.all([currentAccess(), unfinishedStep()]);
+  const paid = access.active;
 
   if (!paid && !isOpenWithoutPlan(pathname)) redirect('/upgrade');
 
@@ -76,20 +78,28 @@ export default async function AppLayout({ children }: { children: React.ReactNod
    * response headers are gone and a redirect from the page below can only be
    * finished by the client, so a paying student would watch an empty shell
    * before it bounced.
+   *
+   * Premium only, since there are two plans and a trial: on Basic the plans
+   * page is where Premium is, and on a trial it is where either plan is.
    */
-  if (paid && pathname === '/upgrade') redirect('/dashboard');
+  if (access.tier === 'premium' && pathname === '/upgrade') redirect('/dashboard');
 
   /*
-   * `paid` goes down to the store as its starting plan. The layout has just
+   * The plan goes down to the store as its starting plan. The layout has just
    * read it, and without it every paying student opened the app on the free
    * state (every chapter locked, "no plan", a red 0/0) until the browser had
-   * asked the same question again.
+   * asked the same question again. The tier and a trial's subject come too, so
+   * a Basic student never sees the AI tutor for that moment either.
    */
   return (
     <Localized lang={lang}>
-      <AppProvider initialLanguage={lang} initialPremium={paid}>
+      <AppProvider
+        initialLanguage={lang}
+        initialPlan={paid ? { active: true, plan: access.tier ?? undefined, trialSubject: access.trialSubject } : null}
+      >
         <LanguageRefresh />
         <PushLive />
+        <StudyClock />
         <SetupGate step={unfinished} />
         <Shell>{children}</Shell>
       </AppProvider>

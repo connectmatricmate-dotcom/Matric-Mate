@@ -7,7 +7,7 @@ import { useTouched } from '@/components/auth/useTouched';
 import { ErrorBanner, Field, SubmitButton } from '@/components/ui/controls';
 import { Card } from '@/components/ui/primitives';
 import { useLang, useT } from '@/lib/store';
-import { isFormValid, validateEmail, validateMobile, validateName, validatePassword } from '@/lib/validation';
+import { isFormValid, validateEmail, validateMobile, validateName, validatePassword, validateSchool } from '@/lib/validation';
 
 export function SignUpForm({ next, referral }: { next?: string; referral?: string }) {
   const t = useT();
@@ -19,13 +19,15 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
+  const [school, setSchool] = useState('');
   const { touched, onBlur } = useTouched();
 
   const nameError = validateName(name, lang);
   const emailError = validateEmail(email, lang);
   const passwordError = validatePassword(password, lang);
   const mobileError = validateMobile(mobile, lang);
-  const canSubmit = isFormValid(nameError, emailError, passwordError, mobileError);
+  const schoolError = validateSchool(school, lang);
+  const canSubmit = isFormValid(nameError, emailError, passwordError, mobileError, schoolError);
 
   // The agreement line links its "Terms and Privacy Policy". The translated
   // sentence is split on its placeholder so the link sits wherever each
@@ -131,6 +133,19 @@ export function SignUpForm({ next, referral }: { next?: string; referral?: strin
           autoComplete="tel"
           required
           error={touched.mobile ? (mobileError ?? undefined) : undefined}
+        />
+        {/* Optional, and said so in the label. The client counts students by
+            school and plans school batches from it; nobody should be kept
+            from studying for not wanting to say. */}
+        <Field
+          label={t('auth.school')}
+          name="school"
+          value={school}
+          onChange={setSchool}
+          placeholder={t('auth.schoolPlaceholder')}
+          icon="gradCap"
+          autoComplete="organization"
+          error={touched.school ? (schoolError ?? undefined) : undefined}
         />
         <Field
           label={t('auth.password')}

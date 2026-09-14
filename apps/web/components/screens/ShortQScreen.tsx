@@ -26,7 +26,7 @@ const isVerdict = (v: unknown): v is AiCheckVerdict =>
   !!v && typeof (v as AiCheckVerdict).score === 'number' && Array.isArray((v as AiCheckVerdict).missed);
 
 export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Chapter; items: ShortQ[]; canChangeChapter?: boolean }) {
-  const { state, actions } = useApp();
+  const { state, actions, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   /* The name a student reads, which is not the name an attempt is filed
@@ -183,17 +183,29 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
               className="w-full resize-y bg-transparent p-4 text-[16px] leading-[1.6] text-ink outline-none placeholder:text-ink3 md:text-[14px] rtl:leading-[1.9]"
             />
           </div>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <Btn
-              title={checking ? t('tutor.checkBusy') : t('tutor.checkTitle')}
-              variant="orange"
-              className="flex-1"
-              loading={checking}
-              disabled={!written.trim()}
-              onClick={() => void checkMine()}
-            />
-            <Btn title={t('session.revealAnswer')} variant="line" className="flex-1" onClick={() => setRevealed(true)} />
-          </div>
+          {/* Marking a written answer is the AI's job, so on Basic the
+              student compares their answer with the model one themselves. */}
+          {derived.access.ai ? (
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <Btn
+                title={checking ? t('tutor.checkBusy') : t('tutor.checkTitle')}
+                variant="orange"
+                className="flex-1"
+                loading={checking}
+                disabled={!written.trim()}
+                onClick={() => void checkMine()}
+              />
+              <Btn title={t('session.revealAnswer')} variant="line" className="flex-1" onClick={() => setRevealed(true)} />
+            </div>
+          ) : (
+            <>
+              <Btn title={t('session.revealAnswer')} className="mt-3 w-full" onClick={() => setRevealed(true)} />
+              <p className="mt-2 flex items-center gap-1.5 text-[12.5px] text-ink3">
+                <Icon name="lock" size={13} className="shrink-0" />
+                {t('tutor.checkTitle')} · {t('aiLock.short')}
+              </p>
+            </>
+          )}
         </div>
       ) : (
         <div className="mt-4">
@@ -223,14 +235,16 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
             </div>
           </Card>
 
-          <div className="mt-3">
-            <LinkBtn
-              title={t('session.askAi')}
-              variant="line"
-              sm
-              href={`/tutor/chat?q=${encodeURIComponent(t('session.askExplain', { q: item.q }))}&chapter=${chapterId}`}
-            />
-          </div>
+          {derived.access.ai ? (
+            <div className="mt-3">
+              <LinkBtn
+                title={t('session.askAi')}
+                variant="line"
+                sm
+                href={`/tutor/chat?q=${encodeURIComponent(t('session.askExplain', { q: item.q }))}&chapter=${chapterId}`}
+              />
+            </div>
+          ) : null}
 
           <div className="mt-6">
             <Label>{t('session.howDidYouDo')}</Label>

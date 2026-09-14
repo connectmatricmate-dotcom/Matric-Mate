@@ -13,6 +13,7 @@ import { levelProgress } from '@matricmate/core';
 import { Bar, Icon, Wordmark } from '@/components/ui/primitives';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { TabGlyph } from '@/components/app/TabGlyph';
+import { TrialBanner } from '@/components/app/TrialBanner';
 import { useQuotaRealtime, useTutorQuota } from '@/lib/use-tutor-quota';
 import { useApp, useT } from '@/lib/store';
 
@@ -150,7 +151,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
             {/* Desktop only, again matching the app, where the AI budget lives
                 on the tutor tab rather than in the header. Five controls do not
-                fit across a 360px phone without everything shrinking. */}
+                fit across a 360px phone without everything shrinking. None on
+                Basic, which has no AI to count. */}
+            {derived.access.ai ? (
             <Link
               href="/tutor"
               title={t('tutor.leftToday', { n: aiLeft })}
@@ -161,6 +164,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <Icon name="spark" size={14} strokeWidth={2.4} />
               {aiLeft}/{aiLimit}
             </Link>
+            ) : null}
 
             <Link
               href="/account"
@@ -183,7 +187,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="w-full flex-1 px-4 pb-28 pt-6 md:px-8 md:pb-16">{children}</main>
+        <main className="w-full flex-1 px-4 pb-28 pt-6 md:px-8 md:pb-16">
+          <TrialBanner />
+          {children}
+        </main>
       </div>
 
       {/* phone bottom bar */}

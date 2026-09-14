@@ -17,6 +17,8 @@ export * from './brand-mark';
 export * from './report-html';
 export * from './domain';
 export * from './billing';
+export * from './access';
+export * from './daily';
 export * from './tokens';
 export * from './icons';
 export * from './papers';

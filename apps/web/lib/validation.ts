@@ -28,6 +28,16 @@ export function validateMobile(v: string, lang: Language = 'en') {
   return /^(92)?0?3\d{9}$/.test(digits) ? null : translate(lang, 'auth.errMobileInvalid');
 }
 
+/** A school name as it is stored: trimmed, inner runs of spaces made one. */
+export const normaliseSchool = (v: string) => v.trim().replace(/\s+/g, ' ');
+
+/** The optional school: empty is fine, otherwise 2 to 120 letters, the column's own bounds (migration 0042). */
+export function validateSchool(v: string, lang: Language = 'en') {
+  const s = normaliseSchool(v);
+  if (!s) return null;
+  return s.length >= 2 && s.length <= 120 ? null : translate(lang, 'auth.errSchoolLength');
+}
+
 /**
  * To E.164, which is what Safepay and every SMS gateway want.
  *

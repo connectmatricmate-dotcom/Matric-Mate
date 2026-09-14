@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { subjectOpen } from '@matricmate/core';
 import { ExamIntro } from '@/components/screens/ExamIntro';
 import { getChapter, getSubject } from '@/lib/content-readers';
+import { currentAccess } from '@/lib/entitlement';
 
 export const metadata: Metadata = {
   title: 'Timed test',
@@ -25,6 +27,13 @@ export default async function ExamIntroPage({
   if (chapter && !ownChapter) notFound();
   const ownSubject = subject ? await getSubject(subject) : undefined;
   if (subject && !ownSubject) notFound();
+
+  /* A free trial's test is of its own subject: the database would hand the
+     test no questions from any other, so the link goes to where the lock is
+     explained. */
+  const access = await currentAccess();
+  if (ownChapter && !subjectOpen(access, ownChapter.subjectId)) redirect(`/learn/chapter/${ownChapter.id}`);
+  if (ownSubject && !subjectOpen(access, ownSubject.id)) redirect(`/learn/subject/${ownSubject.id}`);
 
   return (
     <ExamIntro

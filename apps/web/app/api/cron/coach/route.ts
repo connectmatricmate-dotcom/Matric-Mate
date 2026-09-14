@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildDigestFromDb, writeCoachReport } from '@/lib/ai/coach-report';
+import { tierOf } from '@matricmate/core';
 import { planIsActive } from '@/lib/entitlement';
 import { notify, reportReady } from '@/lib/notify';
 import { JobError, chunks, cronAuthorised, eachLimited, pageAll } from '@/lib/notify/jobs';
@@ -100,8 +101,8 @@ async function run(only: string | null = null): Promise<NextResponse> {
       pageAll<{ id: string }>('profiles', (from, to, signal) =>
         admin.from('profiles').select('id').in('id', slice).eq('role', 'student').order('id').range(from, to).abortSignal(signal),
       ),
-      pageAll<{ user_id: string; active: boolean | null; valid_till: string | null }>('entitlements', (from, to, signal) =>
-        admin.from('entitlements').select('user_id,active,valid_till').in('user_id', slice).order('user_id').range(from, to).abortSignal(signal),
+      pageAll<{ user_id: string; active: boolean | null; valid_till: string | null; plan: string | null }>('entitlements', (from, to, signal) =>
+        admin.from('entitlements').select('user_id,active,valid_till,plan').in('user_id', slice).order('user_id').range(from, to).abortSignal(signal),
       ),
       pageAll<{ user_id: string; period: string; created_at: string }>('coach_reports', (from, to, signal) =>
         admin
@@ -116,7 +117,9 @@ async function run(only: string | null = null): Promise<NextResponse> {
       ),
     ]);
     for (const p of profiles) students.add(p.id);
-    for (const e of plans) if (planIsActive(e)) paying.add(e.user_id);
+    // Premium only: the report is written by a model, and Basic has no AI; a
+    // three-day trial is not worth a nightly report either.
+    for (const e of plans) if (planIsActive(e) && tierOf(e.plan) === 'premium') paying.add(e.user_id);
     for (const r of reports) lastWritten.set(r.user_id, Math.max(lastWritten.get(r.user_id) ?? 0, Date.parse(r.created_at)));
   }
 

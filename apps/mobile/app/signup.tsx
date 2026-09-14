@@ -29,21 +29,25 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
+  const [school, setSchool] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmSent, setConfirmSent] = useState(false);
   const [resending, setResending] = useState(false);
   const toast = useToast();
 
+  // Optional, but when given it has to fit the column (2 to 120 letters), the website's rule.
+  const schoolClean = school.trim().replace(/\s+/g, ' ');
+  const schoolOk = !schoolClean || (schoolClean.length >= 2 && schoolClean.length <= 120);
   const valid =
-    name.trim().length >= 2 && email.trim().includes('@') && password.length >= 6 && !!normaliseMobile(mobile);
+    name.trim().length >= 2 && email.trim().includes('@') && password.length >= 6 && !!normaliseMobile(mobile) && schoolOk;
 
   async function submit() {
     if (!valid || busy) return;
     setBusy(true);
     setError(null);
     try {
-      const { needsConfirmation } = await signUp(name, email, password, mobile);
+      const { needsConfirmation } = await signUp(name, email, password, mobile, schoolClean);
       // With confirmation on there is no session yet, so there is nowhere to go.
       // Saying so is the only honest option; routing into the app would land on
       // a locked screen and read as a failure.
@@ -134,6 +138,18 @@ export default function SignUp() {
         icon="phone"
         keyboardType="phone-pad"
         autoCapitalize="none"
+      />
+      {/* Optional, and the label says so. The client counts students by school
+          and plans school batches from it; nobody is kept from studying for
+          not wanting to say. */}
+      <Field
+        label={t('auth.school')}
+        value={school}
+        onChangeText={setSchool}
+        placeholder={t('auth.schoolPlaceholder')}
+        icon="gradCap"
+        autoCapitalize="words"
+        error={schoolOk ? undefined : t('auth.errSchoolLength')}
       />
       <Field
         label={t('auth.password')}

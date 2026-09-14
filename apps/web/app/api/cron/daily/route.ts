@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { subjectMedium, translate } from '@matricmate/core';
+import { daysLeft, subjectMedium, translate } from '@matricmate/core';
 import type { Language } from '@matricmate/core';
-import { planIsActive } from '@/lib/entitlement';
+import { planIsActive, planIsPaid } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { examTip, notify, recall } from '@/lib/notify';
+import { examTip, notify, recall, trialEnding } from '@/lib/notify';
 import type { Notice, Recipient } from '@/lib/notify';
 import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry } from '@/lib/notify/jobs';
 
@@ -118,8 +118,16 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
   };
 
   const [plans, studied, chapters, subjects] = await Promise.all([
-    readIds<{ user_id: string; active: boolean | null; valid_till: string | null }>('entitlements', (slice, from, to, signal) =>
-      admin.from('entitlements').select('user_id,active,valid_till').in('user_id', slice).order('user_id').range(from, to).abortSignal(signal),
+    readIds<{ user_id: string; active: boolean | null; valid_till: string | null; plan: string | null; trial_subject: string | null }>(
+      'entitlements',
+      (slice, from, to, signal) =>
+        admin
+          .from('entitlements')
+          .select('user_id,active,valid_till,plan,trial_subject')
+          .in('user_id', slice)
+          .order('user_id')
+          .range(from, to)
+          .abortSignal(signal),
     ),
     readIds<{ user_id: string; chapter_id: string }>('attempts', (slice, from, to, signal) =>
       admin
@@ -139,7 +147,14 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
     ),
   ]);
 
-  const paying = new Set(plans.filter(planIsActive).map((e) => e.user_id));
+  // A paid plan, Basic included (flashcards are not AI).
+  const paying = new Set(plans.filter(planIsPaid).map((e) => e.user_id));
+  /* A free trial's one subject: its tips and cards come from that subject and
+     no other, since a card from another opens a locked chapter. And when it
+     ends, so the last afternoon can say so. */
+  const trials = plans.filter((e) => planIsActive(e) && e.plan === 'trial' && e.trial_subject);
+  const trialOf = new Map(trials.map((e) => [e.user_id, e.trial_subject as string]));
+  const trialEndsOf = new Map(trials.map((e) => [e.user_id, Date.parse(e.valid_till as string)]));
   const studiedByUser = new Map<string, Set<string>>();
   for (const r of studied) studiedByUser.set(r.user_id, (studiedByUser.get(r.user_id) ?? new Set()).add(r.chapter_id));
   const subjectById = new Map(subjects.map((r) => [r.id, r]));
@@ -173,16 +188,24 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
        * An empty list (onboarding never finished) still gets a general tip.
        */
       const ownChapters = chapters.filter((c) => c.board === board && c.grade === grade);
-      const chosen = Array.isArray(onboarding.subjects) && onboarding.subjects.length ? onboarding.subjects : compulsory;
+      const trial = trialOf.get(profile.id);
+      const chosen = trial ? [trial] : Array.isArray(onboarding.subjects) && onboarding.subjects.length ? onboarding.subjects : compulsory;
       const list = chosen.filter((id) => ownChapters.some((c) => c.subject_id === id));
       const subjectId = list.length ? list[Math.floor(turn / 2) % list.length] : null;
       const subjectRow = subjectId ? subjectById.get(subjectId) : undefined;
       const subjectLabel = subjectRow ? (lang === 'ur' && subjectRow.urdu_name) || subjectRow.name : '';
 
       let notice: Notice | null = null;
+      // Cards for any plan, the trial included now its subject is the one they come from.
+      const withCards = paying.has(profile.id) || !!trial;
+
+      // A trial's last afternoon: that it ends, rather than a tip.
+      if (trial && subjectLabel && daysLeft(trialEndsOf.get(profile.id) ?? null, now.getTime()) <= 1) {
+        notice = trialEnding(subjectLabel);
+      }
 
       // Every other day a flashcard, for a student with a plan and a subject to draw from.
-      if (paying.has(profile.id) && subjectId && turn % 2 === 0) {
+      if (!notice && withCards && subjectId && turn % 2 === 0) {
         const inSubject = ownChapters.filter((c) => c.subject_id === subjectId).sort((a, b) => a.number - b.number);
         // Chapters they have worked in first: recall of something studied is
         // revision, recall of a chapter never opened is a quiz they cannot pass.
@@ -213,8 +236,8 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
       // Otherwise, or when that chapter had no card short enough, an exam tip.
       // A tip every day for a student who gets no flashcards, every other day
       // for one who does, so the count of tips they have had is not the same.
-      const tipTurn = paying.has(profile.id) && subjectId ? Math.floor(turn / 2) : turn;
-      notice ??= examTip(subjectId, subjectLabel, tipTurn, paying.has(profile.id) ? 'study' : 'home');
+      const tipTurn = withCards && subjectId ? Math.floor(turn / 2) : turn;
+      notice ??= examTip(subjectId, subjectLabel, tipTurn, withCards ? 'study' : 'home');
 
       if (dry) {
         preview.push({

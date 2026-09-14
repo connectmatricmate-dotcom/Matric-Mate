@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
 import { normaliseMobile } from '@matricmate/core';
+import { normaliseSchool } from '@/lib/validation';
 
 import { isOpenWithoutPlan } from '@/lib/entitlement';
 import { currentRole, landingFor } from '@/lib/roles';
@@ -125,6 +126,10 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
   if (!parsed.success) return fail(first(parsed.error));
 
   const mobile = normaliseMobile(String(formData.get('mobile') ?? ''));
+  // Optional. Out of bounds is an error here rather than silently dropped:
+  // the form checks the same rule, so only a hand-made request gets this far.
+  const school = normaliseSchool(String(formData.get('school') ?? ''));
+  if (school && (school.length < 2 || school.length > 120)) return fail('auth.errSchoolLength');
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -146,6 +151,8 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
         // rather than rejected: a mistyped mobile should not cost somebody
         // their account, and the trigger drops it again on its own side.
         ...(mobile ? { phone: mobile } : {}),
+        // Copied to profiles.school by the same trigger (migration 0042).
+        ...(school ? { school } : {}),
         ...(await referralCode(formData)),
       },
       /*

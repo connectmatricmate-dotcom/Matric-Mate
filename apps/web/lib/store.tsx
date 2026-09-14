@@ -52,13 +52,13 @@ import {
   wipeStudyHistory,
   xpForAttempt,
 } from '@matricmate/core';
-import type { Board, Group, HydratedStudyState } from '@matricmate/core';
+import type { Access, Board, Group, HydratedStudyState } from '@matricmate/core';
 import {
   EMPTY,
   Onboarding,
   Settings,
   State,
-  aiLimitFor,
+  accessOf,
   devicePrefs,
   getQueue,
   getSnapshot,
@@ -68,6 +68,7 @@ import {
   saveQueue,
   seedFromServer,
   serverSnapshotFor,
+  type PlanSeed,
   subscribe,
   touchToday,
   update,
@@ -155,8 +156,13 @@ type Ctx = {
     level: number;
     aiLeft: number;
     aiLimit: number;
+    /** What the plan opens: tier, AI, a trial's subject. See accessFor in core. */
+    access: Access;
     plan: PlanTask[];
+    /** The subjects the student can study now: all of theirs, or a trial's one. */
     subjects: string[];
+    /** Their other subjects during a trial, shown locked. Empty otherwise. */
+    lockedSubjects: string[];
     /**
      * The chapter index's version (core's contentVersion). Screens that read
      * chapters synchronously while rendering key a memo on it, so they read
@@ -529,7 +535,7 @@ const actions: Actions = {
     // Read before the update, like every other action that can start a day.
     update((s) => {
       const used = s.ai.day === day ? s.ai.used : 0;
-      const limit = aiLimitFor(s.premium.active);
+      const limit = accessOf(s.premium).aiLimit;
       if (used >= limit) return { ...s, ai: { day, used } };
       allowed = true;
       return touchToday({ ...s, ai: { day, used: used + 1 } });
@@ -709,7 +715,7 @@ async function startOver(uid: string, onboarding: Onboarding): Promise<void> {
  */
 async function refreshPremium(): Promise<boolean> {
   const supabase = createClient();
-  const { data, error } = await supabase.from('entitlements').select('active, plan, valid_till').maybeSingle();
+  const { data, error } = await supabase.from('entitlements').select('active, plan, valid_till, trial_subject').maybeSingle();
   // A read that failed says nothing about the plan. It used to be taken as
   // "no plan", which locked a paying student out of everything until a reload
   // happened to succeed.
@@ -718,7 +724,9 @@ async function refreshPremium(): Promise<boolean> {
   const active = Boolean(data?.active) && till !== null && Number.isFinite(till) && till > Date.now();
   update((s) => ({
     ...s,
-    premium: active ? { active: true, plan: data?.plan ?? undefined, validTill: till } : { active: false, validTill: null },
+    premium: active
+      ? { active: true, plan: data?.plan ?? undefined, validTill: till, trialSubject: data?.trial_subject ?? undefined }
+      : { active: false, validTill: null },
   }));
   return active;
 }
@@ -1001,7 +1009,7 @@ function nameFor(u: AuthUser): string {
 export function AppProvider({
   children,
   initialLanguage = 'en',
-  initialPremium = false,
+  initialPlan = null,
 }: {
   children: React.ReactNode;
   /**
@@ -1011,14 +1019,19 @@ export function AppProvider({
    */
   initialLanguage?: Language;
   /**
-   * Whether the layout found a plan. The paywall already decided on it, so
-   * inside the app this is almost always true, and starting from it is what
-   * keeps a paying student from seeing locks until the browser has asked again.
+   * The plan the layout found. The paywall already decided on it, so inside
+   * the app there is almost always one, and starting from it is what keeps a
+   * paying student from seeing locks, and a Basic one from seeing the AI
+   * tutor, until the browser has asked again.
    */
-  initialPremium?: boolean;
+  initialPlan?: PlanSeed | null;
 }) {
-  seedFromServer(initialLanguage, initialPremium);
-  const serverSnapshot = useCallback(() => serverSnapshotFor(initialLanguage, initialPremium), [initialLanguage, initialPremium]);
+  seedFromServer(initialLanguage, initialPlan);
+  const seedKey = initialPlan?.active ? `${initialPlan.plan ?? ''}|${initialPlan.trialSubject ?? ''}` : '';
+  // Keyed on the seed's contents, not its identity: the layout builds a new
+  // object on every render, and the snapshot has to stay the same one.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const serverSnapshot = useCallback(() => serverSnapshotFor(initialLanguage, initialPlan), [initialLanguage, seedKey]);
   const state = useSyncExternalStore(subscribe, getSnapshot, serverSnapshot);
 
   // Reads the saved snapshot into the external store; not a setState cascade.
@@ -1264,17 +1277,28 @@ export function AppProvider({
   const contentReady = useSyncExternalStore(subscribeContent, contentVersion, contentVersion);
 
   const derived = useMemo(() => {
-    const aiLimit = aiLimitFor(state.premium.active);
+    const access = accessOf(state.premium);
+    const aiLimit = access.aiLimit;
     const usedToday = state.ai.day === todayKey() ? state.ai.used : 0;
-    const subjects = state.onboarding?.subjects?.length
+    const chosen = state.onboarding?.subjects?.length
       ? state.onboarding.subjects
       : ['phy', 'chem', 'bio', 'math', 'eng', 'urd', 'isl'];
+    /*
+     * On a trial the one subject it opens is the student's whole syllabus for
+     * three days: today's plan, the practice pickers and the tutor's starters
+     * all build from this list, and none of them should point at a subject
+     * the database will refuse. The rest are kept to show as locked.
+     */
+    const subjects = access.tier === 'trial' && access.trialSubject ? [access.trialSubject] : chosen;
+    const lockedSubjects = access.tier === 'trial' ? chosen.filter((s) => s !== access.trialSubject) : [];
     return {
       streak: streakFrom(state.activeDays),
       level: level(state.xp),
       aiLeft: Math.max(0, aiLimit - usedToday),
       aiLimit,
+      access,
       subjects,
+      lockedSubjects,
       plan: buildPlan({
         subjectIds: subjects,
         // The student's own class, so the plan can never point at the other

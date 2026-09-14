@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { AI_QUOTA, BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
-import { THE_PLAN } from '@/lib/plans';
+import { BASIC_PLAN, THE_PLAN, rupees } from '@/lib/plans';
 import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'What a plan includes',
   description:
-    'Every service in a MatricMate Premium plan: chapter notes, audio lessons, practice questions, mock papers, past papers, an AI tutor, progress reports and a parent report card.',
+    'Every service in a MatricMate plan: chapter notes, audio lessons, practice questions, past papers, progress reports and a parent report card, with the AI tutor and mock papers in Premium.',
   alternates: { canonical: canonicalUrl('/services') },
 };
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
  * it reviews a merchant: a site that says what the money buys before it asks
  * for any.
  */
-const SERVICES: { name: string; what: string }[] = [
+const SERVICES: { name: string; what: string; premium?: true }[] = [
   {
     name: 'Chapter notes',
     what: 'Every chapter of the FBISE and Punjab Board Class 9 and Class 10 syllabus, written as revision notes rather than a textbook reprint. English and Urdu medium, switchable at any time.',
@@ -38,6 +38,7 @@ const SERVICES: { name: string; what: string }[] = [
   {
     name: 'Mock papers',
     what: 'Papers in the board pattern: Section A as a timed test, then Sections B and C written in the app and marked against the points an examiner looks for.',
+    premium: true,
   },
   {
     name: 'Past papers',
@@ -45,7 +46,8 @@ const SERVICES: { name: string; what: string }[] = [
   },
   {
     name: 'AI tutor',
-    what: `Ask a question in English or Urdu and get it explained, stepped through, and followed up. Up to ${AI_QUOTA.premium} questions a day, with your chapters and progress already in view.`,
+    what: `Ask a question in English or Urdu and get it explained, stepped through, and followed up. Up to ${AI_QUOTA.premium} questions a day, with your chapters and progress already in view. Written answers marked the way an examiner would, AI practice tests, one-page revision sheets, a weekly coach and career guidance come with it.`,
+    premium: true,
   },
   {
     name: 'Progress tracking',
@@ -69,14 +71,18 @@ export default function ServicesPage() {
       <main className="mx-auto max-w-[720px] px-5 py-14">
         <h1 className="font-display text-mk-h1 text-ink">What a plan includes</h1>
         <p className="mt-3 text-mk-lead text-ink2">
-          One plan, Rs {THE_PLAN.price.toLocaleString('en-PK')} a month, and everything below is in it. There is no
-          free tier and nothing costs extra once you have paid.
+          Two plans: Basic at {rupees(BASIC_PLAN.price)} a month and Premium at {rupees(THE_PLAN.price)}. Basic includes
+          everything below except the services marked Premium; Premium includes all of it. There is no free tier,
+          but a new account can try one subject free for three days, and nothing costs extra once you have paid.
         </p>
 
         <div className="mt-10 flex flex-col gap-9">
           {SERVICES.map((s) => (
             <section key={s.name}>
-              <h2 className="font-display text-[22px] text-ink">{s.name}</h2>
+              <h2 className="font-display text-[22px] text-ink">
+                {s.name}
+                {s.premium ? <span className="ms-2 align-middle text-[13px] font-extrabold text-orangedark">Premium</span> : null}
+              </h2>
               <p className="mt-2 text-mk-body leading-[1.75] text-ink2">{s.what}</p>
             </section>
           ))}

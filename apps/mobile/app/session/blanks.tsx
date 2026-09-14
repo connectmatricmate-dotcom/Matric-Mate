@@ -15,7 +15,7 @@ import { leaveSet } from '../../src/core/nav';
 
 export default function Blanks() {
   const { chapter, ai, from } = useLocalSearchParams<{ chapter?: string; ai?: string; from?: string }>();
-  const { actions, contentKey } = useApp();
+  const { actions, contentKey, derived } = useApp();
   // No chapter in the link: one of the student's own chapters that has
   // notes, or a picker. See PracticeChapter.
   const practice = usePracticeChapter(chapter, 'blanks');
@@ -248,7 +248,7 @@ export default function Blanks() {
             <Icon name={correct ? 'check' : 'close'} size={18} color={correct ? C.green : C.red} strokeWidth={2.6} />
             <ScriptText text={verdictLine} face="bodyBold" size={13.5} color={correct ? C.green : C.red} style={{ flex: 1 }} />
           </Row>
-          {!correct && item ? (
+          {!correct && item && derived.access.ai ? (
             <>
               <Spacer h={S.sm} />
               <Btn

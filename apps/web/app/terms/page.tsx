@@ -29,9 +29,10 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: 'Paying, and what happens when a plan ends',
     paragraphs: [
-      'Premium is sold on this website only. A plan is a single payment for a fixed stretch of time. Nothing renews automatically, no card is kept for a later charge, and the end date is shown on your account from the day you pay.',
+      'Plans are sold on this website only. There are two: Basic, which opens every chapter, note, audio lesson and practice question, and Premium, which adds the AI tutor and the other AI features. A new account may also try one subject free for three days, once.',
+      'A plan is a single payment for a fixed stretch of time. Nothing renews automatically, no card is kept for a later charge, and the end date is shown on your account from the day you pay.',
       'There is no cancel button because there is no recurring charge to stop. If you do nothing, the plan ends on its last paid day. Access continues to that date, and your progress stays on the account whether or not you pay again.',
-      'Card, wallet and account details are typed on the payment gateway’s own page. They go to the gateway, never to us, and we store only the reference number shown on your receipt.',
+      'When you pay through the payment gateway, card, wallet and account details are typed on the gateway’s own page. They go to the gateway, never to us, and we store only the reference number shown on your receipt. When our team switches a plan on for you by hand, we record the payment against your account and keep no card or wallet details.',
     ],
   },
   {

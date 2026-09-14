@@ -26,7 +26,7 @@ const LEVELS: { value: Confidence; label: StringKey }[] = [
  * what makes the "how sure vs how right" analytics possible.
  */
 export function McqScreen() {
-  const { actions } = useApp();
+  const { actions, derived } = useApp();
   const t = useT();
   const router = useRouter();
   const s = session.current;
@@ -239,6 +239,8 @@ export function McqScreen() {
       <div className="mt-6 flex gap-2.5">
         {checked ? (
           <>
+            {/* The tutor is Premium's; on Basic, Next takes the row. */}
+            {derived.access.ai ? (
             <Btn
               title={t('session.askAi')}
               variant="line"
@@ -259,6 +261,7 @@ export function McqScreen() {
                 })
               }
             />
+            ) : null}
             <Btn
               title={i + 1 >= s.mcqs.length ? t('session.seeResult') : t('session.nextQuestion')}
               onClick={next}

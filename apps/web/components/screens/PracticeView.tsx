@@ -19,7 +19,7 @@ const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; a
 ];
 
 export function PracticeView({ board: accountBoard, grade }: { board: Board; grade: 9 | 10 }) {
-  const { state } = useApp();
+  const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   /* A result with no questions in it is not a session. An empty test used to
@@ -100,7 +100,7 @@ export function PracticeView({ board: accountBoard, grade }: { board: Board; gra
               <Icon name="spark" className="shrink-0 text-orangedark" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[14.5px] font-extrabold text-ink">{t('practice.aiTest')}</span>
-                <span className="block text-[13px] text-ink2">{t('practice.aiTestSub')}</span>
+                <span className="block text-[13px] text-ink2">{derived.access.ai ? t('practice.aiTestSub') : t('aiLock.short')}</span>
               </span>
               <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
             </Card>

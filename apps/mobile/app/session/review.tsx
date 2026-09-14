@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Body, Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Text } from '../../src/components/ui';
 import { useT } from '../../src/i18n';
 import { session } from '../../src/store/session';
+import { useApp } from '../../src/store/app';
 import { C, S, isRTL } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 
@@ -11,6 +12,7 @@ type Filter = 'all' | 'wrong' | 'flagged';
 
 export default function Review() {
   const t = useT();
+  const { derived } = useApp();
   const s = session.current;
   const [filter, setFilter] = useState<Filter>('wrong');
   const [open, setOpen] = useState<string | null>(null);
@@ -108,6 +110,7 @@ export default function Review() {
                     {/* Wraps, so at a large font the second button drops to a
                         line of its own instead of running out of the card. */}
                     <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
+                      {derived.access.ai ? (
                       <Btn
                         title={t('session.askAi')}
                         variant="line"
@@ -121,6 +124,7 @@ export default function Review() {
                           router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}${mcq.chapterId ? `&chapter=${mcq.chapterId}` : ''}`);
                         }}
                       />
+                      ) : null}
                       {/* A generated question has no chapter to read. */}
                       {mcq.chapterId ? (
                         <Btn

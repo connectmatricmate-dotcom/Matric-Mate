@@ -1,4 +1,5 @@
 import { cache } from 'react';
+import { accessFor, type Access } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -20,6 +21,38 @@ export function planIsActive(row: { active?: boolean | null; valid_till?: string
   const till = Date.parse(row.valid_till);
   return Number.isFinite(till) && till > Date.now();
 }
+
+type PlanRow = { active?: boolean | null; valid_till?: string | null; plan?: string | null; trial_subject?: string | null };
+
+/**
+ * A plan somebody paid for, running now: any active plan except the free
+ * trial. What "has paid" means on a teacher's dashboard and in the admin's
+ * counts, where a trial counted as a sale would inflate both.
+ */
+export function planIsPaid(row: PlanRow | null | undefined): boolean {
+  return planIsActive(row) && row?.plan !== 'trial';
+}
+
+/** What this row lets its student do: the tier, AI, the AI allowance, a trial's subject. See accessFor in core. */
+export function accessFromRow(row: PlanRow | null | undefined): Access {
+  return accessFor({
+    active: planIsActive(row),
+    plan: row?.plan ?? null,
+    validTill: row?.valid_till ? Date.parse(row.valid_till) : null,
+    trialSubject: row?.trial_subject ?? null,
+  });
+}
+
+/** The signed-in student's access, read once per request like hasActivePlan below. */
+export const currentAccess = cache(async (): Promise<Access> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('entitlements').select('active, valid_till, plan, trial_subject').maybeSingle();
+  if (error) {
+    console.error('entitlement: plan read failed', error.message);
+    throw new Error('Could not check the plan on this account.');
+  }
+  return accessFromRow(data);
+});
 
 /**
  * Does this account have a plan right now.

@@ -25,9 +25,13 @@ export type Entitlement = {
   active: boolean;
   validTill: number | null;
   plan: string | null;
+  /** The one subject a free trial opens (plan 'trial'); null otherwise. */
+  trialSubject: string | null;
+  /** This account has had its free trial, so the offer is not shown again. */
+  trialUsed: boolean;
 };
 
-const NONE: Entitlement = { active: false, validTill: null, plan: null };
+const NONE: Entitlement = { active: false, validTill: null, plan: null, trialSubject: null, trialUsed: false };
 
 /**
  * How long a plan we cannot re-check stays trusted.
@@ -121,7 +125,8 @@ async function readCachedEntitlement(userId: string): Promise<Entitlement | null
   try {
     const { cachedAt, ...rest } = JSON.parse(raw) as CachedEntitlement;
     if (!cachedAt || Date.now() - cachedAt > OFFLINE_GRACE_MS) return null;
-    return rest;
+    // A cache written before the trial existed has neither field.
+    return { ...rest, trialSubject: rest.trialSubject ?? null, trialUsed: !!rest.trialUsed };
   } catch {
     return null;
   }
@@ -155,7 +160,8 @@ type Ctx = {
   /** True while an entitlement refresh is in flight, for pull-to-refresh affordances. */
   checking: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (name: string, email: string, password: string, mobile?: string) => Promise<SignUpResult>;
+  /** `school` is optional; the signup trigger copies it to the profile (migration 0042). */
+  signUp: (name: string, email: string, password: string, mobile?: string, school?: string) => Promise<SignUpResult>;
   /** Sends the confirmation email again, for one that never arrived. */
   resendConfirmation: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -260,7 +266,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
        * is the same path an outright error takes.
        */
       const { data, error } = await Promise.race([
-        supabase.from('entitlements').select('active, plan, valid_till').eq('user_id', userId).maybeSingle(),
+        supabase
+          .from('entitlements')
+          .select('active, plan, valid_till, trial_subject, trial_used_at')
+          .eq('user_id', userId)
+          .maybeSingle(),
         new Promise<{ data: null; error: { message: string } }>((resolve) =>
           setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), ENTITLEMENT_TIMEOUT_MS),
         ),
@@ -298,6 +308,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         active: Boolean(data?.active) && (till === null || till > Date.now()),
         validTill: till,
         plan: data?.plan ?? null,
+        trialSubject: data?.trial_subject ?? null,
+        trialUsed: Boolean(data?.trial_used_at),
       };
       setEntitlement(next);
       await AsyncStorage.setItem(cacheKey(userId), JSON.stringify({ ...next, cachedAt: Date.now() }));
@@ -474,8 +486,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
 
-      async signUp(name, email, password, mobile) {
+      async signUp(name, email, password, mobile, school) {
         const phone = mobile ? normaliseMobile(mobile) : null;
+        const schoolName = (school ?? '').trim().replace(/\s+/g, ' ');
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
@@ -485,7 +498,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // The number is normalised to +92 and ten digits here because that
             // is what the column takes; an unrecognised one is left out rather
             // than failing the signup.
-            data: { name: name.trim(), ...(phone ? { phone } : {}) },
+            data: { name: name.trim(), ...(phone ? { phone } : {}), ...(schoolName ? { school: schoolName } : {}) },
             // The link is opened in a phone browser, not in the app, so it has
             // to land on the website. They confirm there and come back to sign
             // in, which is what the "back to sign in" button here expects.

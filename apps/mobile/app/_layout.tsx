@@ -13,6 +13,7 @@ import { AuthProvider } from '../src/store/auth';
 import { AppProvider, useApp } from '../src/store/app';
 import { useQuotaRealtime } from '../src/core/useQuota';
 import { usePush } from '../src/core/usePush';
+import { markTouched, useStudyClock } from '../src/core/studyClock';
 import { Btn, Text, ToastHost } from '../src/components/ui';
 import { C, F, isRTL } from '../src/theme';
 import { en, ur } from '@matricmate/core';
@@ -94,6 +95,7 @@ export default function RootLayout() {
             <SplashGate />
             <QuotaLive />
             <PushLive />
+            <StudyClockLive />
             <ToastHost>
               <Chrome />
             </ToastHost>
@@ -119,6 +121,21 @@ function Chrome() {
     <>
       {/* The bar's own text, so it is light on a dark ground and vice versa. */}
       <StatusBar style={state.settings.dark ? 'light' : 'dark'} />
+      {/* Every touch and scroll, seen on the way down and never taken: the
+          study clock counts a minute only if the app was used in the last
+          ten (core/studyClock.ts). Returning false leaves the touch to
+          whatever it was meant for. */}
+      <View
+        style={{ flex: 1 }}
+        onStartShouldSetResponderCapture={() => {
+          markTouched();
+          return false;
+        }}
+        onMoveShouldSetResponderCapture={() => {
+          markTouched();
+          return false;
+        }}
+      >
       <Stack
         screenOptions={{
           headerShown: false,
@@ -129,6 +146,7 @@ function Chrome() {
         <Stack.Screen name="index" options={{ animation: 'none' }} />
         <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
       </Stack>
+      </View>
     </>
   );
 }
@@ -181,5 +199,12 @@ function QuotaLive() {
 function PushLive() {
   const { state } = useApp();
   usePush(state.user?.id ?? null);
+  return null;
+}
+
+/** Minutes in the app, for the daily report and the teacher's view: see core/studyClock.ts. */
+function StudyClockLive() {
+  const { state } = useApp();
+  useStudyClock(state.user?.id ?? null);
   return null;
 }

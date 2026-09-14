@@ -11,7 +11,7 @@
  * The state shape matches the Android app's store deliberately, see
  * apps/mobile/src/store/app.tsx.
  */
-import { AI_QUOTA, Attempt, Language, Medium, Group, Notification, SyncOp, TestResult, enqueueOp, todayKey } from '@matricmate/core';
+import { Attempt, Language, Medium, Group, Notification, SyncOp, TestResult, accessFor, enqueueOp, todayKey, type Access } from '@matricmate/core';
 
 // v2: the fake "demo seed" that used to write sample attempts, results and a
 // streak on first sign-in is gone. Bumping the key throws away anything a
@@ -66,7 +66,7 @@ export type State = {
   onboarding: Onboarding | null;
   /** `plan` is the PlanId from lib/plans, so the app can name what was bought
    * instead of just saying "Premium". */
-  premium: { active: boolean; validTill: number | null; ref?: string; plan?: string };
+  premium: { active: boolean; validTill: number | null; ref?: string; plan?: string; trialSubject?: string };
   readSections: string[];
   attempts: Attempt[];
   results: TestResult[];
@@ -181,15 +181,33 @@ export const getSnapshot = () => state;
  * reference, because useSyncExternalStore compares snapshots by identity and a
  * fresh object per call never settles.
  */
-const PAID: State['premium'] = { active: true, validTill: null };
 const URDU: Settings = { ...DEFAULT_SETTINGS, language: 'ur', contentMedium: 'ur' };
-const SERVER_SNAPSHOTS: Record<'en' | 'ur', Record<'free' | 'paid', State>> = {
-  en: { free: EMPTY, paid: { ...EMPTY, premium: PAID } },
-  ur: { free: { ...EMPTY, settings: URDU }, paid: { ...EMPTY, settings: URDU, premium: PAID } },
-};
 
-export const serverSnapshotFor = (lang: 'en' | 'ur', paid = false) => SERVER_SNAPSHOTS[lang][paid ? 'paid' : 'free'];
-export const getServerSnapshot = () => SERVER_SNAPSHOTS.en.free;
+/** What the layout read of the plan, for the first render: see seedFromServer. */
+export type PlanSeed = { active: boolean; plan?: string; trialSubject?: string | null };
+
+/*
+ * One snapshot per language and plan, made once and reused. Since there are
+ * two plans and a trial, "paid or not" is no longer enough to render the
+ * first frame right (a Basic student must not see the AI tutor for the moment
+ * before the browser re-reads the plan), and each combination still has to
+ * come back as the same object every time it is asked for.
+ */
+const SERVER_SNAPSHOTS = new Map<string, State>();
+
+export const serverSnapshotFor = (lang: 'en' | 'ur', seed?: PlanSeed | null): State => {
+  const key = `${lang}|${seed?.active ? `${seed.plan ?? ''}|${seed.trialSubject ?? ''}` : 'free'}`;
+  let snap = SERVER_SNAPSHOTS.get(key);
+  if (!snap) {
+    const base = lang === 'ur' ? { ...EMPTY, settings: URDU } : EMPTY;
+    snap = seed?.active
+      ? { ...base, premium: { active: true, validTill: null, plan: seed.plan, trialSubject: seed.trialSubject ?? undefined } }
+      : base;
+    SERVER_SNAPSHOTS.set(key, snap);
+  }
+  return snap;
+};
+export const getServerSnapshot = () => serverSnapshotFor('en');
 
 /**
  * Starts the browser's store from what the server rendered with, once.
@@ -202,9 +220,9 @@ export const getServerSnapshot = () => SERVER_SNAPSHOTS.en.free;
  * re-render after hydration. Never on the server, where this module is shared
  * by every request.
  */
-export function seedFromServer(lang: 'en' | 'ur', paid: boolean): void {
+export function seedFromServer(lang: 'en' | 'ur', seed?: PlanSeed | null): void {
   if (typeof window === 'undefined' || state !== EMPTY) return;
-  state = serverSnapshotFor(lang, paid);
+  state = serverSnapshotFor(lang, seed);
 }
 
 function persist() {
@@ -280,7 +298,9 @@ export function touchToday(s: State): State {
   return s.activeDays.includes(t) ? s : { ...s, activeDays: [...s.activeDays, t] };
 }
 
-export const aiLimitFor = (premium: boolean) => (premium ? AI_QUOTA.premium : AI_QUOTA.free);
+/** What the stored plan lets this student do. See accessFor in core. */
+export const accessOf = (premium: State['premium']): Access =>
+  accessFor({ active: premium.active, plan: premium.plan ?? null, validTill: premium.validTill, trialSubject: premium.trialSubject ?? null });
 
 /* --------------------------------------------------------------- sync queue */
 

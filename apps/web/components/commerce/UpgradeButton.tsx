@@ -4,8 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { IconName } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
-import { THE_PLAN, rupees } from '@/lib/plans';
-import { useT } from '@/lib/store';
+import { Sheet } from '@/components/ui/sheet';
+import { ManualActivation } from '@/components/commerce/ManualActivation';
+import { formatDate } from '@matricmate/core';
+import { THE_PLAN, rupees, type Plan } from '@/lib/plans';
+import { startCheckout } from '@/lib/start-checkout';
+import { useLang, useT } from '@/lib/store';
 
 /**
  * Upgrade, in one press.
@@ -32,6 +36,7 @@ export function UpgradeButton({
   className,
   withPrice = true,
   full,
+  plan = THE_PLAN,
 }: {
   label?: string;
   variant?: 'primary' | 'orange' | 'line' | 'ghost';
@@ -46,11 +51,16 @@ export function UpgradeButton({
    * button itself.
    */
   full?: boolean;
+  /** Which plan it buys. Premium unless the screen offers a choice. */
+  plan?: Plan;
 }) {
   const t = useT();
+  const { lang } = useLang();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** No gateway live: the button explains how to get the plan instead. */
+  const [manual, setManual] = useState(false);
 
   const title = label ?? t('account.upgrade');
 
@@ -59,18 +69,26 @@ export function UpgradeButton({
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: THE_PLAN.id }),
-      });
-      if (res.status === 401) {
-        router.push(`/login?next=${encodeURIComponent('/checkout')}`);
+      const started = await startCheckout(plan.id);
+      if (started.ok) return;
+      if (started.error === 'manual_activation') {
+        setManual(true);
+        setBusy(false);
         return;
       }
-      const body = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !body.url) throw new Error(body.error ?? t('checkout.startFailed'));
-      window.location.href = body.url;
+      if (started.status === 401) {
+        router.push(`/login?next=${encodeURIComponent(`/checkout?plan=${plan.id}`)}`);
+        return;
+      }
+      // Basic while Premium is running: said plainly, with the date it ends.
+      if (started.error === 'premium_running') {
+        throw new Error(
+          t('plans.premiumRunning', {
+            date: started.validTill ? formatDate(started.validTill, lang, { day: 'numeric', month: 'long' }) : '',
+          }),
+        );
+      }
+      throw new Error(started.error ?? t('checkout.startFailed'));
     } catch (err) {
       setError(err instanceof Error ? err.message : t('checkout.startFailed'));
       setBusy(false);
@@ -80,7 +98,7 @@ export function UpgradeButton({
   return (
     <div className={className}>
       <Btn
-        title={withPrice ? `${title} · ${rupees(THE_PLAN.price)}` : title}
+        title={withPrice ? `${title} · ${rupees(plan.price)}` : title}
         variant={variant}
         sm={sm}
         icon={icon ?? undefined}
@@ -93,6 +111,9 @@ export function UpgradeButton({
           {error}
         </p>
       ) : null}
+      <Sheet open={manual} onClose={() => setManual(false)} title={title}>
+        <ManualActivation plan={plan} />
+      </Sheet>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import 'server-only';
-import { notFound } from 'next/navigation';
-import { hasStudyMaterial, type Chapter } from '@matricmate/core';
+import { notFound, redirect } from 'next/navigation';
+import { hasStudyMaterial, subjectOpen, type Chapter } from '@matricmate/core';
 import { defaultChapterId, getAiSession, getChapter, getChapters, getSubjects } from '@/lib/content-readers';
+import { currentAccess } from '@/lib/entitlement';
 
 /**
  * The chapter a flashcards, blanks or short-question page opens on.
@@ -14,16 +15,24 @@ import { defaultChapterId, getAiSession, getChapter, getChapters, getSubjects } 
  * With no id, the last chapter they read; that can belong to a board or class
  * they have since left, so it is checked the same way, and past it the first
  * chapter that has anything to practise.
+ *
+ * On a free trial, only a chapter of the trial's subject. The database serves
+ * nothing else to a trial, so another subject's chapter would open as an
+ * empty set; a link to one goes to that chapter's page instead, which says
+ * why it is locked.
  */
 export async function practiceChapter(requested?: string): Promise<Chapter> {
+  const access = await currentAccess();
   if (requested) {
     const chapter = await getChapter(requested);
     if (!chapter) notFound();
+    if (!subjectOpen(access, chapter.subjectId)) redirect(`/learn/chapter/${chapter.id}`);
     return chapter;
   }
   const last = await getChapter(await defaultChapterId());
-  if (last) return last;
+  if (last && subjectOpen(access, last.subjectId)) return last;
   for (const subject of await getSubjects()) {
+    if (!subjectOpen(access, subject.id)) continue;
     const first = (await getChapters(subject.id)).find(hasStudyMaterial);
     if (first) return first;
   }

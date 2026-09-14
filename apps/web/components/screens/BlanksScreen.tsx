@@ -13,7 +13,7 @@ import { LeaveSetButton } from '@/components/app/LeaveSetButton';
 import { PracticeChapterBar } from '@/components/app/PracticeChapterBar';
 
 export function BlanksScreen({ chapter, items, canChangeChapter }: { chapter: Chapter; items: Blank[]; canChangeChapter?: boolean }) {
-  const { actions } = useApp();
+  const { actions, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   /* The name a student reads, which is not the name an attempt is filed
@@ -183,7 +183,7 @@ export function BlanksScreen({ chapter, items, canChangeChapter }: { chapter: Ch
               className={`min-w-0 flex-1 basis-56 text-[13.5px] font-extrabold ${correct ? 'text-green' : 'text-red'}`}
               urduClassName={`min-w-0 flex-1 basis-56 text-[13.5px] ${correct ? 'text-green' : 'text-red'}`}
             />
-            {!correct ? (
+            {!correct && derived.access.ai ? (
               <LinkBtn
                 title={t('session.askAi')}
                 variant="line"

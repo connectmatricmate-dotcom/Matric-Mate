@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { AI_QUOTA, BOARD_LABEL, SUBJECTS, asBoard, subjectMedium, translate, type Board } from '@matricmate/core';
-import { planIsActive } from '@/lib/entitlement';
+import { BOARD_LABEL, SUBJECTS, asBoard, subjectMedium, translate, type Board } from '@matricmate/core';
+import { accessFromRow, planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { addUsage, chapterGrounding, type Grounding } from '@/lib/ai/guard';
@@ -293,7 +293,7 @@ export async function POST(req: NextRequest) {
    * one piece. None of these four reads depends on any of the others.
    */
   const [{ data: ent, error: entError }, { data: prof, error: profError }, usage, { count: lastMinute }, owned] = await Promise.all([
-    admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
+    admin.from('entitlements').select('active,valid_till,plan,trial_subject').eq('user_id', userId).maybeSingle(),
     admin.from('profiles').select('grade,role,board,onboarding').eq('id', userId).maybeSingle(),
     admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
     // The abuse wall: a human student cannot ask five thoughtful questions in
@@ -328,6 +328,14 @@ export async function POST(req: NextRequest) {
 
   // Paid-only: the same wall RLS enforces on content, applied to the tutor.
   if (!planIsActive(ent)) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
+  // Basic (Rs 500) has no AI; see lib/ai/guard.ts, which says the same.
+  const access = accessFromRow(ent);
+  if (!access.ai) return NextResponse.json({ error: 'ai_not_in_plan' }, { status: 402 });
+  // A free trial asks from its own subject's chapters only (see outsideTrial
+  // in lib/ai/guard.ts). A chapter id starts with its subject's id.
+  if (askedFrom && access.trialSubject && askedFrom.split('-')[0] !== access.trialSubject) {
+    return NextResponse.json({ error: 'not_in_trial' }, { status: 403 });
+  }
   // The tutor teaches the student's own class: persona, weightage and all.
   const grade = prof?.grade === 10 ? 10 : 9;
   const board = asBoard(prof?.board);
@@ -351,10 +359,11 @@ export async function POST(req: NextRequest) {
   const answerIn = askedFrom ? subjectMedium(askedFrom, board, language) : language;
 
   const used = usage.data?.used ?? 0;
+  // Premium's fifty or a trial's handful.
   const quota: QuotaState = {
-    limit: AI_QUOTA.premium,
+    limit: access.aiLimit,
     used,
-    remaining: Math.max(0, AI_QUOTA.premium - used),
+    remaining: Math.max(0, access.aiLimit - used),
     resetAt: resetAt(),
   };
   if (quota.remaining <= 0) {

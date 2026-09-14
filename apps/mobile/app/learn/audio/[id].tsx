@@ -18,6 +18,7 @@ import { useT } from '../../../src/i18n';
 import type { StringKey } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { C, F, S } from '../../../src/theme';
+import { setListening } from '../../../src/core/studyClock';
 
 const SPEEDS = [1, 1.25, 1.5] as const;
 
@@ -230,6 +231,11 @@ function RealPlayer({ id }: { id: string }) {
   const player = useAudioPlayer(track);
 
   const status = useAudioPlayerStatus(player);
+  // Listening counts as study time even with the screen untouched (core/studyClock.ts).
+  useEffect(() => {
+    setListening(status.playing);
+    return () => setListening(false);
+  }, [status.playing]);
   const [speed, setSpeed] = useState(0);
   const title = lessonTitle(id, state.settings.language);
 

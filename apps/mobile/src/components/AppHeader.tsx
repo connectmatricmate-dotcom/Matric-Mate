@@ -7,6 +7,7 @@ import { useApp } from '../store/app';
 import { useT } from '../i18n';
 import { C, F, S, rowDir } from '../theme';
 import { H2, IconButton, Pill, Small, Tap, Text } from './ui';
+import { TrialBanner } from './TrialBanner';
 
 /** Tab-root header: streak → progress, gear → settings, bell → notifications.
  *  The avatar is identity, not a control: settings are behind the gear only. */
@@ -31,6 +32,7 @@ export function AppHeader({
   const unread = state.notifications.some((n) => !n.read);
 
   return (
+    <>
     <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.sm, paddingTop: S.sm, paddingBottom: S.md }}>
       {/* The avatar disc carries its own tint; a second box behind it read
           as a mistake (the client's words: double background). */}
@@ -76,5 +78,8 @@ export function AppHeader({
       <IconButton icon="gear" tone="card" onPress={() => router.push('/account')} />
       <IconButton icon="bell" tone="card" badge={unread} onPress={() => router.push('/notifications')} />
     </View>
+    {/* A running free trial, on every tab root, as on every page of the website. */}
+    <TrialBanner />
+    </>
   );
 }

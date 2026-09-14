@@ -84,6 +84,14 @@ export function StudyList({
       });
   }, [subjects, chaptersBySubject, derived.subjects, derived.contentReady, state.readSections, state.attempts, state.lastChapterId]);
 
+  /* On a free trial, the subjects it does not open. Shown, not hidden: a
+     study list that shrank to one subject would read as the rest having
+     gone missing, when they are one plan away. */
+  const locked = useMemo(
+    () => subjects.filter((s) => derived.lockedSubjects.includes(s.id)),
+    [subjects, derived.lockedSubjects],
+  );
+
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return base;
@@ -172,6 +180,37 @@ export function StudyList({
               })}
             </div>
           )}
+
+          {locked.length && !q.trim() ? (
+            <section className="mt-7">
+              <h2 className="mb-2.5 flex items-center gap-2 font-display text-[16px] text-ink">
+                <Icon name="lock" size={16} className="text-ink3" />
+                {t('trial.lockedSection')}
+              </h2>
+              <div className="grid gap-3 md:grid-cols-2">
+                {locked.map((s) => (
+                  <Link key={s.id} href={`/learn/subject/${s.id}`} className="block">
+                    <Card flat className="flex items-center gap-3 transition-colors duration-200 hover:border-teal">
+                      <span className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[12px] bg-grey text-ink3">
+                        <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={19} strokeWidth={2.3} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        {state.settings.language === 'ur' && s.urduName ? (
+                          <Ur block className="text-[14.5px] text-ink2">{s.urduName}</Ur>
+                        ) : (
+                          <span className="block text-[14.5px] font-extrabold text-ink2">{s.name}</span>
+                        )}
+                        <span className="block text-[12.5px] text-ink3">
+                          {t('study.chapterCount', { n: (chaptersBySubject[s.id] ?? []).length })}
+                        </span>
+                      </span>
+                      <Icon name="lock" size={16} className="shrink-0 text-ink3" />
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
         </Work>
 
         <Rail>

@@ -35,6 +35,7 @@ import { useApp } from '../../src/store/app';
 import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 import { useQuota } from '../../src/core/useQuota';
+import { AiLocked } from '../../src/components/AiLocked';
 
 /** The longest side of a photo sent to the tutor: the size Claude reads images
  *  at best, and a few hundred kilobytes once saved at 70%. */
@@ -155,7 +156,8 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
     if (lastChapter) out.push(t('tutor.starterChapter', { chapter: lastChapter }));
     const subject = subjectName(subjectById(derived.subjects[0] ?? ''), lang);
     if (subject) out.push(t('tutor.starterExam', { subject }));
-    if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
+    if (derived.subjects.length === 1 && subject) out.push(t('tutor.starterPlanOne', { subject }));
+    else if (derived.subjects.length) out.push(t('tutor.starterPlan', { n: derived.subjects.length }));
     out.push(t('tutor.starterMarks'));
     return out.slice(0, 4);
     // contentKey is not read here and has to be listed: chapterById and
@@ -246,7 +248,17 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   );
 }
 
-export default function Chat() {
+/**
+ * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
+ * the screen's own hooks run, so it never starts a request it cannot make.
+ */
+export default function ChatGate() {
+  const { derived } = useApp();
+  if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.title" />;
+  return <Chat />;
+}
+
+function Chat() {
   const { q, chapter, thread, draft, photo: wantPhoto } = useLocalSearchParams<{
     q?: string;
     chapter?: string;

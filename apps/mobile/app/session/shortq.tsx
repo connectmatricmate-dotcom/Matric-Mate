@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, ErrorState, H2, Header, Label, Pill, Row, Screen, ScriptText, Skeleton, Small, Spacer, Text, TextInput, useToast } from '../../src/components/ui';
+import { Icon } from '../../src/components/Icon';
 import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, checkAnswerLive, fetchAiSession, isUrduScript, normalizeAiShortQs, subjectMedium } from '@matricmate/core';
 import type { AiCheckVerdict } from '@matricmate/core';
@@ -20,7 +21,7 @@ type Mark = 'got' | 'partial' | 'missed';
 
 export default function ShortQuestions() {
   const { chapter, ai, from } = useLocalSearchParams<{ chapter?: string; ai?: string; from?: string }>();
-  const { state, actions, contentKey } = useApp();
+  const { state, actions, contentKey, derived } = useApp();
   // No chapter in the link: one of the student's own chapters that has
   // notes, or a picker. See PracticeChapter.
   const practice = usePracticeChapter(chapter, 'shortq');
@@ -224,15 +225,30 @@ export default function ShortQuestions() {
             />
           </Card>
           <Spacer h={S.sm} />
-          <Btn
-            title={checking ? t('tutor.checkBusy') : t('tutor.checkTitle')}
-            variant="orange"
-            loading={checking}
-            disabled={!written.trim()}
-            onPress={checkMine}
-          />
-          <Spacer h={S.sm} />
-          <Btn title={t('session.revealAnswer')} variant="line" onPress={() => setRevealed(true)} />
+          {/* Marking a written answer is the AI's job, so on Basic the student
+              compares their answer with the model one themselves. */}
+          {derived.access.ai ? (
+            <>
+              <Btn
+                title={checking ? t('tutor.checkBusy') : t('tutor.checkTitle')}
+                variant="orange"
+                loading={checking}
+                disabled={!written.trim()}
+                onPress={checkMine}
+              />
+              <Spacer h={S.sm} />
+              <Btn title={t('session.revealAnswer')} variant="line" onPress={() => setRevealed(true)} />
+            </>
+          ) : (
+            <>
+              <Btn title={t('session.revealAnswer')} onPress={() => setRevealed(true)} />
+              <Spacer h={S.sm} />
+              <Row gap={6}>
+                <Icon name="lock" size={13} color={C.ink3} />
+                <Small style={{ color: C.ink3, flex: 1 }}>{`${t('tutor.checkTitle')} · ${t('aiLock.short')}`}</Small>
+              </Row>
+            </>
+          )}
         </>
       ) : (
         <>
@@ -274,18 +290,22 @@ export default function ShortQuestions() {
             </View>
           </Card>
 
-          <Spacer h={S.sm} />
-          <Btn
-            title={t('session.askAi')}
-            variant="line"
-            sm
-            onPress={() =>
-              router.push(
-                // In the student's own language, not an English line they never wrote.
-                `/tutor/chat?q=${encodeURIComponent(t('session.askExplain', { q: item?.q ?? '' }))}${itemChapter ? `&chapter=${itemChapter}` : ''}`,
-              )
-            }
-          />
+          {derived.access.ai ? (
+            <>
+              <Spacer h={S.sm} />
+              <Btn
+                title={t('session.askAi')}
+                variant="line"
+                sm
+                onPress={() =>
+                  router.push(
+                    // In the student's own language, not an English line they never wrote.
+                    `/tutor/chat?q=${encodeURIComponent(t('session.askExplain', { q: item?.q ?? '' }))}${itemChapter ? `&chapter=${itemChapter}` : ''}`,
+                  )
+                }
+              />
+            </>
+          ) : null}
 
           <Spacer h={S.lg} />
           <Label>{t('session.howDidYouDo')}</Label>

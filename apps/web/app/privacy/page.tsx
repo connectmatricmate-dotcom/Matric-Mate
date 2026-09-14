@@ -31,7 +31,8 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     heading: 'What we collect',
     paragraphs: [
       'When you make an account: your name, email address and mobile number. The mobile number is used to reach you about your account and to fill in the payment form, so you are not typing it on a phone keyboard mid-purchase.',
-      'When you study: your class, board, medium and subjects, which sections you have read, which questions you answered and how you rated your own confidence, your test scores, and the days you were active. This is the part that makes weak topics, streaks and the report card work; without it the app has nothing true to tell you.',
+      'When you study: your class, board, medium and subjects, which sections you have read, which questions you answered and how you rated your own confidence, your test scores, the days you were active and how many minutes a day you spent in the app. This is the part that makes weak topics, streaks, the daily report and the report card work; without it the app has nothing true to tell you.',
+      'Your school, if you choose to add it. It is optional, and it is used to count how many of our students come from each school.',
       'When you use the AI tutor: the questions you ask and the answers given, kept so you can read your own history back.',
       'Technical basics that any website receives, such as the pages requested and rough device information, used to keep the service working.',
     ],
@@ -50,6 +51,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
       'Our hosting and database providers, who store the data on our behalf and may not use it for anything else.',
       'The provider of the language model behind the AI tutor, which receives the question being asked in order to answer it.',
       'A parent or guardian you give your monthly report card to. It is a PDF you download and pass on yourself, and it shows study progress, never your password or payment details.',
+      'If you signed up through a teacher’s referral link, that teacher: for each day, whether you opened MatricMate, whether you studied, how long you spent in it, how many questions you answered and got right, and which chapters you worked in. Never your AI tutor questions, your password or your payment details.',
       'Nobody else, unless a Pakistani law or court requires it.',
     ],
   },

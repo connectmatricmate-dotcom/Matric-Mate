@@ -2,11 +2,23 @@
 
 import Link from 'next/link';
 import { useNow } from '@/lib/now';
-import { useMemo } from 'react';
-import { accuracy, formatDate, grade, overallPct, subjectById, subjectName, subjectPct } from '@matricmate/core';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  accuracy,
+  fetchDailyReport,
+  formatDate,
+  grade,
+  overallPct,
+  studyTimeLabel,
+  subjectById,
+  subjectName,
+  subjectPct,
+  type DailyReport,
+} from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { ConfidenceRail, StreakRail, namedWeakTopics, weakKey } from '@/components/app/rails';
 import { Bar, Card, Icon, Item, Kpi, LinkBtn, Pill, Ring, ScriptText } from '@/components/ui/primitives';
+import { createClient } from '@/lib/supabase/client';
 import { useApp, useLang, useT } from '@/lib/store';
 
 export function ProgressView() {
@@ -129,6 +141,9 @@ export function ProgressView() {
             )}
           </div>
 
+          <TodayCard />
+          <CareerCard />
+
           <Link href="/insights/report" className="block">
             <Card
               border="border-orange"
@@ -159,5 +174,74 @@ export function ProgressView() {
         </Rail>
       </Split>
     </Page>
+  );
+}
+
+/**
+ * The way into today's report, with today's two numbers on it: the time and
+ * the questions. The line under it says what the card is for until there is
+ * something to count.
+ */
+function TodayCard() {
+  const t = useT();
+  const { lang } = useLang();
+  const { state } = useApp();
+  const userId = state.user?.id ?? '';
+  const [report, setReport] = useState<DailyReport | null>(null);
+  // Answering a question changes today, so the count follows it.
+  const answered = state.attempts.length;
+
+  useEffect(() => {
+    if (!userId) return;
+    let alive = true;
+    void fetchDailyReport(createClient()).then((r) => {
+      if (alive && r) setReport(r);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [userId, answered]);
+
+  const active = !!report && (report.seconds >= 60 || report.questions > 0);
+  return (
+    <Link href="/insights/today" className="block">
+      <Card border="border-teal" className="flex items-center gap-4 transition-colors duration-200 hover:border-tealdark">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-tealtint text-teal">
+          <Icon name="calendar" size={24} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-[16px] text-ink">{t('today.cardTitle')}</span>
+          <span className="block text-[13px] text-ink2">
+            {active && report
+              ? t('today.cardSub', { time: studyTimeLabel(report.seconds, lang), n: report.questions })
+              : t('today.cardSubNone')}
+          </span>
+        </span>
+        <span className="hidden sm:block">
+          <Pill tone="teal">{t('progress.open')}</Pill>
+        </span>
+        <Icon name="chevron" size={18} className="shrink-0 text-ink3 sm:hidden" />
+      </Card>
+    </Link>
+  );
+}
+
+/** The way into career guidance: Premium's, so Basic sees what it is and whose it is. */
+function CareerCard() {
+  const t = useT();
+  const { derived } = useApp();
+  return (
+    <Link href="/insights/career" className="block">
+      <Card flat className="flex items-center gap-4 transition-colors duration-200 hover:border-teal">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-tealtint text-teal">
+          <Icon name="gradCap" size={24} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-[16px] text-ink">{t('career.title')}</span>
+          <span className="block text-[13px] text-ink2">{derived.access.ai ? t('career.cardSub') : t('aiLock.short')}</span>
+        </span>
+        <Icon name={derived.access.ai ? 'chevron' : 'lock'} size={18} className="shrink-0 text-ink3" />
+      </Card>
+    </Link>
   );
 }

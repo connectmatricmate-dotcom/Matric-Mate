@@ -471,7 +471,7 @@ export const PLAN_WEAK_TARGET = 5;
  * per-minute rate limit, not this ceiling. One constant, enforced in the
  * tutor route; changing it is an edit here and a deploy, no app update.
  */
-export const AI_QUOTA = { premium: 50, free: 0 };
+export const AI_QUOTA = { premium: 50, trial: 5, basic: 0, free: 0 };
 
 /**
  * Class 10 exists in the schema and the UI, but stays un-pickable until its

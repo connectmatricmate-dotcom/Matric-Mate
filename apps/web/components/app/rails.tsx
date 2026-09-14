@@ -232,6 +232,8 @@ export function TutorBudgetRail() {
   const limit = quota ? quota.limit : derived.aiLimit;
   const usedPct = (limit ? (limit - left) / limit : 0) * 100;
   const low = left <= Math.max(1, Math.floor(limit * 0.2));
+  // No AI on Basic, so no allowance to show.
+  if (!derived.access.ai) return null;
 
   return (
     <Card flat className="flex items-center gap-4">
@@ -315,9 +317,11 @@ export function CoachRail() {
      the report the notice announced did not appear until a reload. The old
      card stays up while the new one loads. */
   const reportNotice = state.notifications.find((n) => n.kind === 'report')?.id ?? '';
+  // Basic has no AI coach: the server writes no report and refuses the read.
+  const ai = derived.access.ai;
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !ai) return;
     let alive = true;
     // A read. Reports are written by the nightly job, so opening the dashboard
     // never waits on a model call and never spends a question.
@@ -333,7 +337,18 @@ export function CoachRail() {
     return () => {
       alive = false;
     };
-  }, [userId, reportNotice]);
+  }, [userId, reportNotice, ai]);
+
+  /* Without the coach, the one thing it always ends on: what to do next. */
+  if (!ai) {
+    if (!cta) return null;
+    return (
+      <Card flat tint="bg-tealtint" border="border-teal" className="flex flex-col gap-2">
+        <Label className="text-teal">{t('study.upNext')}</Label>
+        {cta}
+      </Card>
+    );
+  }
 
   /**
    * A skeleton while the report is in flight, not the welcome card.

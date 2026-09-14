@@ -20,7 +20,7 @@ export function ChapterHub({
   /** Whether the account has a plan, from the server. */
   paid: boolean;
 }) {
-  const { state } = useApp();
+  const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   /* Both names in the student's language. The subject used to arrive from the
@@ -157,7 +157,7 @@ export function ChapterHub({
         <Item
           href={`/learn/sheet/${id}`}
           title={t('tutor.sheetMake')}
-          sub={t('tutor.aiMade')}
+          sub={derived.access.ai ? t('tutor.aiMade') : t('aiLock.short')}
           icon="spark"
         />
         <Item

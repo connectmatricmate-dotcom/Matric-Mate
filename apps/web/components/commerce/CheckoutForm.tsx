@@ -19,8 +19,17 @@ import { useState } from 'react';
 import { PayMark } from '@/components/commerce/PayMark';
 import { Btn, ErrorBanner } from '@/components/ui/controls';
 import { Card, Icon, LinkBtn, Pill } from '@/components/ui/primitives';
-import { useLang, useT } from '@/lib/store';
-import { INCLUDED, PAYMENT_METHODS, planName, rupees, type Plan } from '@/lib/plans';
+import { AI_QUOTA, daysLeft, formatDate, type StringKey } from '@matricmate/core';
+import { useApp, useLang, useT } from '@/lib/store';
+import { BASIC_PLAN, PAYMENT_METHODS, THE_PLAN, planName, rupees, type Plan } from '@/lib/plans';
+import { startCheckout } from '@/lib/start-checkout';
+import { ManualActivation } from '@/components/commerce/ManualActivation';
+
+/** What each plan opens, from the shared strings so both languages agree. */
+const PERKS: Record<'basic' | 'premium', StringKey[]> = {
+  basic: ['plans.basicPerk1', 'plans.basicPerk2', 'plans.basicPerk3', 'plans.basicPerk4'],
+  premium: ['plans.premiumPerk1', 'plans.premiumPerk2', 'plans.premiumPerk3', 'plans.premiumPerk4'],
+};
 
 
 /**
@@ -36,10 +45,17 @@ export function CheckoutForm({
   plan,
   live,
   configured,
+  online = true,
   cancelled,
   accountEmail,
 }: {
   plan: Plan;
+  /**
+   * Whether a student can pay online here at all. Off while plans are switched
+   * on by hand (see onlinePayments in lib/gateway): the page then says how to
+   * get the chosen plan instead of offering a payment that goes nowhere.
+   */
+  online?: boolean;
   /** Keys are present, so a checkout can actually be started. */
   configured: boolean;
   /** True when this deployment has Safepay keys. */
@@ -50,6 +66,18 @@ export function CheckoutForm({
 }) {
   const t = useT();
   const { lang } = useLang();
+  const { derived } = useApp();
+  /*
+   * Which of the two plans, switchable here. It arrives from ?plan= (the
+   * pricing page and the upgrade screen link straight to one), and the order
+   * summary is where a student changes their mind without starting over.
+   */
+  const [chosen, setChosen] = useState<Plan>(plan.id === BASIC_PLAN.id ? BASIC_PLAN : THE_PLAN);
+  const current = derived.access;
+  /** Premium running and Basic picked: the server refuses it, so the page does first. */
+  const blocked = !chosen.ai && current.tier === 'premium';
+  /** Basic running and Premium picked: what the unused days become. See carriedOver in lib/payments. */
+  const leftDays = current.tier === 'basic' ? daysLeft(current.validTill) : 0;
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(
@@ -75,35 +103,17 @@ export function CheckoutForm({
     }
 
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: plan.id }),
-      });
-      const body = (await res.json()) as {
-        url?: string;
-        form?: { action: string; fields: Record<string, string> };
-        error?: string;
-      };
-      if (!res.ok || (!body.url && !body.form)) throw new Error(body.error ?? t('checkout.startFailed'));
-      if (body.form) {
-        // PayFast is entered by POSTing a form, not by following a URL. Built
-        // off-DOM and submitted synchronously; the student never sees it.
-        const f = document.createElement('form');
-        f.method = 'POST';
-        f.action = body.form.action;
-        for (const [name, value] of Object.entries(body.form.fields)) {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = name;
-          input.value = value;
-          f.appendChild(input);
-        }
-        document.body.appendChild(f);
-        f.submit();
-        return;
+      // Safepay answers with a URL and PayFast with a form; startCheckout goes to either.
+      const started = await startCheckout(chosen.id);
+      if (started.ok) return;
+      if (started.error === 'premium_running') {
+        throw new Error(
+          t('plans.premiumRunning', {
+            date: started.validTill ? formatDate(started.validTill, lang, { day: 'numeric', month: 'long' }) : '',
+          }),
+        );
       }
-      window.location.href = body.url as string;
+      throw new Error(started.error ?? t('checkout.startFailed'));
     } catch (err) {
       setError(err instanceof Error ? err.message : t('checkout.startFailed'));
       setBusy(false);
@@ -146,51 +156,86 @@ export function CheckoutForm({
       <div className="md:order-2">
         <Card flat className="md:sticky md:top-6">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">{t('checkout.yourPlan')}</p>
-          <div className="mt-2 flex flex-wrap items-baseline gap-2">
-            <span className="font-display text-[24px] text-ink">{t('checkout.planTitle', { plan: planName(plan.id, lang) })}</span>
-            {plan.saving ? <Pill tone="green">{plan.saving}</Pill> : null}
+          {/* The two plans, as a pair of choices: the one picked is the order below. */}
+          <div role="radiogroup" aria-label={t('checkout.yourPlan')} className="mt-2.5 grid grid-cols-2 gap-2">
+            {[THE_PLAN, BASIC_PLAN].map((p) => {
+              const on = chosen.id === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setChosen(p)}
+                  className={`flex min-h-11 flex-col items-start rounded-[14px] border-[1.5px] px-3 py-2.5 text-start transition-colors duration-200 ${
+                    on ? 'border-teal bg-tealtint' : 'border-line bg-card hover:border-teal'
+                  }`}
+                >
+                  <span className="text-[14px] font-extrabold text-ink">{planName(p.id, lang)}</span>
+                  <span className="latin text-[12.5px] text-ink2">{t('plans.perMonth', { price: rupees(p.perMonth) })}</span>
+                  <span className={`mt-0.5 text-[11.5px] font-extrabold ${p.ai ? 'text-teal' : 'text-ink3'}`}>
+                    {t(p.ai ? 'plans.premiumTag' : 'plans.basicTag')}
+                  </span>
+                </button>
+              );
+            })}
           </div>
+          <div className="mt-3 flex flex-wrap items-baseline gap-2">
+            <span className="font-display text-[24px] text-ink">{t('checkout.planTitle', { plan: planName(chosen.id, lang) })}</span>
+            {chosen.saving ? <Pill tone="green">{chosen.saving}</Pill> : null}
+          </div>
+          {blocked ? (
+            <p role="status" className="mt-2 rounded-xl bg-orangetint px-3 py-2 text-[12.5px] leading-[1.55] text-orangedark">
+              {t('plans.premiumRunning', {
+                date: current.validTill ? formatDate(current.validTill, lang, { day: 'numeric', month: 'long' }) : '',
+              })}
+            </p>
+          ) : chosen.ai && leftDays > 0 ? (
+            <p className="mt-2 rounded-xl bg-tealtint px-3 py-2 text-[12.5px] leading-[1.55] text-ink2">
+              {t('plans.upgradeNote', { n: leftDays, m: Math.floor(leftDays / 2) })}
+            </p>
+          ) : null}
 
           <dl className="mt-4 flex flex-col gap-2 text-[14px]">
             <div className="flex justify-between">
               <dt className="text-ink2">{t('checkout.planTotal')}</dt>
-              <dd className="font-extrabold text-ink">{rupees(plan.price)}</dd>
+              <dd className="font-extrabold text-ink">{rupees(chosen.price)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-ink2">{t('checkout.worksOutTo')}</dt>
-              <dd className="text-ink2">{t('checkout.perMonth', { price: rupees(plan.perMonth) })}</dd>
+              <dd className="text-ink2">{t('checkout.perMonth', { price: rupees(chosen.perMonth) })}</dd>
             </div>
             <div className="flex justify-between border-t border-line pt-2">
               <dt className="font-extrabold text-ink">{t('checkout.dueToday')}</dt>
-              <dd className="font-display text-[19px] text-green">{rupees(plan.price)}</dd>
+              <dd className="font-display text-[19px] text-green">{rupees(chosen.price)}</dd>
             </div>
           </dl>
 
-          <p className="mt-3 text-[12.5px] leading-[1.6] text-ink2">
-            {live ? t('checkout.liveNote') : t('checkout.payNote')}
-          </p>
+          {online ? (
+            <p className="mt-3 text-[12.5px] leading-[1.6] text-ink2">
+              {live ? t('checkout.liveNote') : t('checkout.payNote')}
+            </p>
+          ) : null}
 
           <ul className="mt-4 flex flex-col gap-2 border-t border-line pt-4">
-            {INCLUDED.slice(0, 4).map((li) => (
-              <li key={li} className="flex items-start gap-2.5 text-[13.5px] text-ink2">
+            {PERKS[chosen.ai ? 'premium' : 'basic'].map((key) => (
+              <li key={key} className="flex items-start gap-2.5 text-[13.5px] text-ink2">
                 <Icon name="check" size={15} strokeWidth={2.6} className="mt-0.5 shrink-0 text-green" />
-                {li}
+                {t(key, { n: AI_QUOTA.premium })}
               </li>
             ))}
           </ul>
-
-          <Link href="/pricing" className="mt-4 inline-block text-[13px] font-extrabold text-teal hover:underline">
-            {t('checkout.changePlan')}
-          </Link>
         </Card>
       </div>
 
       {/* payment */}
       <div className="md:order-1">
         <h1 className="font-display text-[27px] text-ink">{t('checkout.title')}</h1>
-        <p className="mt-1 text-[14px] leading-[1.6] text-ink2">
-          {live ? t('checkout.subLive') : t('checkout.subPreview')}
-        </p>
+        {online ? (
+          <p className="mt-1 text-[14px] leading-[1.6] text-ink2">
+            {live ? t('checkout.subLive') : t('checkout.subPreview')}
+          </p>
+        ) : null}
 
         {error ? (
           <div className="mt-4">
@@ -198,6 +243,12 @@ export function CheckoutForm({
           </div>
         ) : null}
 
+        {!online ? (
+          <div className="mt-5">
+            <ManualActivation plan={chosen} />
+          </div>
+        ) : (
+        <>
         <Card className="mt-5">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink2">{t('checkout.payWith')}</p>
           <ul className="mt-3 flex flex-col gap-2.5">
@@ -242,12 +293,13 @@ export function CheckoutForm({
         <Btn
           title={
             live
-              ? t('checkout.continueToSafepay', { price: rupees(plan.price) })
-              : t('checkout.subscribeNow', { price: rupees(plan.price) })
+              ? t('checkout.continueToSafepay', { price: rupees(chosen.price) })
+              : t('checkout.subscribeNow', { price: rupees(chosen.price) })
           }
           onClick={pay}
           variant="orange"
           loading={busy}
+          disabled={blocked}
           className="w-full"
         />
 
@@ -258,6 +310,8 @@ export function CheckoutForm({
           </Link>
           {agreeLine[1]} {live ? t('checkout.testNote') : t('checkout.previewNote')}
         </p>
+        </>
+        )}
 
         <p className="mt-4 text-[12.5px] text-ink3">
           {t('checkout.needHelp')}{' '}

@@ -29,6 +29,8 @@ export type StudentRow = {
   teacher: string | null;
   grade: 9 | 10;
   board: 'fbise' | 'punjab';
+  /** As the student typed it at signup or in their account; null when they skipped it. */
+  school: string | null;
 };
 
 /**
@@ -73,5 +75,27 @@ export const allStudents = cache(async (): Promise<StudentRow[]> => {
     teacher: (r.teacher as string | null) ?? null,
     grade: Number(r.grade) === 10 ? 10 : 9,
     board: r.board === 'punjab' ? 'punjab' : 'fbise',
+    school: (r.school as string | null) ?? null,
+  }));
+});
+
+export type SchoolCount = { school: string; students: number; paying: number; trials: number };
+
+/**
+ * Students per school, for the admin's inventory: admin_school_counts()
+ * groups the typed names case-insensitively and shows the commonest spelling.
+ */
+export const schoolCounts = cache(async (): Promise<SchoolCount[]> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('admin_school_counts');
+  if (error) {
+    console.error('students: school counts failed', error.message);
+    throw new Error('Could not load the schools.');
+  }
+  return ((data ?? []) as Record<string, unknown>[]).map((r) => ({
+    school: String(r.school ?? ''),
+    students: Number(r.students ?? 0),
+    paying: Number(r.paying ?? 0),
+    trials: Number(r.trials ?? 0),
   }));
 });

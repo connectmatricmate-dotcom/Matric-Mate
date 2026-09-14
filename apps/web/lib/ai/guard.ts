@@ -1,7 +1,7 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { AI_QUOTA, BOARD_LABEL, SUBJECTS, asBoard, type Board } from '@matricmate/core';
-import { planIsActive } from '@/lib/entitlement';
+import { BOARD_LABEL, SUBJECTS, asBoard, type Board } from '@matricmate/core';
+import { accessFromRow, planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -14,7 +14,7 @@ import { createClient } from '@/lib/supabase/server';
  * Heavier operations produce more tokens, so the pool stays an honest proxy
  * for spend while the student sees one simple number.
  */
-export const AI_COST = { chat: 1, session: 2, check: 1, paper: 3, coach: 1, sheet: 1 } as const;
+export const AI_COST = { chat: 1, session: 2, check: 1, paper: 3, coach: 1, sheet: 1, career: 1 } as const;
 
 /**
  * All non-chat AI work runs on the same model as the tutor, chosen for the
@@ -62,6 +62,10 @@ export type Guarded = {
   /** The medium saved on the account, for a request that does not say which
    *  one it wants. Null when the account has never chosen. */
   medium: 'en' | 'ur' | null;
+  /** On a free trial, the one subject it opens; null on a paid plan. Admin
+   *  queries skip the row level security that holds a trial to it, so a route
+   *  that reads a subject's material checks this itself (outsideTrial). */
+  trialSubject: string | null;
 };
 
 /** Not a decision about the student: the database did not answer. */
@@ -103,7 +107,7 @@ export async function guardStudent(req: NextRequest): Promise<Guarded | NextResp
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
 
   const [ent, prof, usage] = await Promise.all([
-    admin.from('entitlements').select('active,valid_till').eq('user_id', userId).maybeSingle(),
+    admin.from('entitlements').select('active,valid_till,plan,trial_subject').eq('user_id', userId).maybeSingle(),
     admin.from('profiles').select('grade,role,board,onboarding').eq('id', userId).maybeSingle(),
     admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
   ]);
@@ -135,15 +139,44 @@ export async function guardStudent(req: NextRequest): Promise<Guarded | NextResp
   }
 
   if (!planIsActive(ent.data)) return NextResponse.json({ error: 'plan_required' }, { status: 402 });
+  /*
+   * A plan that does not include AI: Basic, Rs 500. Its own answer rather
+   * than plan_required, because this student has a plan and both apps say
+   * something different to them: AI comes with Premium, not "subscribe".
+   */
+  const access = accessFromRow(ent.data);
+  if (!access.ai) return NextResponse.json({ error: 'ai_not_in_plan' }, { status: 402 });
   const grade: 9 | 10 = prof.data?.grade === 10 ? 10 : 9;
   const board = asBoard(prof.data?.board);
   const saved = (prof.data?.onboarding as { medium?: string } | null)?.medium;
 
   const used = (usage.data?.used as number | undefined) ?? 0;
-  const limit = AI_QUOTA.premium;
+  // Premium's fifty, a trial's handful. See accessFor in core.
+  const limit = access.aiLimit;
   const quota: QuotaState = { limit, used, remaining: Math.max(0, limit - used), resetAt: resetAt() };
 
-  return { userId, admin, quota, grade, board, medium: saved === 'ur' ? 'ur' : saved === 'en' ? 'en' : null };
+  return {
+    userId,
+    admin,
+    quota,
+    grade,
+    board,
+    medium: saved === 'ur' ? 'ur' : saved === 'en' ? 'en' : null,
+    trialSubject: access.trialSubject,
+  };
+}
+
+/**
+ * The 403 for a free trial asking about a subject it does not open, or null.
+ *
+ * The database gives a trial one subject's content, and the apps only ever
+ * offer that subject, but these routes read material with the admin client:
+ * without this, a hand-made request could have a mock paper or a practice set
+ * built from any subject's bank.
+ */
+export function outsideTrial(g: Pick<Guarded, 'trialSubject'>, subjectId: string | null | undefined): NextResponse | null {
+  if (!g.trialSubject || subjectId === g.trialSubject) return null;
+  return NextResponse.json({ error: 'not_in_trial' }, { status: 403 });
 }
 
 /** The 429 for a student without `cost` left today, or null when they have it. */

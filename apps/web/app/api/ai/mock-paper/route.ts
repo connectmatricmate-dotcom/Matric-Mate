@@ -9,6 +9,7 @@ import {
   chargeQuota,
   groundingBrief,
   guardAi,
+  outsideTrial,
   refused,
   studentMedium,
 } from '@/lib/ai/guard';
@@ -195,6 +196,8 @@ export async function POST(req: NextRequest) {
   }
   const subjectId = (body.subjectId ?? '').slice(0, 40);
   if (!subjectId) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+  const shut = outsideTrial(g, subjectId);
+  if (shut) return shut;
   const readsIn = studentMedium(body.medium, g);
   // The subject's own language: an Urdu paper is written in Urdu and an
   // English one in English, whichever medium the student reads in.

@@ -29,6 +29,7 @@ import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, rowDir } from '../../src/theme';
 import { useQuota } from '../../src/core/useQuota';
+import { AiLocked } from '../../src/components/AiLocked';
 
 /**
  * Three ways in, and not one of them spends a question.
@@ -53,7 +54,17 @@ const ENTRIES: { key: 'ask' | 'explain' | 'photo'; label: StringKey; sub: String
 
 type ThreadRow = { id: string; title: string; context_label: string | null; updated_at: string };
 
-export default function Tutor() {
+/**
+ * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
+ * the screen's own hooks run, so it never starts a request it cannot make.
+ */
+export default function TutorGate() {
+  const { derived } = useApp();
+  if (derived.access.active && !derived.access.ai) return <AiLocked tabbed />;
+  return <Tutor />;
+}
+
+function Tutor() {
   const { state, derived } = useApp();
   const [picking, setPicking] = useState(false);
   const t = useT();

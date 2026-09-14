@@ -49,7 +49,9 @@ export const payfastProvider: PaymentProvider = {
       token,
       basketId: req.orderId,
       amountRupees: req.amountRupees,
-      description: `MatricMate Premium (${req.orderId})`,
+      // What the student sees on PayFast's page. The plan is in our order id
+      // (MM-basic-..., see api/checkout); a display field, not part of the token.
+      description: `MatricMate ${req.orderId.startsWith('MM-basic-') ? 'Basic' : 'Premium'} (${req.orderId})`,
       customerEmail: req.payer.email,
       customerMobile: localMobile(req.payer.phone),
       successUrl: req.redirectUrl,

@@ -26,7 +26,7 @@ const LEVELS: { value: Confidence; label: StringKey }[] = [
  * what makes the "how sure vs how right" analytics possible.
  */
 export default function McqScreen() {
-  const { actions } = useApp();
+  const { actions, derived } = useApp();
   const t = useT();
   const s = session.current;
   const [i, setI] = useState(0);
@@ -115,6 +115,8 @@ export default function McqScreen() {
       footer={
         checked ? (
           <Row gap={S.sm}>
+            {/* The tutor is Premium's; on Basic, Next takes the row. */}
+            {derived.access.ai ? (
             <View style={{ flex: 1 }}>
               <Btn
                 title={t('session.askAi')}
@@ -135,6 +137,7 @@ export default function McqScreen() {
                 }}
               />
             </View>
+            ) : null}
             <View style={{ flex: 1 }}>
               <Btn title={i + 1 >= s.mcqs.length ? t('session.seeResult') : t('session.nextQuestion')} onPress={next} />
             </View>

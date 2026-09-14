@@ -248,6 +248,19 @@ export const recall = (subject: string, question: string, answer: string, chapte
   chapterId,
 });
 
+/**
+ * The afternoon of a free trial's last day. Instead of that day's tip: the
+ * one thing worth knowing is that the subject they have been using locks
+ * tomorrow. Opens their plan's page, which says how to keep it.
+ */
+export const trialEnding = (subject: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.trialEndsTitle',
+  body: 'notifications.trialEndsBody',
+  params: { subject },
+  target: 'subscription',
+});
+
 const GENERAL_TIPS: StringKey[] = [
   'tips.general1',
   'tips.general2',

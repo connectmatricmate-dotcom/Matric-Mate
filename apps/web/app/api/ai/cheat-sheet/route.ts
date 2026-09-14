@@ -8,6 +8,7 @@ import {
   chargeQuota,
   groundingBrief,
   guardStudent,
+  outsideTrial,
   quotaGate,
   refused,
   studentMedium,
@@ -52,13 +53,15 @@ export async function POST(req: NextRequest) {
    */
   const { data: chapter, error: chapterError } = await g.admin
     .from('chapters')
-    .select('id,grade,board')
+    .select('id,grade,board,subject_id')
     .eq('id', chapterId)
     .maybeSingle();
   if (chapterError) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 503 });
   if (!chapter || chapter.grade !== g.grade || asBoard(chapter.board) !== g.board) {
     return NextResponse.json({ error: 'not_in_syllabus', quota: g.quota }, { status: 404 });
   }
+  const shut = outsideTrial(g, chapter.subject_id as string);
+  if (shut) return shut;
 
   /*
    * One sheet per chapter per LANGUAGE, not per medium. Urdu is written in

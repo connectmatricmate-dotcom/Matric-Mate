@@ -139,12 +139,13 @@ export function CellLink({ href, children }: { href: string; children: React.Rea
   );
 }
 
-export function Tag({ tone, children }: { tone: 'green' | 'grey' | 'red' | 'orange'; children: React.ReactNode }) {
+export function Tag({ tone, children }: { tone: 'green' | 'grey' | 'red' | 'orange' | 'teal'; children: React.ReactNode }) {
   const map = {
     green: 'bg-greentint text-green',
     grey: 'bg-grey text-ink2',
     red: 'bg-redtint text-red',
     orange: 'bg-orangetint text-orangedark',
+    teal: 'bg-tealtint text-teal',
   } as const;
   return <span className={`inline-block rounded-full px-2.5 py-1 text-[11.5px] font-extrabold ${map[tone]}`}>{children}</span>;
 }

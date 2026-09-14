@@ -12,6 +12,7 @@ import {
   Row,
   Screen,
   ScriptText,
+  SectionTitle,
   Skeleton,
   Small,
   TextInput,
@@ -39,6 +40,15 @@ export default function Study() {
     const chapters = await Promise.all(list.map((s) => api.getChapters(s.id)));
     return list.map((s, i) => ({ s, chapters: chapters[i] }));
   }, [derived.subjects.join(), contentKey]);
+
+  /* On a free trial, the subjects it does not open. Listed under the open one,
+     not hidden: a study tab that shrank to one subject would read as the rest
+     having gone missing, when they are one plan away. Names only; nothing in
+     them opens. */
+  const { data: locked } = useAsync(
+    async () => (derived.lockedSubjects.length ? api.getSubjects(derived.lockedSubjects) : []),
+    [derived.lockedSubjects.join(), contentKey],
+  );
 
   const rows = useMemo(() => {
     if (!subjects) return [];
@@ -164,6 +174,29 @@ export default function Study() {
           ))}
         </View>
       )}
+
+      {locked?.length && !q.trim() ? (
+        <>
+          <SectionTitle>{t('trial.lockedSection')}</SectionTitle>
+          <View style={{ gap: S.sm }}>
+            {locked.map((s) => (
+              <Card key={s.id} flat onPress={() => router.push(`/learn/subject/${s.id}`)} style={{ opacity: 0.75 }}>
+                <Row gap={S.md}>
+                  <View
+                    style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: C.grey, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Icon name={SUBJECT_ICON[s.id] ?? 'book'} size={18} color={C.ink3} strokeWidth={2.3} />
+                  </View>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <ScriptText text={subjectName(s, lang)} face="bodyBold" size={14.5} color={C.ink2} />
+                  </View>
+                  <Icon name="lock" size={17} color={C.ink3} />
+                </Row>
+              </Card>
+            ))}
+          </View>
+        </>
+      ) : null}
     </Screen>
   );
 }

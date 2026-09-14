@@ -15,6 +15,7 @@ import {
   subjectById,
   subjectMedium,
   subjectName,
+  subjectOpen,
 } from '@matricmate/core';
 import type { Chapter } from '@matricmate/core';
 import { chapterDownloadBytes, formatBytes, localAudioTrack, localChapter } from '../../../src/core/downloads';
@@ -33,7 +34,7 @@ const countsKnown = (c: Chapter): boolean => c.board !== undefined || hasStudyMa
 
 export default function ChapterHub() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { state, actions, contentKey } = useApp();
+  const { state, actions, contentKey, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   const online = useOnline();
@@ -151,7 +152,9 @@ export default function ChapterHub() {
    * every chapter under row level security, and the empty-chapter screen
    * below told it "Nothing to revise here" about a chapter full of notes.
    */
-  const locked = !!chapter && !state.premium.active && (chapter.premium || !hasStudyMaterial(chapter));
+  // A free trial opens one subject: this chapter may belong to another.
+  const shutByTrial = !!chapter && derived.access.tier === 'trial' && !subjectOpen(derived.access, chapter.subjectId);
+  const locked = !!chapter && ((!state.premium.active && (chapter.premium || !hasStudyMaterial(chapter))) || shutByTrial);
   const blurb = chapter ? chapterBlurb(chapter, lang) : '';
   if (locked) {
     return (
@@ -174,12 +177,19 @@ export default function ChapterHub() {
           )}
         </Card>
         <Spacer h={S.md} />
-        <Card flat style={{ paddingVertical: 0 }}>
-          <Item title={t('study.notes')} sub={t('study.sectionsSub', { n: chapter.sectionCount })} icon="book" />
-          <Item title={t('study.mcqs')} sub={t('study.mcqsSub', { n: chapter.mcqCount })} icon="target" />
-          <Item title={t('study.flashcards')} sub={t('study.flashcardsSub', { n: chapter.flashcardCount, known: 0 })} icon="cards" last />
-        </Card>
-        <Spacer h={S.md} />
+        {/* The counts, when they are known. Under a trial's lock they read
+            zero (the database counts nothing it will not serve), which would
+            say the chapter is empty; the notice alone is the truth. */}
+        {shutByTrial ? null : (
+          <>
+            <Card flat style={{ paddingVertical: 0 }}>
+              <Item title={t('study.notes')} sub={t('study.sectionsSub', { n: chapter.sectionCount })} icon="book" />
+              <Item title={t('study.mcqs')} sub={t('study.mcqsSub', { n: chapter.mcqCount })} icon="target" />
+              <Item title={t('study.flashcards')} sub={t('study.flashcardsSub', { n: chapter.flashcardCount, known: 0 })} icon="cards" last />
+            </Card>
+            <Spacer h={S.md} />
+          </>
+        )}
         <LockedNotice variant="locked" />
       </Screen>
     );
@@ -391,7 +401,7 @@ export default function ChapterHub() {
         {online ? (
           <Item
             title={t('tutor.sheetMake')}
-            sub={t('tutor.aiMade')}
+            sub={derived.access.ai ? t('tutor.aiMade') : t('aiLock.short')}
             icon="spark"
             onPress={() => router.push(`/learn/sheet/${id}`)}
           />

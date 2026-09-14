@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AI_QUOTA } from '@matricmate/core';
+import { accessFromRow } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -36,11 +36,17 @@ export async function GET(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
 
   const admin = createAdminClient();
-  const { data, error } = await admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle();
+  const [{ data, error }, { data: ent, error: entError }] = await Promise.all([
+    admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
+    admin.from('entitlements').select('active,valid_till,plan,trial_subject').eq('user_id', userId).maybeSingle(),
+  ]);
   // A failed read is not a fresh allowance: showing "50 left" to a student
   // who has used them all is a promise the next question breaks.
-  if (error) return NextResponse.json({ error: 'server_error' }, { status: 503 });
+  if (error || entError) return NextResponse.json({ error: 'server_error' }, { status: 503 });
   const used = data?.used ?? 0;
-  const limit = AI_QUOTA.premium;
+  // The plan's own allowance: fifty on Premium, a handful on a trial, none on
+  // Basic. It was fifty for everybody, which is what the route enforces now
+  // only for Premium.
+  const limit = accessFromRow(ent).aiLimit;
   return NextResponse.json({ limit, used, remaining: Math.max(0, limit - used), resetAt: resetAt() });
 }

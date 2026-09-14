@@ -30,4 +30,24 @@ export const gateway: PaymentProvider =
   : payfastProvider.isConfigured ? payfastProvider
   : safepayProvider;
 
+/**
+ * Whether a student can pay online on this deployment, or plans are switched
+ * on by hand from the admin dashboard.
+ *
+ * The live site was sending students to Safepay's sandbox: a test page where
+ * no money moves, and where a published test card completes a "payment" that
+ * the confirmation path would have turned into a real plan. As of 14 Sep 2026
+ * no gateway is live and the client activates plans himself, likely moving to
+ * a bank's own API later. So a sandbox may take payments only where nothing is
+ * real (local development and preview deployments); the production site pays
+ * online only once a provider here is configured AND live, and until then
+ * every plan button explains how to get the plan from the team instead.
+ */
+export function onlinePayments(): boolean {
+  if (!gateway.isConfigured) return false;
+  if (gateway.isLive) return true;
+  const production = process.env.VERCEL_ENV === 'production' || (!process.env.VERCEL_ENV && process.env.NODE_ENV === 'production');
+  return !production;
+}
+
 export type { CheckoutRequest, CheckoutStart, GatewayEvent, PaymentProvider } from './types';

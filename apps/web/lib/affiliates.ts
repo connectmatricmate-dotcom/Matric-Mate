@@ -1,6 +1,6 @@
 import 'server-only';
-import { asBoard, type Board } from '@matricmate/core';
-import { planIsActive } from '@/lib/entitlement';
+import { asBoard, parseDailyReport, type Board, type DailyReport } from '@matricmate/core';
+import { planIsPaid } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/roles';
 
@@ -40,6 +40,21 @@ export type ReferredStudent = {
   paid: boolean;
   /** What this student has paid us in total, net of refunds. */
   spend: Money;
+  /** What they did on the day asked about; null when that read failed. */
+  activity: StudentActivity | null;
+};
+
+/** One student's day, as their teacher sees it (students_activity, migration 0042). */
+export type StudentActivity = {
+  /** The app was opened that day. */
+  opened: boolean;
+  /** The day counts towards their streak: they answered or read something. */
+  studied: boolean;
+  /** Seconds in the app. */
+  seconds: number;
+  questions: number;
+  /** The last day they opened the app or studied, YYYY-MM-DD. */
+  lastActive: string | null;
 };
 
 export type AffiliateRow = {
@@ -135,21 +150,63 @@ async function payingNow(admin: ReturnType<typeof createAdminClient>, ids: strin
     for (let from = 0; ; from += PAGE) {
       const { data, error } = await admin
         .from('entitlements')
-        .select('user_id, active, valid_till')
+        .select('user_id, active, valid_till, plan')
         .in('user_id', slice)
         .order('user_id')
         .range(from, from + PAGE - 1);
       if (error) throw new Error(`entitlements read failed: ${error.message}`);
       const rows = (data ?? []) as { user_id: string; active: boolean | null; valid_till: string | null }[];
-      for (const r of rows) if (planIsActive(r)) out.add(r.user_id);
+      // A free trial is not a sale: it would read as "has paid" to the teacher.
+      for (const r of rows) if (planIsPaid(r)) out.add(r.user_id);
       if (rows.length < PAGE) break;
     }
   }
   return out;
 }
 
-/** Every student a teacher brought, with what each has paid. */
-export async function referredStudents(affiliateId: string): Promise<ReferredStudent[]> {
+/**
+ * What each of these students did on one Karachi day (today when `day` is
+ * not given): opened the app, studied, minutes, questions, last active day.
+ *
+ * Asked for by the client on 14 Sep 2026: a teacher who sends a class the
+ * link wants to see who is actually using it. The database function takes
+ * the ids it is given on trust, which is why it is service-role only and why
+ * every caller here passes ids already scoped to this teacher's own students.
+ * A failed read is an empty map rather than an error: the list of names and
+ * money is still worth showing without it.
+ */
+async function activityByStudent(
+  admin: ReturnType<typeof createAdminClient>,
+  ids: string[],
+  day?: string,
+): Promise<Map<string, StudentActivity>> {
+  const out = new Map<string, StudentActivity>();
+  for (let i = 0; i < ids.length; i += 200) {
+    const slice = ids.slice(i, i + 200);
+    const { data, error } = await admin.rpc('students_activity', { p_users: slice, p_day: day ?? null });
+    if (error) {
+      console.error('[affiliates] activity read failed', error.message);
+      continue;
+    }
+    for (const r of (data ?? []) as { user_id: string; opened: boolean; studied: boolean; seconds: number; questions: number; last_active: string | null }[]) {
+      out.set(r.user_id, {
+        opened: !!r.opened,
+        studied: !!r.studied,
+        seconds: r.seconds ?? 0,
+        questions: r.questions ?? 0,
+        lastActive: r.last_active,
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * Every student a teacher brought, with what each has paid, and, when
+ * `activity` is asked for, what they did that day: `true` for today or a
+ * YYYY-MM-DD day. Totals and the admin's pages skip it; it costs a query.
+ */
+export async function referredStudents(affiliateId: string, opts: { activity?: true | string } = {}): Promise<ReferredStudent[]> {
   const admin = createAdminClient();
 
   const profiles: { id: string; name: string | null; contact: string | null; grade: number | null; board: string | null; referred_at: string | null }[] = [];
@@ -169,7 +226,11 @@ export async function referredStudents(affiliateId: string): Promise<ReferredStu
   }
 
   const ids = profiles.map((p) => p.id);
-  const [spend, paying] = await Promise.all([spendByStudent(admin, ids), payingNow(admin, ids)]);
+  const [spend, paying, activity] = await Promise.all([
+    spendByStudent(admin, ids),
+    payingNow(admin, ids),
+    opts.activity ? activityByStudent(admin, ids, opts.activity === true ? undefined : opts.activity) : Promise.resolve(new Map<string, StudentActivity>()),
+  ]);
 
   return profiles.map((p) => {
     const total = spend.get(p.id) ?? 0;
@@ -182,8 +243,65 @@ export async function referredStudents(affiliateId: string): Promise<ReferredStu
       joinedAt: p.referred_at ?? '',
       paid: paying.has(p.id),
       spend: total,
+      activity: activity.get(p.id) ?? null,
     };
   });
+}
+
+export type StudentDay = {
+  student: { id: string; name: string; grade: number | null; board: Board; school: string | null };
+  report: DailyReport;
+  /** Chapter ids in the report, with their titles. */
+  chapterTitles: Map<string, string>;
+  /** The seven days up to and including `day`, newest first. */
+  week: { day: string; activity: StudentActivity | null }[];
+};
+
+/**
+ * One of a teacher's students, one day in full: the same report the student
+ * sees of themselves, and the week around it.
+ *
+ * Null when the student is not this teacher's: the scoping is the access
+ * control here, as everywhere in this file, so an id from the URL that was
+ * not referred by this teacher reads as not found rather than as a report.
+ */
+export async function referredStudentDay(affiliateId: string, studentId: string, day: string, week: string[]): Promise<StudentDay | null> {
+  const admin = createAdminClient();
+  const { data: profile, error } = await admin
+    .from('profiles')
+    .select('id, name, grade, board, school')
+    .eq('id', studentId)
+    .eq('referred_by', affiliateId)
+    .maybeSingle();
+  if (error) throw new Error(`profile read failed: ${error.message}`);
+  if (!profile) return null;
+
+  const [{ data: raw, error: reportError }, ...days] = await Promise.all([
+    admin.rpc('daily_report', { p_day: day, p_user: studentId }),
+    ...week.map((d) => activityByStudent(admin, [studentId], d)),
+  ]);
+  if (reportError) throw new Error(`report read failed: ${reportError.message}`);
+  const report = parseDailyReport(raw);
+  if (!report) throw new Error('report read failed: no report');
+
+  const chapterTitles = new Map<string, string>();
+  if (report.chapters.length) {
+    const { data: rows } = await admin.from('chapters').select('id, title').in('id', report.chapters);
+    for (const r of (rows ?? []) as { id: string; title: string }[]) chapterTitles.set(r.id, r.title);
+  }
+
+  return {
+    student: {
+      id: profile.id as string,
+      name: (profile.name as string | null)?.trim() || 'Student',
+      grade: profile.grade as number | null,
+      board: asBoard(profile.board),
+      school: (profile.school as string | null) ?? null,
+    },
+    report,
+    chapterTitles,
+    week: week.map((d, i) => ({ day: d, activity: days[i]?.get(studentId) ?? null })),
+  };
 }
 
 export async function payouts(affiliateId: string): Promise<Payout[]> {

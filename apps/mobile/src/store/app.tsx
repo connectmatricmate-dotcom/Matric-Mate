@@ -13,7 +13,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  AI_QUOTA,
+  Access,
   Attempt,
   Board,
   Group,
@@ -25,6 +25,7 @@ import {
   TestResult,
   XP,
   boardChoice,
+  accessFor,
   buildPlan,
   clearContentCache,
   clearSyncQueue,
@@ -194,7 +195,8 @@ export type State = {
   ownerId: string | null;
   user: { id: string; name: string; contact: string } | null;
   onboarding: Onboarding | null;
-  premium: { active: boolean; validTill: number | null; ref?: string };
+  /** The plan, from the server (store/auth.tsx). `plan` and `trialSubject` since there are two plans and a trial. */
+  premium: { active: boolean; validTill: number | null; ref?: string; plan?: string | null; trialSubject?: string | null };
   readSections: string[];
   attempts: Attempt[];
   results: TestResult[];
@@ -391,7 +393,12 @@ type Ctx = {
     aiLeft: number;
     aiLimit: number;
     plan: PlanTask[];
+    /** The subjects this plan opens: on a free trial, only its one. */
     subjects: string[];
+    /** On a free trial, the student's other subjects, shown as locked. */
+    lockedSubjects: string[];
+    /** What the plan lets them do: tier, AI, allowance, trial subject. See accessFor in core. */
+    access: Access;
   };
   /**
    * Changes whenever what a content fetch would return can have changed: the
@@ -419,9 +426,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * true of progress, which starts from AsyncStorage and is corrected by the
    * server the moment a session and a connection both exist.
    */
-  const { user: authUser, entitlement, loading: authLoading } = useAuth();
+  const { user: authUser, entitlement, entitlementReady, loading: authLoading } = useAuth();
   const online = useOnline();
   const [state, setState] = useState<State>(EMPTY);
+  /** Today's AI allowance under the current plan, for consumeAi (the plan is not in `state`). */
+  const aiLimitRef = useRef(0);
   const [localLoaded, setLocalLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   /**
@@ -1120,9 +1129,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
+  /*
+   * What the plan opens decides what row level security serves: a plan that
+   * arrives while the app is open (a payment made on the website, a free
+   * trial started here) or ends, or a trial's one subject. The index read
+   * before it was counted under the old rules, every chapter empty for an
+   * account with no plan, so a new trial opened on an empty plan and "no
+   * material" everywhere. So a change of plan clears what was cached and
+   * reads the index again. Not the first settle after sign-in: the read that
+   * followed it already ran under the server's rules, which do not wait for
+   * this phone to learn the plan.
+   */
+  const planKey = entitlement.active ? `${entitlement.plan ?? ''}:${entitlement.trialSubject ?? ''}` : 'none';
+  const planSeen = useRef<{ user: string | null; key: string | null }>({ user: null, key: null });
+  const [planEpoch, setPlanEpoch] = useState(0);
+  useEffect(() => {
+    if (!entitlementReady || !liveUserId) return;
+    const seen = planSeen.current;
+    if (seen.user !== liveUserId || seen.key === null) {
+      planSeen.current = { user: liveUserId, key: planKey };
+      return;
+    }
+    if (seen.key === planKey) return;
+    planSeen.current = { user: liveUserId, key: planKey };
+    clearContentCache();
+    setPlanEpoch((e) => e + 1);
+  }, [entitlementReady, liveUserId, planKey]);
+
   // Who is asking matters as much as what: row level security answers per
   // account, and a signed-out read returns nothing at all.
-  const syllabusKey = `${liveUserId ?? '-'}:${board}:${classLevel}:${contentMedium}:${profileEpoch}`;
+  const syllabusKey = `${liveUserId ?? '-'}:${board}:${classLevel}:${contentMedium}:${profileEpoch}:${planEpoch}`;
   useEffect(() => {
     // Offline there is nothing to read it from; coming back online reads it
     // again, which is also what refreshes screens that loaded without signal.
@@ -1312,7 +1348,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
         setState((s) => {
           const used = s.ai.day === day ? s.ai.used : 0;
-          const limit = s.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
+          // The plan lives in the auth store, overlaid on the view, never in
+          // this state: read through the ref the render below keeps current.
+          const limit = aiLimitRef.current;
           if (used >= limit) {
             allowed = false;
             return { ...s, ai: { day, used } };
@@ -1494,8 +1532,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [authUser?.id, authUser?.name, authUser?.email], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const premium = useMemo(
-    () => ({ active: entitlement.active, validTill: entitlement.validTill }),
-    [entitlement.active, entitlement.validTill],
+    () => ({ active: entitlement.active, validTill: entitlement.validTill, plan: entitlement.plan, trialSubject: entitlement.trialSubject }),
+    [entitlement.active, entitlement.validTill, entitlement.plan, entitlement.trialSubject],
   );
   const view = useMemo<State>(
     () => ({
@@ -1509,14 +1547,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const accountReady = hydrated && readyFor === (authUser?.id ?? null);
 
   const derived = useMemo(() => {
-    const aiLimit = view.premium.active ? AI_QUOTA.premium : AI_QUOTA.free;
+    const access = accessFor({
+      active: view.premium.active,
+      plan: view.premium.plan ?? null,
+      validTill: view.premium.validTill,
+      trialSubject: view.premium.trialSubject ?? null,
+    });
+    const aiLimit = access.aiLimit;
     const usedToday = view.ai.day === todayKey() ? view.ai.used : 0;
-    const subjects = view.onboarding?.subjects?.length ? view.onboarding.subjects : DEFAULT_SUBJECTS;
+    const chosen = view.onboarding?.subjects?.length ? view.onboarding.subjects : DEFAULT_SUBJECTS;
+    /*
+     * On a free trial the one subject it opens is the student's whole syllabus
+     * for three days: today's plan, the practice pickers and the tutor all
+     * build from this list, and none of them should point at a subject the
+     * database will refuse. The rest are kept to show as locked. Same rule as
+     * the website's store.
+     */
+    const subjects = access.tier === 'trial' && access.trialSubject ? [access.trialSubject] : chosen;
+    const lockedSubjects = access.tier === 'trial' ? chosen.filter((id) => id !== access.trialSubject) : [];
     return {
       streak: streakFrom(view.activeDays),
       level: level(view.xp),
       aiLeft: Math.max(0, aiLimit - usedToday),
       aiLimit,
+      access,
+      lockedSubjects,
       subjects,
       // Can be empty while the index loads (contentLoading): the plan no
       // longer falls back to a chapter whose counts it cannot see.
@@ -1540,6 +1595,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // underneath without React knowing, so the plan is rebuilt each time it does.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, indexVersion, primed.version]);
+
+  useEffect(() => {
+    aiLimitRef.current = derived.aiLimit;
+  }, [derived.aiLimit]);
 
   return (
     <AppCtx.Provider value={{ state: view, hydrated, accountReady, actions, derived, contentKey, contentLoading }}>

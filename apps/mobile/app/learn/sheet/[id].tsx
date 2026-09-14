@@ -8,6 +8,7 @@ import { useLang, useT } from '../../../src/i18n';
 import { useApp } from '../../../src/store/app';
 import { S } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
+import { AiLocked } from '../../../src/components/AiLocked';
 
 /**
  * The AI revision sheet: one page per chapter, definitions, formulas,
@@ -15,7 +16,17 @@ import { Markdown } from '../../../src/components/Markdown';
  * per chapter and medium, cached for every student, so opening it a second
  * time is instant and free.
  */
-export default function RevisionSheet() {
+/**
+ * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
+ * the screen's own hooks run, so it never starts a request it cannot make.
+ */
+export default function RevisionSheetGate() {
+  const { derived } = useApp();
+  if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.sheetTitle" />;
+  return <RevisionSheet />;
+}
+
+function RevisionSheet() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, contentKey } = useApp();
   const t = useT();

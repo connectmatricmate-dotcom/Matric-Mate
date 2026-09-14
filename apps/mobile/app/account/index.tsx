@@ -133,11 +133,16 @@ export default function Account() {
             <Text style={{ fontSize: 24 }}>{state.premium.active ? '👑' : '🔓'}</Text>
             <View style={{ flex: 1 }}>
               <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>
-                {state.premium.active ? t('account.premiumActive') : t('account.freeMode')}
+                {state.premium.active
+                  ? `${t('account.premiumActive')} · ${t(
+                      state.premium.plan === 'basic' ? 'billing.planBasic' : state.premium.plan === 'trial' ? 'billing.planTrial' : 'billing.planMonthly',
+                    )}`
+                  : t('account.freeMode')}
               </Text>
               <Small>
                 {state.premium.active && state.premium.validTill
-                  ? t('account.premiumTill', {
+                  ? // A free trial is not renewed at all, manually or otherwise.
+                    t(state.premium.plan === 'trial' ? 'billing.activeTill' : 'account.premiumTill', {
                       date: formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short' }),
                     })
                   : t('account.freeModeSub')}

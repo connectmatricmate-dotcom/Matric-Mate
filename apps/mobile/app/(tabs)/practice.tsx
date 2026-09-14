@@ -43,7 +43,7 @@ const MODES: { label: StringKey; sub: StringKey; icon: IconName; href: string; a
 ];
 
 export default function Practice() {
-  const { state } = useApp();
+  const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   const recent = state.results.slice(0, 5);
@@ -134,7 +134,7 @@ export default function Practice() {
         <Icon name="spark" color={C.orangeDark} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('practice.aiTest')}</Text>
-          <Small>{t('practice.aiTestSub')}</Small>
+          <Small>{derived.access.ai ? t('practice.aiTestSub') : t('aiLock.short')}</Small>
         </View>
         <Chevron size={18} color={C.ink3} />
       </Card>

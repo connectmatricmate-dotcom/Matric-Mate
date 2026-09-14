@@ -237,7 +237,7 @@ export async function grantPremiumAction(_prev: AdminState, formData: FormData):
 
   revalidatePath('/admin/students');
   revalidatePath('/admin');
-  return { ok: `${check.name} now has Premium.` };
+  return { ok: `${check.name} now has ${plan.name}.` };
 }
 
 /**
@@ -283,10 +283,10 @@ export async function revokePremiumAction(_prev: AdminState, formData: FormData)
   // as revenue, and towards a teacher's commission, is worth knowing about.
   if (refundError) {
     return {
-      error: `${check.name} no longer has Premium, but the manual payment could not be marked refunded: ${refundError.message}`,
+      error: `${check.name} no longer has a plan, but the manual payment could not be marked refunded: ${refundError.message}`,
     };
   }
-  return { ok: `${check.name} no longer has Premium.` };
+  return { ok: `${check.name} no longer has a plan.` };
 }
 
 /**

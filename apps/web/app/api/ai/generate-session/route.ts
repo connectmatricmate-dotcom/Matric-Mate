@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { BOARD_LABEL, subjectMedium } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi, refused, studentMedium } from '@/lib/ai/guard';
+import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi, outsideTrial, refused, studentMedium } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -141,6 +141,8 @@ export async function POST(req: NextRequest) {
     // again", which never helps. A chapter with no text of ours still builds,
     // from the syllabus.
     if (!grounding) return NextResponse.json({ error: 'not_in_syllabus', quota: g.quota }, { status: 404 });
+    const shut = outsideTrial(g, grounding.subjectId);
+    if (shut) return shut;
 
     const response = await anthropic.messages.create({
       model: AI_MODEL,

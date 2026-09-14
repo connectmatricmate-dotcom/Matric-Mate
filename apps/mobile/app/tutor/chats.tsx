@@ -27,6 +27,7 @@ import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../../src/theme';
+import { AiLocked } from '../../src/components/AiLocked';
 
 /**
  * Every conversation the student has ever had with the tutor.
@@ -47,7 +48,17 @@ type ThreadRow = { id: string; title: string; context_label: string | null; upda
  *  student who uses the tutor daily for two years will pass that. */
 const PAGE = 100;
 
-export default function AllChats() {
+/**
+ * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
+ * the screen's own hooks run, so it never starts a request it cannot make.
+ */
+export default function AllChatsGate() {
+  const { derived } = useApp();
+  if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.allChatsTitle" />;
+  return <AllChats />;
+}
+
+function AllChats() {
   const { state } = useApp();
   const t = useT();
   const { lang } = useLang();
