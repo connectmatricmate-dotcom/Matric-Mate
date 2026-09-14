@@ -3,6 +3,7 @@ import { affiliateByUserId, payouts, referredStudents, totalsFor } from '@/lib/a
 import { requireAdmin } from '@/lib/roles';
 import { SITE_URL } from '@/lib/site';
 import { BackLink, Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { ShareCard } from '@/components/affiliate/ShareCard';
 import { RecordPayout, ToggleActive } from '@/components/admin/TeacherControls';
 
 export const dynamic = 'force-dynamic';
@@ -46,9 +47,26 @@ export default async function TeacherPage({ params }: { params: Promise<{ id: st
         <ToggleActive affiliateId={row.userId} active={row.active} />
       </div>
 
-      <div className="mt-5 rounded-[16px] border border-line bg-card px-4 py-3.5">
-        <p className="text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink3">Their link</p>
-        <p className="mt-1 break-all font-mono text-[13.5px] text-ink">{`${SITE_URL}/r/${row.code}`}</p>
+      {/* The teacher's invite, the same card they see on their own page, so
+          Adnan can send the link or print the QR card for their classes. A
+          switched-off link shows only the address: there is nothing to sign
+          up through until it is turned back on. */}
+      <div id="qr" className="mt-5 scroll-mt-20">
+        {row.active ? (
+          <ShareCard
+            link={`${SITE_URL}/r/${row.code}`}
+            code={row.code}
+            name={row.fullName}
+            heading={`${row.fullName.split(' ')[0]}\u2019s invite`}
+            note="Send the link to the teacher, or download the QR card and print it for their classes. Students who sign up through either are counted as theirs."
+            printNote={`Download QR saves a card ready to print, with the QR, the link written out and ${row.fullName}\u2019s name.`}
+          />
+        ) : (
+          <div className="rounded-[16px] border border-line bg-card px-4 py-3.5">
+            <p className="text-[13px] font-extrabold text-ink2">Their link, switched off</p>
+            <p className="mt-1 break-all text-[13.5px] text-ink3">{`${SITE_URL}/r/${row.code}`}</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-3">

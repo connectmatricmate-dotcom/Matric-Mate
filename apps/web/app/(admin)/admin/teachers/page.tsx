@@ -1,6 +1,8 @@
 import { allAffiliates } from '@/lib/affiliates';
 import { requireAdmin } from '@/lib/roles';
-import { CellLink, Panel, Row, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { SITE_URL } from '@/lib/site';
+import { CellLink, Panel, PillLink, Row, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { CopyLink } from '@/components/admin/CopyLink';
 import { LinkBtn } from '@/components/ui/primitives';
 
 export const dynamic = 'force-dynamic';
@@ -39,38 +41,50 @@ export default async function TeachersPage() {
         <Panel title="On the programme">
           {/* "Have paid" counts everyone who has ever paid, which is what the
               commission is earned on, so it does not say "Paying". */}
-          <Table head={['Teacher', 'Code', 'Share', 'Students', 'Have paid', 'Not yet', 'Earned', 'Paid out', 'Outstanding']}>
-            {rows.map(({ row, totals }) => (
-              <Row key={row.userId}>
-                <Td>
-                  <CellLink href={`/admin/teachers/${row.userId}`}>{row.fullName}</CellLink>
-                  <span className="block text-[11.5px] font-normal text-ink3 wrap-anywhere">{row.email}</span>
-                </Td>
-                <Td num>
-                  <span className="font-mono text-[12.5px]">{row.code}</span>
-                  {row.active ? null : (
-                    <span className="ms-2">
-                      <Tag tone="grey">off</Tag>
+          <Table head={['Teacher', 'Referral link', 'Share', 'Students', 'Have paid', 'Not yet', 'Earned', 'Paid out', 'Outstanding']}>
+            {rows.map(({ row, totals }) => {
+              const link = `${SITE_URL}/r/${row.code}`;
+              return (
+                <Row key={row.userId}>
+                  <Td>
+                    <CellLink href={`/admin/teachers/${row.userId}`}>{row.fullName}</CellLink>
+                    <span className="block text-[11.5px] font-normal text-ink3 wrap-anywhere">{row.email}</span>
+                  </Td>
+                  {/* The link the teacher shares, not only its code: it is what
+                      gets pasted into WhatsApp, so it is what gets copied. Shown
+                      without https://www. to keep the column narrow; the copy has it.
+                      Plain text, not a link to follow: opening it here would drop
+                      the referral cookie into the admin's own browser. */}
+                  <Td>
+                    <span className="block whitespace-nowrap text-[13px] font-extrabold text-teal">{link.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                    <span className="mt-1.5 flex items-center gap-2">
+                      <CopyLink link={link} />
+                      {/* The QR lives on the teacher's page, big enough to scan. */}
+                      {row.active ? (
+                        <PillLink href={`/admin/teachers/${row.userId}#qr`}>QR code</PillLink>
+                      ) : (
+                        <Tag tone="grey">off</Tag>
+                      )}
                     </span>
-                  )}
-                </Td>
-                <Td num>{row.commissionPct}%</Td>
-                <Td num>{totals.students}</Td>
-                <Td num>{totals.paidStudents}</Td>
-                <Td num>{totals.students - totals.paidStudents}</Td>
-                <Td num>{rupees(totals.earned)}</Td>
-                <Td num>{rupees(totals.paidOut)}</Td>
-                <Td num className="font-extrabold">
-                  {totals.outstanding > 0 ? (
-                    <span className="text-orangedark">{rupees(totals.outstanding)}</span>
-                  ) : totals.outstanding < 0 ? (
-                    <span className="text-ink2">{rupees(totals.outstanding)} ahead</span>
-                  ) : (
-                    <span className="text-ink3">settled</span>
-                  )}
-                </Td>
-              </Row>
-            ))}
+                  </Td>
+                  <Td num>{row.commissionPct}%</Td>
+                  <Td num>{totals.students}</Td>
+                  <Td num>{totals.paidStudents}</Td>
+                  <Td num>{totals.students - totals.paidStudents}</Td>
+                  <Td num>{rupees(totals.earned)}</Td>
+                  <Td num>{rupees(totals.paidOut)}</Td>
+                  <Td num className="font-extrabold">
+                    {totals.outstanding > 0 ? (
+                      <span className="text-orangedark">{rupees(totals.outstanding)}</span>
+                    ) : totals.outstanding < 0 ? (
+                      <span className="text-ink2">{rupees(totals.outstanding)} ahead</span>
+                    ) : (
+                      <span className="text-ink3">settled</span>
+                    )}
+                  </Td>
+                </Row>
+              );
+            })}
           </Table>
         </Panel>
       )}

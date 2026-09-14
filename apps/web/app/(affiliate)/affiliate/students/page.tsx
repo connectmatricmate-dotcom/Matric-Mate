@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { karachiDay, studyTimeLabel } from '@matricmate/core';
 import { referredStudents, type StudentActivity } from '@/lib/affiliates';
 import { currentAffiliate } from '@/lib/affiliate-session';
-import { CellLink, Panel, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { CellLink, Panel, PillLink, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { CopyLink } from '@/components/admin/CopyLink';
+import { SITE_URL } from '@/lib/site';
 import { Skeleton } from '@/components/ui/primitives';
 
 export const dynamic = 'force-dynamic';
@@ -60,6 +62,12 @@ async function Students({ day }: { day: Day }) {
               Send your link to a class group. When somebody signs up through it their name appears here, and once they
               subscribe your share starts adding up.
             </p>
+            {/* The one thing to do about an empty list, right here. The QR to
+                print is on Overview. */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <CopyLink link={`${SITE_URL}/r/${row.code}`} />
+              <PillLink href="/affiliate">Print your QR code</PillLink>
+            </div>
           </div>
         ) : (
           <Table head={['Student', 'Class', day === 'yesterday' ? 'Yesterday' : 'Today', 'Time', 'Questions', 'Last active', 'Status', 'Your share']}>

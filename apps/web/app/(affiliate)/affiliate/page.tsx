@@ -3,8 +3,7 @@ import { payouts, totalsFor } from '@/lib/affiliates';
 import { currentAffiliate } from '@/lib/affiliate-session';
 import { SITE_URL } from '@/lib/site';
 import { Panel, Row, Stat, StatGrid, Table, Td, rupees } from '@/components/admin/bits';
-import { ShareQr } from '@/components/affiliate/ShareQr';
-import { ShareLink } from '@/components/affiliate/ShareLink';
+import { ShareCard } from '@/components/affiliate/ShareCard';
 import { Skeleton } from '@/components/ui/primitives';
 
 export const dynamic = 'force-dynamic';
@@ -115,12 +114,18 @@ export default async function AffiliateDashboard() {
         </div>
       )}
 
-      <ShareLink link={`${SITE_URL}/r/${row.code}`} code={row.code} name={row.fullName} />
-      {/* A switched-off link has nothing to scan into. */}
+      {/* The link and the QR together, to copy, print or share. Not for a
+          switched-off link, which has nothing to sign up through; the notice
+          above says so. */}
       {row.active ? (
-        <div className="mt-3">
-          <ShareQr link={`${SITE_URL}/r/${row.code}`} code={row.code} />
-        </div>
+        <ShareCard
+          link={`${SITE_URL}/r/${row.code}`}
+          code={row.code}
+          name={row.fullName}
+          heading="Invite students"
+          note="Show the QR in class or print it on a notice, or send the link on WhatsApp. Everyone who signs up through either is counted as yours."
+          printNote="Download QR saves a card ready to print, with your QR, the link written out and your name."
+        />
       ) : null}
 
       <div className="mt-4">

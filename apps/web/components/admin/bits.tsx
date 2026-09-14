@@ -139,6 +139,18 @@ export function CellLink({ href, children }: { href: string; children: React.Rea
   );
 }
 
+/** A secondary action shaped like a button, for next to one: a full 44px target where a text link would be 20. */
+export function PillLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-line bg-card px-3 text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:border-teal hover:text-teal md:h-10"
+    >
+      {children}
+    </Link>
+  );
+}
+
 export function Tag({ tone, children }: { tone: 'green' | 'grey' | 'red' | 'orange' | 'teal'; children: React.ReactNode }) {
   const map = {
     green: 'bg-greentint text-green',
