@@ -35,9 +35,10 @@ export async function POST(request: Request) {
 
   // No online payment here (see onlinePayments): the page shows how to get
   // the plan from the team, and a request that skipped the page gets the same
-  // answer as a code the buttons know.
+  // answer as a code the buttons know. A 200, because nothing failed: every
+  // buy button asks, and a 503 put an error in the console of each press.
   if (!onlinePayments()) {
-    return NextResponse.json({ error: 'manual_activation' }, { status: 503 });
+    return NextResponse.json({ error: 'manual_activation' }, { status: 200 });
   }
 
   const parsed = Body.safeParse(await request.json().catch(() => ({})));

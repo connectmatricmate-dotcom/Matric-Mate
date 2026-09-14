@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AI_QUOTA, formatDate, subjectById, subjectName, type StringKey } from '@matricmate/core';
+import { AI_QUOTA, daysLeft, formatDate, subjectById, subjectName, type StringKey } from '@matricmate/core';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { Page, Work } from '@/components/app/Page';
 import { Btn } from '@/components/ui/controls';
@@ -78,10 +78,11 @@ function PlanCard({ plan, highlight }: { plan: Plan; highlight?: boolean }) {
   /* What an upgrade does to the Basic days already paid for, the same rule
      the payment applies (carriedOver in lib/payments.ts): they carry over at
      Basic's price, so half as many Premium days. */
-  // The moment the page opened: close enough for a count of days, and stable across renders.
+  // The moment the page opened: close enough for a count of days, and stable
+  // across renders. Counted as the checkout page counts them, so the two agree.
   const [openedAt] = useState(() => Date.now());
-  const rest = upgrading && access.validTill ? Math.max(0, (access.validTill - openedAt) / 864e5) : 0;
-  const carried = Math.round((rest * BASIC_PLAN.perMonth) / THE_PLAN.perMonth);
+  const rest = upgrading ? daysLeft(access.validTill, openedAt) : 0;
+  const carried = Math.floor((rest * BASIC_PLAN.perMonth) / THE_PLAN.perMonth);
   const label = current ? t('plans.renewCta', { plan: name }) : upgrading ? t('plans.upgradeCta') : t('plans.choose', { plan: name });
 
   return (
@@ -107,9 +108,9 @@ function PlanCard({ plan, highlight }: { plan: Plan; highlight?: boolean }) {
           </li>
         ))}
       </ul>
-      {upgrading && Math.round(rest) > 0 ? (
+      {upgrading && rest > 0 ? (
         <p className="mt-4 text-[12.5px] leading-[1.6] text-ink2 rtl:leading-[1.9]">
-          {t('plans.upgradeNote', { n: Math.round(rest), m: carried })}
+          {t('plans.upgradeNote', { n: rest, m: carried })}
         </p>
       ) : null}
       <div className="mt-5">

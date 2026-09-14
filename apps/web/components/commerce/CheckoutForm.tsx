@@ -192,7 +192,7 @@ export function CheckoutForm({
             </p>
           ) : chosen.ai && leftDays > 0 ? (
             <p className="mt-2 rounded-xl bg-tealtint px-3 py-2 text-[12.5px] leading-[1.55] text-ink2">
-              {t('plans.upgradeNote', { n: leftDays, m: Math.floor(leftDays / 2) })}
+              {t('plans.upgradeNote', { n: leftDays, m: Math.floor((leftDays * BASIC_PLAN.perMonth) / THE_PLAN.perMonth) })}
             </p>
           ) : null}
 
@@ -205,10 +205,13 @@ export function CheckoutForm({
               <dt className="text-ink2">{t('checkout.worksOutTo')}</dt>
               <dd className="text-ink2">{t('checkout.perMonth', { price: rupees(chosen.perMonth) })}</dd>
             </div>
-            <div className="flex justify-between border-t border-line pt-2">
-              <dt className="font-extrabold text-ink">{t('checkout.dueToday')}</dt>
-              <dd className="font-display text-[19px] text-green">{rupees(chosen.price)}</dd>
-            </div>
+            {/* Nothing is due on this page while plans are switched on by hand. */}
+            {online ? (
+              <div className="flex justify-between border-t border-line pt-2">
+                <dt className="font-extrabold text-ink">{t('checkout.dueToday')}</dt>
+                <dd className="font-display text-[19px] text-green">{rupees(chosen.price)}</dd>
+              </div>
+            ) : null}
           </dl>
 
           {online ? (
@@ -230,7 +233,10 @@ export function CheckoutForm({
 
       {/* payment */}
       <div className="md:order-1">
-        <h1 className="font-display text-[27px] text-ink">{t('checkout.title')}</h1>
+        {/* "Confirm and pay" only where there is a payment to confirm. */}
+        <h1 className="font-display text-[27px] text-ink">
+          {online ? t('checkout.title') : t('activation.title', { plan: planName(chosen.id, lang) })}
+        </h1>
         {online ? (
           <p className="mt-1 text-[14px] leading-[1.6] text-ink2">
             {live ? t('checkout.subLive') : t('checkout.subPreview')}
@@ -245,7 +251,7 @@ export function CheckoutForm({
 
         {!online ? (
           <div className="mt-5">
-            <ManualActivation plan={chosen} />
+            <ManualActivation plan={chosen} bare />
           </div>
         ) : (
         <>

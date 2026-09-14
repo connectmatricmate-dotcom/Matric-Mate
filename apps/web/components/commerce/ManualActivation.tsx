@@ -14,7 +14,7 @@ import { useApp, useLang, useT } from '@/lib/store';
  * the two ways to reach the team. The email is written for them, naming the
  * account and the plan, so nothing has to be typed or remembered.
  */
-export function ManualActivation({ plan }: { plan: Plan }) {
+export function ManualActivation({ plan, bare }: { plan: Plan; /** No heading, where the page's own says it. */ bare?: boolean }) {
   const t = useT();
   const { lang } = useLang();
   const { state } = useApp();
@@ -28,8 +28,8 @@ export function ManualActivation({ plan }: { plan: Plan }) {
 
   return (
     <Card flat tint="bg-tealtint" border="border-tealtint2">
-      <p className="font-display text-[18px] text-ink">{t('activation.title', { plan: planName(plan.id, lang) })}</p>
-      <ol className="mt-3 flex flex-col gap-2">
+      {bare ? null : <p className="font-display text-[18px] text-ink">{t('activation.title', { plan: planName(plan.id, lang) })}</p>}
+      <ol className={`flex flex-col gap-2 ${bare ? '' : 'mt-3'}`}>
         {(['activation.step1', 'activation.step2', 'activation.step3'] as const).map((key, i) => (
           <li key={key} className="flex items-start gap-2.5">
             <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal text-[11px] font-extrabold text-onbrand">
