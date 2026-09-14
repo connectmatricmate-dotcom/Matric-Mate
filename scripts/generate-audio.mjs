@@ -60,6 +60,8 @@ const DRY = args.includes('--dry-run');
 const MISSING_ONLY = args.includes('--missing');
 const ONLY_CHAPTER = flag('chapter');
 const ONLY_SUBJECT = flag('subject');
+/** `--medium en` or `--medium ur`: only that language's lessons. */
+const ONLY_MEDIUM = flag('medium');
 /** Parallel narrations. edge-tts tolerates a few at once; keep it modest. */
 const CONCURRENCY = Number(flag('concurrency')) || 1;
 
@@ -76,6 +78,23 @@ const VOICE = {
   ur: 'ur-PK-UzmaNeural',
   en: 'en-US-AriaNeural',
 };
+
+/**
+ * English lessons full of Arabic and Urdu names, read by a South Asian voice.
+ *
+ * The client, 14 Sep 2026: the American voice got "Hadith", "Hazrat" and the
+ * Prophet's name (peace be upon him) wrong in Islamiyat, and Pakistan Studies
+ * is the same with Quaid-e-Azam, Iqbal and Tehreek-e-Pakistan. Indian English
+ * says those names the way a Pakistani classroom does. Female, like the other
+ * two, so the app keeps one kind of voice. Changing this means regenerating
+ * these subjects' English lessons (--subject isl --medium en).
+ */
+const EN_VOICE_BY_SUBJECT = {
+  isl: 'en-IN-NeerjaNeural',
+  pst: 'en-IN-NeerjaNeural',
+};
+
+const voiceFor = (chapterId, lang) => (lang === 'en' ? (EN_VOICE_BY_SUBJECT[chapterId.split('-')[0]] ?? VOICE.en) : VOICE.ur);
 
 /** Slightly slower than default. This is teaching, not a news bulletin. */
 const RATE = '-8%';
@@ -144,6 +163,7 @@ async function main() {
     .filter((j) => !(j.chapterId.startsWith('isl-pj-') && j.medium === 'en'))
     .filter((j) => (ONLY_CHAPTER ? j.chapterId === ONLY_CHAPTER : true))
     .filter((j) => (ONLY_SUBJECT ? j.chapterId.startsWith(`${ONLY_SUBJECT}-`) : true))
+    .filter((j) => (ONLY_MEDIUM ? j.medium === ONLY_MEDIUM : true))
     .sort((a, b) => a.file.localeCompare(b.file));
 
   if (MISSING_ONLY) {
@@ -219,7 +239,7 @@ async function main() {
           'asyncio.run(edge_tts.Communicate(txt, sys.argv[2], rate=sys.argv[3]).save(sys.argv[4]))',
         ].join('\n'),
         resolve(SCRIPTS, file),
-        VOICE[voiceLang],
+        voiceFor(chapterId, voiceLang),
         RATE,
         mp3,
       ]);
