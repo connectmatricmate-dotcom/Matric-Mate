@@ -50,6 +50,7 @@ export function CareerView() {
       quota: t('tutor.limitToast'),
       rate: t('tutor.slowDown'),
       plan: t('tutor.planNeeded'),
+      trial: t('tutor.notInTrial'),
       refused: t('career.failed'),
       syllabus: t('career.failed'),
       error: t('career.failed'),

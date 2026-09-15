@@ -107,7 +107,7 @@ export const api = {
     /** The row the server saved this answer as, so it can be rated. */
     messageId?: string;
     quota?: TutorQuota;
-    reason?: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'syllabus' | 'error';
+    reason?: 'offline' | 'quota' | 'rate' | 'plan' | 'trial' | 'refused' | 'syllabus' | 'error';
   }> {
     if (tutorConfigured()) {
       const res = await askTutorLive(

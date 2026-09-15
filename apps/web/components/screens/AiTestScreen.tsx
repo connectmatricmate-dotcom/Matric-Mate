@@ -144,6 +144,7 @@ export function AiTestScreen({ chaptersBySubject }: { chaptersBySubject: Record<
       quota: t('tutor.limitToast'),
       rate: t('tutor.slowDown'),
       plan: t('tutor.planNeeded'),
+      trial: t('tutor.notInTrial'),
       refused: t('tutor.refused'),
       syllabus: t('tutor.notInSyllabus'),
       error: t('tutor.errorReply'),

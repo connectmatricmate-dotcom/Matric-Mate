@@ -49,6 +49,7 @@ const FAILURE: Record<AiFail['reason'], { title: StringKey; body: StringKey; ret
   refused: { title: 'states.errorTitle', body: 'tutor.refused', retry: true },
   quota: { title: 'tutor.limitTitle', body: 'tutor.limitToast', retry: false },
   plan: { title: 'tutor.noPlanTitle', body: 'tutor.planNeeded', retry: false },
+  trial: { title: 'access.lockedSection', body: 'tutor.notInTrial', retry: false },
   syllabus: { title: 'states.errorTitle', body: 'tutor.notInSyllabus', retry: false },
 };
 

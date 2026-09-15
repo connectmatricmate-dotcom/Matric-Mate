@@ -32,7 +32,7 @@ export type TutorReply =
    *  non-streaming path. It is what makes an answer ratable: see the note in
    *  the tutor route about tutor_feedback sitting empty. */
   | { ok: true; text: string; threadId: string; messageId: string | null; quota: TutorQuota }
-  | { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'syllabus' | 'error'; quota?: TutorQuota };
+  | { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'trial' | 'refused' | 'syllabus' | 'error'; quota?: TutorQuota };
 
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
@@ -76,6 +76,8 @@ function failFrom(status: number, body: { error?: string; quota?: TutorQuota }, 
   setQuota(body.quota, who);
   if (body.error === 'refused') return { ok: false, reason: 'refused', quota: body.quota };
   if (status === 402) return { ok: false, reason: 'plan' };
+  // A free trial asking about another subject: no retry can change that.
+  if (body.error === 'not_in_trial') return { ok: false, reason: 'trial' };
   // A chapter from outside the student's class or board: another try cannot
   // help, so it gets its own reason and its own words.
   if (body.error === 'not_in_syllabus') return { ok: false, reason: 'syllabus' };
@@ -200,7 +202,7 @@ export async function fetchTutorQuota(): Promise<TutorQuota | null> {
 
 /* ------------------------------------------------------------- AI actions */
 
-export type AiFail = { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'refused' | 'syllabus' | 'error'; quota?: TutorQuota };
+export type AiFail = { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'trial' | 'refused' | 'syllabus' | 'error'; quota?: TutorQuota };
 
 /**
  * How long one of these may hang before the client stops waiting.

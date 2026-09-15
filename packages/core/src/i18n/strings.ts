@@ -1137,6 +1137,9 @@ export const en = {
     limitInputHint: 'Daily limit reached. Resets at {time}.',
     slowDown: 'One breath! Wait a few seconds between questions.',
     planNeeded: 'The AI tutor comes with Premium.',
+    /* The same refusal in the Android app, which may not name a plan (Google Play). */
+    aiNotInPlan: 'The AI tutor is not in your plan.',
+    notInTrial: 'Your free trial opens one subject, and this is not it.',
     offline: 'The tutor needs internet. Check your connection and try again.',
     refused: 'The tutor could not answer that one. Try asking it another way.',
     errorReply: 'Something went wrong on our side. Your question was not counted, try again.',
@@ -2551,6 +2554,8 @@ export const ur: typeof en = {
     limitInputHint: 'آج کی حد ختم۔ {time} پر دوبارہ کھلے گی۔',
     slowDown: 'ایک سانس لیں! سوالوں کے بیچ چند سیکنڈ رکیں۔',
     planNeeded: 'اے آئی ٹیوٹر پریمیم کے ساتھ ہے۔',
+    aiNotInPlan: 'اے آئی ٹیوٹر آپ کے پلان میں شامل نہیں۔',
+    notInTrial: 'آپ کی مفت آزمائش میں ایک مضمون کھلا ہے، اور یہ وہ نہیں۔',
     offline: 'ٹیوٹر کے لیے انٹرنیٹ چاہیے۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔',
     refused: 'ٹیوٹر اس سوال کا جواب نہیں دے سکا۔ اسے دوسرے انداز میں پوچھیں۔',
     errorReply: 'ہماری طرف سے کچھ غلط ہوا۔ آپ کا سوال شمار نہیں ہوا، دوبارہ کوشش کریں۔',

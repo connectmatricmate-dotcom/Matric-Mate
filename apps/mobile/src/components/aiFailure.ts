@@ -12,7 +12,9 @@ const NOTE: Record<AiFail['reason'], StringKey> = {
   offline: 'tutor.offline',
   quota: 'tutor.limitToast',
   rate: 'tutor.slowDown',
-  plan: 'tutor.planNeeded',
+  // Status only: this app may not name a plan to get (Google Play).
+  plan: 'tutor.aiNotInPlan',
+  trial: 'tutor.notInTrial',
   refused: 'tutor.refused',
   syllabus: 'tutor.notInSyllabus',
   error: 'tutor.errorReply',
