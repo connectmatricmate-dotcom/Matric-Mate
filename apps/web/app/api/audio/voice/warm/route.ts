@@ -5,8 +5,7 @@ import {
   claimPart,
   failPart,
   finalize,
-  loadLesson,
-  readSettings,
+  openLesson,
   readyRow,
   remainingChars,
   savePart,
@@ -41,9 +40,8 @@ export async function POST(req: NextRequest) {
   if (!chapter || (medium !== 'en' && medium !== 'ur')) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
   const admin = createAdminClient();
-  const settings = await readSettings(admin);
+  const { settings, lesson } = await openLesson(admin, chapter, medium as Medium);
   if (!voiceReady(settings, medium as Medium)) return NextResponse.json({ error: 'voice_off' }, { status: 503 });
-  const lesson = await loadLesson(admin, chapter, medium as Medium, settings);
   if (!lesson) return NextResponse.json({ error: 'not_in_scope' }, { status: 404 });
   if (!lesson.pending) return NextResponse.json({ done: true, parts: lesson.parts.length, made: 0, remainingChars: 0 });
 

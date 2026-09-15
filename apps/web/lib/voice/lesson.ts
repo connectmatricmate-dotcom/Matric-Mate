@@ -142,27 +142,38 @@ export function splitParts(body: string): Part[] {
 export const partPath = (l: Pick<Lesson, 'key' | 'chapter' | 'medium'>, n: number) => `voice-parts/${l.key}/${l.chapter}/${l.medium}/${n}.mp3`;
 export const finalPath = (l: Pick<Lesson, 'key' | 'chapter' | 'medium'>) => `${l.chapter}/${l.medium}-${l.key}.mp3`;
 
-/** Everything about one lesson's premium voice, or null when it is not in scope or the voice is off. */
-export async function loadLesson(admin: Admin, chapter: string, medium: Medium, settings: VoiceSettings): Promise<Lesson | null> {
-  const voiceId = medium === 'ur' ? settings.voiceUr : (settings.voiceEn ?? settings.voiceUr);
-  if (!voiceId) return null;
-  const key = sha(`${settings.model}:${voiceId}`).slice(0, 10);
-  const [{ data: script, error: se }, { data: rows, error: re }, { data: track, error: te }] = await Promise.all([
+/**
+ * The settings and everything about one lesson's premium voice, read in one
+ * go: the website runs far from the database, and every round trip in a row
+ * is time a student spends looking at a spinner after pressing play. The
+ * lesson is null when the voice is off for this medium or the lesson is not
+ * in scope.
+ */
+export async function openLesson(admin: Admin, chapter: string, medium: Medium): Promise<{ settings: VoiceSettings | null; lesson: Lesson | null }> {
+  const [settings, { data: script, error: se }, { data: rows, error: re }, { data: track, error: te }] = await Promise.all([
+    readSettings(admin),
     admin.from('voice_scripts').select('body').eq('chapter_id', chapter).eq('medium', medium).maybeSingle(),
-    admin.from('voice_parts').select('part, text_hash, status, storage_path, bytes').eq('chapter_id', chapter).eq('medium', medium).eq('voice', key),
+    // Every voice's parts, sorted out below once the voice is known.
+    admin.from('voice_parts').select('voice, part, text_hash, status, storage_path, bytes').eq('chapter_id', chapter).eq('medium', medium),
     admin.from('audio_tracks').select('voice_pending, voice').eq('id', `${chapter}-${medium}`).maybeSingle(),
   ]);
   if (se || re || te) throw new Error(`voice lesson read failed: ${(se ?? re ?? te)?.message}`);
-  if (!script?.body) return null;
+  if (!voiceReady(settings, medium) || !script?.body) return { settings, lesson: null };
+  const voiceId = (medium === 'ur' ? settings.voiceUr : (settings.voiceEn ?? settings.voiceUr)) as string;
+  const key = sha(`${settings.model}:${voiceId}`).slice(0, 10);
+  const mine = ((rows ?? []) as (PartRow & { voice: string })[]).filter((r) => r.voice === key);
   return {
-    chapter,
-    medium,
-    voiceId,
-    model: settings.model,
-    key,
-    parts: splitParts(String(script.body)),
-    rows: new Map(((rows ?? []) as PartRow[]).map((r) => [r.part, r])),
-    pending: !!track && track.voice !== key,
+    settings,
+    lesson: {
+      chapter,
+      medium,
+      voiceId,
+      model: settings.model,
+      key,
+      parts: splitParts(String(script.body)),
+      rows: new Map(mine.map((r) => [r.part, r])),
+      pending: !!track && track.voice !== key,
+    },
   };
 }
 

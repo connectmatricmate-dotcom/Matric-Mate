@@ -6,10 +6,9 @@ import {
   failPart,
   finalize,
   finalPath,
-  loadLesson,
+  openLesson,
   publicUrl,
   readPart,
-  readSettings,
   readyRow,
   savePart,
   speak,
@@ -57,9 +56,8 @@ export async function GET(req: NextRequest) {
   if (!who) return NextResponse.json({ error: 'bad_token' }, { status: 401 });
 
   const admin = createAdminClient();
-  const settings = await readSettings(admin);
+  const { settings, lesson } = await openLesson(admin, who.chapter, who.medium);
   if (!voiceReady(settings, who.medium)) return NextResponse.json({ error: 'voice_off' }, { status: 503 });
-  const lesson = await loadLesson(admin, who.chapter, who.medium, settings);
   if (!lesson) return NextResponse.json({ error: 'not_in_scope' }, { status: 404 });
   const at = Math.max(0, Number(q.get('at')) || 0);
 
@@ -91,8 +89,13 @@ export async function GET(req: NextRequest) {
   const startJob = (p: Part): Job => {
     const job: Job = { chunks: [], listener: null, live: false, done: Promise.resolve(null) };
     job.done = (async (): Promise<Uint8Array | null> => {
-      if (await overBudget(p)) return null;
-      if (!(await claimPart(admin, lesson, p))) {
+      // Both at once, to save a round trip before the voice is asked.
+      const [over, claimed] = await Promise.all([overBudget(p), claimPart(admin, lesson, p)]);
+      if (over) {
+        if (claimed) await failPart(admin, lesson, p);
+        return null;
+      }
+      if (!claimed) {
         // Another listener's request is making it: take it from them when saved.
         const row = await waitForPart(admin, lesson, p, WAIT_MS);
         return row ? readPart(admin, row) : null;

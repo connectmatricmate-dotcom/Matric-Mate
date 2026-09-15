@@ -3,9 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import {
   estimatedSecs,
   finalPath,
-  loadLesson,
+  openLesson,
   publicUrl,
-  readSettings,
   remainingChars,
   signStream,
   startPart,
@@ -37,15 +36,19 @@ export async function GET(req: NextRequest) {
   if (!chapter || (medium !== 'en' && medium !== 'ur')) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
   const at = Math.max(0, Math.round(Number(q.get('at')) || 0));
 
-  const who = await studentForLesson(req, chapter);
-  if (who instanceof NextResponse) return who;
-
   const admin = createAdminClient();
   const none = (reason: string) => NextResponse.json({ stream: null, reason });
+  // All at once: who is asking, the lesson and this month's spend.
+  const [who, opened, used] = await Promise.all([
+    studentForLesson(req, chapter),
+    openLesson(admin, chapter, medium as Medium).catch((err: unknown) => err as Error),
+    usedThisMonth(admin),
+  ]);
+  if (who instanceof NextResponse) return who;
   try {
-    const settings = await readSettings(admin);
+    if (opened instanceof Error) throw opened;
+    const { settings, lesson } = opened;
     if (!voiceReady(settings, medium as Medium)) return none('off');
-    const lesson = await loadLesson(admin, chapter, medium as Medium, settings);
     if (!lesson) return none('not_in_scope');
     if (!lesson.pending) {
       const { data: track } = await admin.from('audio_tracks').select('duration_secs').eq('id', `${chapter}-${medium}`).maybeSingle();
@@ -57,7 +60,7 @@ export async function GET(req: NextRequest) {
     // Only a lesson this month can finish: half a lesson in one voice and
     // the other half cut off is worse than the old voice all the way through.
     const remaining = remainingChars(lesson);
-    if (remaining > 0 && (await usedThisMonth(admin)) + remaining > settings.monthlyChars) return none('budget');
+    if (remaining > 0 && used + remaining > settings.monthlyChars) return none('budget');
     const token = signStream(chapter, medium as Medium, who.userId);
     const stream = `${req.nextUrl.origin}/api/audio/voice/stream?${token}${at ? `&at=${at}` : ''}`;
     return NextResponse.json({ stream, estSecs: estimatedSecs(lesson) });
