@@ -21,8 +21,6 @@
   --color-track: #eaf0ec;
   --color-mute: #d7e0db;
   --color-orange: #ff8a00;
-  /* A filled orange button, under an onbrand label. See orangeFill in tokens.ts. */
-  --color-orangefill: #b85800;
   --color-orangedark: #a85700;
   --color-orangetint: #fff0dc;
   --color-green: #1e7b45;
@@ -191,7 +189,6 @@ html:has([data-app-header]) {
   --color-track: #173f4e;
   --color-mute: #2a5a6b;
   --color-orange: #ff9f2e;
-  --color-orangefill: #ff9f2e;
   --color-orangedark: #ffc178;
   --color-orangetint: #3a2712;
   --color-green: #48c77a;
@@ -786,7 +783,6 @@ button:disabled,
     --color-track: #eaf0ec;
     --color-mute: #d7e0db;
     --color-orange: #ff8a00;
-    --color-orangefill: #b85800;
     --color-orangedark: #a85700;
     --color-orangetint: #fff0dc;
     --color-green: #1e7b45;

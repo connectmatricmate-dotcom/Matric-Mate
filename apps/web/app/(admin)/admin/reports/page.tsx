@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { BOARD_LABEL, asBoard, subjectById } from '@matricmate/core';
-import { Panel, Row, Table, Tag, Td } from '@/components/admin/bits';
+import { BackLink, Panel, Row, Table, Tag, Td } from '@/components/admin/bits';
 import { ReportSeenButton, SheetResetButton } from '@/components/admin/ReportSeenButton';
 import { requireAdmin } from '@/lib/roles';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -242,6 +242,8 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const page = Math.max(1, Math.min(10_000, Number.parseInt((await searchParams).page ?? '1', 10) || 1));
   return (
     <>
+      {/* Reached from a card on the overview, not a tab, so the way back is here. */}
+      <BackLink href="/admin">Overview</BackLink>
       <h1 className="font-display text-[26px] text-ink">Reported answers</h1>
       <p className="mt-0.5 mb-6 text-[13.5px] text-ink2">
         What students flagged with “Report this answer” in the AI tutor and the other AI features. A student can send

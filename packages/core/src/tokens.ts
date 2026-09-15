@@ -43,14 +43,6 @@ export const colors = {
   /** Hotter than the old #F29329, which went muddy next to the brighter
    * primary. Reads at 7:1 on night, and carries ink at 5:1. */
   orange: '#FF8A00',
-  /**
-   * Orange as a BUTTON, under an `onBrand` label. The client wants a white
-   * label on a filled button, and white on `orange` is 2.4:1, which a student
-   * in daylight struggles to read. This deeper orange carries white at 4.7:1
-   * and is still plainly the brand's orange; bars, badges and chips keep the
-   * bright one.
-   */
-  orangeFill: '#B85800',
   /** Orange as TEXT (labels on tints and cards). Fills stay `orange`. */
   orangeDark: '#A85700',
   orangeTint: '#FFF0DC',
@@ -131,8 +123,6 @@ export const darkColors: Palette = {
   track: '#173F4E',
   mute: '#2A5A6B',
   orange: '#FF9F2E',
-  /* After dark a button's label goes dark (onBrand), so the fill stays bright. */
-  orangeFill: '#FF9F2E',
   orangeDark: '#FFC178',
   orangeTint: '#3A2712',
   green: '#48C77A',

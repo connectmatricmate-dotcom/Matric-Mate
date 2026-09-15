@@ -308,3 +308,18 @@ export async function serviceAlerts(): Promise<ServiceAlert[]> {
     detail: (r.detail as string | null) ?? null,
   }));
 }
+
+/**
+ * How many reported AI answers are still new, for the overview's way in to
+ * /admin/reports. Null when the count could not be read: the card then just
+ * opens the page, without a number that might be wrong.
+ */
+export async function newReportCount(): Promise<number | null> {
+  await requireAdmin();
+  const { count, error } = await createAdminClient().from('ai_reports').select('id', { count: 'exact', head: true }).eq('status', 'new');
+  if (error) {
+    console.error('admin-stats: report count read failed', error.message);
+    return null;
+  }
+  return count ?? 0;
+}

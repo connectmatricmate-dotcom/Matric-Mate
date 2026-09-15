@@ -25,12 +25,16 @@ export const metadata: Metadata = { title: 'Admin', robots: { index: false, foll
  * student who guesses the URL to learn that this address means anything.
  */
 
+/*
+ * Five tabs, which is what a phone's bottom bar holds without squeezing the
+ * labels. Reported answers is reached from a card on the overview instead
+ * (its tab crowded the bar on a phone), so the overview stays lit there.
+ */
 const NAV: StaffNavItem[] = [
-  { href: '/admin', label: 'Overview', icon: 'home' },
+  { href: '/admin', label: 'Overview', icon: 'home', owns: ['/admin/reports'] },
   { href: '/admin/students', label: 'Students', icon: 'user' },
   { href: '/admin/follow-up', label: 'Follow up', icon: 'whatsapp' },
   { href: '/admin/teachers', label: 'Teachers', icon: 'share' },
-  { href: '/admin/reports', label: 'Reported answers', icon: 'alert' },
   { href: '/admin/settings', label: 'Settings', icon: 'gear' },
 ];
 

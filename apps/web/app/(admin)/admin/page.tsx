@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { JOBS, adminStats, dailyStats, jobHealth, serviceAlerts, type ServiceAlert } from '@/lib/admin-stats';
+import Link from 'next/link';
+import { JOBS, adminStats, dailyStats, jobHealth, newReportCount, serviceAlerts, type ServiceAlert } from '@/lib/admin-stats';
 import { requireAdmin } from '@/lib/roles';
 import { TrendChart } from '@/components/admin/TrendChart';
 import { Panel, Stat, StatGrid, Tag, rupees } from '@/components/admin/bits';
@@ -31,6 +32,10 @@ export default async function AdminOverview() {
       {/* Nothing while it loads: most days there is nothing to say. */}
       <Suspense fallback={null}>
         <Alerts />
+      </Suspense>
+
+      <Suspense fallback={<ReportsSkeleton />}>
+        <Reports />
       </Suspense>
 
       <Suspense fallback={<StatsSkeleton />}>
@@ -98,6 +103,46 @@ async function Alerts() {
       })}
     </div>
   );
+}
+
+/**
+ * The way in to reported AI answers: the one list on this page that asks
+ * Adnan to do something. It was a tab, and a sixth tab squeezed every label
+ * in a phone's bottom bar. The whole card is the button; it turns orange
+ * while anything is waiting to be read.
+ */
+async function Reports() {
+  const n = await newReportCount();
+  const waiting = !!n;
+  return (
+    <Link
+      href="/admin/reports"
+      className={`mb-6 flex min-h-[68px] items-center gap-3 rounded-[16px] border px-4 py-3 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal ${
+        waiting ? 'border-orange bg-orangetint hover:bg-card' : 'border-line bg-card hover:border-teal'
+      }`}
+    >
+      <span
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${waiting ? 'bg-orange text-white' : 'bg-grey text-ink2'}`}
+      >
+        <Icon name="alert" size={19} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[14.5px] font-extrabold text-ink">Reported AI answers</span>
+        <span className={`block text-[13px] ${waiting ? 'font-extrabold text-orangedark' : 'text-ink2'}`}>
+          {n === null
+            ? 'Answers students flagged as wrong or unsuitable'
+            : n === 0
+              ? 'Nothing new to read'
+              : `${n} new ${n === 1 ? 'report' : 'reports'} to read`}
+        </span>
+      </span>
+      <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
+    </Link>
+  );
+}
+
+function ReportsSkeleton() {
+  return <div className="mb-6 h-[68px] animate-pulse rounded-[16px] border border-line bg-card" />;
 }
 
 /**

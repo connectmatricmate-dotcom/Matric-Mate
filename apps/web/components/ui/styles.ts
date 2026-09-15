@@ -13,10 +13,10 @@ const VARIANTS: Record<BtnVariant, string> = {
   // onbrand, not a literal white: the teal, green and red fills brighten in
   // dark mode and white on them drops below a readable contrast.
   primary: 'bg-teal text-onbrand hover:bg-tealdark',
-  // A white label, the client's explicit call after seeing ink on the orange,
-  // on the deeper button orange: white on the bright one is 2.4:1. After dark
-  // the label goes dark and the fill stays bright, like every other fill.
-  orange: 'bg-orangefill text-onbrand hover:brightness-95',
+  // White on the orange, the client's explicit call after seeing ink on it;
+  // the extra-bold face keeps it legible on the bright fill. The client chose
+  // the bright brand orange over a deeper, higher-contrast one (16 Sep).
+  orange: 'bg-orange text-white hover:brightness-95',
   green: 'bg-green text-onbrand hover:brightness-95',
   danger: 'bg-red text-onbrand hover:brightness-95',
   whatsapp: 'bg-whatsapp text-white hover:brightness-95',

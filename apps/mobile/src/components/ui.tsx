@@ -749,8 +749,8 @@ export function Btn({
 }) {
   const bg: Record<BtnVariant, string> = {
     primary: C.teal,
-    // The deeper button orange: white on the bright one is 2.4:1.
-    orange: C.orangeFill,
+    // The bright brand orange, the client's choice over a deeper one (16 Sep).
+    orange: C.orange,
     green: C.green,
     danger: C.red,
     whatsapp: C.whatsapp,

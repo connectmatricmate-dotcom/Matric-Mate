@@ -47,7 +47,6 @@ export const C: Palette = {
   get track() { return (darkUi ? darkColors : colors).track; },
   get mute() { return (darkUi ? darkColors : colors).mute; },
   get orange() { return (darkUi ? darkColors : colors).orange; },
-  get orangeFill() { return (darkUi ? darkColors : colors).orangeFill; },
   get orangeDark() { return (darkUi ? darkColors : colors).orangeDark; },
   get orangeTint() { return (darkUi ? darkColors : colors).orangeTint; },
   get green() { return (darkUi ? darkColors : colors).green; },

@@ -161,7 +161,7 @@ export function ExamScreen() {
         const isFlagged = flags.includes(m.id);
         const current = n === i;
         const style = current
-          ? 'bg-orangefill text-onbrand'
+          ? 'bg-orange text-onbrand'
           : answered
             ? 'bg-teal text-onbrand'
             : isFlagged
