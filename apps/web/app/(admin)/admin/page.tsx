@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { JOBS, adminStats, dailyStats, jobHealth, newReportCount, serviceAlerts, type ServiceAlert } from '@/lib/admin-stats';
+import { JOBS, adminStats, dailyStats, jobHealth, newReportCount, serviceAlerts, type JobState, type ServiceAlert } from '@/lib/admin-stats';
 import { requireAdmin } from '@/lib/roles';
 import { TrendChart } from '@/components/admin/TrendChart';
 import { Panel, Stat, StatGrid, Tag, rupees } from '@/components/admin/bits';
@@ -145,27 +145,45 @@ function ReportsSkeleton() {
   return <div className="mb-6 h-[68px] animate-pulse rounded-[16px] border border-line bg-card" />;
 }
 
+/** How each automation's state reads: a word and a colour Adnan can take in at a glance. */
+const JOB_TAG: Record<JobState, { tone: 'green' | 'grey' | 'orange' | 'red'; label: string }> = {
+  working: { tone: 'green', label: 'Working' },
+  waiting: { tone: 'grey', label: 'Starting' },
+  retrying: { tone: 'orange', label: 'Trying again' },
+  down: { tone: 'red', label: 'Not working' },
+  unknown: { tone: 'grey', label: 'Checking' },
+};
+
 /**
- * The scheduled jobs: the daily tip, the evening reminder, the plan
- * reminders, the welcome and the coach, each with its last run and what it
- * did. A job that sends nothing looks exactly like a quiet day from inside
- * the app; this is where the difference shows.
+ * The automations: the daily tip, the evening reminder, the plan reminders,
+ * the welcome and the coach, each with its last run and what it did. A job
+ * that sends nothing looks exactly like a quiet day from inside the app; this
+ * is where the difference shows, in words that do not alarm anyone over a
+ * phone that was switched off.
  */
 async function Jobs() {
   const jobs = await jobHealth();
+  const down = jobs.some((j) => j.state === 'down');
   return (
-    <Panel title="Scheduled jobs">
+    <Panel title="Automations">
+      <p className="border-b border-line px-4 py-3 text-[13px] leading-[1.6] text-ink2">
+        Messages and reports the app sends by itself.{' '}
+        {down
+          ? 'One of them is not working: please tell your developer.'
+          : 'Green means the last run worked. Nothing here needs you.'}
+      </p>
       <ul>
         {jobs.map((j) => (
           <li key={j.job} className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1.5 border-b border-line px-4 py-3 last:border-b-0">
             <div className="min-w-0">
               <p className="text-[13.5px] font-extrabold text-ink">{j.name}</p>
               <p className="text-[12px] text-ink2">
-                Runs {j.when} · last {j.at ? at(j.at) : 'never'}
+                Runs {j.when}
+                {j.at ? ` · last ${at(j.at)}` : ''}
               </p>
             </div>
             <div className="flex min-w-0 flex-col items-start gap-1 sm:items-end">
-              {j.ok ? <Tag tone="green">OK</Tag> : <Tag tone="red">Needs a look</Tag>}
+              <Tag tone={JOB_TAG[j.state].tone}>{JOB_TAG[j.state].label}</Tag>
               <p className="text-[12.5px] text-ink2 sm:text-end">{j.said}</p>
             </div>
           </li>

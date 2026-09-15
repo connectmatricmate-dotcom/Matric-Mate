@@ -209,44 +209,57 @@ export async function dailyStats(days = 14): Promise<DailyPoint[]> {
 }
 
 /**
- * The five scheduled jobs, and how each one's last run went.
+ * The five automations (scheduled jobs), and how each one is doing.
  *
  * pg_cron calls every run a success whatever the route answered, so the
  * routes write their own answer to `job_runs` (migration 0054) and this reads
- * the latest per job. Every one of them runs at least once a day, so a job
- * with nothing in 26 hours has stopped, whatever its last answer said.
+ * the latest two per job. `every` is how often a job runs, and `grace` how
+ * late a run can be before it counts as missing.
+ *
+ * Judged for someone who is not a developer. The first version marked every
+ * job "Needs a look" on the day recording began, before most had run once,
+ * and a single run that could not reach a few phones looked the same as a
+ * job that had stopped. Now: a job that has not run yet since recording
+ * began is waiting, a job whose last run had trouble is retrying (every job
+ * runs again soon, and the daily ones have a second run minutes later), and
+ * only two troubled runs in a row, or a run that is overdue, says it is not
+ * working.
  */
+const HOUR = 3600 * 1000;
 export const JOBS = [
-  { job: 'daily', name: 'Daily tip and flashcard', when: '2 pm every day' },
-  { job: 'nudge', name: 'Evening study reminder', when: 'each evening' },
-  { job: 'plans', name: 'Plan and trial reminders', when: 'every hour' },
-  { job: 'welcome', name: 'Welcome message', when: 'every 15 minutes' },
-  { job: 'coach', name: 'AI coach reports', when: '7:30 am every day' },
+  { job: 'daily', name: 'Daily tip and flashcard', when: '2 pm every day', first: 'after 2 pm', every: 24 * HOUR, grace: 3 * HOUR },
+  { job: 'nudge', name: 'Evening study reminder', when: 'each evening, 4 to 9 pm', first: 'this evening', every: 24 * HOUR, grace: 3 * HOUR },
+  { job: 'plans', name: 'Plan and trial reminders', when: 'every hour', first: 'within the hour', every: HOUR, grace: 2 * HOUR },
+  { job: 'welcome', name: 'Welcome message', when: 'every 15 minutes', first: 'within 15 minutes', every: HOUR / 4, grace: HOUR },
+  { job: 'coach', name: 'AI coach reports', when: '7:30 am every day', first: 'after 7:30 am', every: 24 * HOUR, grace: 3 * HOUR },
 ] as const;
+
+/** When job_runs began (migration 0054). A job with no run since then is new, not broken, for its first cycle. */
+const RECORDING_SINCE = Date.parse('2026-09-16T00:00:00+05:00');
+
+export type JobState = 'working' | 'waiting' | 'retrying' | 'down' | 'unknown';
 
 export type JobHealth = {
   job: string;
   name: string;
   when: string;
-  /** The last run, or null for a job with no run in the last month. */
+  /** The last run, or null for a job with no run recorded. */
   at: string | null;
-  ok: boolean;
-  /** What the run did, in words: "12 sent of 40", "Nobody due". */
+  state: JobState;
+  /** What the last run did, in words: "12 sent of 40", "Nobody due". */
   said: string;
 };
-
-const STALE_MS = 26 * 3600 * 1000;
 
 const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 
 /** A run's summary, in the words Adnan would use. Each route answers its own shape. */
 function inWords(job: string, s: Record<string, unknown> | null): string {
   if (!s) return 'No details';
-  if (s.error) return `Stopped${s.stage ? ` while ${String(s.stage).replace(/_/g, ' ')}` : ''}${n(s.failed) ? `, ${n(s.failed)} failed` : ''}`;
   if (s.quiet) return 'Quiet hours, nothing sent (9 pm to 8 am)';
   const done = n(s.sent ?? s.welcomed ?? s.written);
   const of = n(s.considered ?? s.candidates);
-  const failed = n(s.failed) + n(s.pushFailed) + n(s.emailFailed) + n(s.unfinished) + n(s.dropped);
+  const missed = n(s.failed) + n(s.pushFailed) + n(s.emailFailed) + n(s.unfinished) + n(s.dropped) + n(s.left);
+  if (s.error && !of) return 'Could not finish; it runs again soon';
   if (!of) {
     const reason: Record<string, string> = {
       nobody_this_hour: 'Nobody due this hour',
@@ -256,30 +269,34 @@ function inWords(job: string, s: Record<string, unknown> | null): string {
     return reason[String(s.reason)] ?? (job === 'welcome' ? 'Nobody new to welcome' : 'Nobody due');
   }
   const verb = job === 'welcome' ? 'welcomed' : job === 'coach' ? 'written' : 'sent';
-  return `${done} ${verb} of ${of}${failed ? `, ${failed} not sent` : ''}`;
+  // A phone that is switched off or has uninstalled the app is the usual
+  // reason a few do not go; the next run tries again.
+  return `${done} ${verb} of ${of}${missed ? `, ${missed} to try again` : ''}`;
 }
 
 export async function jobHealth(): Promise<JobHealth[]> {
   await requireAdmin();
   const admin = createAdminClient();
-  // One small read per job: the latest row each, by the (job, at desc) index.
-  const rows = await Promise.all(
-    JOBS.map((j) => admin.from('job_runs').select('at, status, summary').eq('job', j.job).order('at', { ascending: false }).limit(1).maybeSingle()),
+  // A small read per job: the latest two rows each, by the (job, at desc) index.
+  const reads = await Promise.all(
+    JOBS.map((j) => admin.from('job_runs').select('at, status, summary').eq('job', j.job).order('at', { ascending: false }).limit(2)),
   );
+  const now = Date.now();
   return JOBS.map((j, i) => {
-    const { data, error } = rows[i];
+    const { data, error } = reads[i];
     if (error) console.error(`admin-stats: job ${j.job} read failed`, error.message);
-    const at = (data?.at as string | undefined) ?? null;
-    const stale = !at || Date.now() - Date.parse(at) > STALE_MS;
-    const ok = !error && !!data && data.status === 200 && !stale;
-    const said = error
-      ? 'Could not be read'
-      : !at
-        ? 'No run recorded in the last month'
-        : stale
-          ? 'No run for over a day'
-          : inWords(j.job, data?.summary as Record<string, unknown> | null);
-    return { job: j.job, name: j.name, when: j.when, at, ok, said };
+    const [last, before] = (data ?? []) as { at: string; status: number; summary: Record<string, unknown> | null }[];
+    const base = { job: j.job, name: j.name, when: j.when, at: last?.at ?? null };
+    if (error) return { ...base, state: 'unknown', said: 'Could not check just now' };
+    if (!last) {
+      return now - RECORDING_SINCE < j.every + j.grace
+        ? { ...base, state: 'waiting', said: `Its first run shows here ${j.first}` }
+        : { ...base, state: 'down', said: 'No run recorded' };
+    }
+    if (now - Date.parse(last.at) > j.every + j.grace) return { ...base, state: 'down', said: 'Its last run was too long ago' };
+    const said = inWords(j.job, last.summary);
+    if (last.status === 200) return { ...base, state: 'working', said };
+    return before && before.status !== 200 ? { ...base, state: 'down', said } : { ...base, state: 'retrying', said };
   });
 }
 
