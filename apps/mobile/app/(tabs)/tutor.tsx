@@ -60,7 +60,8 @@ type ThreadRow = { id: string; title: string; context_label: string | null; upda
  */
 export default function TutorGate() {
   const { derived } = useApp();
-  if (derived.access.active && !derived.access.ai) return <AiLocked tabbed />;
+  // Saved chats stay readable: see AiLocked's `chats`.
+  if (derived.access.active && !derived.access.ai) return <AiLocked tabbed chats />;
   return <Tutor />;
 }
 

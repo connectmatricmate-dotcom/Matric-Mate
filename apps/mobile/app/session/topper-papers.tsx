@@ -10,16 +10,20 @@ export default function TopperPapers() {
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
-  const { state } = useApp();
+  const { state, derived } = useApp();
   // FBISE's own scripts. Not offered to a Punjab student anywhere, and a link
   // that lands here anyway says why there are none rather than showing them.
   const punjab = state.onboarding?.board === 'punjab';
+  // On a free trial, only its one subject: the rest are not open to it.
+  const trial = derived.access.tier === 'trial';
   const groups = punjab
     ? []
-    : fbiseTopperSubjectIds().map((subjectId) => ({
-        subjectId,
-        scripts: fbiseToppersFor(subjectId),
-      }));
+    : fbiseTopperSubjectIds()
+        .filter((subjectId) => !trial || derived.subjects.includes(subjectId))
+        .map((subjectId) => ({
+          subjectId,
+          scripts: fbiseToppersFor(subjectId),
+        }));
 
   async function openScript(url: string) {
     try {
@@ -114,7 +118,7 @@ export default function TopperPapers() {
         <>
           <Spacer h={S.md} />
           <Small>{t('session.toppersSource', { year: topperYears()[0] ?? '' })}</Small>
-          <Small style={{ marginTop: 2 }}>{t('session.toppersFootnote')}</Small>
+          <Small style={{ marginTop: 2 }}>{t('session.toppersFootnoteApp')}</Small>
         </>
       )}
     </Screen>

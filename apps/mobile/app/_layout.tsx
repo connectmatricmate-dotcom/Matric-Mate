@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { Stack, usePathname, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -16,7 +16,7 @@ import { usePush } from '../src/core/usePush';
 import { markTouched, useStudyClock } from '../src/core/studyClock';
 import { Btn, Text, ToastHost } from '../src/components/ui';
 import { C, F, isRTL } from '../src/theme';
-import { en, ur } from '@matricmate/core';
+import { en, fetchTutorQuota, ur } from '@matricmate/core';
 import { resetTo } from '../src/core/nav';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -93,6 +93,7 @@ export default function RootLayout() {
         <AuthProvider>
           <AppProvider>
             <SplashGate />
+            <SignedOutGate />
             <PlanGate />
             <QuotaLive />
             <PushLive />
@@ -164,8 +165,44 @@ function Chrome() {
  * hydration somehow never reports, a slightly wrong first frame is a blemish
  * and a splash that never lifts is an outage.
  */
-/** Screens a student without a plan may still be on. Everything else is study content. */
-const OPEN_WITHOUT_PLAN = ['/paused', '/trial', '/upgrade', '/account', '/offline', '/onboarding', '/notifications', '/login', '/signup', '/welcome', '/forgot'];
+/**
+ * Screens a student without a plan may still be on. Everything else is study
+ * content. The downloads list is housekeeping (freeing space), reached from
+ * Settings; its rows do not open chapters without a plan.
+ */
+const OPEN_WITHOUT_PLAN = ['/paused', '/trial', '/upgrade', '/account', '/offline', '/onboarding', '/notifications', '/login', '/signup', '/welcome', '/forgot', '/learn/downloads'];
+
+/** Screens that make sense signed out: the way in, and the first run's choices. */
+const OPEN_SIGNED_OUT = ['/welcome', '/login', '/signup', '/forgot', '/onboarding'];
+
+/**
+ * Nothing past the way in without an account.
+ *
+ * The tabs sent a signed-out phone back to the start, but only the tabs had
+ * that check: a link into a chapter, a practice set or the reader opened
+ * signed out, on whatever the bundle or the cache could show. The splash
+ * decides where a signed-out student goes (the carousel, or Log in).
+ */
+function SignedOutGate() {
+  const { state, hydrated } = useApp();
+  const { loading } = useAuth();
+  const pathname = usePathname();
+  const out =
+    hydrated &&
+    !loading &&
+    !state.user &&
+    pathname !== '/' &&
+    !OPEN_SIGNED_OUT.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  useEffect(() => {
+    if (!out) return;
+    // A moment's grace: signing out from Settings, or deleting the account,
+    // goes on to the way in by itself, and two resets at once left the
+    // navigator popping a stack that was already gone.
+    const timer = setTimeout(() => resetTo('/'), 300);
+    return () => clearTimeout(timer);
+  }, [out]);
+  return null;
+}
 
 /**
  * A plan that ends while the student is somewhere in the app ends there too.
@@ -176,8 +213,7 @@ const OPEN_WITHOUT_PLAN = ['/paused', '/trial', '/upgrade', '/account', '/offlin
  * showed the subject's chapters labelled for a plan. So wherever they are, the
  * moment there is no plan the whole stack is replaced by the paused screen (or
  * the trial screen, for an account that can still start one). The account
- * pages, help and notifications stay reachable; offline, the downloads screen
- * decides for itself.
+ * pages, help and notifications stay reachable.
  */
 function PlanGate() {
   const { state, hydrated } = useApp();
@@ -186,14 +222,16 @@ function PlanGate() {
   const pathname = usePathname();
   const blocked =
     hydrated &&
-    online &&
     !!state.user &&
     entitlementReady &&
     role === 'student' &&
     !state.premium.active &&
     pathname !== '/' &&
     !OPEN_WITHOUT_PLAN.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-  const to = state.premium.trialState === 'eligible' ? '/trial' : '/paused';
+  // Offline too: a plan that ends with no signal (its end date passes, see
+  // store/auth.tsx) used to leave an open chapter, and its audio, running on
+  // the downloads. The offline screen says the account is not active.
+  const to = !online ? '/offline' : state.premium.trialState === 'eligible' ? '/trial' : '/paused';
   useEffect(() => {
     if (blocked) resetTo(to);
   }, [blocked, to]);
@@ -222,7 +260,20 @@ function SplashGate() {
  */
 function QuotaLive() {
   const { state } = useApp();
-  useQuotaRealtime(state.user?.id);
+  const userId = state.user?.id;
+  useQuotaRealtime(userId);
+  /*
+   * A plan that changes while the app is open changes the allowance too: a
+   * trial's 5 became Premium's 50, or Basic's none, only after a restart. The
+   * count is read again whenever the plan does, not on the first settle.
+   */
+  const planKey = state.premium.active ? `${state.premium.plan ?? ''}:${state.premium.trialSubject ?? ''}` : 'none';
+  const seen = useRef<{ user: string | undefined; key: string } | null>(null);
+  useEffect(() => {
+    const before = seen.current;
+    seen.current = { user: userId, key: planKey };
+    if (userId && before && before.user === userId && before.key !== planKey) void fetchTutorQuota();
+  }, [userId, planKey]);
   return null;
 }
 
@@ -230,12 +281,19 @@ function QuotaLive() {
  * Registers this phone for push and routes a tap on a notification.
  *
  * Mounted inside AppProvider because it needs the signed-in user, and once
- * rather than per screen: the permission prompt and the token write should
- * happen on launch, not every time somebody opens a tab.
+ * rather than per screen. The permission prompt waits until the student is
+ * in the app with a plan: at sign-in it covered the trial's subject picker,
+ * the one choice the first minute is about.
  */
 function PushLive() {
   const { state } = useApp();
-  usePush(state.user?.id ?? null);
+  const pathname = usePathname();
+  const settled =
+    state.premium.active &&
+    !!state.onboarding?.subjects?.length &&
+    !['/trial', '/paused', '/offline'].includes(pathname) &&
+    !pathname.startsWith('/onboarding');
+  usePush(state.user?.id ?? null, settled);
   return null;
 }
 

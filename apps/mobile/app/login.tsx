@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { router } from 'expo-router';
+import { accountDeletedNote, clearAccountDeleted } from '../src/lib/first-run';
 import { useT } from '../src/i18n';
 import { isAuthErrorKey, useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer } from '../src/components/ui';
@@ -16,6 +17,11 @@ import { C, S } from '../src/theme';
 export default function Login() {
   const { signIn } = useAuth();
   const t = useT();
+  // Just deleted, and the splash chose this screen over the carousel.
+  const [deleted] = useState(accountDeletedNote);
+  useEffect(() => {
+    if (deleted) clearAccountDeleted();
+  }, [deleted]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -51,6 +57,12 @@ export default function Login() {
         style={{ width: 124, height: 96, alignSelf: 'center', marginVertical: S.md }}
         resizeMode="contain"
       />
+      {deleted ? (
+        <Card flat tint={C.greenTint} border={C.green} style={{ marginBottom: S.md }}>
+          <Body style={{ fontSize: 14 }}>{t('deletion.doneTitle')}</Body>
+          <Small style={{ marginTop: 2 }}>{t('deletion.doneBody')}</Small>
+        </Card>
+      ) : null}
       {error ? (
         <Card flat tint={C.redTint} border={C.red} style={{ marginBottom: S.md }}>
           <Body style={{ color: C.red, fontSize: 13.5 }}>{error}</Body>

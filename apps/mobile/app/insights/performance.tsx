@@ -4,6 +4,7 @@ import Svg, { Circle, Polyline, Rect } from 'react-native-svg';
 import { Bar, Card, Header, Item, Label, Row, Screen, SectionTitle, Seg, Small, Spacer, Text } from '../../src/components/ui';
 import { accuracy, confidenceBreakdown, formatDate } from '@matricmate/core';
 import { resultTitle } from '../../src/components/resultTitle';
+import { useNow } from '../../src/core/useNow';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S } from '../../src/theme';
@@ -25,15 +26,15 @@ export default function Performance() {
   const [range, setRange] = useState<Range>('month');
 
   /**
-   * One clock reading for the whole screen, taken on mount.
+   * One clock reading for the whole screen, held still while it is open.
    *
    * Two things wanted the time here and each was reading it separately, so the
    * filter below and the day buckets underneath it could land on opposite sides
    * of midnight and disagree about which day an attempt belonged to. Reading it
    * once fixes that, and keeps render repeatable, which is what the hooks rule
-   * is really asking for.
+   * is really asking for. It moves on when the day turns (useNow).
    */
-  const [now] = useState(() => Date.now());
+  const now = useNow();
 
   const attempts = useMemo(() => {
     const cut = range === 'week' ? 7 : range === 'month' ? 30 : 3650;
@@ -41,17 +42,25 @@ export default function Performance() {
     return state.attempts.filter((a) => a.at >= since);
   }, [state.attempts, range, now]);
 
+  /**
+   * One bar and one point per day for a week or a month, per week for all
+   * time (twelve weeks), as on the website. Month and All time both drew the
+   * same fourteen days, so the picker changed the number above the charts and
+   * nothing in them.
+   */
+  const perWeek = range === 'all';
   const trend = useMemo(() => {
-    const days = range === 'week' ? 7 : 14;
-    return Array.from({ length: days }, (_, i) => {
-      const start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-      start.setDate(start.getDate() - (days - 1 - i));
-      const end = start.getTime() + 864e5;
-      const set = attempts.filter((a) => a.at >= start.getTime() && a.at < end);
+    const count = range === 'week' ? 7 : range === 'month' ? 30 : 12;
+    const span = (perWeek ? 7 : 1) * 864e5;
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const end = today.getTime() + 864e5;
+    return Array.from({ length: count }, (_, i) => {
+      const to = end - (count - 1 - i) * span;
+      const set = attempts.filter((a) => a.at >= to - span && a.at < to);
       return { acc: set.length ? accuracy(set) : null, count: set.length };
     });
-  }, [attempts, range, now]);
+  }, [attempts, range, perWeek, now]);
 
   const points = useMemo(() => {
     const valid = trend.map((x, i) => ({ ...x, i })).filter((x) => x.acc != null);
@@ -71,8 +80,14 @@ export default function Performance() {
    * figure to give and the label says so.
    */
   const todaysBucket = trend[trend.length - 1];
-  const todayLabel =
-    todaysBucket?.acc != null ? t('progress.today', { n: todaysBucket.acc }) : t('progress.todayNone');
+  const todayLabel = perWeek
+    ? todaysBucket?.acc != null
+      ? t('progress.weekPct', { n: todaysBucket.acc })
+      : t('progress.weekNone')
+    : todaysBucket?.acc != null
+      ? t('progress.today', { n: todaysBucket.acc })
+      : t('progress.todayNone');
+  const sinceLabel = perWeek ? t('progress.weeksAgo', { n: trend.length }) : t('progress.daysAgo', { n: trend.length });
 
   const confLabels = [t('session.conf0'), t('session.conf1'), t('session.conf2')];
 
@@ -117,9 +132,7 @@ export default function Performance() {
                 languages, so its labels have to as well. Mirrored, "today"
                 sat under the oldest point in Urdu. */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>
-                {t('progress.daysAgo', { n: range === 'week' ? 7 : 14 })}
-              </Small>
+              <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>{sinceLabel}</Small>
               <Small style={{ fontFamily: F.bodyBold, fontSize: 10.5 }}>{todayLabel}</Small>
             </View>
           </>
@@ -130,20 +143,22 @@ export default function Performance() {
 
       <Spacer h={S.md} />
       <Card>
-        <Label>{t('progress.questionsPerDay')}</Label>
+        <Label>{perWeek ? t('progress.questionsPerWeek') : t('progress.questionsPerDay')}</Label>
         <View style={{ marginTop: S.sm }}>
           <Svg width="100%" height={70} viewBox="0 0 300 70">
             {trend.map((x, i) => {
-              const bw = 300 / trend.length - 6;
+              // A share of the slot, not a fixed gap: thirty bars with a
+              // six-unit gap each left almost nothing of the bars.
+              const bw = (300 / trend.length) * 0.7;
               const h = (x.count / maxCount) * 58;
               return (
                 <Rect
                   key={i}
-                  x={(300 / trend.length) * i + 3}
+                  x={(300 / trend.length) * (i + 0.15)}
                   y={64 - h}
                   width={bw}
                   height={Math.max(2, h)}
-                  rx={4}
+                  rx={Math.min(4, bw / 2)}
                   // A theme colour, so dark mode gets a dark-mode bar.
                   fill={i >= trend.length - 2 ? C.orange : C.tealTint2}
                 />

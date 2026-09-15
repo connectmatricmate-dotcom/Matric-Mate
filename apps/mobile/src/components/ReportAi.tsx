@@ -94,6 +94,7 @@ export function ReportAi({
               title={t(key)}
               last={i === REASONS.length - 1}
               onPress={() => setReason(value)}
+              checked={reason === value}
               right={<Check on={reason === value} round />}
             />
           ))}

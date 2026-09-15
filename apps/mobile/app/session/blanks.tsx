@@ -6,7 +6,8 @@ import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, blankHalves, fetchAiSession, isUrduScript, normalizeAiBlanks } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
-import { PickPracticeChapter, PracticeChapterBar, usePracticeChapter } from '../../src/components/PracticeChapter';
+import { PickPracticeChapter, PracticeChapterBar, PracticeEmpty, usePracticeChapter } from '../../src/components/PracticeChapter';
+import { ReportAi } from '../../src/components/ReportAi';
 import { cheer, thud, tick } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -84,7 +85,11 @@ export default function Blanks() {
         {/* The way out of an empty chapter is another chapter. */}
         {ai ? null : <PracticeChapterBar kind="blanks" chapter={practice.chapter} />}
         <Spacer h={S.lg} />
-        <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+        {ai ? (
+          <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+        ) : (
+          <PracticeEmpty kind="blanks" chapterId={chapterId} chapter={practice.chapter} onRetry={reload} />
+        )}
       </Screen>
     );
   }
@@ -266,6 +271,15 @@ export default function Blanks() {
                 }
               />
             </>
+          ) : null}
+          {/* Google Play: AI-written text can be reported in the app, and
+              every blank is written by the AI, the chapter's own included. */}
+          {item ? (
+            <ReportAi
+              surface="ai_test"
+              refId={item.id}
+              excerpt={`${item.sentence[0]} ____ ${item.sentence[1]}\n\n${item.answer}`}
+            />
           ) : null}
         </Card>
       ) : null}

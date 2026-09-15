@@ -27,7 +27,6 @@ import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../../src/theme';
-import { AiLocked } from '../../src/components/AiLocked';
 
 /**
  * Every conversation the student has ever had with the tutor.
@@ -49,12 +48,11 @@ type ThreadRow = { id: string; title: string; context_label: string | null; upda
 const PAGE = 100;
 
 /**
- * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
- * the screen's own hooks run, so it never starts a request it cannot make.
+ * Open on every plan. The list asks the AI nothing: it is the student's own
+ * saved chats, which on a plan without the tutor open to read (see the chat
+ * screen), and can still be renamed or deleted.
  */
 export default function AllChatsGate() {
-  const { derived } = useApp();
-  if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.allChatsTitle" />;
   return <AllChats />;
 }
 
@@ -162,7 +160,7 @@ function AllChats() {
             ]}
           />
           {query ? (
-            <Tap onPress={() => setQuery('')}>
+            <Tap onPress={() => setQuery('')} hit label={t('a11y.clearSearch')}>
               <Icon name="close" size={16} color={C.ink3} />
             </Tap>
           ) : null}
@@ -209,6 +207,7 @@ function AllChats() {
                     setTitle(thread.title);
                   }}
                   hit
+                  label={t('a11y.chatOptions')}
                 >
                   <Icon name="dots" size={18} color={C.ink3} />
                 </Tap>

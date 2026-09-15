@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { View } from 'react-native';
-import { router } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { BackHandler, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
 import { Icon } from '../../src/components/Icon';
 import { Body, Btn, Card, Chevron, Confirm, H3, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, Text } from '../../src/components/ui';
 import { SessionHeader } from '../../src/components/SessionHeader';
@@ -54,6 +54,27 @@ export default function McqScreen() {
    * than that guess, and it cannot be wrong.
    */
   const answeredCount = s ? Object.keys(s.answers).length : 0;
+
+  /**
+   * Hardware back, the same three ways as the close button: nothing answered
+   * goes back, part of the set asks first, a finished set shows its result.
+   * It used to leave the set in one reflex tap, the result never saved. Only
+   * while this screen is the one in front: the tutor chat opened from "Ask
+   * AI" sits on top of it, and its back belongs to the chat.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+        const cur = session.current;
+        const answered = cur ? Object.keys(cur.answers).length : 0;
+        if (!cur || !answered) return false;
+        if (answered < cur.mcqs.length) setConfirmEnd(true);
+        else router.replace('/session/result');
+        return true;
+      });
+      return () => sub.remove();
+    }, []),
+  );
 
   if (!s || !mcq) {
     return (

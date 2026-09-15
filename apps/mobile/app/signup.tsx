@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useT } from '../src/i18n';
-import { isAuthErrorKey, useAuth } from '../src/store/auth';
-import { Body, Btn, Card, Field, Header, Screen, Small, Spacer, useToast } from '../src/components/ui';
-import { normaliseMobile } from '@matricmate/core';
+import { cleanTeacherCode, isAuthErrorKey, teacherCodeOk, useAuth } from '../src/store/auth';
+import { Body, Btn, Card, Field, Header, Screen, Small, Spacer, Text, useToast } from '../src/components/ui';
+import { isPlausibleEmail, normaliseMobile } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
-import { C, S } from '../src/theme';
+import { SITE_URL } from '../src/lib/site';
+import { C, F, S } from '../src/theme';
 import { resetTo } from '../src/core/nav';
 
 /**
@@ -29,7 +30,9 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
+  const [mobileTouched, setMobileTouched] = useState(false);
   const [school, setSchool] = useState('');
+  const [teacherCode, setTeacherCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmSent, setConfirmSent] = useState(false);
@@ -39,15 +42,44 @@ export default function SignUp() {
   // Optional, but when given it has to fit the column (2 to 120 letters), the website's rule.
   const schoolClean = school.trim().replace(/\s+/g, ' ');
   const schoolOk = !schoolClean || (schoolClean.length >= 2 && schoolClean.length <= 120);
-  const valid =
-    name.trim().length >= 2 && email.trim().includes('@') && password.length >= 6 && !!normaliseMobile(mobile) && schoolOk;
+  // Optional too, and held to the website's shape for a code.
+  const code = cleanTeacherCode(teacherCode);
+  const codeOk = !code || teacherCodeOk(code);
+  const mobileOk = !!normaliseMobile(mobile);
+  // The same rule as the website and the server: `name@gmail` has an @ but
+  // can never receive the password-reset email.
+  const emailOk = isPlausibleEmail(email);
+  const othersOk = name.trim().length >= 2 && emailOk && password.length >= 6 && schoolOk && codeOk;
+  const valid = othersOk && mobileOk;
+  /*
+   * Said under the field, not left for the button to explain by staying grey:
+   * a number that does not read as Pakistani disabled "Create account" with no
+   * reason given. Once the field is left, once it is long enough to judge, or
+   * when it is the only thing still wrong.
+   */
+  const mobileError =
+    !!mobile.trim() && !mobileOk && (mobileTouched || mobile.replace(/\D/g, '').length >= 11 || othersOk)
+      ? t('auth.errMobileInvalid')
+      : undefined;
+
+  async function openDoc(path: '/terms' | '/privacy') {
+    // ?from=app: the bare page, with no navigation on to the plans (core/billing.ts).
+    try {
+      await Linking.openURL(`${SITE_URL}${path}?from=app`);
+    } catch {
+      toast(t('common.openLinkError'));
+    }
+  }
 
   async function submit() {
     if (!valid || busy) return;
     setBusy(true);
     setError(null);
     try {
-      const { needsConfirmation } = await signUp(name, email, password, mobile, schoolClean);
+      const { needsConfirmation, refMissed } = await signUp(name, email, password, mobile, schoolClean, code);
+      // The account is made either way; a code that matched nobody is worth
+      // knowing now, while the teacher can still be asked for the right one.
+      if (refMissed) toast(t('auth.teacherCodeMissed'));
       // With confirmation on there is no session yet, so there is nowhere to go.
       // Saying so is the only honest option; routing into the app would land on
       // a locked screen and read as a failure.
@@ -126,6 +158,7 @@ export default function SignUp() {
         icon="mail"
         keyboardType="email-address"
         autoCapitalize="none"
+        error={email.trim() && !emailOk && email.includes('.') ? t('auth.errEmailInvalid') : undefined}
       />
       {/* Asked here so it is never asked at checkout. Safepay will not create
           the payer record that fills its own form in without a number, and a
@@ -136,10 +169,12 @@ export default function SignUp() {
         label={t('auth.mobile')}
         value={mobile}
         onChangeText={setMobile}
+        onBlur={() => setMobileTouched(true)}
         placeholder={t('auth.mobilePlaceholder')}
         icon="phone"
         keyboardType="phone-pad"
         autoCapitalize="none"
+        error={mobileError}
       />
       {/* Optional, and the label says so. The client counts students by school
           and plans school batches from it; nobody is kept from studying for
@@ -161,7 +196,36 @@ export default function SignUp() {
         icon="key"
         secure
       />
-      <Small style={{ marginBottom: S.md }}>{t('auth.terms')}</Small>
+      {/* A student who signs up here never passes the teacher's link the
+          website reads, so the code the teacher handed out is asked for. */}
+      <Field
+        label={t('auth.teacherCode')}
+        value={teacherCode}
+        onChangeText={setTeacherCode}
+        placeholder={t('auth.teacherCodePlaceholder')}
+        icon="award"
+        autoCapitalize="characters"
+        error={codeOk ? undefined : t('auth.errTeacherCode')}
+      />
+      {/* The two documents the sentence names, each one tap away. */}
+      <Small style={{ marginBottom: S.md }}>
+        {t('auth.agreeLine', { terms: '\u0000terms\u0000', privacy: '\u0000privacy\u0000' })
+          .split('\u0000')
+          .map((part, i) =>
+            part === 'terms' || part === 'privacy' ? (
+              <Text
+                key={i}
+                accessibilityRole="link"
+                onPress={() => void openDoc(part === 'terms' ? '/terms' : '/privacy')}
+                style={{ fontFamily: F.bodyBold, color: C.teal, textDecorationLine: 'underline' }}
+              >
+                {t(part === 'terms' ? 'auth.termsWord' : 'auth.privacyWord')}
+              </Text>
+            ) : (
+              part
+            ),
+          )}
+      </Small>
       <Btn title={t('auth.createAccount')} onPress={submit} loading={busy} disabled={!valid} />
       <Spacer h={S.sm} />
       <Btn title={t('welcome.haveAccount')} variant="ghost" onPress={() => router.replace('/login')} />

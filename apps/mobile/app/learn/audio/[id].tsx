@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Image, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { requireOptionalNativeModule } from 'expo';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
 import { Icon } from '../../../src/components/Icon';
-import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, Text } from '../../../src/components/ui';
+import { Bar, Btn, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, Text } from '../../../src/components/ui';
 import { api, chapterById, chapterName, fetchVoiceStream, isOneLanguageSubject, pickAudioTrack, subjectMedium } from '@matricmate/core';
 import type { Medium, VoiceStream } from '@matricmate/core';
 import { Equalizer } from '../../../src/components/celebration';
@@ -96,6 +97,7 @@ function PlayerChrome({
   busy,
   onToggleDownload,
   confirm,
+  onRetry,
 }: {
   title: string;
   subtitle: string;
@@ -124,6 +126,8 @@ function PlayerChrome({
   onToggleDownload: () => void;
   /** The confirm sheet a removal asks through. */
   confirm?: ReactNode;
+  /** Set when the lesson failed to play: a Retry under the note. */
+  onRetry?: () => void;
 }) {
   const t = useT();
   return (
@@ -140,6 +144,8 @@ function PlayerChrome({
             <IconButton
               icon={downloaded ? 'check' : 'download'}
               tone={downloaded ? 'active' : 'card'}
+              // Said aloud: an icon alone was read as "button".
+              label={t(downloaded ? 'study.removeOffline' : 'study.saveOffline')}
               onPress={onToggleDownload}
             />
           )
@@ -212,8 +218,16 @@ function PlayerChrome({
         </Pill>
       </Row>
 
-      <Card flat tint={disabled ? C.orangeTint : C.tealTint} style={{ marginTop: S.lg }}>
+      <Card flat tint={disabled || onRetry ? C.orangeTint : C.tealTint} style={{ marginTop: S.lg }}>
         <Small>{note}</Small>
+        {/* A lesson that failed to load, or dropped part way, gets a way on:
+            the player went quiet and Play did nothing. */}
+        {onRetry ? (
+          <>
+            <Spacer h={S.sm} />
+            <Btn title={t('common.retry')} variant="line" sm icon="refresh" onPress={onRetry} />
+          </>
+        ) : null}
       </Card>
     </Screen>
   );
@@ -289,7 +303,16 @@ function RealPlayer({ id }: { id: string }) {
   const track = useMemo(() => (uri ? { uri } : null), [uri]);
   const player = useAudioPlayer(track);
 
-  const status = useAudioPlayerStatus(player);
+  /*
+   * The status of this player, not the last one. The hook keeps the previous
+   * player's last event until the new player sends one of its own, and a
+   * stopped player sends none: after a stream ended early, that stale "just
+   * finished" at X made the new stream player ask to carry on from X + X, so
+   * the clock doubled and the lesson skipped ahead or stopped. An event from
+   * another player is read past for the new one's current state.
+   */
+  const heard = useAudioPlayerStatus(player);
+  const status = heard.id === player.id ? heard : player.currentStatus;
   // Listening counts as study time even with the screen untouched (core/studyClock.ts).
   useEffect(() => {
     setListening(status.playing);
@@ -322,15 +345,18 @@ function RealPlayer({ id }: { id: string }) {
     if (!status.playing || onLockScreen.current) return;
     onLockScreen.current = true;
     try {
+      // No skipping from the lock screen through a lesson being made as it
+      // plays, as in the app (the -15 and +15 are off): seeking a stream
+      // restarts it. The finished file is a new player, registered afresh.
       player.setActiveForLockScreen(
         true,
         { title, artist: 'MatricMate', artworkUrl: LOCK_SCREEN_ART },
-        { showSeekBackward: true, showSeekForward: true },
+        { showSeekBackward: !streaming, showSeekForward: !streaming },
       );
     } catch {
       // A binary without the playback service still plays in the foreground.
     }
-  }, [status.playing, player, title]);
+  }, [status.playing, player, title, streaming]);
 
   // A new player starts at 1x, but the speed pill keeps its state across a
   // source switch. Re-applied whenever either changes, so they cannot drift.
@@ -346,6 +372,29 @@ function RealPlayer({ id }: { id: string }) {
   const duration = streaming ? (voice?.estSecs ?? 0) : status.duration || voice?.fileSecs || picked?.durationSecs || 0;
   const position = (streaming ? (voice?.offset ?? 0) : 0) + (status.currentTime || 0);
 
+  /*
+   * A file that would not load, or that dropped part way (mobile data going,
+   * the most likely case). Only the stream's errors were handled: a file's
+   * left a quiet player whose Play did nothing, since a player that has
+   * failed does not load again by itself. Said, with a Retry that loads the
+   * same file again and carries on from where it stopped.
+   */
+  const fileFailed = !streaming && !!track && !!status.error;
+  const reached = useRef(0);
+  useEffect(() => {
+    if (status.currentTime > 0) reached.current = status.currentTime;
+  }, [status.currentTime]);
+  useEffect(() => {
+    reached.current = 0;
+  }, [uri]);
+  const [reloads, setReloads] = useState(0);
+  const retryFile = () => {
+    if (!track) return;
+    resume.current = { at: reached.current, play: true };
+    player.replace(track);
+    setReloads((n) => n + 1);
+  };
+
   // A new source (the stream, or the finished file swapped in) plays as soon
   // as it can when the press or the swap asked for it; a file seeks first.
   useEffect(() => {
@@ -355,7 +404,7 @@ function RealPlayer({ id }: { id: string }) {
     if (!streaming && r.at > 0) player.seekTo(r.at);
     if (r.play) player.play();
     resume.current = null;
-  }, [player, status.isLoaded, streaming]);
+  }, [player, status.isLoaded, streaming, reloads]);
 
   /**
    * The lesson from `at` seconds in, after a stream stopped: the finished
@@ -453,6 +502,11 @@ function RealPlayer({ id }: { id: string }) {
       asking={asking}
       onPlay={async () => {
         if (!track || asking) return;
+        // A failed file does not load again on play: Play is a retry too.
+        if (fileFailed) {
+          retryFile();
+          return;
+        }
         if (status.playing) {
           player.pause();
           return;
@@ -493,9 +547,12 @@ function RealPlayer({ id }: { id: string }) {
        * chapter that has one. A slow request looked exactly like a missing
        * lesson. A failed request looked like one too, silently.
        */
+      onRetry={fileFailed ? retryFile : undefined}
       note={
         streaming
           ? t('audio.voiceMaking')
+          : fileFailed
+          ? t('audio.loadFailed')
           : track
           ? t(lessonNote(id, state.onboarding?.board))
           : tracksLoading
@@ -520,7 +577,7 @@ function RealPlayer({ id }: { id: string }) {
  * works, the transport just runs on a timer, so a dev build from before the
  * module was added keeps every other screen usable.
  */
-function PreviewPlayer({ id }: { id: string }) {
+function PreviewPlayer({ id, onRetry }: { id: string; onRetry?: () => void }) {
   const { state } = useApp();
   const t = useT();
   const download = useChapterDownload(id);
@@ -556,20 +613,28 @@ function PreviewPlayer({ id }: { id: string }) {
       onPlay={() => setPlaying((p) => !p)}
       onSeek={(d) => setPosition((p) => Math.max(0, Math.min(duration, p + d)))}
       onSpeed={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
-      note={t('audio.needsNewBuild')}
+      note={onRetry ? t('audio.loadFailed') : t('audio.needsNewBuild')}
       downloaded={download.readable}
       offlineAudio={onDisk}
       busy={download.busy}
       onToggleDownload={download.press}
       confirm={download.confirm}
+      onRetry={onRetry}
     />
   );
 }
 
+/**
+ * Whether this binary has the audio module at all. Only a build older than
+ * audio support lacks it; in any other the fallback means the player itself
+ * failed, and "install the latest build" was advice that could not help.
+ */
+const HAS_AUDIO = requireOptionalNativeModule('ExpoAudio') != null;
+
 export default function AudioLesson() {
   const { id } = useLocalSearchParams<{ id: string }>();
   return (
-    <ErrorBoundary fallback={<PreviewPlayer id={id} />}>
+    <ErrorBoundary fallback={(reset) => (HAS_AUDIO ? <PreviewPlayer id={id} onRetry={reset} /> : <PreviewPlayer id={id} />)}>
       <RealPlayer id={id} />
     </ErrorBoundary>
   );

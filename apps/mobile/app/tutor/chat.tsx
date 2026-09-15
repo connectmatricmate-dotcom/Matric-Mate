@@ -255,11 +255,16 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
  */
 export default function ChatGate() {
   const { derived } = useApp();
-  if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.title" />;
+  const { thread } = useLocalSearchParams<{ thread?: string }>();
+  if (derived.access.active && !derived.access.ai) {
+    // A saved chat is the student's own, and reading it costs nothing: it
+    // opens to read on a plan without the tutor. Asking stays locked.
+    return thread ? <Chat readOnly /> : <AiLocked titleKey="tutor.title" chats />;
+  }
   return <Chat />;
 }
 
-function Chat() {
+function Chat({ readOnly = false }: { readOnly?: boolean }) {
   const { q, chapter, thread, draft, photo: wantPhoto } = useLocalSearchParams<{
     q?: string;
     chapter?: string;
@@ -383,12 +388,18 @@ function Chat() {
         }
         const { data: meta } = await supabase.from('chat_threads').select('context_label').eq('id', thread).maybeSingle();
         if (!alive) return;
-        const loaded: ChatMessage[] = rows.map((r) => ({
-          id: r.id,
-          role: r.role === 'assistant' ? ('ai' as const) : ('user' as const),
-          text: r.content,
-          at: Date.parse(r.at),
-        }));
+        const loaded: ChatMessage[] = rows
+          .map((r, i) => ({ r, i }))
+          // A question and its answer can be saved with the same time, and
+          // the row id, the tie-break, is random: the answer then showed above
+          // the question. On a tie the student's question goes first.
+          .sort((a, b) => Date.parse(a.r.at) - Date.parse(b.r.at) || (a.r.role === 'assistant' ? 1 : 0) - (b.r.role === 'assistant' ? 1 : 0) || a.i - b.i)
+          .map(({ r }) => ({
+            id: r.id,
+            role: r.role === 'assistant' ? ('ai' as const) : ('user' as const),
+            text: r.content,
+            at: Date.parse(r.at),
+          }));
         const known = new Set(loaded.map((m) => m.id));
         setMessages((now) => [...loaded, ...now.filter((m) => !known.has(m.id))]);
         if (meta?.context_label) setThreadLabel(meta.context_label as string);
@@ -538,7 +549,7 @@ function Chat() {
    * already left.
    */
   useEffect(() => {
-    if (!q || messages.length) return;
+    if (!q || messages.length || readOnly) return;
     const timer = setTimeout(() => send(String(q)), 0);
     return () => clearTimeout(timer);
     // Only a new `?q=` should retrigger this. Including `send` or `messages`
@@ -547,7 +558,7 @@ function Chat() {
   }, [q]);
 
   useEffect(() => {
-    if (wantPhoto !== '1') return;
+    if (wantPhoto !== '1' || readOnly) return;
     const timer = setTimeout(() => pickPhotoSource(), 250);
     return () => clearTimeout(timer);
     // Once, on arrival, and never again on a re-render.
@@ -580,7 +591,7 @@ function Chat() {
           <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{t('tutor.title')}</Text>
           {contextLabel ? <Small numberOfLines={1}>{t('tutor.context', { label: contextLabel })}</Small> : null}
         </View>
-        {quota ? (
+        {quota && !readOnly ? (
           <View style={{ alignItems: 'flex-end' }}>
             <Pill tone={outOfQuestions ? 'red' : 'grey'}>
               {t('tutor.quotaPill', { n: quota.remaining, limit: quota.limit })}
@@ -625,7 +636,7 @@ function Chat() {
               {t('common.retry')}
             </Pill>
           </View>
-        ) : messages.length === 0 && !thinking ? (
+        ) : messages.length === 0 && !thinking && !readOnly ? (
           // Asked on the tap, like the follow-up chips. It only filled the
           // box, which on a one-line field showed the last few words, so a
           // card with an arrow on it looked like it had done nothing.
@@ -710,7 +721,7 @@ function Chat() {
                 <ReportAi variant="pill" surface="tutor" refId={m.id} excerpt={parseTutorActions(m.text, false, lang).text} />
                 {/* Only when the answer is NOT already Urdu: asking for
                     Urdu on an Urdu reply spends a question for nothing. */}
-                {isUrduScript(m.text) ? null : (
+                {isUrduScript(m.text) || readOnly ? null : (
                   <Pill tone="teal" onPress={() => send(t('tutor.reExplainUrdu'))}>
                     {t('tutor.inUrdu')}
                   </Pill>
@@ -730,7 +741,7 @@ function Chat() {
               {/* Follow-ups on the newest answer only. One tap continues
                   the thread the way students actually go next, and the
                   chapter context rides along with it. */}
-              {m.id === messages[messages.length - 1]?.id && !thinking ? (
+              {m.id === messages[messages.length - 1]?.id && !thinking && !readOnly ? (
                 <View style={{ marginTop: S.md, borderTopWidth: 1, borderTopColor: C.line, paddingTop: S.md, gap: S.sm }}>
                   <Text style={{ fontFamily: F.bodyBold, fontSize: 11, letterSpacing: 0.7, color: C.ink3 }}>
                     {t('tutor.askFollowUp').toUpperCase()}
@@ -772,7 +783,7 @@ function Chat() {
         ) : null}
       </ScrollView>
 
-      {photo ? (
+      {photo && !readOnly ? (
         <Row style={{ paddingHorizontal: S.md, paddingVertical: 6, backgroundColor: C.card }} gap={S.sm}>
           <Image source={{ uri: photo.uri }} style={{ width: 44, height: 44, borderRadius: 8 }} resizeMode="cover" />
           <Small style={{ flex: 1 }}>{t('tutor.photoAttached')}</Small>
@@ -783,7 +794,7 @@ function Chat() {
       {/* What the answer will be drawn from, said out loud and removable. The
           chapter used to be invisible: arriving from a chapter's Ask AI button
           silently grounded the whole thread and nothing on screen said so. */}
-      {groundedId ? (
+      {groundedId && !readOnly ? (
         <Row style={{ paddingHorizontal: S.md, paddingBottom: 6 }} gap={S.sm}>
           <View
             style={{
@@ -808,6 +819,7 @@ function Chat() {
                 setThreadLabel(undefined);
               }}
               hit
+              label={t('tutor.chapterClear')}
             >
               <Icon name="close" size={13} color={C.teal} />
             </Tap>
@@ -830,6 +842,23 @@ function Chat() {
           if (topic) setInput((current) => (current.trim() ? current : t('tutor.explainDraft', { chapter: topic }).replace(/[\u2066-\u2069]/g, '')));
         }}
       />
+      {/* Read, not asked: in place of the composer, what the plan leaves. */}
+      {readOnly ? (
+        <Row
+          style={{
+            paddingHorizontal: S.md,
+            paddingTop: S.md,
+            paddingBottom: Math.max(insets.bottom, S.md),
+            borderTopWidth: 1,
+            borderTopColor: C.line,
+            backgroundColor: C.card,
+          }}
+          gap={S.sm}
+        >
+          <Icon name="lock" size={16} color={C.ink3} />
+          <Small style={{ flex: 1 }}>{t('tutor.readOnlyNote')}</Small>
+        </Row>
+      ) : (
       <Row
         style={{
           paddingHorizontal: S.md,
@@ -910,6 +939,7 @@ function Chat() {
           </View>
         </Tap>
       </Row>
+      )}
     </Screen>
   );
 }

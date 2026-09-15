@@ -38,6 +38,7 @@ import {
   level,
   markNotificationsRead,
   mergeHydratedState,
+  staleQueue,
   newRowId,
   primeAllContent,
   setContentBoard,
@@ -54,7 +55,7 @@ import {
   syncReadSection,
   syncResult,
   todayKey,
-  wipeStudyHistory,
+  resetStudyHistory,
   xpForAttempt,
 } from '@matricmate/core';
 import type { HydratedStudyState } from '@matricmate/core';
@@ -98,6 +99,14 @@ async function loadQueue(userId: string): Promise<SyncOp[]> {
  */
 function saveQueue(userId: string, queue: SyncOp[]): void {
   AsyncStorage.setItem(queueKey(userId), JSON.stringify(queue)).catch(() => {});
+}
+
+/**
+ * Throws away a student's unsent writes on this phone, for an account that no
+ * longer exists (deleted from Settings): there is nobody left to send them for.
+ */
+export function forgetSavedQueue(userId: string): Promise<void> {
+  return AsyncStorage.removeItem(queueKey(userId)).catch(() => {});
 }
 
 /**
@@ -229,6 +238,8 @@ export type State = {
   activeDays: string[];
   xp: number;
   cardsKnown: string[];
+  /** The account's last wipe this copy was built against (see staleCopy in core). */
+  progressEpoch?: number | null;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -243,6 +254,42 @@ const DEFAULT_SETTINGS: Settings = {
   contentMedium: 'en',
   fontScale: 1,
 };
+
+/**
+ * Caps on the histories that only ever grow, the website's numbers
+ * (apps/web/lib/persisted-store.ts). The whole state is one AsyncStorage
+ * value, rewritten after every answer, and Android will not read back a row
+ * much past two megabytes: a student answering thirty questions a day would
+ * one term lose everything saved on the phone at once. Recent history is what
+ * the screens read; XP and the streak have their own counters.
+ */
+const CAP = { attempts: 1000, results: 100, notifications: 50, activeDays: 400 };
+
+function prune(s: State): State {
+  if (
+    s.attempts.length <= CAP.attempts &&
+    s.results.length <= CAP.results &&
+    s.notifications.length <= CAP.notifications &&
+    s.activeDays.length <= CAP.activeDays
+  ) {
+    return s;
+  }
+  return {
+    ...s,
+    // attempts and activeDays append newest-last; results and notifications
+    // insert newest-first. Both slices keep the newest rows.
+    attempts: s.attempts.slice(-CAP.attempts),
+    results: s.results.slice(0, CAP.results),
+    notifications: s.notifications.slice(0, CAP.notifications),
+    activeDays: s.activeDays.slice(-CAP.activeDays),
+  };
+}
+
+/** Milliseconds until the next midnight in Karachi, where todayKey's days turn over (UTC+5, no DST). */
+function msToKarachiMidnight(now: number): number {
+  const day = 864e5;
+  return day - ((now + 5 * 3600_000) % day);
+}
 
 const EMPTY: State = {
   ownerId: null,
@@ -386,6 +433,14 @@ type Actions = {
    * than eight seconds.
    */
   syncNow: () => Promise<number>;
+  /**
+   * Sends this phone's onboarding choices to the account now, when the
+   * account has none of its own yet, and says whether they are there. For the
+   * trial screen: until they land, row level security serves the account's
+   * default class and board, and a Punjab or Class 10 student was told no
+   * subject has chapters. Never overwrites choices the account already has.
+   */
+  ensureChoicesSaved: () => Promise<boolean>;
   resetDemo: () => void;
 };
 
@@ -522,12 +577,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
            * a student reading Urdu notes wants an Urdu app.
            */
           const one = parsed.onboarding?.medium ?? settings.contentMedium ?? settings.language;
-          setState({
-            ...EMPTY,
-            ...parsed,
-            settings: { ...settings, language: one, contentMedium: one },
-            onboarding: parsed.onboarding ? { ...parsed.onboarding, medium: one } : parsed.onboarding,
-          });
+          setState(
+            prune({
+              ...EMPTY,
+              ...parsed,
+              settings: { ...settings, language: one, contentMedium: one },
+              onboarding: parsed.onboarding ? { ...parsed.onboarding, medium: one } : parsed.onboarding,
+            }),
+          );
         }
       } catch {
         // corrupt cache, start clean rather than crash
@@ -541,7 +598,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!hydrated) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      AsyncStorage.setItem(KEY, JSON.stringify(state)).catch(() => {});
+      // Capped on the way to disk; see CAP.
+      AsyncStorage.setItem(KEY, JSON.stringify(prune(state))).catch(() => {});
     }, 250);
   }, [state, hydrated]);
 
@@ -721,14 +779,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    */
   const startOver = useCallback(
     async (uid: string | null, onboarding: Onboarding) => {
+      let resetAt: number | null = null;
       if (uid) {
         await dropQueue(uid);
-        await within(wipeStudyHistory(supabase, uid), NETWORK_WAIT_MS, false);
+        ({ resetAt } = await within(resetStudyHistory(supabase, uid), NETWORK_WAIT_MS, { ok: false, resetAt: null }));
       }
       restart(onboarding);
+      // This phone's copy starts at the wipe it just made, so its next sync
+      // does not take its own new history for a stale copy (staleCopy in core).
+      if (resetAt) setState((s) => ({ ...s, progressEpoch: resetAt }));
     },
     [dropQueue, restart],
   );
+
+  /**
+   * A reset or a switch made on another device since this phone's copy was
+   * built (the account's progress_reset_at, migration 0058): answers queued
+   * here before it must not reach the server after it, or the wiped history
+   * comes back on every device. Keeps what was done since, stops a send in
+   * flight. The merge itself replaces the stale copy (mergeHydratedState).
+   */
+  const dropStaleOps = useCallback((uid: string, server: HydratedStudyState) => {
+    const kept = staleQueue(stateRef.current, server, queueRef.current);
+    if (!kept) return;
+    queueGenRef.current += 1;
+    clearSyncQueue();
+    queueRef.current = kept;
+    saveQueue(uid, kept);
+    activeDaySyncedRef.current = null;
+  }, []);
 
   /**
    * On sign-in (including the app's very first launch already signed in),
@@ -747,7 +826,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // two branches with no real async work, so nothing here sets state
     // synchronously while the effect itself is still running.
     (async () => {
-      if (syncedForRef.current === uid) {
+      // Signed out with a student's copy still on the phone is not "nothing
+      // changed": the session went while the app was closed (it expired, or
+      // the app was killed straight after a sign-out, before the wipe below
+      // was saved). That copy goes too.
+      const leftBehind = !uid && Boolean(stateRef.current.ownerId);
+      if (syncedForRef.current === uid && !leftBehind) {
         setHydrated(true);
         setReadyFor(uid);
         return;
@@ -803,6 +887,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         session.clear();
         activeDaySyncedRef.current = null;
         setState((s) => ({ ...EMPTY, ownerId: uid, settings: devicePrefs(s.settings), ...(carried ? { onboarding: carried } : {}) }));
+        // A sign-out is written through at once, not after the usual pause: a
+        // phone put away straight after "Log out" kept the student's copy.
+        if (!uid) {
+          const wiped: State = { ...EMPTY, ownerId: null, settings: devicePrefs(stateRef.current.settings) };
+          AsyncStorage.setItem(KEY, JSON.stringify(wiped)).catch(() => {});
+        }
       } else if (uid) {
         // Signed in, so any choices on the phone are this account's from now on.
         setState((s) => (s.ownerId === uid && !s.onboardingSignedOut ? s : { ...s, ownerId: uid, onboardingSignedOut: false }));
@@ -835,6 +925,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
        */
       const apply = async (server: HydratedStudyState | null): Promise<void> => {
         if (stale() || !server) return;
+        dropStaleOps(uid, server);
         // After a change of account the phone has no choices by definition,
         // and stateRef may not have caught up with the reset yet: reading it
         // could hand the previous student's choices to this one's profile.
@@ -987,7 +1078,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [localLoaded, authLoading, authUser?.id, flush, dropQueue, restart, saveChoices, syllabusChanged]);
+  }, [localLoaded, authLoading, authUser?.id, flush, dropQueue, restart, saveChoices, syllabusChanged, dropStaleOps]);
 
   /**
    * Retries whatever is still queued whenever the student picks the phone
@@ -1012,6 +1103,65 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     return () => sub.remove();
   }, [flush, saveChoices, syllabusChanged]);
+
+  /**
+   * The same, the moment the connection comes back. Answers given offline
+   * used to wait for the next time the app went to the background and came
+   * back, so a student who studied on the bus and kept the app open at home
+   * had nothing on their laptop, and a streak with no active day behind it.
+   */
+  const wasOnline = useRef(online);
+  useEffect(() => {
+    const back = online && !wasOnline.current;
+    wasOnline.current = online;
+    const uid = syncedForRef.current;
+    if (!back || !uid) return;
+    /*
+     * Not just once. After the signal returns, Android's HTTP client can keep
+     * sending on the connection it had before, which leads nowhere: on the
+     * test phone every request timed out for minutes after airplane mode went
+     * off, and the answers given in the air waited for the next time the app
+     * was reopened. So it is tried again every half minute for five minutes
+     * while anything is still queued, and stopped if the signal goes again.
+     * (The native fix, a keep-alive ping so a dead connection is noticed in
+     * seconds, is plugins/with-okhttp-ping.js and arrives with the next build.)
+     */
+    let tries = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const again = () => {
+      if (syncedForRef.current !== uid || tries >= 10) return;
+      tries += 1;
+      void flush(uid).then(() => {
+        if (queueRef.current.length) timer = setTimeout(again, 30_000);
+      });
+    };
+    again();
+    const onboarding = stateRef.current.onboarding;
+    if (choicesUnsavedRef.current === uid && onboarding) {
+      void saveChoices(uid, onboarding).then((ok) => {
+        if (ok && syncedForRef.current === uid) syllabusChanged();
+      });
+    }
+    return () => clearTimeout(timer);
+  }, [online, flush, saveChoices, syllabusChanged]);
+
+  /**
+   * Today, as the rest of this store counts days (Karachi). Moved on at
+   * midnight and whenever the app comes back to the front, so a phone left
+   * open overnight does not keep yesterday's plan and allowance as today's.
+   */
+  const [day, setDay] = useState(todayKey);
+  useEffect(() => {
+    const roll = () => setDay(todayKey());
+    const timer = setTimeout(roll, msToKarachiMidnight(Date.now()) + 1000);
+    const sub = AppState.addEventListener('change', (status) => {
+      if (status === 'active') roll();
+    });
+    return () => {
+      clearTimeout(timer);
+      sub.remove();
+    };
+  }, [day]);
 
   /**
    * Records today as studied, locally and on the server, exactly once per
@@ -1064,13 +1214,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
          * settings the same way: a switch turned off on the laptop turns off
          * here.
          */
+        if (syncedForRef.current === liveUserId) dropStaleOps(liveUserId, server);
         const pending = syncedForRef.current === liveUserId ? queueRef.current : [];
         setState((s) => withServer(s, server, pending));
       }, 1200);
     };
 
     const channel = supabase
-      .channel(`study:${liveUserId}`, { config: { private: false } })
+      // Private: only this account may listen (migration 0068); a public topic
+      // let anyone with the id listen in, or send made-up updates.
+      .channel(`study:${liveUserId}`, { config: { private: true } })
       .on('broadcast', { event: 'change' }, refresh)
       .subscribe();
 
@@ -1079,7 +1232,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (timer) clearTimeout(timer);
       void supabase.removeChannel(channel);
     };
-  }, [liveUserId]);
+  }, [liveUserId, dropStaleOps]);
 
   /**
    * Keep the content layer on the student's medium.
@@ -1370,21 +1523,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         markDayActive();
       },
       consumeAi: () => {
-        let allowed = false;
         const day = todayKey();
-        // Read before the update, like every other action that can start a day.
-
+        /*
+         * Decided here, from the current state, not inside the updater. The
+         * updater used to set `allowed` as a side effect, and React may run an
+         * updater later (it did whenever another update was queued), so the
+         * action could answer "no" for a question it then counted. The plan
+         * lives in the auth store, never in this state: read through the ref
+         * the render below keeps current.
+         */
+        const now = stateRef.current.ai;
+        const usedNow = now.day === day ? now.used : 0;
+        const allowed = usedNow < aiLimitRef.current;
+        // Ahead of the render, so two answers landing together count as two.
+        if (allowed) stateRef.current = { ...stateRef.current, ai: { day, used: usedNow + 1 } };
         setState((s) => {
           const used = s.ai.day === day ? s.ai.used : 0;
-          // The plan lives in the auth store, overlaid on the view, never in
-          // this state: read through the ref the render below keeps current.
-          const limit = aiLimitRef.current;
-          if (used >= limit) {
-            allowed = false;
-            return { ...s, ai: { day, used } };
-          }
-          allowed = true;
-          return touchToday({ ...s, ai: { day, used: used + 1 } });
+          return allowed ? touchToday({ ...s, ai: { day, used: used + 1 } }) : { ...s, ai: { day, used } };
         });
         // Asking the tutor is studying, so it counts, but it has to be written
         // through like the rest. Marking the day locally and never syncing it
@@ -1400,24 +1555,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) }));
       },
       setSettings: (patch) => {
-        setState((s) => {
-          const settings = { ...s.settings, ...patch };
-          // The three nudge preferences are account-level, so they go up. The
-          // rest describe this device and stay on it.
-          const uid = syncedForRef.current;
-          if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch ||
-        'channelPush' in patch || 'channelEmail' in patch)) {
-            void syncAccountPrefs(supabase, uid, {
-              reminders: settings.reminders,
-              streakAlerts: settings.streakAlerts,
-              reminderTime: settings.reminderTime,
-              dark: settings.dark,
-              channelPush: settings.channelPush,
-              channelEmail: settings.channelEmail,
-            });
-          }
-          return { ...s, settings };
-        });
+        setState((s) => ({ ...s, settings: { ...s.settings, ...patch } }));
+        // Ahead of the render too, so a second change before it lands builds
+        // on this one.
+        const settings = { ...stateRef.current.settings, ...patch };
+        stateRef.current = { ...stateRef.current, settings };
+        // The nudge preferences are account-level, so they go up; the rest
+        // describe this device and stay on it. Sent from here, not from inside
+        // the updater, which React may run twice or late.
+        const uid = syncedForRef.current;
+        if (uid && ('reminders' in patch || 'streakAlerts' in patch || 'reminderTime' in patch || 'dark' in patch ||
+          'channelPush' in patch || 'channelEmail' in patch)) {
+          void syncAccountPrefs(supabase, uid, {
+            reminders: settings.reminders,
+            streakAlerts: settings.streakAlerts,
+            reminderTime: settings.reminderTime,
+            dark: settings.dark,
+            channelPush: settings.channelPush,
+            channelEmail: settings.channelEmail,
+          });
+        }
       },
       /**
        * One language for the whole app.
@@ -1507,7 +1664,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       syncNow: async () => {
         const uid = syncedForRef.current;
         if (uid) await sendAll(uid);
+        const onboarding = stateRef.current.onboarding;
+        if (uid && onboarding && choicesUnsavedRef.current === uid) {
+          const ok = await saveChoices(uid, onboarding);
+          if (ok && syncedForRef.current === uid) syllabusChanged();
+        }
         return queueRef.current.length;
+      },
+      ensureChoicesSaved: async () => {
+        const uid = syncedForRef.current;
+        const onboarding = stateRef.current.onboarding;
+        if (!uid || !onboarding?.subjects?.length) return false;
+        // The same test as the hydrate's: choices the account already has win.
+        const { data } = await within<{ data: { onboarding?: unknown } | null }>(
+          supabase.from('profiles').select('onboarding').eq('id', uid).maybeSingle(),
+          NETWORK_WAIT_MS,
+          { data: null },
+        );
+        const saved = (data?.onboarding ?? null) as Record<string, unknown> | null;
+        if (gradeChoice(saved) !== null && boardChoice(saved) !== null && savedSubjects(saved).length) return true;
+        const ok = await saveChoices(uid, onboarding);
+        if (ok && syncedForRef.current === uid) syllabusChanged();
+        return ok;
       },
       resetDemo: () => {
         // Files on disk, not just the state pointing at them: otherwise every
@@ -1524,7 +1702,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // The queue goes first, or answers still waiting to send land after
         // the wipe and bring part of the history straight back.
         const uid = authUser?.id;
-        if (uid) void dropQueue(uid).then(() => wipeStudyHistory(supabase, uid));
+        if (uid)
+          void dropQueue(uid)
+            .then(() => resetStudyHistory(supabase, uid))
+            // The wipe's own time, as this phone's epoch (see startOver).
+            .then(({ resetAt }) => {
+              if (resetAt) setState((s) => ({ ...s, progressEpoch: resetAt }));
+            });
         /* Notifications survive. They belong to the account, nothing here can
            delete them, and blanking them locally only made the inbox look
            cleared until the next hydration read every one of them back. */
@@ -1627,8 +1811,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // The index versions are not read here, and have to be listed: buildPlan
     // reads the chapter index through synchronous lookups that change
     // underneath without React knowing, so the plan is rebuilt each time it does.
+    // `day` the same way: the plan's task ids and today's allowance read the
+    // clock, which moves at midnight without anything else changing.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, indexVersion, primed.version]);
+  }, [view, indexVersion, primed.version, day]);
 
   useEffect(() => {
     aiLimitRef.current = derived.aiLimit;

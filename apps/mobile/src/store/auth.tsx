@@ -178,7 +178,20 @@ export type AuthUser = { id: string; name: string; email: string };
  * correct thing to do. Redirecting them into the app would land on a locked
  * screen with no explanation.
  */
-export type SignUpResult = { ok: true; needsConfirmation: boolean };
+export type SignUpResult = {
+  ok: true;
+  needsConfirmation: boolean;
+  /** A teacher's code was given and matched no active teacher, so nobody is linked. */
+  refMissed?: boolean;
+};
+
+/**
+ * A teacher's code as the website accepts it (referralCode in its sign-up
+ * action): upper case, letters and digits, 4 to 16 of them. Anything else is
+ * not sent, so the trigger sees no `ref` at all.
+ */
+export const cleanTeacherCode = (raw: string): string => raw.replace(/\s+/g, '').toUpperCase().slice(0, 16);
+export const teacherCodeOk = (code: string): boolean => /^[A-Z0-9]{4,16}$/.test(code);
 
 type Ctx = {
   /** Null until the stored session has been read back. Nothing should route on this until it is false. */
@@ -197,11 +210,19 @@ type Ctx = {
   /** True while an entitlement refresh is in flight, for pull-to-refresh affordances. */
   checking: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  /** `school` is optional; the signup trigger copies it to the profile (migration 0042). */
-  signUp: (name: string, email: string, password: string, mobile?: string, school?: string) => Promise<SignUpResult>;
+  /**
+   * `school` is optional; the signup trigger copies it to the profile
+   * (migration 0042). `teacherCode` too: the trigger ties the student to the
+   * teacher whose active code it is (`ref`, as the website sends it).
+   */
+  signUp: (name: string, email: string, password: string, mobile?: string, school?: string, teacherCode?: string) => Promise<SignUpResult>;
   /** Sends the confirmation email again, for one that never arrived. */
   resendConfirmation: (email: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  /**
+   * `deleted`: the account has just been deleted on the server, so there is
+   * nothing to send first and nobody to hand the push token back for.
+   */
+  signOut: (opts?: { deleted?: boolean }) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   /** Re-reads entitlement from the server. Called on resume, and by hand after paying. */
   refresh: () => Promise<void>;
@@ -555,9 +576,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
 
-      async signUp(name, email, password, mobile, school) {
+      async signUp(name, email, password, mobile, school, teacherCode) {
         const phone = mobile ? normaliseMobile(mobile) : null;
         const schoolName = (school ?? '').trim().replace(/\s+/g, ' ');
+        const code = cleanTeacherCode(teacherCode ?? '');
+        const ref = teacherCodeOk(code) ? code : null;
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
@@ -567,7 +590,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // The number is normalised to +92 and ten digits here because that
             // is what the column takes; an unrecognised one is left out rather
             // than failing the signup.
-            data: { name: name.trim(), ...(phone ? { phone } : {}), ...(schoolName ? { school: schoolName } : {}) },
+            data: {
+              name: name.trim(),
+              ...(phone ? { phone } : {}),
+              ...(schoolName ? { school: schoolName } : {}),
+              ...(ref ? { ref } : {}),
+            },
             // The link is opened in a phone browser, not in the app, so it has
             // to land on the website. They confirm there and come back to sign
             // in, which is what the "back to sign in" button here expects.
@@ -575,11 +603,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
         });
         if (error) throw new Error(readable(error.message));
+        /*
+         * Whether the code found its teacher, so the student hears about a
+         * typo now rather than never. The trigger ignores an unknown code in
+         * silence, and the profile says which it was. Bounded and best
+         * effort: an unanswered read says nothing either way.
+         */
+        let refMissed = false;
+        const uid = data.session?.user.id;
+        if (ref && uid) {
+          const read = await Promise.race([
+            supabase.from('profiles').select('referred_by').eq('id', uid).maybeSingle(),
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), PROFILE_TIMEOUT_MS)),
+          ]);
+          refMissed = !!read && !read.error && !read.data?.referred_by;
+        }
         /**
          * No session means the project is set to confirm addresses by email.
          * The account exists; it just cannot be used until the link is clicked.
          */
-        return { ok: true, needsConfirmation: !data.session };
+        return { ok: true, needsConfirmation: !data.session, refMissed };
       },
 
       /**
@@ -599,22 +642,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw new Error(readable(error.message));
       },
 
-      async signOut() {
-        // Unsent answers first, while the session that owns them still exists.
-        // Bounded, because a student on no signal must still be able to sign
-        // out; what cannot be sent now stays queued under their own account
-        // and goes the next time they sign in on this phone.
-        if (beforeSignOut) await settle(beforeSignOut(), SIGN_OUT_FLUSH_MS);
-        // Before the session goes, not after: the phone has to be handed back
-        // while we can still prove who is handing it over. Otherwise the next
-        // student to sign in on this device inherits the last one's push.
-        // Bounded too: fetching the device token can hang with no signal.
-        await settle(releasePushToken(), PUSH_RELEASE_MS);
+      async signOut(opts) {
+        // A deleted account has nothing left to send or hand back: its rows,
+        // push token included, went with it.
+        if (!opts?.deleted) {
+          // Unsent answers first, while the session that owns them still exists.
+          // Bounded, because a student on no signal must still be able to sign
+          // out; what cannot be sent now stays queued under their own account
+          // and goes the next time they sign in on this phone.
+          if (beforeSignOut) await settle(beforeSignOut(), SIGN_OUT_FLUSH_MS);
+          // Before the session goes, not after: the phone has to be handed back
+          // while we can still prove who is handing it over. Otherwise the next
+          // student to sign in on this device inherits the last one's push.
+          // Bounded too: fetching the device token can hang with no signal.
+          await settle(releasePushToken(), PUSH_RELEASE_MS);
+        }
+        // Read before the session goes: the sign-out event clears it on the
+        // way (adopt), and read after, it was always null, so the cached plan
+        // below was never removed.
+        const id = currentUserId.current;
         // This phone only, as the website does: the default ends the session on
         // every device, so signing out here signed the student out of their
         // laptop too, which is not what "sign out" on one phone means.
         await supabase.auth.signOut({ scope: 'local' });
-        const id = currentUserId.current;
         // Drop the cached entitlement with the session. Leaving it behind would
         // hand the next person to sign in on this phone somebody else's plan.
         if (id) await AsyncStorage.removeItem(cacheKey(id));

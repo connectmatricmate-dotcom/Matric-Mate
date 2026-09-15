@@ -8,7 +8,7 @@ import { api, checkAnswerLive, fetchAiSession, isUrduScript, normalizeAiShortQs,
 import type { AiCheckVerdict } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
-import { PickPracticeChapter, PracticeChapterBar, usePracticeChapter } from '../../src/components/PracticeChapter';
+import { PickPracticeChapter, PracticeChapterBar, PracticeEmpty, usePracticeChapter } from '../../src/components/PracticeChapter';
 import { aiFailureKey } from '../../src/components/aiFailure';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
@@ -92,7 +92,11 @@ export default function ShortQuestions() {
         {/* The way out of an empty chapter is another chapter. */}
         {ai ? null : <PracticeChapterBar kind="shortq" chapter={practice.chapter} />}
         <Spacer h={S.lg} />
-        <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+        {ai ? (
+          <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+        ) : (
+          <PracticeEmpty kind="shortq" chapterId={chapterId} chapter={practice.chapter} onRetry={reload} />
+        )}
       </Screen>
     );
   }
@@ -114,6 +118,9 @@ export default function ShortQuestions() {
       medium: itemChapter
         ? subjectMedium(itemChapter, state.onboarding?.board, state.settings.contentMedium)
         : state.settings.contentMedium,
+      // Where the question is from: a free trial's answers are marked only in
+      // its own subject, and the server refuses a check that does not say.
+      chapterId: itemChapter || undefined,
     });
     setChecking(false);
     if (!res.ok) {
@@ -290,6 +297,11 @@ export default function ShortQuestions() {
                 <ScriptText key={n} text={`• ${p}`} size={13} color={C.ink2} />
               ))}
             </View>
+            {/* Google Play: the model answer and its marking points are
+                written by the AI, a set asked for here and the bank alike. */}
+            {item ? (
+              <ReportAi surface="ai_test" refId={item.id} excerpt={`${item.q}\n\n${item.answer}\n\n${item.points.join('\n')}`} />
+            ) : null}
           </Card>
 
           {derived.access.ai ? (

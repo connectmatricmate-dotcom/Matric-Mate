@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { AppHeader } from '../../src/components/AppHeader';
@@ -19,6 +19,7 @@ import {
 import { Icon } from '../../src/components/Icon';
 import { useOnline } from '../../src/core/connectivity';
 import { useAsync } from '../../src/core/useAsync';
+import { useNow } from '../../src/core/useNow';
 import { supabase } from '../../src/lib/supabase';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -40,11 +41,12 @@ export default function Progress() {
   const days = useMemo(() => last14(state.activeDays), [state.activeDays]);
   // Same reason: weakTopics holds answers to the syllabus the index knows.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const weak = useMemo(() => weakTopics(state.attempts).slice(0, 4), [state.attempts, contentKey]);
+  const weak = useMemo(() => weakTopics(state.attempts, 3, { lang }).slice(0, 4), [state.attempts, contentKey, lang]);
   const acc = accuracy(state.attempts);
-  // Pinned once on mount rather than read during render: a render must be
-  // repeatable, and the month label has no business changing mid-screen.
-  const [now] = useState(() => Date.now());
+  // Held still rather than read during render: a render must be repeatable,
+  // and the month label has no business changing mid-screen. It moves when
+  // the day turns (useNow), since this tab is never unmounted.
+  const now = useNow();
   const month = formatDate(now, lang, { month: 'long' });
   /**
    * This month's answers, for the report card row. The row names this

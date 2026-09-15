@@ -115,7 +115,11 @@ export default function Downloads() {
             emoji="📭"
             title={t('downloads.emptyTitle')}
             sub={t('downloads.emptyBody')}
-            cta={<Btn title={t('downloads.browse')} sm variant="line" onPress={() => router.dismissTo('/(tabs)/study')} />}
+            cta={
+              state.premium.active ? (
+                <Btn title={t('downloads.browse')} sm variant="line" onPress={() => router.dismissTo('/(tabs)/study')} />
+              ) : undefined
+            }
           />
         </>
       ) : (
@@ -136,19 +140,28 @@ export default function Downloads() {
                   icon={r.readable ? 'check' : 'download'}
                   tone={r.readable ? 'green' : 'orange'}
                   last={i === list.length - 1}
-                  onPress={() => router.push(`/learn/chapter/${r.chapter.id}`)}
+                  // Without a plan this list is for freeing space only: the
+                  // chapter would close again at once (PlanGate). Offline, a
+                  // copy in the other language cannot open, and says so.
+                  onPress={
+                    !state.premium.active
+                      ? undefined
+                      : !r.readable && !online
+                        ? () => toast(t('downloads.savedIn', { lang: langName(r.savedIn) }))
+                        : () => router.push(`/learn/chapter/${r.chapter.id}`)
+                  }
                   right={
                     <Row gap={S.md}>
-                      {!r.readable && online ? (
+                      {!r.readable && online && state.premium.active ? (
                         saving === r.chapter.id ? (
                           <ActivityIndicator size="small" color={C.teal} />
                         ) : (
-                          <Tap onPress={() => void saveAgain(r.chapter.id)} hit>
+                          <Tap onPress={() => void saveAgain(r.chapter.id)} hit label={t('downloads.downloadAgain')}>
                             <Icon name="refresh" size={19} color={C.teal} />
                           </Tap>
                         )
                       ) : null}
-                      <Tap onPress={() => setRemoving(r.chapter.id)} hit>
+                      <Tap onPress={() => setRemoving(r.chapter.id)} hit label={t('study.removeOffline')}>
                         <Icon name="trash" size={19} color={C.red} />
                       </Tap>
                     </Row>

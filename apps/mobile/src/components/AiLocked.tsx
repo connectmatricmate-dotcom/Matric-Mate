@@ -1,10 +1,14 @@
 import { View } from 'react-native';
+import { router } from 'expo-router';
 import type { StringKey } from '@matricmate/core';
+import { useAsync } from '../core/useAsync';
 import { useT } from '../i18n';
+import { supabase } from '../lib/supabase';
+import { useApp } from '../store/app';
 import { C, S } from '../theme';
 import { AppHeader } from './AppHeader';
 import { Icon } from './Icon';
-import { Body, Card, H2, Header, Screen, Spacer } from './ui';
+import { Body, Btn, Card, H2, Header, Screen, Spacer } from './ui';
 
 /**
  * What an AI screen shows on the Basic plan, in place of the screen: that AI
@@ -20,8 +24,19 @@ import { Body, Card, H2, Header, Screen, Spacer } from './ui';
  * `tabbed` for the tutor tab, which keeps the header every tab root has;
  * anything pushed gets a back header with the screen's own title.
  */
-export function AiLocked({ tabbed, titleKey = 'tutor.title' }: { tabbed?: boolean; titleKey?: StringKey }) {
+export function AiLocked({ tabbed, titleKey = 'tutor.title', chats }: { tabbed?: boolean; titleKey?: StringKey; chats?: boolean }) {
   const t = useT();
+  const { state } = useApp();
+  /*
+   * `chats`: the tutor's own screens. Chats saved on an earlier plan are the
+   * student's, and reading one costs nothing, so they stay a tap away (read
+   * only; see the chat screen). Offered only when there is one to read.
+   */
+  const saved = useAsync<boolean>(async () => {
+    if (!chats) return false;
+    const { data } = await supabase.from('chat_threads').select('id').limit(1);
+    return !!data?.length;
+  }, [chats ? 1 : 0, state.user?.id ?? '']);
   return (
     <Screen tabbed={tabbed}>
       {tabbed ? <AppHeader title={t('tutor.title')} eyebrow={t('tutor.sub')} showStreak={false} /> : <Header title={t(titleKey)} back />}
@@ -44,6 +59,13 @@ export function AiLocked({ tabbed, titleKey = 'tutor.title' }: { tabbed?: boolea
         <Spacer h={S.sm} />
         <Body style={{ textAlign: 'center', color: C.ink2 }}>{t('access.aiBody')}</Body>
       </Card>
+      {saved.data ? (
+        <>
+          <Spacer h={S.md} />
+          {/* Cast as elsewhere: the generated route list can lag a new route. */}
+          <Btn title={t('tutor.viewAllChats')} variant="line" icon="spark" onPress={() => router.push('/tutor/chats' as never)} />
+        </>
+      ) : null}
     </Screen>
   );
 }

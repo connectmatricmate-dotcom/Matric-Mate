@@ -9,14 +9,16 @@ export default function Papers() {
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
-  const { state } = useApp();
+  const { state, derived } = useApp();
   // The student's own class and board. Showing a Class 10 student the SSC-I
   // papers as "your board's papers" was the sort of thing they would spot
   // instantly, and a Punjab student FBISE's even more so.
   const board = state.onboarding?.board ?? 'fbise';
   const punjab = board === 'punjab';
-  // Punjab lists run per subject, so only the student's own subjects.
-  const groups = pastPaperGroups(board, state.onboarding?.classLevel ?? 9, state.onboarding?.subjects);
+  // Punjab lists run per subject, so only the subjects the plan opens: on a
+  // free trial, its one. (FBISE publishes one paper per session covering
+  // every subject, so there is nothing to narrow.)
+  const groups = pastPaperGroups(board, state.onboarding?.classLevel ?? 9, derived.subjects);
   const hasPapers = groups.some((g) => g.papers.length > 0);
 
   async function openPaper(url: string) {
@@ -63,7 +65,8 @@ export default function Papers() {
       )}
 
       <Spacer h={S.md} />
-      <Small>{t(punjab ? 'session.papersFootnotePunjab' : 'session.papersFootnote')}</Small>
+      {/* The app's own wording: these open in the phone's browser, not a tab. */}
+      <Small>{t(punjab ? 'session.papersFootnotePunjabApp' : 'session.papersFootnoteApp')}</Small>
     </Screen>
   );
 }

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChoiceCard, StepScreen } from '../../src/components/OnboardingStep';
-import { Confirm, useToast } from '../../src/components/ui';
+import { Card, Confirm, Small, useToast } from '../../src/components/ui';
 import { GRADE_10_READY } from '@matricmate/core';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
+import { C } from '../../src/theme';
 
 export default function ChooseClass() {
   const { state, actions } = useApp();
@@ -29,6 +30,8 @@ export default function ChooseClass() {
   const [value, setValue] = useState<9 | 10>(state.onboarding?.classLevel ?? 9);
   const [confirming, setConfirming] = useState(false);
   const [switching, setSwitching] = useState(false);
+  /** The 7-day rule said no: see `change`. */
+  const [cooldown, setCooldown] = useState(false);
 
   const forward = () => router.push(editing ? '/onboarding/board?edit=1' : '/onboarding/board');
   /** Nothing chosen on the account yet: a tap is the answer (StepScreen auto). */
@@ -62,6 +65,9 @@ export default function ChooseClass() {
         forward();
       } else {
         toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+        // Kept on the screen, not only in a two-second toast: see the note on
+        // the settings screen.
+        if (r === 'cooldown') setCooldown(true);
       }
     });
   };
@@ -101,6 +107,11 @@ export default function ChooseClass() {
           disabledLabel={GRADE_10_READY ? undefined : t('onboarding.comingSoon')}
           onPress={() => (GRADE_10_READY ? pick(10) : toast(t('onboarding.class10Toast')))}
         />
+        {cooldown ? (
+          <Card flat tint={C.orangeTint} border={C.orange}>
+            <Small style={{ color: C.ink }}>{t('tutor.classCooldown')}</Small>
+          </Card>
+        ) : null}
       </StepScreen>
 
       {/* The same warning the settings screen shows, because it is the same

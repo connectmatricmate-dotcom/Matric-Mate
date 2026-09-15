@@ -3,6 +3,7 @@ import { AI_QUOTA, formatDate, hasEnded, subjectById, subjectName } from '@matri
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
+import { planNameKey } from '../../src/components/planName';
 import { Btn, Card, Header, Item, Pill, Row, Screen, SectionTitle, Small, Spacer, Text, useToast } from '../../src/components/ui';
 import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
@@ -26,9 +27,6 @@ const BASIC_PERKS: [IconName, StringKey][] = [
   ['download', 'plans.basicPerk4'],
 ];
 
-/** The plan's name for the status line; the stored id can still be a retired length on an old row. */
-const PLAN_KEY: Record<string, StringKey> = { basic: 'billing.planBasic', trial: 'billing.planTrial', quarter: 'billing.planQuarter', year: 'billing.planYear' };
-
 /**
  * The student's own plan: what it is, until when, and what it opens. Nothing
  * about other plans, prices, renewing or where plans are bought, which Google
@@ -42,7 +40,8 @@ export default function Subscription() {
   const { lang } = useLang();
   const active = state.premium.active;
   const tier = derived.access.tier;
-  const planLabel = active ? t(PLAN_KEY[state.premium.plan ?? ''] ?? 'billing.planMonthly') : '';
+  // The same name the Settings row gives it; see planNameKey.
+  const planLabel = active ? t(planNameKey(state.premium.plan)) : '';
   const trialSubject = tier === 'trial' ? subjectName(subjectById(derived.access.trialSubject ?? ''), lang) || derived.access.trialSubject || '' : '';
   // "Ended on" only for a date that has passed: a plan switched off early keeps a date still to come.
   const shown = state.premium.validTill && (active || hasEnded(state.premium.validTill)) ? state.premium.validTill : null;

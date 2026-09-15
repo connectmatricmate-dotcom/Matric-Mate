@@ -41,6 +41,32 @@ const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
  */
 export let supabaseError: string | null = null;
 
+/**
+ * Every database request gives up after this long.
+ *
+ * After the phone's network changes (airplane mode off, Wi-Fi to mobile
+ * data), a request can go out on a connection that no longer leads anywhere
+ * and wait with no answer and no error. The sync queue sends one request at a
+ * time, so one such request held back every answer given offline: on the
+ * test phone the ten answers from a flight arrived three minutes after the
+ * signal came back. A request that times out fails like any other, the queue
+ * keeps the answers, and the next attempt goes out on a fresh connection.
+ * Generous, because a slow 3G answer is still an answer.
+ */
+const REQUEST_LIMIT_MS = 20_000;
+
+const timedFetch: typeof fetch = (input, init) => {
+  const limit = new AbortController();
+  const timer = setTimeout(() => limit.abort(), REQUEST_LIMIT_MS);
+  // The caller's own signal still stops it early.
+  const own = init?.signal;
+  if (own) {
+    if (own.aborted) limit.abort();
+    else own.addEventListener('abort', () => limit.abort(), { once: true });
+  }
+  return fetch(input, { ...init, signal: limit.signal }).finally(() => clearTimeout(timer));
+};
+
 function build(): SupabaseClient | null {
   if (!url || !key) {
     supabaseError = 'Supabase keys are missing from this build.';
@@ -64,6 +90,7 @@ function build(): SupabaseClient | null {
          */
         detectSessionInUrl: false,
       },
+      global: { fetch: timedFetch },
     });
   } catch (err) {
     supabaseError = err instanceof Error ? `${err.name}: ${err.message}` : String(err);

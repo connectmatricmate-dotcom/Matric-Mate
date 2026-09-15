@@ -37,6 +37,7 @@ import { localChapter } from '../../../src/core/downloads';
 import { useApp } from '../../../src/store/app';
 import { C, F, S, isRTL, isWeb } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
+import { ReportAi } from '../../../src/components/ReportAi';
 import { useQuota } from '../../../src/core/useQuota';
 
 /** Arabic-script text needs the Nastaliq face; Nunito has no Urdu glyphs. */
@@ -125,7 +126,21 @@ function BlockView({ b, scale, labels }: { b: Block; scale: number; labels: { de
     case 'formula':
       return (
         <Card flat style={{ alignItems: 'center', marginBottom: S.md }}>
-          <Text style={{ fontFamily: F.display, fontSize: 24 * scale, letterSpacing: 1.2, color: C.ink }}>{b.text}</Text>
+          {/* The face of the formula's own script. F.display is Nastaliq in
+              the Urdu interface, and most formulas in Urdu notes are Latin
+              and Greek (P = IV), which that face drew wrongly or not at all. */}
+          <Text
+            style={{
+              fontFamily: isUrduScript(b.text) ? F.urduBold : F.latin.display,
+              fontSize: 24 * scale,
+              lineHeight: Math.round((isUrduScript(b.text) ? 44 : 32) * scale),
+              letterSpacing: isUrduScript(b.text) ? 0 : 1.2,
+              color: C.ink,
+              textAlign: 'center',
+            }}
+          >
+            {b.text}
+          </Text>
           {b.caption ? <Prose text={b.caption} size={13 * scale} style={{ color: C.ink2, marginTop: 4 }} /> : null}
         </Card>
       );
@@ -205,7 +220,8 @@ export default function Reader() {
    */
   const [rawIdx, setIdx] = useState(() => Math.max(0, Math.trunc(Number(startAt)) || 0));
   const [askOpen, setAskOpen] = useState(false);
-  const [answer, setAnswer] = useState<{ text: string; steps?: string[] } | null>(null);
+  /** The answer on show, and the row the server saved it as, which its Report points at. */
+  const [answer, setAnswer] = useState<{ text: string; steps?: string[]; messageId?: string } | null>(null);
   const [asking, setAsking] = useState(false);
   /** Which suggestion the answer on show is for, so its chip can say so. */
   const [askedKey, setAskedKey] = useState<StringKey | null>(null);
@@ -293,7 +309,7 @@ export default function Reader() {
         toast(t(aiFailureKey(res.reason)));
         return;
       }
-      setAnswer({ text: res.text, steps: res.steps });
+      setAnswer({ text: res.text, steps: res.steps, messageId: res.messageId });
       // The conversation now exists on the server, so "Open full chat" opens
       // it rather than asking the same question again at the cost of another
       // of the day's questions.
@@ -429,7 +445,9 @@ export default function Reader() {
 
         {/* The tutor is the one thing on this screen that cannot work from
             disk, and it is not in Basic, nor for a subject outside a trial. */}
-        {online && derived.access.ai && subjectOpen(derived.access, id.split('-')[0]) ? (
+        {/* Only over a section: over the error or empty state there is
+            nothing to ask about. */}
+        {section && online && derived.access.ai && subjectOpen(derived.access, id.split('-')[0]) ? (
           // The far edge from where the text starts, which swaps in Urdu.
           <View style={{ position: 'absolute', ...(isRTL() ? { left: S.lg } : { right: S.lg }), bottom: 92 + insets.bottom }}>
             <Btn title={t('reader.askAi')} icon="spark" sm onPress={() => setAskOpen(true)} style={{ borderRadius: 99 }} />
@@ -535,7 +553,9 @@ export default function Reader() {
                 <Body style={{ flex: 1, fontSize: 14 }}>{step}</Body>
               </Row>
             ))}
-            <Spacer h={S.md} />
+            {/* Google Play: every AI answer can be reported in the app. */}
+            <ReportAi surface="tutor" refId={answer.messageId} excerpt={parseTutorActions(answer.text, false, lang).text} />
+            <Spacer h={S.sm} />
             <Btn
               title={t('reader.openChat')}
               variant="line"

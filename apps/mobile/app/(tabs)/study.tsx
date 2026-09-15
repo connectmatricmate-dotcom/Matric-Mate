@@ -15,6 +15,7 @@ import {
   SectionTitle,
   Skeleton,
   Small,
+  Tap,
   TextInput,
 } from '../../src/components/ui';
 import { SUBJECT_COLORS, api, boardName, chapterName, hasStudyMaterial, mediumName, subjectName, subjectPct } from '@matricmate/core';
@@ -157,15 +158,20 @@ export default function Study() {
                   <Small>
                     {t('study.chapterCount', { n: chapters.length })} · {t('study.percentComplete', { n: pct })}
                   </Small>
+                  {/* Its own tap, to the chapter it names: the card opens the
+                      subject, and "Continue: Kinematics" opened the subject
+                      too, one more tap from where it said it would go. */}
                   {next ? (
-                    <ScriptText
-                      text={t('study.continueChapter', { chapter: chapterName(next, lang) })}
-                      face="bodyBold"
-                      size={12}
-                      color={C.teal}
-                      lines={1}
-                      style={{ marginTop: 2 }}
-                    />
+                    <Tap onPress={() => router.push(`/learn/chapter/${next.id}`)} slop={{ top: 8, bottom: 8 }}>
+                      <ScriptText
+                        text={t('study.continueChapter', { chapter: chapterName(next, lang) })}
+                        face="bodyBold"
+                        size={12}
+                        color={C.teal}
+                        lines={1}
+                        style={{ marginTop: 2 }}
+                      />
+                    </Tap>
                   ) : null}
                 </View>
                 <Chevron size={18} color={C.ink3} />

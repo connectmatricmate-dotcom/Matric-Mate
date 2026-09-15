@@ -1,16 +1,17 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { api, chapterById, chapterIsTheirs, chapterName, chaptersFor, inSyllabus, subjectMedium } from '@matricmate/core';
+import { api, chapterById, chapterIsTheirs, chapterName, chaptersFor, inSyllabus } from '@matricmate/core';
 import type { Chapter } from '@matricmate/core';
-import { localChapter } from '../core/downloads';
+import { useOnline } from '../core/connectivity';
+import { localChapter, readableOffline } from '../core/downloads';
 import { useAsync } from '../core/useAsync';
 import { useLang, useT } from '../i18n';
 import { useApp } from '../store/app';
 import { C, F, R, S, rowDir } from '../theme';
 import { ChapterPicker } from './ChapterPicker';
 import { Icon } from './Icon';
-import { Btn, Empty, ScriptText, Tap, Text } from './ui';
+import { Btn, Empty, ErrorState, ScriptText, Tap, Text } from './ui';
 
 /**
  * Which chapter a flashcards, blanks or short-questions screen is about when
@@ -72,13 +73,12 @@ export function usePracticeChapter(param: string | undefined, kind: PracticeKind
     fetched ?? (chapterId ? (chapterById(chapterId) ?? localChapter(chapterId) ?? undefined) : undefined);
 
   /**
-   * What an answer here is filed under as its topic: the chapter's name in the
-   * language its questions are written in, the same language an MCQ's own
-   * topic is in. Empty when the chapter cannot be named, never the raw id,
-   * which used to turn up on the weak topics screen as "phy-pj-9-3".
+   * What an answer here is filed under as its topic: the chapter id, the one
+   * rule both apps use (topicKey in core). The chapter's name forked it, Urdu
+   * here and English on the website, into two weak topics for one chapter.
+   * Weak topics name it in the app's language (topicLabel), never as the id.
    */
-  const topic =
-    chapterId && chapter ? chapterName(chapter, subjectMedium(chapterId, board, state.settings.contentMedium)) : '';
+  const topic = chapterId ?? '';
 
   return { chapterId, chapter, topic, waiting: !chapterId && contentLoading };
 }
@@ -129,6 +129,42 @@ export function PracticeChapterBar({ kind, chapter }: { kind: PracticeKind; chap
       />
     </>
   );
+}
+
+/**
+ * A set that came back with nothing in it, said for what it is.
+ *
+ * The content read never throws: offline it answers from the cache, a
+ * download or the bundled sample, and on a failed or slow read the same, so
+ * an empty answer arrives where an error should. "This chapter does not have
+ * this practice type yet" was said offline, and after a dropped read, about
+ * chapters that have plenty (every live chapter has all three kinds). Offline
+ * on a chapter not on the phone, it says so; a chapter whose own row counts
+ * this kind of practice is a read that failed, with a retry; only a chapter
+ * that really has none is empty.
+ */
+export function PracticeEmpty({
+  kind,
+  chapterId,
+  chapter,
+  onRetry,
+}: {
+  kind: PracticeKind;
+  chapterId: string | undefined;
+  chapter: Chapter | undefined;
+  onRetry: () => void;
+}) {
+  const t = useT();
+  const online = useOnline();
+  const { state } = useApp();
+  if (!online && chapterId && !readableOffline(chapterId, state.settings.contentMedium)) {
+    return <ErrorState title={t('offline.title')} sub={t('session.offlineChapterBody')} retry={t('common.retry')} onRetry={onRetry} />;
+  }
+  // A live row (it has a board) that counts this practice: the read failed.
+  if (chapter && chapter.board !== undefined && offers(chapter, kind)) {
+    return <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={onRetry} />;
+  }
+  return <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />;
 }
 
 /** Nothing to start from: none of their chapters has this kind of practice yet, or the index is not in. */

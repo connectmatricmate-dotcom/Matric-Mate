@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { reviewWrong } from '@matricmate/core';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Body, Btn, Card, Header, Label, Pill, Row, Screen, ScriptText, Small, Spacer, Text } from '../../src/components/ui';
@@ -7,6 +8,7 @@ import { session } from '../../src/store/session';
 import { useApp } from '../../src/store/app';
 import { C, S, isRTL } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
+import { ReportAi } from '../../src/components/ReportAi';
 
 type Filter = 'all' | 'wrong' | 'flagged';
 
@@ -21,14 +23,14 @@ export default function Review() {
     if (!s) return [];
     return s.mcqs
       .map((m) => ({ mcq: m, a: s.answers[m.id] }))
-      // Unanswered counts as wrong, as it does on the result screen's score:
-      // closing a practice set early left those questions out of this list
-      // while the score counted them against the student.
-      .filter(({ a }) => (filter === 'all' ? true : filter === 'wrong' ? !a?.correct : a?.flagged))
+      // "Wrong" is what the score counted as wrong (reviewWrong in core, the
+      // website's rule too): unanswered in a timed test, not in a practice set
+      // closed early, which is marked on what was answered.
+      .filter(({ a }) => (filter === 'all' ? true : filter === 'wrong' ? reviewWrong(s.mode, a) : a?.flagged))
       .sort((x, y) => Number(!!x.a?.correct) - Number(!!y.a?.correct));
   }, [s, filter]);
 
-  const wrongCount = s ? s.mcqs.filter((m) => !s.answers[m.id]?.correct).length : 0;
+  const wrongCount = s ? s.mcqs.filter((m) => reviewWrong(s.mode, s.answers[m.id])).length : 0;
   const flagCount = s ? Object.values(s.answers).filter((a) => a.flagged).length : 0;
 
   if (!s) {
@@ -48,15 +50,18 @@ export default function Review() {
       <Header title={t('session.reviewTitle')} sub={s.label} back onBack={() => session.leave()} />
 
       <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
-        <Pill tone={filter === 'all' ? 'teal' : 'grey'} onPress={() => setFilter('all')}>
+        <Pill tone={filter === 'all' ? 'teal' : 'grey'} selected={filter === 'all'} onPress={() => setFilter('all')}>
           {`${t('session.all')} · ${s.mcqs.length}`}
         </Pill>
-        <Pill tone={filter === 'wrong' ? 'red' : 'grey'} onPress={() => setFilter('wrong')}>
+        <Pill tone={filter === 'wrong' ? 'red' : 'grey'} selected={filter === 'wrong'} onPress={() => setFilter('wrong')}>
           {`${t('session.wrongOnly')} · ${wrongCount}`}
         </Pill>
-        <Pill tone={filter === 'flagged' ? 'orange' : 'grey'} onPress={() => setFilter('flagged')}>
-          {`${t('session.flaggedOnly')} · ${flagCount}`}
-        </Pill>
+        {/* Only a timed test can flag a question: a practice set said "Flagged · 0" forever. */}
+        {s.mode === 'exam' ? (
+          <Pill tone={filter === 'flagged' ? 'orange' : 'grey'} selected={filter === 'flagged'} onPress={() => setFilter('flagged')}>
+            {`${t('session.flaggedOnly')} · ${flagCount}`}
+          </Pill>
+        ) : null}
       </Row>
 
       <Spacer h={S.md} />
@@ -106,6 +111,12 @@ export default function Review() {
                     <Spacer h={S.sm} />
                     <Label style={{ color: C.teal }}>{t('session.why')}</Label>
                     <View style={{ marginTop: 2 }}><Markdown text={mcq.explanation} size={13.5} /></View>
+                    {/* Google Play: AI-written text can be reported in the app,
+                        as on the practice screen. A timed test shows its
+                        explanations only here, so this is its only place. */}
+                    {mcq.source === 'ai' || s.aiGenerated ? (
+                      <ReportAi surface="ai_test" refId={mcq.id} excerpt={`${mcq.q}\n\n${mcq.explanation}`} />
+                    ) : null}
                     <Spacer h={S.sm} />
                     {/* Wraps, so at a large font the second button drops to a
                         line of its own instead of running out of the card. */}

@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Skeleton, Small, useToast } from '../../src/components/ui';
 import { api, chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { useOnline } from '../../src/core/connectivity';
+import { localChapter } from '../../src/core/downloads';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -32,7 +33,7 @@ export default function SessionSetup() {
       'phy',
   );
   const [chapterIds, setChapterIds] = useState<string[]>(chapterParam ? [chapterParam] : []);
-  const [count, setCount] = useState<'10' | '20' | '50'>('10');
+  const [countPick, setCount] = useState<string>('10');
   const [busy, setBusy] = useState(false);
 
   // contentKey: a language, class or board switch reaches an open setup.
@@ -78,9 +79,25 @@ export default function SessionSetup() {
    * pickers stay for the Practice tab and the home screen's quick action,
    * where nothing has been chosen yet.
    */
+  // The row saved with a download last: offline the catalogue has no Class 10
+  // or Punjab chapter to name, and the row stayed a skeleton for good.
   const fixed = chapterParam
-    ? (chapters.find((c) => c.id === chapterParam) ?? chapterById(chapterParam) ?? null)
+    ? (chapters.find((c) => c.id === chapterParam) ?? chapterById(chapterParam) ?? localChapter(chapterParam) ?? null)
     : null;
+
+  /**
+   * How many questions there are to draw from, when the rows say: the ticked
+   * chapters, the one chapter, or the whole subject. Every chapter has about
+   * thirty, so "Start 50" on one chapter ran "Question 1 of 30". The choices
+   * stop at what there is, and the last one is all of it. Unknown (a bundled
+   * row's zeroes, still loading) leaves the usual three.
+   */
+  const pool = fixed
+    ? fixed.mcqCount
+    : (chapterIds.length ? chapters.filter((c) => chapterIds.includes(c.id)) : chapters).reduce((n, c) => n + (c.mcqCount || 0), 0);
+  const counts = pool > 0 ? [...[10, 20, 50].filter((n) => n < pool), ...(pool <= 50 ? [pool] : [])] : [10, 20, 50];
+  // The pick, or the nearest the pool allows when the chapters change under it.
+  const count = String(counts.includes(Number(countPick)) ? Number(countPick) : Math.min(Number(countPick), counts[counts.length - 1]));
 
   async function start() {
     setBusy(true);
@@ -102,7 +119,10 @@ export default function SessionSetup() {
       toast(online ? t('session.noQuestions') : t('states.offline'));
       return;
     }
-    const one = chapterIds.length === 1 ? (chapters.find((c) => c.id === chapterIds[0]) ?? chapterById(chapterIds[0])) : undefined;
+    const one =
+      chapterIds.length === 1
+        ? (chapters.find((c) => c.id === chapterIds[0]) ?? chapterById(chapterIds[0]) ?? localChapter(chapterIds[0]) ?? undefined)
+        : undefined;
     session.start({
       mode: 'practice',
       label:
@@ -136,6 +156,10 @@ export default function SessionSetup() {
                 tone="teal"
                 last
               />
+            ) : !online && !chaptersLoading ? (
+              // Offline on a chapter that is not on the phone: nothing can
+              // name it, and waiting will not change that.
+              <Item title={t('session.chapter')} sub={t('states.offline')} icon="book" tone="grey" last />
             ) : (
               <View style={{ flexDirection: rowDir(), alignItems: 'center', gap: S.md, paddingVertical: 14, minHeight: 62 }}>
                 <Skeleton w={42} h={42} style={{ borderRadius: 13 }} />
@@ -155,6 +179,7 @@ export default function SessionSetup() {
               <Pill
                 key={sid}
                 tone={sid === subjectId ? 'teal' : 'grey'}
+                selected={sid === subjectId}
                 onPress={() => setSubjectId(sid)}
                 style={{ paddingVertical: 9, paddingHorizontal: 14 }}
               >
@@ -175,6 +200,7 @@ export default function SessionSetup() {
               icon="cards"
               tone={chapterIds.length === 0 ? 'teal' : 'grey'}
               onPress={() => setChapterIds([])}
+              checked={chapterIds.length === 0}
               right={<Check on={chapterIds.length === 0} round />}
             />
             {chaptersLoading
@@ -211,6 +237,7 @@ export default function SessionSetup() {
                   tone={on ? 'teal' : 'grey'}
                   last={i === chapters.length - 1}
                   onPress={() => setChapterIds((p) => (on ? p.filter((x) => x !== c.id) : [...p, c.id]))}
+                  checked={on}
                   right={<Check on={on} />}
                 />
               );
@@ -220,15 +247,7 @@ export default function SessionSetup() {
       )}
 
       <SectionTitle>{t('session.howMany')}</SectionTitle>
-      <Seg
-        value={count}
-        onChange={setCount}
-        options={[
-          { value: '10', label: '10' },
-          { value: '20', label: '20' },
-          { value: '50', label: '50' },
-        ]}
-      />
+      <Seg value={count} onChange={setCount} options={counts.map((n) => ({ value: String(n), label: String(n) }))} />
     </Screen>
   );
 }

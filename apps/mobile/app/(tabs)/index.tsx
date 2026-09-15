@@ -28,6 +28,7 @@ import {
   boardName,
   chapterById,
   chapterName,
+  topicLabel,
   chapterPct,
   formatDate,
   inSyllabus,
@@ -41,6 +42,7 @@ import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { useAsync } from '../../src/core/useAsync';
+import { useNow } from '../../src/core/useNow';
 import { supabase } from '../../src/lib/supabase';
 import { C, F, S, alpha, rowDir, textStart } from '../../src/theme';
 
@@ -65,15 +67,15 @@ export default function Dashboard() {
   const firstName = (state.user?.name ?? t('common.student')).split(' ')[0];
 
   /**
-   * The clock, read once on mount rather than on every render.
+   * The clock, held still rather than read on every render.
    *
    * Reading it during render means the same state can produce different output
    * on two consecutive passes, so React cannot treat the render as repeatable.
-   * A dashboard is a snapshot of the moment it opened, so pinning "now" is also
-   * what the screen means: the seven-day window should not slide underneath the
-   * numbers while somebody is looking at them.
+   * The seven-day window should not slide underneath the numbers while
+   * somebody is looking at them. It does move when the day turns (useNow):
+   * this tab is never unmounted, and it kept yesterday's date overnight.
    */
-  const [now] = useState(() => Date.now());
+  const now = useNow();
 
   /** Teacher verifications, the client's trust feature. The card only
    *  appears once real certificates exist; an empty promise would be
@@ -148,7 +150,9 @@ export default function Dashboard() {
     const name = chapter ? chapterName(chapter, lang) : subjectName(subjectById(task.subjectId), lang);
     if (task.kind === 'read') return t('dash.taskRead', { chapter: name });
     if (task.kind === 'mcq') return t('dash.taskMcq', { chapter: name });
-    if (task.weakTopic) return t('dash.taskWeak', { topic: task.weakTopic, n: task.weakAccuracy ?? 0 });
+    // The task holds the topic's key (a chapter id for blanks and short
+    // questions); topicLabel names it in the app's language.
+    if (task.weakTopic) return t('dash.taskWeak', { topic: topicLabel(task.weakTopic, lang), n: task.weakAccuracy ?? 0 });
     return t('dash.taskCards');
   }
 

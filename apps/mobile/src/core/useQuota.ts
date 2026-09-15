@@ -45,7 +45,9 @@ export function useQuotaRealtime(userId: string | null | undefined): void {
   useEffect(() => {
     if (!userId) return;
     const channel = supabase
-      .channel(quotaTopic(userId), { config: { private: false } })
+      // Private: only this account may listen (migration 0068); a public topic
+      // let anyone with the id listen in, or send made-up updates.
+      .channel(quotaTopic(userId), { config: { private: true } })
       .on('broadcast', { event: 'change' }, (message) => {
         const payload = message.payload as { used?: number };
         if (typeof payload.used !== 'number') return;

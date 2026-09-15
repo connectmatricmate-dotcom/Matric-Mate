@@ -7,6 +7,7 @@ import {
   Btn,
   Card,
   Chevron,
+  Empty,
   ErrorState,
   Header,
   Pill,
@@ -34,9 +35,11 @@ export default function Chapters() {
   const t = useT();
   const { lang } = useLang();
   // contentKey: a language, class or board switch reaches an open list.
-  const { data: subject } = useAsync(() => api.getSubject(id), [id, contentKey]);
+  const { data: subject, loading: subjectLoading } = useAsync(() => api.getSubject(id), [id, contentKey]);
   const { data: chapters, loading, reload } = useAsync(() => api.getChapters(id), [id, contentKey]);
   const [showLocked, setShowLocked] = useState(false);
+  /** No such subject at all (an old or mistyped link), once the read has settled. */
+  const unknown = !subjectLoading && !subject && !subjectById(id);
 
   const pct = subjectPct(id, state.readSections, state.attempts);
   /**
@@ -55,6 +58,18 @@ export default function Chapters() {
      the same reason, which is a lock, not an empty chapter. */
   const shut = derived.access.tier === 'trial' && !subjectOpen(derived.access, id);
   const emptyRow = (c: Chapter) => !shut && c.board !== undefined && state.premium.active && !hasStudyMaterial(c);
+
+  // Said as not found, like the chapter hub: "Couldn't load this" with a
+  // Try again that could never work kept a student retrying a dead link.
+  if (unknown) {
+    return (
+      <Screen>
+        <Header title=" " back />
+        <Spacer h={S.lg} />
+        <Empty emoji="🔍" title={t('states.notFoundTitle')} sub={t('states.notFoundBody')} />
+      </Screen>
+    );
+  }
 
   return (
     <Screen
@@ -214,7 +229,13 @@ export default function Chapters() {
         </View>
       )}
 
-      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={t('trial.lockedTitle')}>
+      {/* "Not in your free trial" only on a trial: a chapter locked for
+          having no plan (an ended plan, or one switched off) is not a trial's. */}
+      <Sheet
+        visible={showLocked}
+        onClose={() => setShowLocked(false)}
+        title={derived.access.tier === 'trial' ? t('trial.lockedTitle') : t('access.noPlan')}
+      >
         <LockedNotice />
         <Spacer h={S.md} />
         <Btn title={t('common.close')} variant="line" onPress={() => setShowLocked(false)} />

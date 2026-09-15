@@ -25,6 +25,7 @@ import {
 import { boardName, formatDate, GRADE_10_READY, hasEnded, Language, levelProgress, mediumName, REMINDER_TIMES, reminderHour, translate, xpToNextLevel } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
+import { planNameKey } from '../../src/components/planName';
 import { needsDownloadIn } from '../../src/core/downloads';
 import { usePushPermission } from '../../src/core/usePush';
 import { useApp } from '../../src/store/app';
@@ -86,6 +87,20 @@ export default function Account() {
   const pushBlocked = push.status !== null && push.status !== 'granted';
   /** "7:00 PM" in English, "شام 7 بجے" in Urdu: the stored value is the English label. */
   const timeLabel = (value: string) => t('account.reminderTimeLabel', { h: ((reminderHour(value) + 11) % 12) + 1 });
+  /**
+   * A class change the 7-day rule refused, said where the class row is and
+   * kept there: the toast alone was gone in two seconds, and the row looked
+   * like a button that had done nothing.
+   */
+  const [cooldown, setCooldown] = useState(false);
+
+  async function openPage(path: '/terms' | '/privacy') {
+    try {
+      await Linking.openURL(`${SITE_URL}${path}?from=app`);
+    } catch {
+      toast(t('common.openLinkError'));
+    }
+  }
 
   return (
     <>
@@ -122,11 +137,7 @@ export default function Account() {
             <Text style={{ fontSize: 24 }}>{state.premium.active ? '👑' : '🔓'}</Text>
             <View style={{ flex: 1 }}>
               <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>
-                {state.premium.active
-                  ? `${t('account.premiumActive')} · ${t(
-                      state.premium.plan === 'basic' ? 'billing.planBasic' : state.premium.plan === 'trial' ? 'billing.planTrial' : 'billing.planMonthly',
-                    )}`
-                  : t('access.noPlan')}
+                {state.premium.active ? `${t('account.premiumActive')} · ${t(planNameKey(state.premium.plan))}` : t('access.noPlan')}
               </Text>
               <Small>
                 {state.premium.validTill && (state.premium.active || hasEnded(state.premium.validTill))
@@ -218,6 +229,12 @@ export default function Account() {
           />
         </Card>
 
+        {cooldown ? (
+          <Card flat tint={C.orangeTint} border={C.orange} style={{ marginTop: S.sm }}>
+            <Small style={{ color: C.ink }}>{t('tutor.classCooldown')}</Small>
+          </Card>
+        ) : null}
+
         <SectionTitle>{t('account.appearance')}</SectionTitle>
         <Card flat style={{ paddingVertical: 0 }}>
           <Item
@@ -301,6 +318,8 @@ export default function Account() {
 
         <SectionTitle>{t('account.storage')}</SectionTitle>
         <Card flat style={{ paddingVertical: 0 }}>
+          {/* Reachable without a plan too, to free the space; see
+              OPEN_WITHOUT_PLAN in app/_layout.tsx. */}
           <Item
             title={t('account.manageDownloads')}
             sub={t('account.chaptersCount', { n: state.downloads.length })}
@@ -321,34 +340,21 @@ export default function Account() {
         <SectionTitle>{t('account.about')}</SectionTitle>
         <Card flat style={{ paddingVertical: 0 }}>
           <Item title={t('account.help')} icon="help" onPress={() => router.push('/account/help')} />
-          {/* ?from=app opens the page without the site's navigation, which
-              reaches the pricing page in a tap or two (core/billing.ts). */}
-          <Item
-            title={t('account.terms')}
-            icon="doc"
-            onPress={async () => {
-              try {
-                await Linking.openURL(`${SITE_URL}/terms?from=app`);
-              } catch {
-                toast(t('common.openLinkError'));
-              }
-            }}
-          />
-          {/* Play requires the deletion route to be reachable from inside the
-              app. The page is on the website because deleting has to work for
-              someone who has already uninstalled. */}
+          {/* ?from=app opens each page without the site's navigation, which
+              reaches the pricing page in a tap or two (core/billing.ts). The
+              privacy policy has its own row: Play asks for it inside the app,
+              and "Terms and privacy" opened only the terms. */}
+          <Item title={t('account.termsOfUse')} icon="doc" onPress={() => void openPage('/terms')} />
+          <Item title={t('account.privacyPolicy')} icon="doc" onPress={() => void openPage('/privacy')} />
+          {/* Play requires deletion to be reachable from inside the app. It
+              happens here now, on its own screen; the website's page stays
+              for someone who has already uninstalled, and is linked from it. */}
           <Item
             title={t('account.deleteAccount')}
-            sub={t('account.deleteAccountSub')}
+            sub={t('account.deleteAccountAppSub')}
             icon="trash"
             tone="red"
-            onPress={async () => {
-              try {
-                await Linking.openURL(`${SITE_URL}/delete-account?from=app`);
-              } catch {
-                toast(t('common.openLinkError'));
-              }
-            }}
+            onPress={() => router.push('/account/delete')}
           />
           {/* The version and the over-the-air update this phone is running.
               "Same issue after updating" once turned out to be a phone that
@@ -456,6 +462,7 @@ export default function Account() {
               router.dismissTo('/(tabs)');
             } else {
               toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+              if (r === 'cooldown') setCooldown(true);
             }
           });
         }}

@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Empty, ErrorState, Header, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, Text, TextInput, useToast } from '../../src/components/ui';
+import { Btn, Card, Empty, ErrorState, Header, Item, Label, Pill, Row, Screen, ScriptText, SectionTitle, Skeleton, Small, Spacer, Text, TextInput, useToast } from '../../src/components/ui';
 import { AiWorking } from '../../src/components/AiWorking';
 import { aiFailureKey } from '../../src/components/aiFailure';
-import { checkAnswerLive, generateMockPaper, isUrduScript, readAiSession, subjectById, subjectMedium, subjectName } from '@matricmate/core';
+import { checkAnswerLive, fetchAiSessions, generateMockPaper, isUrduScript, readAiSession, subjectById, subjectMedium, subjectName } from '@matricmate/core';
 import type { AiCheckVerdict, AiPaperItems, ShortQ } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
@@ -46,6 +46,15 @@ function MockPaper() {
   /* A paper that is gone and a read that did not come back used to wear one
      face, with a Retry that could only ever help one of them. */
   const paper = useAsync(async () => (id ? readAiSession(id) : null), [id ?? '']);
+  /**
+   * The student's saved papers, as on the website. A paper could be opened
+   * only the moment it was made: back out of it, or have the wait run out,
+   * and it was unreachable from the app though it was saved, and paid for.
+   */
+  const papers = useAsync(
+    () => (id ? Promise.resolve([]) : fetchAiSessions().then((rows) => rows.filter((r) => r.kind === 'paper'))),
+    [id ?? '', state.user?.id ?? ''],
+  );
 
   async function build() {
     if (busy) return;
@@ -63,7 +72,10 @@ function MockPaper() {
     // Stopped on purpose: see the note in the AI builder.
     if (controller.signal.aborted) return;
     if (!res.ok) {
-      toast(t(aiFailureKey(res.reason)));
+      // The wait running out is not a lost connection: the server finishes
+      // the paper and saves it, and it turns up in the list below.
+      toast(res.timedOut ? t('tutor.paperTimedOut') : t(aiFailureKey(res.reason)));
+      if (res.timedOut) papers.reload();
       return;
     }
     router.setParams({ id: res.sessionId });
@@ -87,7 +99,7 @@ function MockPaper() {
         <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
         <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
           {derived.subjects.map((sid) => (
-            <Pill key={sid} tone={sid === subjectId ? 'teal' : 'grey'} onPress={() => setSubjectId(sid)}>
+            <Pill key={sid} tone={sid === subjectId ? 'teal' : 'grey'} selected={sid === subjectId} onPress={() => setSubjectId(sid)}>
               {subjectName(subjectById(sid), lang) || sid}
             </Pill>
           ))}
@@ -100,6 +112,25 @@ function MockPaper() {
             <Spacer h={S.md} />
             <Card flat tint={C.tealTint}>
               <Small>{t('tutor.costNote', { n: 3, limit: derived.aiLimit })}</Small>
+            </Card>
+          </>
+        ) : null}
+
+        {papers.data?.length ? (
+          <>
+            <SectionTitle>{t('tutor.recentPapers')}</SectionTitle>
+            <Card flat style={{ paddingVertical: 0 }}>
+              {papers.data.slice(0, 5).map((p, i, list) => (
+                <Item
+                  key={p.id}
+                  title={p.title}
+                  sub={`${subjectName(subjectById(p.subjectId ?? ''), lang) || t('tutor.paperTitle')} · ${t('tutor.aiMade')}`}
+                  icon="doc"
+                  last={i === list.length - 1}
+                  // Pushed, so back from the paper comes back to this list.
+                  onPress={() => router.push(`/tutor/paper?id=${p.id}`)}
+                />
+              ))}
             </Card>
           </>
         ) : null}
@@ -172,12 +203,12 @@ function MockPaper() {
 
       <SectionTitle>{t('tutor.paperSectionB')}</SectionTitle>
       {items.shortQs.map((q, n) => (
-        <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
+        <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} subjectId={row.subjectId ?? subjectId} />
       ))}
 
       <SectionTitle>{t('tutor.paperSectionC')}</SectionTitle>
       {items.longQs.map((q, n) => (
-        <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
+        <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} subjectId={row.subjectId ?? subjectId} />
       ))}
       <Spacer h={S.lg} />
     </Screen>
@@ -185,7 +216,7 @@ function MockPaper() {
 }
 
 /** One written question: write, get marked, compare with the model answer. */
-function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string }) {
+function PaperQuestion({ n, q, medium, subjectId }: { n: number; q: ShortQ; medium: string; subjectId: string }) {
   const t = useT();
   const toast = useToast();
   const [open, setOpen] = useState(false);
@@ -204,6 +235,8 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
       marks: q.marks,
       answer: written.trim(),
       medium,
+      // The paper's subject: a free trial's answers are marked only in its own.
+      subjectId,
     });
     setChecking(false);
     if (!res.ok) {

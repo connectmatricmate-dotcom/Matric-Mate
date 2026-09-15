@@ -27,6 +27,12 @@ const ROUTE: Record<NotificationTarget, string> = {
  * of it, and back from that home screen came out on the inbox again.
  */
 const TAB_TARGETS = new Set<NotificationTarget>(['home', 'study', 'practice', 'progress']);
+/**
+ * The targets that stay open without a plan (see OPEN_WITHOUT_PLAN in
+ * app/_layout.tsx). Any other one, tapped from the paused screen's inbox,
+ * opened and was replaced by the paused screen in the same moment.
+ */
+const OPEN_TARGETS = new Set<NotificationTarget>(['payments', 'subscription']);
 const openTarget = (target: NotificationTarget, chapterId?: string) => {
   if (target === 'chapter' && chapterId) router.push(`/learn/chapter/${chapterId}` as never);
   else if (TAB_TARGETS.has(target)) router.dismissTo(ROUTE[target] as never);
@@ -78,7 +84,9 @@ export default function Notifications() {
         // A read notice steps back a little; a new one keeps full strength
         // and a dot, so the two can be told apart.
         dim={!fresh.has(n.id)}
-        onPress={n.target ? () => openTarget(n.target!, n.chapterId) : undefined}
+        onPress={
+          n.target && (state.premium.active || OPEN_TARGETS.has(n.target)) ? () => openTarget(n.target!, n.chapterId) : undefined
+        }
         right={
           fresh.has(n.id) ? (
             <View style={{ width: 9, height: 9, borderRadius: 99, backgroundColor: C.orange }} />

@@ -23,19 +23,13 @@ type Receipt = { id: string; at: string; amount: number; plan: string | null; re
  */
 const TONE: Record<string, 'green' | 'orange' | 'red' | 'grey'> = {
   paid: 'green',
-  pending: 'orange',
-  failed: 'red',
   refunded: 'grey',
-  cancelled: 'grey',
 };
 
 /** The status in the student's language, never the raw column value. */
 const STATUS: Record<string, StringKey> = {
   paid: 'account.paidLabel',
-  pending: 'account.statusPending',
-  failed: 'account.statusFailed',
   refunded: 'account.statusRefunded',
-  cancelled: 'account.statusCancelled',
 };
 
 export default function Payments() {
@@ -51,10 +45,11 @@ export default function Payments() {
       .from('payments')
       .select('id,at,amount,plan,reference,status')
       .eq('user_id', userId)
-      // Every attempt, not only the ones that went through. A payment that
-      // failed or never completed is the first thing a student points at when
-      // they say the money left and the plan did not arrive, and the website
-      // has always listed them.
+      // Receipts only: payments that went through (and any since refunded).
+      // A checkout that failed or was never finished is the website's to
+      // show; listed in this app it read as a purchase flow Play does not
+      // allow here. The website's history keeps every attempt.
+      .in('status', ['paid', 'refunded'])
       .order('at', { ascending: false })
       .limit(24);
     if (qErr) throw qErr;
@@ -72,7 +67,7 @@ export default function Payments() {
       ) : error ? (
         <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
       ) : !receipts || receipts.length === 0 ? (
-        <Empty emoji="🧾" title={t('account.noPaymentsTitle')} sub={t('account.noPaymentsBody')} />
+        <Empty emoji="🧾" title={t('account.noReceiptsTitle')} sub={t('account.noReceiptsBody')} />
       ) : (
         <Card flat style={{ paddingVertical: 0 }}>
           {receipts.map((r, i) => (

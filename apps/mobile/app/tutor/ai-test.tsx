@@ -74,6 +74,8 @@ function AiBuilder() {
   const [busy, setBusy] = useState(false);
   /** Held while a build is in flight so the wait screen can call it off. */
   const cancel = useRef<AbortController | null>(null);
+  /** Moved to read the shelf again, after a wait that ran out. */
+  const [shelfKey, setShelfKey] = useState(0);
 
   const weak = weakTopics(state.attempts).slice(0, 3);
 
@@ -108,7 +110,10 @@ function AiBuilder() {
     // and saves either way, so there is nothing to report as a failure.
     if (controller.signal.aborted) return;
     if (!res.ok) {
-      toast(t(aiFailureKey(res.reason)));
+      // The wait running out is not the student's Stop, nor a lost
+      // connection: the server finishes and saves the set on the shelf below.
+      toast(res.timedOut ? t('tutor.buildTimedOut') : t(aiFailureKey(res.reason)));
+      if (res.timedOut) setShelfKey((n) => n + 1);
       return;
     }
     openSet(kind, res.sessionId, res.items, chapterInSubject);
@@ -186,7 +191,7 @@ function AiBuilder() {
       <SectionTitle>{t('tutor.pickSubject')}</SectionTitle>
       <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
         {derived.subjects.map((sid) => (
-          <Pill key={sid} tone={sid === subjectId ? 'teal' : 'grey'} onPress={() => setSubjectId(sid)}>
+          <Pill key={sid} tone={sid === subjectId ? 'teal' : 'grey'} selected={sid === subjectId} onPress={() => setSubjectId(sid)}>
             {subjectName(subjectById(sid), lang) || sid}
           </Pill>
         ))}
@@ -212,6 +217,7 @@ function AiBuilder() {
               icon="book"
               last={i === chapters.length - 1}
               onPress={() => setChapterTouched(c.id)}
+              checked={c.id === chapterInSubject}
               right={<Check on={c.id === chapterInSubject} />}
             />
           ))}
@@ -269,18 +275,18 @@ function AiBuilder() {
         </>
       ) : null}
 
-      <RecentSets onOpen={reopen} />
+      <RecentSets onOpen={reopen} refreshKey={shelfKey} />
     </Screen>
   );
 }
 
 /** The shelf of saved AI sets, so a set built yesterday is one tap away. */
-function RecentSets({ onOpen }: { onOpen: (id: string, kind: string, chapterId: string | null) => void }) {
+function RecentSets({ onOpen, refreshKey }: { onOpen: (id: string, kind: string, chapterId: string | null) => void; refreshKey: number }) {
   const t = useT();
   const { state } = useApp();
   const { data: sets } = useAsync(
     () => fetchAiSessions().then((rows) => rows.filter((r) => r.kind !== 'paper')),
-    [state.user?.id ?? ''],
+    [state.user?.id ?? '', refreshKey],
   );
 
   if (!sets?.length) return null;

@@ -14,7 +14,7 @@ export default function Weak() {
   // contentKey is not read here and has to be listed: weakTopics keeps to the
   // syllabus the chapter index knows, which changes underneath on a switch.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const rows = useMemo(() => weakTopics(state.attempts), [state.attempts, contentKey]);
+  const rows = useMemo(() => weakTopics(state.attempts, 3, { lang }), [state.attempts, contentKey, lang]);
 
   const bySubject = rows.reduce<Record<string, typeof rows>>((acc, r) => {
     (acc[r.subjectId] ||= []).push(r);

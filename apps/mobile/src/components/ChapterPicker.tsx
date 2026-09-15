@@ -203,7 +203,7 @@ function Picking({ onPick, chapterOnly }: { onPick: (pick: ChapterPick) => void;
           ]}
         />
         {query ? (
-          <Tap onPress={() => setQuery('')}>
+          <Tap onPress={() => setQuery('')} hit label={t('a11y.clearSearch')}>
             <Icon name="close" size={16} color={C.ink3} />
           </Tap>
         ) : null}

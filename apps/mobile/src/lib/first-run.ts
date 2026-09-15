@@ -30,3 +30,21 @@ export async function hasSeenWelcome(): Promise<boolean> {
 export function markWelcomeSeen(): void {
   AsyncStorage.setItem(KEY, '1').catch(() => {});
 }
+
+/**
+ * "Your account was deleted", said once on whichever way-in screen comes up
+ * next (the carousel, or Log in when the splash picks that). In memory only:
+ * it belongs to this moment, not to the phone.
+ */
+let accountDeleted = false;
+
+export function markAccountDeleted(): void {
+  accountDeleted = true;
+}
+
+/** Whether the note is waiting. Read on mount; cleared once shown (clearAccountDeleted). */
+export const accountDeletedNote = (): boolean => accountDeleted;
+
+export function clearAccountDeleted(): void {
+  accountDeleted = false;
+}

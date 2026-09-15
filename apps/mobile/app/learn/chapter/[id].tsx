@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, Card, Empty, ErrorState, H2, Header, IconButton, Item, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Text, Ur } from '../../../src/components/ui';
@@ -95,6 +95,15 @@ export default function ChapterHub() {
    */
   const justCleared =
     pct !== null && pct >= 100 && !!chapter && hasStudyMaterial(chapter) && !state.celebratedChapters.includes(id);
+  /*
+   * The burst, held here rather than read off the store, as the dashboard's
+   * streak burst is: marking the chapter celebrated lands in the same commit
+   * that mounts the confetti, so reading `justCleared` for it unmounted the
+   * pieces before a frame of them ran. Latched while rendering, let go when
+   * the pieces are done.
+   */
+  const [burst, setBurst] = useState(false);
+  if (justCleared && !burst) setBurst(true);
   useEffect(() => {
     if (justCleared) {
       cheer();
@@ -102,6 +111,11 @@ export default function ChapterHub() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [justCleared, id]);
+  useEffect(() => {
+    if (!burst) return;
+    const timer = setTimeout(() => setBurst(false), 2400);
+    return () => clearTimeout(timer);
+  }, [burst]);
 
 
   // While the chapter row is still on its way, the screen used to paint the
@@ -306,8 +320,8 @@ export default function ChapterHub() {
         )
       }
     >
-      {justCleared ? <Confetti /> : null}
-      {justCleared ? (
+      {burst ? <Confetti /> : null}
+      {burst ? (
         <Pop>
           <Card flat tint={C.greenTint} border={C.green} style={{ alignItems: 'center', paddingVertical: 12, marginBottom: S.sm }}>
             <Text style={{ fontFamily: F.display, fontSize: 17, color: C.green }}>{t('study.chapterCleared')}</Text>
@@ -332,6 +346,7 @@ export default function ChapterHub() {
               <IconButton
                 icon={download.readable ? 'check' : 'download'}
                 tone={download.readable ? 'active' : 'card'}
+                label={t(download.readable ? 'study.removeOffline' : 'study.saveOffline')}
                 onPress={download.press}
               />
             </Pop>
@@ -477,12 +492,21 @@ export default function ChapterHub() {
       ) : null}
 
       <Spacer h={S.lg} />
-      <Row gap={S.sm} style={{ flexWrap: 'wrap' }}>
-        <Pill tone={download.readable ? 'green' : 'grey'} icon={download.readable ? 'check' : 'download'}>
-          {download.readable ? t('study.savedOffline') : t('study.notDownloaded')}
-        </Pill>
-        {download.listed ? <Pill tone="grey">{formatBytes(chapterDownloadBytes(id))}</Pill> : null}
-      </Row>
+      {/* Saving for offline, said in words: it was an unlabelled icon in the
+          header, and a pill down here that looked like a button and was not.
+          The same press as the header's (a removal asks first). */}
+      {download.readable ? (
+        <Row gap={S.sm} style={{ flexWrap: 'wrap', alignItems: 'center' }}>
+          <Pill tone="green" icon="check">
+            {t('study.savedOffline')}
+          </Pill>
+          {download.listed ? <Pill tone="grey">{formatBytes(chapterDownloadBytes(id))}</Pill> : null}
+          <View style={{ flex: 1 }} />
+          <Btn title={t('study.removeOffline')} variant="ghost" sm icon="trash" onPress={download.press} loading={download.busy} />
+        </Row>
+      ) : download.savedInNote ? null : (
+        <Btn title={t('study.saveOffline')} variant="line" icon="download" onPress={download.press} loading={download.busy} />
+      )}
       {/* Saved, but in the other language: said, with the way to fix it. */}
       {download.savedInNote ? (
         <Card flat tint={C.orangeTint} style={{ marginTop: S.sm }}>

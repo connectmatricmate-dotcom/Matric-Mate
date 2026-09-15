@@ -567,20 +567,27 @@ export function Tap({
   style,
   disabled,
   hit,
+  slop,
   label,
   role,
   checked,
+  selected,
 }: {
   children: React.ReactNode;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
   hit?: boolean;
+  /** A touch area bigger than the control on some sides only, for controls
+   *  packed side by side where `hit` would overlap the neighbour. */
+  slop?: { top?: number; bottom?: number; left?: number; right?: number };
   /** What a screen reader says for a control with no words on it (an icon,
    *  a switch). A control with text needs none: the text is read. */
   label?: string;
-  role?: 'button' | 'switch' | 'checkbox' | 'link';
+  role?: 'button' | 'switch' | 'checkbox' | 'link' | 'radio' | 'tab';
   checked?: boolean;
+  /** One of a set of choices, and this one is picked: said aloud as "selected". */
+  selected?: boolean;
 }) {
   const interactive = !!onPress && !disabled;
   return (
@@ -589,8 +596,12 @@ export function Tap({
       disabled={!interactive}
       accessibilityLabel={label}
       accessibilityRole={role ?? (onPress ? 'button' : undefined)}
-      accessibilityState={checked === undefined ? { disabled: !interactive } : { disabled: !interactive, checked }}
-      hitSlop={hit ? 12 : undefined}
+      accessibilityState={{
+        disabled: !interactive,
+        ...(checked === undefined ? {} : { checked }),
+        ...(selected === undefined ? {} : { selected }),
+      }}
+      hitSlop={slop ?? (hit ? 12 : undefined)}
       android_ripple={interactive && !hit ? { color: 'rgba(9,106,139,0.10)', foreground: true } : undefined}
       style={({ pressed }) => [
         style,
@@ -738,7 +749,8 @@ export function Btn({
 }) {
   const bg: Record<BtnVariant, string> = {
     primary: C.teal,
-    orange: C.orange,
+    // The deeper button orange: white on the bright one is 2.4:1.
+    orange: C.orangeFill,
     green: C.green,
     danger: C.red,
     whatsapp: C.whatsapp,
@@ -786,6 +798,7 @@ export function Pill({
   onPress,
   style,
   lines,
+  selected,
 }: {
   children?: React.ReactNode;
   tone?: Tone;
@@ -795,6 +808,9 @@ export function Pill({
   /** Truncate after this many lines, for a pill that has to stay one row
    *  tall. Without it a long label wraps inside the pill. */
   lines?: number;
+  /** A pill used as one of a set of choices (a subject, a filter): whether
+   *  it is the picked one, for a screen reader. The colour alone said so. */
+  selected?: boolean;
 }) {
   const map: Record<Tone, [string, string]> = {
     teal: [C.tealTint, C.teal],
@@ -829,7 +845,7 @@ export function Pill({
   // a control: playback speed, review filters, chat feedback. `hit` pads the
   // touchable area out to something a thumb can actually land on.
   return onPress ? (
-    <Tap onPress={onPress} hit style={st.pillTap}>
+    <Tap onPress={onPress} hit style={st.pillTap} selected={selected}>
       {body}
     </Tap>
   ) : (
@@ -853,7 +869,16 @@ export function Seg<Tv extends string>({
       {options.map((o) => {
         const on = o.value === value;
         return (
-          <Tap key={o.value} onPress={() => onChange(o.value)} style={[st.segBtn, on && { backgroundColor: C.card }]}>
+          // Said as one of a set, with the picked one "selected", and a touch
+          // area reaching above and below the 36dp bar to a thumb's 44 plus.
+          <Tap
+            key={o.value}
+            onPress={() => onChange(o.value)}
+            role="radio"
+            selected={on}
+            slop={{ top: 7, bottom: 7 }}
+            style={[st.segBtn, on && { backgroundColor: C.card }]}
+          >
             {/* One line height for both scripts; see LanguageToggle for why.
                 One line, shrinking a little to fit: every slot is an equal
                 share of the width, and at a large font "English" broke in the
@@ -902,6 +927,7 @@ export function Field({
   label,
   value,
   onChangeText,
+  onBlur,
   placeholder,
   icon,
   secure,
@@ -912,13 +938,16 @@ export function Field({
   label: string;
   value: string;
   onChangeText: (v: string) => void;
+  /** When the student leaves the field: the moment to judge what they typed. */
+  onBlur?: () => void;
   placeholder?: string;
   icon?: IconName;
   secure?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   error?: string;
-  autoCapitalize?: 'none' | 'words';
+  autoCapitalize?: 'none' | 'words' | 'characters';
 }) {
+  const t = useT();
   const [hide, setHide] = useState(!!secure);
   const [focus, setFocus] = useState(false);
   return (
@@ -935,7 +964,10 @@ export function Field({
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
+          onBlur={() => {
+            setFocus(false);
+            onBlur?.();
+          }}
           style={[
             // What a student types reads the same way as everything else on
             // screen, and an Urdu keyboard filling an input from the left is
@@ -945,7 +977,7 @@ export function Field({
           ]}
         />
         {secure ? (
-          <Tap onPress={() => setHide((h) => !h)} hit>
+          <Tap onPress={() => setHide((h) => !h)} hit label={t(hide ? 'a11y.showPassword' : 'a11y.hidePassword')}>
             <Icon name={hide ? 'eye' : 'eyeOff'} size={18} color={C.ink3} />
           </Tap>
         ) : null}
@@ -1075,6 +1107,7 @@ export function Item({
   urduTitle,
   last,
   dim,
+  checked,
 }: {
   title: string;
   sub?: string;
@@ -1087,6 +1120,9 @@ export function Item({
   urduTitle?: boolean;
   last?: boolean;
   dim?: boolean;
+  /** A row that is one of a list of choices with a tick beside it: whether it
+   *  is ticked, for a screen reader, which heard only the title. */
+  checked?: boolean;
 }) {
   const bgMap = { teal: C.tealTint, orange: C.orangeTint, green: C.greenTint, red: C.redTint, grey: C.grey };
   const fgMap = { teal: C.teal, orange: C.orangeDark, green: C.green, red: C.red, grey: C.ink2 };
@@ -1101,6 +1137,8 @@ export function Item({
   return (
     <Tap
       onPress={onPress}
+      role={checked === undefined ? undefined : 'checkbox'}
+      checked={checked}
       style={[
         st.item,
         { borderBottomColor: C.line },

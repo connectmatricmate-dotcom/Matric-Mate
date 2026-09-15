@@ -6,7 +6,8 @@ import { SegmentTrack } from '../../src/components/SessionHeader';
 import { api, fetchAiSession, itemKey, normalizeAiCards } from '@matricmate/core';
 import { useAsync } from '../../src/core/useAsync';
 import { Confetti, Pop } from '../../src/components/celebration';
-import { PickPracticeChapter, PracticeChapterBar, usePracticeChapter } from '../../src/components/PracticeChapter';
+import { PickPracticeChapter, PracticeChapterBar, PracticeEmpty, usePracticeChapter } from '../../src/components/PracticeChapter';
+import { ReportAi } from '../../src/components/ReportAi';
 import { cheer } from '../../src/core/haptics';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -104,7 +105,11 @@ export default function Flashcards() {
         {/* The way out of an empty chapter is another chapter. */}
         {ai ? null : <PracticeChapterBar kind="cards" chapter={practice.chapter} />}
         <Spacer h={S.lg} />
-        <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+        {ai ? (
+          <Empty title={t('session.noItemsTitle')} sub={t('session.noItemsBody')} />
+        ) : (
+          <PracticeEmpty kind="cards" chapterId={chapterId} chapter={practice.chapter} onRetry={reload} />
+        )}
       </Screen>
     );
   }
@@ -156,6 +161,9 @@ export default function Flashcards() {
               setRound(repeats);
               setI(0);
               setRepeats([]);
+              // Counts per round, as on the website: the finish after a repeats
+              // round says how that round went.
+              setKnown([]);
             }}
           />
         ) : null}
@@ -259,6 +267,14 @@ export default function Flashcards() {
         <Pill tone="green">{t('session.knownCount', { n: known.length })}</Pill>
         <Pill tone="orange">{t('session.repeatCount', { n: repeats.length })}</Pill>
       </Row>
+      {/* Google Play: AI-written text can be reported in the app. Every card
+          is written by the AI, a set asked for here and the chapter's own
+          deck alike, so each one can be, once it has been turned over. */}
+      {flipped && card ? (
+        <View style={{ alignItems: 'center' }}>
+          <ReportAi surface="ai_test" refId={card.id} excerpt={`${card.front}\n\n${card.back}`} />
+        </View>
+      ) : null}
     </Screen>
   );
 }

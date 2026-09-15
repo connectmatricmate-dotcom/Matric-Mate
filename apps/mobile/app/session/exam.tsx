@@ -5,6 +5,7 @@ import { Icon } from '../../src/components/Icon';
 import { Btn, Card, Confirm, H3, IconButton, Pill, Row, Screen, ScriptText, Small, Spacer, Tap, Text, useToast } from '../../src/components/ui';
 import { isUrduScript } from '@matricmate/core';
 import { SegmentTrack } from '../../src/components/SessionHeader';
+import { ReportAi } from '../../src/components/ReportAi';
 import { useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
@@ -142,6 +143,9 @@ export default function Exam() {
               setFlags((f) => (flagged ? f.filter((x) => x !== mcq.id) : [...f, mcq.id]));
               toast(flagged ? t('session.flagRemoved') : t('session.flagged'));
             }}
+            label={t(flagged ? 'session.unflag' : 'session.flag')}
+            role="switch"
+            checked={flagged}
           >
             <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="star" color={flagged ? C.orange : C.ink3} />
@@ -199,6 +203,12 @@ export default function Exam() {
             </Tap>
           );
         })}
+
+        {/* Google Play: a question the AI wrote can be reported where it is
+            shown. Quiet, and it gives nothing of the answer away. */}
+        {mcq.source === 'ai' || s.aiGenerated ? (
+          <ReportAi surface="ai_test" refId={mcq.id} excerpt={`${mcq.q}\n\n${mcq.options.join('\n')}`} />
+        ) : null}
 
         <Spacer h={S.md} />
         <Row gap={6} style={{ flexWrap: 'wrap', justifyContent: 'center' }}>

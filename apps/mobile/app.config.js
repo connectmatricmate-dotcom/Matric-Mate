@@ -7,8 +7,11 @@
  *   APP_VARIANT=development  → "MatricMate Dev", package pk.matricmate.app.dev
  *   (unset)                  → "MatricMate",     package pk.matricmate.app
  *
- * The variant is set per build profile in eas.json, so nothing needs to be
- * remembered at the command line.
+ * No build profile sets it any more: google-services.json (push) only covers
+ * pk.matricmate.app, so a `.dev` build either failed or came out without
+ * push. The `development` and `emulator` profiles both build the store
+ * package as a development client. Setting APP_VARIANT by hand still works
+ * for a build that does not need push.
  */
 const IS_DEV = process.env.APP_VARIANT === 'development';
 

@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { LanguageToggle } from '../src/components/LanguageToggle';
-import { markWelcomeSeen } from '../src/lib/first-run';
-import { Body, Btn, H1, Screen, Tap, Text, Wordmark } from '../src/components/ui';
+import { accountDeletedNote, clearAccountDeleted, markWelcomeSeen } from '../src/lib/first-run';
+import { Body, Btn, Card, H1, Screen, Small, Tap, Text, Wordmark } from '../src/components/ui';
 import { useT } from '../src/i18n';
 import type { StringKey } from '../src/i18n';
-import { C, S, rowDir } from '../src/theme';
+import { C, F, S, rowDir } from '../src/theme';
 
 const SLIDES: { emoji: string; title: StringKey; body: StringKey }[] = [
   { emoji: '📚', title: 'welcome.slide1Title', body: 'welcome.slide1Body' },
@@ -16,6 +16,11 @@ const SLIDES: { emoji: string; title: StringKey; body: StringKey }[] = [
 
 export default function Welcome() {
   const t = useT();
+  // Just deleted from Settings: said here, once, so the student knows it went.
+  const [deleted] = useState(accountDeletedNote);
+  useEffect(() => {
+    if (deleted) clearAccountDeleted();
+  }, [deleted]);
   // Seen once is seen. Marked on the way out rather than on mount, so
   // backgrounding the app mid-carousel still shows the rest of it next time.
   const leave = (to: '/onboarding/class' | '/login') => {
@@ -50,6 +55,12 @@ export default function Welcome() {
           <View style={{ flex: 1 }} />
           <LanguageToggle compact />
         </View>
+        {deleted ? (
+          <Card flat tint={C.greenTint} border={C.green} style={{ marginTop: S.md }}>
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('deletion.doneTitle')}</Text>
+            <Small style={{ marginTop: 2 }}>{t('deletion.doneBody')}</Small>
+          </Card>
+        ) : null}
 
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: S.md }}>
           <Text style={{ fontSize: 80 }}>{slide.emoji}</Text>
@@ -58,7 +69,7 @@ export default function Welcome() {
 
           <View style={{ flexDirection: rowDir(), gap: 6, marginTop: S.sm }}>
             {SLIDES.map((_, n) => (
-              <Tap key={n} onPress={() => setI(n)} hit>
+              <Tap key={n} onPress={() => setI(n)} hit label={t('a11y.slideOf', { n: n + 1, total: SLIDES.length })} selected={n === i}>
                 <View
                   style={{
                     width: n === i ? 22 : 8,

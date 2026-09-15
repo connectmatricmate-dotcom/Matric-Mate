@@ -1,8 +1,8 @@
 import { formatDate } from '@matricmate/core';
 import { useEffect, useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { Card, ErrorState, Header, Label, Screen, Skeleton, Small, Spacer } from '../../src/components/ui';
+import { Card, ErrorState, Header, Label, Screen, Skeleton, Small, Spacer, Text } from '../../src/components/ui';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { supabase } from '../../src/lib/supabase';

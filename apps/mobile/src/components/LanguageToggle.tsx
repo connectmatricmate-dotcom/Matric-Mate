@@ -45,6 +45,11 @@ export function LanguageToggle({ compact }: { compact?: boolean }) {
           <Tap
             key={o.value}
             onPress={() => setLang(o.value)}
+            // One of two, the picked one said as "selected"; the compact pill
+            // is 32dp, so its touch area reaches past it above and below.
+            role="radio"
+            selected={on}
+            slop={compact ? { top: 8, bottom: 8 } : { top: 4, bottom: 4 }}
             style={{
               // A floor, not a height: the label's line box grows with the
               // system font size, and a fixed pill with the clip below cut

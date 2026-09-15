@@ -5,6 +5,8 @@ import { Icon } from '../../src/components/Icon';
 import { Btn, Card, ErrorState, H2, Header, Pill, Row, Screen, SectionTitle, Skeleton, Small, Spacer, Text } from '../../src/components/ui';
 import { api, boardName, chapterById, chapterName, subjectById, subjectName, weakTopics } from '@matricmate/core';
 import type { Mcq } from '@matricmate/core';
+import { useOnline } from '../../src/core/connectivity';
+import { localChapter } from '../../src/core/downloads';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
@@ -35,6 +37,7 @@ export default function ExamIntro() {
   const { state, derived, contentKey } = useApp();
   const t = useT();
   const { lang } = useLang();
+  const online = useOnline();
 
   const isAi = ai === '1';
   /**
@@ -81,16 +84,24 @@ export default function ExamIntro() {
   const count = mcqs.length;
   const minutes = Math.max(1, Math.round(count * 1.5));
 
-  const best = state.results
-    .filter((r) => r.subjectId === subjectId && r.mode === 'exam')
-    .sort((a, b) => (b.total ? b.score / b.total : 0) - (a.total ? a.score / a.total : 0))[0];
+  /* A weak-topic test spans the topics' subjects, so a best filed under one
+     of them would be some other test's: none is shown for it, as on the
+     website. And only real results: a 0/0 left by an older build read
+     "Best NaN%". */
+  const best = isAi
+    ? undefined
+    : state.results
+        .filter((r) => r.subjectId === subjectId && r.mode === 'exam' && r.total > 0)
+        .sort((a, b) => b.score / b.total - a.score / a.total)[0];
 
   const label = isAi
     ? t('tutor.aiTestTitle')
     : paper
       ? `${boardName(state.onboarding?.board, lang)} ${paper}`
       : chapter
-        ? chapterName(chapterById(chapter), lang)
+        ? // The row saved with a download when the catalogue cannot name it
+          // (offline, Class 10 or Punjab), else the subject: never blank.
+          chapterName(chapterById(chapter) ?? localChapter(chapter) ?? undefined, lang) || subjectName(subjectById(subjectId), lang)
         : subjectName(subjectById(subjectId), lang);
 
   function start() {
@@ -131,6 +142,7 @@ export default function ExamIntro() {
               <Pill
                 key={sid}
                 tone={sid === subjectId ? 'teal' : 'grey'}
+                selected={sid === subjectId}
                 onPress={() => setPicked(sid)}
                 style={{ paddingVertical: 9, paddingHorizontal: 14 }}
               >
@@ -147,7 +159,8 @@ export default function ExamIntro() {
         <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={set.reload} />
       ) : !count ? (
         <Card flat style={{ alignItems: 'center', paddingVertical: 24 }}>
-          <Small style={{ textAlign: 'center' }}>{t('session.noQuestions')}</Small>
+          {/* Offline, "no questions" is not true: they are on the server. */}
+          <Small style={{ textAlign: 'center' }}>{online ? t('session.noQuestions') : t('states.offline')}</Small>
         </Card>
       ) : (
         <Card border={C.orange} style={{ alignItems: 'center', paddingVertical: 24 }}>

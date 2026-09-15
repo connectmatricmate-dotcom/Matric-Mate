@@ -171,10 +171,17 @@ export function takePendingNotificationRoute(): string | null {
   }
 }
 
-export function usePush(userId: string | null) {
+/**
+ * `canAsk`: whether now is a moment to show the permission dialog. Until it
+ * is, a phone that already allows notifications is still claimed, silently;
+ * the question itself waits (see PushLive in app/_layout.tsx).
+ */
+export function usePush(userId: string | null, canAsk = true) {
   const registeredFor = useRef<string | null>(null);
   /** Whether this launch has actually claimed the token for `registeredFor`. */
   const claimed = useRef(false);
+  /** Whether this launch has already shown `registeredFor` the question. */
+  const asked = useRef(false);
 
   useEffect(() => {
     if (!userId) {
@@ -184,22 +191,28 @@ export function usePush(userId: string | null) {
       // who signed out and back in got no push until the app was restarted.
       registeredFor.current = null;
       claimed.current = false;
+      asked.current = false;
       return;
     }
-    // Once per signed-in user per launch. Re-running on every render would
-    // hammer both the permission API and the table.
-    if (registeredFor.current === userId) return;
-    registeredFor.current = userId;
-    claimed.current = false;
+    // Once per signed-in user per launch, and once more when the moment to
+    // ask arrives. Re-running on every render would hammer both the
+    // permission API and the table.
+    if (registeredFor.current === userId && (claimed.current || asked.current || !canAsk)) return;
+    if (registeredFor.current !== userId) {
+      registeredFor.current = userId;
+      claimed.current = false;
+      asked.current = false;
+    }
+    if (canAsk) asked.current = true;
 
     // Never allowed to break startup: a phone with no Play Services, or a
     // blocked network, must still get an app.
-    void register(userId)
+    void register(userId, canAsk)
       .then((ok) => {
-        if (registeredFor.current === userId) claimed.current = ok;
+        if (registeredFor.current === userId && ok) claimed.current = true;
       })
       .catch(() => {});
-  }, [userId]);
+  }, [userId, canAsk]);
 
   /**
    * Notifications switched back on in Settings, noticed on the way back.

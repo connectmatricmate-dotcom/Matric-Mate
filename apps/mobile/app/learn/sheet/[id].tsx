@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { Card, Empty, ErrorState, Header, Screen, Skeleton, Small, Spacer } from '../../../src/components/ui';
-import { api, chapterById, chapterName, fetchCheatSheet, subjectMedium } from '@matricmate/core';
+import { api, chapterById, chapterName, fetchCheatSheet, subjectMedium, subjectOpen } from '@matricmate/core';
 import type { AiFail } from '@matricmate/core';
 import { aiFailureKey, aiRetryable } from '../../../src/components/aiFailure';
 import { useAsync } from '../../../src/core/useAsync';
@@ -9,6 +9,7 @@ import { useApp } from '../../../src/store/app';
 import { S } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
 import { AiLocked } from '../../../src/components/AiLocked';
+import { LockedNotice } from '../../../src/components/LockedNotice';
 import { ReportAi } from '../../../src/components/ReportAi';
 
 /**
@@ -23,8 +24,25 @@ import { ReportAi } from '../../../src/components/ReportAi';
  */
 export default function RevisionSheetGate() {
   const { derived } = useApp();
+  const { id } = useLocalSearchParams<{ id: string }>();
   if (derived.access.active && !derived.access.ai) return <AiLocked titleKey="tutor.sheetTitle" />;
+  // A free trial opens one subject, the sheet included: a tutor button or a
+  // link could open another subject's, which the server refuses anyway. The
+  // lock says which subject the trial opens, before a request is made.
+  if (derived.access.tier === 'trial' && id && !subjectOpen(derived.access, id.split('-')[0])) {
+    return <TrialLocked />;
+  }
   return <RevisionSheet />;
+}
+
+function TrialLocked() {
+  const t = useT();
+  return (
+    <Screen>
+      <Header title={t('tutor.sheetTitle')} back />
+      <LockedNotice />
+    </Screen>
+  );
 }
 
 function RevisionSheet() {

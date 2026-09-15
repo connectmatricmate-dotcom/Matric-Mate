@@ -14,9 +14,9 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Redirect, router } from 'expo-router';
-import { chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
+import { chapterById, chapterName, hasEnded, subjectById, subjectName } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
-import { Card, Confirm, Empty, Header, Item, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../src/components/ui';
+import { Card, Confirm, Empty, Header, IconButton, Item, Screen, SectionTitle, Small, Spacer, Tap, useToast } from '../src/components/ui';
 import { useOnline } from '../src/core/connectivity';
 import { chapterDownloadBytes, formatBytes, localAudioTrack, localChapter, readableOffline, savedMediums } from '../src/core/downloads';
 import { useLang, useT } from '../src/i18n';
@@ -42,10 +42,19 @@ export default function Offline() {
    * signal. Status only, the same as the paused screen (core/billing.ts).
    */
   if (state.user && !state.premium.active) {
-    const ended = state.premium.plan === 'trial' ? 'paused.trialTitle' : state.premium.plan ? 'paused.planTitle' : 'paused.noneTitle';
+    // Ended only when its date has passed, as on the paused screen: a plan
+    // switched off early keeps a date still to come, and is simply not active.
+    const endedAt = hasEnded(state.premium.validTill);
+    const ended =
+      state.premium.plan === 'trial' && endedAt ? 'paused.trialTitle' : state.premium.plan && endedAt ? 'paused.planTitle' : 'paused.noneTitle';
     return (
       <Screen>
-        <Header title={t('offline.title')} sub={t('offline.sub')} />
+        {/* Settings and help stay a tap away, as they are on the paused screen. */}
+        <Header
+          title={t('offline.title')}
+          sub={t('offline.sub')}
+          right={<IconButton icon="gear" tone="card" onPress={() => router.push('/account')} />}
+        />
         <Spacer h={S.lg} />
         <Empty emoji="🔒" title={t(ended)} sub={t('paused.saved')} />
       </Screen>
@@ -66,7 +75,11 @@ export default function Offline() {
 
   return (
     <Screen>
-      <Header title={t('offline.title')} sub={t('offline.sub')} />
+      <Header
+        title={t('offline.title')}
+        sub={t('offline.sub')}
+        right={<IconButton icon="gear" tone="card" onPress={() => router.push('/account')} />}
+      />
 
       {chapters.length === 0 ? (
         <>
@@ -103,9 +116,13 @@ export default function Offline() {
                     icon={readable ? 'check' : 'download'}
                     tone={readable ? 'green' : 'grey'}
                     last={i === list.length - 1}
-                    onPress={() => router.push(`/learn/chapter/${c!.id}`)}
+                    // A copy saved in the other language cannot open with no
+                    // signal: opening it led to a bare error. Said instead.
+                    onPress={() =>
+                      readable ? router.push(`/learn/chapter/${c!.id}`) : toast(t('downloads.savedIn', { lang: langName(c!.id) }))
+                    }
                     right={
-                      <Tap onPress={() => setRemoving(c!.id)} hit>
+                      <Tap onPress={() => setRemoving(c!.id)} hit label={t('study.removeOffline')}>
                         <Icon name="trash" size={19} color={C.red} />
                       </Tap>
                     }
