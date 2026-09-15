@@ -11,7 +11,6 @@ import { SITE_URL } from '@/lib/site';
 import { normaliseMobile } from '@matricmate/core';
 import { normaliseSchool } from '@/lib/validation';
 
-import { isOpenWithoutPlan } from '@/lib/entitlement';
 import { currentRole, landingFor } from '@/lib/roles';
 import { createClient } from '@/lib/supabase/server';
 
@@ -261,9 +260,13 @@ export async function signInAction(_prev: AuthState, formData: FormData): Promis
    * or an administrator sent to /dashboard is bounced on to their own area by
    * the student layout, which is the same double redirect (see landingFor).
    */
+  // A student with a plan may go anywhere they asked. Setup, the trial and the
+  // plans are not skipped for a link, except to the account pages, which
+  // none of them bounce.
+  const accountPage = asked === '/account' || asked.startsWith('/account/');
   const allowed =
     role === 'student'
-      ? landing !== '/upgrade' || isOpenWithoutPlan(asked)
+      ? landing === '/dashboard' || (!landing.startsWith('/onboarding') && accountPage)
       : asked === landing || asked.startsWith(`${landing}/`);
   redirect(allowed && asked ? asked : landing);
 }
@@ -318,6 +321,18 @@ export async function setPasswordAction(_prev: AuthState, formData: FormData): P
   // unpaid student through the paywall: the blank-screen double redirect
   // landingFor exists to prevent.
   redirect(await landingFor(await currentRole()));
+}
+
+/**
+ * Sign out and sign in again as someone else, coming back to where they were:
+ * for a staff page opened on the wrong account (components/staff/WrongAccount).
+ * `next` is only ever a path on this site (safePath).
+ */
+export async function switchAccountAction(formData: FormData) {
+  const next = safePath(formData.get('next'), '/dashboard');
+  const supabase = await createClient();
+  await supabase.auth.signOut({ scope: 'local' });
+  redirect(`/login?next=${encodeURIComponent(next)}`);
 }
 
 export async function signOutAction() {

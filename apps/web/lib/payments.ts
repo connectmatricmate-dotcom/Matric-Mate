@@ -123,7 +123,8 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
   await admin.from('entitlements').upsert(
     // trial_subject cleared: a paid plan opens every subject, and a stale
     // value would read as a trial's limit to anything that forgot the plan.
-    { user_id: payment.user_id, active: true, plan: plan.id, valid_till: validTill, trial_subject: null, source: 'safepay' },
+    // A plan the admin switched on by hand is recorded as one, not as a card payment.
+    { user_id: payment.user_id, active: true, plan: plan.id, valid_till: validTill, trial_subject: null, source: input.tracker.startsWith('MANUAL-') ? 'manual' : 'safepay' },
     { onConflict: 'user_id' }
   );
 
@@ -134,10 +135,12 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
    * keep, and WhatsApp once that is switched on. It was a hardcoded English
    * row, which nobody noticed because until recently no app read the table.
    */
-  const to = await loadRecipient(payment.user_id);
+  // With the address: loaded without it, the email channel had nobody to
+  // write to and every receipt email was skipped.
+  const to = await loadRecipient(payment.user_id, { email: true });
   if (to) {
     const date = formatDate(validTill, to.lang, { day: 'numeric', month: 'long', year: 'numeric' });
-    await notify(to, paymentReceived(date));
+    await notify(to, paymentReceived(date, plan.id === 'basic' ? 'basic' : 'premium'));
   }
 
   return { handled: true as const, userId: payment.user_id };

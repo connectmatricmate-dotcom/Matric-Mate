@@ -109,6 +109,16 @@ export const en = {
     pickTwo: 'Pick at least 2 electives',
     subjectAdded: '{name} added',
     subjectsFootnote: 'More subjects are on the way.',
+    /* The first run's subject step: everyone takes the compulsory subjects,
+       Physics, Chemistry and Maths, so the one real choice is the fourth
+       science subject. Edit profile keeps the full list. */
+    scienceTitle: 'Biology or Computer Science?',
+    scienceSub: 'Physics, Chemistry, Maths and the compulsory subjects are added for you.',
+    scienceBioSub: 'Science with Biology',
+    scienceCsSub: 'Science with Computer Science',
+    scienceBoth: 'Both',
+    scienceBothSub: 'Biology and Computer Science together',
+    scienceFootnote: 'You can change your subjects any time from Edit profile.',
     /* The step dots' accessible name. */
     stepOf: 'Step {n} of {total}',
     /* Changing a board the account already has, from Edit profile. The same
@@ -245,6 +255,8 @@ export const en = {
     basicCurrentBody: 'Every chapter, note and practice set is open until {date}. Premium adds the AI tutor, answer checking and the other AI features.',
     upgradeCta: 'Upgrade to Premium',
     renewCta: 'Renew {plan}',
+    /* The website's plans page after a paid plan has run out. */
+    endedBody: 'It ended on {date}. Renew below and everything opens again. Your progress is saved.',
     notInBasic: 'Not in Basic',
     basicIncludes: 'What Basic includes',
   },
@@ -282,7 +294,7 @@ export const en = {
   billing: {
     premium: 'Premium',
     checkAgain: 'Check again',
-    checkedActive: 'Premium is on. Enjoy.',
+    checkedActive: 'Your plan is active.',
     checkedFree: 'No active plan on this account yet.',
     renewCta: 'Renew {plan} · {price}',
     fromMonthly: 'From {price} a month. Pick the length that suits you.',
@@ -499,6 +511,7 @@ export const en = {
        are stored already translated rather than translated on the way out. */
     paymentTitle: 'Payment received',
     paymentBody: 'Premium is active until {date}.',
+    paymentBodyBasic: 'Basic is active until {date}.',
     welcomeTitle: 'Welcome to MatricMate',
     welcomeBody: 'Your notes, past papers and the AI tutor are ready. Open a chapter and start where you like.',
     reminderTitle: 'Nothing studied today',
@@ -583,7 +596,16 @@ export const en = {
     tipTitleGeneral: 'Exam tip of the day',
     /* A free trial's last day, in place of that afternoon's tip. */
     trialEndsTitle: 'Last day of your free trial',
-    trialEndsBody: '{subject} stays open with a plan, and every other subject opens with it.',
+    trialEndsBody: 'Your {subject} trial ends today.',
+    /* Plan reminders, from the hourly plans job. Shown inside the apps, so
+       they say what happened and nothing about buying (Google Play). The
+       email versions, which may, are under email.* */
+    trialEndedTitle: 'Your free trial has ended',
+    trialEndedBody: 'Your progress is saved.',
+    planEndsTitle: 'Your plan ends soon',
+    planEndsBody: 'It ends on {date}.',
+    planEndedTitle: 'Your plan has ended',
+    planEndedBody: 'Your progress is saved.',
   },
 
   /* Exam technique, one per afternoon. General enough to hold for both boards
@@ -630,6 +652,91 @@ export const en = {
 
   email: {
     footer: 'You are getting this because you have a MatricMate account. You can turn these off in Profile, under Notifications.',
+    /* Plan reminders by email, which is outside the app and so may say where
+       to renew. The button signs the student in on the website. */
+    trialEndsBody: 'Your {subject} trial ends today. Choose a plan on matricmate.co to keep {subject} open and open every other subject too.',
+    trialEndedBody: 'Your progress is saved. Choose a plan on matricmate.co and everything opens again.',
+    planEndsBody: 'Your plan ends on {date}. Renew on matricmate.co before then so nothing locks.',
+    planEndedBody: 'Your plan ended on {date}. Your progress is saved. Renew on matricmate.co and everything opens again.',
+    seePlans: 'See the plans',
+    renew: 'Renew my plan',
+    linkNote: 'The button signs you in to matricmate.co. It works for 7 days.',
+  },
+
+  /* The first screen after onboarding for a new account: the free trial is
+     started by picking its one subject. */
+  trialStart: {
+    title: 'Your free trial starts now',
+    sub: 'Pick one subject. Its chapters, notes, audio lessons and practice open for 3 days, with {n} AI questions a day.',
+    pick: 'Choose your subject',
+    confirmTitle: 'Open {subject} for 3 days?',
+    confirmBody: 'Your free trial opens one subject, and it cannot be changed later.',
+    confirmCta: 'Start with {subject}',
+    none: 'No subject has chapters for your class and board yet. Check back soon.',
+    errorNoChapters: 'That subject has no chapters for your class yet. Pick another one.',
+    errorOnboarding: 'Choose your class and board first.',
+  },
+
+  /* Shown once on the dashboard after the trial starts. */
+  welcomeTrial: {
+    title: 'Welcome, {name}',
+    trialOn: 'Your free trial is on. {subject} is open until {date}.',
+    tipStudy: 'Study: chapter notes, audio lessons and flashcards.',
+    tipPractice: 'Practice: MCQs, short questions and full tests.',
+    tipAi: 'AI tutor: {n} questions a day for anything you get stuck on.',
+    start: 'Start {subject}',
+    dismiss: 'Got it',
+  },
+
+  /* Android only: a trial or plan that has ended. Status and nothing else. No
+     price, no plan to buy and no website, by Google Play's payments policy
+     (core/billing.ts). */
+  paused: {
+    trialTitle: 'Your free trial has ended',
+    trialBody: 'Your 3 days with {subject} are over.',
+    trialBodyNoSubject: 'Your 3 free days are over.',
+    planTitle: 'Your plan has ended',
+    planBody: 'It ended on {date}.',
+    noneTitle: 'Your account is not active',
+    noneBody: 'There is no plan on this account right now.',
+    saved: 'Your progress, scores and notes are saved. Everything opens again as soon as your account is active.',
+    stillInactive: 'Still not active.',
+    nowActive: 'Your account is active again.',
+    help: 'Help',
+  },
+
+  /* The Android app's plan wording: status only, the same policy as paused.* */
+  access: {
+    lockedTrialBody: 'Your free trial opens {subject}.',
+    lockedSection: 'Not in your free trial',
+    lockedNoPlan: 'This opens when your account is active.',
+    aiTitle: 'The AI tutor is not in your plan',
+    aiBody: 'Your plan opens every chapter, note, audio lesson and practice set.',
+    aiShort: 'Not in your plan',
+    activeUntil: 'Active until {date}',
+    endedOn: 'Ended on {date}',
+    noPlan: 'No active plan',
+    trialLine: 'Free trial · {subject}',
+    checking: 'Checking…',
+    faqPlanQ: 'My plan changed but the app still shows the old one',
+    faqPlanA: 'Open Profile, then Subscription, and tap Check again. The app also checks each time you open it.',
+    faqAiA: 'The AI tutor has a daily limit, which keeps MatricMate affordable for everyone. It resets every night.',
+  },
+
+  /* Every AI answer can be reported from inside the app (Google Play's rule
+     for apps that generate content with AI). */
+  report: {
+    button: 'Report',
+    title: 'Report this answer',
+    sub: 'Tell us what is wrong with it. We read every report.',
+    wrong: 'It is wrong',
+    offensive: 'It is offensive or rude',
+    unsafe: 'It is harmful or unsafe',
+    other: 'Something else',
+    notePlaceholder: 'Anything to add? (optional)',
+    send: 'Send report',
+    sent: 'Thanks. We will look into it.',
+    failed: 'The report did not send. Try again.',
   },
 
   study: {
@@ -1316,7 +1423,7 @@ export const en = {
 
     paymentsTitle: 'Payment history',
     noPaymentsTitle: 'No payments yet',
-    noPaymentsBody: 'Receipts appear here after your first Premium payment.',
+    noPaymentsBody: 'Your receipts will appear here.',
     paidLabel: 'Paid',
     /* A payment that never completed still belongs in the history: it is the
        first thing a student points at when they say the money left and the
@@ -1328,7 +1435,7 @@ export const en = {
     statusCancelled: 'Cancelled',
     receiptLine: 'Rs {amount} · Premium',
     referenceCopied: 'Reference copied',
-    paymentsFootnote: 'Every receipt carries a Safepay reference you can quote to support.',
+    paymentsFootnote: 'Every receipt carries a reference you can quote to support.',
 
     settingsTitle: 'Settings',
     appearance: 'Appearance',
@@ -1519,6 +1626,13 @@ export const ur: typeof en = {
     pickTwo: 'کم از کم 2 اختیاری مضامین چنیں',
     subjectAdded: '{name} شامل ہو گیا',
     subjectsFootnote: 'مزید مضامین جلد آ رہے ہیں۔',
+    scienceTitle: 'بیالوجی یا کمپیوٹر سائنس؟',
+    scienceSub: 'فزکس، کیمسٹری، ریاضی اور لازمی مضامین آپ کے لیے خود شامل ہو جاتے ہیں۔',
+    scienceBioSub: 'سائنس، بیالوجی کے ساتھ',
+    scienceCsSub: 'سائنس، کمپیوٹر سائنس کے ساتھ',
+    scienceBoth: 'دونوں',
+    scienceBothSub: 'بیالوجی اور کمپیوٹر سائنس دونوں',
+    scienceFootnote: 'آپ اپنے مضامین کبھی بھی ”پروفائل میں ترمیم“ سے بدل سکتے ہیں۔',
     stepOf: 'مرحلہ {n} از {total}',
     boardWarnTitle: '{board} پر جائیں؟',
     boardWarnBody:
@@ -1635,6 +1749,7 @@ export const ur: typeof en = {
     basicCurrentBody: 'ہر باب، نوٹس اور مشق {date} تک کھلی ہے۔ پریمیم میں اے آئی ٹیوٹر، جوابات کی جانچ اور باقی اے آئی سہولتیں شامل ہیں۔',
     upgradeCta: 'پریمیم پر اپ گریڈ کریں',
     renewCta: '{plan} کی تجدید کریں',
+    endedBody: 'یہ {date} کو ختم ہوا۔ نیچے سے تجدید کریں اور سب کچھ دوبارہ کھل جائے گا۔ آپ کی پیش رفت محفوظ ہے۔',
     notInBasic: 'بیسک میں شامل نہیں',
     basicIncludes: 'بیسک میں کیا شامل ہے',
   },
@@ -1670,7 +1785,7 @@ export const ur: typeof en = {
   billing: {
     premium: 'پریمیم',
     checkAgain: 'دوبارہ چیک کریں',
-    checkedActive: 'پریمیم چل رہا ہے۔ مزے کریں!',
+    checkedActive: 'آپ کا پلان فعال ہے۔',
     checkedFree: 'اس اکاؤنٹ پر ابھی کوئی پلان فعال نہیں۔',
     renewCta: '{plan} تجدید کریں · {price}',
     fromMonthly: '{price} ماہانہ سے شروع۔ جتنی مدت چاہیں چنیں۔',
@@ -1879,6 +1994,7 @@ export const ur: typeof en = {
     emptyBody: 'پلان، تسلسل اور رپورٹ کارڈ کے بارے میں ہم یہاں یاد دلائیں گے۔',
     paymentTitle: 'ادائیگی موصول ہوئی',
     paymentBody: 'پریمیم {date} تک فعال ہے۔',
+    paymentBodyBasic: 'بیسک {date} تک فعال ہے۔',
     welcomeTitle: 'MatricMate میں خوش آمدید',
     welcomeBody: 'آپ کے نوٹس، پرانے پرچے اور اے آئی ٹیوٹر تیار ہیں۔ کوئی بھی باب کھولیں اور شروع کریں۔',
     reminderTitle: 'آج کچھ نہیں پڑھا',
@@ -1948,7 +2064,13 @@ export const ur: typeof en = {
     tipTitle: '{subject} · امتحانی مشورہ',
     tipTitleGeneral: 'آج کا امتحانی مشورہ',
     trialEndsTitle: 'مفت آزمائش کا آخری دن',
-    trialEndsBody: 'پلان کے ساتھ {subject} کھلا رہے گا، اور باقی ہر مضمون بھی کھل جائے گا۔',
+    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج ختم ہو رہی ہے۔',
+    trialEndedTitle: 'آپ کی مفت آزمائش ختم ہو گئی ہے',
+    trialEndedBody: 'آپ کی پیش رفت محفوظ ہے۔',
+    planEndsTitle: 'آپ کا پلان جلد ختم ہو رہا ہے',
+    planEndsBody: 'یہ {date} کو ختم ہو گا۔',
+    planEndedTitle: 'آپ کا پلان ختم ہو گیا ہے',
+    planEndedBody: 'آپ کی پیش رفت محفوظ ہے۔',
   },
 
   tips: {
@@ -1993,6 +2115,80 @@ export const ur: typeof en = {
 
   email: {
     footer: 'یہ پیغام آپ کو اس لیے ملا کہ آپ کا میٹرک میٹ اکاؤنٹ ہے۔ انہیں پروفائل میں ”اطلاعات“ سے بند کیا جا سکتا ہے۔',
+    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج ختم ہو رہی ہے۔ matricmate.co پر پلان لیں تاکہ {subject} کھلا رہے اور باقی ہر مضمون بھی کھل جائے۔',
+    trialEndedBody: 'آپ کی پیش رفت محفوظ ہے۔ matricmate.co پر پلان لیں اور سب کچھ دوبارہ کھل جائے گا۔',
+    planEndsBody: 'آپ کا پلان {date} کو ختم ہو رہا ہے۔ اس سے پہلے matricmate.co پر تجدید کر لیں تاکہ کچھ بند نہ ہو۔',
+    planEndedBody: 'آپ کا پلان {date} کو ختم ہو گیا۔ آپ کی پیش رفت محفوظ ہے۔ matricmate.co پر تجدید کریں اور سب کچھ دوبارہ کھل جائے گا۔',
+    seePlans: 'پلان دیکھیں',
+    renew: 'پلان کی تجدید کریں',
+    linkNote: 'یہ بٹن آپ کو matricmate.co پر سائن ان کر دیتا ہے۔ یہ 7 دن تک کام کرتا ہے۔',
+  },
+
+  trialStart: {
+    title: 'آپ کی مفت آزمائش ابھی شروع ہوتی ہے',
+    sub: 'ایک مضمون چنیں۔ اس کے ابواب، نوٹس، آڈیو اسباق اور مشق 3 دن کے لیے کھل جائیں گے، اور روز {n} AI سوال۔',
+    pick: 'اپنا مضمون چنیں',
+    confirmTitle: '{subject} 3 دن کے لیے کھولیں؟',
+    confirmBody: 'مفت آزمائش میں ایک مضمون کھلتا ہے، اور بعد میں اسے بدلا نہیں جا سکتا۔',
+    confirmCta: '{subject} سے شروع کریں',
+    none: 'آپ کی کلاس اور بورڈ کے لیے ابھی کسی مضمون کے ابواب نہیں آئے۔ جلد دوبارہ دیکھیں۔',
+    errorNoChapters: 'اس مضمون کے ابواب آپ کی کلاس کے لیے ابھی نہیں آئے۔ کوئی اور چنیں۔',
+    errorOnboarding: 'پہلے اپنی کلاس اور بورڈ چنیں۔',
+  },
+
+  welcomeTrial: {
+    title: 'خوش آمدید، {name}',
+    trialOn: 'آپ کی مفت آزمائش شروع ہو گئی ہے۔ {subject} {date} تک کھلا ہے۔',
+    tipStudy: 'پڑھائی: ابواب کے نوٹس، آڈیو اسباق اور فلیش کارڈز۔',
+    tipPractice: 'مشق: MCQs، مختصر سوالات اور مکمل ٹیسٹ۔',
+    tipAi: 'AI ٹیوٹر: جہاں اٹکیں وہاں کے لیے روز {n} سوال۔',
+    start: '{subject} شروع کریں',
+    dismiss: 'ٹھیک ہے',
+  },
+
+  paused: {
+    trialTitle: 'آپ کی مفت آزمائش ختم ہو گئی ہے',
+    trialBody: '{subject} کے ساتھ آپ کے 3 دن پورے ہو گئے۔',
+    trialBodyNoSubject: 'آپ کے 3 مفت دن پورے ہو گئے۔',
+    planTitle: 'آپ کا پلان ختم ہو گیا ہے',
+    planBody: 'یہ {date} کو ختم ہوا۔',
+    noneTitle: 'آپ کا اکاؤنٹ فعال نہیں ہے',
+    noneBody: 'اس اکاؤنٹ پر ابھی کوئی پلان نہیں ہے۔',
+    saved: 'آپ کی پیش رفت، نمبر اور نوٹس محفوظ ہیں۔ جیسے ہی آپ کا اکاؤنٹ فعال ہو گا، سب کچھ دوبارہ کھل جائے گا۔',
+    stillInactive: 'ابھی بھی فعال نہیں۔',
+    nowActive: 'آپ کا اکاؤنٹ دوبارہ فعال ہے۔',
+    help: 'مدد',
+  },
+
+  access: {
+    lockedTrialBody: 'آپ کی مفت آزمائش میں {subject} کھلا ہے۔',
+    lockedSection: 'مفت آزمائش میں شامل نہیں',
+    lockedNoPlan: 'یہ آپ کا اکاؤنٹ فعال ہونے پر کھلے گا۔',
+    aiTitle: 'AI ٹیوٹر آپ کے پلان میں شامل نہیں',
+    aiBody: 'آپ کے پلان میں ہر باب، نوٹس، آڈیو سبق اور مشق کھلی ہے۔',
+    aiShort: 'آپ کے پلان میں نہیں',
+    activeUntil: '{date} تک فعال',
+    endedOn: '{date} کو ختم ہوا',
+    noPlan: 'کوئی فعال پلان نہیں',
+    trialLine: 'مفت آزمائش · {subject}',
+    checking: 'دیکھ رہے ہیں…',
+    faqPlanQ: 'میرا پلان بدل گیا لیکن ایپ میں پرانا ہی دکھ رہا ہے',
+    faqPlanA: 'پروفائل میں سبسکرپشن کھولیں اور ”دوبارہ دیکھیں“ دبائیں۔ ایپ ہر بار کھلنے پر بھی خود دیکھ لیتی ہے۔',
+    faqAiA: 'AI ٹیوٹر کی روز کی ایک حد ہے، جس سے میٹرک میٹ سب کے لیے سستی رہتی ہے۔ یہ ہر رات نئی ہو جاتی ہے۔',
+  },
+
+  report: {
+    button: 'رپورٹ',
+    title: 'اس جواب کی رپورٹ کریں',
+    sub: 'بتائیں اس میں کیا غلط ہے۔ ہم ہر رپورٹ پڑھتے ہیں۔',
+    wrong: 'یہ غلط ہے',
+    offensive: 'یہ نامناسب یا بدتمیزی والا ہے',
+    unsafe: 'یہ نقصان دہ یا خطرناک ہے',
+    other: 'کچھ اور',
+    notePlaceholder: 'کچھ اور بتانا ہے؟ (اختیاری)',
+    send: 'رپورٹ بھیجیں',
+    sent: 'شکریہ۔ ہم اسے دیکھیں گے۔',
+    failed: 'رپورٹ نہیں گئی۔ دوبارہ کوشش کریں۔',
   },
 
   study: {
@@ -2612,7 +2808,7 @@ export const ur: typeof en = {
 
     paymentsTitle: 'ادائیگیوں کی تاریخ',
     noPaymentsTitle: 'ابھی کوئی ادائیگی نہیں',
-    noPaymentsBody: 'پہلی پریمیم ادائیگی کے بعد رسیدیں یہاں آئیں گی۔',
+    noPaymentsBody: 'آپ کی رسیدیں یہاں آئیں گی۔',
     paidLabel: 'ادا شدہ',
     statusPending: 'مکمل نہیں ہوئی',
     statusFailed: 'ناکام',
@@ -2620,7 +2816,7 @@ export const ur: typeof en = {
     statusCancelled: 'منسوخ',
     receiptLine: '{amount} روپے · پریمیم',
     referenceCopied: 'حوالہ نقل ہو گیا',
-    paymentsFootnote: 'ہر رسید پر Safepay کا حوالہ ہوتا ہے، معاونت سے بات کرتے وقت یہی بتائیں۔',
+    paymentsFootnote: 'ہر رسید پر ایک حوالہ ہوتا ہے، معاونت سے بات کرتے وقت یہی بتائیں۔',
 
     settingsTitle: 'ترتیبات',
     appearance: 'ایپ کی شکل',

@@ -137,22 +137,21 @@ export default function Account() {
                   ? `${t('account.premiumActive')} · ${t(
                       state.premium.plan === 'basic' ? 'billing.planBasic' : state.premium.plan === 'trial' ? 'billing.planTrial' : 'billing.planMonthly',
                     )}`
-                  : t('account.freeMode')}
+                  : t('access.noPlan')}
               </Text>
               <Small>
-                {state.premium.active && state.premium.validTill
-                  ? // A free trial is not renewed at all, manually or otherwise.
-                    t(state.premium.plan === 'trial' ? 'billing.activeTill' : 'account.premiumTill', {
+                {state.premium.validTill
+                  ? t(state.premium.active ? 'access.activeUntil' : 'access.endedOn', {
                       date: formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short' }),
                     })
-                  : t('account.freeModeSub')}
+                  : t('paused.noneBody')}
               </Small>
             </View>
-            {/* No "Upgrade" call to action: Play treats that as steering to an
-                out-of-Play purchase. The row still opens the read-only plan
-                screen, which explains the position without selling anything. */}
+            {/* Status only. No "Upgrade", no website, no renewing: Play treats
+                any of those as steering to an out-of-Play purchase
+                (core/billing.ts). The row opens the read-only plan screen. */}
             <Pill tone={state.premium.active ? 'green' : 'grey'}>
-              {state.premium.active ? t('account.active') : t('billing.statusFree')}
+              {state.premium.active ? t('account.active') : t('account.inactive')}
             </Pill>
           </Row>
         </Card>
@@ -333,15 +332,14 @@ export default function Account() {
         <SectionTitle>{t('account.about')}</SectionTitle>
         <Card flat style={{ paddingVertical: 0 }}>
           <Item title={t('account.help')} icon="help" onPress={() => router.push('/account/help')} />
-          {/* The toast here said legal pages would ship with the landing page.
-              They did. Opening a page with no price and no checkout on it is
-              not selling, so this stays within core/billing.ts. */}
+          {/* ?from=app opens the page without the site's navigation, which
+              reaches the pricing page in a tap or two (core/billing.ts). */}
           <Item
             title={t('account.terms')}
             icon="doc"
             onPress={async () => {
               try {
-                await Linking.openURL(`${SITE_URL}/terms`);
+                await Linking.openURL(`${SITE_URL}/terms?from=app`);
               } catch {
                 toast(t('common.openLinkError'));
               }
@@ -357,7 +355,7 @@ export default function Account() {
             tone="red"
             onPress={async () => {
               try {
-                await Linking.openURL(`${SITE_URL}/delete-account`);
+                await Linking.openURL(`${SITE_URL}/delete-account?from=app`);
               } catch {
                 toast(t('common.openLinkError'));
               }

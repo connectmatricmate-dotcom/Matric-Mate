@@ -5,7 +5,7 @@ import { planIsActive } from '@/lib/entitlement';
 /** Signed-in students only. Everything else is public or handles its own state. */
 // '/r' is deliberately absent: a teacher's referral link has to work for
 // somebody who has never signed in, which is the entire point of it.
-const PROTECTED = ['/dashboard', '/upgrade', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout', '/certificates', '/onboarding', '/admin', '/affiliate'];
+const PROTECTED = ['/dashboard', '/upgrade', '/trial', '/study', '/practice', '/tutor', '/progress', '/learn', '/session', '/insights', '/account', '/notifications', '/checkout', '/certificates', '/onboarding', '/admin', '/affiliate'];
 
 /** Already signed in? These two have nothing left to offer you. */
 const AUTH_ONLY = ['/login', '/signup'];
@@ -19,7 +19,7 @@ const AUTH_ONLY = ['/login', '/signup'];
  * before they are asked for money, and `/checkout` because being sent to the
  * upgrade page while trying to pay is a closed loop.
  */
-const OPEN_WITHOUT_PLAN = ['/upgrade', '/account', '/onboarding', '/checkout'];
+const OPEN_WITHOUT_PLAN = ['/upgrade', '/account', '/onboarding', '/checkout', '/trial'];
 
 /**
  * Inside a protected branch, but public anyway.

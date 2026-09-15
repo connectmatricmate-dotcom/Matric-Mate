@@ -78,13 +78,15 @@ export default function Payments() {
           {receipts.map((r, i) => (
             <Item
               key={r.id}
-              title={t('billing.premium')}
+              // The plan the payment was for, since there are two. No amount:
+              // the app names no price anywhere (core/billing.ts).
+              title={t(r.plan === 'basic' ? 'billing.planBasic' : 'billing.premium')}
               // The footnote tells students to quote the reference to support,
               // so it has to be on the row, readable. It used to live in a
               // two-second toast: gone before anyone could write it down, and
               // invisible to anyone who never thought to tap a receipt.
               sub={[
-                `${formatDate(r.at, lang, { day: 'numeric', month: 'short', year: 'numeric' })} · Rs ${r.amount}`,
+                formatDate(r.at, lang, { day: 'numeric', month: 'short', year: 'numeric' }),
                 r.reference ? t('checkout.reference', { ref: r.reference }) : null,
               ]
                 .filter(Boolean)

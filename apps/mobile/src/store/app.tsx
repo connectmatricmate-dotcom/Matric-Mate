@@ -59,6 +59,7 @@ import {
 } from '@matricmate/core';
 import type { HydratedStudyState } from '@matricmate/core';
 import { setBeforeSignOut, useAuth } from './auth';
+import type { TrialState } from './auth';
 import { session } from './session';
 import { supabase } from '../lib/supabase';
 import { useOnline } from '../core/connectivity';
@@ -195,8 +196,22 @@ export type State = {
   ownerId: string | null;
   user: { id: string; name: string; contact: string } | null;
   onboarding: Onboarding | null;
+  /**
+   * The choices above were made signed out, on the way to creating an account.
+   * They belong to the account created next, so the reset on a change of
+   * account keeps them. Every other choice belongs to the account that made it.
+   */
+  onboardingSignedOut?: boolean;
   /** The plan, from the server (store/auth.tsx). `plan` and `trialSubject` since there are two plans and a trial. */
-  premium: { active: boolean; validTill: number | null; ref?: string; plan?: string | null; trialSubject?: string | null };
+  premium: {
+    active: boolean;
+    validTill: number | null;
+    ref?: string;
+    plan?: string | null;
+    trialSubject?: string | null;
+    /** Whether the free trial is still on offer (store/auth.tsx). */
+    trialState?: TrialState | null;
+  };
   readSections: string[];
   attempts: Attempt[];
   results: TestResult[];
@@ -757,6 +772,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
        */
       const previousOwner = stateRef.current.ownerId;
       const switchedAccount = Boolean(previousOwner) && previousOwner !== uid;
+      /*
+       * Choices made signed out after the previous student left: the class,
+       * board, medium and subjects of the account being created now. The reset
+       * below used to wipe them with everything else, so a new account on a
+       * shared phone had no choices at all, went straight to the dashboard on
+       * the previous student's routing, and was served the default syllabus.
+       */
+      const carried =
+        switchedAccount && uid && stateRef.current.onboardingSignedOut && stateRef.current.onboarding?.subjects?.length
+          ? stateRef.current.onboarding
+          : null;
       if (switchedAccount) {
         // Paid chapters on disk go too. They were bought by the account that
         // is leaving, and the reader does not ask who downloaded them.
@@ -776,9 +802,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         clearContentCache();
         session.clear();
         activeDaySyncedRef.current = null;
-        setState((s) => ({ ...EMPTY, ownerId: uid, settings: devicePrefs(s.settings) }));
+        setState((s) => ({ ...EMPTY, ownerId: uid, settings: devicePrefs(s.settings), ...(carried ? { onboarding: carried } : {}) }));
       } else if (uid) {
-        setState((s) => (s.ownerId === uid ? s : { ...s, ownerId: uid }));
+        // Signed in, so any choices on the phone are this account's from now on.
+        setState((s) => (s.ownerId === uid && !s.onboardingSignedOut ? s : { ...s, ownerId: uid, onboardingSignedOut: false }));
       }
 
       if (!uid) {
@@ -811,7 +838,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // After a change of account the phone has no choices by definition,
         // and stateRef may not have caught up with the reset yet: reading it
         // could hand the previous student's choices to this one's profile.
-        const local = switchedAccount ? null : stateRef.current.onboarding;
+        const local = switchedAccount ? carried : stateRef.current.onboarding;
         const localChose = Boolean(local?.subjects?.length);
         const saved = server.onboarding;
         /*
@@ -1201,6 +1228,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setState((s) => ({
           ...s,
           onboarding,
+          onboardingSignedOut: !syncedForRef.current,
           ...(moved ? { downloads: [], lastChapterId: undefined, lastSectionIndex: 0 } : {}),
         }));
         // Choices follow the account so a reinstall skips this flow. Signed
@@ -1532,8 +1560,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [authUser?.id, authUser?.name, authUser?.email], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const premium = useMemo(
-    () => ({ active: entitlement.active, validTill: entitlement.validTill, plan: entitlement.plan, trialSubject: entitlement.trialSubject }),
-    [entitlement.active, entitlement.validTill, entitlement.plan, entitlement.trialSubject],
+    () => ({
+      active: entitlement.active,
+      validTill: entitlement.validTill,
+      plan: entitlement.plan,
+      trialSubject: entitlement.trialSubject,
+      trialState: entitlement.trialState,
+    }),
+    [entitlement.active, entitlement.validTill, entitlement.plan, entitlement.trialSubject, entitlement.trialState],
   );
   const view = useMemo<State>(
     () => ({

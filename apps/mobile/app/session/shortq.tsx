@@ -16,6 +16,7 @@ import { useApp } from '../../src/store/app';
 import { C, F, S, isRTL, isWeb, textStart } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 import { leaveSet } from '../../src/core/nav';
+import { ReportAi } from '../../src/components/ReportAi';
 
 type Mark = 'got' | 'partial' | 'missed';
 
@@ -245,7 +246,7 @@ export default function ShortQuestions() {
               <Spacer h={S.sm} />
               <Row gap={6}>
                 <Icon name="lock" size={13} color={C.ink3} />
-                <Small style={{ color: C.ink3, flex: 1 }}>{`${t('tutor.checkTitle')} · ${t('aiLock.short')}`}</Small>
+                <Small style={{ color: C.ink3, flex: 1 }}>{`${t('tutor.checkTitle')} · ${t('access.aiShort')}`}</Small>
               </Row>
             </>
           )}
@@ -274,6 +275,7 @@ export default function ShortQuestions() {
                     </View>
                   </>
                 ) : null}
+                <ReportAi surface="check" refId={item?.id} excerpt={verdict.feedback} />
               </Card>
               <Spacer h={S.md} />
             </>

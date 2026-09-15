@@ -19,8 +19,23 @@ const PRODUCT = [
   { href: '/pricing', label: 'Pricing', absolute: true },
 ];
 
-export function SiteFooter({ home = false }: { home?: boolean }) {
+export function SiteFooter({ home = false, bare = false }: { home?: boolean; bare?: boolean }) {
   const to = (l: (typeof PRODUCT)[number]) => (l.absolute || home ? l.href : `/${l.href}`);
+
+  // Opened from the Android app: who we are and how to reach us, no links on
+  // to the rest of the site (see Nav's bare mode for why).
+  if (bare) {
+    return (
+      <footer data-chrome className="border-t border-line bg-card">
+        <div className="mx-auto flex max-w-[1100px] flex-col gap-1.5 px-5 py-8 text-mk-small text-ink2">
+          <p>
+            {BUSINESS.name} · <span className="wrap-anywhere">{SUPPORT_EMAIL}</span>
+          </p>
+          <p className="text-ink3">© {new Date().getFullYear()} MatricMate</p>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     // data-chrome keeps the footer off paper: see the print rules in globals.css.

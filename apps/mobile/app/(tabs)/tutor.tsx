@@ -21,7 +21,7 @@ import {
   TileGrid,
   Tiny,
 } from '../../src/components/ui';
-import { BILLING_SITE, chapterName, formatDate } from '@matricmate/core';
+import { chapterName, formatDate } from '@matricmate/core';
 import { supabase } from '../../src/lib/supabase';
 import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
@@ -112,7 +112,7 @@ function Tutor() {
           /* An account with no plan has no allowance to draw a ring around.
              "0/0" read as a used-up plan, which is the opposite of the truth. */
           limit === 0 ? (
-            <Pill tone="grey">{t('billing.statusFree')}</Pill>
+            <Pill tone="grey">{t('access.aiShort')}</Pill>
           ) : (
             <Ring pct={usedPct} size={46} stroke={6} color={low ? C.orange : C.teal}>
               {/* Shrinks to the 34dp inside the stroke rather than crossing it,
@@ -205,10 +205,9 @@ function Tutor() {
         <>
           <Spacer h={S.md} />
           <Card flat tint={C.tealTint} border={C.teal}>
-            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.ink }}>{t('tutor.noPlanTitle')}</Text>
+            {/* What is true, and nothing about where to get more: see core/billing.ts. */}
+            <Text style={{ fontFamily: F.bodyBold, fontSize: 13.5, color: C.ink }}>{t('access.aiTitle')}</Text>
             <Small style={{ marginTop: 2 }}>{t('tutor.noPlanBody')}</Small>
-            {/* Plain text, never tappable: see core/billing.ts. */}
-            <Small style={{ marginTop: 4 }}>{t('billing.manageNote', { site: BILLING_SITE })}</Small>
           </Card>
         </>
       ) : left === 0 ? (

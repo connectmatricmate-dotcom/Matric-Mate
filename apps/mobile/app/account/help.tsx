@@ -7,10 +7,14 @@ import { useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
 import { C, F, S, isRTL, rowDir } from '../../src/theme';
 
+/*
+ * No question here is about buying or renewing: the app may not tell anyone
+ * how or where to pay (core/billing.ts). The website's help keeps those.
+ */
 const FAQ: [StringKey, StringKey][] = [
-  ['account.faq1Q', 'account.faq1A'],
+  ['access.faqPlanQ', 'access.faqPlanA'],
   ['account.faq2Q', 'account.faq2A'],
-  ['account.faq3Q', 'account.faq3A'],
+  ['account.faq3Q', 'access.faqAiA'],
   ['account.faq4Q', 'account.faq4A'],
 ];
 

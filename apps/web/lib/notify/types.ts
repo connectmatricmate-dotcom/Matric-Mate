@@ -88,6 +88,19 @@ export type Notice = {
    * adapters.
    */
   also?: Exclude<Channel, 'inbox' | 'push'>[];
+  /**
+   * The email's own wording and button, when it needs more than the inbox
+   * line. The inbox and the push notification are shown by the app, where
+   * nothing may point at paying outside Google Play (core/billing.ts); an email
+   * is outside the app and can say where to renew, with a button that signs
+   * the student in (lib/signin-link.ts). Interpolated with `params` too.
+   */
+  email?: {
+    body?: StringKey;
+    action?: { label: StringKey; href: string };
+    /** A small line under the button. */
+    note?: StringKey;
+  };
 };
 
 /** Everything a channel needs to know about who it is writing to. */

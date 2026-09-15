@@ -190,7 +190,7 @@ export default function ChapterHub() {
             <Spacer h={S.md} />
           </>
         )}
-        <LockedNotice variant="locked" />
+        <LockedNotice />
       </Screen>
     );
   }
@@ -401,7 +401,7 @@ export default function ChapterHub() {
         {online ? (
           <Item
             title={t('tutor.sheetMake')}
-            sub={derived.access.ai ? t('tutor.aiMade') : t('aiLock.short')}
+            sub={derived.access.ai ? t('tutor.aiMade') : t('access.aiShort')}
             icon="spark"
             onPress={() => router.push(`/learn/sheet/${id}`)}
           />

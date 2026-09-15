@@ -36,6 +36,7 @@ import { C, F, R, S, isWeb, rowDir, textStart, urdu } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 import { useQuota } from '../../src/core/useQuota';
 import { AiLocked } from '../../src/components/AiLocked';
+import { ReportAi } from '../../src/components/ReportAi';
 
 /** The longest side of a photo sent to the tutor: the size Claude reads images
  *  at best, and a few hundred kilobytes once saved at 70%. */
@@ -705,6 +706,8 @@ function Chat() {
                 >
                   👎
                 </Pill>
+                {/* Google Play: every AI answer can be reported in the app. */}
+                <ReportAi variant="pill" surface="tutor" refId={m.id} excerpt={parseTutorActions(m.text, false, lang).text} />
                 {/* Only when the answer is NOT already Urdu: asking for
                     Urdu on an Urdu reply spends a question for nothing. */}
                 {isUrduScript(m.text) ? null : (

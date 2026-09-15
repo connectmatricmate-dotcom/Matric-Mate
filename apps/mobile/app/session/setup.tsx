@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Skeleton, Small, Spacer, useToast } from '../../src/components/ui';
+import { Btn, Card, Check, Header, Item, Pill, Screen, SectionTitle, Seg, Skeleton, Small, useToast } from '../../src/components/ui';
 import { api, chapterById, chapterName, subjectById, subjectName } from '@matricmate/core';
 import { useOnline } from '../../src/core/connectivity';
 import { useAsync } from '../../src/core/useAsync';
@@ -229,8 +229,6 @@ export default function SessionSetup() {
           { value: '50', label: '50' },
         ]}
       />
-      <Spacer h={S.md} />
-      <Small>{state.premium.active ? t('session.premiumActive') : t('session.premiumNote')}</Small>
     </Screen>
   );
 }

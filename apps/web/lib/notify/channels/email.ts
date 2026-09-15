@@ -20,8 +20,8 @@ import type { ChannelAdapter } from '../types';
  * The from-address must be on a domain verified in Resend, which means SPF,
  * DKIM and DMARC records. In Cloudflare each must be "DNS only" rather than
  * proxied, or authentication fails quietly and the mail lands in spam with no
- * error anywhere. Until that is done the test sender only reaches the Resend
- * account owner, so this channel is effectively off for real students.
+ * error anywhere. matricmate.co is verified (a send from no-reply@ was
+ * accepted, 15 Sep 2026), so this reaches real students.
  */
 
 const apiKey = () => process.env.RESEND_API_KEY ?? '';
@@ -38,7 +38,7 @@ const esc = (s: string) =>
  * and Gmail strips a <style> block outright. Table-free and single-column, so
  * it survives Outlook without a layout table.
  */
-function shell(lang: Language, heading: string, body: string, action?: { label: string; href: string }): string {
+function shell(lang: Language, heading: string, body: string, action?: { label: string; href: string }, note?: string): string {
   const rtl = lang === 'ur';
   const dir = rtl ? 'rtl' : 'ltr';
   const font = rtl
@@ -63,6 +63,7 @@ function shell(lang: Language, heading: string, body: string, action?: { label: 
              </p>`
           : ''
       }
+      ${note ? `<p style="margin:10px 0 0;font-size:12px;color:${colors.ink3}">${esc(note)}</p>` : ''}
     </div>
   </div>
   <p style="max-width:560px;margin:14px auto 0;font-size:11.5px;color:${colors.ink3};text-align:${rtl ? 'right' : 'left'}">
@@ -84,7 +85,9 @@ export const email: ChannelAdapter = {
     if (!to.email) return 'skipped';
 
     const subject = translate(to.lang, notice.title, notice.params);
-    const body = translate(to.lang, notice.body, notice.params);
+    const body = translate(to.lang, notice.email?.body ?? notice.body, notice.params);
+    const action = notice.email?.action ? { label: translate(to.lang, notice.email.action.label, notice.params), href: notice.email.action.href } : undefined;
+    const note = notice.email?.note ? translate(to.lang, notice.email.note, notice.params) : undefined;
 
     try {
       const res = await fetch('https://api.resend.com/emails', {
@@ -100,10 +103,10 @@ export const email: ChannelAdapter = {
            */
           reply_to: SUPPORT_EMAIL,
           subject,
-          html: shell(to.lang, subject, body),
+          html: shell(to.lang, subject, body, action, note),
           // A plain-text part as well, so a client that refuses HTML still
           // shows something, and so spam filters see a complete message.
-          text: `${subject}\n\n${body}\n`,
+          text: `${subject}\n\n${body}\n${action ? `\n${action.label}: ${action.href}\n` : ''}${note ? `${note}\n` : ''}`,
         }),
       });
       if (!res.ok) {

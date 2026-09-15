@@ -6,7 +6,7 @@ import { boardName, type Board } from '@matricmate/core';
 import { Confirm } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useLang, useT } from '@/lib/store';
-import { ChoiceCard, StepScreen } from './StepScreen';
+import { ChoiceCard, StepScreen, useAutoStep } from './StepScreen';
 import { goBackTo } from '@/lib/nav-trail';
 
 export function ChooseBoard({ edit = false }: { edit?: boolean }) {
@@ -52,9 +52,26 @@ export function ChooseBoard({ edit = false }: { edit?: boolean }) {
     else router.replace(next);
   };
 
+  /** Nothing chosen on the account yet: a click is the answer (StepScreen auto). */
+  const firstRun = !edit && !current;
+  const auto = useAutoStep<Board>(firstRun, synced, async (v) => {
+    if (!(await actions.setOnboarding({ board: v }))) {
+      toast(t('states.errorBody'));
+      return;
+    }
+    router.replace(next);
+  });
+  const going = auto.going;
+  const pick = (v: Board) => {
+    setPicked(v);
+    auto.pick(v);
+  };
+
   return (
     <>
       <StepScreen
+        auto={firstRun}
+        busy={going}
         step={2}
         title={t('onboarding.boardTitle')}
         sub={t('onboarding.boardSub')}
@@ -79,13 +96,13 @@ export function ChooseBoard({ edit = false }: { edit?: boolean }) {
           title={t('onboarding.fbise')}
           sub={t('onboarding.fbiseSub')}
           selected={value === 'fbise'}
-          onClick={() => setPicked('fbise')}
+          onClick={() => pick('fbise')}
         />
         <ChoiceCard
           title={t('onboarding.punjab')}
           sub={t('onboarding.punjabSub')}
           selected={value === 'punjab'}
-          onClick={() => setPicked('punjab')}
+          onClick={() => pick('punjab')}
         />
       </StepScreen>
 

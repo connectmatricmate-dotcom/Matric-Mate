@@ -90,7 +90,7 @@ export const hasActivePlan = cache(async (): Promise<boolean> => {
  * out, check whether a payment landed, and read their receipts. Locking those
  * away turns a paywall into a support ticket.
  */
-const OPEN_WITHOUT_PLAN = ['/upgrade', '/account'];
+const OPEN_WITHOUT_PLAN = ['/upgrade', '/account', '/trial'];
 
 export function isOpenWithoutPlan(pathname: string): boolean {
   // An unknown path is treated as open. The pathname arrives as a header set

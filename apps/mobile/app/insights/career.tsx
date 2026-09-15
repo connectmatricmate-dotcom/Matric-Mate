@@ -10,6 +10,7 @@ import { useAsync } from '../../src/core/useAsync';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, F, S, rowDir } from '../../src/theme';
+import { ReportAi } from '../../src/components/ReportAi';
 
 /**
  * AI, so not in Basic: the lock in its place (see AiLocked). Decided before
@@ -154,7 +155,7 @@ function Career() {
                 ))}
               </Card>
 
-              <Spacer h={S.md} />
+              <ReportAi surface="career" excerpt={report.summary} />
               <Small>{t('career.disclaimer')}</Small>
               <Spacer h={S.sm} />
               {career.nextAt ? (

@@ -21,10 +21,12 @@ export const metadata: Metadata = {
  * spells out how to ask and how long it takes; what it does not forgive is a
  * page describing a button that is not there.
  */
-export default function DeleteAccountPage() {
+export default async function DeleteAccountPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+  // The Android app opens this with ?from=app: no navigation on to pricing.
+  const bare = (await searchParams).from === 'app';
   return (
     <>
-      <Nav />
+      <Nav bare={bare} />
 
       <main className="mx-auto max-w-[720px] px-5 py-14">
         <h1 className="font-display text-mk-h1 text-ink">Delete your account</h1>
@@ -95,7 +97,7 @@ export default function DeleteAccountPage() {
         </p>
       </main>
 
-      <SiteFooter />
+      <SiteFooter bare={bare} />
     </>
   );
 }

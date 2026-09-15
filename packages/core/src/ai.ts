@@ -338,20 +338,6 @@ export async function fetchVoiceStream(chapterId: string, medium: 'en' | 'ur', a
 }
 
 /**
- * A one-time link that opens the website already signed in, on the upgrade
- * page. The Android app can only be consumed from, not bought in, so this
- * exists so a student does not have to sign in a second time on a phone
- * keyboard just to pay.
- *
- * Returns null rather than throwing: a student who cannot get a link should
- * still see the plain address they can type, not an error.
- */
-export async function fetchUpgradeLink(): Promise<string | null> {
-  const res = await aiPost<{ url?: string }>('/api/upgrade-link', {});
-  return res.ok ? (res.data.url ?? null) : null;
-}
-
-/**
  * The student's latest coach report, if the nightly job has written one.
  *
  * A read, not a generation: null simply means there is nothing to say yet,
@@ -375,6 +361,37 @@ export async function fetchLatestCoachReport(): Promise<CoachReport | null> {
  * Fire and forget by design: a rating that fails to save must not interrupt
  * the conversation, and the student has already been thanked.
  */
+/** Where a reported AI answer was shown. Matches ai_reports.surface (migration 0045). */
+export type AiReportSurface = 'tutor' | 'ai_test' | 'paper' | 'sheet' | 'career' | 'coach' | 'check';
+export type AiReportReason = 'wrong' | 'offensive' | 'unsafe' | 'other';
+
+/**
+ * A student reporting an AI answer, from inside either app.
+ *
+ * Google Play requires every app that generates content with AI to let people
+ * report offensive output without leaving the app. The report is a row the
+ * admin panel lists; the answer itself goes with it (cut short), because the
+ * conversation it came from may be deleted by then. Unlike a rating, this one
+ * reports failure: the student is told whether it went.
+ */
+export async function reportAiAnswer(
+  client: SyncClient,
+  input: { surface: AiReportSurface; reason: AiReportReason; ref?: string | null; excerpt?: string | null; note?: string | null },
+): Promise<boolean> {
+  try {
+    const { error } = await client.from('ai_reports').insert({
+      surface: input.surface,
+      reason: input.reason,
+      ref: input.ref ? String(input.ref).slice(0, 120) : null,
+      excerpt: input.excerpt ? input.excerpt.slice(0, 2000) : null,
+      note: input.note?.trim() ? input.note.trim().slice(0, 500) : null,
+    });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
 export async function rateTutorAnswer(
   client: SyncClient,
   input: { messageId: string; userId: string; rating: 'up' | 'down' },

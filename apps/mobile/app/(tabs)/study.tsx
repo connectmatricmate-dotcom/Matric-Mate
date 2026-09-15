@@ -177,7 +177,7 @@ export default function Study() {
 
       {locked?.length && !q.trim() ? (
         <>
-          <SectionTitle>{t('trial.lockedSection')}</SectionTitle>
+          <SectionTitle>{t('access.lockedSection')}</SectionTitle>
           <View style={{ gap: S.sm }}>
             {locked.map((s) => (
               <Card key={s.id} flat onPress={() => router.push(`/learn/subject/${s.id}`)} style={{ opacity: 0.75 }}>

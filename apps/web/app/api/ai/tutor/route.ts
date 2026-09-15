@@ -464,6 +464,12 @@ export async function POST(req: NextRequest) {
     `- Study medium: ${medium === 'ur' ? 'Urdu' : 'English'}`,
     `- Answer them in this language: ${languageRule(answerIn, grade, board)}`,
     profile.subjects?.length ? `- Their subjects: ${profile.subjects.join(', ')}` : null,
+    /* A free trial opens one subject. A question from a chapter is checked
+       above; a question typed with no chapter can only be steered, so the
+       tutor is told the limit and how to say it. */
+    access.trialSubject
+      ? `- They are on a free trial that opens one subject only: ${access.trialSubject}. Help with that subject. If they ask about any other subject, say kindly in one sentence that their free trial opens ${access.trialSubject} only, and offer to help with it instead. Do not mention prices, plans or how to pay.`
+      : null,
     /* Their weak topics used to be listed here, three of them, chosen by the
        client and pushed into every question whether it needed them or not.
        get_weak_topics answers the same thing on demand, from the whole record

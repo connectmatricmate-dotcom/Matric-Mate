@@ -46,16 +46,23 @@ export function homeFor(role: Role): string {
  */
 export async function landingFor(role: Role): Promise<string> {
   if (role !== 'student') return homeFor(role);
+  // Setup first: the trial is picked from the subjects chosen there.
+  const { unfinishedStep } = await import('@/lib/setup');
+  const step = await unfinishedStep();
+  if (step) return `/onboarding/${step}`;
   const { hasActivePlan } = await import('@/lib/entitlement');
   // hasActivePlan throws when the entitlement read fails rather than calling
   // the student unpaid. Signing in should not end on an error page for that:
   // send them to the dashboard, where the (app) layout asks again and shows
   // its own error with a retry if the database is still not answering.
   try {
-    return (await hasActivePlan()) ? '/dashboard' : '/upgrade';
+    if (await hasActivePlan()) return '/dashboard';
   } catch {
     return '/dashboard';
   }
+  // No plan: a new account starts its free trial, anyone else goes to the plans.
+  const { data } = await (await createClient()).rpc('trial_state');
+  return data === 'eligible' ? '/trial' : '/upgrade';
 }
 
 /**

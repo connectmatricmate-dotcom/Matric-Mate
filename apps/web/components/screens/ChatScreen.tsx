@@ -14,6 +14,7 @@ import { quotaClock, useTutorQuota } from '@/lib/use-tutor-quota';
 import { ChapterPicker } from '@/components/ui/ChapterPicker';
 import { canGoBack } from '@/lib/nav-trail';
 import { useRouter } from 'next/navigation';
+import { ReportAi } from '@/components/app/ReportAi';
 
 /**
  * The buttons the tutor can put under an answer.
@@ -530,6 +531,8 @@ export function ChatScreen({
                 >
                   <Icon name="thumbsDown" size={16} strokeWidth={2.2} />
                 </button>
+                {/* Google Play: every AI answer can be reported in the app. */}
+                <ReportAi variant="pill" surface="tutor" refId={m.id} excerpt={m.text} />
                 {/* Only offered when the answer is NOT already in Urdu:
                     asking for Urdu on an Urdu reply spends a question to
                     get the same thing back. */}

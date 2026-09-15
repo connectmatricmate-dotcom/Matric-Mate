@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/toast';
 import { GRADE_10_READY } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/client';
 import { useApp, useT } from '@/lib/store';
-import { ChoiceCard, StepScreen } from './StepScreen';
+import { ChoiceCard, StepScreen, useAutoStep } from './StepScreen';
 
 /** How long a class change may be corrected without the cooldown. Migration 0014. */
 const CORRECTION_MS = 30 * 60 * 1000;
@@ -81,9 +81,26 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
     }
   };
 
+  /** Nothing chosen on the account yet: a click is the answer (StepScreen auto). */
+  const firstRun = !edit && !current;
+  const auto = useAutoStep<9 | 10>(firstRun, synced, async (v) => {
+    if (!(await actions.setOnboarding({ classLevel: v }))) {
+      toast(t('states.errorBody'));
+      return;
+    }
+    router.replace(next);
+  });
+  const going = auto.going;
+  const pick = (v: 9 | 10) => {
+    setPicked(v);
+    auto.pick(v);
+  };
+
   return (
     <>
       <StepScreen
+        auto={firstRun}
+        busy={going}
         step={1}
         title={t('onboarding.classTitle')}
         sub={t('onboarding.classSub')}
@@ -112,7 +129,7 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
           title={t('onboarding.class9')}
           sub={t('onboarding.class9Sub')}
           selected={value === 9}
-          onClick={() => setPicked(9)}
+          onClick={() => pick(9)}
         />
         {/* Class 10 is a real choice the day its catalogue ships. Hardcoding
             the card shut meant a Class 10 student had to sign up as Class 9
@@ -123,7 +140,7 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
           selected={value === 10}
           disabled={!GRADE_10_READY}
           disabledLabel={GRADE_10_READY ? undefined : t('onboarding.comingSoon')}
-          onClick={() => (GRADE_10_READY ? setPicked(10) : toast(t('onboarding.class10Toast')))}
+          onClick={() => (GRADE_10_READY ? pick(10) : toast(t('onboarding.class10Toast')))}
         />
       </StepScreen>
 

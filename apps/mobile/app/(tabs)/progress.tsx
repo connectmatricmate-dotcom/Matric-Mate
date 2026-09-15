@@ -235,7 +235,7 @@ function CareerCard() {
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14, color: C.ink }}>{t('career.title')}</Text>
-          <Small>{derived.access.ai ? t('career.cardSub') : t('aiLock.short')}</Small>
+          <Small>{derived.access.ai ? t('career.cardSub') : t('access.aiShort')}</Small>
         </View>
         <Icon name={derived.access.ai ? 'chevron' : 'lock'} size={18} color={C.ink3} />
       </Row>

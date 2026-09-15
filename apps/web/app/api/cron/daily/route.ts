@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { daysLeft, subjectMedium, translate } from '@matricmate/core';
+import { subjectMedium, translate } from '@matricmate/core';
 import type { Language } from '@matricmate/core';
 import { planIsActive, planIsPaid } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { examTip, notify, recall, trialEnding } from '@/lib/notify';
+import { examTip, notify, recall } from '@/lib/notify';
 import type { Notice, Recipient } from '@/lib/notify';
 import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry } from '@/lib/notify/jobs';
 
@@ -154,7 +154,6 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
      ends, so the last afternoon can say so. */
   const trials = plans.filter((e) => planIsActive(e) && e.plan === 'trial' && e.trial_subject);
   const trialOf = new Map(trials.map((e) => [e.user_id, e.trial_subject as string]));
-  const trialEndsOf = new Map(trials.map((e) => [e.user_id, Date.parse(e.valid_till as string)]));
   const studiedByUser = new Map<string, Set<string>>();
   for (const r of studied) studiedByUser.set(r.user_id, (studiedByUser.get(r.user_id) ?? new Set()).add(r.chapter_id));
   const subjectById = new Map(subjects.map((r) => [r.id, r]));
@@ -199,11 +198,8 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
       // Cards for any plan, the trial included now its subject is the one they come from.
       const withCards = paying.has(profile.id) || !!trial;
 
-      // A trial's last afternoon: that it ends, rather than a tip.
-      if (trial && subjectLabel && daysLeft(trialEndsOf.get(profile.id) ?? null, now.getTime()) <= 1) {
-        notice = trialEnding(subjectLabel);
-      }
-
+      // A trial's last day is told by the plans job (/api/cron/plans), once,
+      // whatever the study-reminder setting; here it is a day like any other.
       // Every other day a flashcard, for a student with a plan and a subject to draw from.
       if (!notice && withCards && subjectId && turn % 2 === 0) {
         const inSubject = ownChapters.filter((c) => c.subject_id === subjectId).sort((a, b) => a.number - b.number);

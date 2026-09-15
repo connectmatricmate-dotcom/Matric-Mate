@@ -36,6 +36,14 @@ export default function ChooseBoard() {
     if (editing) router.dismissTo('/account/edit');
     else router.push('/onboarding/medium');
   };
+  /** Nothing chosen on the account yet: a tap is the answer (StepScreen auto). */
+  const firstRun = !editing && !current;
+  const pick = (v: Board) => {
+    setValue(v);
+    if (!firstRun) return;
+    actions.setOnboarding({ board: v });
+    setTimeout(forward, 180);
+  };
 
   const change = () => {
     if (switching) return;
@@ -59,6 +67,7 @@ export default function ChooseBoard() {
         title={t('onboarding.boardTitle')}
         sub={t('onboarding.boardSub')}
         cta={t('common.continue')}
+        auto={firstRun}
         onNext={() => {
           if (current && value !== current) {
             setConfirming(true);
@@ -73,13 +82,13 @@ export default function ChooseBoard() {
           title={t('onboarding.fbise')}
           sub={t('onboarding.fbiseSub')}
           selected={value === 'fbise'}
-          onPress={() => setValue('fbise')}
+          onPress={() => pick('fbise')}
         />
         <ChoiceCard
           title={t('onboarding.punjab')}
           sub={t('onboarding.punjabSub')}
           selected={value === 'punjab'}
-          onPress={() => setValue('punjab')}
+          onPress={() => pick('punjab')}
         />
       </StepScreen>
 

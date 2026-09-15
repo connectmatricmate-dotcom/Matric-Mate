@@ -24,6 +24,8 @@ export const config = {
     '/dashboard',
     '/upgrade/:path*',
     '/upgrade',
+    '/trial/:path*',
+    '/trial',
     '/study/:path*',
     '/study',
     '/practice/:path*',

@@ -29,9 +29,35 @@ export type Entitlement = {
   trialSubject: string | null;
   /** This account has had its free trial, so the offer is not shown again. */
   trialUsed: boolean;
+  /**
+   * Whether this account can still start the free trial, as the database
+   * decides it (trial_state(), migration 0045): 'eligible' goes to the trial
+   * screen when there is no plan, anything else to the paused screen. Null
+   * until it has been read.
+   */
+  trialState: TrialState | null;
 };
 
-const NONE: Entitlement = { active: false, validTill: null, plan: null, trialSubject: null, trialUsed: false };
+export type TrialState = 'eligible' | 'used' | 'no';
+
+const NONE: Entitlement = { active: false, validTill: null, plan: null, trialSubject: null, trialUsed: false, trialState: null };
+
+/** A timer this far ahead is not worth holding: the app is re-checked on every return to the front anyway. */
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Running means an end date still ahead. A row with no end date is not a
+ * plan, the same reading as the database (has_active_plan, 0045) and the
+ * website (planIsActive).
+ */
+const running = (active: unknown, till: number | null) => Boolean(active) && till !== null && till > Date.now();
+
+/** What the server said, or the same answer worked out from the row when the call failed. */
+const trialStateFrom = (fromServer: unknown, row: { plan?: string | null; trial_used_at?: string | null } | null): TrialState => {
+  if (fromServer === 'eligible' || fromServer === 'used' || fromServer === 'no') return fromServer;
+  if (row?.trial_used_at) return 'used';
+  return row?.plan ? 'no' : 'eligible';
+};
 
 /**
  * How long a plan we cannot re-check stays trusted.
@@ -125,8 +151,19 @@ async function readCachedEntitlement(userId: string): Promise<Entitlement | null
   try {
     const { cachedAt, ...rest } = JSON.parse(raw) as CachedEntitlement;
     if (!cachedAt || Date.now() - cachedAt > OFFLINE_GRACE_MS) return null;
-    // A cache written before the trial existed has neither field.
-    return { ...rest, trialSubject: rest.trialSubject ?? null, trialUsed: !!rest.trialUsed };
+    /*
+     * The end date still counts offline. The grace window is for a plan that
+     * cannot be re-checked, not for one that has ended: a cached "active" used
+     * to keep a finished plan's downloads open for up to a month.
+     * A cache written before the trial existed has neither trial field.
+     */
+    return {
+      ...rest,
+      active: running(rest.active, rest.validTill ?? null),
+      trialSubject: rest.trialSubject ?? null,
+      trialUsed: !!rest.trialUsed,
+      trialState: rest.trialState ?? null,
+    };
   } catch {
     return null;
   }
@@ -265,14 +302,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
        * Giving up after eight seconds falls through to the cached value, which
        * is the same path an outright error takes.
        */
-      const { data, error } = await Promise.race([
-        supabase
-          .from('entitlements')
-          .select('active, plan, valid_till, trial_subject, trial_used_at')
-          .eq('user_id', userId)
-          .maybeSingle(),
-        new Promise<{ data: null; error: { message: string } }>((resolve) =>
-          setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), ENTITLEMENT_TIMEOUT_MS),
+      type Row = { active: boolean | null; plan: string | null; valid_till: string | null; trial_subject: string | null; trial_used_at: string | null };
+      type Read = [{ data: Row | null; error: { message: string } | null }, { data: unknown; error: unknown }];
+      const [{ data, error }, trial] = await Promise.race<Read>([
+        Promise.all([
+          supabase
+            .from('entitlements')
+            .select('active, plan, valid_till, trial_subject, trial_used_at')
+            .eq('user_id', userId)
+            .maybeSingle(),
+          // Whether the trial is still on offer, beside the row, in the same wait.
+          supabase.rpc('trial_state'),
+        ]) as unknown as Promise<Read>,
+        new Promise<Read>((resolve) =>
+          setTimeout(
+            () => resolve([{ data: null, error: { message: 'timeout' } }, { data: null, error: { message: 'timeout' } }]),
+            ENTITLEMENT_TIMEOUT_MS,
+          ),
         ),
       ]);
 
@@ -305,11 +351,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
        * and a student should not keep premium because a cron job does not exist.
        */
       const next: Entitlement = {
-        active: Boolean(data?.active) && (till === null || till > Date.now()),
+        active: running(data?.active, till),
         validTill: till,
         plan: data?.plan ?? null,
         trialSubject: data?.trial_subject ?? null,
         trialUsed: Boolean(data?.trial_used_at),
+        trialState: trialStateFrom(trial.error ? null : trial.data, data),
       };
       setEntitlement(next);
       await AsyncStorage.setItem(cacheKey(userId), JSON.stringify({ ...next, cachedAt: Date.now() }));
@@ -438,6 +485,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     return () => sub.remove();
   }, [loadEntitlement]);
+
+  /**
+   * A plan that ends while the app is open ends on screen too.
+   *
+   * Nothing re-read the plan at its end time, so the tabs stayed up after a
+   * trial's last minute while the database had already stopped handing over
+   * its content: the chapter screens filled with errors instead of locks. At
+   * the end time the plan is marked ended here and read again, and the tab
+   * gate moves the student to the paused screen.
+   */
+  useEffect(() => {
+    if (!entitlement.active || !entitlement.validTill) return;
+    const ms = entitlement.validTill - Date.now();
+    if (ms > DAY_MS) return;
+    const till = entitlement.validTill;
+    const timer = setTimeout(() => {
+      setEntitlement((e) => (e.validTill === till ? { ...e, active: false } : e));
+      const id = currentUserId.current;
+      if (id) void loadEntitlement(id);
+    }, Math.max(ms, 0) + 1000);
+    return () => clearTimeout(timer);
+  }, [entitlement.active, entitlement.validTill, loadEntitlement]);
 
   const value = useMemo<Ctx>(() => {
     const authUser: AuthUser | null = session?.user

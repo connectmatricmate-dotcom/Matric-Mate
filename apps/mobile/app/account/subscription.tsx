@@ -1,8 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { AI_QUOTA, formatDate, subjectById, subjectName } from '@matricmate/core';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
-import { LockedNotice } from '../../src/components/LockedNotice';
 import { Btn, Card, Header, Item, Pill, Row, Screen, SectionTitle, Small, Spacer, Text, useToast } from '../../src/components/ui';
 import { useLang, useT } from '../../src/i18n';
 import type { StringKey } from '../../src/i18n';
@@ -18,25 +18,21 @@ const PERKS: [IconName, StringKey][] = [
   ['download', 'billing.perk5'],
 ];
 
-/** Basic's list, and the AI that Premium adds to it (see accessFor in core). */
+/** Basic's own list: what the plan the student holds opens (see accessFor in core). */
 const BASIC_PERKS: [IconName, StringKey][] = [
   ['book', 'plans.basicPerk1'],
   ['target', 'plans.basicPerk2'],
   ['chart', 'plans.basicPerk3'],
   ['download', 'plans.basicPerk4'],
 ];
-const PREMIUM_EXTRAS: [IconName, StringKey][] = [
-  ['spark', 'plans.premiumPerk2'],
-  ['check', 'plans.premiumPerk3'],
-  ['quill', 'plans.premiumPerk4'],
-];
 
 /** The plan's name for the status line; the stored id can still be a retired length on an old row. */
 const PLAN_KEY: Record<string, StringKey> = { basic: 'billing.planBasic', trial: 'billing.planTrial', quarter: 'billing.planQuarter', year: 'billing.planYear' };
 
 /**
- * Read-only. The app may show what a student's plan includes, but never sell,
- * price, or link to a purchase, see core/billing.ts.
+ * The student's own plan: what it is, until when, and what it opens. Nothing
+ * about other plans, prices, renewing or where plans are bought, which Google
+ * Play would read as leading the student to pay outside Play (core/billing.ts).
  */
 export default function Subscription() {
   const { state, derived } = useApp();
@@ -48,6 +44,13 @@ export default function Subscription() {
   const tier = derived.access.tier;
   const planLabel = active ? t(PLAN_KEY[state.premium.plan ?? ''] ?? 'billing.planMonthly') : '';
   const trialSubject = tier === 'trial' ? subjectName(subjectById(derived.access.trialSubject ?? ''), lang) || derived.access.trialSubject || '' : '';
+  const date = state.premium.validTill ? formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  // After "Check again" the answer is whatever the re-read found, not what
+  // this render held before it: the toast used to report the old state.
+  const activeNow = useRef(active);
+  useEffect(() => {
+    activeNow.current = active;
+  }, [active]);
 
   return (
     <Screen>
@@ -58,86 +61,32 @@ export default function Subscription() {
           <Text style={{ fontSize: 24 }}>{active ? '👑' : '🔓'}</Text>
           <View style={{ flex: 1 }}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>
-              {active ? [t('billing.statusActive'), planLabel, trialSubject].filter(Boolean).join(' · ') : t('billing.statusFree')}
+              {active ? [t('billing.statusActive'), planLabel, trialSubject].filter(Boolean).join(' · ') : t('access.noPlan')}
             </Text>
-            <Small>
-              {active && state.premium.validTill
-                ? t('billing.activeTill', {
-                    date: formatDate(state.premium.validTill, lang, {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    }),
-                  })
-                : t('billing.freeBody')}
-            </Small>
+            <Small>{date ? t(active ? 'access.activeUntil' : 'access.endedOn', { date }) : t('paused.noneBody')}</Small>
           </View>
           <Pill tone={active ? 'green' : 'grey'}>{active ? t('account.active') : t('account.inactive')}</Pill>
         </Row>
       </Card>
 
-      {tier === 'basic' ? (
-        <>
-          <SectionTitle>{t('plans.basicIncludes')}</SectionTitle>
-          <Card flat>
-            <View style={{ gap: S.md }}>
-              {BASIC_PERKS.map(([icon, key]) => (
-                <Row key={key} gap={S.md}>
-                  <Icon name={icon} size={18} color={C.teal} />
-                  <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14, lineHeight: 21, color: C.ink }}>{t(key)}</Text>
-                  <Icon name="check" size={16} color={C.green} strokeWidth={2.6} />
-                </Row>
-              ))}
-            </View>
-          </Card>
-          <SectionTitle>{t('plans.notInBasic')}</SectionTitle>
-          <Card flat>
-            <View style={{ gap: S.md }}>
-              {PREMIUM_EXTRAS.map(([icon, key]) => (
-                <Row key={key} gap={S.md}>
-                  <Icon name={icon} size={18} color={C.ink3} />
-                  <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14, lineHeight: 21, color: C.ink2 }}>{t(key, { n: AI_QUOTA.premium })}</Text>
-                  <Icon name="lock" size={15} color={C.ink3} />
-                </Row>
-              ))}
-            </View>
-          </Card>
-        </>
-      ) : (
+      {active && tier === 'premium' ? (
         <>
           <SectionTitle>{t('billing.whatsIncluded')}</SectionTitle>
-          <Card flat>
-            <View style={{ gap: S.md }}>
-              {PERKS.map(([icon, key]) => {
-                // Premium's list: ticked on Premium, a preview on anything else.
-                const on = tier === 'premium';
-                return (
-                  <Row key={key} gap={S.md}>
-                    <Icon name={icon} size={18} color={on ? C.teal : C.ink3} />
-                    <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14, lineHeight: 21, color: on ? C.ink : C.ink2 }}>{t(key)}</Text>
-                    {on ? <Icon name="check" size={16} color={C.green} strokeWidth={2.6} /> : null}
-                  </Row>
-                );
-              })}
-            </View>
-          </Card>
+          <PerkList perks={PERKS} />
         </>
-      )}
-
-      {/* Basic or a trial: the plans screen says what else there is (no prices here). */}
-      {tier === 'basic' || tier === 'trial' ? (
+      ) : active && tier === 'basic' ? (
         <>
-          <Spacer h={S.md} />
-          <Btn title={t('trial.seePlans')} variant="orange" icon="crown" onPress={() => router.push('/upgrade')} />
+          <SectionTitle>{t('plans.basicIncludes')}</SectionTitle>
+          <PerkList perks={BASIC_PERKS} />
         </>
       ) : null}
 
       <Spacer h={S.md} />
       {/*
-        For the student who has just paid on the website and come back wondering
-        why nothing changed. Entitlement already refreshes when the app returns
-        to the front, but a button they can press is worth more than a rule they
-        cannot see. It re-reads the server; it cannot grant anything.
+        For the student whose plan has just been switched on and who came back
+        wondering why nothing changed. The plan is also re-read whenever the app
+        returns to the front, but a button they can press is worth more than a
+        rule they cannot see. It re-reads the server; it cannot grant anything.
       */}
       <Btn
         title={t('billing.checkAgain')}
@@ -147,34 +96,32 @@ export default function Subscription() {
         loading={checking}
         onPress={async () => {
           await refresh();
-          toast(t(active ? 'billing.checkedActive' : 'billing.checkedFree'));
+          // A render has happened by now; the ref holds what the re-read found.
+          setTimeout(() => toast(t(activeNow.current ? 'billing.checkedActive' : 'billing.checkedFree')), 0);
         }}
       />
-
-      {/* Someone with an active plan needs no upgrade guidance at all. The
-          old ternary showed them the "locked chapter" notice, which told a
-          paying subscriber their chapter was not in their plan. */}
-      {active ? (
-        // What a subscriber does need, and the website already said: there is
-        // no cancel button here because there is nothing to cancel. Without
-        // this line the absence reads as a missing control rather than as the
-        // point, and someone goes looking for how to stop a charge that is
-        // never going to happen.
-        <>
-          <Spacer h={S.md} />
-          <Small>{t('account.noAutoCharge')}</Small>
-        </>
-      ) : (
-        <>
-          <Spacer h={S.lg} />
-          <LockedNotice variant="free" />
-        </>
-      )}
 
       <Spacer h={S.md} />
       <Card flat style={{ paddingVertical: 0 }}>
         <Item title={t('account.paymentHistory')} icon="card" last onPress={() => router.push('/account/payments')} />
       </Card>
     </Screen>
+  );
+}
+
+function PerkList({ perks }: { perks: [IconName, StringKey][] }) {
+  const t = useT();
+  return (
+    <Card flat>
+      <View style={{ gap: S.md }}>
+        {perks.map(([icon, key]) => (
+          <Row key={key} gap={S.md}>
+            <Icon name={icon} size={18} color={C.teal} />
+            <Text style={{ flex: 1, fontFamily: F.body, fontSize: 14, lineHeight: 21, color: C.ink }}>{t(key, { n: AI_QUOTA.premium })}</Text>
+            <Icon name="check" size={16} color={C.green} strokeWidth={2.6} />
+          </Row>
+        ))}
+      </View>
+    </Card>
   );
 }

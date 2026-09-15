@@ -99,7 +99,15 @@ export default function TabLayout() {
    */
   if (hydrated && state.user && !entitlementReady) return <Waiting />;
 
-  if (hydrated && state.user && !state.premium.active) return <Redirect href="/upgrade" />;
+  /*
+   * No plan: a new account starts its free trial, anyone else (a trial or a
+   * plan that has ended) meets the paused screen. There used to be one plans
+   * screen for both, comparing plans and handing over a link to buy one, which
+   * Google Play does not allow (core/billing.ts).
+   */
+  if (hydrated && state.user && !state.premium.active) {
+    return <Redirect href={state.premium.trialState === 'eligible' ? '/trial' : '/paused'} />;
+  }
 
   return (
     <Tabs

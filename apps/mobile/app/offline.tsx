@@ -35,6 +35,23 @@ export default function Offline() {
   if (online) return <Redirect href="/(tabs)" />;
   if (!hydrated) return null;
 
+  /*
+   * Downloads are part of the plan, so they close with it. The saved copy of
+   * the plan now carries its end date offline too (store/auth.tsx); a plan
+   * that ended used to keep its downloads open for up to a month without
+   * signal. Status only, the same as the paused screen (core/billing.ts).
+   */
+  if (state.user && !state.premium.active) {
+    const ended = state.premium.plan === 'trial' ? 'paused.trialTitle' : state.premium.plan ? 'paused.planTitle' : 'paused.noneTitle';
+    return (
+      <Screen>
+        <Header title={t('offline.title')} sub={t('offline.sub')} />
+        <Spacer h={S.lg} />
+        <Empty emoji="🔒" title={t(ended)} sub={t('paused.saved')} />
+      </Screen>
+    );
+  }
+
   /**
    * The saved row first, the catalogue second.
    *

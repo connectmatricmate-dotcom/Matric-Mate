@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { BOARD_WITH_ARTICLE, subjectMedium } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chargeQuota, guardAi, refused, studentMedium } from '@/lib/ai/guard';
+import { AI_COST, AI_MODEL, chargeQuota, guardAi, outsideTrial, refused, studentMedium } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -61,6 +61,12 @@ export async function POST(req: NextRequest) {
   const from = String(body.chapterId || body.subjectId || '').slice(0, 40);
   const medium = from ? subjectMedium(from, g.board, studentMedium(body.medium, g)) : studentMedium(body.medium, g);
   if (!question || !answer || !modelAnswer) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+  // A free trial checks answers from its own subject only, like every other
+  // AI route (outsideTrial). A chapter id starts with its subject's id.
+  if (from) {
+    const shut = outsideTrial(g, from.split('-')[0]);
+    if (shut) return shut;
+  }
 
   try {
     const response = await anthropic.messages.create({

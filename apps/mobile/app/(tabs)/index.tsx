@@ -21,6 +21,7 @@ import {
   TileGrid,
 } from '../../src/components/ui';
 import { CoachCard } from '../../src/components/CoachCard';
+import { WelcomeTrial } from '../../src/components/WelcomeTrial';
 import {
   SUBJECT_COLORS,
   accuracy,
@@ -160,6 +161,9 @@ export default function Dashboard() {
       </Small>
       <Spacer h={S.sm} />
       {burst ? <Confetti /> : null}
+
+      {/* Once, after the free trial starts: what it opens and until when. */}
+      <WelcomeTrial />
 
       {/* The streak lives in the header pill alone. A second chip here said
           the same thing twice, and its entrance slide dragged the row in

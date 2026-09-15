@@ -13,6 +13,7 @@ import { session } from '../../src/store/session';
 import { C, F, S, isRTL, isWeb, textStart } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
 import { AiLocked } from '../../src/components/AiLocked';
+import { ReportAi } from '../../src/components/ReportAi';
 
 /**
  * The board mock paper. Without an id: pick a subject and have one set.
@@ -264,12 +265,14 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
                 {t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}
               </Text>
               <View style={{ marginTop: 4 }}><Markdown text={verdict.feedback} size={13.5} /></View>
+              <ReportAi surface="paper" excerpt={verdict.feedback} />
             </Card>
           ) : null}
           {revealed ? (
             <Card flat tint={C.greenTint} border={C.green}>
               <Label style={{ color: C.green }}>{t('session.modelAnswer')}</Label>
               <View style={{ marginTop: 4 }}><Markdown text={q.answer} size={14} /></View>
+              <ReportAi surface="paper" refId={q.id} excerpt={`${q.q}\n\n${q.answer}`} />
               {q.points.length ? (
                 <>
                   <Spacer h={S.sm} />

@@ -7,6 +7,7 @@ import { Btn } from '@/components/ui/controls';
 import { Bar, Card, Icon, Label, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useLang, useT } from '@/lib/store';
+import { ReportAi } from '@/components/app/ReportAi';
 
 /**
  * Career guidance: the student's results, subject by subject, and what an AI
@@ -172,6 +173,7 @@ export function CareerView() {
                 </ol>
               </Card>
 
+              <ReportAi surface="career" excerpt={report.summary} />
               <p className="text-[12.5px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('career.disclaimer')}</p>
 
               {career.nextAt ? (

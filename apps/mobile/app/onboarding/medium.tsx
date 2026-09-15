@@ -28,34 +28,43 @@ export default function ChooseMedium() {
     [value, state.settings.contentMedium, state.downloads],
   );
 
+  // One choice, whole app: the interface and the syllabus both follow this,
+  // so a student never ends up reading Urdu notes in an English app or the
+  // reverse.
+  const save = (v: Medium) => {
+    actions.setOnboarding({ medium: v });
+    actions.setLanguage(v);
+    if (editing) router.back();
+    else router.push('/onboarding/subjects');
+  };
+  const pick = (v: Medium) => {
+    setValue(v);
+    // The first run moves on at the tap (StepScreen auto). Edit profile asks
+    // for Continue, since a change there can strand downloads.
+    if (!editing) setTimeout(() => save(v), 180);
+  };
+
   return (
     <StepScreen
       step={3}
+      auto={!editing}
       title={t('onboarding.mediumTitle')}
       sub={t('onboarding.mediumSub')}
       cta={t('common.continue')}
       footnote={stranded ? t('downloads.languageNote') : t('onboarding.mediumFootnote')}
-      onNext={() => {
-        // One choice, whole app: the interface and the syllabus both follow
-        // this, so a student never ends up reading Urdu notes in an English
-        // app or the reverse.
-        actions.setOnboarding({ medium: value });
-        actions.setLanguage(value);
-        if (editing) router.back();
-        else router.push('/onboarding/subjects');
-      }}
+      onNext={() => save(value)}
     >
       <ChoiceCard
         title={t('onboarding.mediumEn')}
         sub={t('onboarding.mediumEnSub')}
         selected={value === 'en'}
-        onPress={() => setValue('en')}
+        onPress={() => pick('en')}
       />
       <ChoiceCard
         title={t('onboarding.mediumUr')}
         sub={t('onboarding.mediumUrSub')}
         selected={value === 'ur'}
-        onPress={() => setValue('ur')}
+        onPress={() => pick('ur')}
       />
     </StepScreen>
   );

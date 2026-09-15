@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole, emailAllowedAsAdmin } from '@/lib/roles';
 import { signOutAction } from '@/app/(auth)/actions';
 import { SignOutButton, StaffShell, type StaffNavItem } from '@/components/staff/StaffShell';
+import { WrongAccount } from '@/components/staff/WrongAccount';
 
 export const metadata: Metadata = { title: 'Admin', robots: { index: false, follow: false } };
 
@@ -27,7 +28,9 @@ export const metadata: Metadata = { title: 'Admin', robots: { index: false, foll
 const NAV: StaffNavItem[] = [
   { href: '/admin', label: 'Overview', icon: 'home' },
   { href: '/admin/students', label: 'Students', icon: 'user' },
+  { href: '/admin/follow-up', label: 'Follow up', icon: 'whatsapp' },
   { href: '/admin/teachers', label: 'Teachers', icon: 'share' },
+  { href: '/admin/reports', label: 'Reported answers', icon: 'alert' },
   { href: '/admin/settings', label: 'Settings', icon: 'gear' },
 ];
 
@@ -36,8 +39,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect('/login');
 
+  // The wrong account says so, rather than "not found": Adnan, signed in on a
+  // test account, read that as the admin panel having been deleted.
   const role = await currentRole();
-  if (role !== 'admin' || !emailAllowedAsAdmin(data.user.email)) notFound();
+  if (role !== 'admin' || !emailAllowedAsAdmin(data.user.email)) return <WrongAccount area="admin" email={data.user.email} role={role === 'admin' ? 'student' : role} />;
 
   const { data: profile } = await supabase.from('profiles').select('name').eq('id', data.user.id).maybeSingle();
   const name = profile?.name?.trim() || data.user.email?.split('@')[0] || 'Admin';

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SUBJECT_ICON, accuracy, boardName, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, type IconName, type StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoachRail, ConfidenceRail, StreakRail, WeakRail } from '@/components/app/rails';
+import { WelcomeTrial } from '@/components/app/WelcomeTrial';
 import { Bar, Card, Icon, Label, ScriptText } from '@/components/ui/primitives';
 import { createClient } from '@/lib/supabase/client';
 import { useNow } from '@/lib/now';
@@ -94,6 +95,8 @@ export function DashboardView() {
 
       <Split>
         <Work className="flex flex-col gap-4">
+          {/* Once, after the free trial starts: what it opens and until when. */}
+          <WelcomeTrial />
           {/* Today's plan, the only thing on this page with a coloured ground */}
           <Card tint="bg-teal" border="border-teal">
             <div className="flex items-center gap-3">

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useT } from '../src/i18n';
-import { useApp } from '../src/store/app';
 import { isAuthErrorKey, useAuth } from '../src/store/auth';
 import { Body, Btn, Card, Field, Header, Screen, Small, Spacer, useToast } from '../src/components/ui';
 import { normaliseMobile } from '@matricmate/core';
@@ -23,7 +22,8 @@ import { resetTo } from '../src/core/nav';
  */
 export default function SignUp() {
   const { signUp, resendConfirmation } = useAuth();
-  const { state } = useApp();
+  /** 'onboarding' when the subject step sent them here, having just chosen. */
+  const { from } = useLocalSearchParams<{ from?: string }>();
   const t = useT();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,10 +52,12 @@ export default function SignUp() {
       // Saying so is the only honest option; routing into the app would land on
       // a locked screen and read as a failure.
       if (needsConfirmation) setConfirmSent(true);
-      // Onboarding runs before sign-up on this app, so anyone arriving here has
-      // already chosen their class and subjects. Sending them back through it
-      // would look like the account did not save.
-      else resetTo(state.onboarding?.subjects?.length ? '/(tabs)' : '/onboarding/class');
+      // Onboarding runs before sign-up on this app, so a student who came from
+      // it has chosen already and goes on. One who came from Log in, "Create
+      // account", has not, and goes through it. Decided by where they came
+      // from, not by choices on the phone: after a sign-out those can be the
+      // previous student's, and a new account used to skip onboarding on them.
+      else resetTo(from === 'onboarding' ? '/(tabs)' : '/onboarding/class');
     } catch (e) {
       // The auth store hands back a string key, because it has no
       // language of its own to translate with.

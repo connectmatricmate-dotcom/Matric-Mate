@@ -14,6 +14,7 @@ import { useApp } from '../../src/store/app';
 import { session } from '../../src/store/session';
 import { C, F, S, rowDir } from '../../src/theme';
 import { Markdown } from '../../src/components/Markdown';
+import { ReportAi } from '../../src/components/ReportAi';
 
 const LEVELS: { value: Confidence; label: StringKey }[] = [
   { value: 0, label: 'session.conf0' },
@@ -309,6 +310,7 @@ export default function McqScreen() {
           <Card style={{ marginTop: S.sm }}>
             <Label style={{ color: C.teal }}>{t('session.why')}</Label>
             <View style={{ marginTop: 4 }}><Markdown text={mcq.explanation} size={14} /></View>
+            {mcq.source === 'ai' ? <ReportAi surface="ai_test" refId={mcq.id} excerpt={`${mcq.q}\n\n${mcq.explanation}`} /> : null}
             {/* A generated question carries no chapter, and /learn/reader/
                 with nothing after it is not a page. The arrow is the
                 chevron, which turns round in Urdu; a typed one did not. */}

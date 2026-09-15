@@ -84,7 +84,7 @@ export default function Practice() {
 
       {!paid ? (
         <>
-          <LockedNotice variant="free" />
+          <LockedNotice />
           <Spacer h={S.sm} />
         </>
       ) : null}
@@ -134,7 +134,7 @@ export default function Practice() {
         <Icon name="spark" color={C.orangeDark} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: F.bodyBold, fontSize: 14.5, color: C.ink }}>{t('practice.aiTest')}</Text>
-          <Small>{derived.access.ai ? t('practice.aiTestSub') : t('aiLock.short')}</Small>
+          <Small>{derived.access.ai ? t('practice.aiTestSub') : t('access.aiShort')}</Small>
         </View>
         <Chevron size={18} color={C.ink3} />
       </Card>
@@ -162,8 +162,8 @@ export default function Practice() {
       <Spacer h={S.md} />
       <Small>{t('practice.answered', { n: state.attempts.length })}</Small>
 
-      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={t('billing.premium')}>
-        <LockedNotice variant="free" />
+      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={derived.access.tier === 'trial' ? t('trial.lockedTitle') : t('access.noPlan')}>
+        <LockedNotice />
         <Spacer h={S.md} />
         <Btn title={t('common.close')} variant="line" onPress={() => setShowLocked(false)} />
       </Sheet>

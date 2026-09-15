@@ -29,6 +29,21 @@ export const SUBJECTS: Subject[] = [
   { id: 'cs', name: 'Computer Science', urduName: SUBJECT_NAMES_UR['cs'], icon: 'book2', compulsory: false, group: 'science', chapterCount: 7 },
 ];
 
+/** The fourth science subject, the one real choice a matric science student makes. */
+export type ScienceChoice = 'bio' | 'cs' | 'both';
+
+/**
+ * A new student's subjects from that one answer: the compulsory subjects,
+ * Physics and Chemistry, then Biology, Computer Science or both. Everything
+ * that builds a plan, a picker or a daily tip reads this list, so it keeps the
+ * catalogue's order.
+ */
+export const subjectsForScience = (choice: ScienceChoice): string[] => {
+  const want = new Set(['phy', 'chem', ...(choice === 'both' ? ['bio', 'cs'] : [choice])]);
+  return SUBJECTS.filter((s) => s.compulsory || want.has(s.id)).map((s) => s.id);
+};
+
+
 const CH: Record<string, [string, string, string?, string?][]> = {
   // The board's own content areas, from the Table of Specification in the SSC-I
   // Assessment Framework, not the 2006 nine-unit scheme that used to be here.

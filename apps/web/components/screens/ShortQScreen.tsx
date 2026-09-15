@@ -14,6 +14,7 @@ import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
 import { LeaveSetButton } from '@/components/app/LeaveSetButton';
 import { PracticeChapterBar } from '@/components/app/PracticeChapterBar';
+import { ReportAi } from '@/components/app/ReportAi';
 
 type Mark = 'got' | 'partial' | 'missed';
 
@@ -224,6 +225,7 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
                   <ScriptBullets items={verdict.missed} className="text-[13px] text-ink2" />
                 </div>
               ) : null}
+              <ReportAi surface="check" refId={item.id} excerpt={verdict.feedback} />
             </Card>
           ) : null}
           <Card flat tint="bg-greentint" border="border-green">

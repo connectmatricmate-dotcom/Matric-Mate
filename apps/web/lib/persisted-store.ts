@@ -184,7 +184,12 @@ export const getSnapshot = () => state;
 const URDU: Settings = { ...DEFAULT_SETTINGS, language: 'ur', contentMedium: 'ur' };
 
 /** What the layout read of the plan, for the first render: see seedFromServer. */
-export type PlanSeed = { active: boolean; plan?: string; trialSubject?: string | null };
+/**
+ * The plan the server read, for the first frame. `validTill` rides along so
+ * the trial strip and the plan pages have their date from the start: without
+ * it they read "last day" and "open until ." until the browser asked again.
+ */
+export type PlanSeed = { active: boolean; plan?: string; trialSubject?: string | null; validTill?: number | null };
 
 /*
  * One snapshot per language and plan, made once and reused. Since there are
@@ -196,12 +201,15 @@ export type PlanSeed = { active: boolean; plan?: string; trialSubject?: string |
 const SERVER_SNAPSHOTS = new Map<string, State>();
 
 export const serverSnapshotFor = (lang: 'en' | 'ur', seed?: PlanSeed | null): State => {
-  const key = `${lang}|${seed?.active ? `${seed.plan ?? ''}|${seed.trialSubject ?? ''}` : 'free'}`;
+  const key = `${lang}|${seed?.active ? `${seed.plan ?? ''}|${seed.trialSubject ?? ''}|${seed.validTill ?? ''}` : 'free'}`;
   let snap = SERVER_SNAPSHOTS.get(key);
   if (!snap) {
+    // The end date makes keys nearly one per student, so the cache is kept
+    // small: it only has to hold the snapshots of the requests in flight.
+    if (SERVER_SNAPSHOTS.size > 200) SERVER_SNAPSHOTS.clear();
     const base = lang === 'ur' ? { ...EMPTY, settings: URDU } : EMPTY;
     snap = seed?.active
-      ? { ...base, premium: { active: true, validTill: null, plan: seed.plan, trialSubject: seed.trialSubject ?? undefined } }
+      ? { ...base, premium: { active: true, validTill: seed.validTill ?? null, plan: seed.plan, trialSubject: seed.trialSubject ?? undefined } }
       : base;
     SERVER_SNAPSHOTS.set(key, snap);
   }

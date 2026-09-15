@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import { Stack, type ErrorBoundaryProps } from 'expo-router';
+import { Stack, usePathname, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,8 +8,8 @@ import { useFonts } from 'expo-font';
 import { Baloo2_600SemiBold, Baloo2_700Bold } from '@expo-google-fonts/baloo-2';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import { NotoNastaliqUrdu_400Regular, NotoNastaliqUrdu_600SemiBold } from '@expo-google-fonts/noto-nastaliq-urdu';
-import { ConnectivityProvider } from '../src/core/connectivity';
-import { AuthProvider } from '../src/store/auth';
+import { ConnectivityProvider, useOnline } from '../src/core/connectivity';
+import { AuthProvider, useAuth } from '../src/store/auth';
 import { AppProvider, useApp } from '../src/store/app';
 import { useQuotaRealtime } from '../src/core/useQuota';
 import { usePush } from '../src/core/usePush';
@@ -93,6 +93,7 @@ export default function RootLayout() {
         <AuthProvider>
           <AppProvider>
             <SplashGate />
+            <PlanGate />
             <QuotaLive />
             <PushLive />
             <StudyClockLive />
@@ -163,6 +164,42 @@ function Chrome() {
  * hydration somehow never reports, a slightly wrong first frame is a blemish
  * and a splash that never lifts is an outage.
  */
+/** Screens a student without a plan may still be on. Everything else is study content. */
+const OPEN_WITHOUT_PLAN = ['/paused', '/trial', '/upgrade', '/account', '/offline', '/onboarding', '/notifications', '/login', '/signup', '/welcome', '/forgot'];
+
+/**
+ * A plan that ends while the student is somewhere in the app ends there too.
+ *
+ * The tab gate sent a student without a plan to the paused screen, but only
+ * the tabs had it: a trial that ran out while a chapter, a practice set or the
+ * subscription screen was open left that screen up, and backing out of it
+ * showed the subject's chapters labelled for a plan. So wherever they are, the
+ * moment there is no plan the whole stack is replaced by the paused screen (or
+ * the trial screen, for an account that can still start one). The account
+ * pages, help and notifications stay reachable; offline, the downloads screen
+ * decides for itself.
+ */
+function PlanGate() {
+  const { state, hydrated } = useApp();
+  const { entitlementReady, role } = useAuth();
+  const online = useOnline();
+  const pathname = usePathname();
+  const blocked =
+    hydrated &&
+    online &&
+    !!state.user &&
+    entitlementReady &&
+    role === 'student' &&
+    !state.premium.active &&
+    pathname !== '/' &&
+    !OPEN_WITHOUT_PLAN.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const to = state.premium.trialState === 'eligible' ? '/trial' : '/paused';
+  useEffect(() => {
+    if (blocked) resetTo(to);
+  }, [blocked, to]);
+  return null;
+}
+
 function SplashGate() {
   const { hydrated } = useApp();
   useEffect(() => {

@@ -14,8 +14,24 @@ const LINKS = [
   { href: '/pricing', label: 'Pricing' },
 ];
 
-export function Nav() {
+export function Nav({ bare = false }: { bare?: boolean } = {}) {
   const [open, setOpen] = useState(false);
+
+  /*
+   * Opened from the Android app (the terms and the account-deletion page):
+   * the wordmark and nothing to go on to. Google Play treats an app that
+   * leads to a page with pricing on it as leading to a purchase outside Play,
+   * and every link here reaches the pricing page in a tap or two.
+   */
+  if (bare) {
+    return (
+      <header data-chrome className="border-b border-line bg-glass">
+        <div className="mx-auto flex max-w-[1100px] items-center px-5 py-3.5">
+          <Wordmark priority />
+        </div>
+      </header>
+    );
+  }
 
   return (
     // data-chrome keeps the bar off paper: see the print rules in globals.css.

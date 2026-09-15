@@ -9,6 +9,7 @@ import { useApp } from '../../../src/store/app';
 import { S } from '../../../src/theme';
 import { Markdown } from '../../../src/components/Markdown';
 import { AiLocked } from '../../../src/components/AiLocked';
+import { ReportAi } from '../../../src/components/ReportAi';
 
 /**
  * The AI revision sheet: one page per chapter, definitions, formulas,
@@ -77,6 +78,7 @@ function RevisionSheet() {
         <>
           <Card flat>
             <Markdown text={result.text} size={13.5} />
+            <ReportAi surface="sheet" refId={id} excerpt={result.text} />
           </Card>
           <Spacer h={S.md} />
           <Small style={{ textAlign: 'center' }}>{t('tutor.aiMade')} · {t('tutor.disclaimer')}</Small>

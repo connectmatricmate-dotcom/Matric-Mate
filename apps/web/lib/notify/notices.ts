@@ -68,10 +68,11 @@ export const reportReady = (): Notice => ({
   target: 'home',
 });
 
-export const paymentReceived = (date: string): Notice => ({
+export const paymentReceived = (date: string, plan: 'basic' | 'premium' = 'premium'): Notice => ({
   kind: 'payment',
   title: 'notifications.paymentTitle',
-  body: 'notifications.paymentBody',
+  // Named for the plan bought: every receipt used to say Premium.
+  body: plan === 'basic' ? 'notifications.paymentBodyBasic' : 'notifications.paymentBody',
   params: { date },
   target: 'payments',
   // Email too. This is money, and the student wants something to keep.
@@ -248,17 +249,56 @@ export const recall = (subject: string, question: string, answer: string, chapte
   chapterId,
 });
 
-/**
- * The afternoon of a free trial's last day. Instead of that day's tip: the
- * one thing worth knowing is that the subject they have been using locks
- * tomorrow. Opens their plan's page, which says how to keep it.
+/*
+ * Plan reminders, from the hourly plans job (/api/cron/plans), each sent once
+ * per plan end date (plan_notices). The inbox and push lines say what is
+ * happening and nothing more, because the app shows them and Google Play
+ * forbids an app pointing anyone at paying outside Play. The email, which is
+ * outside the app, says where to renew and carries a button that signs the
+ * student in on the website's plans page (`link`, lib/signin-link.ts).
  */
-export const trialEnding = (subject: string): Notice => ({
+
+/** The last day of a free trial. */
+export const trialEnding = (subject: string, link: string): Notice => ({
   kind: 'reminder',
   title: 'notifications.trialEndsTitle',
   body: 'notifications.trialEndsBody',
   params: { subject },
   target: 'subscription',
+  also: ['email'],
+  email: { body: 'email.trialEndsBody', action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
+});
+
+/** A free trial that has just ended. */
+export const trialEnded = (link: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.trialEndedTitle',
+  body: 'notifications.trialEndedBody',
+  target: 'subscription',
+  also: ['email'],
+  email: { body: 'email.trialEndedBody', action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
+});
+
+/** A paid plan with three days left. */
+export const planEnding = (date: string, link: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.planEndsTitle',
+  body: 'notifications.planEndsBody',
+  params: { date },
+  target: 'subscription',
+  also: ['email'],
+  email: { body: 'email.planEndsBody', action: { label: 'email.renew', href: link }, note: 'email.linkNote' },
+});
+
+/** A paid plan that has just ended. */
+export const planEnded = (date: string, link: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.planEndedTitle',
+  body: 'notifications.planEndedBody',
+  params: { date },
+  target: 'subscription',
+  also: ['email'],
+  email: { body: 'email.planEndedBody', action: { label: 'email.renew', href: link }, note: 'email.linkNote' },
 });
 
 const GENERAL_TIPS: StringKey[] = [

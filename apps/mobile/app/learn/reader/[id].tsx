@@ -364,7 +364,7 @@ export default function Reader() {
               // not the same as a chapter with no notes. Nor on a free trial,
               // for any subject but its own (a chapter id starts with its
               // subject's); the notice says which one it opens.
-              <LockedNotice variant="locked" />
+              <LockedNotice />
             ) : chapter && chapter.sectionCount > 0 ? (
               <ErrorState title={t('states.errorTitle')} sub={t('states.errorBody')} retry={t('common.retry')} onRetry={reload} />
             ) : (

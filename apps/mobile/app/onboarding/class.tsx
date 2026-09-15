@@ -31,6 +31,15 @@ export default function ChooseClass() {
   const [switching, setSwitching] = useState(false);
 
   const forward = () => router.push(editing ? '/onboarding/board?edit=1' : '/onboarding/board');
+  /** Nothing chosen on the account yet: a tap is the answer (StepScreen auto). */
+  const firstRun = !editing && !current;
+  const pick = (v: 9 | 10) => {
+    setValue(v);
+    if (!firstRun) return;
+    actions.setOnboarding({ classLevel: v });
+    // Long enough to see the tick land on the card that was tapped.
+    setTimeout(forward, 180);
+  };
 
   /**
    * Changing an existing class goes through switchClass, exactly as the
@@ -64,6 +73,7 @@ export default function ChooseClass() {
         title={t('onboarding.classTitle')}
         sub={t('onboarding.classSub')}
         cta={t('common.continue')}
+        auto={firstRun}
         onNext={() => {
           if (current && value !== current) {
             setConfirming(true);
@@ -78,7 +88,7 @@ export default function ChooseClass() {
           title={t('onboarding.class9')}
           sub={t('onboarding.class9Sub')}
           selected={value === 9}
-          onPress={() => setValue(9)}
+          onPress={() => pick(9)}
         />
         {/* Class 10 is a real choice the day its catalogue ships. Hardcoding
             the card shut meant a Class 10 student had to sign up as Class 9
@@ -89,7 +99,7 @@ export default function ChooseClass() {
           selected={value === 10}
           disabled={!GRADE_10_READY}
           disabledLabel={GRADE_10_READY ? undefined : t('onboarding.comingSoon')}
-          onPress={() => (GRADE_10_READY ? setValue(10) : toast(t('onboarding.class10Toast')))}
+          onPress={() => (GRADE_10_READY ? pick(10) : toast(t('onboarding.class10Toast')))}
         />
       </StepScreen>
 

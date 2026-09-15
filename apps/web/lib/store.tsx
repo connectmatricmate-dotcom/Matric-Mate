@@ -1027,7 +1027,7 @@ export function AppProvider({
   initialPlan?: PlanSeed | null;
 }) {
   seedFromServer(initialLanguage, initialPlan);
-  const seedKey = initialPlan?.active ? `${initialPlan.plan ?? ''}|${initialPlan.trialSubject ?? ''}` : '';
+  const seedKey = initialPlan?.active ? `${initialPlan.plan ?? ''}|${initialPlan.trialSubject ?? ''}|${initialPlan.validTill ?? ''}` : '';
   // Keyed on the seed's contents, not its identity: the layout builds a new
   // object on every render, and the snapshot has to stay the same one.
   // eslint-disable-next-line react-hooks/exhaustive-deps

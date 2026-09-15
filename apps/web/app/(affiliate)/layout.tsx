@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { WrongAccount } from '@/components/staff/WrongAccount';
 import { currentRole } from '@/lib/roles';
 import { signOutAction } from '@/app/(auth)/actions';
 import { SignOutButton, StaffShell, type StaffNavItem } from '@/components/staff/StaffShell';
@@ -36,7 +37,8 @@ export default async function AffiliateLayout({ children }: { children: React.Re
   /* Teachers only. An administrator sees the same numbers on
      /admin/teachers/[id], so there is nothing here they need and one fewer
      way for the two areas to bleed into each other. */
-  if ((await currentRole()) !== 'affiliate') notFound();
+  const role = await currentRole();
+  if (role !== 'affiliate') return <WrongAccount area="affiliate" email={data.user.email} role={role} />;
 
   const { data: profile } = await supabase.from('profiles').select('name').eq('id', data.user.id).maybeSingle();
   const name = profile?.name?.trim() || data.user.email?.split('@')[0] || 'Teacher';

@@ -4,13 +4,12 @@ import { useState } from 'react';
 import { AI_QUOTA, daysLeft, formatDate, subjectById, subjectName, type StringKey } from '@matricmate/core';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { Page, Work } from '@/components/app/Page';
-import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
 import { BASIC_PLAN, THE_PLAN, rupees, type Plan } from '@/lib/plans';
 import { useApp, useLang, useT } from '@/lib/store';
-import { createClient } from '@/lib/supabase/client';
 
-export type TrialState = 'eligible' | 'ended' | 'none';
+/** A trial or plan that has run out, and when; null for anything else. */
+export type Lapsed = { kind: 'trial'; endedAt: number } | { kind: 'plan'; endedAt: number; plan: 'basic' | 'premium' } | null;
 
 const PERKS: Record<'basic' | 'premium', StringKey[]> = {
   basic: ['plans.basicPerk1', 'plans.basicPerk2', 'plans.basicPerk3', 'plans.basicPerk4'],
@@ -18,17 +17,17 @@ const PERKS: Record<'basic' | 'premium', StringKey[]> = {
 };
 
 /**
- * The plans page: what an account without a plan sees, and where a student on
- * Basic or on the free trial comes to change that.
+ * The plans page: where a student whose trial or plan has run out comes, and
+ * where one on Basic or on the free trial comes to change that.
  *
- * It used to state one price and offer one button. Since 14 Sep 2026 there
- * are two plans and a free trial, so it offers them in the order a new
- * student meets them: try one subject free, then Premium (with AI, the one we
- * recommend and the default everywhere else), then Basic for families for
- * whom Rs 1,000 is the obstacle. The heading says where the student is now;
- * Premium students never land here (the layout sends them home).
+ * Premium (with AI, the one we recommend) then Basic for families for whom
+ * Rs 1,000 is the obstacle. The heading says where the student is now: on a
+ * trial, on Basic, a trial that ended, or a plan that ended on a date, whose
+ * button then says Renew. New accounts never land here: the free trial starts
+ * itself on /trial (the layout decides). Premium students never land here
+ * either (the layout sends them home).
  */
-export function UpgradeView({ trial }: { trial: TrialState }) {
+export function UpgradeView({ lapsed }: { lapsed: Lapsed }) {
   const t = useT();
   const { lang } = useLang();
   const { derived } = useApp();
@@ -41,7 +40,16 @@ export function UpgradeView({ trial }: { trial: TrialState }) {
       ? { icon: 'clock' as const, title: t('trial.currentTitle', { subject: trialSubject }), body: t('trial.currentBody', { subject: trialSubject, date: until }) }
       : access.tier === 'basic'
         ? { icon: 'crown' as const, title: t('plans.basicCurrentTitle'), body: t('plans.basicCurrentBody', { date: until }) }
-        : { icon: 'crown' as const, title: t('billing.statusFree'), body: trial === 'ended' ? t('trial.ended') : t('billing.freeBody') };
+        : lapsed?.kind === 'trial'
+          ? { icon: 'clock' as const, title: t('paused.trialTitle'), body: t('trial.ended') }
+          : lapsed?.kind === 'plan'
+            ? {
+                icon: 'clock' as const,
+                title: t('paused.planTitle'),
+                body: t('plans.endedBody', { date: formatDate(lapsed.endedAt, lang, { day: 'numeric', month: 'long', year: 'numeric' }) }),
+              }
+            : { icon: 'crown' as const, title: t('billing.statusFree'), body: t('billing.freeBody') };
+  const renew = lapsed?.kind === 'plan' ? lapsed.plan : null;
 
   return (
     <Page width="focus">
@@ -54,11 +62,9 @@ export function UpgradeView({ trial }: { trial: TrialState }) {
           <p className="mx-auto mt-2 max-w-[440px] text-[14.5px] leading-[1.65] text-ink2 rtl:leading-[1.9]">{head.body}</p>
         </div>
 
-        {trial === 'eligible' && !access.active ? <TrialOffer /> : null}
-
         <div className="grid gap-4 md:grid-cols-2">
-          <PlanCard plan={THE_PLAN} highlight />
-          <PlanCard plan={BASIC_PLAN} />
+          <PlanCard plan={THE_PLAN} highlight renew={renew === 'premium'} />
+          <PlanCard plan={BASIC_PLAN} renew={renew === 'basic'} />
         </div>
 
         <p className="text-center text-[12.5px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('checkout.noChargeToday')}</p>
@@ -67,7 +73,8 @@ export function UpgradeView({ trial }: { trial: TrialState }) {
   );
 }
 
-function PlanCard({ plan, highlight }: { plan: Plan; highlight?: boolean }) {
+/** `renew`: the plan this student had and let run out, so its button says Renew. */
+function PlanCard({ plan, highlight, renew }: { plan: Plan; highlight?: boolean; renew?: boolean }) {
   const t = useT();
   const { derived } = useApp();
   const access = derived.access;
@@ -83,7 +90,7 @@ function PlanCard({ plan, highlight }: { plan: Plan; highlight?: boolean }) {
   const [openedAt] = useState(() => Date.now());
   const rest = upgrading ? daysLeft(access.validTill, openedAt) : 0;
   const carried = Math.floor((rest * BASIC_PLAN.perMonth) / THE_PLAN.perMonth);
-  const label = current ? t('plans.renewCta', { plan: name }) : upgrading ? t('plans.upgradeCta') : t('plans.choose', { plan: name });
+  const label = current || renew ? t('plans.renewCta', { plan: name }) : upgrading ? t('plans.upgradeCta') : t('plans.choose', { plan: name });
 
   return (
     <Card className={`flex flex-col ${highlight ? 'border-orange' : ''}`}>
@@ -128,62 +135,3 @@ function PlanCard({ plan, highlight }: { plan: Plan; highlight?: boolean }) {
   );
 }
 
-/**
- * Three days, one subject, once. Starts in the database (start_trial), which
- * refuses anything the offer should not have been shown for, and then the
- * whole app opens on a fresh load, which reads the new plan everywhere at once.
- */
-function TrialOffer() {
-  const t = useT();
-  const { lang } = useLang();
-  const { derived } = useApp();
-  const [pick, setPick] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function start() {
-    if (!pick || busy) return;
-    setBusy(true);
-    setError(null);
-    const { error: rpcError } = await createClient().rpc('start_trial', { p_subject: pick });
-    if (!rpcError) {
-      window.location.assign('/dashboard');
-      return;
-    }
-    const m = rpcError.message;
-    setError(
-      /already used/.test(m) ? t('trial.errorUsed') : /already on a plan/.test(m) ? t('trial.errorPlan') : /paid before/.test(m) ? t('trial.errorPaid') : t('trial.errorGeneric'),
-    );
-    setBusy(false);
-  }
-
-  return (
-    <Card className="border-teal bg-tealtint">
-      <h2 className="font-display text-[21px] text-ink">{t('trial.offerTitle')}</h2>
-      <p className="mt-1.5 text-[14px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('trial.offerBody', { n: AI_QUOTA.trial })}</p>
-      <p className="mt-4 text-[12px] font-extrabold uppercase tracking-[0.07em] text-teal">{t('trial.pickSubject')}</p>
-      <div role="radiogroup" aria-label={t('trial.pickSubject')} className="mt-2 flex flex-wrap gap-2">
-        {derived.subjects.map((sid) => (
-          <button
-            key={sid}
-            type="button"
-            role="radio"
-            aria-checked={pick === sid}
-            onClick={() => setPick(sid)}
-            className={`min-h-11 rounded-full px-4 py-2 text-[13.5px] font-extrabold transition-colors duration-200 ${
-              pick === sid ? 'bg-teal text-onbrand' : 'bg-card text-ink2 hover:brightness-95'
-            }`}
-          >
-            {subjectName(subjectById(sid), lang) || sid}
-          </button>
-        ))}
-      </div>
-      {error ? (
-        <p role="alert" className="mt-3 text-[12.5px] font-extrabold text-red">
-          {error}
-        </p>
-      ) : null}
-      <Btn title={t('trial.start')} onClick={() => void start()} disabled={!pick} loading={busy} className="mt-4 w-full sm:w-auto" />
-    </Card>
-  );
-}

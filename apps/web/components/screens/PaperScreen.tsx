@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
 import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
+import { ReportAi } from '@/components/app/ReportAi';
 
 /** Every failure a marking request can come back with, in words. */
 function useFailNote() {
@@ -362,12 +363,14 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
             >
               <p className="font-display text-[17px] text-ink">{t('tutor.checkScore', { a: verdict.score, b: verdict.maxMarks })}</p>
               <Markdown text={verdict.feedback} className="mt-1 text-[13.5px] leading-[1.6] text-ink" />
+              <ReportAi surface="paper" excerpt={verdict.feedback} />
             </Card>
           ) : null}
           {revealed ? (
             <Card flat tint="bg-greentint" border="border-green">
               <Label className="text-green">{t('session.modelAnswer')}</Label>
               <Markdown text={q.answer} className="mt-1 text-[14px] leading-[1.6] text-ink" />
+              <ReportAi surface="paper" refId={q.id} excerpt={`${q.q}\n\n${q.answer}`} />
               {q.points.length ? (
                 <>
                   {/* Named, like Android names them. Unlabelled bullets under a

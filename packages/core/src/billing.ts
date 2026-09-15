@@ -14,16 +14,25 @@
  *
  * Rules this file exists to enforce (breaking them risks suspension, not just a
  * failed review):
- *   · no checkout, plan picker, price, or Buy/Upgrade/Subscribe control
- *   · no link, deep link or WebView to a payment or pricing page
- *   · no payment links in push notifications
- *   · plain, non-tappable text may name the website, nothing more
+ *   · no checkout, plan picker, price, or Buy/Upgrade/Subscribe/Renew control
+ *   · no link, copied link, deep link or WebView to a payment or pricing page,
+ *     and no instruction to go and pay somewhere (Play's rule covers "messaging
+ *     or other calls to action", whatever the wording)
+ *   · no mention of where plans are bought, not even as plain text
+ *   · push and inbox text says what happened (a trial or plan ending), never
+ *     how to pay; the email version of the same notice may, because email is
+ *     outside the app (lib/notify on the website)
+ *   · a locked screen says it is locked and nothing more; a student whose plan
+ *     has ended meets the paused screen (app/paused.tsx), which can only Check
+ *     again
+ * Checked 15 Sep 2026: the external-links programme (billing choice) covers
+ * the UK, the EEA and the US only, not Pakistan.
  */
 
 /** Named so the intent survives future edits: nothing may be sold here. */
 export const CAN_SELL_IN_APP = false;
 
-/** Mentioned as plain text only, never a link, never a button. */
+/** The website's name. Only for the staff signpost (a teacher or admin told where their pages are), never about plans: see the rules above. */
 export const BILLING_SITE = 'matricmate.co';
 
 /**

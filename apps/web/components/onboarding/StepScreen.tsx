@@ -8,10 +8,43 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { canGoBack } from '@/lib/nav-trail';
-import { useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Check, Icon, Pill, Ur } from '@/components/ui/primitives';
 import { useT } from '@/lib/store';
+
+/**
+ * One click is the answer on a first run (StepScreen `auto`): `pick` saves and
+ * moves on. A click that lands while the account's saved setup is still being
+ * read is kept, and carried out the moment it has been: it used to only tick
+ * the card, and a quick student sat looking at a step that would not move.
+ */
+export function useAutoStep<T>(enabled: boolean, synced: boolean, run: (value: T) => Promise<void>) {
+  const [going, start] = useTransition();
+  const queued = useRef<{ value: T } | null>(null);
+  // A click is waiting for the account; shown as the button spinning.
+  const [waiting, setWaiting] = useState(false);
+  const runRef = useRef(run);
+  useEffect(() => {
+    runRef.current = run;
+  });
+  useEffect(() => {
+    if (!enabled || !synced || !queued.current) return;
+    const { value } = queued.current;
+    queued.current = null;
+    start(() => runRef.current(value));
+  }, [enabled, synced]);
+  const pick = (value: T) => {
+    if (!enabled || going) return;
+    if (!synced) {
+      queued.current = { value };
+      setWaiting(true);
+      return;
+    }
+    start(() => run(value));
+  };
+  return { pick, going: going || (enabled && !synced && waiting) };
+}
 
 export function Steps({ step, total = 4 }: { step: number; total?: number }) {
   const t = useT();
@@ -88,6 +121,8 @@ export function StepScreen({
   footnote,
   backHref,
   edit,
+  auto,
+  busy,
 }: {
   step: number;
   title: string;
@@ -111,6 +146,15 @@ export function StepScreen({
   backHref?: string;
   /** Opened from Edit profile: Back is history back, to the profile. */
   edit?: boolean;
+  /**
+   * The first run: a click on a card is the answer and moves on, so the four
+   * steps are four clicks. The same steps opened from Edit profile keep the
+   * button, because a change there can cost progress and asks first. The
+   * button still shows, spinning, while the account loads or the choice saves.
+   */
+  auto?: boolean;
+  /** An auto step's choice is being saved. */
+  busy?: boolean;
 }) {
   const t = useT();
   const router = useRouter();
@@ -150,19 +194,21 @@ export function StepScreen({
 
       {footnote ? <p className="mt-6 text-[12.5px] text-ink2">{footnote}</p> : null}
 
-      <div className="mt-7">
-        <Btn
-          title={cta}
-          onClick={() =>
-            startTransition(async () => {
-              await onNext();
-            })
-          }
-          disabled={disabled}
-          loading={pending || waiting}
-          className="w-full"
-        />
-      </div>
+      {auto && !waiting && !busy ? null : (
+        <div className="mt-7">
+          <Btn
+            title={cta}
+            onClick={() =>
+              startTransition(async () => {
+                await onNext();
+              })
+            }
+            disabled={disabled || (auto && (waiting || busy))}
+            loading={pending || waiting || busy}
+            className="w-full"
+          />
+        </div>
+      )}
     </div>
   );
 }

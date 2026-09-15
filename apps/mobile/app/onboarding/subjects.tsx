@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Steps } from '../../src/components/OnboardingStep';
+import { ChoiceCard, StepScreen } from '../../src/components/OnboardingStep';
 import { Icon } from '../../src/components/Icon';
 import { Btn, Card, Check, Header, Item, Screen, SectionTitle, Small, useToast } from '../../src/components/ui';
-import { SUBJECTS, subjectName } from '@matricmate/core';
+import { SUBJECTS, subjectById, subjectName, subjectsForScience } from '@matricmate/core';
+import type { ScienceChoice } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { useApp } from '../../src/store/app';
 import { C, S } from '../../src/theme';
@@ -37,6 +38,45 @@ export default function ChooseSubjects() {
   const total = compulsory.length + picked.length;
   const enough = picked.length >= 2;
 
+  /*
+   * The first run asks one thing. Everyone takes the compulsory subjects,
+   * Physics, Chemistry and Maths, so the only real choice is the fourth
+   * science subject. The full list stays for Edit profile, where a student can
+   * take on as many as they like.
+   */
+  if (!editing) {
+    const choose = (choice: ScienceChoice) => {
+      actions.setOnboarding({ group: 'science', subjects: subjectsForScience(choice) });
+      setTimeout(() => {
+        // Signed in already (sent here to finish choosing): the account
+        // exists, so on to the app rather than to sign-up. Signed out: the
+        // account comes next, and sign-up is told where the student came from
+        // so it never has to guess from choices left on the phone.
+        if (state.user) resetTo('/(tabs)');
+        else router.replace('/signup?from=onboarding');
+      }, 180);
+    };
+    const bio = subjectById('bio');
+    const cs = subjectById('cs');
+    const current = new Set(state.onboarding?.subjects ?? []);
+    const had: ScienceChoice | null = current.has('bio') && current.has('cs') ? 'both' : current.has('cs') ? 'cs' : current.has('bio') ? 'bio' : null;
+    return (
+      <StepScreen
+        step={4}
+        title={t('onboarding.scienceTitle')}
+        sub={t('onboarding.scienceSub')}
+        cta={t('common.continue')}
+        onNext={() => {}}
+        auto
+        footnote={t('onboarding.scienceFootnote')}
+      >
+        <ChoiceCard title={subjectName(bio, lang)} sub={t('onboarding.scienceBioSub')} selected={had === 'bio'} onPress={() => choose('bio')} />
+        <ChoiceCard title={subjectName(cs, lang)} sub={t('onboarding.scienceCsSub')} selected={had === 'cs'} onPress={() => choose('cs')} />
+        <ChoiceCard title={t('onboarding.scienceBoth')} sub={t('onboarding.scienceBothSub')} selected={had === 'both'} onPress={() => choose('both')} />
+      </StepScreen>
+    );
+  }
+
   return (
     <Screen
       footer={
@@ -45,26 +85,15 @@ export default function ChooseSubjects() {
           disabled={!enough}
           onPress={() => {
             actions.setOnboarding({ group: 'science', subjects: [...compulsory.map((s) => s.id), ...picked] });
-            // From Edit profile, back to it: a replace here stacked a second
+            // Only Edit profile reaches this list now (the first run asks one
+            // question above), so back to it: a replace here stacked a second
             // home screen over the profile and the steps behind it.
-            if (editing) {
-              router.back();
-              return;
-            }
-            // A student who signed in first and was sent here to pick their
-            // subjects already has the account this flow used to demand next.
-            // Routing them to signup told them to create one again. Signed in,
-            // the steps behind this one are dismissed too, so back from home
-            // does not walk into onboarding.
-            if (state.user) {
-              resetTo('/(tabs)');
-            } else router.replace('/signup');
+            router.back();
           }}
         />
       }
     >
       <Header title={t('onboarding.subjectsTitle')} sub={t('onboarding.subjectsSub')} back />
-      {editing ? null : <Steps step={4} />}
 
       <SectionTitle>{t('onboarding.compulsory')}</SectionTitle>
       <Card flat style={{ paddingVertical: 0 }}>

@@ -14,6 +14,7 @@ import { ScriptNumbers } from '@/components/ui/ScriptList';
 import { useApp, useLang, useT } from '@/lib/store';
 import { useTutorQuota } from '@/lib/use-tutor-quota';
 import { Markdown } from '@/components/ui/Markdown';
+import { ReportAi } from '@/components/app/ReportAi';
 
 /**
  * Weak topics, each with a name a student can read.
@@ -431,6 +432,7 @@ export function CoachRail() {
         urduClassName="text-[12.5px] text-ink2"
         listClassName="flex flex-col gap-1"
       />
+      <ReportAi surface="coach" excerpt={report.summary} />
       {cta}
     </Card>
   );

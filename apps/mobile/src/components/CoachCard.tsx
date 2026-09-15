@@ -7,6 +7,7 @@ import { useLang, useT } from '../i18n';
 import { useApp } from '../store/app';
 import { C, rowDir } from '../theme';
 import { Markdown } from './Markdown';
+import { ReportAi } from './ReportAi';
 
 /**
  * The AI coach on the dashboard: two sentences about the week, the two weakest
@@ -171,6 +172,7 @@ export function CoachCard() {
           );
         })}
       </View>
+      <ReportAi surface="coach" excerpt={data.summary} />
       {cta}
     </Card>
   );

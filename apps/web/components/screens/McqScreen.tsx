@@ -14,6 +14,7 @@ import { Confirm } from '@/components/ui/sheet';
 import { NoSession } from './NoSession';
 import { Page } from '@/components/app/Page';
 import { Markdown } from '@/components/ui/Markdown';
+import { ReportAi } from '@/components/app/ReportAi';
 
 const LEVELS: { value: Confidence; label: StringKey }[] = [
   { value: 0, label: 'session.conf0' },
@@ -221,6 +222,7 @@ export function McqScreen() {
           <Card>
             <Label className="text-teal">{t('session.why')}</Label>
             <Markdown text={mcq.explanation} className="mt-1 text-[14.5px] leading-[1.6] text-ink" />
+            {mcq.source === 'ai' ? <ReportAi surface="ai_test" refId={mcq.id} excerpt={`${mcq.q}\n\n${mcq.explanation}`} /> : null}
             {/* Generated questions carry no chapter, and a link to
                 /learn/reader/ with nothing after it is a 404. */}
             {mcq.chapterId ? (

@@ -2,12 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { SUBJECTS, subjectName } from '@matricmate/core';
+import { SUBJECTS, subjectById, subjectName, subjectsForScience } from '@matricmate/core';
+import type { ScienceChoice } from '@matricmate/core';
 import { ItemButton } from '@/components/ui/controls';
 import { Card, Check, Icon, Item, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useLang, useT } from '@/lib/store';
-import { StepScreen } from './StepScreen';
+import { ChoiceCard, StepScreen, useAutoStep } from './StepScreen';
 import { goBackTo } from '@/lib/nav-trail';
 
 /** What a first run starts with: the three sciences. */
@@ -42,6 +43,46 @@ export function ChooseSubjects({ edit = false }: { edit?: boolean }) {
 
   const total = compulsory.length + picked.length;
   const enough = picked.length >= 2;
+
+  /*
+   * The first run asks one thing. Everyone takes the compulsory subjects,
+   * Physics, Chemistry and Maths, so the only real choice is the fourth
+   * science subject. The full list stays for Edit profile, where a student can
+   * take on as many as they like. Next is the free trial, which starts by
+   * picking its subject.
+   */
+  const auto = useAutoStep<ScienceChoice>(!edit, synced, async (choice) => {
+    const ok = await actions.setOnboarding({ group: 'science', subjects: subjectsForScience(choice) });
+    if (!ok) {
+      toast(t('states.errorBody'));
+      return;
+    }
+    router.replace('/trial');
+  });
+  const going = auto.going;
+  if (!edit) {
+    const mine = new Set(state.onboarding?.subjects ?? []);
+    const had: ScienceChoice | null = mine.has('bio') && mine.has('cs') ? 'both' : mine.has('cs') ? 'cs' : mine.has('bio') ? 'bio' : null;
+    const choose = (choice: ScienceChoice) => auto.pick(choice);
+    return (
+      <StepScreen
+        auto
+        busy={going}
+        step={4}
+        title={t('onboarding.scienceTitle')}
+        sub={t('onboarding.scienceSub')}
+        cta={t('common.continue')}
+        waiting={!synced}
+        footnote={t('onboarding.scienceFootnote')}
+        backHref="/onboarding/medium"
+        onNext={() => {}}
+      >
+        <ChoiceCard title={subjectName(subjectById('bio'), lang)} sub={t('onboarding.scienceBioSub')} selected={had === 'bio'} onClick={() => choose('bio')} />
+        <ChoiceCard title={subjectName(subjectById('cs'), lang)} sub={t('onboarding.scienceCsSub')} selected={had === 'cs'} onClick={() => choose('cs')} />
+        <ChoiceCard title={t('onboarding.scienceBoth')} sub={t('onboarding.scienceBothSub')} selected={had === 'both'} onClick={() => choose('both')} />
+      </StepScreen>
+    );
+  }
 
   return (
     <StepScreen

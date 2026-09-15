@@ -63,10 +63,12 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   },
 ];
 
-export default function TermsPage() {
+export default async function TermsPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+  // The Android app opens this with ?from=app: no navigation on to pricing.
+  const bare = (await searchParams).from === 'app';
   return (
     <>
-      <Nav />
+      <Nav bare={bare} />
 
       <main className="mx-auto max-w-[720px] px-5 py-14">
         <h1 className="font-display text-mk-h1 text-ink">Terms and conditions</h1>
@@ -88,7 +90,7 @@ export default function TermsPage() {
         </div>
       </main>
 
-      <SiteFooter />
+      <SiteFooter bare={bare} />
     </>
   );
 }

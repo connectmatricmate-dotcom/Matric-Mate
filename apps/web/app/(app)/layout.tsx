@@ -1,38 +1,18 @@
 import { LanguageRefresh } from '@/components/app/LanguageRefresh';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { boardChoice } from '@matricmate/core';
 import { Localized } from '@/components/app/Localized';
-import { SetupGate, type SetupStep } from '@/components/app/SetupGate';
+import { SetupGate } from '@/components/app/SetupGate';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import { Shell } from '@/components/app/Shell';
 import { PushLive } from '@/components/app/PushLive';
 import { StudyClock } from '@/components/app/StudyClock';
 import { currentAccess, isOpenWithoutPlan } from '@/lib/entitlement';
 import { keepStaffOut } from '@/lib/roles';
-import { createClient, getUser } from '@/lib/supabase/server';
+import { unfinishedStep } from '@/lib/setup';
+import { createClient } from '@/lib/supabase/server';
 import { AppProvider } from '@/lib/store';
 
-/**
- * The onboarding step an account stopped before, or null when its setup is
- * complete: a board, a medium and at least one subject saved. Only the first
- * missing step, so a student who has everything but their subjects answers
- * one screen, not four. A failed read answers null, because sending a student
- * back through setup on a database hiccup is worse than letting them in.
- */
-async function unfinishedStep(): Promise<SetupStep | null> {
-  const user = await getUser();
-  if (!user) return null;
-  const supabase = await createClient();
-  const { data, error } = await supabase.from('profiles').select('onboarding').eq('id', user.id).maybeSingle();
-  if (error || !data) return null;
-  const onboarding = data.onboarding as { medium?: unknown; subjects?: unknown } | null;
-  if (!onboarding) return 'class';
-  if (!boardChoice(onboarding)) return 'board';
-  if (onboarding.medium !== 'en' && onboarding.medium !== 'ur') return 'medium';
-  if (!Array.isArray(onboarding.subjects) || onboarding.subjects.length === 0) return 'subjects';
-  return null;
-}
 
 /** Renders once; child pages slot into it without rebuilding the nav. */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -67,7 +47,25 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const [access, unfinished] = await Promise.all([currentAccess(), unfinishedStep()]);
   const paid = access.active;
 
-  if (!paid && !isOpenWithoutPlan(pathname)) redirect('/upgrade');
+  /*
+   * No plan: a new account starts its free trial (/trial), anyone else goes
+   * to the plans. Asked only of a student without a plan, and of the database
+   * (trial_state, migration 0045), so this and start_trial cannot disagree.
+   */
+  if (!paid) {
+    // Setup comes before the trial or the plans: the trial is picked from the
+    // subjects chosen there. The account pages stay open either way.
+    if (unfinished && !(pathname === '/account' || pathname.startsWith('/account/'))) redirect(`/onboarding/${unfinished}`);
+    const planPage = pathname === '/upgrade' || pathname === '/trial';
+    if (planPage || !isOpenWithoutPlan(pathname)) {
+      const { data: trial } = await (await createClient()).rpc('trial_state');
+      const to = trial === 'eligible' ? '/trial' : '/upgrade';
+      if (pathname !== to) redirect(to);
+    }
+  } else if (pathname === '/trial') {
+    // A plan is running: nothing to start.
+    redirect('/dashboard');
+  }
 
   /*
    * And the other direction. A student who pays has nothing to do on a sales
@@ -95,7 +93,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <Localized lang={lang}>
       <AppProvider
         initialLanguage={lang}
-        initialPlan={paid ? { active: true, plan: access.tier ?? undefined, trialSubject: access.trialSubject } : null}
+        initialPlan={paid ? { active: true, plan: access.tier ?? undefined, trialSubject: access.trialSubject, validTill: access.validTill } : null}
       >
         <LanguageRefresh />
         <PushLive />

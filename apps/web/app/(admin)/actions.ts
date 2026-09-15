@@ -296,6 +296,18 @@ export async function revokePremiumAction(_prev: AdminState, formData: FormData)
  * they already brought or anything they have earned, which is the difference
  * between suspending a link and erasing a working relationship.
  */
+/** A reported AI answer, read (see /admin/reports). */
+export async function markReportSeenAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  const who = await requireAdmin();
+  if ('error' in who) return { error: who.error };
+  const id = String(formData.get('reportId') ?? '');
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { error: 'Unknown report.' };
+  const { error } = await createAdminClient().from('ai_reports').update({ status: 'seen' }).eq('id', id);
+  if (error) return { error: `Could not update: ${error.message}` };
+  revalidatePath('/admin/reports');
+  return { ok: 'Marked as seen.' };
+}
+
 export async function setTeacherActiveAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   const who = await requireAdmin();
   if ('error' in who) return { error: who.error };

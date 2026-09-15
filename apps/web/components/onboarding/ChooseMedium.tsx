@@ -10,7 +10,7 @@ import { useState } from 'react';
 import type { Medium } from '@matricmate/core';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useT } from '@/lib/store';
-import { ChoiceCard, StepScreen } from './StepScreen';
+import { ChoiceCard, StepScreen, useAutoStep } from './StepScreen';
 import { goBackTo } from '@/lib/nav-trail';
 
 export function ChooseMedium({ edit = false }: { edit?: boolean }) {
@@ -23,8 +23,29 @@ export function ChooseMedium({ edit = false }: { edit?: boolean }) {
   const [picked, setPicked] = useState<Medium | null>(null);
   const value = picked ?? state.onboarding?.medium ?? state.settings.language;
 
+  const save = async (v: Medium) => {
+    // The language first, so the next screen already arrives in it.
+    if (v !== state.settings.language) actions.setLanguage(v);
+    if (!(await actions.setOnboarding({ medium: v }))) {
+      toast(t('states.errorBody'));
+      return;
+    }
+    if (edit) goBackTo(router, '/account/edit');
+    else router.replace('/onboarding/subjects');
+  };
+  // The first run moves on at the click (StepScreen auto); Edit profile saves
+  // with the button.
+  const auto = useAutoStep<Medium>(!edit, synced, save);
+  const going = auto.going;
+  const pick = (v: Medium) => {
+    setPicked(v);
+    auto.pick(v);
+  };
+
   return (
     <StepScreen
+      auto={!edit}
+      busy={going}
       step={3}
       title={t('onboarding.mediumTitle')}
       sub={t('onboarding.mediumSub')}
@@ -33,28 +54,19 @@ export function ChooseMedium({ edit = false }: { edit?: boolean }) {
       backHref={edit ? '/account/edit' : '/onboarding/board'}
       edit={edit}
       waiting={!synced}
-      onNext={async () => {
-        // The language first, so the next screen already arrives in it.
-        if (value !== state.settings.language) actions.setLanguage(value);
-        if (!(await actions.setOnboarding({ medium: value }))) {
-          toast(t('states.errorBody'));
-          return;
-        }
-        if (edit) goBackTo(router, '/account/edit');
-        else router.replace('/onboarding/subjects');
-      }}
+      onNext={() => save(value)}
     >
       <ChoiceCard
         title={t('onboarding.mediumEn')}
         sub={t('onboarding.mediumEnSub')}
         selected={value === 'en'}
-        onClick={() => setPicked('en')}
+        onClick={() => pick('en')}
       />
       <ChoiceCard
         title={t('onboarding.mediumUr')}
         sub={t('onboarding.mediumUrSub')}
         selected={value === 'ur'}
-        onClick={() => setPicked('ur')}
+        onClick={() => pick('ur')}
       />
     </StepScreen>
   );

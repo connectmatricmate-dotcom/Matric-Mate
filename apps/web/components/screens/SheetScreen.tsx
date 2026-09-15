@@ -8,6 +8,7 @@ import { Btn } from '@/components/ui/controls';
 import { Card, Skeleton } from '@/components/ui/primitives';
 import { useApp, useLang, useT } from '@/lib/store';
 import { Markdown } from '@/components/ui/Markdown';
+import { ReportAi } from '@/components/app/ReportAi';
 
 /** Lines of a sheet, in the shape of the card that is coming. */
 function SheetLines() {
@@ -113,6 +114,7 @@ export function SheetScreen({ chapter }: { chapter: Chapter }) {
         <>
           <Card flat>
             <Markdown text={sheet ?? ''} className="text-[14px] leading-[1.7] text-ink" />
+            <ReportAi surface="sheet" refId={chapterId} excerpt={sheet} />
           </Card>
           <p className="mt-3 text-center text-[12px] text-ink3">
             {t('tutor.aiMade')} · {t('tutor.disclaimer')}

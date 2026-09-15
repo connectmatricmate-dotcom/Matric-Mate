@@ -184,9 +184,8 @@ export default function Chapters() {
                   {empty ? null : locked && shut ? (
                     <Icon name="lock" size={17} color={C.ink3} />
                   ) : locked ? (
-                    <Pill tone="grey" icon="lock" style={{ maxWidth: '40%' }}>
-                      {t('study.premiumChapter')}
-                    </Pill>
+                    // A lock, not a plan's name: the app names no plan to buy (core/billing.ts).
+                    <Icon name="lock" size={17} color={C.ink3} />
                   ) : current ? (
                     <Pill tone="orange" style={{ maxWidth: '40%' }}>
                       {t('common.continue')}
@@ -214,11 +213,9 @@ export default function Chapters() {
           })}
         </View>
       )}
-      <Spacer h={S.md} />
-      <Small>{t('study.premiumNote')}</Small>
 
-      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={shut ? t('trial.lockedTitle') : t('billing.premium')}>
-        <LockedNotice variant="locked" />
+      <Sheet visible={showLocked} onClose={() => setShowLocked(false)} title={t('trial.lockedTitle')}>
+        <LockedNotice />
         <Spacer h={S.md} />
         <Btn title={t('common.close')} variant="line" onPress={() => setShowLocked(false)} />
       </Sheet>

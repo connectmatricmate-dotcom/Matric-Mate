@@ -73,6 +73,7 @@ export function StepScreen({
   onNext,
   disabled,
   footnote,
+  auto,
 }: {
   step: number;
   title: string;
@@ -82,9 +83,15 @@ export function StepScreen({
   onNext: () => void;
   disabled?: boolean;
   footnote?: string;
+  /**
+   * The first run: a tap on a card is the answer and moves on, so the four
+   * steps are four taps. The same screens reached from Edit profile keep the
+   * button, because a change there can cost progress and asks first.
+   */
+  auto?: boolean;
 }) {
   return (
-    <Screen footer={<Btn title={cta} onPress={onNext} disabled={disabled} />}>
+    <Screen footer={auto ? undefined : <Btn title={cta} onPress={onNext} disabled={disabled} />}>
       <Header title={title} sub={sub} back />
       <Steps step={step} />
       <View style={{ gap: S.md }}>{children}</View>
