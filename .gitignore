@@ -69,3 +69,6 @@ image*.png
 # every APK and are restricted to our package name, so there is nothing in it
 # to leak. Ignoring it broke the build instead: EAS decides what to archive
 # from this file, so the Android build reached Gradle with no FCM config.
+
+# A captured browser session for a third-party site (15 Sep audit): never commit it.
+reference/apex-capture/state.json

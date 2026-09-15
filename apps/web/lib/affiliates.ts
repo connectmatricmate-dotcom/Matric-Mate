@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { asBoard, parseDailyReport, type Board, type DailyReport } from '@matricmate/core';
 import { planIsPaid } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -40,6 +41,9 @@ export type ReferredStudent = {
   paid: boolean;
   /** What this student has paid us in total, net of refunds. */
   spend: Money;
+  /** The teacher's commission on `spend`, rounded per student (shareOf), so
+   *  the rows of a table add up to the "Earned" total above it. */
+  share: Money;
   /** What they did on the day asked about; null when that read failed. */
   activity: StudentActivity | null;
 };
@@ -96,11 +100,27 @@ export type Payout = { id: string; amount: Money; note: string | null; at: strin
  */
 const COUNTS = 'paid';
 
-/** Rupees, rounded to the nearest whole one. Nobody pays out paisa. */
-const share = (gross: Money, pct: number): Money => Math.round((gross * pct) / 100);
+/**
+ * A teacher's commission on an amount, in whole rupees. Nobody pays out paisa.
+ *
+ * Rounded per student and then added up, everywhere: the total used to be
+ * rounded once while each table row rounded its own share, so a teacher could
+ * add up their rows and get a different rupee from "Earned".
+ */
+export const shareOf = (spend: Money, pct: number): Money => Math.round((spend * pct) / 100);
+
+/** Payments by students who have since deleted their account: the money and
+ *  the commission stay, the student does not. */
+export type DeletedSpend = { spend: Money; payments: number };
 
 /**
- * Every payment made by a set of students, totalled per student.
+ * Every payment that earns this teacher a commission, totalled per student.
+ *
+ * Found by `payments.referred_by`, the teacher written on the payment when it
+ * was made (migration 0048), not through the students' profiles: a student
+ * can delete their account, the payment stays for the accounts with no
+ * student on it, and the teacher's earnings must not drop by what that
+ * student paid. Those rows come back as `deleted`.
  *
  * Paged with `.range()`, not `.limit()`. A `select()` stops at a thousand rows
  * without saying so, and a teacher with a few hundred students who have been
@@ -108,30 +128,33 @@ const share = (gross: Money, pct: number): Money => Math.round((gross * pct) / 1
  * they are owed. That is the worst direction for this particular number to be
  * wrong in.
  */
-async function spendByStudent(admin: ReturnType<typeof createAdminClient>, ids: string[]): Promise<Map<string, Money>> {
-  const out = new Map<string, Money>();
-  if (!ids.length) return out;
-
+async function spendForTeacher(
+  admin: ReturnType<typeof createAdminClient>,
+  affiliateId: string,
+): Promise<{ byStudent: Map<string, Money>; deleted: DeletedSpend }> {
+  const byStudent = new Map<string, Money>();
+  const deleted: DeletedSpend = { spend: 0, payments: 0 };
   const PAGE = 1000;
-  // Chunked by student too: a very long `in` list is a very long URL, and
-  // PostgREST is served over one.
-  for (let i = 0; i < ids.length; i += 200) {
-    const slice = ids.slice(i, i + 200);
-    for (let from = 0; ; from += PAGE) {
-      const { data, error } = await admin
-        .from('payments')
-        .select('user_id, amount')
-        .in('user_id', slice)
-        .eq('status', COUNTS)
-        .order('id')
-        .range(from, from + PAGE - 1);
-      if (error) throw new Error(`payments read failed: ${error.message}`);
-      const rows = (data ?? []) as { user_id: string; amount: number | null }[];
-      for (const r of rows) out.set(r.user_id, (out.get(r.user_id) ?? 0) + (r.amount ?? 0));
-      if (rows.length < PAGE) break;
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await admin
+      .from('payments')
+      .select('user_id, amount')
+      .eq('referred_by', affiliateId)
+      .eq('status', COUNTS)
+      .order('id')
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`payments read failed: ${error.message}`);
+    const rows = (data ?? []) as { user_id: string | null; amount: number | null }[];
+    for (const r of rows) {
+      if (r.user_id) byStudent.set(r.user_id, (byStudent.get(r.user_id) ?? 0) + (r.amount ?? 0));
+      else {
+        deleted.spend += r.amount ?? 0;
+        deleted.payments += 1;
+      }
     }
+    if (rows.length < PAGE) break;
   }
-  return out;
+  return { byStudent, deleted };
 }
 
 /**
@@ -190,7 +213,10 @@ async function activityByStudent(
     }
     for (const r of (data ?? []) as { user_id: string; opened: boolean; studied: boolean; seconds: number; questions: number; last_active: string | null }[]) {
       out.set(r.user_id, {
-        opened: !!r.opened,
+        // "Opened" came from study time alone, which a phone offline or a tab
+        // closed quickly may never send, and the teacher read "Not opened"
+        // beside twenty answered questions. Studying is opening.
+        opened: !!r.opened || !!r.studied || (r.questions ?? 0) > 0,
         studied: !!r.studied,
         seconds: r.seconds ?? 0,
         questions: r.questions ?? 0,
@@ -201,12 +227,30 @@ async function activityByStudent(
   return out;
 }
 
+/** A teacher's students, and what students who have since deleted their account paid. */
+export type Referrals = { students: ReferredStudent[]; deleted: DeletedSpend & { share: Money } };
+
 /**
- * Every student a teacher brought, with what each has paid, and, when
- * `activity` is asked for, what they did that day: `true` for today or a
- * YYYY-MM-DD day. Totals and the admin's pages skip it; it costs a query.
+ * Every student a teacher brought, with what each has paid and the teacher's
+ * share of it, and, when `activity` is asked for, what they did that day:
+ * `true` for today or a YYYY-MM-DD day. Totals and the admin's pages skip it;
+ * it costs a query.
  */
-export async function referredStudents(affiliateId: string, opts: { activity?: true | string } = {}): Promise<ReferredStudent[]> {
+export async function referredStudents(
+  affiliateId: string,
+  commissionPct: number,
+  opts: { activity?: true | string } = {},
+): Promise<Referrals> {
+  return readReferrals(affiliateId, commissionPct, opts.activity === true ? 'today' : (opts.activity ?? null));
+}
+
+/**
+ * The reader behind referredStudents, keyed on plain values so React.cache
+ * can share one read between the sections of a page that each ask for it
+ * (the totals and the student table on a teacher's page).
+ */
+const readReferrals = cache(async (affiliateId: string, commissionPct: number, activityDay: string | null): Promise<Referrals> => {
+  const opts = { activity: activityDay === 'today' ? (true as const) : (activityDay ?? undefined) };
   const admin = createAdminClient();
 
   const profiles: { id: string; name: string | null; contact: string | null; grade: number | null; board: string | null; referred_at: string | null }[] = [];
@@ -226,14 +270,15 @@ export async function referredStudents(affiliateId: string, opts: { activity?: t
   }
 
   const ids = profiles.map((p) => p.id);
-  const [spend, paying, activity] = await Promise.all([
-    spendByStudent(admin, ids),
+  const [{ byStudent, deleted }, paying, activity] = await Promise.all([
+    spendForTeacher(admin, affiliateId),
     payingNow(admin, ids),
     opts.activity ? activityByStudent(admin, ids, opts.activity === true ? undefined : opts.activity) : Promise.resolve(new Map<string, StudentActivity>()),
   ]);
 
-  return profiles.map((p) => {
-    const total = spend.get(p.id) ?? 0;
+  const students = profiles.map((p) => {
+    const total = byStudent.get(p.id) ?? 0;
+    byStudent.delete(p.id);
     return {
       id: p.id,
       name: p.name?.trim() || 'Student',
@@ -243,10 +288,20 @@ export async function referredStudents(affiliateId: string, opts: { activity?: t
       joinedAt: p.referred_at ?? '',
       paid: paying.has(p.id),
       spend: total,
+      share: shareOf(total, commissionPct),
       activity: activity.get(p.id) ?? null,
     };
   });
-}
+
+  // A payment still carrying a payer who is no longer on this list has no row
+  // of its own to sit in; it is counted with the deleted accounts rather than
+  // dropped, so the rows still add up to the total.
+  for (const amount of byStudent.values()) {
+    deleted.spend += amount;
+    deleted.payments += 1;
+  }
+  return { students, deleted: { ...deleted, share: shareOf(deleted.spend, commissionPct) } };
+});
 
 export type StudentDay = {
   student: { id: string; name: string; grade: number | null; board: Board; school: string | null };
@@ -275,7 +330,35 @@ export async function referredStudentDay(affiliateId: string, studentId: string,
     .maybeSingle();
   if (error) throw new Error(`profile read failed: ${error.message}`);
   if (!profile) return null;
+  return dayFor(admin, profile, day, week);
+}
 
+/**
+ * Any student's day, for the administrator's student page: the same report a
+ * teacher sees, without the teacher scoping. Administrators only, checked
+ * here as well as on the page (see requireAdmin). Null for an id that is not a
+ * student.
+ */
+export async function adminStudentDay(studentId: string, day: string, week: string[]): Promise<StudentDay | null> {
+  await requireAdmin();
+  const admin = createAdminClient();
+  const { data: profile, error } = await admin
+    .from('profiles')
+    .select('id, name, grade, board, school, role')
+    .eq('id', studentId)
+    .maybeSingle();
+  if (error) throw new Error(`profile read failed: ${error.message}`);
+  if (!profile || (profile.role && profile.role !== 'student')) return null;
+  return dayFor(admin, profile, day, week);
+}
+
+async function dayFor(
+  admin: ReturnType<typeof createAdminClient>,
+  profile: Record<string, unknown>,
+  day: string,
+  week: string[],
+): Promise<StudentDay> {
+  const studentId = String(profile.id);
   const [{ data: raw, error: reportError }, ...days] = await Promise.all([
     admin.rpc('daily_report', { p_day: day, p_user: studentId }),
     ...week.map((d) => activityByStudent(admin, [studentId], d)),
@@ -304,17 +387,32 @@ export async function referredStudentDay(affiliateId: string, studentId: string,
   };
 }
 
-export async function payouts(affiliateId: string): Promise<Payout[]> {
+/**
+ * Every payout to a teacher, newest first. Paged: it stopped at 500, and the
+ * sum of this list is what "Paid to you" and "Outstanding" are made of, so a
+ * long-serving teacher would have been shown as owed money already paid.
+ * Cached per render, like readReferrals: the totals and the payout table both
+ * ask for it.
+ */
+export const payouts = cache(async (affiliateId: string): Promise<Payout[]> => {
   const admin = createAdminClient();
-  const { data, error } = await admin
-    .from('affiliate_payouts')
-    .select('id, amount, note, at')
-    .eq('affiliate_id', affiliateId)
-    .order('at', { ascending: false })
-    .range(0, 499);
-  if (error) throw new Error(`payouts read failed: ${error.message}`);
-  return (data ?? []) as Payout[];
-}
+  const out: Payout[] = [];
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await admin
+      .from('affiliate_payouts')
+      .select('id, amount, note, at')
+      .eq('affiliate_id', affiliateId)
+      .order('at', { ascending: false })
+      .order('id')
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`payouts read failed: ${error.message}`);
+    const rows = (data ?? []) as Payout[];
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+});
 
 export async function affiliateByUserId(userId: string): Promise<AffiliateRow | null> {
   const admin = createAdminClient();
@@ -347,9 +445,10 @@ function toRow(r: Record<string, unknown>, email: string): AffiliateRow {
 
 /** One teacher's numbers: students, what they brought in, what they are owed. */
 export async function totalsFor(affiliateId: string, commissionPct: number): Promise<AffiliateTotals> {
-  const [students, paid] = await Promise.all([referredStudents(affiliateId), payouts(affiliateId)]);
-  const gross = students.reduce((sum, s) => sum + s.spend, 0);
-  const earned = share(gross, commissionPct);
+  const [{ students, deleted }, paid] = await Promise.all([referredStudents(affiliateId, commissionPct), payouts(affiliateId)]);
+  const gross = students.reduce((sum, s) => sum + s.spend, 0) + deleted.spend;
+  // The sum of the per-student shares, so the table rows add up to it.
+  const earned = students.reduce((sum, s) => sum + s.share, 0) + deleted.share;
   const paidOut = paid.reduce((sum, p) => sum + p.amount, 0);
   return {
     students: students.length,
@@ -369,10 +468,21 @@ export async function totalsFor(affiliateId: string, commissionPct: number): Pro
 export async function allAffiliates(): Promise<{ row: AffiliateRow; totals: AffiliateTotals }[]> {
   await requireAdmin();
   const admin = createAdminClient();
-  const { data, error } = await admin.from('affiliates').select('*').order('created_at', { ascending: false }).range(0, 499);
-  if (error) throw new Error(`affiliates read failed: ${error.message}`);
-
-  const rows = (data ?? []) as Record<string, unknown>[];
+  // Paged: it stopped at 500 teachers without saying so.
+  const rows: Record<string, unknown>[] = [];
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await admin
+      .from('affiliates')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .order('user_id')
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`affiliates read failed: ${error.message}`);
+    const page = (data ?? []) as Record<string, unknown>[];
+    rows.push(...page);
+    if (page.length < PAGE) break;
+  }
   const emails = await Promise.all(rows.map((r) => admin.auth.admin.getUserById(String(r.user_id))));
 
   return Promise.all(

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { formatDate } from '@matricmate/core';
 import { loadRecipient, notify, planEnded, planEnding, trialEnded, trialEnding } from '@/lib/notify';
 import type { Notice } from '@/lib/notify';
-import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry } from '@/lib/notify/jobs';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry, logged } from '@/lib/notify/jobs';
 import { plansLink } from '@/lib/signin-link';
+import { SITE_URL } from '@/lib/site';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -60,7 +61,9 @@ function due(row: Row, now: number): Kind | null {
   return null;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = logged('plans', handle);
+
+async function handle(req: NextRequest) {
   if (!cronAuthorised(req)) return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   const nowDate = new Date();
   const hour = karachiHour(nowDate);
@@ -139,7 +142,8 @@ export async function GET(req: NextRequest) {
           await release(row, kind);
           return;
         }
-        const link = plansLink(row.user_id);
+        // Without the secret no link can be signed; the email then points at sign-in.
+        const link = plansLink(row.user_id) ?? `${SITE_URL}/login?next=/upgrade`;
         const s = row.trial_subject ? subjectRow.get(row.trial_subject) : undefined;
         const subject = s ? (recipient.lang === 'ur' && s.urdu_name) || s.name : '';
         // In Karachi time: the server's own clock is UTC, which put a plan

@@ -31,11 +31,11 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
   const t = useT();
   const { lang } = useLang();
   /* The name a student reads, which is not the name an attempt is filed
-     under. The chapter's own title keeps feeding `topic`, so weak-topic stats
-     do not split in two when somebody switches language; the heading follows
-     the app's language instead. Both come from the server: the client index
-     is empty on a cold load for Class 10 and Punjab, which filed every one of
-     their attempts under a blank topic. */
+     under: answers are filed under the chapter id (topicKey in core), so weak
+     topics do not split in two across a language switch or between the two
+     apps; the heading follows the app's language instead. Both come from the
+     server: the client index is empty on a cold load for Class 10 and Punjab,
+     which filed every one of their attempts under a blank topic. */
   const chapterId = chapter.id;
   const name = chapterName(chapter, lang);
   const toast = useToast();
@@ -68,6 +68,9 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
       // The subject's own language: English answers are marked in English
       // and Urdu ones in Urdu, whatever medium the student reads in.
       medium: subjectMedium(chapterId, chapter.board, state.settings.contentMedium),
+      // Where the question is from: the server marks a free trial's answers
+      // only in the trial's own subject, and refuses a check that does not say.
+      chapterId,
     });
     setChecking(false);
     if (!res.ok) {
@@ -99,11 +102,11 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
       mcqId: item.id,
       chapterId,
       subjectId: chapterId.split('-')[0],
-      // The chapter's own title, not the name of the exercise. This used
-      // to store the translated UI label, so Weak topics listed
-      // "Fill in the blanks" as a syllabus topic, and switching language
-      // forked it into a second one.
-      topic: chapter.title,
+      // The chapter's id, the one rule both apps file short questions under
+      // (see topicKey in core); weak topics name the chapter in the student's
+      // language. The title filed it in English here and in the subject's
+      // language on Android, which split one chapter into two topics.
+      topic: chapterId,
       correct: m === 'got',
       confidence: null,
       mode: 'shortq',
@@ -148,6 +151,7 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
 
   return (
     <Page width="focus">
+      <h1 className="sr-only">{`${t('practice.shortQ')} · ${name}`}</h1>
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
         backLabel={name}
@@ -236,6 +240,8 @@ export function ShortQScreen({ chapter, items, canChangeChapter }: { chapter: Ch
               <Label>{t('session.markingPoints')}</Label>
               <ScriptBullets items={item.points} className="text-[13px] text-ink2" />
             </div>
+            {/* The model answer and its points are written with AI too. */}
+            <ReportAi surface="ai_test" refId={item.id} excerpt={item.answer} />
           </Card>
 
           {derived.access.ai ? (

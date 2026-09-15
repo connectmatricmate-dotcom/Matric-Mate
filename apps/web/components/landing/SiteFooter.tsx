@@ -7,8 +7,9 @@ import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 import { Wordmark } from '@/components/ui/primitives';
 
 /* 44px rows on a phone, where every one of these is a thumb target; a
-   mouse gets the tighter 40px list. */
-const LINK = 'inline-flex min-h-11 items-center transition-colors duration-200 hover:text-teal md:min-h-10';
+   mouse gets the tighter 40px list. Never narrower than tall either: "FAQ"
+   on its own was a 28px-wide target. */
+const LINK = 'inline-flex min-h-11 min-w-11 items-center transition-colors duration-200 hover:text-teal md:min-h-10 md:min-w-10';
 
 /** Who built the site: the studio's name, linking to its Upwork profile. */
 const DEVELOPER_URL = 'https://www.upwork.com/freelancers/~0193f3975eff0003a8';

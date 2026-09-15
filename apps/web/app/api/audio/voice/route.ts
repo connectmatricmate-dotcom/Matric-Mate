@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   estimatedSecs,
-  finalPath,
   openLesson,
   publicUrl,
+  creditsFor,
   remainingChars,
   signStream,
   startPart,
@@ -51,8 +51,9 @@ export async function GET(req: NextRequest) {
     if (!voiceReady(settings, medium as Medium)) return none('off');
     if (!lesson) return none('not_in_scope');
     if (!lesson.pending) {
+      if (!lesson.path) return none('error');
       const { data: track } = await admin.from('audio_tracks').select('duration_secs').eq('id', `${chapter}-${medium}`).maybeSingle();
-      return NextResponse.json({ stream: null, reason: 'finished', url: publicUrl(admin, finalPath(lesson)), durationSecs: Number(track?.duration_secs) || 0 });
+      return NextResponse.json({ stream: null, reason: 'finished', url: publicUrl(admin, lesson.path), durationSecs: Number(track?.duration_secs) || 0 });
     }
     // Asked again from the very end of a lesson that is made but not yet
     // joined into its file: that was the end, there is nothing more to play.
@@ -60,7 +61,7 @@ export async function GET(req: NextRequest) {
     // Only a lesson this month can finish: half a lesson in one voice and
     // the other half cut off is worse than the old voice all the way through.
     const remaining = remainingChars(lesson);
-    if (remaining > 0 && used + remaining > settings.monthlyChars) return none('budget');
+    if (remaining > 0 && used + creditsFor(remaining) > settings.monthlyChars) return none('budget');
     const token = signStream(chapter, medium as Medium, who.userId);
     const stream = `${req.nextUrl.origin}/api/audio/voice/stream?${token}${at ? `&at=${at}` : ''}`;
     return NextResponse.json({ stream, estSecs: estimatedSecs(lesson) });

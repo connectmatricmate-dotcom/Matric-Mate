@@ -101,13 +101,20 @@ export function ResultScreen() {
   }, [answers, s]);
 
   // Memoized: this render runs ~42 times a second while the ring counts up,
-  // and accuracy() walks the full attempts history on every call.
-  const overallAccuracy = useMemo(() => accuracy(state.attempts), [state.attempts]);
+  // and accuracy() walks the full attempts history on every call. Only the
+  // answers from before this set, as on Android: counting the set in its own
+  // average pulled the average towards it, and a first set always read
+  // "+0% vs your average". Null when there were none, and the pill goes.
+  const before = s?.startedAt ?? 0;
+  const overallAccuracy = useMemo(() => {
+    const earlier = state.attempts.filter((a) => a.at < before);
+    return earlier.length ? accuracy(earlier) : null;
+  }, [state.attempts, before]);
 
   if (!s || !total) return <NoSession />;
 
   const good = pct >= 70;
-  const diff = pct - overallAccuracy;
+  const diff = overallAccuracy === null ? null : pct - overallAccuracy;
 
   return (
     <Page width="focus">
@@ -141,7 +148,7 @@ export function ResultScreen() {
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         <Pill tone={good ? 'green' : 'red'}>{t('session.grade', { g: grade(pct) })}</Pill>
         <Pill tone="orange">{s.mode === 'exam' ? t('session.xpDoubled', { n: xp }) : t('session.xpEarned', { n: xp })}</Pill>
-        <Pill tone="grey">{t('session.vsAverage', { n: `${diff >= 0 ? '+' : ''}${diff}` })}</Pill>
+        {diff !== null ? <Pill tone="grey">{t('session.vsAverage', { n: `${diff >= 0 ? '+' : ''}${diff}` })}</Pill> : null}
       </div>
 
       {weakest ? (

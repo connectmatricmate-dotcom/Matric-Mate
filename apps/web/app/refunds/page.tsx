@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
+import { onlinePayments } from '@/lib/gateway';
 import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -11,7 +12,13 @@ export const metadata: Metadata = {
   alternates: { canonical: canonicalUrl('/refunds') },
 };
 
-const SECTIONS: { heading: string; paragraphs: string[] }[] = [
+/**
+ * Refunds, as they work today. Where the money goes back, and what a stuck
+ * payment looks like, depend on how it was paid: through a gateway, or to our
+ * team directly while plans are switched on by hand (onlinePayments). The
+ * rules themselves are the same either way.
+ */
+const sections = (online: boolean): { heading: string; paragraphs: string[] }[] => [
   {
     heading: 'Stopping',
     paragraphs: [
@@ -39,19 +46,26 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
     heading: 'How to ask for one',
     paragraphs: [
       `Call ${BUSINESS.phone} or email ${SUPPORT_EMAIL} with the mobile number on the account and the date of the payment. That is all we need to find it.`,
-      'We reply within two working days. Approved refunds go back through the payment gateway to the same method you paid with, which is the only place they can go. Wallets usually take two to three working days, and cards five to ten working days, depending on the bank.',
+      online
+        ? 'We reply within two working days. Approved refunds go back through the payment gateway to the same method you paid with, which is the only place they can go. Wallets usually take two to three working days, and cards five to ten working days, depending on the bank.'
+        : 'We reply within two working days. An approved refund goes back the way you paid: to the same bank account or mobile wallet, or in cash if you paid in cash.',
     ],
   },
   {
-    heading: 'Failed and pending payments',
-    paragraphs: [
-      'If money left your account but the plan did not activate, do not pay again. Send us the transaction ID and we will either activate the plan or return the payment.',
-      'A payment the gateway declines is never taken. If you see it held on your statement it is an authorisation, and your bank releases it, usually within a few working days.',
-    ],
+    heading: online ? 'Failed and pending payments' : 'If your plan has not been switched on',
+    paragraphs: online
+      ? [
+          'If money left your account but the plan did not activate, do not pay again. Send us the transaction ID and we will either activate the plan or return the payment.',
+          'A payment the gateway declines is never taken. If you see it held on your statement it is an authorisation, and your bank releases it, usually within a few working days.',
+        ]
+      : [
+          'Our team switches a plan on by hand once your payment has reached us. If you have paid and your plan is not on within a working day, do not pay again: send us the receipt or transaction ID and we will either switch the plan on or return the payment.',
+        ],
   },
 ];
 
 export default function RefundsPage() {
+  const online = onlinePayments();
   return (
     <>
       <Nav />
@@ -64,7 +78,7 @@ export default function RefundsPage() {
         </p>
 
         <div className="mt-10 flex flex-col gap-9">
-          {SECTIONS.map((s) => (
+          {sections(online).map((s) => (
             <section key={s.heading}>
               <h2 className="font-display text-[22px] text-ink">{s.heading}</h2>
               {s.paragraphs.map((p, i) => (

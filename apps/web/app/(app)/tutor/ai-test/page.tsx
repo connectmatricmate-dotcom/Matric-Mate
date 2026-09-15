@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { Suspense } from 'react';
 import type { Chapter } from '@matricmate/core';
 import { AiTestScreen, AiTestSkeleton } from '@/components/screens/AiTestScreen';
 import { getChapters, getSubjects } from '@/lib/content-readers';
 
-export const metadata: Metadata = {
-  title: 'AI test',
-  description: 'A paper built from the topics you keep getting wrong.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('tutor.aiTestTitle', 'A paper built from the topics you keep getting wrong.');
 
 /**
  * The chapters to build from, read on the server under the student's own

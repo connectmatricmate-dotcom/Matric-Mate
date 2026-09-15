@@ -8,8 +8,11 @@
 
 export const colors = {
   /** Primary. Brightened from #096A8B: the old one read as grey-blue on a
-   * phone in daylight and the client could not tell it apart from the ink. */
-  teal: '#0A7EA4',
+   * phone in daylight and the client could not tell it apart from the ink.
+   * Then a shade back from #0A7EA4, which as text sat at 4.0:1 on its own tint
+   * and 4.5 on paper; this one clears 4.5:1 on every light ground and carries
+   * white at 5.2:1. */
+  teal: '#087598',
   tealDark: '#063D52',
   /** The darkest ground, for the landing hero and any full-bleed dark band.
    * White sits on it at 16:1. */
@@ -24,8 +27,9 @@ export const colors = {
    * reported the greyer text was hard to read; now 6.2:1. */
   ink2: '#3E6473',
   /** Fine print and placeholders only; meaningful copy uses ink2. Darkened
-   * twice: #8AA4AD sat at 2.5:1, #6E8B96 at 3.5:1 still failed AA. Now 4.4:1. */
-  ink3: '#587A87',
+   * three times: #8AA4AD sat at 2.5:1, #6E8B96 at 3.5:1, #587A87 at 4.0:1 on
+   * the tints. Now 4.8:1 on the palest tint and 5.3:1 on paper. */
+  ink3: '#4D6D7A',
   paper: '#FAFBF7',
   card: '#FFFFFF',
   /** Borders. #E4EAE6 read as invisible (1.2:1 against card), so grouped
@@ -39,12 +43,24 @@ export const colors = {
   /** Hotter than the old #F29329, which went muddy next to the brighter
    * primary. Reads at 7:1 on night, and carries ink at 5:1. */
   orange: '#FF8A00',
+  /**
+   * Orange as a BUTTON, under an `onBrand` label. The client wants a white
+   * label on a filled button, and white on `orange` is 2.4:1, which a student
+   * in daylight struggles to read. This deeper orange carries white at 4.7:1
+   * and is still plainly the brand's orange; bars, badges and chips keep the
+   * bright one.
+   */
+  orangeFill: '#B85800',
   /** Orange as TEXT (labels on tints and cards). Fills stay `orange`. */
   orangeDark: '#A85700',
   orangeTint: '#FFF0DC',
-  green: '#2E9E5B',
+  /** Deepened from #2E9E5B, which as text on its own tint was 3.0:1 and
+   * carried a white label at 3.4:1. Now 4.7:1 and 5.3:1. */
+  green: '#1E7B45',
   greenTint: '#E7F5EC',
-  red: '#D9534F',
+  /** Deepened from #D9534F, which carried a white label (Delete, Missed) at
+   * 4.0:1 and was 3.5:1 as text on its own tint. Now 5.4:1 and 4.7:1. */
+  red: '#C0392B',
   redTint: '#FBECEB',
   grey: '#EFF3F0',
   whatsapp: '#25D366',
@@ -115,6 +131,8 @@ export const darkColors: Palette = {
   track: '#173F4E',
   mute: '#2A5A6B',
   orange: '#FF9F2E',
+  /* After dark a button's label goes dark (onBrand), so the fill stays bright. */
+  orangeFill: '#FF9F2E',
   orangeDark: '#FFC178',
   orangeTint: '#3A2712',
   green: '#48C77A',

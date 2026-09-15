@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { useEffect, useMemo, useState } from 'react';
 import { accuracy, chapterById, chapterName, chaptersFor, confidenceBreakdown, fetchLatestCoachReport, last14, nextAction, nextStep, subjectById, subjectName, subjectPct, weakTopics } from '@matricmate/core';
-import type { Attempt, CoachReport } from '@matricmate/core';
+import type { Attempt, CoachReport, Language } from '@matricmate/core';
 import { Bar, Card, Icon, Label, LinkBtn, Pill, Ring, ScriptText, Skeleton } from '@/components/ui/primitives';
 import { ScriptNumbers } from '@/components/ui/ScriptList';
 import { useApp, useLang, useT } from '@/lib/store';
@@ -17,21 +17,17 @@ import { Markdown } from '@/components/ui/Markdown';
 import { ReportAi } from '@/components/app/ReportAi';
 
 /**
- * Weak topics, each with a name a student can read.
- *
- * Answers from AI-made sets are saved with no topic, so they grouped into one
- * nameless row on the rail, on Progress and on Weak topics, and the coach's
- * reports took to saying "the topic name is missing". Those fall back to their
- * chapter's name, which is what the set was built from; anything with no name
- * at all is left out rather than shown as a blank.
+ * Weak topics, each with a name a student can read: core's one helper, named
+ * in the app's language. Answers with no topic (AI sets) and blanks and short
+ * questions are grouped under their chapter there and named after it, so the
+ * rail, Progress, Weak topics and the tutor's profile all agree with Android.
  */
-export function namedWeakTopics(attempts: Attempt[], lang: string) {
-  const named = attempts.map((a) => ((a.topic ?? '').trim() ? a : { ...a, topic: chapterName(chapterById(a.chapterId), lang) }));
-  return weakTopics(named.filter((a) => a.topic));
+export function namedWeakTopics(attempts: Attempt[], lang: Language) {
+  return weakTopics(attempts, 3, { lang });
 }
 
 /** A row key for a weak topic. Two subjects can share a topic name, and a bare name collided. */
-export const weakKey = (w: { subjectId: string; topic: string }) => `${w.subjectId}|${w.topic}`;
+export const weakKey = (w: { subjectId: string; key: string }) => `${w.subjectId}|${w.key}`;
 
 /**
  * The Pakka-meter, promoted out of a sub-page.
@@ -74,7 +70,7 @@ export function ConfidenceRail() {
       )}
       <Link
         href="/insights/performance"
-        className="mt-3 inline-flex min-h-10 items-center gap-1 text-[12.5px] font-extrabold text-teal hover:underline"
+        className="mt-3 inline-flex min-h-11 min-w-11 items-center gap-1 text-[12.5px] font-extrabold text-teal hover:underline"
       >
         {t('common.details')}
         <Icon name="arrowRight" size={13} strokeWidth={2.4} />
@@ -114,13 +110,12 @@ export function SyllabusRail({ limit = 5 }: { limit?: number }) {
   const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const rows = useMemo(
-    () =>
-      derived.subjects
-        .slice(0, limit)
-        .map((sid) => ({ sid, pct: subjectPct(sid, state.readSections, state.attempts) })),
-    [derived.subjects, limit, state.readSections, state.attempts]
-  );
+  // Again when the chapter index lands (contentReady): subjectPct reads its counts.
+  const ready = derived.contentReady;
+  const rows = useMemo(() => {
+    void ready;
+    return derived.subjects.slice(0, limit).map((sid) => ({ sid, pct: subjectPct(sid, state.readSections, state.attempts) }));
+  }, [derived.subjects, limit, state.readSections, state.attempts, ready]);
 
   return (
     <Card flat>
@@ -156,10 +151,15 @@ export function SyllabusRail({ limit = 5 }: { limit?: number }) {
 
 /** The three topics to fix first. Empty until there is enough evidence. */
 export function WeakRail({ limit = 3 }: { limit?: number }) {
-  const { state } = useApp();
+  const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const rows = useMemo(() => namedWeakTopics(state.attempts, lang).slice(0, limit), [state.attempts, lang, limit]);
+  // Again when the chapter index lands: weak topics keep to its syllabus and take their names from it.
+  const ready = derived.contentReady;
+  const rows = useMemo(() => {
+    void ready;
+    return namedWeakTopics(state.attempts, lang).slice(0, limit);
+  }, [state.attempts, lang, limit, ready]);
 
   if (rows.length === 0) return null;
 
@@ -189,7 +189,7 @@ export function WeakRail({ limit = 3 }: { limit?: number }) {
       </ul>
       <Link
         href="/insights/weak"
-        className="mt-3 inline-flex min-h-10 items-center gap-1 text-[12.5px] font-extrabold text-red hover:underline"
+        className="mt-3 inline-flex min-h-11 min-w-11 items-center gap-1 text-[12.5px] font-extrabold text-red hover:underline"
       >
         {t('common.seeAll')}
         <Icon name="arrowRight" size={13} strokeWidth={2.4} />
@@ -202,10 +202,14 @@ export function WeakRail({ limit = 3 }: { limit?: number }) {
 export function CoverageRail() {
   const { state, derived } = useApp();
   const t = useT();
-  const overall = useMemo(
-    () => (derived.subjects.length ? Math.round(derived.subjects.reduce((n, s) => n + subjectPct(s, state.readSections, state.attempts), 0) / derived.subjects.length) : 0),
-    [derived.subjects, state.readSections, state.attempts]
-  );
+  // Again when the chapter index lands (contentReady): subjectPct reads its counts.
+  const ready = derived.contentReady;
+  const overall = useMemo(() => {
+    void ready;
+    return derived.subjects.length
+      ? Math.round(derived.subjects.reduce((n, s) => n + subjectPct(s, state.readSections, state.attempts), 0) / derived.subjects.length)
+      : 0;
+  }, [derived.subjects, state.readSections, state.attempts, ready]);
   const acc = useMemo(() => accuracy(state.attempts), [state.attempts]);
 
   return (

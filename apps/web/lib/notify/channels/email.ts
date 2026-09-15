@@ -2,6 +2,7 @@ import 'server-only';
 import { SUPPORT_EMAIL, colors, translate } from '@matricmate/core';
 import type { Language } from '@matricmate/core';
 import type { ChannelAdapter } from '../types';
+import { unsubscribeLink } from '@/lib/unsubscribe';
 
 /**
  * Resend, for the messages a student may want to keep.
@@ -40,7 +41,7 @@ const esc = (s: string) =>
  * and Gmail strips a <style> block outright. Table-free and single-column, so
  * it survives Outlook without a layout table.
  */
-function shell(lang: Language, heading: string, body: string, action?: { label: string; href: string }, note?: string): string {
+function shell(lang: Language, heading: string, body: string, action?: { label: string; href: string }, note?: string, stop?: string | null): string {
   const rtl = lang === 'ur';
   const dir = rtl ? 'rtl' : 'ltr';
   const font = rtl
@@ -69,7 +70,7 @@ function shell(lang: Language, heading: string, body: string, action?: { label: 
     </div>
   </div>
   <p style="max-width:560px;margin:14px auto 0;font-size:11.5px;color:${colors.ink3};text-align:${rtl ? 'right' : 'left'}">
-    ${esc(translate(lang, 'email.footer'))}
+    ${esc(translate(lang, 'email.footer'))}${stop ? ` <a href="${esc(stop)}" style="color:${colors.ink3}">${esc(translate(lang, 'email.stopEmails'))}</a>` : ''}
   </p>
 </body>
 </html>`;
@@ -95,6 +96,7 @@ export const email: ChannelAdapter = {
     const action = notice.email?.action ? { label: translate(to.lang, notice.email.action.label, notice.params), href: notice.email.action.href } : undefined;
     const note = notice.email?.note ? translate(to.lang, notice.email.note, notice.params) : undefined;
 
+    const stop = unsubscribeLink(to.userId, to.lang);
     try {
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -109,10 +111,13 @@ export const email: ChannelAdapter = {
            */
           reply_to: SUPPORT_EMAIL,
           subject,
-          html: shell(to.lang, subject, body, action, note),
+          html: shell(to.lang, subject, body, action, note, stop),
+          // Mail apps show their own unsubscribe button for this, and a
+          // press on it POSTs straight to the link (one-click, RFC 8058).
+          ...(stop ? { headers: { 'List-Unsubscribe': `<${stop}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } } : {}),
           // A plain-text part as well, so a client that refuses HTML still
           // shows something, and so spam filters see a complete message.
-          text: `${subject}\n\n${body}\n${action ? `\n${action.label}: ${action.href}\n` : ''}${note ? `${note}\n` : ''}\n${translate(to.lang, 'email.footer')}\n`,
+          text: `${subject}\n\n${body}\n${action ? `\n${action.label}: ${action.href}\n` : ''}${note ? `${note}\n` : ''}\n${translate(to.lang, 'email.footer')}\n${stop ? `${translate(to.lang, 'email.stopEmails')}: ${stop}\n` : ''}`,
         }),
       });
       if (!res.ok) {

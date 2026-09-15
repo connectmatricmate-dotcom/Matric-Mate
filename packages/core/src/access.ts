@@ -46,7 +46,10 @@ export function accessFor(input: {
   validTill?: number | null;
   trialSubject?: string | null;
 } | null | undefined): Access {
-  const running = !!input?.active && (input.validTill == null || input.validTill > Date.now());
+  // A plan with no end date is not running: the database (has_active_plan),
+  // the website and the Android app all agree on that, and this used to be
+  // the one place that read a missing date as "for ever".
+  const running = !!input?.active && input.validTill != null && input.validTill > Date.now();
   if (!running) return { active: false, tier: null, ai: false, aiLimit: AI_QUOTA.free, trialSubject: null, validTill: input?.validTill ?? null };
   const tier = tierOf(input?.plan);
   return {

@@ -37,6 +37,14 @@ export type Onboarding = {
   subjects: string[];
 };
 
+/**
+ * Why an account without a plan has none: a free trial or a plan that ran out
+ * on a date, or one switched off early by hand. Absent for an account that
+ * never had one. "No plan yet" was said to all four, which told a student
+ * whose month had just ended that they had never paid.
+ */
+export type Lapse = { kind: 'trial' | 'plan'; at: number } | { kind: 'off'; at: number };
+
 export type Settings = {
   language: Language;
   /** Index into core's AVATARS cast, chosen on the edit-profile screen. */
@@ -66,7 +74,7 @@ export type State = {
   onboarding: Onboarding | null;
   /** `plan` is the PlanId from lib/plans, so the app can name what was bought
    * instead of just saying "Premium". */
-  premium: { active: boolean; validTill: number | null; ref?: string; plan?: string; trialSubject?: string };
+  premium: { active: boolean; validTill: number | null; ref?: string; plan?: string; trialSubject?: string; lapse?: Lapse };
   readSections: string[];
   attempts: Attempt[];
   results: TestResult[];
@@ -79,6 +87,12 @@ export type State = {
   activeDays: string[];
   xp: number;
   cardsKnown: string[];
+  /**
+   * The account's last wipe (profiles.progress_reset_at) this copy was built
+   * against. A newer one on the server means this copy is from before a reset
+   * or a switch, and it is replaced rather than merged (see staleCopy in core).
+   */
+  progressEpoch?: number | null;
   /** False until the saved snapshot has been read, so the UI can hold off. */
   hydrated: boolean;
 };
@@ -351,6 +365,29 @@ export function saveQueue(userId: string, queue: SyncOp[]): void {
     window.localStorage.setItem(queueStorageKey(userId), JSON.stringify(queue));
   } catch {
     // storage blocked or full; the queue still lives in memory for this tab
+  }
+}
+
+/**
+ * Lets go of the in-memory queue and leaves the saved one where it is.
+ *
+ * For signing out: what could not be sent is real work, and it still goes the
+ * next time that student signs in on this browser, under their own key. The
+ * sign-out used to save an empty queue over it, and every answer given
+ * offline before signing out was lost.
+ */
+export function unloadQueue(): void {
+  syncQueue = [];
+}
+
+/** Deletes a user's saved queue: for an account that no longer exists. */
+export function forgetQueue(userId: string): void {
+  syncQueue = [];
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(queueStorageKey(userId));
+  } catch {
+    // storage blocked; nothing was saved there either
   }
 }
 

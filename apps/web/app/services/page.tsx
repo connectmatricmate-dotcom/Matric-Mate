@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AI_QUOTA, BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { onlinePayments } from '@/lib/gateway';
 import { BASIC_PLAN, THE_PLAN, rupees } from '@/lib/plans';
 import { canonicalUrl } from '@/lib/site';
 
@@ -59,11 +60,14 @@ const SERVICES: { name: string; what: string; premium?: true }[] = [
   },
   {
     name: 'Android app',
-    what: 'Coming to Google Play: the same account on a phone, with chapters you can download and study without a connection. Until it arrives, everything above works in a phone’s browser.',
+    what: 'The same account on an Android phone, with chapters you can download and study without a connection. Everything above also works in any phone’s browser.',
   },
 ];
 
 export default function ServicesPage() {
+  // How access opens, said the way it works today: by hand until a payment
+  // gateway is live (onlinePayments in lib/gateway).
+  const online = onlinePayments();
   return (
     <>
       <Nav />
@@ -90,15 +94,14 @@ export default function ServicesPage() {
           <section>
             <h2 className="font-display text-[22px] text-ink">How the service is delivered</h2>
             <p className="mt-2 text-mk-body leading-[1.75] text-ink2">
-              MatricMate is a digital service. Nothing is posted or shipped. Access opens on the account you paid
-              with, normally within a few seconds of the payment being confirmed, and is used by signing in on this
-              website, and in the Android app once it is on Google Play. A plan runs for one month from the day it is
-              paid, and the end date is shown on your account.
+              {online
+                ? 'MatricMate is a digital service. Nothing is posted or shipped. Access opens on the account you paid with, normally within a few seconds of the payment being confirmed, and is used by signing in on this website or in the Android app. A plan runs for one month from the day it is paid, and the end date is shown on your account.'
+                : `MatricMate is a digital service. Nothing is posted or shipped. To get a plan, write to ${SUPPORT_EMAIL}${BUSINESS.phone ? ` or call ${BUSINESS.phone}` : ''} with your account email and the plan you want; our team tells you how to pay and switches the plan on for your account. It is used by signing in on this website or in the Android app. A plan runs for one month from the day it starts, and the end date is shown on your account.`}
             </p>
             <p className="mt-2 text-mk-body leading-[1.75] text-ink2">
-              If a payment succeeds and access has not opened within a few minutes, write to {SUPPORT_EMAIL}
-              {BUSINESS.phone ? ` or call ${BUSINESS.phone}` : ''} with the receipt and we will sort it out the same
-              day.
+              {online
+                ? `If a payment succeeds and access has not opened within a few minutes, write to ${SUPPORT_EMAIL}${BUSINESS.phone ? ` or call ${BUSINESS.phone}` : ''} with the receipt and we will sort it out the same day.`
+                : `If you have paid and your plan is not on within a working day, write to ${SUPPORT_EMAIL}${BUSINESS.phone ? ` or call ${BUSINESS.phone}` : ''} with the receipt and we will sort it out the same day.`}
             </p>
           </section>
         </div>

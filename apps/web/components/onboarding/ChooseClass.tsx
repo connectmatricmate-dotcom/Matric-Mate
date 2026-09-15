@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Confirm } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/toast';
-import { GRADE_10_READY } from '@matricmate/core';
+import { GRADE_10_READY, formatDate } from '@matricmate/core';
+import { useClassWait } from '@/components/app/useClassWait';
+import { Icon } from '@/components/ui/primitives';
 import { createClient } from '@/lib/supabase/client';
 import { useApp, useT } from '@/lib/store';
 import { ChoiceCard, StepScreen, useAutoStep } from './StepScreen';
@@ -15,6 +17,9 @@ const CORRECTION_MS = 30 * 60 * 1000;
 export function ChooseClass({ edit = false }: { edit?: boolean }) {
   const { state, synced, actions } = useApp();
   const t = useT();
+  const lang = state.settings.language;
+  // The editor says when a class can change again, not only a toast after a refusal.
+  const wait = useClassWait(edit ? state.user?.id : undefined);
   const router = useRouter();
   const toast = useToast();
   /**
@@ -78,6 +83,7 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
       else router.replace(next);
     } else {
       toast(r === 'cooldown' ? t('tutor.classCooldown') : t('states.errorTitle'));
+      if (r === 'cooldown') wait.reread();
     }
   };
 
@@ -142,6 +148,15 @@ export function ChooseClass({ edit = false }: { edit?: boolean }) {
           disabledLabel={GRADE_10_READY ? undefined : t('onboarding.comingSoon')}
           onClick={() => (GRADE_10_READY ? pick(10) : toast(t('onboarding.class10Toast')))}
         />
+        {edit && wait.waitUntil && wait.changedAt ? (
+          <p className="mt-1 flex items-start gap-1.5 text-[13px] font-extrabold leading-[1.55] text-orangedark rtl:leading-[1.9]">
+            <Icon name="clock" size={15} className="mt-0.5 shrink-0" />
+            {t('account.classWaitNote', {
+              date: formatDate(wait.changedAt, lang, { day: 'numeric', month: 'long' }),
+              next: formatDate(wait.waitUntil, lang, { day: 'numeric', month: 'long' }),
+            })}
+          </p>
+        ) : null}
       </StepScreen>
 
       {/* The same warning the account screen shows, because it is the same

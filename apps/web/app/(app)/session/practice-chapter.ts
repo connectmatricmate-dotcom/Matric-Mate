@@ -21,7 +21,7 @@ import { currentAccess } from '@/lib/entitlement';
  * empty set; a link to one goes to that chapter's page instead, which says
  * why it is locked.
  */
-export async function practiceChapter(requested?: string): Promise<Chapter> {
+export async function practiceChapter(requested?: string, kind?: PracticeKind): Promise<Chapter> {
   const access = await currentAccess();
   if (requested) {
     const chapter = await getChapter(requested);
@@ -30,13 +30,26 @@ export async function practiceChapter(requested?: string): Promise<Chapter> {
     return chapter;
   }
   const last = await getChapter(await defaultChapterId());
-  if (last && subjectOpen(access, last.subjectId)) return last;
+  if (last && subjectOpen(access, last.subjectId) && offers(last, kind)) return last;
   for (const subject of await getSubjects()) {
     if (!subjectOpen(access, subject.id)) continue;
-    const first = (await getChapters(subject.id)).find(hasStudyMaterial);
+    const first = (await getChapters(subject.id)).find((c) => offers(c, kind));
     if (first) return first;
   }
   notFound();
+}
+
+export type PracticeKind = 'cards' | 'blanks' | 'shortq';
+
+/**
+ * Whether a chapter has this kind of practice, as far as its counts say: the
+ * Android rule. "Has anything" let a chapter with notes and no flashcards
+ * open the flashcards page on an empty deck. Blanks and short questions carry
+ * no count on the chapter row, so for them it is "has anything".
+ */
+function offers(chapter: Chapter, kind?: PracticeKind): boolean {
+  if (kind === 'cards') return chapter.flashcardCount > 0;
+  return hasStudyMaterial(chapter);
 }
 
 /**

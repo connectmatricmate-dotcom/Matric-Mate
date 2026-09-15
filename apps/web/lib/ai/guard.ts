@@ -1,5 +1,5 @@
 import 'server-only';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { BOARD_LABEL, SUBJECTS, asBoard, type Board } from '@matricmate/core';
 import { accessFromRow, planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -37,16 +37,33 @@ export function weekKey(): string {
   return `${pk.getFullYear()}-${String(pk.getMonth() + 1).padStart(2, '0')}-${String(pk.getDate()).padStart(2, '0')}`;
 }
 
-/** Next midnight in Pakistan, as an ISO instant the apps can render. */
+/**
+ * Next midnight in Pakistan, as an ISO instant the apps can render.
+ *
+ * Worked out on whole days, not by round-tripping through a locale string:
+ * that kept the current millisecond, so every response named a slightly
+ * different reset, and the apps' "is this count older?" check, which compares
+ * resets exactly, never matched. Pakistan has one offset all year.
+ */
 export function resetAt(): string {
-  const now = new Date();
-  const pkNow = new Date(now.toLocaleString('en-US', { timeZone: TIMEZONE }));
-  const pkMidnight = new Date(pkNow);
-  pkMidnight.setHours(24, 0, 0, 0);
-  return new Date(now.getTime() + (pkMidnight.getTime() - pkNow.getTime())).toISOString();
+  const DAY = 86_400_000;
+  const OFFSET = 5 * 3_600_000;
+  return new Date(Math.floor((Date.now() + OFFSET) / DAY) * DAY + DAY - OFFSET).toISOString();
 }
 
 export type QuotaState = { limit: number; used: number; remaining: number; resetAt: string };
+
+/**
+ * Questions set aside for a request that is still being answered.
+ *
+ * The allowance used to be checked when a request arrived and charged when it
+ * finished, so requests sent together all saw the same count and all got
+ * through: a trial at 4 of 5 fired three at once and ended the day on 7, on
+ * the client's Anthropic key. Now the cost is taken before the model is
+ * called, in one statement that refuses to pass the limit, and given back
+ * if no answer is delivered.
+ */
+export type QuotaHold = { day: string; cost: number; usedAfter: number; settled: boolean };
 
 export type Guarded = {
   userId: string;
@@ -66,6 +83,8 @@ export type Guarded = {
    *  queries skip the row level security that holds a trial to it, so a route
    *  that reads a subject's material checks this itself (outsideTrial). */
   trialSubject: string | null;
+  /** This request's cost, already taken from the allowance (reserveQuota). */
+  hold?: QuotaHold;
 };
 
 /** Not a decision about the student: the database did not answer. */
@@ -79,7 +98,7 @@ const unavailable = () => NextResponse.json({ error: 'server_error' }, { status:
 export async function guardAi(req: NextRequest, cost: number): Promise<Guarded | NextResponse> {
   const g = await guardStudent(req);
   if (g instanceof NextResponse) return g;
-  return quotaGate(g, cost) ?? g;
+  return (await reserveQuota(g, cost)) ?? g;
 }
 
 /**
@@ -89,7 +108,7 @@ export async function guardAi(req: NextRequest, cost: number): Promise<Guarded |
  * Split out for the one route that may answer for free: a cheat sheet another
  * student already paid for costs nothing, so a student who has used up the
  * day's allowance can still open one. Everything that calls the model goes
- * through `guardAi`, which is this plus `quotaGate`.
+ * through `guardAi`, which is this plus `reserveQuota`.
  */
 export async function guardStudent(req: NextRequest): Promise<Guarded | NextResponse> {
   let userId: string | null = null;
@@ -188,6 +207,71 @@ export function quotaGate(g: Guarded, cost: number): NextResponse | null {
 }
 
 /**
+ * Takes `cost` from today's allowance before the model is called, or answers
+ * why not. Sets `g.hold`; chargeQuota confirms it once an answer is
+ * delivered, and anything else (a refusal, an error, a request the route
+ * turns away) gives it back when the response is finished.
+ */
+export async function reserveQuota(g: Guarded, cost: number): Promise<NextResponse | null> {
+  if (cost <= 0) return null;
+  // The count read with the plan answers most students without a round trip.
+  const early = quotaGate(g, cost);
+  if (early) return early;
+  const held = await holdUsage(g.admin, g.userId, cost, g.quota.limit);
+  if (held === 'exhausted') {
+    const quota = { ...g.quota, used: g.quota.limit, remaining: 0 };
+    return NextResponse.json({ error: 'quota_exhausted', quota }, { status: 429 });
+  }
+  if (held === 'unavailable') return unavailable();
+  if (held !== 'legacy') g.hold = held;
+  return null;
+}
+
+/** True when the database has not got reserve_ai_usage yet (migration 0049). */
+const missingReserve = (e: { code?: string; message?: string }) =>
+  e.code === 'PGRST202' || e.code === '42883' || /reserve_ai_usage/.test(e.message ?? '');
+
+/**
+ * The reservation itself, for the routes that check their own plan (the
+ * tutor). 'legacy' means the database predates it and the old charge after
+ * delivery applies.
+ */
+export async function holdUsage(
+  admin: ReturnType<typeof createAdminClient>,
+  userId: string,
+  cost: number,
+  limit: number,
+): Promise<QuotaHold | 'exhausted' | 'unavailable' | 'legacy'> {
+  const day = dayKey();
+  const { data, error } = await admin.rpc('reserve_ai_usage', { p_user: userId, p_day: day, p_cost: cost, p_limit: limit });
+  if (error) {
+    if (missingReserve(error)) return 'legacy';
+    console.error('[quota] reserve failed', error.message);
+    return 'unavailable';
+  }
+  if (typeof data !== 'number') return 'exhausted';
+  const hold: QuotaHold = { day, cost, usedAfter: data, settled: false };
+  // Runs once the response has finished, streaming included: by then a
+  // delivered answer has confirmed the hold, and anything else is refunded.
+  after(() => releaseHold(admin, userId, hold));
+  return hold;
+}
+
+/** Gives a hold back, once. Safe to call from a failure path and again from after(). */
+export async function releaseHold(admin: ReturnType<typeof createAdminClient>, userId: string, hold: QuotaHold): Promise<void> {
+  if (hold.settled) return;
+  hold.settled = true;
+  const { error } = await admin.rpc('refund_ai_usage', { p_user: userId, p_day: hold.day, p_cost: hold.cost });
+  if (error) console.error('[quota] refund failed', error.message);
+}
+
+/** Keeps a hold: the answer was delivered. Returns the day's count with it. */
+export function confirmHold(hold: QuotaHold): number {
+  hold.settled = true;
+  return hold.usedAfter;
+}
+
+/**
  * The student's reading medium for this request: what the app sent, or what
  * the account has saved when it sent nothing. Callers turn this into the
  * language of a particular subject with subjectMedium from core.
@@ -246,9 +330,13 @@ export async function addUsage(admin: ReturnType<typeof createAdminClient>, user
   return used;
 }
 
-/** Charge after delivery, never before: a failed request costs nothing. */
+/**
+ * Settles the cost once an answer is delivered: keeps the hold taken before
+ * the model ran, or (on a database without holds) charges now. A failed
+ * request never gets here, so it costs nothing.
+ */
 export async function chargeQuota(g: Guarded, cost: number): Promise<QuotaState> {
-  const used = (await addUsage(g.admin, g.userId, cost)) ?? g.quota.used + cost;
+  const used = g.hold ? confirmHold(g.hold) : ((await addUsage(g.admin, g.userId, cost)) ?? g.quota.used + cost);
   return { ...g.quota, used, remaining: Math.max(0, g.quota.limit - used) };
 }
 
@@ -378,3 +466,21 @@ export function groundingBrief(g: Grounding, grade: 9 | 10, board: Board = 'fbis
  * question screen. 422 is "understood, but not something we can produce".
  */
 export const refused = (quota: QuotaState) => NextResponse.json({ error: 'refused', quota }, { status: 422 });
+
+/**
+ * Tells the admin when an AI call failed for a reason only they can fix: the
+ * Anthropic account out of credit, or its billing refused. On 11 Sep the
+ * credit ran dry and every AI screen said "something went wrong, try again"
+ * while nothing said why. Recorded in service_alerts (migration 0066) and
+ * shown on the admin overview. Anything else is left to the route's own log.
+ */
+export async function noteAiFailure(e: unknown): Promise<void> {
+  const message = e instanceof Error ? e.message : String(e);
+  const status = (e as { status?: number } | null)?.status;
+  if (!/credit balance|billing|payment required|quota exceeded/i.test(message) && status !== 402) return;
+  try {
+    await createAdminClient().rpc('note_service_alert', { p_kind: 'anthropic_billing', p_detail: message.slice(0, 500) });
+  } catch {
+    // The route has already logged the failure itself.
+  }
+}

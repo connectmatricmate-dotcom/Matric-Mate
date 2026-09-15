@@ -512,6 +512,12 @@ export type HydratedStudyState = {
    * or null when it could not say. See hydratedXp for how to use it.
    */
   xp?: number | null;
+  /**
+   * When the account's history was last wiped (a reset, or a class or board
+   * switch), in ms, or null for never. A device whose copy is older throws it
+   * away rather than merging it back (migration 0058, mergeHydratedState).
+   */
+  progressResetAt?: number | null;
 };
 
 /**
@@ -656,6 +662,12 @@ async function serverXp(client: SyncClient): Promise<number | null> {
   }
 }
 
+/** A timestamptz from the database as ms, or null for none or unreadable. */
+const resetTime = (value: string | null | undefined): number | null => {
+  const ms = value ? Date.parse(value) : NaN;
+  return Number.isFinite(ms) ? ms : null;
+};
+
 async function fetchStudyState(client: SyncClient, userId: string): Promise<HydratedStudyState> {
   const [attemptsRes, resultsRes, sectionsRes, cardsRes, daysRes, planRes, profileRes, notifsRes, xp] = await Promise.all([
     /* Newest first, then capped. It was oldest first, so a student past a
@@ -678,7 +690,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     // Today only: yesterday's ticks belong to yesterday's plan, and the task
     // ids carry the date anyway.
     client.from('plan_done').select('task_id').eq('user_id', userId).eq('day', todayKey()),
-    client.from('profiles').select('onboarding,grade,settings').eq('id', userId).maybeSingle(),
+    client.from('profiles').select('onboarding,grade,settings,progress_reset_at').eq('id', userId).maybeSingle(),
     // Capped at the same 50 the screens show. An inbox is a recent list, not
     // an archive, and nobody scrolls to a receipt from four months ago.
     client.from('notifications').select('id,kind,title,body,target,read,at').eq('user_id', userId).order('at', { ascending: false }).limit(50),
@@ -709,6 +721,7 @@ async function fetchStudyState(client: SyncClient, userId: string): Promise<Hydr
     lastChapterId: last?.chapter_id,
     lastSectionIndex: last?.section_index ?? 0,
     xp,
+    progressResetAt: resetTime((profileRes.data as { progress_reset_at?: string | null } | null)?.progress_reset_at),
   };
 }
 
@@ -743,7 +756,59 @@ export type SyncableState = {
   notifications: Notification[];
   lastChapterId?: string;
   lastSectionIndex: number;
+  /** The account's progressResetAt this copy was built against. See staleCopy. */
+  progressEpoch?: number | null;
 };
+
+/**
+ * Whether this device's copy was built before the account's history was last
+ * wiped, on this device or another: a reset, or a class or board switch.
+ * Such a copy is not merged, it is replaced (mergeHydratedState), and what it
+ * queued before the wipe is not sent (opsSince).
+ */
+export function staleCopy(local: { progressEpoch?: number | null }, server: Pick<HydratedStudyState, 'progressResetAt'>): boolean {
+  return server.progressResetAt != null && (local.progressEpoch ?? 0) < server.progressResetAt;
+}
+
+/** When an op was made. One with no time of its own (taking a card back) counts as now. */
+function opTime(op: SyncOp): number {
+  switch (op.kind) {
+    case 'attempt':
+      return op.attempt.at;
+    case 'result':
+      return op.result.at;
+    case 'read_section':
+    case 'card_known':
+      return op.at;
+    case 'active_day':
+    case 'plan_task':
+      // The end of that day in Karachi: a day op is as late as its day.
+      return Date.parse(`${op.day}T23:59:59+05:00`);
+    default:
+      return Number.POSITIVE_INFINITY;
+  }
+}
+
+/** The ops made at or after `since`: what a stale copy still has to send. */
+export function opsSince(queue: SyncOp[], since: number): SyncOp[] {
+  return queue.filter((op) => opTime(op) >= since);
+}
+
+/**
+ * The queue to keep after a hydrate, or null when nothing changes: when the
+ * copy is stale, only what was done since the wipe. The app swaps it in (and
+ * stops any send in flight, clearSyncQueue) before it merges, or answers from
+ * before a reset on another device would be sent after it and bring the old
+ * history back to every device.
+ */
+export function staleQueue(
+  local: { progressEpoch?: number | null },
+  server: Pick<HydratedStudyState, 'progressResetAt'>,
+  queue: SyncOp[],
+): SyncOp[] | null {
+  if (!staleCopy(local, server)) return null;
+  return opsSince(queue, server.progressResetAt ?? 0);
+}
 
 /**
  * Folds server rows into whatever the device already has, rather than
@@ -754,15 +819,39 @@ export type SyncableState = {
  * write is never erased by a hydration that ran before it landed.
  */
 export function mergeHydratedState<S extends SyncableState>(
-  local: S,
+  device: S,
   server: HydratedStudyState,
   /**
    * The ops this device has queued and not yet sent. Pass it, and known cards
    * and plan ticks follow the server except where this device has something
    * still on its way; leave it out and both stay a plain union, as before.
    */
-  pending?: SyncOp[],
+  queued?: SyncOp[],
 ): S {
+  /*
+   * A copy from before the account's last wipe is replaced, not merged. The
+   * union below kept every answer, section and study day, so a reset on the
+   * laptop was undone by the phone's copy on its next sync. Only what this
+   * device did since the wipe survives it: answers and results by their time,
+   * and ops still queued (opsSince).
+   */
+  const since = server.progressResetAt ?? 0;
+  const stale = staleCopy(device, server);
+  const local: S = stale
+    ? {
+        ...device,
+        readSections: [],
+        attempts: device.attempts.filter((a) => a.at >= since),
+        results: device.results.filter((r) => r.at >= since),
+        cardsKnown: [],
+        activeDays: [],
+        planDone: [],
+        lastChapterId: undefined,
+        lastSectionIndex: 0,
+      }
+    : device;
+  const pending = stale && queued ? opsSince(queued, since) : queued;
+  const progressEpoch = server.progressResetAt ?? device.progressEpoch ?? null;
   const byId = <T extends { id: string }>(a: T[], b: T[]): T[] => {
     const seen = new Set(a.map((x) => x.id));
     return [...a, ...b.filter((x) => !seen.has(x.id))];
@@ -834,6 +923,7 @@ export function mergeHydratedState<S extends SyncableState>(
     // position is exactly what a reinstalled or second device needs.
     lastChapterId: local.lastChapterId ?? server.lastChapterId,
     lastSectionIndex: local.lastChapterId ? local.lastSectionIndex : server.lastSectionIndex,
+    progressEpoch,
   };
 }
 
@@ -909,6 +999,17 @@ export async function markNotificationsRead(client: SyncClient, userId: string):
  * rather than show a success it cannot back up.
  */
 export async function wipeStudyHistory(client: SyncClient, userId: string): Promise<boolean> {
+  return (await resetStudyHistory(client, userId)).ok;
+}
+
+/**
+ * wipeStudyHistory, and the time the server stamped the wipe with
+ * (profiles.progress_reset_at, migration 0058), for the device that did it to
+ * keep as its own epoch. Every other device finds the stamp newer than its
+ * copy on its next sync and throws that copy away (staleCopy). `resetAt` is
+ * null when the stamp could not be written; the wipe itself still stands.
+ */
+export async function resetStudyHistory(client: SyncClient, userId: string): Promise<{ ok: boolean; resetAt: number | null }> {
   const tables = ['attempts', 'results', 'read_sections', 'cards_known', 'active_days', 'plan_done'];
   let ok = true;
   for (const t of tables) {
@@ -919,5 +1020,11 @@ export async function wipeStudyHistory(client: SyncClient, userId: string): Prom
       ok = false;
     }
   }
-  return ok;
+  if (!ok || typeof client.rpc !== 'function') return { ok, resetAt: null };
+  try {
+    const { data, error } = await client.rpc('mark_progress_reset');
+    return { ok, resetAt: error ? null : resetTime(data as string | null) };
+  } catch {
+    return { ok, resetAt: null };
+  }
 }

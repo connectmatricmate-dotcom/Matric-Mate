@@ -168,8 +168,15 @@ export async function updateSession(request: NextRequest) {
    */
   const isPrefetch = request.headers.get('next-router-prefetch') === '1';
   const needsPlan = isProtected && !starts(OPEN_WITHOUT_PLAN) && !starts(['/admin', '/affiliate']);
+  /*
+   * The plans page is open without a plan, but not the place for a student
+   * whose free trial is still waiting for them: they belong on /trial. The
+   * layout says the same, and a layout redirect is not re-run on a soft
+   * navigation between two pages under it, so this has to be a 307 here too.
+   */
+  const plansPage = isProtected && (pathname === '/upgrade' || pathname === '/upgrade/');
 
-  if (user && needsPlan && !isPrefetch) {
+  if (user && (needsPlan || plansPage) && !isPrefetch) {
     /*
      * A read that failed or timed out is not an answer, so it fails open, the
      * same way the auth call above does, and the layout's own check decides.
@@ -202,10 +209,27 @@ export async function updateSession(request: NextRequest) {
         return response;
       }
       if (!role || role === 'student') {
-        const upgrade = request.nextUrl.clone();
-        upgrade.pathname = '/upgrade';
-        upgrade.search = '';
-        return NextResponse.redirect(upgrade);
+        /*
+         * A student who has never had the free trial starts it on /trial,
+         * which the database decides (trial_state, migration 0045), the same
+         * question the layout asks. Every unpaid student used to be sent to
+         * the plans page from here, so a new account tapping a tab on the
+         * trial screen landed on prices with no word of the trial. A failed
+         * read fails open to the layout, like the reads above.
+         */
+        let to = '/upgrade';
+        try {
+          const { data: trial, error } = await supabase.rpc('trial_state');
+          if (error) return response;
+          if (trial === 'eligible') to = '/trial';
+        } catch {
+          return response;
+        }
+        if (pathname === to) return response;
+        const next = request.nextUrl.clone();
+        next.pathname = to;
+        next.search = '';
+        return NextResponse.redirect(next);
       }
     }
   }

@@ -19,6 +19,8 @@ import { signOutAction } from '@/app/(auth)/actions';
 import { planName } from '@/lib/plans';
 import { APP_VERSION } from '@/lib/site';
 import { CardGrid, Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
+import { lapseLines } from '@/components/app/planStatus';
+import { useClassWait } from '@/components/app/useClassWait';
 import { CoverageRail, StreakRail } from '@/components/app/rails';
 import { AvatarBadge } from '@/components/ui/AvatarBadge';
 import { Btn, ItemButton, Seg, Toggle } from '@/components/ui/controls';
@@ -79,6 +81,11 @@ export function AccountView() {
    */
   const timeLabel = (value: string) => t('account.reminderTimeLabel', { h: ((reminderHour(value) + 11) % 12) + 1 });
   const unreadCount = state.notifications.filter((n) => !n.read).length;
+  const lapse = lapseLines(state.premium.lapse, lang);
+
+  // A week's wait between class changes, said on the card itself and not
+  // only in a toast that is gone in two seconds. See useClassWait.
+  const { changedAt, waitUntil: classWaitUntil, reread: rereadClass } = useClassWait(state.user?.id);
 
   return (
     <Page>
@@ -130,19 +137,26 @@ export function AccountView() {
             </span>
             <span className="min-w-[12rem] flex-1">
               <span className="block text-[15px] font-extrabold text-ink">{t('tutor.classRowValue', { n: classLevel, board: boardName(state.onboarding?.board, lang) })}</span>
-              {/* The warning's first sentence. Urdu ends its sentences with
-                  "۔", which a split on "." never found, so the whole warning
-                  printed here, with a Latin full stop after it. */}
-              <span className="block text-[13px] text-ink2">
-                {t('tutor.classWarnBody').split(/[.۔]/)[0]}
-                {lang === 'ur' ? '۔' : '.'}
-              </span>
+              {/* What the class decides, and what changing it costs. It used
+                  to print the confirm's first sentence, "Your dashboard starts
+                  over", which read as if that had just happened. */}
+              <span className="block text-[13px] leading-[1.55] text-ink2 rtl:leading-[1.9]">{t('account.classCardSub')}</span>
+              {classWaitUntil && changedAt ? (
+                <span className="mt-1.5 flex items-start gap-1.5 text-[12.5px] font-extrabold leading-[1.55] text-orangedark rtl:leading-[1.9]">
+                  <Icon name="clock" size={14} className="mt-0.5 shrink-0" />
+                  {t('account.classWaitNote', {
+                    date: formatDate(changedAt, lang, { day: 'numeric', month: 'long' }),
+                    next: formatDate(classWaitUntil, lang, { day: 'numeric', month: 'long' }),
+                  })}
+                </span>
+              ) : null}
             </span>
             <Btn
               title={t('tutor.classChange')}
               variant="line"
               sm
               className="shrink-0"
+              disabled={!!classWaitUntil}
               onClick={() => {
                 const next = classLevel === 9 ? 10 : 9;
                 if (next === 10 && !GRADE_10_READY) {
@@ -172,7 +186,7 @@ export function AccountView() {
                 <span className="block text-[15px] font-extrabold text-ink">
                   {state.premium.active
                     ? `${t('account.premiumActive')} · ${planName(state.premium.plan ?? 'monthly', lang)}`
-                    : t('account.freeMode')}
+                    : lapse.title}
                 </span>
                 <span className="block text-[13px] text-ink2">
                   {state.premium.active && state.premium.validTill
@@ -180,10 +194,17 @@ export function AccountView() {
                       t(state.premium.plan === 'trial' ? 'billing.activeTill' : 'account.premiumTill', {
                         date: formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short' }),
                       })
-                    : t('account.freeModeSub')}
+                    : lapse.sub}
                 </span>
               </span>
-              {state.premium.active ? null : <Pill tone="orange">{t('account.upgrade')}</Pill>}
+              {/* Says where the card goes: it is the only way to the plan and
+                  its renewal, and it looked like a status line. */}
+              {state.premium.active ? (
+                <span className="shrink-0 text-[13px] font-extrabold text-teal">{t('account.managePlan')}</span>
+              ) : (
+                <Pill tone="orange">{lapse.ended ? t('account.renew') : t('account.upgrade')}</Pill>
+              )}
+              <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
             </Card>
           </Link>
 
@@ -353,12 +374,13 @@ export function AccountView() {
             <Group title={t('account.about')}>
               <Item href="/account/help" title={t('account.help')} icon="help" />
               <Item href="/terms" title={t('account.terms')} icon="doc" />
-              {/* Play requires the deletion route to be reachable from inside
-                  the product, not only from the marketing footer. */}
+              {/* Deleting happens here, in the product: the screen says what
+                  goes and what stays, then does it. /delete-account stays the
+                  public page for anyone who cannot sign in. */}
               <Item
-                href="/delete-account"
+                href="/account/delete"
                 title={t('account.deleteAccount')}
-                sub={t('account.deleteAccountSub')}
+                sub={t('account.deleteAccountAppSub')}
                 icon="trash"
                 tone="red"
               />
@@ -413,6 +435,8 @@ export function AccountView() {
           void actions.switchClass(confirmClass).then((r) => {
             setSwitching(false);
             setConfirmClass(null);
+            // The card's note follows the new date (or the refusal's).
+            rereadClass();
             if (r === 'ok') {
               toast(t('tutor.classChanged', { n: confirmClass }));
               // The store already holds the new syllabus; this brings the

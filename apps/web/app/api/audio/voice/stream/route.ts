@@ -3,9 +3,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import {
   BYTES_PER_SEC,
   claimPart,
+  creditsFor,
   failPart,
   finalize,
-  finalPath,
   openLesson,
   publicUrl,
   readPart,
@@ -65,7 +65,8 @@ export async function GET(req: NextRequest) {
   // second tab): the saved file, from where the player is. Never made again.
   if (!lesson.pending) {
     const from = Math.floor(at * BYTES_PER_SEC);
-    const file = await fetch(publicUrl(admin, finalPath(lesson)), { headers: from ? { Range: `bytes=${from}-` } : {} });
+    if (!lesson.path) return NextResponse.json({ error: 'not_found' }, { status: 404 });
+    const file = await fetch(publicUrl(admin, lesson.path), { headers: from ? { Range: `bytes=${from}-` } : {} });
     if (!file.ok || !file.body) return NextResponse.json({ error: 'not_found' }, { status: 404 });
     return new Response(file.body, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'no-store' } });
   }
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
 
   const started = Date.now();
   const timeLeft = () => Date.now() - started < TIME_BUDGET_MS;
-  const overBudget = async (p: Part) => (await usedThisMonth(admin)) + p.text.length > settings.monthlyChars;
+  const overBudget = async (p: Part) => (await usedThisMonth(admin)) + creditsFor(p.text.length) > settings.monthlyChars;
 
   /**
    * Parts in the making, by part number, several at once: the voice makes

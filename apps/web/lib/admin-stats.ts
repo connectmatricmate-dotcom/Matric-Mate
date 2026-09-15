@@ -26,6 +26,9 @@ export type AdminStats = {
   teachers: number;
   referredStudents: number;
   referredPaid: number;
+  /** Accounts their owners deleted this Karachi month (account_deletions,
+   *  migration 0048). A fact with no names attached, by design. */
+  deletedThisMonth: number;
 };
 
 /** Asia/Karachi, because that is the day the students live in and the day
@@ -70,7 +73,7 @@ export async function adminStats(): Promise<AdminStats> {
    */
   const nowIso = new Date().toISOString();
 
-  const [students, paidStudents, teachers, referred, today] = (
+  const [students, paidStudents, teachers, referred, today, deletions] = (
     await Promise.all([
       admin.from('profiles').select('*', HEAD).eq('role', 'student'),
       // A running plan that was paid for: the free trial is not a paying student.
@@ -78,6 +81,7 @@ export async function adminStats(): Promise<AdminStats> {
       admin.from('affiliates').select('*', HEAD),
       admin.from('profiles').select('*', HEAD).not('referred_by', 'is', null),
       admin.from('active_days').select('*', HEAD).eq('day', dayKey()),
+      admin.from('account_deletions').select('*', HEAD).gte('deleted_at', monthStart.toISOString()),
     ])
   ).map((res, i) => must(res, `count ${i}`));
 
@@ -140,6 +144,8 @@ export async function adminStats(): Promise<AdminStats> {
         .select('*', HEAD)
         .eq('active', true)
         .gt('valid_till', nowIso)
+        // Paying, as everywhere else on this page: a free trial is not a sale.
+        .or('plan.is.null,plan.neq.trial')
         .in('user_id', referredIds.slice(i, i + 200)),
       'referred paying',
     );
@@ -156,6 +162,7 @@ export async function adminStats(): Promise<AdminStats> {
     teachers: teachers.count ?? 0,
     referredStudents: referred.count ?? 0,
     referredPaid,
+    deletedThisMonth: deletions.count ?? 0,
   };
 }
 
@@ -198,5 +205,106 @@ export async function dailyStats(days = 14): Promise<DailyPoint[]> {
     signups: Number(r.signup_count ?? 0),
     revenue: Number(r.revenue_total ?? 0),
     studied: Number(r.studied_count ?? 0),
+  }));
+}
+
+/**
+ * The five scheduled jobs, and how each one's last run went.
+ *
+ * pg_cron calls every run a success whatever the route answered, so the
+ * routes write their own answer to `job_runs` (migration 0054) and this reads
+ * the latest per job. Every one of them runs at least once a day, so a job
+ * with nothing in 26 hours has stopped, whatever its last answer said.
+ */
+export const JOBS = [
+  { job: 'daily', name: 'Daily tip and flashcard', when: '2 pm every day' },
+  { job: 'nudge', name: 'Evening study reminder', when: 'each evening' },
+  { job: 'plans', name: 'Plan and trial reminders', when: 'every hour' },
+  { job: 'welcome', name: 'Welcome message', when: 'every 15 minutes' },
+  { job: 'coach', name: 'AI coach reports', when: '7:30 am every day' },
+] as const;
+
+export type JobHealth = {
+  job: string;
+  name: string;
+  when: string;
+  /** The last run, or null for a job with no run in the last month. */
+  at: string | null;
+  ok: boolean;
+  /** What the run did, in words: "12 sent of 40", "Nobody due". */
+  said: string;
+};
+
+const STALE_MS = 26 * 3600 * 1000;
+
+const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+
+/** A run's summary, in the words Adnan would use. Each route answers its own shape. */
+function inWords(job: string, s: Record<string, unknown> | null): string {
+  if (!s) return 'No details';
+  if (s.error) return `Stopped${s.stage ? ` while ${String(s.stage).replace(/_/g, ' ')}` : ''}${n(s.failed) ? `, ${n(s.failed)} failed` : ''}`;
+  if (s.quiet) return 'Quiet hours, nothing sent (9 pm to 8 am)';
+  const done = n(s.sent ?? s.welcomed ?? s.written);
+  const of = n(s.considered ?? s.candidates);
+  const failed = n(s.failed) + n(s.pushFailed) + n(s.emailFailed) + n(s.unfinished) + n(s.dropped);
+  if (!of) {
+    const reason: Record<string, string> = {
+      nobody_this_hour: 'Nobody due this hour',
+      nobody_with_a_plan: 'Nobody due tonight',
+      all_nudged_tonight: 'Everyone already reminded tonight',
+    };
+    return reason[String(s.reason)] ?? (job === 'welcome' ? 'Nobody new to welcome' : 'Nobody due');
+  }
+  const verb = job === 'welcome' ? 'welcomed' : job === 'coach' ? 'written' : 'sent';
+  return `${done} ${verb} of ${of}${failed ? `, ${failed} not sent` : ''}`;
+}
+
+export async function jobHealth(): Promise<JobHealth[]> {
+  await requireAdmin();
+  const admin = createAdminClient();
+  // One small read per job: the latest row each, by the (job, at desc) index.
+  const rows = await Promise.all(
+    JOBS.map((j) => admin.from('job_runs').select('at, status, summary').eq('job', j.job).order('at', { ascending: false }).limit(1).maybeSingle()),
+  );
+  return JOBS.map((j, i) => {
+    const { data, error } = rows[i];
+    if (error) console.error(`admin-stats: job ${j.job} read failed`, error.message);
+    const at = (data?.at as string | undefined) ?? null;
+    const stale = !at || Date.now() - Date.parse(at) > STALE_MS;
+    const ok = !error && !!data && data.status === 200 && !stale;
+    const said = error
+      ? 'Could not be read'
+      : !at
+        ? 'No run recorded in the last month'
+        : stale
+          ? 'No run for over a day'
+          : inWords(j.job, data?.summary as Record<string, unknown> | null);
+    return { job: j.job, name: j.name, when: j.when, at, ok, said };
+  });
+}
+
+/** A problem with an outside service that only the admin can fix, seen in the last day (service_alerts, migration 0066). */
+export type ServiceAlert = { kind: string; firstAt: string; lastAt: string; count: number; detail: string | null };
+
+export async function serviceAlerts(): Promise<ServiceAlert[]> {
+  await requireAdmin();
+  const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+  const { data, error } = await createAdminClient()
+    .from('service_alerts')
+    .select('kind, first_at, last_at, count, detail')
+    .gte('last_at', since)
+    .order('last_at', { ascending: false });
+  if (error) {
+    // The banner is a warning on top of a working page: a failed read is
+    // logged and shows nothing rather than taking the overview down.
+    console.error('admin-stats: service alerts read failed', error.message);
+    return [];
+  }
+  return ((data ?? []) as Record<string, unknown>[]).map((r) => ({
+    kind: String(r.kind),
+    firstAt: String(r.first_at),
+    lastAt: String(r.last_at),
+    count: Number(r.count ?? 1),
+    detail: (r.detail as string | null) ?? null,
   }));
 }

@@ -12,8 +12,6 @@ import {
   moreSet,
   moreToday,
   notify,
-  planDone,
-  planUnfinished,
   resumeChapter,
   startSubject,
   streakAtRiskTiered,
@@ -21,7 +19,7 @@ import {
   weakTopicNudge,
 } from '@/lib/notify';
 import type { Notice, Recipient } from '@/lib/notify';
-import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry } from '@/lib/notify/jobs';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry, logged } from '@/lib/notify/jobs';
 
 /**
  * The evening nudge, and the thing that makes two settings real.
@@ -88,14 +86,12 @@ const MAX_PER_RUN = 500;
 /** Students sent to at once. One at a time, a run reached about ninety. */
 const CONCURRENCY = 8;
 /**
- * When to stop starting new sends. Well inside the two minutes pg_net waits
+ * When to stop starting new sends. Well inside the five minutes pg_net waits
  * for an answer, so a run that has to stop early still gets to say so.
  */
 const BUDGET_MS = 100_000;
 /** A weak topic already named within this many days is not named again. */
 const TOPIC_REPEAT_DAYS = 3;
-/** Tasks on today's plan: buildPlan in core makes three. */
-const PLAN_TASKS = 3;
 /** Streaks worth congratulating rather than passing over in silence. */
 const MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
 /** Past this many questions short of their best day, the gap reads as a scold rather than a target. */
@@ -140,7 +136,9 @@ async function forIds<Row>(
   return out;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = logged('nudge', handle);
+
+async function handle(req: NextRequest) {
   if (!cronAuthorised(req)) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
@@ -300,7 +298,6 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
     const days = daysByUser.get(p.id) ?? new Set<string>();
     return { profile: p, days, neverStarted: days.size === 0 };
   });
-  const ids = candidates.map((c) => c.profile.id);
 
   /*
    * Attempts only for the students whose message could depend on them:
@@ -316,7 +313,7 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
    * the best day this week, and the rest of their history cannot change it.
    */
   const studiedToday = candidates.filter((c) => c.days.has(today)).map((c) => c.profile.id);
-  const [attemptRows, planRows, weekRows, subjectRows] = await Promise.all([
+  const [attemptRows, weekRows, subjectRows] = await Promise.all([
     forIds<AttemptRow>('attempts', needAttempts, (slice, from, to, signal) =>
       admin
         .from('attempts')
@@ -325,17 +322,6 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
         .gte('at', new Date(now.getTime() - 30 * 864e5).toISOString())
         .order('at')
         .order('id')
-        .range(from, to)
-        .abortSignal(signal),
-    ),
-    forIds<{ user_id: string; task_id: string }>('plan_done', ids, (slice, from, to, signal) =>
-      admin
-        .from('plan_done')
-        .select('user_id,task_id')
-        .in('user_id', slice)
-        .eq('day', today)
-        .order('user_id')
-        .order('task_id')
         .range(from, to)
         .abortSignal(signal),
     ),
@@ -368,8 +354,6 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
 
   const attemptsByUser = new Map<string, AttemptRow[]>();
   for (const r of attemptRows) attemptsByUser.set(r.user_id, [...(attemptsByUser.get(r.user_id) ?? []), r]);
-  const planDoneByUser = new Map<string, number>();
-  for (const r of planRows) planDoneByUser.set(r.user_id, (planDoneByUser.get(r.user_id) ?? 0) + 1);
 
   /*
    * Chapter names from the chapters table. The bundled catalogue on this
@@ -442,7 +426,6 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
         subject: subjectRow ? (lang === 'ur' && subjectRow.urdu_name) || subjectRow.name : null,
         todayCount: perDay?.get(today) ?? 0,
         bestBefore,
-        planTicks: planDoneByUser.get(profile.id) ?? 0,
         saidLately: saidLately.get(profile.id) ?? [],
         wantsReminder,
         wantsStreak,
@@ -537,7 +520,6 @@ type Signals = {
   /** Questions answered today, and on their best other day in the last week. */
   todayCount: number;
   bestBefore: number;
-  planTicks: number;
   /** Titles and bodies of what they were sent in the last few days. */
   saidLately: string[];
   wantsReminder: boolean;
@@ -568,9 +550,9 @@ function pick(s: Signals): Notice | null {
     if (!s.wantsReminder) return null;
     // Today already beats the rest of the week, and by enough to mention.
     if (s.todayCount >= BEST_DAY_MIN && s.todayCount > s.bestBefore) return bestDay(s.todayCount);
-    if (s.planTicks >= PLAN_TASKS) return planDone();
-    // Started today's plan and left it. The plan has three tasks.
-    if (s.planTicks > 0) return planUnfinished(PLAN_TASKS - s.planTicks);
+    /* Today's plan is not asked about here. Its tasks tick themselves as the
+       work is done, in the app, and only a hand tick reaches the database,
+       so a student who had done all three could be told "2 left". */
     // Read or listened, but answered nothing.
     if (s.todayCount === 0) return keepGoing();
     // Close enough to their best day to make it a target; past that, just one more set.
@@ -594,17 +576,13 @@ function pick(s: Signals): Notice | null {
   const rung = awayFor(s.awayDays);
   if (rung) return rung;
 
-  // 3. Today's plan, started and abandoned. Only when they actually began it:
-  //    "3 tasks left" to someone who never opened the app reads as a scold.
-  if (s.planTicks > 0 && s.planTicks < PLAN_TASKS) return planUnfinished(PLAN_TASKS - s.planTicks);
-
-  // 4. A chapter left halfway, while it is still fresh, and not the same
+  // 3. A chapter left halfway, while it is still fresh, and not the same
   //    chapter as the last few nights.
   if (s.lastChapter && s.awayDays <= 7 && !s.saidLately.some((said) => said.includes(s.lastChapter!))) {
     return resumeChapter(s.lastChapter, s.lastChapterId ?? undefined);
   }
 
-  // 5. Their genuinely worst topic, named, with the number. Not the same
+  // 4. Their genuinely worst topic, named, with the number. Not the same
   //    topic as the last few nights: by the third time it is wallpaper.
   if (s.attempts.length >= 10) {
     const worst = weakTopics(
@@ -624,7 +602,7 @@ function pick(s: Signals): Notice | null {
     if (worst?.topic && !s.saidLately.some((said) => said.includes(worst.topic))) return weakTopicNudge(worst.topic, worst.accuracy);
   }
 
-  // 6. Nothing specific to say, so say something general, and a different
+  // 5. Nothing specific to say, so say something general, and a different
   //    something from last night: one of their subjects every third evening,
   //    the rotating pool on the others.
   return s.subject && s.dayIndex % 3 === 0 ? awaySubject(s.subject) : comeBack(s.dayIndex);

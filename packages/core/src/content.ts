@@ -114,9 +114,10 @@ const CH: Record<string, [string, string, string?, string?][]> = {
   // area theorems generally. Chapters 1, 10 and 13 (Matrices, Congruent
   // Triangles, Sides and Angles of a Triangle) have no outcomes the board
   // examines in Class 9 under NCP 2022-23; their titles stay so a student
-  // with an older textbook can still find them, but the blurb says so.
+  // with an older textbook can still find them, but the blurb says so
+  // (the same words as the database, which now has notes for them too).
   math: [
-    ['Matrices and Determinants', 'Matrix types, operations and determinants. Older FBISE textbooks include this chapter, but the current Class 9 syllabus does not test it, so there is nothing here to revise for your paper.'],
+    ['Matrices and Determinants', 'Matrix types, operations and determinants. The current FBISE Class 9 paper does not test this chapter, so treat it as background reading.'],
     ['Sets and Rational Numbers', 'Three-set Venn diagrams and set laws, plus real-life problems using rational numbers.'],
     ['Logarithms', 'Scientific notation, common and natural logs, laws of logarithms.'],
     ['Algebraic Expressions and Formulas', 'Rational expressions, surds, useful algebraic identities.'],
@@ -125,10 +126,10 @@ const CH: Record<string, [string, string, string?, string?][]> = {
     ['Linear Equations and Inequalities', 'Solving equations, absolute value, inequality solution sets.'],
     ['Relations', 'Binary relations and their domain and range, shown as tables, ordered pairs or graphs.'],
     ['Introduction to Coordinate Geometry', 'Distance formula, collinear points, midpoint.'],
-    ['Congruent Triangles', 'Congruence postulates and proofs for triangles. Older FBISE textbooks include this chapter, but the current Class 9 syllabus does not test it, so there is nothing here to revise for your paper.'],
+    ['Congruent Triangles', 'Congruence postulates and proofs for triangles. The current FBISE Class 9 paper does not test this chapter, so treat it as background reading.'],
     ['Parallelograms and Triangles', 'Properties of parallelograms, midpoint theorem and its converse.'],
     ['Line Bisectors and Angle Bisectors', 'Perpendicular bisectors, angle bisectors and their concurrency.'],
-    ['Sides and Angles of a Triangle', 'Angle-side inequalities and the triangle inequality. Older FBISE textbooks include this chapter, but the current Class 9 syllabus does not test it, so there is nothing here to revise for your paper.'],
+    ['Sides and Angles of a Triangle', 'Angle-side inequalities and the triangle inequality. The current FBISE Class 9 paper does not test this chapter, so treat it as background reading.'],
     ['Statistics and Probability', 'Mean, median, mode and modal class, plus probability and relative frequency.'],
     ['Trigonometry', 'Angles, trig ratios and identities, plus bearings and angles of elevation and depression.'],
     ['Areas and Volumes of Similar Figures', 'How the areas and volumes of similar figures and solids compare by scale factor.'],

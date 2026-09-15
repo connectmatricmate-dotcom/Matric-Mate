@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { chapterName } from '@matricmate/core';
 import { ChatScreen } from '@/components/screens/ChatScreen';
 import { getChapter } from '@/lib/content-readers';
 import { readUiLanguage } from '@/lib/ui-language.server';
 
-export const metadata: Metadata = { title: 'Ask the AI tutor' };
+export const generateMetadata = (): Promise<Metadata> => localTitle('tutor.title');
 
 export default async function ChatPage({
   searchParams,

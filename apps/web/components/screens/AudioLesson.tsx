@@ -6,11 +6,12 @@
  * expo-audio for the same job; the transport and copy are deliberately identical.
  */
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import type { Chapter, PlayableTrack, VoiceStream } from '@matricmate/core';
 import { chapterName, fetchVoiceStream, isOneLanguageSubject, pickAudioTrack, subjectMedium } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { Btn } from '@/components/ui/controls';
 import { Bar, Card, Icon, ScriptText } from '@/components/ui/primitives';
 import { useApp, useT } from '@/lib/store';
 
@@ -34,6 +35,31 @@ const POLL_MS = 20_000;
 
 const askVoice = (chapterId: string, medium: 'en' | 'ur', at: number): Promise<VoiceStream | null> =>
   Promise.race([fetchVoiceStream(chapterId, medium, at), new Promise<null>((r) => setTimeout(() => r(null), ASK_MS))]);
+
+/*
+ * Where a student stopped in a lesson, on this browser: a call, a back press
+ * or a closed tab used to mean starting again at 0:00, in lessons that run
+ * five to thirteen minutes. Per recording, since each medium is its own.
+ */
+const noStore = () => () => {};
+const placeKey = (trackId: string) => `mm.audio.at.${trackId}`;
+function savedPlace(trackId: string | undefined): number {
+  if (!trackId || typeof window === 'undefined') return 0;
+  try {
+    const at = Number(window.localStorage.getItem(placeKey(trackId)));
+    return Number.isFinite(at) && at > 0 ? at : 0;
+  } catch {
+    return 0;
+  }
+}
+function savePlace(trackId: string, at: number | null): void {
+  try {
+    if (at === null) window.localStorage.removeItem(placeKey(trackId));
+    else window.localStorage.setItem(placeKey(trackId), String(Math.floor(at)));
+  } catch {
+    // storage blocked: the lesson still plays, it just starts at the top next time
+  }
+}
 
 export function AudioLesson({
   chapter,
@@ -71,8 +97,20 @@ export function AudioLesson({
   // A stream has no length until it is over: the lesson's estimated one meanwhile.
   const duration = streaming ? (voice?.estSecs ?? 0) : fileDuration;
   const [playing, setPlaying] = useState(false);
+  /* Waiting for sound: a stream still being made, a slow connection. The
+     button said Pause over a clock stuck at 0:00, which reads as broken. */
+  const [buffering, setBuffering] = useState(false);
   const [speed, setSpeed] = useState(0);
   const [loadedTrack, setLoadedTrack] = useState(track?.id ?? null);
+  /* Where this student stopped last time, offered as a button rather than
+     jumped to: they may want the lesson from the top. Only on the client
+     (nothing on the server knows it), and gone once anything plays. */
+  const saved = useSyncExternalStore(noStore, () => savedPlace(track?.id), () => 0);
+  const [placeUsed, setPlaceUsed] = useState(false);
+  const total = track?.durationSecs ?? 0;
+  // A lesson finished, or barely started, simply plays from the top.
+  const place = !placeUsed && saved >= 15 && (!total || saved < total - 15) ? saved : null;
+  const lastSaved = useRef(0);
 
   /** Where to put the playhead, and whether to play, once the next source loads. */
   const resume = useRef<{ at: number; play: boolean } | null>(null);
@@ -89,6 +127,7 @@ export function AudioLesson({
     setVoice(null);
     setPosition(0);
     setPlaying(false);
+    setPlaceUsed(false);
     setFileDuration(track?.durationSecs ?? 0);
   }
   useEffect(() => {
@@ -112,8 +151,33 @@ export function AudioLesson({
   useEffect(() => {
     const el = audio.current;
     if (!el || !resume.current?.play) return;
+    el.muted = false;
     el.play().catch(() => setPlaying(false));
   }, [src]);
+
+  /*
+   * A file that failed before the page came alive. The server's HTML starts
+   * loading it at once, and an error then fires before React has attached
+   * onError, so the page never heard: the Play button refused silently and
+   * the note promised a lesson. The element remembers its own error.
+   */
+  useEffect(() => {
+    const el = audio.current;
+    if (!el || !src || streaming) return;
+    let alive = true;
+    void Promise.resolve().then(() => {
+      if (alive && el.error) setFailedSrc(src);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [src, streaming]);
+
+  /** A play the browser refused: a broken file says so, a refusal just stays paused. */
+  const refused = (el: HTMLAudioElement) => () => {
+    setPlaying(false);
+    if (el.error && !streaming && src) setFailedSrc(src);
+  };
 
   /**
    * The lesson from `at` seconds in, after a stream stopped: the finished
@@ -179,31 +243,77 @@ export function AudioLesson({
       el.pause();
       return;
     }
+    await startFrom(null);
+  }
+
+  /** Plays, from `at` seconds in when given (Carry on), else from where the player is. */
+  async function startFrom(at: number | null) {
+    const el = audio.current;
+    if (!el || !src || failed || asking) return;
+    setPlaceUsed(true);
     // The first press on a lesson whose new voice is still being made asks
     // for it. Asked here and not on opening, because asking starts it being
     // made, and a student who opens the page and leaves should cost nothing.
     if (track?.voicePending && !voice && !asked.current) {
       asked.current = true;
+      /*
+       * Started from inside the tap, silently, before the wait for the voice.
+       * iPhone Safari lets an element play later only once it has been
+       * started from a tap, and the voice is played after that wait, so the
+       * first press did nothing there and needed a second.
+       */
+      el.muted = true;
+      const primed = el.currentSrc;
+      void el
+        .play()
+        .then(() => {
+          if (el.currentSrc === primed) el.pause();
+        })
+        .catch(() => {});
       setAsking(true);
-      const r = await askVoice(track.chapterId, track.medium, 0);
+      const r = await askVoice(track.chapterId, track.medium, at ?? 0);
       setAsking(false);
       if (r?.stream) {
         resume.current = { at: 0, play: true };
         setSpeed(0);
-        setVoice({ src: r.stream, stream: true, offset: 0, estSecs: r.estSecs || track.durationSecs });
+        setVoice({ src: r.stream, stream: true, offset: at ?? 0, estSecs: r.estSecs || track.durationSecs });
         return;
       }
       if (r?.url) {
-        resume.current = { at: 0, play: true };
+        resume.current = { at: at ?? 0, play: true };
         setVoice({ src: r.url, stream: false, offset: 0, estSecs: 0, fileSecs: r.durationSecs });
         if (r.durationSecs) setFileDuration(r.durationSecs);
         return;
       }
+      el.muted = false;
+    }
+    if (at !== null && !streaming) {
+      // Before the file's length is known the seek waits for it (onLoadedMetadata).
+      if (el.readyState >= 1) el.currentTime = at;
+      else resume.current = { at, play: true };
     }
     // play() rejects when the browser refuses (autoplay rules, a pause that
     // lands first) or the file cannot play. The element's own error event
     // reports a broken file; a refusal needs nothing more than staying paused.
-    el.play().catch(() => setPlaying(false));
+    el.muted = false;
+    el.play().catch(refused(el));
+  }
+
+  /**
+   * After a file failed to load: try it again, from where it was. A lesson
+   * whose new voice was being made asks for it again too, because the old
+   * recording it fell back to is deleted the moment the new one is joined.
+   * The message used to say "try again" over controls that were all disabled.
+   */
+  function reload() {
+    const el = audio.current;
+    resume.current = position ? { at: position, play: false } : null;
+    if (track?.voicePending) {
+      asked.current = false;
+      setVoice(null);
+    }
+    setFailedSrc(null);
+    el?.load();
   }
 
   function seek(delta: number) {
@@ -227,10 +337,22 @@ export function AudioLesson({
           // A stream is only ever loaded by a press: loading it is what makes it.
           preload={streaming ? 'none' : 'metadata'}
           onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
+          onPause={() => {
+            setPlaying(false);
+            setBuffering(false);
+            if (track && position > 0) savePlace(track.id, position);
+          }}
+          onWaiting={() => setBuffering(true)}
+          onStalled={() => setBuffering(true)}
+          onPlaying={() => setBuffering(false)}
+          onCanPlay={() => setBuffering(false)}
           onTimeUpdate={(e) => {
             const at = (voice?.stream ? voice.offset : 0) + e.currentTarget.currentTime;
             setPosition(at);
+            if (track && Math.abs(at - lastSaved.current) >= 5) {
+              lastSaved.current = at;
+              savePlace(track.id, at);
+            }
             /*
              * Listening counts as studying. It used to count as nothing: the
              * player recorded no attempt, no section and no active day, so an
@@ -252,12 +374,16 @@ export function AudioLesson({
           }}
           onEnded={(e) => {
             setPlaying(false);
+            setBuffering(false);
+            // Heard to the end: next time it starts from the top.
+            if (track && !streaming) savePlace(track.id, null);
             // A stream ends at the end of the lesson, or early (its time ran
             // out, the connection dropped): ask again from here to find out.
             if (streaming && voice) void carryOn(voice.offset + e.currentTarget.currentTime, true);
           }}
           onError={(e) => {
             setPlaying(false);
+            setBuffering(false);
             if (streaming && voice) void carryOn(voice.offset + e.currentTarget.currentTime, true);
             else setFailedSrc(src);
           }}
@@ -311,11 +437,11 @@ export function AudioLesson({
           type="button"
           onClick={toggle}
           disabled={!src || failed}
-          aria-busy={asking || undefined}
-          aria-label={playing ? t('audio.pause') : t('audio.play')}
+          aria-busy={asking || (playing && buffering) || undefined}
+          aria-label={asking || (playing && buffering) ? t('audio.loading') : playing ? t('audio.pause') : t('audio.play')}
           className="flex h-[76px] w-[76px] items-center justify-center rounded-full bg-teal text-onbrand transition-[background-color,transform] duration-200 ease-out active:scale-[0.97] hover:bg-tealdark disabled:cursor-not-allowed disabled:opacity-45 aria-busy:cursor-wait"
         >
-          {asking ? (
+          {asking || (playing && buffering) ? (
             <Icon name="refresh" size={28} strokeWidth={2.2} className="animate-spin" />
           ) : (
             <Icon name={playing ? 'pause' : 'play'} size={30} strokeWidth={2.2} />
@@ -341,7 +467,9 @@ export function AudioLesson({
         >
           {t('audio.speed', { n: SPEEDS[speed] })}
         </button>
-
+        {place !== null && !playing && !failed ? (
+          <Btn title={t('audio.resumeFrom', { time: fmt(place) })} icon="play" variant="line" sm onClick={() => void startFrom(place)} />
+        ) : null}
       </div>
 
       <Card
@@ -361,6 +489,7 @@ export function AudioLesson({
                 ? t(medium === 'ur' ? 'audio.oneLanguageUr' : 'audio.oneLanguageEn')
                 : t('audio.sampleNote')}
         </p>
+        {failed ? <Btn title={t('common.retry')} icon="refresh" variant="line" sm className="mt-3" onClick={reload} /> : null}
       </Card>
     </Page>
   );

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
-import { isUrduScript } from '@matricmate/core';
+import { isUrduScript, reviewWrong } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, PillButton } from '@/components/ui/controls';
 import { Card, Icon, Label, LinkBtn, Pill, ScriptText } from '@/components/ui/primitives';
@@ -11,6 +11,7 @@ import { leaveSession, session } from '@/lib/session';
 import { canGoBack } from '@/lib/nav-trail';
 import { NoSession } from './NoSession';
 import { Markdown } from '@/components/ui/Markdown';
+import { ReportAi } from '@/components/app/ReportAi';
 
 type Filter = 'all' | 'wrong' | 'flagged';
 
@@ -23,18 +24,23 @@ export function ReviewScreen() {
   const [open, setOpen] = useState<string | null>(null);
   const [leaving, startLeaving] = useTransition();
 
+  /* "Wrong" means what the score counted as wrong (reviewWrong in core): an
+     unanswered question in a timed test, not in a practice set ended early.
+     The two apps had one half each, and showed different counts. */
   const rows = useMemo(() => {
     if (!s) return [];
     return s.mcqs
       .map((m) => ({ mcq: m, a: s.answers[m.id] }))
-      .filter(({ a }) => (filter === 'all' ? true : filter === 'wrong' ? a && !a.correct : a?.flagged))
+      .filter(({ a }) => (filter === 'all' ? true : filter === 'wrong' ? reviewWrong(s.mode, a) : a?.flagged))
       .sort((x, y) => Number(!!x.a?.correct) - Number(!!y.a?.correct));
   }, [s, filter]);
 
   if (!s) return <NoSession />;
 
-  const wrongCount = Object.values(s.answers).filter((a) => !a.correct).length;
+  const wrongCount = s.mcqs.filter((m) => reviewWrong(s.mode, s.answers[m.id])).length;
   const flagCount = Object.values(s.answers).filter((a) => a.flagged).length;
+  // Only a timed test can flag a question; a practice set showed "Flagged · 0" forever.
+  const canFlag = s.mode === 'exam';
 
   return (
     <Page width="focus">
@@ -47,9 +53,11 @@ export function ReviewScreen() {
         <PillButton tone={filter === 'wrong' ? 'red' : 'grey'} onClick={() => setFilter('wrong')}>
           {`${t('session.wrongOnly')} · ${wrongCount}`}
         </PillButton>
-        <PillButton tone={filter === 'flagged' ? 'orange' : 'grey'} onClick={() => setFilter('flagged')}>
-          {`${t('session.flaggedOnly')} · ${flagCount}`}
-        </PillButton>
+        {canFlag ? (
+          <PillButton tone={filter === 'flagged' ? 'orange' : 'grey'} onClick={() => setFilter('flagged')}>
+            {`${t('session.flaggedOnly')} · ${flagCount}`}
+          </PillButton>
+        ) : null}
       </div>
 
       <div className="mt-4 flex flex-col gap-2.5">
@@ -65,7 +73,7 @@ export function ReviewScreen() {
         ) : (
           rows.map(({ mcq, a }) => {
             const isOpen = open === mcq.id;
-            const wrong = a && !a.correct;
+            const wrong = reviewWrong(s.mode, a);
             return (
               <Card
                 key={mcq.id}
@@ -103,6 +111,9 @@ export function ReviewScreen() {
                   <div className="mt-3">
                     <Label className="text-teal">{t('session.why')}</Label>
                     <Markdown text={mcq.explanation} className="mt-0.5 text-[13.5px] leading-[1.6] text-ink" />
+                    {/* Explanations are written with AI, and a timed test shows
+                        them only here, so this is where they can be reported. */}
+                    <ReportAi surface="ai_test" refId={mcq.id} excerpt={`${mcq.q}\n${mcq.explanation}`} />
                     <div className="mt-3 flex flex-wrap gap-2">
                       {derived.access.ai ? (
                       <LinkBtn
@@ -110,7 +121,9 @@ export function ReviewScreen() {
                         href={`/tutor/chat?q=${encodeURIComponent(
                           a?.chosen != null && a.chosen !== mcq.answer
                             ? t('session.askWhyWrong', { mine: mcq.options[a.chosen], right: mcq.options[mcq.answer], q: mcq.q })
-                            : mcq.q,
+                            : // A question put in the student's words, as on Android:
+                              // the bare question read as if they had typed it.
+                              t('session.askExplain', { q: mcq.q }),
                         )}${mcq.chapterId ? `&chapter=${mcq.chapterId}` : ''}`}
                         variant="line"
                         sm

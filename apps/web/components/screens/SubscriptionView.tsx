@@ -9,6 +9,7 @@ import { UpgradeButton } from '@/components/commerce/UpgradeButton';
  */
 import type { IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
+import { lapseLines } from '@/components/app/planStatus';
 import { useState } from 'react';
 import { Btn } from '@/components/ui/controls';
 import { Card, Icon, Item, LinkBtn, Pill, SectionTitle } from '@/components/ui/primitives';
@@ -50,6 +51,9 @@ export function SubscriptionView() {
      row ("Full year"); the tier for the other two. */
   const planLabel = tier === 'premium' ? planName(state.premium.plan ?? 'monthly', lang) : tier ? planName(tier, lang) : '';
   const trialSubject = tier === 'trial' ? subjectName(subjectById(access.trialSubject ?? ''), lang) || access.trialSubject || '' : '';
+  // Ended, switched off, or never: the plan reminders open this page, and it
+  // answered all three with "No plan yet".
+  const lapse = lapseLines(state.premium.lapse, lang);
 
   return (
     <Page width="focus">
@@ -65,7 +69,7 @@ export function SubscriptionView() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[15px] font-extrabold text-ink">
-            {active ? [t('billing.statusActive'), planLabel, trialSubject].filter(Boolean).join(' · ') : t('billing.statusFree')}
+            {active ? [t('billing.statusActive'), planLabel, trialSubject].filter(Boolean).join(' · ') : state.premium.lapse ? lapse.title : t('billing.statusFree')}
           </p>
           <p className="text-[13px] text-ink2">
             {active && state.premium.validTill
@@ -76,7 +80,9 @@ export function SubscriptionView() {
                     year: 'numeric',
                   }),
                 })
-              : t('billing.freeBody')}
+              : state.premium.lapse
+                ? lapse.sub
+                : t('billing.freeBody')}
           </p>
         </div>
         <Pill tone={active ? 'green' : 'grey'}>{active ? t('account.active') : t('account.inactive')}</Pill>

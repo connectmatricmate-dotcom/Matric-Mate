@@ -264,14 +264,15 @@ export function ShareCard({
 
           {/* The link as a field with its copy button, the pattern everyone
               already knows from sharing anything. */}
-          <div className="flex min-h-12 items-center gap-2 rounded-[14px] border-[1.5px] border-line bg-paper py-1 ps-3.5 pe-1">
+          <div className="flex min-h-[3.25rem] items-center gap-2 rounded-[14px] border-[1.5px] border-line bg-paper py-1 ps-3.5 pe-1 md:min-h-12">
             <span className="min-w-0 flex-1 truncate text-[14.5px] font-extrabold text-teal" title={link}>
               {shortLink}
             </span>
+            {/* 44px on a phone, a thumb's target; 40 with a mouse. */}
             <button
               type="button"
               onClick={() => void copyLink()}
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-teal px-3.5 text-[13px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110"
+              className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-[10px] bg-teal px-3.5 text-[13px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110 md:h-10"
             >
               <Icon name={linkFlash === 'copied' ? 'check' : 'doc'} size={15} strokeWidth={2.4} />
               {linkFlash === 'copied' ? 'Copied' : 'Copy link'}

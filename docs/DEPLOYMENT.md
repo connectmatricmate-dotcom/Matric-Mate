@@ -44,8 +44,31 @@ international card once you leave the free tier.
    `apps/web`. With this off the build fails with a module-not-found on the very first deploy. It is
    on by default when Vercel detects a monorepo, but check it.
 
-4. **Environment Variables: none.** The prototype runs on mock data. Leave the section empty and
-   deploy. `apps/web/.env.example` lists everything that arrives later and what each one is for.
+4. **Environment Variables:** every one the website reads is in the table below, and
+   `apps/web/.env.example` lists the same names with no values. Production needs all of the
+   required ones; a missing one fails quietly (a feature switches off), not loudly.
+
+   | Name | Required | What it is for |
+   | :-- | :-- | :-- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | yes | The Supabase project address |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes | The Supabase public key (safe in the browser) |
+   | `SUPABASE_SECRET_KEY` | yes | The Supabase server key: jobs, admin, AI routes. Never `NEXT_PUBLIC_` |
+   | `NEXT_PUBLIC_SITE_URL` | yes | `https://www.matricmate.co`: links in emails and previews |
+   | `ADMIN_EMAILS` | yes | Comma-separated addresses allowed into /admin. **Unset locks the admin panel in production** |
+   | `CRON_SECRET` | yes | Authorises the scheduled jobs; also signs plan-email links and voice stream links. Rotating it ends every outstanding one, and means re-running `scripts/db-cron-secrets.mjs` |
+   | `ANTHROPIC_API_KEY` | yes | Every AI feature (read by the Anthropic SDK itself) |
+   | `ELEVENLABS_API_KEY` | yes | The premium voice (Islamiyat, Urdu and Islamic lessons) |
+   | `RESEND_API_KEY`, `EMAIL_FROM` | yes | Email: receipts and plan reminders (`MatricMate <no-reply@matricmate.co>`) |
+   | `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | yes | Sending push notifications (the service account) |
+   | `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_APP_ID`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | for web push | Browser notifications on the website |
+   | `NEXT_PUBLIC_ALLOW_INDEXING` | no | `true` lets Google index the site (see below). Off by the client's choice |
+   | `PAYMENT_GATEWAY` | when payments go live | Which gateway takes online payments; unset means manual activation |
+   | `SAFEPAY_ENV`, `SAFEPAY_SECRET_KEY`, `SAFEPAY_MERCHANT_API_KEY`, `SAFEPAY_WEBHOOK_SECRET` | with Safepay | See Part 3 |
+   | `PAYFAST_ENV`, `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_NAME`, `PAYFAST_SECURED_KEY`, `PAYFAST_BASE_URL`, `PAYFAST_API_BASE_URL` | with PayFast | The alternative gateway |
+   | `VOICE_TIME_BUDGET_MS` | no | Testing only: how long one voice stream may run |
+
+   The Android app reads only public values, baked in at build time from EAS environments:
+   `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_SITE_URL`.
 
 5. **Deploy.**
 
@@ -62,9 +85,8 @@ international card once you leave the free tier.
   **To turn indexing on at launch:** add `NEXT_PUBLIC_ALLOW_INDEXING` = `true` in Project → Settings
   → Environment Variables (Production only), and redeploy. That is the whole change.
 
-- **Custom domain.** Project → Settings → Domains → add `matricmate.pk`. Vercel prints the DNS
-  records to add at the registrar. Once it resolves, also set `NEXT_PUBLIC_SITE_URL` to
-  `https://matricmate.pk` so link previews on WhatsApp point at the right place.
+- **Custom domain.** The site is at `www.matricmate.co` (GoDaddy DNS). `NEXT_PUBLIC_SITE_URL` is
+  `https://www.matricmate.co` so link previews on WhatsApp point at the right place.
 
 ## Scheduled jobs do NOT live on Vercel
 
@@ -78,20 +100,26 @@ the Deployments tab at all. It cost most of an afternoon on 18 Aug.
 The nudge has to run hourly through the evening, because each student picks the hour they are
 reminded at. So all scheduling moved to Supabase, which is on a paid plan:
 
-| Job | Schedule (UTC) | Karachi |
-| :-- | :-- | :-- |
-| `matricmate-nudge` | `0 11-16 * * *` | hourly, 4pm to 9pm |
-| `matricmate-coach` | `30 1 * * *` | 6:30am |
+| Job | Schedule (UTC) | Karachi | What it does |
+| :-- | :-- | :-- | :-- |
+| `matricmate-daily` (+ `-retry` 5 min later) | `0 9 * * *` | 2pm | The afternoon tip or flashcard |
+| `matricmate-nudge` (+ `-retry` 5 min later) | `0 11-16 * * *` | hourly, 4pm to 9pm | The evening study nudge, at each student's chosen hour |
+| `matricmate-plans` | `20 * * * *` | hourly, quiet 9pm to 8am | Trial and plan ending / ended reminders |
+| `matricmate-welcome` | `*/15 * * * *` | every 15 minutes | Welcome for a new install |
+| `matricmate-coach` (+ `-retry` an hour later) | `30 2 * * *` | 7:30am | Rewrites the AI coach card |
+| `matricmate-job-runs-trim` | `15 22 * * *` | 3:15am | Deletes job records older than 30 days |
 
-They are pg_cron entries created by migration 0024, calling the same HTTP routes with the same
-`CRON_SECRET`. Nothing about the routes changed; Postgres just holds the clock. The secret and the
+They are pg_cron entries (migrations 0024, 0040, 0045, 0053, 0054), calling the same HTTP routes
+with the same `CRON_SECRET`. Nothing about the routes changed; Postgres just holds the clock. The secret and the
 site URL live in Supabase Vault, seeded by `scripts/db-cron-secrets.mjs`.
 
 **Re-run that script after rotating `CRON_SECRET`, or after moving to the real domain.** Neither
 is detected: the jobs simply stop working, and the only symptom is that nothing arrives.
 
 To see the schedule: `select jobname, schedule, active from cron.job;`
-To see what happened: `select status_code, content from net._http_response order by id desc limit 5;`
+To see what happened: the admin overview shows each job's last run. Underneath, every run writes a
+row to `job_runs` (kept 30 days): `select job, at, status, summary from job_runs order by at desc limit 10;`
+(`net._http_response` only keeps six hours, and pg_cron calls every run a success.)
 
 ---
 

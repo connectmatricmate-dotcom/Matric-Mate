@@ -8,10 +8,15 @@ import { Card, Empty, LinkBtn, ScriptText, SectionTitle } from '@/components/ui/
 import { useApp, useLang, useT } from '@/lib/store';
 
 export function WeakTopicsScreen() {
-  const { state } = useApp();
+  const { state, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
-  const rows = useMemo(() => namedWeakTopics(state.attempts, lang), [state.attempts, lang]);
+  // Again when the chapter index lands: weak topics keep to its syllabus and take their names from it.
+  const ready = derived.contentReady;
+  const rows = useMemo(() => {
+    void ready;
+    return namedWeakTopics(state.attempts, lang);
+  }, [state.attempts, lang, ready]);
 
   const bySubject = rows.reduce<Record<string, typeof rows>>((acc, r) => {
     (acc[r.subjectId] ||= []).push(r);

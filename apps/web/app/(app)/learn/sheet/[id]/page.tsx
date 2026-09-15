@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { notFound, redirect } from 'next/navigation';
 import { subjectOpen } from '@matricmate/core';
 import { AiLocked } from '@/components/app/AiLocked';
@@ -6,10 +7,7 @@ import { SheetScreen } from '@/components/screens/SheetScreen';
 import { getChapter } from '@/lib/content-readers';
 import { currentAccess } from '@/lib/entitlement';
 
-export const metadata: Metadata = {
-  title: 'Revision sheet',
-  description: 'A one-page AI revision sheet for this chapter.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('tutor.sheetTitle', 'A one-page AI revision sheet for this chapter.');
 
 export default async function SheetPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

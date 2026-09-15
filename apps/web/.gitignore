@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files. All of them, always.
 .env*
+# The names-only list of what the site reads (docs/DEPLOYMENT.md). Never values.
+!.env.example
 
 # vercel
 .vercel

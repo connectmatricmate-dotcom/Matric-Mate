@@ -2,13 +2,13 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import type { AuthError } from '@supabase/supabase-js';
+import { createClient as createPlainClient, type AuthError } from '@supabase/supabase-js';
 import { type StringKey, translate } from '@matricmate/core';
 import { readUiLanguage } from '@/lib/ui-language.server';
 import { z } from 'zod';
 import { safePath } from '@/lib/safe-path';
 import { SITE_URL } from '@/lib/site';
-import { normaliseMobile } from '@matricmate/core';
+import { EMAIL_RULE, normaliseMobile } from '@matricmate/core';
 import { normaliseSchool } from '@/lib/validation';
 
 import { currentRole, landingFor } from '@/lib/roles';
@@ -46,11 +46,15 @@ export type AuthState = {
  * readable, and an Urdu student is told what is wrong in Urdu.
  */
 const email = z.string().trim().min(1, 'auth.errEmailEmpty').email('auth.errEmailInvalid');
+// A new account also needs core's rule, a domain ending of two letters or
+// more: `name@gmail` could never receive a confirmation or a reset link.
+// Signing in keeps the plain check, so no existing account is locked out.
+const newEmail = email.regex(EMAIL_RULE, 'auth.errEmailInvalid');
 const password = z.string().min(6, 'auth.errWeakPassword');
 
 const SignUp = z.object({
   name: z.string().trim().min(2, 'auth.errNameEmpty').max(80, 'auth.errNameLong'),
-  email,
+  email: newEmail,
   password,
 });
 
@@ -124,7 +128,12 @@ export async function signUpAction(_prev: AuthState, formData: FormData): Promis
   });
   if (!parsed.success) return fail(first(parsed.error));
 
+  /* Required, and read the way the form reads it. An unreadable number used to
+     be dropped without a word, so a hand-made request (or a form that let one
+     through) made an account with no number while an empty field was
+     refused: the admin's follow-up list is built from these. */
   const mobile = normaliseMobile(String(formData.get('mobile') ?? ''));
+  if (!mobile) return fail('auth.errMobileInvalid');
   // Optional. Out of bounds is an error here rather than silently dropped:
   // the form checks the same rule, so only a hand-made request gets this far.
   const school = normaliseSchool(String(formData.get('school') ?? ''));
@@ -275,10 +284,19 @@ export async function resetPasswordAction(_prev: AuthState, formData: FormData):
   const parsed = email.safeParse(formData.get('email'));
   if (!parsed.success) return fail(first(parsed.error));
 
-  const supabase = await createClient();
-  // The link has to land on /auth/callback, which is the only place that can
-  // turn the one-time code into a session. Sending it straight at /reset would
-  // give the student a form with no authority to save anything.
+  /*
+   * Asked for with the implicit flow, the way the Android app asks, not the
+   * site's usual PKCE. A PKCE link only works in the browser that asked for
+   * it, and a student asks on a laptop and opens the email on a phone: the
+   * link landed on "this link did not work". The implicit link carries the
+   * session in its fragment, which /auth/callback passes on to /reset on any
+   * device. Nothing is stored for it, so a plain client does.
+   */
+  const supabase = createPlainClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { flowType: 'implicit', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+  // The link has to land on /auth/callback, which sends a recovery on to
+  // /reset with the session still in the fragment for the form to read.
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
     redirectTo: `${SITE_URL}/auth/callback?next=/reset`,
   });

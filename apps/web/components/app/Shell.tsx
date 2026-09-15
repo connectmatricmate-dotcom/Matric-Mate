@@ -127,7 +127,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           The avatar is identity, not a control, which is the app's rule too:
           nothing marks a face as tappable, so settings live behind the gear.
         */}
-        <header data-chrome className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
+        <header data-chrome data-app-header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-glass px-4 backdrop-blur md:px-8">
           <span className="md:hidden">
             <AvatarBadge index={state.settings.avatar ?? 0} size={34} />
           </span>
@@ -166,10 +166,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </Link>
             ) : null}
 
+            {/* 44px: a finger, not a cursor, is what presses these on a phone. */}
             <Link
               href="/account"
               aria-label={t('account.settings')}
-              className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper md:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-[12px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper md:hidden"
             >
               <Icon name="gear" size={19} />
             </Link>
@@ -177,7 +178,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Link
               href="/notifications"
               aria-label={t('notifications.title')}
-              className="relative flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper"
+              className="relative flex h-11 w-11 items-center justify-center rounded-[12px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper"
             >
               <Icon name="bell" size={19} />
               {unread ? (
@@ -193,8 +194,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      {/* phone bottom bar */}
-      <nav data-chrome className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
+      {/* phone bottom bar. Not on the free trial's start screen: that is one
+          step to finish, and every tab there leads straight back to it. */}
+      {pathname === '/trial' ? null : (
+      <nav data-chrome data-bottom-bar className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
         {NAV.map((item) => {
           const on = isActive(pathname, item);
           return (
@@ -218,6 +221,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           );
         })}
       </nav>
+      )}
     </div>
   );
 }

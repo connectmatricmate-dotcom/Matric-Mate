@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { CertificatesView, type CertRow } from '@/components/screens/CertificatesView';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Verified by teachers',
-  description: 'Teachers who reviewed MatricMate study material and certified it.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('cert.title', 'Teachers who reviewed MatricMate study material and certified it.');
 
 export default async function CertificatesPage() {
   const supabase = await createClient();

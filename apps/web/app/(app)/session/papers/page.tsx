@@ -2,11 +2,10 @@ import type { Metadata } from 'next';
 import { asBoard, pastPaperGroups } from '@matricmate/core';
 import { PapersScreen } from '@/components/screens/PapersScreen';
 import { createClient } from '@/lib/supabase/server';
+import { currentAccess } from '@/lib/entitlement';
+import { localTitle } from '@/lib/page-title';
 
-export const metadata: Metadata = {
-  title: 'Past papers',
-  description: 'Past papers, straight from your board.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('session.papersTitle', 'Past papers, straight from your board.');
 
 export default async function PapersPage() {
   /**
@@ -22,8 +21,14 @@ export default async function PapersPage() {
     : { data: null };
 
   const board = asBoard(profile?.board);
-  // Punjab lists run per subject, so only the student's own subjects.
-  const subjects = (profile?.onboarding as { subjects?: string[] } | null)?.subjects;
+  // Punjab lists run per subject, so only the student's own subjects, and on
+  // a free trial only its one subject, like every other list in the trial.
+  // (FBISE's papers are one file a year for every subject, so they stay.)
+  const access = await currentAccess();
+  const subjects =
+    access.tier === 'trial' && access.trialSubject
+      ? [access.trialSubject]
+      : (profile?.onboarding as { subjects?: string[] } | null)?.subjects;
   const groups = pastPaperGroups(board, profile?.grade ?? 9, subjects);
   return <PapersScreen groups={groups} board={board} />;
 }

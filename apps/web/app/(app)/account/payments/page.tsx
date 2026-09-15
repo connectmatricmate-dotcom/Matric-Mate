@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { PaymentsView, type PaymentRow } from '@/components/screens/PaymentsView';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Payment history',
-  description: 'Every Premium receipt, with the reference you can quote to support.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('account.paymentsTitle', 'Every Premium receipt, with the reference you can quote to support.');
 
 /**
  * The rows are read here, on the server, under the student's own session and

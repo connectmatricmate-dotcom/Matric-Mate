@@ -658,7 +658,9 @@ export function Empty({
       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-tealtint text-teal">
         <Icon name={icon} size={26} />
       </span>
-      <h3 className="mt-2.5 font-display text-[17px] text-ink">{title}</h3>
+      {/* h2: an empty state sits straight under the page title, and an h3
+          there skipped a level for anyone reading by headings. */}
+      <h2 className="mt-2.5 font-display text-[17px] text-ink">{title}</h2>
       {sub ? <p className="mt-1 max-w-sm text-[13px] text-ink2">{sub}</p> : null}
       {cta ? <div className="mt-3">{cta}</div> : null}
     </Card>

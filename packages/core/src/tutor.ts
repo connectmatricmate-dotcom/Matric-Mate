@@ -85,6 +85,15 @@ function failFrom(status: number, body: { error?: string; quota?: TutorQuota }, 
   return { ok: false, reason: 'error', quota: body.quota };
 }
 
+/**
+ * How long the tutor may go quiet before the client stops waiting: no
+ * response, or no new line of the answer, for this long. A dropped
+ * connection mid-answer left the reply pending forever, with "Thinking…" on
+ * screen and the question stuck. A web search or a tool round can pause the
+ * answer for a while, so this is generous.
+ */
+const TUTOR_STALL_MS = 45_000;
+
 export async function askTutorLive(
   input: {
     message: string;
@@ -101,11 +110,27 @@ export async function askTutorLive(
 ): Promise<TutorReply> {
   if (!config) return { ok: false, reason: 'offline' };
   const who = quotaUser();
+  // The stall watchdog: re-armed by every response and every chunk. When it
+  // fires it cancels the request and the body, and the ask ends as offline.
+  const controller = new AbortController();
+  let stalled = false;
+  let bodyReader: { cancel: () => Promise<void> } | null = null;
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+  const arm = () => {
+    clearTimeout(watchdog);
+    watchdog = setTimeout(() => {
+      stalled = true;
+      controller.abort();
+      bodyReader?.cancel().catch(() => {});
+    }, TUTOR_STALL_MS);
+  };
+  arm();
   try {
     const res = await doFetch(`${config.siteUrl}/api/ai/tutor`, {
       method: 'POST',
       headers: await headers(),
       credentials: 'include',
+      signal: controller.signal,
       body: JSON.stringify({
         message: input.message,
         threadId: input.threadId ?? undefined,
@@ -115,6 +140,7 @@ export async function askTutorLive(
         image: input.image ? { data: input.image.data, mediaType: input.image.mediaType } : undefined,
       }),
     });
+    arm();
 
     if (!res.ok) {
       const body = (await res.json().catch(() => ({}))) as { error?: string; quota?: TutorQuota };
@@ -164,11 +190,13 @@ export async function askTutorLive(
 
     const reader = res.body?.getReader?.();
     if (reader) {
+      bodyReader = reader;
       const decoder = new TextDecoder();
       let buffer = '';
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
+        arm();
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
         buffer = lines.pop() ?? '';
@@ -180,9 +208,13 @@ export async function askTutorLive(
       for (const line of (await res.text()).split('\n')) handleLine(line);
     }
 
+    // Cut off by the watchdog: half an answer is not an answer.
+    if (stalled && !finale) return { ok: false, reason: 'offline' };
     return finale ?? { ok: false, reason: 'error' };
   } catch {
     return { ok: false, reason: 'offline' };
+  } finally {
+    clearTimeout(watchdog);
   }
 }
 
@@ -202,7 +234,20 @@ export async function fetchTutorQuota(): Promise<TutorQuota | null> {
 
 /* ------------------------------------------------------------- AI actions */
 
-export type AiFail = { ok: false; reason: 'offline' | 'quota' | 'rate' | 'plan' | 'trial' | 'refused' | 'syllabus' | 'error'; quota?: TutorQuota };
+export type AiFail = {
+  ok: false;
+  reason: 'offline' | 'quota' | 'rate' | 'plan' | 'trial' | 'refused' | 'syllabus' | 'error';
+  quota?: TutorQuota;
+  /**
+   * The wait ran out (AI_DEADLINE_MS), as opposed to no connection or the
+   * caller's own cancel. The server carries on and saves the work, so a
+   * screen can say where it will be instead of "needs internet".
+   */
+  timedOut?: boolean;
+};
+
+/** Thrown by withDeadline when its own timer, not the caller, ended the wait. */
+class AiDeadline extends Error {}
 
 /**
  * How long one of these may hang before the client stops waiting.
@@ -227,11 +272,17 @@ const AI_DEADLINE_MS = 90_000;
  */
 async function withDeadline(url: string, init: RequestInit, signal?: AbortSignal): Promise<Response> {
   const controller = new AbortController();
+  let timedOut = false;
   const stop = () => controller.abort();
-  const timer = setTimeout(stop, AI_DEADLINE_MS);
+  const timer = setTimeout(() => {
+    timedOut = true;
+    stop();
+  }, AI_DEADLINE_MS);
   signal?.addEventListener('abort', stop);
   try {
     return await doFetch(url, { ...init, signal: controller.signal });
+  } catch (e) {
+    throw timedOut && !signal?.aborted ? new AiDeadline() : e;
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener('abort', stop);
@@ -283,8 +334,8 @@ export async function aiPost<T>(
     );
     const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
     return settle(res, body, who);
-  } catch {
-    return { ok: false, reason: 'offline' };
+  } catch (e) {
+    return e instanceof AiDeadline ? { ok: false, reason: 'offline', timedOut: true } : { ok: false, reason: 'offline' };
   }
 }
 
@@ -296,7 +347,7 @@ export async function aiGet<T>(path: string): Promise<{ ok: true; data: T } | Ai
     const res = await withDeadline(`${config.siteUrl}${path}`, { headers: await headers(), credentials: 'include' });
     const body = (await res.json().catch(() => ({}))) as T & { error?: string; quota?: TutorQuota };
     return settle(res, body, who);
-  } catch {
-    return { ok: false, reason: 'offline' };
+  } catch (e) {
+    return e instanceof AiDeadline ? { ok: false, reason: 'offline', timedOut: true } : { ok: false, reason: 'offline' };
   }
 }

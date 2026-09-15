@@ -77,18 +77,40 @@ export function Panel({ title, action, children }: { title: string; action?: Rea
 }
 
 /**
+ * On a phone, a `stack` table stops being a table: each row becomes a card,
+ * two columns of labelled values, with the cells marked `span` (the name, the
+ * buttons) across the full width. Scrolling a wide table sideways hid exactly
+ * the columns Adnan and the teachers came for, the plan buttons, Outstanding,
+ * WhatsApp, off the right edge of the screen with nothing to say they were
+ * there. Styled from the table itself, so a row and a cell need no variant of
+ * their own; the labels come from each cell's `label`.
+ */
+const STACK = [
+  'max-md:block',
+  'max-md:[&_thead]:hidden',
+  'max-md:[&_tbody]:block',
+  'max-md:[&_tr]:grid max-md:[&_tr]:grid-cols-2 max-md:[&_tr]:gap-x-4 max-md:[&_tr]:gap-y-3',
+  'max-md:[&_tr]:border-b max-md:[&_tr]:border-line max-md:[&_tr]:px-4 max-md:[&_tr]:py-4 max-md:[&_tr:last-child]:border-b-0',
+  'max-md:[&_td]:block max-md:[&_td]:min-w-0 max-md:[&_td]:border-0 max-md:[&_td]:p-0',
+  'max-md:[&_td[data-span]]:col-span-2 max-md:[&_td[data-span]]:text-start',
+  // A cell with nothing in it is a column on a wide screen and a gap on a card.
+  'max-md:[&_td:empty]:hidden',
+].join(' ');
+
+/**
  * A table that scrolls inside its own box rather than pushing the page wide.
  * Headings never wrap, so the table grows past its minimum and scrolls
- * instead of stacking "Paid out" on two lines.
+ * instead of stacking "Paid out" on two lines. `stack`: cards on a phone, see
+ * STACK.
  */
-export function Table({ head, children }: { head: string[]; children: React.ReactNode }) {
+export function Table({ head, children, stack }: { head: string[]; children: React.ReactNode; stack?: boolean }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px] border-collapse text-start">
+    <div className={stack ? 'md:overflow-x-auto' : 'overflow-x-auto'}>
+      <table className={`w-full border-collapse text-start ${stack ? `md:min-w-[640px] ${STACK}` : 'min-w-[640px]'}`}>
         <thead>
           <tr className="border-b border-line">
-            {head.map((h) => (
-              <th key={h} className="whitespace-nowrap px-4 py-2.5 text-start text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink3">
+            {head.map((h, i) => (
+              <th key={`${h}-${i}`} className="whitespace-nowrap px-4 py-2.5 text-start text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink3">
                 {h}
               </th>
             ))}
@@ -100,19 +122,58 @@ export function Table({ head, children }: { head: string[]; children: React.Reac
   );
 }
 
-/** `num` for money, counts and dates: one line, figures in even columns. */
-export function Td({ children, className = '', num }: { children: React.ReactNode; className?: string; num?: boolean }) {
+/**
+ * `num` for money, counts and dates: one line, figures in even columns.
+ * In a `stack` table on a phone, `label` names the value above it and `span`
+ * takes the card's full width.
+ */
+export function Td({
+  children,
+  className = '',
+  num,
+  label,
+  span,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  num?: boolean;
+  label?: string;
+  span?: boolean;
+}) {
   return (
-    <td className={`border-b border-line px-4 py-3 text-[13px] text-ink ${num ? 'whitespace-nowrap tabular' : ''} ${className}`}>
+    <td
+      data-span={span ? '' : undefined}
+      className={`border-b border-line px-4 py-3 text-[13px] text-ink ${num ? 'whitespace-nowrap tabular' : ''} ${className}`}
+    >
+      {label ? <span className="mb-0.5 block text-[11.5px] font-extrabold text-ink3 md:hidden">{label}</span> : null}
       {children}
     </td>
   );
 }
 
-/** A table row cannot legally contain an anchor, so rows are not clickable and
- *  the link lives on the cell that names the thing. See `CellLink`. */
+/** A row that goes nowhere. A row that opens something is a `TapRow`
+ *  (components/staff/TapRow), with a `ViewLink` in it. */
 export function Row({ children }: { children: React.ReactNode }) {
   return <tr className="transition-colors duration-200 hover:bg-paper">{children}</tr>;
+}
+
+/**
+ * The button on a row that says where the row goes: "View report", "View
+ * student". The row itself is tappable too, but a teacher on a phone does not
+ * know that until told, and this is the telling. A real link, so it opens in
+ * a new tab, and a keyboard or a screen reader finds it. Full width at the
+ * foot of a card on a phone.
+ */
+export function ViewLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex h-11 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full border border-teal bg-card ps-3.5 pe-2.5 text-[12.5px] font-extrabold text-teal transition-colors duration-200 hover:bg-tealtint max-md:w-full md:h-10"
+    >
+      {children}
+      <Icon name="chevron" size={16} strokeWidth={2.4} />
+    </Link>
+  );
 }
 
 /**
@@ -128,6 +189,23 @@ export function BackLink({ href, children }: { href: string; children: React.Rea
       <Icon name="chevron" size={17} className="rotate-180" />
       {children}
     </Link>
+  );
+}
+
+/**
+ * The name at the head of a tappable row: a link with a mouse, where the eye
+ * expects one, and plain text on a phone card, where the whole card and its
+ * View button are the targets and an 18px link inside it is only something to
+ * miss.
+ */
+export function RowName({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <>
+      <Link href={href} className="font-extrabold text-teal transition-colors duration-200 hover:brightness-90 max-md:hidden">
+        {children}
+      </Link>
+      <span className="block font-extrabold text-ink md:hidden">{children}</span>
+    </>
   );
 }
 

@@ -6,9 +6,10 @@
  * language passed in, so an Urdu form is corrected in Urdu. The default keeps
  * a caller that passes no language on English, as before.
  */
-import { type Language, translate } from '@matricmate/core';
+import { EMAIL_RULE, type Language, translate } from '@matricmate/core';
 
-export const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+/** Core's rule, the one the server and the Android app use: a real domain ending, not `name@gmail`. */
+export const EMAIL_RE = EMAIL_RULE;
 
 export function validateName(v: string, lang: Language = 'en') {
   return v.trim().length >= 2 ? null : translate(lang, 'auth.errNameEmpty');

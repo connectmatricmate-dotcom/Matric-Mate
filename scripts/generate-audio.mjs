@@ -32,6 +32,7 @@
  */
 
 import { execFile } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import dns from 'node:dns';
 import { mkdir, readFile, readdir, stat, unlink } from 'node:fs/promises';
 import net from 'node:net';
@@ -259,7 +260,10 @@ async function main() {
       return;
     }
 
-    const path = `${chapterId}/${medium}.mp3`;
+    // An unguessable name: the bucket is public (players fetch plain
+    // addresses), so a name worked out from the chapter id was a lesson
+    // anyone could fetch without a plan. The track row keeps the name.
+    const path = `${chapterId}/${medium}-${randomBytes(9).toString('hex')}.mp3`;
     const body = await readFile(mp3);
     const { error: upErr } = await db.storage.from(BUCKET).upload(path, body, { contentType: 'audio/mpeg', upsert: true });
     if (upErr) {
@@ -292,6 +296,7 @@ async function main() {
       return;
     }
 
+    const { data: before } = await db.from('audio_tracks').select('storage_path').eq('id', `${chapterId}-${medium}`).maybeSingle();
     const { error: rowErr } = await db.from('audio_tracks').upsert(
       {
         id: `${chapterId}-${medium}`,
@@ -309,6 +314,11 @@ async function main() {
       console.log(`${C.red(' fail')} ${label.padEnd(14)} ${C.dim(`row: ${rowErr.message}`)}`);
       skipped++;
       return;
+    }
+    // Every name is new, so the recording it replaces would otherwise stay
+    // in the bucket for good.
+    if (before?.storage_path && before.storage_path !== path) {
+      await db.storage.from(BUCKET).remove([before.storage_path]).catch(() => {});
     }
 
     await unlink(mp3).catch(() => {});

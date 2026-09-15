@@ -4,13 +4,13 @@ import { Reader } from '@/components/screens/Reader';
 import { getChapter, getChapterContent } from '@/lib/content-readers';
 import { subjectOpen } from '@matricmate/core';
 import { currentAccess } from '@/lib/entitlement';
+import { chapterTitle } from '@/lib/page-title';
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ section?: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const chapter = await getChapter(id);
-  return chapter ? { title: `${chapter.title} notes`, description: chapter.blurb } : { title: 'Notes' };
+  return chapterTitle(await getChapter(id), 'study.notes');
 }
 
 export default async function ReaderPage({ params, searchParams }: Props) {

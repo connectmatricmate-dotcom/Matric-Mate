@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildDigestFromDb, writeCoachReport } from '@/lib/ai/coach-report';
+import { noteAiFailure } from '@/lib/ai/guard';
 import { tierOf } from '@matricmate/core';
 import { planIsActive } from '@/lib/entitlement';
 import { notify, reportReady } from '@/lib/notify';
-import { JobError, chunks, cronAuthorised, eachLimited, pageAll } from '@/lib/notify/jobs';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll, logged } from '@/lib/notify/jobs';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -44,7 +45,9 @@ const CONCURRENCY = 4;
  */
 const BUDGET_MS = 170_000;
 
-export async function GET(req: NextRequest) {
+export const GET = logged('coach', handle);
+
+async function handle(req: NextRequest) {
   /*
    * pg_cron signs its calls with CRON_SECRET. Without this the route is a
    * button on the open internet that spends the client's model budget.
@@ -157,6 +160,7 @@ async function run(only: string | null = null): Promise<NextResponse> {
       } catch (e) {
         failed++;
         console.error('[cron/coach] report failed', e instanceof Error ? e.message : e);
+        await noteAiFailure(e);
       }
     },
     () => Date.now() > stopAt,

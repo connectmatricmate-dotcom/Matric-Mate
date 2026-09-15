@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
-import { SubmitButton } from '@/components/ui/controls';
+import { useActionState, useState } from 'react';
+import { ErrorBanner, SubmitButton } from '@/components/ui/controls';
 import { LinkBtn } from '@/components/ui/primitives';
 import { createTeacherAction, type AdminState } from '@/app/(admin)/actions';
-import { Note } from '@/components/admin/bits';
 
 /**
  * Adnan's onboarding form.
@@ -15,14 +14,35 @@ import { Note } from '@/components/admin/bits';
  * make the account work is optional, and nothing here validates a phone number
  * or a bank account into a shape a real teacher might not fit.
  *
- * Uncontrolled inputs, which is the one place this departs from the house rule
- * about controlled fields. React 19 resets an uncontrolled form once its action
- * returns, so a failed submit used to come back empty; the action now hands
- * back what was typed and each field starts from it. Holding every field in
- * React state to get the same result would be the wrong trade.
+ * Controlled, like every other form in the app: a rejected submit keeps what
+ * was typed, and the button stays off until the four required fields pass the
+ * same rules the server checks (NewTeacher in app/(admin)/actions.ts), each
+ * saying what is wrong once it has been left.
  */
+
+type Values = Record<(typeof FIELDS)[number], string>;
+const FIELDS = ['fullName', 'email', 'password', 'commissionPct', 'phone', 'city', 'institution', 'payoutMethod', 'payoutAccount', 'payoutName', 'note'] as const;
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** The server's rules for the four fields that matter, in the server's words. */
+function problems(v: Values): Partial<Record<keyof Values, string>> {
+  const out: Partial<Record<keyof Values, string>> = {};
+  if (v.fullName.trim().length < 2) out.fullName = 'Name is required.';
+  if (!EMAIL.test(v.email.trim())) out.email = 'That does not look like an email address.';
+  if (v.password.length < 8) out.password = 'Password must be at least 8 characters.';
+  else if (v.password.length > 72) out.password = 'Password must be 72 characters or fewer.';
+  const pct = Number(v.commissionPct);
+  if (v.commissionPct.trim() === '' || !Number.isFinite(pct)) out.commissionPct = 'Enter their commission, 0 to 100.';
+  else if (pct < 0) out.commissionPct = 'Commission cannot be negative.';
+  else if (pct > 100) out.commissionPct = 'Commission cannot be over 100%.';
+  return out;
+}
+
 export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
   const [state, action] = useActionState<AdminState, FormData>(createTeacherAction, {});
+  const [values, setValues] = useState<Values>(() => Object.fromEntries(FIELDS.map((f) => [f, ''])) as Values);
+  const [left, setLeft] = useState<Partial<Record<keyof Values, boolean>>>({});
 
   if (state.code) {
     const link = `${siteUrl}/r/${state.code}`;
@@ -34,9 +54,9 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
         </p>
 
         <div className="mt-4 rounded-[12px] border border-line bg-card px-4 py-3">
-          <p className="text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink3">Their link</p>
+          <p className="text-[12px] font-extrabold text-ink2">Their link</p>
           <p className="mt-1 break-all font-mono text-[13.5px] text-ink">{link}</p>
-          <p className="mt-2.5 text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink3">Their code</p>
+          <p className="mt-2.5 text-[12px] font-extrabold text-ink2">Their code</p>
           <p className="mt-1 font-mono text-[15px] font-extrabold text-teal">{state.code}</p>
         </div>
 
@@ -48,57 +68,59 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
     );
   }
 
-  const v = state.values ?? {};
+  const issues = problems(values);
+  const valid = Object.keys(issues).length === 0;
+  const field = (name: keyof Values) => ({
+    name,
+    value: values[name],
+    onChange: (v: string) => setValues((cur) => ({ ...cur, [name]: v })),
+    onBlur: () => setLeft((cur) => ({ ...cur, [name]: true })),
+    error: left[name] ? issues[name] : undefined,
+  });
 
   return (
     <form action={action} className="max-w-[640px]">
-      {state.error ? (
-        <div className="mb-4" role="alert">
-          <Note tone="red">{state.error}</Note>
-        </div>
-      ) : null}
+      {state.error ? <ErrorBanner message={state.error} /> : null}
 
       <Group title="The account">
-        <Text name="fullName" label="Full name" required placeholder="Sana Iqbal" value={v.fullName} />
-        <Text name="email" label="Email" type="email" required placeholder="sana@example.com" value={v.email} />
+        <Text {...field('fullName')} label="Full name" required placeholder="Sana Iqbal" />
+        <Text {...field('email')} label="Email" type="email" required placeholder="sana@example.com" />
         <Text
-          name="password"
+          {...field('password')}
           label="Password you will give them"
           type="text"
           required
           placeholder="At least 8 characters"
-          hint="Shown as plain text on purpose: you have to read it out. Email invites are not possible until the domain is verified."
-          value={v.password}
+          hint="Shown as plain text on purpose: you have to read it out or send it to them. They can change it under Settings once they are in."
         />
         <Text
-          name="commissionPct"
+          {...field('commissionPct')}
           label="Commission"
           type="number"
           required
           placeholder="20"
           suffix="%"
           hint="Their share of everything their students pay, for as long as they keep paying."
-          value={v.commissionPct}
         />
       </Group>
 
       <Group title="Who they are" note="All optional. For your own records.">
-        <Text name="phone" label="Phone" placeholder="+92 300 1234567" value={v.phone} />
-        <Text name="city" label="City" placeholder="Rawalpindi" value={v.city} />
-        <Text name="institution" label="School or academy" placeholder="Government Model School" value={v.institution} />
+        <Text {...field('phone')} label="Phone" placeholder="+92 300 1234567" />
+        <Text {...field('city')} label="City" placeholder="Rawalpindi" />
+        <Text {...field('institution')} label="School or academy" placeholder="Government Model School" />
       </Group>
 
       {/* The teacher's page shows these beside every payout. The action always
           took them; the form never asked, so they read "not recorded". */}
       <Group title="How they are paid" note="All optional. Shown on their page when you record a payout.">
-        <Text name="payoutMethod" label="Payout method" placeholder="JazzCash" value={v.payoutMethod} />
-        <Text name="payoutAccount" label="Account" placeholder="0300 1234567" value={v.payoutAccount} />
-        <Text name="payoutName" label="Account title" placeholder="Sana Iqbal" value={v.payoutName} />
-        <Text name="note" label="Note" placeholder="Pays on the 1st of each month" value={v.note} />
+        <Text {...field('payoutMethod')} label="Payout method" placeholder="JazzCash" />
+        <Text {...field('payoutAccount')} label="Account" placeholder="0300 1234567" />
+        <Text {...field('payoutName')} label="Account title" placeholder="Sana Iqbal" />
+        <Text {...field('note')} label="Note" placeholder="Pays on the 1st of each month" />
       </Group>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <SubmitButton title="Create the account" pendingTitle="Creating…" />
+        <SubmitButton title="Create the account" pendingTitle="Creating…" disabled={!valid} />
         <Link
           href="/admin/teachers"
           className="inline-flex min-h-11 items-center px-2 text-[13px] font-extrabold text-ink2 transition-colors duration-200 hover:text-ink"
@@ -106,6 +128,7 @@ export function NewTeacherForm({ siteUrl }: { siteUrl: string }) {
           Cancel
         </Link>
       </div>
+      {!valid ? <p className="mt-2 text-[12px] text-ink2">Fill in the four fields marked * to create the account.</p> : null}
     </form>
   );
 }
@@ -129,6 +152,9 @@ function Text({
   hint,
   suffix,
   value,
+  onChange,
+  onBlur,
+  error,
 }: {
   name: string;
   label: string;
@@ -137,8 +163,10 @@ function Text({
   placeholder?: string;
   hint?: string;
   suffix?: string;
-  /** What was typed before a failed submit, so the form's reset restores it. */
-  value?: string;
+  value: string;
+  onChange: (v: string) => void;
+  onBlur: () => void;
+  error?: string;
 }) {
   return (
     <label className={`block ${hint ? 'sm:col-span-2' : ''}`}>
@@ -148,13 +176,20 @@ function Text({
       </span>
       {/* .field-shell owns the focus ring, see globals.css. Without it the
           box draws a border and the browser draws its own inside it. */}
-      <span className="field-shell flex items-center gap-2 rounded-[12px] border-[1.5px] border-line bg-card px-3.5 py-2.5 transition-[border-color,box-shadow] duration-200">
+      <span
+        className={`field-shell flex items-center gap-2 rounded-[12px] border-[1.5px] bg-card px-3.5 py-2.5 transition-[border-color,box-shadow] duration-200 ${
+          error ? 'border-red' : 'border-line'
+        }`}
+      >
         <input
           name={name}
           type={type}
           required={required}
           placeholder={placeholder}
-          defaultValue={value}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          aria-invalid={!!error}
           step={type === 'number' ? '0.5' : undefined}
           min={type === 'number' ? '0' : undefined}
           max={type === 'number' ? '100' : undefined}
@@ -164,7 +199,11 @@ function Text({
         />
         {suffix ? <span className="text-[13px] font-extrabold text-ink3">{suffix}</span> : null}
       </span>
-      {hint ? <span className="mt-1 block text-[11.5px] text-ink3">{hint}</span> : null}
+      {error ? (
+        <span className="mt-1 block text-[12px] font-bold text-red">{error}</span>
+      ) : hint ? (
+        <span className="mt-1 block text-[12px] text-ink2">{hint}</span>
+      ) : null}
     </label>
   );
 }

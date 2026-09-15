@@ -5,7 +5,7 @@ import { planIsActive, planIsPaid } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { examTip, notify, recall } from '@/lib/notify';
 import type { Notice, Recipient } from '@/lib/notify';
-import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry } from '@/lib/notify/jobs';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry, logged } from '@/lib/notify/jobs';
 
 /**
  * The afternoon message: one thing worth knowing, from the student's own
@@ -40,7 +40,7 @@ const BACK_MAX = 200;
 /** Chapters count as theirs when they answered something in them this recently. */
 const STUDIED_DAYS = 60;
 
-type ProfileRow = { id: string; settings: unknown; onboarding: unknown; grade: number | null };
+type ProfileRow = { id: string; settings: unknown; onboarding: unknown; grade: number | null; tip_sent_on: string | null };
 type Onboarding = { board?: string; classLevel?: number; subjects?: string[]; medium?: string };
 type ChapterRow = { id: string; subject_id: string; board: string; grade: number; number: number };
 
@@ -53,7 +53,9 @@ const seed = (id: string) => {
   return Math.abs(h);
 };
 
-export async function GET(req: NextRequest) {
+export const GET = logged('daily', handle);
+
+async function handle(req: NextRequest) {
   if (!cronAuthorised(req)) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
@@ -81,10 +83,14 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
   const dayIndex = Math.floor(now.getTime() / 864e5) + shift;
 
   const profiles = await pageAll<ProfileRow>('profiles', (from, to, signal) =>
-    admin.from('profiles').select('id,settings,onboarding,grade').eq('role', 'student').order('id').range(from, to).abortSignal(signal),
+    admin.from('profiles').select('id,settings,onboarding,grade,tip_sent_on').eq('role', 'student').order('id').range(from, to).abortSignal(signal),
   );
-  // Absent means never touched, and it defaults to on. Only an explicit false is a no.
-  const wanting = profiles.filter((p) => ((p.settings ?? {}) as Record<string, unknown>).reminders !== false);
+  // Absent means never touched, and it defaults to on. Only an explicit false
+  // is a no. Whoever went longest without one first: in id order, a school
+  // bigger than two runs' ceiling would leave the same students out every day.
+  const wanting = profiles
+    .filter((p) => ((p.settings ?? {}) as Record<string, unknown>).reminders !== false)
+    .sort((a, b) => String(a.tip_sent_on ?? '').localeCompare(String(b.tip_sent_on ?? '')));
   if (!wanting.length) return NextResponse.json({ considered: 0, sent: 0 });
 
   /*
@@ -270,7 +276,10 @@ async function run(dry: boolean, shift = 0): Promise<NextResponse> {
    */
   if (dry) return NextResponse.json({ dry: true, considered: batch.length, preview });
   const unfinished = batch.length - reached;
-  const summary = { considered: batch.length, sent, failed, pushed, pushFailed, unfinished, picked };
-  if (failed || pushFailed || unfinished) return NextResponse.json({ error: 'incomplete', ...summary }, { status: 503 });
+  // Due today but past this run's ceiling: the :05 run takes them, and this
+  // says how many there were, so a school outgrowing two runs shows.
+  const left = wanting.filter((p) => p.tip_sent_on !== today && !claimed.has(p.id)).length;
+  const summary = { considered: batch.length, sent, failed, pushed, pushFailed, unfinished, left, picked };
+  if (failed || pushFailed || unfinished || left) return NextResponse.json({ error: 'incomplete', ...summary }, { status: 503 });
   return NextResponse.json(summary);
 }

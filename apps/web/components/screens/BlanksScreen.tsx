@@ -11,17 +11,18 @@ import { fireConfetti } from '@/lib/confetti';
 import { useApp, useLang, useT } from '@/lib/store';
 import { LeaveSetButton } from '@/components/app/LeaveSetButton';
 import { PracticeChapterBar } from '@/components/app/PracticeChapterBar';
+import { ReportAi } from '@/components/app/ReportAi';
 
 export function BlanksScreen({ chapter, items, canChangeChapter }: { chapter: Chapter; items: Blank[]; canChangeChapter?: boolean }) {
   const { actions, derived } = useApp();
   const t = useT();
   const { lang } = useLang();
   /* The name a student reads, which is not the name an attempt is filed
-     under. The chapter's own title keeps feeding `topic`, so weak-topic stats
-     do not split in two when somebody switches language; the heading and the
-     pill follow the app's language instead. Both come from the server: the
-     client index is empty on a cold load for Class 10 and Punjab, which filed
-     every one of their attempts under a blank topic. */
+     under: answers are filed under the chapter id (topicKey in core), so weak
+     topics do not split in two across a language switch or between the two
+     apps; the heading and the pill follow the app's language instead. Both
+     come from the server: the client index is empty on a cold load for Class
+     10 and Punjab, which filed every one of their attempts under a blank topic. */
   const chapterId = chapter.id;
   const name = chapterName(chapter, lang);
   const [i, setI] = useState(0);
@@ -50,11 +51,11 @@ export function BlanksScreen({ chapter, items, canChangeChapter }: { chapter: Ch
       mcqId: item.id,
       chapterId,
       subjectId: chapterId.split('-')[0],
-      // The chapter's own title, not the name of the exercise. This used
-      // to store the translated UI label, so Weak topics listed
-      // "Fill in the blanks" as a syllabus topic, and switching language
-      // forked it into a second one.
-      topic: chapter.title,
+      // The chapter's id, the one rule both apps file blanks under (see
+      // topicKey in core). The title forked it: English here, the subject's
+      // language on Android, so one chapter was two weak topics. Weak topics
+      // show the chapter's name in the student's language.
+      topic: chapterId,
       correct: ok,
       confidence: null,
       mode: 'blanks',
@@ -100,6 +101,7 @@ export function BlanksScreen({ chapter, items, canChangeChapter }: { chapter: Ch
 
   return (
     <Page width="focus">
+      <h1 className="sr-only">{`${t('practice.blanks')} · ${name}`}</h1>
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
         backLabel={name}
@@ -195,6 +197,8 @@ export function BlanksScreen({ chapter, items, canChangeChapter }: { chapter: Ch
               />
             ) : null}
           </Card>
+          {/* Written with AI, like the rest of the bank, so it can be reported. */}
+          <ReportAi surface="ai_test" refId={item.id} excerpt={`${item.sentence[0]} ____ ${item.sentence[1]} · ${item.answer}`} />
         </div>
       ) : null}
 

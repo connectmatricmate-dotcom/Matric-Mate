@@ -13,6 +13,7 @@ import { ScriptBullets } from '@/components/ui/ScriptList';
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
 import { useApp, useLang, useT } from '@/lib/store';
+import { useTutorQuota } from '@/lib/use-tutor-quota';
 import { Markdown } from '@/components/ui/Markdown';
 import { ReportAi } from '@/components/app/ReportAi';
 
@@ -46,6 +47,7 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
   /** Held while a build is in flight so the wait screen can call it off. */
   const cancel = useRef<AbortController | null>(null);
   const { state, derived } = useApp();
+  const [quota] = useTutorQuota();
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
@@ -153,7 +155,8 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
           ))}
         </div>
         <Card flat tint="bg-tealtint" className="mt-4">
-          <p className="text-[13px] text-ink2">{t('tutor.costNote', { n: 3, limit: 50 })}</p>
+          {/* The student's own allowance: a free trial has five a day, not fifty. */}
+          <p className="text-[13px] text-ink2">{t('tutor.costNote', { n: 3, limit: quota?.limit ?? derived.aiLimit })}</p>
         </Card>
         <div className="mt-5">
           <Btn
@@ -271,14 +274,14 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
       <div className="mt-5"><SectionTitle>{t('tutor.paperSectionB')}</SectionTitle></div>
       <div className="flex flex-col gap-2.5">
         {items.shortQs.map((q, n) => (
-          <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
+          <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} subjectId={paper.subjectId ?? subjectId} />
         ))}
       </div>
 
       <div className="mt-5"><SectionTitle>{t('tutor.paperSectionC')}</SectionTitle></div>
       <div className="flex flex-col gap-2.5">
         {items.longQs.map((q, n) => (
-          <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} />
+          <PaperQuestion key={q.id} n={n + 1} q={q} medium={paperMedium} subjectId={paper.subjectId ?? subjectId} />
         ))}
       </div>
     </Page>
@@ -286,7 +289,7 @@ export function PaperScreen({ paperId }: { paperId?: string }) {
 }
 
 /** One written question: write, get marked, compare with the model answer. */
-function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string }) {
+function PaperQuestion({ n, q, medium, subjectId }: { n: number; q: ShortQ; medium: string; subjectId: string }) {
   const t = useT();
   const toast = useToast();
   const failNote = useFailNote();
@@ -306,6 +309,9 @@ function PaperQuestion({ n, q, medium }: { n: number; q: ShortQ; medium: string 
       marks: q.marks,
       answer: written.trim(),
       medium,
+      // The paper's subject: a free trial's answers are marked only in the
+      // trial's own subject, and the server refuses a check that does not say.
+      subjectId,
     });
     setChecking(false);
     // The actual reason. Every failure used to read "something went wrong,

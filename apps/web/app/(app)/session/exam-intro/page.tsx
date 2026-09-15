@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { notFound, redirect } from 'next/navigation';
 import { subjectOpen } from '@matricmate/core';
 import { ExamIntro } from '@/components/screens/ExamIntro';
 import { getChapter, getSubject } from '@/lib/content-readers';
 import { currentAccess } from '@/lib/entitlement';
 
-export const metadata: Metadata = {
-  title: 'Timed test',
-  description: '20 questions, 30 minutes, double XP, exam conditions.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('practice.exam', '20 questions, 30 minutes, double XP, exam conditions.');
 
 export default async function ExamIntroPage({
   searchParams,

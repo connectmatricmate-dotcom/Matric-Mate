@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { SUBJECT_ICON, accuracy, boardName, chapterById, chapterName, chapterPct, formatDate, subjectById, subjectName, type IconName, type StringKey } from '@matricmate/core';
+import { SUBJECT_ICON, accuracy, boardName, chapterById, chapterName, chapterPct, formatDate, planAutoDone, subjectById, subjectName, topicLabel, type IconName, type StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoachRail, ConfidenceRail, StreakRail, WeakRail } from '@/components/app/rails';
 import { WelcomeTrial } from '@/components/app/WelcomeTrial';
@@ -63,14 +63,28 @@ export function DashboardView() {
   const lastChapter = state.lastChapterId ? chapterById(state.lastChapterId) : undefined;
   const lastPct = lastChapter ? chapterPct(lastChapter.id, state.readSections, state.attempts) : 0;
   const planDone = derived.plan.filter((task) => task.done).length;
+  /*
+   * Tasks the student's own work has finished. Their box cannot be unticked
+   * (the work is still done), so it is not a button: every tap on it used to
+   * write a plan_done row and change nothing on screen.
+   */
+  const autoDone = useMemo(
+    () =>
+      new Set(
+        planAutoDone(derived.plan, { attempts: state.attempts, readSections: state.readSections, cardsKnown: state.cardsKnown }),
+      ),
+    [derived.plan, state.attempts, state.readSections, state.cardsKnown],
+  );
 
   /** Plan labels are composed here so they follow the app language. */
   function planLabel(task: (typeof derived.plan)[number]) {
     const chapter = chapterById(task.chapterId);
-    const name = chapter ? chapterName(chapter, lang) : '';
+    // The subject while the chapter index loads, as on Android. The name used
+    // to be blank, and the task read "Read  · 15 min".
+    const name = chapter ? chapterName(chapter, lang) : subjectName(subjectById(task.subjectId), lang);
     if (task.kind === 'read') return t('dash.taskRead', { chapter: name });
     if (task.kind === 'mcq') return t('dash.taskMcq', { chapter: name });
-    if (task.weakTopic) return t('dash.taskWeak', { topic: task.weakTopic, n: task.weakAccuracy ?? 0 });
+    if (task.weakTopic) return t('dash.taskWeak', { topic: topicLabel(task.weakTopic, lang), n: task.weakAccuracy ?? 0 });
     return t('dash.taskCards');
   }
 
@@ -101,9 +115,9 @@ export function DashboardView() {
           <Card tint="bg-teal" border="border-teal">
             <div className="flex items-center gap-3">
               <h2 className="flex-1 font-display text-[18px] text-onbrand">{t('dash.todayPlan')}</h2>
-              {/* onbrand-hair, not white: the fill under it brightens after
-                  dark and a white wash on it stops reading. */}
-              <span className="rounded-full bg-onbrand-hair px-2.5 py-1 text-[11.5px] font-extrabold text-onbrand tabular">
+              {/* tealdark, not a white wash: the label on a wash of the fill
+                  it sits on was 3.6:1, and tealdark follows the theme. */}
+              <span className="rounded-full bg-tealdark px-2.5 py-1 text-[11.5px] font-extrabold text-onbrand tabular">
                 {t('dash.doneCount', { a: planDone, b: derived.plan.length })}
               </span>
             </div>
@@ -134,6 +148,18 @@ export function DashboardView() {
             <ul>
               {derived.plan.map((task) => (
                 <li key={task.id} className="flex items-center gap-2 border-t border-onbrand-hair">
+                  {autoDone.has(task.id) ? (
+                    <span
+                      role="img"
+                      aria-label={t('dash.autoDone', { task: planLabel(task) })}
+                      title={t('dash.autoDone', { task: planLabel(task) })}
+                      className="flex h-11 w-11 shrink-0 items-center justify-center"
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded-[8px] border-2 border-orange bg-orange text-onbrand">
+                        <Icon name="check" size={14} strokeWidth={3} />
+                      </span>
+                    </span>
+                  ) : (
                   <button
                     type="button"
                     aria-pressed={task.done}
@@ -149,6 +175,7 @@ export function DashboardView() {
                       {task.done ? <Icon name="check" size={14} strokeWidth={3} /> : null}
                     </span>
                   </button>
+                  )}
 
                   <Link
                     href={taskHref(task)}
@@ -220,14 +247,20 @@ export function DashboardView() {
                   : 'xl:grid-cols-4'
               }`}
             >
-              {quick.map((q) => (
-                <Link key={q.label} href={q.href} className="h-full">
-                  <Card flat className="flex h-full min-h-[88px] flex-col gap-2 transition-colors duration-200 hover:border-teal">
-                    <Icon name={q.icon} size={22} className="text-teal" />
-                    <span className="text-[13.5px] font-extrabold text-ink">{t(q.label)}</span>
-                  </Card>
-                </Link>
-              ))}
+              {quick.map((q) => {
+                // On a plan without AI the tile says so before the tap, the
+                // way the chapter's revision sheet row does.
+                const locked = q.href === '/tutor' && !derived.access.ai;
+                return (
+                  <Link key={q.label} href={q.href} className="h-full">
+                    <Card flat className="flex h-full min-h-[88px] flex-col gap-2 transition-colors duration-200 hover:border-teal">
+                      <Icon name={locked ? 'lock' : q.icon} size={22} className={locked ? 'text-ink3' : 'text-teal'} />
+                      <span className="text-[13.5px] font-extrabold text-ink">{t(q.label)}</span>
+                      {locked ? <span className="-mt-1.5 text-[12px] font-extrabold text-orangedark">{t('aiLock.short')}</span> : null}
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
           </div>
 

@@ -4,15 +4,13 @@ import { ChapterHub } from '@/components/screens/ChapterHub';
 import { getAudioTracks, getChapter, getChapterContent } from '@/lib/content-readers';
 import { subjectOpen } from '@matricmate/core';
 import { currentAccess } from '@/lib/entitlement';
+import { chapterTitle } from '@/lib/page-title';
 
 type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const chapter = await getChapter(id);
-  return chapter
-    ? { title: chapter.title, description: chapter.blurb }
-    : { title: 'Chapter' };
+  return chapterTitle(await getChapter(id));
 }
 
 export default async function ChapterPage({ params }: Props) {
@@ -33,7 +31,9 @@ export default async function ChapterPage({ params }: Props) {
   const [chapter, content, tracks, access] = await Promise.all([
     getChapter(id),
     getChapterContent(id),
-    getAudioTracks(id),
+    // A failed read of the recordings hides the audio row rather than the
+    // whole chapter; the audio page itself says it failed.
+    getAudioTracks(id).catch(() => []),
     currentAccess(),
   ]);
   if (!chapter) notFound();

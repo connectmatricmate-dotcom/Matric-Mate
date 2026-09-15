@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Notification, NotificationTarget } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { RowsSkeleton } from '@/components/app/skeletons';
@@ -37,6 +37,17 @@ export function NotificationsView() {
   const unread = state.notifications.some((n) => !n.read);
 
   /*
+   * What was unread when the inbox opened, and whatever arrives unread while
+   * it is open, kept for as long as the page is: everything is marked read a
+   * moment after opening, and the new ones then looked exactly like the old.
+   * The Android inbox marks them with a dot the same way. Added to during
+   * render, the adjusting-state pattern, rather than in an effect.
+   */
+  const [fresh, setFresh] = useState<ReadonlySet<string>>(() => new Set());
+  const arrived = state.notifications.filter((n) => !n.read && !fresh.has(n.id));
+  if (arrived.length) setFresh(new Set([...fresh, ...arrived.map((n) => n.id)]));
+
+  /*
    * Marked read once the account's inbox is actually here, and again for
    * anything that arrives while the page is open. It ran once, 400ms after
    * opening, which on a new browser was before the rows had come back: they
@@ -69,6 +80,14 @@ export function NotificationsView() {
         icon={meta.icon}
         tone={meta.tone}
         last={last}
+        right={
+          fresh.has(n.id) ? (
+            <span className="flex shrink-0 items-center">
+              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-orange" />
+              <span className="sr-only">{t('notifications.newLabel')}</span>
+            </span>
+          ) : undefined
+        }
       />
     );
   };

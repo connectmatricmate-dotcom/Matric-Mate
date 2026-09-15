@@ -6,6 +6,7 @@ import { useSyncExternalStore } from 'react';
 import { translate } from '@matricmate/core';
 import { Icon } from '@/components/ui/primitives';
 import { canGoBack, subscribeTrail } from '@/lib/nav-trail';
+import { useStoreLanguage } from '@/lib/store';
 
 const pageLang = () => (document.documentElement.lang === 'ur' ? 'ur' : 'en');
 
@@ -21,7 +22,11 @@ const pageLang = () => (document.documentElement.lang === 'ur' ? 'ur' : 'en');
 export function BackLink({ href, label, className }: { href: string; label?: string; className?: string }) {
   const router = useRouter();
   const back = useSyncExternalStore(subscribeTrail, canGoBack, () => false);
-  const lang = useSyncExternalStore(subscribeTrail, pageLang, () => 'en' as const);
+  /* The app's own language first. The document's is set once, by the server,
+     from the cookie, and did not follow a switch made in the app, so after a
+     switch to Urdu every back link read "Back". */
+  const docLang = useSyncExternalStore(subscribeTrail, pageLang, () => 'en' as const);
+  const lang = useStoreLanguage() ?? docLang;
   return (
     <Link
       href={href}

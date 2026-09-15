@@ -45,13 +45,6 @@ export const welcome = (): Notice => ({
   target: 'home',
 });
 
-export const nothingStudiedToday = (): Notice => ({
-  kind: 'reminder',
-  title: 'notifications.reminderTitle',
-  body: 'notifications.reminderBody',
-  target: 'home',
-});
-
 /**
  * A fresh coach report. It lives in the coach card on the dashboard, so that
  * is where a tap lands: this pointed at the monthly grade table, which is a
@@ -68,15 +61,25 @@ export const reportReady = (): Notice => ({
   target: 'home',
 });
 
-export const paymentReceived = (date: string, plan: 'basic' | 'premium' = 'premium'): Notice => ({
+export const paymentReceived = (
+  date: string,
+  plan: 'basic' | 'premium' = 'premium',
+  /** For the emailed receipt: what was paid and the payment's reference. */
+  receipt?: { amount: number; reference: string },
+): Notice => ({
   kind: 'payment',
   title: 'notifications.paymentTitle',
   // Named for the plan bought: every receipt used to say Premium.
   body: plan === 'basic' ? 'notifications.paymentBodyBasic' : 'notifications.paymentBody',
-  params: { date },
+  params: { date, amount: receipt ? `Rs ${receipt.amount.toLocaleString('en-PK')}` : '', reference: receipt?.reference ?? '' },
   target: 'payments',
-  // Email too. This is money, and the student wants something to keep.
+  // Email too. This is money, and the student wants something to keep: the
+  // email (outside the app) says how much and the reference, which the inbox
+  // and the phone do not.
   also: ['email'],
+  ...(receipt
+    ? { email: { body: plan === 'basic' ? 'email.receiptBodyBasic' : 'email.receiptBody', note: 'email.receiptNote' } }
+    : {}),
 });
 
 /* ------------------------------------------------------- the evening nudge */
@@ -119,15 +122,6 @@ export const weakTopicNudge = (topic: string, pct: number): Notice => ({
   body: 'notifications.weakTopicBody',
   params: { topic, pct },
   target: 'practice',
-});
-
-/** Today's plan, still with tasks on it, while there is still an evening left. */
-export const planUnfinished = (left: number): Notice => ({
-  kind: 'reminder',
-  title: 'notifications.planLeftTitle',
-  body: 'notifications.planLeftBody',
-  params: { n: left },
-  target: 'home',
 });
 
 /**
@@ -216,13 +210,6 @@ export const moreSet = (n: number): Notice => ({
   body: 'notifications.moreSetBody',
   params: { n },
   target: 'practice',
-});
-
-export const planDone = (): Notice => ({
-  kind: 'reminder',
-  title: 'notifications.planDoneTitle',
-  body: 'notifications.planDoneBody',
-  target: 'home',
 });
 
 /** Studied today without answering anything: read notes or listened. */

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { type StringKey, translate } from '@matricmate/core';
-import { Card, Icon, LinkBtn } from '@/components/ui/primitives';
+import { PlanLink } from '@/components/landing/PlanLink';
+import { Card, Icon } from '@/components/ui/primitives';
 import { BASIC_INCLUDED, BASIC_PLAN, PREMIUM_INCLUDED, THE_PLAN, rupees, type Plan } from '@/lib/plans';
 
 /**
@@ -58,12 +59,8 @@ function PlanCard({ plan, items, tag, highlight }: { plan: Plan; items: string[]
           </li>
         ))}
       </ul>
-      <LinkBtn
-        title={`Get ${plan.name} · ${rupees(plan.price)}`}
-        href={`/checkout?plan=${plan.id}`}
-        variant={highlight ? 'orange' : 'line'}
-        className="mt-5 w-full"
-      />
+      {/* Sign-up first for a visitor without an account (see PlanLink). */}
+      <PlanLink title={`Get ${plan.name} · ${rupees(plan.price)}`} planId={plan.id} variant={highlight ? 'orange' : 'line'} className="mt-5 w-full" />
       <p className="mt-2 text-center text-[12px] text-ink3">{t('checkout.noChargeToday')}</p>
     </Card>
   );

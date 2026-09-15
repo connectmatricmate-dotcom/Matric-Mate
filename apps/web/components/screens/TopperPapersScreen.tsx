@@ -61,7 +61,10 @@ export function TopperPapersScreen({
                       text={subjectName(subject, lang)}
                       className="text-[15.5px] font-extrabold text-ink"
                     />
-                    <span className="block text-[12.5px] text-ink2">{t('session.toppersCount', { n: scripts.length })}</span>
+                    <span className="block text-[12.5px] text-ink2">
+                      {/* One of anything is singular: it read "1 scripts". */}
+                      {scripts.length === 1 ? t('session.toppersCountOne') : t('session.toppersCount', { n: scripts.length })}
+                    </span>
                   </span>
                 </span>
                 <div className="flex flex-wrap gap-2">

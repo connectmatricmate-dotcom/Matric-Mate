@@ -122,15 +122,18 @@ export function PillButton({
   icon,
   onClick,
   className = '',
+  pressed,
 }: {
   children: React.ReactNode;
   tone?: Tone;
   icon?: IconName;
   onClick: () => void;
   className?: string;
+  /** For a pill that is one of a set of choices: says which is chosen. */
+  pressed?: boolean;
 }) {
   return (
-    <button type="button" onClick={onClick} className={pillClasses(tone, true, className)}>
+    <button type="button" onClick={onClick} aria-pressed={pressed} className={pillClasses(tone, true, className)}>
       {icon ? <Icon name={icon} size={12} strokeWidth={2.4} /> : null}
       {children}
     </button>
@@ -222,7 +225,7 @@ export function Field({
             type="button"
             onClick={() => setReveal((r) => !r)}
             aria-label={reveal ? 'Hide password' : 'Show password'}
-            className="-my-2.5 -me-2 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-[10px] text-ink3 transition-colors duration-200 hover:bg-paper hover:text-ink"
+            className="-my-2.5 -me-2 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-[10px] pointer-coarse:-my-3 pointer-coarse:h-11 pointer-coarse:w-11 text-ink3 transition-colors duration-200 hover:bg-paper hover:text-ink"
           >
             <Icon name={reveal ? 'eyeOff' : 'eye'} size={18} />
           </button>

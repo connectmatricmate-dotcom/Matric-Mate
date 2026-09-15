@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { BOARD_LABEL, subjectMedium } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi, outsideTrial, refused, studentMedium } from '@/lib/ai/guard';
+import { AI_COST, AI_MODEL, chapterGrounding, chargeQuota, groundingBrief, guardAi, outsideTrial, refused, studentMedium, noteAiFailure } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -106,6 +106,46 @@ const ITEM_SCHEMAS: Record<Kind, Record<string, unknown>> = {
   },
 };
 
+const text = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
+
+/**
+ * Only items a student can actually answer. "Exactly 4 options, one of them
+ * the answer" is an instruction to the model, not a guarantee: a blank whose
+ * answer is not among its options can never be marked right, and an MCQ with
+ * three options or a blank question is a broken screen. Those are dropped,
+ * and a blank missing its answer from the options has it put in.
+ */
+function sound(kind: Kind, items: unknown[]): unknown[] {
+  const out: unknown[] = [];
+  for (const it of items) {
+    if (!it || typeof it !== 'object') continue;
+    const o = it as Record<string, unknown>;
+    if (kind === 'mcq') {
+      const options = Array.isArray(o.options) ? o.options.map(text) : [];
+      const answer = Number(o.answer);
+      if (!text(o.q) || options.length !== 4 || options.some((x) => !x) || new Set(options).size !== 4) continue;
+      if (!Number.isInteger(answer) || answer < 0 || answer > 3) continue;
+      out.push({ ...o, q: text(o.q), options, answer });
+    } else if (kind === 'flashcards') {
+      if (!text(o.front) || !text(o.back)) continue;
+      out.push({ front: text(o.front), back: text(o.back) });
+    } else if (kind === 'blanks') {
+      const answer = text(o.answer);
+      let options = [...new Set((Array.isArray(o.options) ? o.options.map(text) : []).filter(Boolean))];
+      if (!answer || (!text(o.before) && !text(o.after))) continue;
+      // Put in where it cannot be spotted by its place in the row.
+      if (!options.includes(answer)) options = [...options.slice(0, 3), answer].sort(() => Math.random() - 0.5);
+      if (options.length < 2) continue;
+      out.push({ ...o, answer, options });
+    } else {
+      const points = (Array.isArray(o.points) ? o.points.map(text) : []).filter(Boolean);
+      if (!text(o.q) || !text(o.answer)) continue;
+      out.push({ ...o, q: text(o.q), answer: text(o.answer), points });
+    }
+  }
+  return out;
+}
+
 const KIND_BRIEF: Record<Kind, string> = {
   mcq: 'multiple-choice questions with exactly 4 options each, one correct, distractors drawn from common student mistakes, and a one-or-two sentence explanation',
   flashcards: 'flashcards: front is a term, definition prompt or short question; back is the concise answer a student should recall',
@@ -146,7 +186,8 @@ export async function POST(req: NextRequest) {
 
     const response = await anthropic.messages.create({
       model: AI_MODEL,
-      max_tokens: 8000,
+      // Twelve short questions with model answers in Urdu ran past 8,000.
+      max_tokens: 12000,
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: ITEM_SCHEMAS[kind] } },
       system:
         `You write practice material for ${BOARD_LABEL[g.board]} Class ${g.grade} students (SSC-${g.grade === 10 ? 'II' : 'I'}, Pakistan). ${grounding.grounded ? 'Work ONLY from the chapter text the user provides: every item must be answerable from it.' : 'Follow the chapter brief the user provides.'} Match the board register. Plain text only: no markdown headings, no asterisks or bold markers. Never use an em dash; use a comma, a colon, or a new sentence. ` +
@@ -167,8 +208,9 @@ export async function POST(req: NextRequest) {
     }
     const block = response.content.find((b) => b.type === 'text');
     if (!block) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
-    const items = (JSON.parse(block.text) as { items: unknown[] }).items;
-    if (!Array.isArray(items) || !items.length) {
+    const raw = (JSON.parse(block.text) as { items: unknown[] }).items;
+    const items = Array.isArray(raw) ? sound(kind, raw) : [];
+    if (!items.length) {
       return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
     }
 
@@ -195,6 +237,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ sessionId: saved.id, kind, items, quota });
   } catch (e) {
     console.error('[generate-session]', e instanceof Error ? e.message : e);
+    await noteAiFailure(e);
     return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
   }
 }

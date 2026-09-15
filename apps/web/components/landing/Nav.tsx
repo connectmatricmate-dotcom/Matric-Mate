@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Icon, LinkBtn, Wordmark } from '@/components/ui';
+import { useSignedIn } from './useSignedIn';
 
 // Three, not five. "For parents" and the FAQ are places you arrive at by
 // scrolling, not destinations you go looking for, they stay in the footer.
@@ -16,6 +17,9 @@ const LINKS = [
 
 export function Nav({ bare = false }: { bare?: boolean } = {}) {
   const [open, setOpen] = useState(false);
+  // A signed-in student gets one way back into the app instead of "Log in"
+  // and "Create account", which meant nothing to them (see useSignedIn).
+  const signedIn = useSignedIn();
 
   /*
    * Opened from the Android app (the terms and the account-deletion page):
@@ -38,7 +42,7 @@ export function Nav({ bare = false }: { bare?: boolean } = {}) {
     <header data-chrome className="sticky top-0 z-50 border-b border-line bg-glass backdrop-blur">
       {/* Three tracks, so the links are centred on the page rather than pushed
           along by whatever the logo and the buttons happen to measure. */}
-      <nav className="mx-auto flex max-w-[1100px] items-center justify-between gap-6 px-5 py-3.5 md:grid md:grid-cols-[1fr_auto_1fr]">
+      <nav className="mx-auto flex max-w-[1100px] items-center justify-between gap-3 px-5 py-3.5 md:grid md:grid-cols-[1fr_auto_1fr] md:gap-6">
         {/* The Wordmark primitive, not the bare image: the teal half of the
             artwork disappears on the dark theme's glass without its plate. */}
         <Link href="/" className="inline-flex min-h-11 shrink-0 items-center justify-self-start" aria-label="MatricMate home">
@@ -59,14 +63,25 @@ export function Nav({ bare = false }: { bare?: boolean } = {}) {
         </ul>
 
         <div className="hidden items-center gap-3 justify-self-end md:flex">
-          <Link
-            href="/login"
-            className="inline-flex min-h-11 items-center text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
-          >
-            Log in
-          </Link>
-          <LinkBtn title="Create account" href="/signup" sm />
+          {signedIn ? (
+            <LinkBtn title="Open MatricMate" href="/dashboard" sm />
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="inline-flex min-h-11 items-center text-[14.5px] font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
+              >
+                Log in
+              </Link>
+              <LinkBtn title="Create account" href="/signup" sm />
+            </>
+          )}
         </div>
+
+        {/* On a phone too, in the bar itself: a student who came here from the
+            app (their settings link to the delete-account page) needs the way
+            back in plain sight, not behind the menu. */}
+        {signedIn ? <LinkBtn title="Open app" href="/dashboard" sm className="ms-auto shrink-0 md:hidden" /> : null}
 
         {/* -me-2 keeps the glyph on the bar's end edge while the box stays 44px. */}
         <button
@@ -100,8 +115,14 @@ export function Nav({ bare = false }: { bare?: boolean } = {}) {
             ))}
           </ul>
           <div className="mt-3 flex gap-2">
-            <LinkBtn title="Log in" href="/login" variant="line" sm className="flex-1" />
-            <LinkBtn title="Create account" href="/signup" sm className="flex-1" />
+            {signedIn ? (
+              <LinkBtn title="Open MatricMate" href="/dashboard" sm className="flex-1" />
+            ) : (
+              <>
+                <LinkBtn title="Log in" href="/login" variant="line" sm className="flex-1" />
+                <LinkBtn title="Create account" href="/signup" sm className="flex-1" />
+              </>
+            )}
           </div>
         </div>
       ) : null}

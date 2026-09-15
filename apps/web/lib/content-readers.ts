@@ -89,13 +89,14 @@ export const defaultChapterId = cache(async (): Promise<string> => {
   return '';
 });
 
-export const getChapter = cache(async (id: string) => api.getChapter(id, await client()));
+export const getChapter = cache(async (id: string) => api.getChapter(id, await client(), await studentMedium()));
 export const getChapterContent = cache(async (id: string) =>
   api.getChapterContent(id, await client(), await studentMedium()),
 );
 export const getSubject = cache(async (id: string) => api.getSubject(id, await client()));
 export const getSubjects = cache(async (ids?: string[]) => api.getSubjects(ids, await client()));
-export const getChapters = cache(async (subjectId: string) => api.getChapters(subjectId, await client()));
+// Counted in the student's medium, like the hub: see fetchChapters.
+export const getChapters = cache(async (subjectId: string) => api.getChapters(subjectId, await client(), await studentMedium()));
 export const getFlashcards = cache(async (chapterId: string) =>
   api.getFlashcards(chapterId, await client(), await studentMedium()),
 );

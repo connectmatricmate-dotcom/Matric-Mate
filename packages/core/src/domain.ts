@@ -3,7 +3,18 @@
  * Pure functions so the same rules run on device, on web and (later) on the server.
  */
 import { Attempt, Board, Chapter, Confidence, Medium, PlanTask, TestResult } from './types';
-import { belongsToChapter, chapterById, chapterName, chaptersFor, contentFor, inSyllabus, itemKey } from './content';
+import {
+  belongsToChapter,
+  chapterById,
+  chapterName,
+  chapterOfId,
+  chaptersFor,
+  contentFor,
+  inSyllabus,
+  itemKey,
+  subjectById,
+  subjectName,
+} from './content';
 import { translate, type Language } from './i18n';
 
 /**
@@ -47,6 +58,44 @@ export const blankHalves = (before: string, after: string): [string, string] => 
 
 export const hasStudyMaterial = (chapter: Pick<Chapter, 'sectionCount' | 'mcqCount' | 'flashcardCount'>): boolean =>
   chapter.sectionCount > 0 || chapter.mcqCount > 0 || chapter.flashcardCount > 0;
+
+/**
+ * Whether the board leaves a chapter off the annual paper: its table of
+ * specification gives the chapter a share of exactly zero.
+ *
+ * Unknown is not zero. Most chapters have no share recorded at all and are
+ * examined like any other, so only a recorded 0 counts. These chapters now
+ * have full notes and questions (three dropped Maths chapters, the listening
+ * and speaking units, Chemistry's practical skills), so they stay readable,
+ * but nothing steers a student into them: not Continue, not today's plan, not
+ * the coach's next step, and no subject test draws from them.
+ */
+export const offPaper = (chapter: Pick<Chapter, 'examShare'> | undefined): boolean =>
+  chapter?.examShare != null && Number(chapter.examShare) === 0;
+
+/**
+ * The topic an answer is filed under, one rule for both apps.
+ *
+ * MCQs carry their own topic from the bank. Blanks and short questions have
+ * none, and each app used to file them under the chapter's title: English on
+ * the website, the subject's language on Android, so one chapter became two
+ * weak topics, each needing three answers of its own. They are filed under
+ * the chapter id now, which no language switch changes, and named when shown
+ * (topicLabel). Answers saved the old way, and AI sets saved with no topic,
+ * are read the same way, so they all count together.
+ */
+export const topicKey = (a: Pick<Attempt, 'mode' | 'topic' | 'chapterId'>): string =>
+  a.mode === 'blanks' || a.mode === 'shortq' || !a.topic?.trim() ? a.chapterId : a.topic.trim();
+
+/**
+ * A topic as a student reads it: a chapter's name, in their language, for one
+ * filed under its chapter (see topicKey), and the topic itself otherwise.
+ * Until the chapter index has loaded, the subject's name rather than an id.
+ */
+export function topicLabel(topic: string, lang: Language = 'en'): string {
+  if (!topic || chapterOfId(topic) !== topic) return topic;
+  return chapterName(chapterById(topic), lang) || subjectName(subjectById(topic.split('-')[0]), lang) || topic;
+}
 
 export const XP = {
   /** Correct answer. Honest confidence is rewarded: a lucky guess earns less than a sure answer. */
@@ -177,17 +226,24 @@ export function confidenceBreakdown(attempts: Attempt[]) {
 /**
  * Topics ranked worst-first, from at least 3 attempts each.
  *
- * Two kinds of answer never make a weak topic. One with no topic, which AI
- * sets used to record: it came out as a nameless row, a "Fix ." button and a
- * blank task on the plan. And one from a chapter outside the student's
- * syllabus, left over from before a board or class change: its button opened
+ * One helper for every screen and job that names weak topics, so the rail,
+ * the weak topics page, the plan, the coach and the tutor cannot disagree.
+ * Answers are grouped by topicKey: an MCQ's own topic, or the chapter for
+ * blanks, short questions and AI sets saved with no topic. `topic` is what to
+ * show, in `lang`; `key` is what to match and build ids from.
+ *
+ * An answer from a chapter outside the student's syllabus, left over from
+ * before a board or class change, never makes a weak topic: its button opened
  * a chapter their account cannot read.
  */
 export function weakTopics(
   attempts: Attempt[],
   minAttempts = 3,
-  /** The syllabus to hold chapters to. Defaults to the one the app set; see inSyllabus. */
-  syllabus?: { grade?: number; board?: Board | null },
+  /**
+   * The syllabus to hold chapters to (defaults to the one the app set; see
+   * inSyllabus), and the language to name chapter topics in (English).
+   */
+  syllabus?: { grade?: number; board?: Board | null; lang?: Language },
 ) {
   const fits = new Map<string, boolean>();
   const theirs = (chapterId: string): boolean => {
@@ -198,18 +254,20 @@ export function weakTopics(
     }
     return ok;
   };
-  const map = new Map<string, { topic: string; subjectId: string; chapterId: string; right: number; total: number }>();
+  const map = new Map<string, { key: string; subjectId: string; chapterId: string; right: number; total: number }>();
   attempts.forEach((a) => {
-    if (!a.topic?.trim() || !theirs(a.chapterId)) return;
-    const k = `${a.subjectId}|${a.topic}`;
-    const row = map.get(k) ?? { topic: a.topic, subjectId: a.subjectId, chapterId: a.chapterId, right: 0, total: 0 };
+    const key = topicKey(a);
+    if (!key || !theirs(a.chapterId)) return;
+    const k = `${a.subjectId}|${key}`;
+    const row = map.get(k) ?? { key, subjectId: a.subjectId, chapterId: a.chapterId, right: 0, total: 0 };
     row.total += 1;
     if (a.correct) row.right += 1;
     map.set(k, row);
   });
+  const lang = syllabus?.lang ?? 'en';
   return [...map.values()]
     .filter((r) => r.total >= minAttempts)
-    .map((r) => ({ ...r, accuracy: Math.round((r.right / r.total) * 100) }))
+    .map((r) => ({ ...r, topic: topicLabel(r.key, lang), accuracy: Math.round((r.right / r.total) * 100) }))
     .filter((r) => r.accuracy < 75)
     .sort((a, b) => a.accuracy - b.accuracy);
 }
@@ -290,13 +348,15 @@ export function planChapterId(
    */
   const finished = (c: Chapter) =>
     c.sectionCount > 0 && new Set(readSections.filter((id) => belongsToChapter(id, c.id)).map(itemKey)).size >= c.sectionCount;
-  const theirs = (c: Chapter) => c.grade === grade && (!board || (c.board ?? 'fbise') === board);
+  // Their class and board, with something in it, and on the paper: a chapter
+  // the board does not examine is never the one the plan sends them to.
+  const theirs = (c: Chapter) => c.grade === grade && (!board || (c.board ?? 'fbise') === board) && !offPaper(c);
 
   if (lastChapterId && inSyllabus(lastChapterId, grade, board)) {
     const known = chapterById(lastChapterId);
     // Unknown, but shaped like this syllabus's chapter: offline, trust it.
-    // Known and finished, and the plan should move on.
-    if (!known || !finished(known)) return lastChapterId;
+    // Known and finished, or off the paper, and the plan should move on.
+    if (!known || (!finished(known) && !offPaper(known))) return lastChapterId;
   }
   // Something to study and something still to do in it, in any subject,
   // before settling for less. Stopping at the first subject's finished
@@ -354,11 +414,14 @@ export function buildPlan(opts: {
     { id: `plan-mcq-${chId}-${day}`, subjectId, chapterId: chId, kind: 'mcq' },
     weak && weakCh
       ? {
-          id: `plan-weak-${weak.topic}-${day}`,
+          // The key, not the name: the name follows the language, and a tick
+          // must not come off because the student switched to Urdu. Screens
+          // show it through topicLabel.
+          id: `plan-weak-${weak.key}-${day}`,
           subjectId: weak.subjectId,
           chapterId: weak.chapterId,
           kind: 'cards',
-          weakTopic: weak.topic,
+          weakTopic: weak.key,
           weakAccuracy: weak.accuracy,
         }
       : { id: `plan-cards-default-${day}`, subjectId, chapterId: chId, kind: 'cards' },
@@ -436,7 +499,7 @@ export function planAutoDone(
     // Cards. A weak-topic task is really "practise this topic", so answering
     // it counts as well as reviewing the cards.
     if (task.weakTopic) {
-      const onTopic = todays.filter((a) => a.topic === task.weakTopic);
+      const onTopic = todays.filter((a) => topicKey(a) === task.weakTopic);
       if (onTopic.length >= PLAN_WEAK_TARGET) done.push(task.id);
       continue;
     }
@@ -574,6 +637,12 @@ export function testsThisMonth(results: TestResult[]) {
   return results.filter((r) => Number.isFinite(r.at) && dayKey(r.at).slice(0, 7) === month);
 }
 
+/** Answers from this calendar month in Karachi: what a monthly report card grades. */
+export function attemptsThisMonth(attempts: Attempt[]) {
+  const month = todayKey().slice(0, 7);
+  return attempts.filter((a) => Number.isFinite(a.at) && dayKey(a.at).slice(0, 7) === month);
+}
+
 /* ------------------------------------------------------------ next action */
 
 /**
@@ -618,7 +687,9 @@ export function nextAction(opts: {
         the last one read belongs to the old one. */
   const current =
     opts.lastChapterId && inSyllabus(opts.lastChapterId, opts.grade, opts.board) ? chapterById(opts.lastChapterId) : undefined;
-  if (opts.lastChapterId && current && current.sectionCount > 0) {
+  // Not a chapter the board leaves off the paper: reading it is fine, being
+  // sent back to it every morning is not.
+  if (opts.lastChapterId && current && current.sectionCount > 0 && !offPaper(current)) {
     const read = new Set(opts.readSections.filter((id) => belongsToChapter(id, current.id)).map(itemKey)).size;
     if (read > 0 && read < current.sectionCount) {
       return {
@@ -635,7 +706,8 @@ export function nextAction(opts: {
         button would open a chapter the account cannot read. */
   const weak = weakTopics(opts.attempts, 3, { grade: opts.grade, board: opts.board })[0];
   if (weak) {
-    return { kind: 'fix', topic: weak.topic, chapterId: weak.chapterId, accuracy: weak.accuracy };
+    // The key; nextStep names it in the student's language.
+    return { kind: 'fix', topic: weak.key, chapterId: weak.chapterId, accuracy: weak.accuracy };
   }
 
   /* 3. Nothing behind them at all. Before the plan, because the plan would say
@@ -693,7 +765,7 @@ export function nextStep(action: NextAction, lang: Language): { label: string; h
          topics screen already does with its Practise button. Deliberately not
          the AI test: a dashboard button should not spend a student's questions
          for them. */
-      return { label: translate(lang, 'dash.nextFix', { topic: action.topic }), href: `/session/setup?chapter=${action.chapterId}` };
+      return { label: translate(lang, 'dash.nextFix', { topic: topicLabel(action.topic, lang) }), href: `/session/setup?chapter=${action.chapterId}` };
     case 'task':
       if (action.task.kind === 'read') return named(action.task.chapterId, 'dash.nextRead', `/learn/reader/${action.task.chapterId}`);
       if (action.task.kind === 'mcq') return named(action.task.chapterId, 'dash.nextPractise', `/session/setup?chapter=${action.task.chapterId}`);
@@ -702,6 +774,53 @@ export function nextStep(action: NextAction, lang: Language): { label: string; h
       return named(action.chapterId, 'dash.nextStart', `/learn/reader/${action.chapterId}`);
   }
 }
+
+/**
+ * Whether a question counts as wrong in a set's review, the same rule as its
+ * score: a timed test counts an unanswered question against the student, a
+ * practice set ended early is marked on what was answered. The two apps each
+ * had half of this, so the same set showed a different "Wrong · n" on each.
+ */
+export const reviewWrong = (mode: 'practice' | 'exam', answer: { correct: boolean } | undefined | null): boolean =>
+  mode === 'exam' ? !answer?.correct : !!answer && !answer.correct;
+
+/**
+ * A saved session's title in the language the app is in now.
+ *
+ * The title is written into the result when the session ends, in whatever
+ * language the app was in then, and results synced from the other app arrive
+ * in its language. So "Physics · Mixed, all chapters" sat in an Urdu list
+ * after a language switch. The standard titles are rebuilt from the result's
+ * own chapter and subject; anything else (a mock paper's own title) is left as
+ * the student saw it. Both apps' recent-session lists read this.
+ */
+export function resultTitle(r: TestResult, lang: Language): string {
+  const shapes = (l: Language): string[] => {
+    const subject = subjectName(subjectById(r.subjectId), l);
+    const chapter = r.chapterId ? chapterName(chapterById(r.chapterId), l) : '';
+    if (r.mode === 'exam') {
+      const exam = translate(l, 'session.examTitle');
+      return [
+        chapter && `${chapter} · ${exam}`,
+        subject && `${subject} · ${exam}`,
+        `${translate(l, 'tutor.aiTestTitle')} · ${exam}`,
+      ];
+    }
+    return [chapter, subject && `${subject} · ${translate(l, 'session.mixed')}`, translate(l, 'tutor.aiMade')];
+  };
+  const other: Language = lang === 'ur' ? 'en' : 'ur';
+  const i = shapes(other).findIndex((shape) => shape && shape === r.label);
+  return i < 0 ? r.label : shapes(lang)[i] || r.label;
+}
+
+/**
+ * An email address that could receive mail: something, an @, a domain, and a
+ * dot before an ending of two or more letters. `name@gmail` passed every check
+ * we had (Supabase takes it too) and made an account that could never be sent
+ * a confirmation or a password reset. One rule for both apps and the server.
+ */
+export const EMAIL_RULE = /^[^@\s]+@[^@\s.]+(?:\.[^@\s.]+)*\.[A-Za-z]{2,}$/;
+export const isPlausibleEmail = (v: string): boolean => EMAIL_RULE.test(v.trim());
 
 /**
  * A Pakistani mobile in the shape the database takes: +92 then ten digits.

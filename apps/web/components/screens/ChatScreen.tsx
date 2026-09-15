@@ -205,16 +205,33 @@ export function ChatScreen({
     let alive = true;
     const supabase = createClient();
     (async () => {
+      /*
+       * Every message, a thousand at a time: the database answers at most a
+       * thousand rows and says nothing when it stops, so a long thread would
+       * have opened with its newest answers missing. Each question and its
+       * answer are saved in one statement with one timestamp, so `at` alone
+       * left the pair in either order: the question sorts first ('user' after
+       * 'assistant', descending), and the id keeps the pages from overlapping.
+       */
+      const readAll = async () => {
+        const all: { id: unknown; role: unknown; content: unknown; at: unknown }[] = [];
+        for (let page = 0; page < 10; page += 1) {
+          const { data, error } = await supabase
+            .from('chat_messages')
+            .select('id,role,content,at')
+            .eq('thread_id', threadParam)
+            .order('at')
+            .order('role', { ascending: false })
+            .order('id')
+            .range(page * 1000, page * 1000 + 999);
+          if (error || !data) return { data: null, error: error ?? new Error('no rows') };
+          all.push(...data);
+          if (data.length < 1000) break;
+        }
+        return { data: all, error: null };
+      };
       const [{ data: rows, error }, { data: meta }] = await Promise.all([
-        // Each question and its answer are saved in one statement with one
-        // timestamp, so `at` alone left the pair in either order. The
-        // question sorts first ('user' after 'assistant', descending).
-        supabase
-          .from('chat_messages')
-          .select('id,role,content,at')
-          .eq('thread_id', threadParam)
-          .order('at')
-          .order('role', { ascending: false }),
+        readAll(),
         supabase.from('chat_threads').select('context_label').eq('id', threadParam).maybeSingle(),
       ]);
       if (!alive) return;
@@ -408,7 +425,7 @@ export function ChatScreen({
           <Icon name="back" size={20} />
         </Link>
         <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-extrabold text-ink">{t('tutor.title')}</p>
+          <h1 className="text-[15px] font-extrabold text-ink">{t('tutor.title')}</h1>
           {contextLabel ? <p className="truncate text-[13px] text-ink2">{t('tutor.context', { label: contextLabel })}</p> : null}
         </div>
         {quota ? (
@@ -533,7 +550,7 @@ export function ChatScreen({
                   <Icon name="thumbsDown" size={16} strokeWidth={2.2} />
                 </button>
                 {/* Google Play: every AI answer can be reported in the app. */}
-                <ReportAi variant="pill" surface="tutor" refId={m.id} excerpt={m.text} />
+                <ReportAi variant="pill" surface="tutor" refId={m.id} excerpt={parseTutorActions(m.text, false, lang).text} />
                 {/* Only offered when the answer is NOT already in Urdu:
                     asking for Urdu on an Urdu reply spends a question to
                     get the same thing back. */}
@@ -547,7 +564,9 @@ export function ChatScreen({
                   type="button"
                   aria-label={t('tutor.copyAnswer')}
                   onClick={() => {
-                    void navigator.clipboard?.writeText(m.text);
+                    // The words the student read, without the button tags
+                    // ([[practice:phy-3]]) the answer carries for the buttons.
+                    void navigator.clipboard?.writeText(parseTutorActions(m.text, false, lang).text);
                     toast(t('tutor.copied'));
                   }}
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-grey text-ink2 transition-colors duration-200 hover:text-ink md:h-10 md:w-10"

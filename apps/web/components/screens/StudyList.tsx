@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { SUBJECT_COLORS, SUBJECT_ICON, boardName, chapterName, hasStudyMaterial, mediumName, subjectPct, type Chapter, type Subject } from '@matricmate/core';
+import { SUBJECT_COLORS, SUBJECT_ICON, boardName, chapterName, hasStudyMaterial, mediumName, offPaper, subjectPct, type Chapter, type Subject } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { CoverageRail, WeakRail } from '@/components/app/rails';
 import { Bar, Card, Empty, Icon, Skeleton, Ur } from '@/components/ui/primitives';
@@ -47,7 +47,7 @@ export function StudyList({
   subjects: Subject[];
   chaptersBySubject: Record<string, Chapter[]>;
 }) {
-  const { state, derived } = useApp();
+  const { state, derived, synced } = useApp();
   const t = useT();
   const { lang } = useLang();
   const [q, setQ] = useState('');
@@ -78,8 +78,12 @@ export function StudyList({
           chapters,
           pct: subjectPct(s.id, state.readSections, state.attempts),
           // Skip chapters with nothing to study: pointing "Continue" at an
-          // empty chapter would send a student straight to a dead end.
-          next: chapters.find((c) => c.id === state.lastChapterId) ?? chapters.find(hasStudyMaterial),
+          // empty chapter would send a student straight to a dead end. And the
+          // ones the board leaves off the paper: Maths said "Continue:
+          // Matrices and Determinants", a chapter FBISE does not examine.
+          next:
+            chapters.find((c) => c.id === state.lastChapterId && !offPaper(c)) ??
+            chapters.find((c) => hasStudyMaterial(c) && !offPaper(c)),
         };
       });
   }, [subjects, chaptersBySubject, derived.subjects, derived.contentReady, state.readSections, state.attempts, state.lastChapterId]);
@@ -105,9 +109,18 @@ export function StudyList({
     );
   }, [base, q]);
 
+  /* A new browser knows nobody's subjects until the account answers, and the
+     default list it would show (and the "Class 9 · FBISE" line over it) is
+     not this student's. So the page waits, as a skeleton, for that answer. */
+  if (!synced && !setup?.subjects?.length) return <StudyListSkeleton />;
+
   return (
     <Page>
-      <PageHead eyebrow={eyebrow} title={t('study.title')} sub={t('study.subjectsOnList', { n: rows.length })} />
+      <PageHead
+        eyebrow={eyebrow}
+        title={t('study.title')}
+        sub={rows.length === 1 ? t('study.subjectsOnListOne') : t('study.subjectsOnList', { n: rows.length })}
+      />
 
       <Split>
         <Work>
@@ -185,7 +198,8 @@ export function StudyList({
             <section className="mt-7">
               <h2 className="mb-2.5 flex items-center gap-2 font-display text-[16px] text-ink">
                 <Icon name="lock" size={16} className="text-ink3" />
-                {t('trial.lockedSection')}
+                {/* The Android key, for the same words on both apps. */}
+                {t('access.lockedSection')}
               </h2>
               <div className="grid gap-3 md:grid-cols-2">
                 {locked.map((s) => (

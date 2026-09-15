@@ -120,6 +120,13 @@ export const push: ChannelAdapter = {
     // A chapter travels as its own field, so an app that predates chapter
     // targets reads an unknown destination and simply opens normally.
     const chapter = target === 'chapter' && notice.chapterId ? { chapter: notice.chapterId } : {};
+    /*
+     * How long Firebase keeps trying a phone that is off. Its default is four
+     * weeks, so "answer before midnight" could arrive the next morning. Study
+     * reminders and streak warnings are about today; a report keeps a day; a
+     * receipt keeps the default.
+     */
+    const ttl = notice.kind === 'payment' ? null : notice.kind === 'report' ? 86_400 : 21_600;
 
     const results = await Promise.all(
       (devices as { token: string; platform: string }[]).map(async ({ token: device, platform }) => {
@@ -137,7 +144,9 @@ export const push: ChannelAdapter = {
                 data: { target, kind: notice.kind, ...chapter },
                 // The channel the app creates before it registers, so every
                 // push wears the same name and importance in Settings.
-                ...(platform === 'android' ? { android: { notification: { channel_id: 'default' } } } : {}),
+                ...(platform === 'android'
+                  ? { android: { ...(ttl ? { ttl: `${ttl}s` } : {}), notification: { channel_id: 'default' } } }
+                  : {}),
                 /*
                  * In a browser the Firebase worker shows a message that has a
                  * notification block by itself, and opens this link when it
@@ -150,6 +159,7 @@ export const push: ChannelAdapter = {
                 ...(platform === 'web'
                   ? {
                       webpush: {
+                        ...(ttl ? { headers: { TTL: String(ttl) } } : {}),
                         notification: { icon: `${SITE_URL}/icon.png`, tag: notice.kind },
                         ...(SITE_URL.startsWith('https://')
                           ? { fcm_options: { link: new URL(webPath(target, notice.chapterId), SITE_URL).toString() } }
@@ -180,7 +190,14 @@ export const push: ChannelAdapter = {
           } catch {
             // Not JSON: logged below as it came.
           }
-          const deadToken = res.status === 404 || code === 'UNREGISTERED' || (res.status === 400 && /registration token/i.test(message));
+          // SENDER_ID_MISMATCH: a token from another Firebase project (an old
+          // build), which no message from this one can ever reach. Kept, it
+          // failed every run and turned each job's answer into a 503.
+          const deadToken =
+            res.status === 404 ||
+            code === 'UNREGISTERED' ||
+            code === 'SENDER_ID_MISMATCH' ||
+            (res.status === 400 && /registration token/i.test(message));
           if (deadToken) {
             const { error: pruneError } = await admin.from('push_tokens').delete().eq('token', device);
             if (pruneError) console.error('notify/push: could not prune a dead device', pruneError.message);
@@ -250,15 +267,26 @@ export async function diagnosePush(): Promise<Record<string, unknown>> {
   const admin = createAdminClient();
   const { data: devices } = await admin.from('push_tokens').select('token');
   const verdicts: Record<string, number> = {};
+  let pruned = 0;
   for (const { token: device } of (devices ?? []) as { token: string }[]) {
     const res = await fetch(`https://fcm.googleapis.com/v1/projects/${projectId()}/messages:send`, {
       method: 'POST',
       headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
       body: JSON.stringify({ validate_only: true, message: { token: device, notification: { title: 'check', body: 'check' } } }),
     });
-    const key = res.ok ? 'valid' : `${res.status} ${((await res.text()).match(/"status":\s*"([A-Z_]+)"/) ?? [])[1] ?? ''}`.trim();
+    const text = res.ok ? '' : await res.text();
+    const status = (text.match(/"status":\s*"([A-Z_]+)"/) ?? [])[1] ?? '';
+    const code = (text.match(/"errorCode":\s*"([A-Z_]+)"/) ?? [])[1] ?? '';
+    const key = res.ok ? 'valid' : `${res.status} ${code || status}`.trim();
     verdicts[key] = (verdicts[key] ?? 0) + 1;
+    // A device the check finds dead, by the same rule a real send uses, is
+    // removed now rather than at the next send that happens to meet it.
+    if (!res.ok && (res.status === 404 || code === 'UNREGISTERED' || code === 'SENDER_ID_MISMATCH')) {
+      const { error } = await admin.from('push_tokens').delete().eq('token', device);
+      if (!error) pruned++;
+    }
   }
   report.devices = verdicts;
+  report.pruned = pruned;
   return report;
 }

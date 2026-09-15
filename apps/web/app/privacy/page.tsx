@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 import { Nav } from '@/components/landing/Nav';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { onlinePayments } from '@/lib/gateway';
 import { canonicalUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -18,82 +19,95 @@ export const metadata: Metadata = {
  * anyone looking for a privacy policy, a parent or a payment gateway
  * reviewing the merchant, looks for the word on its own. Same commitments,
  * their own address.
+ *
+ * The Android app opens it too (?from=app), bare like the terms: no way on to
+ * the pricing page, and the payment lines say only what is kept, never where
+ * or how to pay. On the website the payment lines follow the payment switch
+ * (onlinePayments): no gateway sees anything while plans are switched on by
+ * hand.
  */
-const SECTIONS: { heading: string; paragraphs: string[] }[] = [
-  {
-    heading: 'Who we are',
-    paragraphs: [
-      `${BUSINESS.name} runs this website and the MatricMate Android app (not yet on Google Play), from ${[BUSINESS.address, BUSINESS.city, BUSINESS.country].filter(Boolean).join(', ')}. We decide what is collected here and we are the people to complain to about it.`,
-      `Write to ${SUPPORT_EMAIL}${BUSINESS.phone ? `, or call ${BUSINESS.phone}` : ''}.`,
-    ],
-  },
-  {
-    heading: 'What we collect',
-    paragraphs: [
-      'When you make an account: your name, email address and mobile number. The mobile number is used to reach you about your account and to fill in the payment form, so you are not typing it on a phone keyboard mid-purchase.',
-      'When you study: your class, board, medium and subjects, which sections you have read, which questions you answered and how you rated your own confidence, your test scores, the days you were active and how many minutes a day you spent in the app. This is the part that makes weak topics, streaks, the daily report and the report card work; without it the app has nothing true to tell you.',
-      'Your school, if you choose to add it. It is optional, and it is used to count how many of our students come from each school.',
-      'When you use the AI tutor: the questions you ask and the answers given, kept so you can read your own history back.',
-      'Technical basics that any website receives, such as the pages requested and rough device information, used to keep the service working.',
-    ],
-  },
-  {
-    heading: 'What we do not collect',
-    paragraphs: [
-      'Card numbers, wallet PINs and bank credentials never reach us. Those are typed on the payment gateway’s own page and stay with them; we keep only the reference number printed on your receipt and the amount.',
-      'We do not track you across other websites, we do not sell data, and we do not use your study history to advertise to you.',
-    ],
-  },
-  {
-    heading: 'Who else sees it',
-    paragraphs: [
-      'The payment gateway, for the transaction itself: your name, email and mobile number are passed so the payment can be attributed and a receipt issued.',
-      'Our hosting and database providers, who store the data on our behalf and may not use it for anything else.',
-      'The provider of the language model behind the AI tutor, which receives the question being asked in order to answer it.',
-      'A parent or guardian you give your monthly report card to. It is a PDF you download and pass on yourself, and it shows study progress, never your password or payment details.',
-      'If you signed up through a teacher’s referral link, that teacher: for each day, whether you opened MatricMate, whether you studied, how long you spent in it, how many questions you answered and got right, and which chapters you worked in. Never your AI tutor questions, your password or your payment details.',
-      'Nobody else, unless a Pakistani law or court requires it.',
-    ],
-  },
-  {
-    heading: 'How long we keep it',
-    paragraphs: [
-      'Your account and study history stay while the account exists, because a progress record that resets every month is not a progress record.',
-      'Receipts and payment references are kept as long as tax and accounting rules require, even after an account is deleted. This is the one thing deletion does not remove.',
-    ],
-  },
-  {
-    heading: 'Children',
-    paragraphs: [
-      'MatricMate is built for Class 9 and Class 10 students, most of whom are under 18. A parent or guardian should read this page with them. A parent may write to us about their child’s account and ask for it to be corrected or deleted, and we will act on that.',
-    ],
-  },
-  {
-    heading: 'Your choices',
-    paragraphs: [
-      `You can change your name, board, medium and subjects from your account, and your class once every seven days. To correct your email address or mobile number, write to ${SUPPORT_EMAIL} and we will change it for you.`,
-      `You can have the whole account and everything attached to it deleted: use the delete account page, or write to ${SUPPORT_EMAIL}. It is done within seven days.`,
-      'You can ask us for a copy of what we hold about you, and we will send it.',
-    ],
-  },
-  {
-    heading: 'Security',
-    paragraphs: [
-      'Traffic is encrypted in transit, passwords are stored hashed and never in readable form, and study data is walled off per account at the database itself rather than only in the app, so one student cannot read another’s work.',
-    ],
-  },
-  {
-    heading: 'Changes',
-    paragraphs: [
-      'If this policy changes in a way that affects what we collect or who sees it, we will say so in the app rather than quietly editing this page.',
-    ],
-  },
-];
+function sections(mode: 'app' | 'online' | 'manual'): { heading: string; paragraphs: string[] }[] {
+  const online = mode === 'online';
+  return [
+    {
+      heading: 'Who we are',
+      paragraphs: [
+        `${BUSINESS.name} runs this website and the MatricMate Android app, from ${[BUSINESS.address, BUSINESS.city, BUSINESS.country].filter(Boolean).join(', ')}. We decide what is collected here and we are the people to complain to about it.`,
+        `Write to ${SUPPORT_EMAIL}${BUSINESS.phone ? `, or call ${BUSINESS.phone}` : ''}.`,
+      ],
+    },
+    {
+      heading: 'What we collect',
+      paragraphs: [
+        `When you make an account: your name, email address and mobile number. The mobile number is used to reach you about your account${online ? ' and to fill in the payment form, so you are not typing it on a phone keyboard mid-purchase' : ''}.`,
+        'When you study: your class, board, medium and subjects, which sections you have read, which questions you answered and how you rated your own confidence, your test scores, the days you were active and how many minutes a day you spent in the app. This is the part that makes weak topics, streaks, the daily report and the report card work; without it the app has nothing true to tell you.',
+        'Your school, if you choose to add it. It is optional, and it is used to count how many of our students come from each school.',
+        'When you use the AI tutor: the questions you ask and the answers given, kept so you can read your own history back. If you report an answer, the report and the part of the answer it is about.',
+        'Technical basics that any website receives, such as the pages requested and rough device information, used to keep the service working.',
+      ],
+    },
+    {
+      heading: 'What we do not collect',
+      paragraphs: [
+        online
+          ? 'Card numbers, wallet PINs and bank credentials never reach us. Those are typed on the payment gateway’s own page and stay with them; we keep only the reference number printed on your receipt and the amount.'
+          : 'Card numbers, wallet PINs and bank credentials never reach us. For a plan we keep only the amount, the date and a reference.',
+        'We do not track you across other websites, we do not sell data, and we do not use your study history to advertise to you.',
+      ],
+    },
+    {
+      heading: 'Who else sees it',
+      paragraphs: [
+        ...(online ? ['The payment gateway, for the transaction itself: your name, email and mobile number are passed so the payment can be attributed and a receipt issued.'] : []),
+        'Our hosting and database providers, who store the data on our behalf and may not use it for anything else.',
+        'The provider of the language model behind the AI tutor, which receives the question being asked in order to answer it.',
+        'A parent or guardian you give your monthly report card to. It is a PDF you download and pass on yourself, and it shows study progress, never your password or payment details.',
+        'If you signed up through a teacher’s referral link, that teacher: for each day, whether you opened MatricMate, whether you studied, how long you spent in it, how many questions you answered and got right, and which chapters you worked in. Never your AI tutor questions, your password or your payment details.',
+        'Nobody else, unless a Pakistani law or court requires it.',
+      ],
+    },
+    {
+      heading: 'How long we keep it',
+      paragraphs: [
+        'Your account and study history stay while the account exists, because a progress record that resets every month is not a progress record.',
+        'Payment records (the amount, the date and the reference) are kept as long as tax and accounting rules require, even after an account is deleted. This is the one thing deletion does not remove.',
+      ],
+    },
+    {
+      heading: 'Children',
+      paragraphs: [
+        'MatricMate is built for Class 9 and Class 10 students, most of whom are under 18. A parent or guardian should read this page with them. A parent may write to us about their child’s account and ask for it to be corrected or deleted, and we will act on that.',
+      ],
+    },
+    {
+      heading: 'Your choices',
+      paragraphs: [
+        `You can change your name, board, medium and subjects from your account, and your class once every seven days. To correct your email address or mobile number, write to ${SUPPORT_EMAIL} and we will change it for you.`,
+        `You can delete the whole account and everything attached to it yourself: open your account settings in the app or on the website and choose “Delete my account”. If you cannot sign in, write to ${SUPPORT_EMAIL} and it is done within seven days.`,
+        'You can ask us for a copy of what we hold about you, and we will send it.',
+      ],
+    },
+    {
+      heading: 'Security',
+      paragraphs: [
+        'Traffic is encrypted in transit, passwords are stored hashed and never in readable form, and study data is walled off per account at the database itself rather than only in the app, so one student cannot read another’s work.',
+      ],
+    },
+    {
+      heading: 'Changes',
+      paragraphs: [
+        'If this policy changes in a way that affects what we collect or who sees it, we will say so in the app rather than quietly editing this page.',
+      ],
+    },
+  ];
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+  const bare = (await searchParams).from === 'app';
+  const mode = bare ? 'app' : onlinePayments() ? 'online' : 'manual';
   return (
     <>
-      <Nav />
+      <Nav bare={bare} />
 
       <main className="mx-auto max-w-[720px] px-5 py-14">
         <h1 className="font-display text-mk-h1 text-ink">Privacy policy</h1>
@@ -102,7 +116,7 @@ export default function PrivacyPage() {
         </p>
 
         <div className="mt-10 flex flex-col gap-9">
-          {SECTIONS.map((s) => (
+          {sections(mode).map((s) => (
             <section key={s.heading}>
               <h2 className="font-display text-[22px] text-ink">{s.heading}</h2>
               {s.paragraphs.map((p, i) => (
@@ -114,13 +128,28 @@ export default function PrivacyPage() {
           ))}
         </div>
 
-        <p className="mt-10 text-mk-small text-ink3">
-          See also <Link className="text-teal hover:underline" href="/terms">terms and conditions</Link> and{' '}
-          <Link className="text-teal hover:underline" href="/refunds">refunds and cancellation</Link>.
+        {/* From the app, only on to the terms in their own bare version: the
+            refund page carries the site's full navigation, pricing included. */}
+        <p className="mt-10 text-mk-small text-ink2">
+          See also{' '}
+          <Link className="font-extrabold text-teal hover:underline" href={bare ? '/terms?from=app' : '/terms'}>
+            terms and conditions
+          </Link>
+          {bare ? (
+            '.'
+          ) : (
+            <>
+              {' '}and{' '}
+              <Link className="font-extrabold text-teal hover:underline" href="/refunds">
+                refunds and cancellation
+              </Link>
+              .
+            </>
+          )}
         </p>
       </main>
 
-      <SiteFooter />
+      <SiteFooter bare={bare} />
     </>
   );
 }

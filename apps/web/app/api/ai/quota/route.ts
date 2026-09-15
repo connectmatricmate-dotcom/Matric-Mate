@@ -2,25 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { accessFromRow } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { dayKey, resetAt } from '@/lib/ai/guard';
 
 /**
  * The tutor's fuel gauge. The apps call this on screen load so the counter
  * a student sees is the server's number, not a local guess, and so the
- * "resets at midnight" line can show a real clock time.
+ * "resets at midnight" line can show a real clock time. Day and reset come
+ * from the guard, so every AI route names the same midnight.
  */
-const TIMEZONE = 'Asia/Karachi';
-
-function dayKey(): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE }).format(new Date());
-}
-
-function resetAt(): string {
-  const now = new Date();
-  const pkNow = new Date(now.toLocaleString('en-US', { timeZone: TIMEZONE }));
-  const pkMidnight = new Date(pkNow);
-  pkMidnight.setHours(24, 0, 0, 0);
-  return new Date(now.getTime() + (pkMidnight.getTime() - pkNow.getTime())).toISOString();
-}
 
 export async function GET(req: NextRequest) {
   let userId: string | null = null;

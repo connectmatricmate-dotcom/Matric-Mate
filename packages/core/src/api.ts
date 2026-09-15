@@ -44,9 +44,9 @@ export const api = {
 
   getSubject: (id: string, client?: ContentClient): Promise<Subject | undefined> => fetchSubject(id, client),
 
-  getChapters: (subjectId: string, client?: ContentClient): Promise<Chapter[]> => fetchChapters(subjectId, client),
+  getChapters: (subjectId: string, client?: ContentClient, medium?: Medium): Promise<Chapter[]> => fetchChapters(subjectId, client, medium),
 
-  getChapter: (id: string, client?: ContentClient): Promise<Chapter | undefined> => fetchChapter(id, client),
+  getChapter: (id: string, client?: ContentClient, medium?: Medium): Promise<Chapter | undefined> => fetchChapter(id, client, medium),
 
   getChapterContent: (chapterId: string, client?: ContentClient, medium?: Medium): Promise<ChapterContent> =>
     fetchChapterContent(chapterId, client, medium),

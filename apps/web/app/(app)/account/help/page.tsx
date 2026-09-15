@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { HelpView } from '@/components/screens/HelpView';
+import { onlinePayments } from '@/lib/gateway';
+import { localTitle } from '@/lib/page-title';
 
-export const metadata: Metadata = {
-  title: 'Help and support',
-  description: 'Common questions, and how to reach us if you are still stuck.',
-};
+export const generateMetadata = (): Promise<Metadata> =>
+  localTitle('account.helpTitle', 'Common questions, and how to reach us if you are still stuck.');
 
+/** Whether paying online is open decides how the renew answer reads. */
 export default function HelpPage() {
-  return <HelpView />;
+  return <HelpView online={onlinePayments()} />;
 }

@@ -64,6 +64,10 @@ function carriedOver(current: { valid_till?: string | null; active?: boolean | n
   return remaining * (perMonth(now) / perMonth(tierOf(next.id)));
 }
 
+export type SettleResult =
+  | { handled: true; userId?: string; alreadySettled?: true; validTill?: string }
+  | { handled: false; error?: string };
+
 /**
  * Settle a payment and grant access. Safe to run repeatedly.
  *
@@ -71,21 +75,31 @@ function carriedOver(current: { valid_till?: string | null; active?: boolean | n
  * be called again for payments that already settled. Every step is written to
  * be idempotent rather than guarded by a "have we seen this?" flag that can go
  * stale.
+ *
+ * The two writes, payment paid and plan on, happen in one database
+ * transaction (settle_payment, migration 0062), and a failure comes back as
+ * `handled: false` with the reason. They were two unchecked writes: a failed
+ * second one left revenue counted for a plan that never started, the admin
+ * was told it worked, and a retry found the payment paid and granted nothing.
  */
-export async function markPaidAndGrant(input: { tracker: string; reference?: string; raw: unknown }) {
+export async function markPaidAndGrant(input: { tracker: string; reference?: string; raw: unknown }): Promise<SettleResult> {
   const admin = createAdminClient();
 
-  const { data: payment } = await admin
+  const { data: payment, error: readError } = await admin
     .from('payments')
-    .select('id, user_id, plan, status')
+    .select('id, user_id, plan, status, amount')
     .eq('tracker', input.tracker)
     .maybeSingle();
 
+  if (readError) {
+    console.error('payments: could not read the payment', input.tracker, readError.message);
+    return { handled: false, error: readError.message };
+  }
   if (!payment) {
     // A tracker we never issued. Either a stale sandbox test or someone poking
     // the endpoint. Nothing to do, and nothing to grant.
     console.warn('payments: webhook for an unknown tracker', input.tracker);
-    return { handled: false as const };
+    return { handled: false };
   }
 
   /**
@@ -95,38 +109,72 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
    * sends more than one success-shaped event for a single payment
    * (authorization.succeeded then payment.succeeded). Without this, each one
    * extended the plan by another period and posted another receipt: a student
-   * who paid for three months quietly got six.
+   * who paid for three months quietly got six. settle_payment checks it again
+   * under a row lock, for two deliveries arriving at the same moment.
    *
    * A genuine second purchase is a different tracker, so it is unaffected.
    */
   if (payment.status === 'paid') {
-    return { handled: true as const, userId: payment.user_id ?? undefined, alreadySettled: true };
+    return { handled: true, userId: payment.user_id ?? undefined, alreadySettled: true };
   }
 
-  await admin
-    .from('payments')
-    .update({ status: 'paid', reference: input.reference ?? null, raw: input.raw as never })
-    .eq('id', payment.id);
-
-  if (!payment.user_id) return { handled: true as const };
-
   const plan = planById(payment.plan ?? 'monthly');
+  // A plan the admin switched on by hand is recorded as one, not as a card payment.
+  const source = input.tracker.startsWith('MANUAL-') ? 'manual' : 'safepay';
 
-  const { data: current } = await admin
-    .from('entitlements')
-    .select('valid_till, active, plan')
-    .eq('user_id', payment.user_id)
-    .maybeSingle();
+  /*
+   * The end date is worked out here, where the plan rules live, from the plan
+   * as it stands. settle_payment writes it only if that plan has not changed
+   * since it was read, and says "stale" otherwise, so a second payment
+   * settling at the same moment is extended from, not overwritten. Three
+   * tries is far more than that race ever needs.
+   */
+  let validTill = '';
+  let userId: string | undefined;
+  let settled = false;
+  for (let attempt = 0; attempt < 3 && !settled; attempt++) {
+    let seen: string | null = null;
+    if (payment.user_id) {
+      const { data: current, error: entError } = await admin
+        .from('entitlements')
+        .select('valid_till, active, plan')
+        .eq('user_id', payment.user_id)
+        .maybeSingle();
+      if (entError) {
+        console.error('payments: could not read the plan', input.tracker, entError.message);
+        return { handled: false, error: entError.message };
+      }
+      seen = current?.valid_till ?? null;
+      validTill = new Date(Date.now() + carriedOver(current, plan) + plan.months * 30 * 864e5).toISOString();
+    }
 
-  const validTill = new Date(Date.now() + carriedOver(current, plan) + plan.months * 30 * 864e5).toISOString();
+    const { data, error } = await admin.rpc('settle_payment', {
+      p_tracker: input.tracker,
+      p_reference: input.reference ?? null,
+      p_raw: input.raw ?? null,
+      p_plan: plan.id,
+      p_valid_till: validTill || null,
+      p_seen_valid_till: seen,
+      p_source: source,
+    });
+    if (error) {
+      console.error('payments: settle failed', input.tracker, error.message);
+      return { handled: false, error: error.message };
+    }
+    const out = (data ?? {}) as { outcome?: string; user_id?: string | null };
+    if (out.outcome === 'already') return { handled: true, userId: out.user_id ?? undefined, alreadySettled: true };
+    if (out.outcome === 'unknown') return { handled: false };
+    if (out.outcome === 'granted') {
+      settled = true;
+      userId = out.user_id ?? undefined;
+    }
+  }
+  if (!settled) {
+    console.error('payments: plan kept changing while settling', input.tracker);
+    return { handled: false, error: 'The plan changed while it was being saved. Try again.' };
+  }
 
-  await admin.from('entitlements').upsert(
-    // trial_subject cleared: a paid plan opens every subject, and a stale
-    // value would read as a trial's limit to anything that forgot the plan.
-    // A plan the admin switched on by hand is recorded as one, not as a card payment.
-    { user_id: payment.user_id, active: true, plan: plan.id, valid_till: validTill, trial_subject: null, source: input.tracker.startsWith('MANUAL-') ? 'manual' : 'safepay' },
-    { onConflict: 'user_id' }
-  );
+  if (!userId) return { handled: true };
 
   /*
    * Through the dispatcher, not straight into the table. A receipt should
@@ -137,13 +185,23 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
    */
   // With the address: loaded without it, the email channel had nobody to
   // write to and every receipt email was skipped.
-  const to = await loadRecipient(payment.user_id, { email: true });
-  if (to) {
-    const date = formatDate(validTill, to.lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Karachi' });
-    await notify(to, paymentReceived(date, plan.id === 'basic' ? 'basic' : 'premium'));
+  // The plan is already on by here, so a receipt that fails to send must not
+  // turn a done grant into a reported failure. Logged, not thrown.
+  try {
+    const to = await loadRecipient(userId, { email: true });
+    if (to) {
+      const date = formatDate(validTill, to.lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Karachi' });
+      // The amount and reference go into the emailed receipt only.
+      await notify(
+        to,
+        paymentReceived(date, plan.id === 'basic' ? 'basic' : 'premium', { amount: Number(payment.amount ?? plan.price), reference: input.tracker }),
+      );
+    }
+  } catch (err) {
+    console.error('payments: receipt not sent', input.tracker, err);
   }
 
-  return { handled: true as const, userId: payment.user_id };
+  return { handled: true, userId, validTill };
 }
 
 /** A payment that did not go through. Access is untouched. */

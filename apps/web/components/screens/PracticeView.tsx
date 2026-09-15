@@ -1,6 +1,6 @@
 'use client';
 
-import { boardName, formatDate, pastPaperYears, yearSpan } from '@matricmate/core';
+import { boardName, formatDate, pastPaperYears, resultTitle, yearSpan } from '@matricmate/core';
 import Link from 'next/link';
 import type { Board, IconName, StringKey } from '@matricmate/core';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
@@ -115,7 +115,9 @@ export function PracticeView({ board: accountBoard, grade }: { board: Board; gra
                 {recent.map((r, i) => (
                   <Item
                     key={r.id}
-                    title={r.label}
+                    // Rebuilt in the app's language: a result keeps the title it
+                    // was saved with, from either app and either language.
+                    title={resultTitle(r, lang)}
                     sub={`${formatDate(r.at, lang, { day: 'numeric', month: 'short' })} · ${r.score}/${r.total} · +${r.xp} XP`}
                     icon={r.mode === 'exam' ? 'clock' : 'target'}
                     tone={r.mode === 'exam' ? 'orange' : 'teal'}

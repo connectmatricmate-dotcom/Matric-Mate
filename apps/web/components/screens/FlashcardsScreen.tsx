@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Chapter, Flashcard } from '@matricmate/core';
-import { chapterName } from '@matricmate/core';
+import { chapterName, itemKey } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { SessionHeader } from '@/components/app/SessionHeader';
 import { Btn } from '@/components/ui/controls';
@@ -11,9 +11,12 @@ import { fireConfetti } from '@/lib/confetti';
 import { useApp, useLang, useT } from '@/lib/store';
 import { LeaveSetButton } from '@/components/app/LeaveSetButton';
 import { PracticeChapterBar } from '@/components/app/PracticeChapterBar';
+import { ReportAi } from '@/components/app/ReportAi';
+
+const NONE = new Set<string>();
 
 export function FlashcardsScreen({ chapter, cards, canChangeChapter }: { chapter: Chapter; cards: Flashcard[]; canChangeChapter?: boolean }) {
-  const { actions } = useApp();
+  const { state, hydrated, actions } = useApp();
   const t = useT();
   const { lang } = useLang();
   /* From the server, under the student's own session. The client index this
@@ -26,8 +29,22 @@ export function FlashcardsScreen({ chapter, cards, canChangeChapter }: { chapter
      as ids over the prop rather than a copy of it, so a language switch that
      re-fetches the cards still shows the new ones. */
   const [reviewing, setReviewing] = useState<string[] | null>(null);
-  const review = reviewing ? cards.filter((c) => reviewing.includes(c.id)) : [];
-  const deck = review.length ? review : cards;
+  /*
+   * Cards not yet known lead the deck, as the finish screen promises ("repeats
+   * come back first next time") and as Android does. Against what was known
+   * when the deck opened, taken once the browser's copy has loaded (it is
+   * empty on the server's first render), so the order does not reshuffle while
+   * cards are being marked. Once per card, whatever medium it was known in.
+   */
+  const [knownAtStart, setKnownAtStart] = useState<Set<string> | null>(null);
+  if (!knownAtStart && hydrated) setKnownAtStart(new Set(state.cardsKnown.map(itemKey)));
+  const opened = knownAtStart ?? NONE;
+  const ordered = useMemo(
+    () => [...cards].sort((a, b) => Number(opened.has(itemKey(a.id))) - Number(opened.has(itemKey(b.id)))),
+    [cards, opened],
+  );
+  const review = reviewing ? ordered.filter((c) => reviewing.includes(c.id)) : [];
+  const deck = review.length ? review : ordered;
   const [i, setI] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [repeats, setRepeats] = useState<string[]>([]);
@@ -99,6 +116,7 @@ export function FlashcardsScreen({ chapter, cards, canChangeChapter }: { chapter
 
   return (
     <Page width="focus">
+      <h1 className="sr-only">{`${t('study.flashcards')} · ${name}`}</h1>
       <SessionHeader
         backHref={`/learn/chapter/${chapterId}`}
         backLabel={name}
@@ -141,6 +159,13 @@ export function FlashcardsScreen({ chapter, cards, canChangeChapter }: { chapter
         <Pill tone="green">{t('session.knownCount', { n: known.length })}</Pill>
         <Pill tone="orange">{t('session.repeatCount', { n: repeats.length })}</Pill>
       </div>
+      {/* The cards are written with AI, the bank's and a set built on request
+          alike, so each can be reported once its answer is showing. */}
+      {flipped ? (
+        <div className="mt-2 flex justify-center">
+          <ReportAi surface="ai_test" refId={card.id} excerpt={`${card.front}\n${card.back}`} />
+        </div>
+      ) : null}
 
       <div className="mt-6 flex gap-2.5">
         <Btn title={t('session.repeat')} variant="line" className="flex-1" onClick={() => mark(false)} />

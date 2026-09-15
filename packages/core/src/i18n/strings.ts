@@ -43,6 +43,11 @@ export const en = {
     previousSection: 'Previous section',
     nextSection: 'Next section',
     markDone: 'Mark as done',
+    clearSearch: 'Clear search',
+    chatOptions: 'Rename or delete this chat',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
+    slideOf: 'Slide {n} of {total}',
   },
 
   lang: {
@@ -211,6 +216,16 @@ export const en = {
     school: 'School (optional)',
     schoolPlaceholder: 'Your school’s name',
     errSchoolLength: 'A school name needs 2 to 120 letters.',
+    /* The Android sign-up's own line, with the two documents as links. */
+    agreeLine: 'By continuing you agree to the {terms} and the {privacy}.',
+    termsWord: 'Terms',
+    privacyWord: 'Privacy Policy',
+    /* A teacher's referral code, typed in the app (the website reads it from
+       the teacher's link). Optional, and unknown codes are simply ignored. */
+    teacherCode: 'Teacher’s code (optional)',
+    teacherCodePlaceholder: 'Only if your teacher gave you one',
+    errTeacherCode: 'A teacher’s code is 4 to 16 letters and numbers.',
+    teacherCodeMissed: 'That teacher’s code was not found, so no teacher is linked to your account.',
     /* The role line on the staff signpost, which was English in both languages. */
     roleAdmin: 'Administrator',
     rolePartner: 'Referral partner',
@@ -393,7 +408,8 @@ export const en = {
     selected: 'Selected',
     chooseLength: 'Choose this length',
     premiumIncludes: 'Premium includes',
-    noChargeToday: 'Cancel any time · nothing renews on its own',
+    // Not "cancel any time": a plan is one payment and there is nothing to cancel.
+    noChargeToday: 'One payment · nothing renews on its own',
   },
 
   tabs: {
@@ -423,6 +439,8 @@ export const en = {
     taskMcq: '10 MCQs on {chapter}',
     taskCards: 'Flashcards · 10 cards',
     taskWeak: 'Revise {topic} · {n}% so far',
+    /* A task the student's own work has finished: its box is a status, not a button. */
+    autoDone: 'Done by your work: {task}',
     continueLearning: 'Continue learning',
     /* The coach card's one button. See nextAction() in domain.ts: which of
        these a student is offered depends on what they have already done. */
@@ -503,6 +521,8 @@ export const en = {
 
   notifications: {
     title: 'Notifications',
+    /* Read out for the dot on a notice that arrived since the inbox was last opened. */
+    newLabel: 'New',
     today: 'Today',
     earlier: 'Earlier',
     emptyTitle: 'No notifications yet',
@@ -513,13 +533,11 @@ export const en = {
     paymentBody: 'Premium is active until {date}.',
     paymentBodyBasic: 'Basic is active until {date}.',
     welcomeTitle: 'Welcome to MatricMate',
-    welcomeBody: 'Your notes, past papers and the AI tutor are ready. Open a chapter and start where you like.',
-    reminderTitle: 'Nothing studied today',
-    reminderBody: 'A few questions now still counts. Even ten minutes keeps you moving.',
+    welcomeBody: 'Your notes, practice and past papers are ready. Open a chapter and start where you like.',
     streakTitle: '{n} day streak at risk',
     streakBody: 'You have not studied today. Answer a few questions before midnight to keep it.',
-    reportTitle: 'Your report card is ready',
-    reportBody: 'Fresh notes from your coach on how this week went.',
+    reportTitle: 'Your coach has new advice',
+    reportBody: 'Fresh notes from your coach on how your studying is going, and what to do next.',
 
     /* A streak worth more gets a louder warning. Losing a two day streak is a
        shrug; losing a five week one is the thing that makes people quit. */
@@ -538,8 +556,6 @@ export const en = {
     resumeChapterBody: 'Picking up where you left off takes about ten minutes.',
     weakTopicTitle: '{topic} is your weakest topic',
     weakTopicBody: 'You are at {pct}% there. Ten questions tonight would move it.',
-    planLeftTitle: '{n} left on today\u2019s plan',
-    planLeftBody: 'It was built to fit one sitting. There is still time.',
 
     /* The general evening nudge, rotated so it does not read like a robot
        saying the same sentence every night for a month. */
@@ -584,8 +600,6 @@ export const en = {
     moreTodayBody: '{k} more and today is your best day this week.',
     moreSetTitle: '{n} questions today',
     moreSetBody: 'One more set of ten before bed keeps the momentum going.',
-    planDoneTitle: 'Today’s plan is done',
-    planDoneBody: 'All three tasks ticked. That is how a syllabus gets finished, one day at a time.',
     keepGoingTitle: 'Good start today',
     keepGoingBody: 'Ten practice questions on what you read will fix it in your memory.',
 
@@ -663,7 +677,18 @@ export const en = {
     planEndedBody: 'Your plan ended on {date}. Your progress is saved. Renew on matricmate.co and everything opens again.',
     seePlans: 'See the plans',
     renew: 'Renew my plan',
-    linkNote: 'The button signs you in to matricmate.co. It works for 7 days.',
+    linkNote: 'The button signs you in to matricmate.co. It works once, within 7 days.',
+    receiptBody: 'We received {amount} for Premium. It is active until {date}.',
+    receiptBodyBasic: 'We received {amount} for Basic. It is active until {date}.',
+    receiptNote: 'Payment reference: {reference}. Keep this email as your receipt.',
+    /* The footer's one-tap way to stop emails (/unsubscribe). */
+    stopEmails: 'Stop these emails',
+    unsubDoneTitle: 'No more emails',
+    unsubDoneBody: 'MatricMate will not email you any more. Notifications inside the app carry on, and you can switch emails back on in Profile, then Notifications.',
+    unsubBadTitle: 'This link did not work',
+    unsubBadBody: 'It may have been cut short when it was copied. You can turn emails off in the app: Profile, then Notifications.',
+    unsubRetryTitle: 'Please try again',
+    unsubRetryBody: 'We could not save that just now. Open the link again in a minute.',
   },
 
   /* The first screen after onboarding for a new account: the free trial is
@@ -722,7 +747,7 @@ export const en = {
     trialLine: 'Free trial · {subject}',
     checking: 'Checking…',
     faqPlanQ: 'My plan changed but the app still shows the old one',
-    faqPlanA: 'Open Profile, then Subscription, and tap Check again. The app also checks each time you open it.',
+    faqPlanA: 'Open Settings (the gear at the top), tap your plan, then tap Check again. The app also checks each time you open it.',
     faqAiA: 'The AI tutor has a daily limit, which keeps MatricMate affordable for everyone. It resets every night.',
   },
 
@@ -752,6 +777,7 @@ export const en = {
     chapterN: 'Chapter {n}',
     percentComplete: '{n}% complete',
     subjectsOnList: '{n} subjects on your list',
+    subjectsOnListOne: '1 subject on your list',
     thisChapter: 'This chapter',
     upNext: 'Up next',
     coachStart: 'Start with the notes. The MCQs draw from the same sections.',
@@ -770,6 +796,8 @@ export const en = {
     premiumChapter: 'Premium',
     premiumNote: 'Every chapter opens with the plan.',
     notOnPaper: 'Not on the annual paper',
+    /* Under the line above, on a chapter the board gives no share of the paper. */
+    notOnPaperBody: 'Read it if you like. It will not come up in your exam, so your plan and tests leave it out.',
     chapterCleared: 'Chapter cleared!',
     emptyChapterTitle: 'Nothing to revise here',
     emptyChapterBody: 'No notes, audio, flashcards or questions for this chapter.',
@@ -854,6 +882,10 @@ export const en = {
     /* The first listen to a lesson whose new voice is still being made: it
        plays as it is made, so it cannot be skipped through yet. */
     voiceMaking: 'This lesson has a new voice, made as you listen, so it plays at normal speed. Skipping and speed come back once it is ready, in a few minutes.',
+    /* Where the student stopped last time, offered on opening the lesson again. */
+    resumeFrom: 'Carry on from {time}',
+    /* Read out while the lesson is still arriving. */
+    loading: 'Loading the lesson',
   },
 
   downloads: {
@@ -952,10 +984,14 @@ export const en = {
     askAi: 'Ask AI',
     nextQuestion: 'Next question',
     seeResult: 'See result',
+    /* The result page's tab title. */
+    resultPageTitle: 'Your result',
     levelUp: 'Level {n} unlocked!',
     combo: '{n} in a row!',
     noItemsTitle: 'Nothing here yet',
     noItemsBody: 'This chapter does not have this practice type yet.',
+    /* Offline on a chapter that is not on the phone: not an empty chapter. */
+    offlineChapterBody: 'This chapter is not saved on your phone. Connect to the internet, or download it while you have signal.',
     noSession: 'No active session',
     noSessionBody: 'Start a practice session to see questions here.',
     setUpSession: 'Set up a session',
@@ -987,6 +1023,10 @@ export const en = {
     noChangeAfter: 'You can’t change answers after submitting.',
     submitNow: 'Submit now',
     keepWorking: 'Keep working',
+    /* Leaving a timed test that is still open, by a link or a tab. */
+    leaveTestTitle: 'Leave the test?',
+    leaveTestBody: 'Your answers are not saved and this test will not count.',
+    leaveTest: 'Leave the test',
     /* Closing a practice set part-way. Ending it used to happen on the tap,
        with no way back from a mis-tap on the close button. */
     endSetTitle: 'End this set?',
@@ -1080,7 +1120,13 @@ export const en = {
     toppersIntro: 'A past paper tells you what was asked. A topper’s script shows how it was actually answered: how much to write for 3 marks against 6, how the working is laid out. These are the board’s own scripts, marked by FBISE examiners.',
     toppersScript: 'Script {n}',
     toppersCount: '{n} scripts',
+    toppersCountOne: '1 script',
     toppersFootnote: 'These open on the board’s own site in a new tab.',
+    /* The same three footnotes in the Android app, which opens them in the
+       phone's browser, not in a tab. */
+    papersFootnoteApp: 'These open in your browser, on the board’s own website. More years are added as FBISE publishes them.',
+    papersFootnotePunjabApp: 'These open in your browser, on each board’s own website. More are added as the Punjab boards publish them.',
+    toppersFootnoteApp: 'These open in your browser, on the board’s own website.',
     /* The scripts carry no class. Naming the examination and the year is what
        the catalogue can actually support: see topperYears. */
     toppersSource: 'From the board’s SSC {year} topper copies.',
@@ -1140,6 +1186,7 @@ export const en = {
     /* The same refusal in the Android app, which may not name a plan (Google Play). */
     aiNotInPlan: 'The AI tutor is not in your plan.',
     notInTrial: 'Your free trial opens one subject, and this is not it.',
+    cutShort: '(This answer was too long and got cut short. Ask me to carry on.)',
     offline: 'The tutor needs internet. Check your connection and try again.',
     refused: 'The tutor could not answer that one. Try asking it another way.',
     errorReply: 'Something went wrong on our side. Your question was not counted, try again.',
@@ -1164,6 +1211,12 @@ export const en = {
     /* Cancelling stops the waiting, not the writing: the route finishes and
        saves either way, so the honest line points at where it will be. */
     buildStopped: 'Stopped waiting. If it finished, it is in your sets.',
+    /* The wait ran out, which is not the student's Stop and not a lost
+       connection: the server carries on and saves the set. */
+    buildTimedOut: 'This is taking longer than usual. It is still being written, and it will be in Your AI sets when it is ready.',
+    paperTimedOut: 'This is taking longer than usual. It is still being written, and it will be in Your mock papers when it is ready.',
+    /* A saved chat opened on a plan without the tutor: readable, not askable. */
+    readOnlyNote: 'You can read your saved chats. Asking the AI tutor is not in your plan.',
     buildIt: 'Make my set',
     aiMade: 'AI-made for you',
     recentSets: 'Your AI sets',
@@ -1386,9 +1439,9 @@ export const en = {
     title: 'Profile',
     classLine: 'Class {class} · {board} · {medium} medium',
     premiumActive: 'Plan active',
-    premiumTill: 'Till {date} · renews manually',
+    premiumTill: 'Open until {date}. It does not renew by itself.',
     freeMode: 'No plan yet',
-    freeModeSub: 'Plans are managed on the website',
+    freeModeSub: 'Choose a plan to open every chapter',
     upgrade: 'Upgrade',
     levelLine: '{xp} XP · Level {level}',
     toNextLevel: '{n} to go',
@@ -1453,7 +1506,7 @@ export const en = {
     readingSize: 'Reading text size',
     notificationsSection: 'Notifications',
     studyReminder: 'Study reminder',
-    studyReminderSub: 'Daily · {time}',
+    studyReminderSub: 'A tip at 2 PM and a reminder at {time}',
     reminderTimeTitle: 'Reminder time',
     streakAlerts: 'Streak alerts',
     streakAlertsSub: 'Remind me before I break a streak',
@@ -1462,7 +1515,7 @@ export const en = {
     channelPushSub: 'Free, and the fastest way to reach you',
     channelPushEnable: 'Turn on for this browser',
     channelEmail: 'Email',
-    channelEmailSub: 'Receipts and your monthly report card',
+    channelEmailSub: 'Receipts and plan reminders',
     storage: 'Storage',
     manageDownloads: 'Manage downloads',
     chaptersCount: '{n} chapters',
@@ -1477,6 +1530,15 @@ export const en = {
     terms: 'Terms and privacy',
     deleteAccount: 'Delete my account',
     deleteAccountSub: 'How to have everything removed',
+    /* The Android settings rows: Terms and the privacy policy apart, and the
+       delete row opening the in-app deletion screen. */
+    termsOfUse: 'Terms of use',
+    privacyPolicy: 'Privacy policy',
+    deleteAccountAppSub: 'Remove your account and its data',
+    /* Android's payment history lists receipts only, so its empty state
+       does not talk about paying. */
+    noReceiptsTitle: 'No receipts',
+    noReceiptsBody: 'Receipts for this account are listed here.',
 
     helpTitle: 'Help and support',
     emailUs: 'Email us: {email}',
@@ -1485,14 +1547,21 @@ export const en = {
     faq1A:
       'Plans are managed on our website, matricmate.co, never inside the app. Renew there with the same account you use here, then open Profile → Subscription and tap Check again.',
     faq2Q: 'Does it work without internet?',
-    faq2A: 'Downloaded chapters, audio and MCQs work offline. The AI tutor and timed tests need a connection.',
+    faq2A: 'Downloaded chapters work offline: their notes, audio lesson, flashcards, questions and chapter test. The AI tutor and anything you have not downloaded need a connection.',
     /* The website's own answers to the two questions above. The ones above are
        written for the Android app: on the website they sent the student to
        "our website" to renew, and promised downloads the website does not have. */
     faq1AWeb:
-      'Open Settings → Subscription and pay for a new plan there. A plan is one payment for a fixed period and never renews on its own, so nothing is charged until you choose to. The Android app picks the new plan up on the same account.',
+      'Open Settings → Subscription. It shows your plan, the date it ends and how to get the next one. A plan is one payment for a fixed period and never renews on its own, so nothing is charged until you choose to. The Android app picks the new plan up on the same account.',
     faq2AWeb:
       'The website needs an internet connection. Downloading chapters, audio and MCQs to use offline is part of the Android app.',
+    /* How to renew while plans are switched on by hand (no online payment yet). */
+    faq1AWebManual:
+      'Open Settings, tap your plan, then Renew. Paying online has not opened yet, so the page shows how to reach us: our team tells you how to pay and switches the plan on for your account. A plan never renews by itself.',
+    /* The limit per plan, from AI_QUOTA: fifty was said to every student. */
+    faq3APlans:
+      'Premium includes {premium} AI questions a day and the free trial {trial}. Basic has no AI. The count starts again every night, which keeps MatricMate affordable for everyone.',
+    whatsappUs: 'WhatsApp us',
     faq3Q: 'Why is the AI limited each day?',
     faq3A: 'The AI tutor has a daily limit of 50 questions, which keeps MatricMate affordable for everyone.',
     faq4Q: 'Can my parents see my progress?',
@@ -1506,6 +1575,44 @@ export const en = {
     reminderTimeLabel: '{h}:00 PM',
     /* The push switch when the phone itself has notifications turned off. */
     channelPushOff: 'Turned off in phone settings. Tap to turn it on.',
+    /* The website's Settings. The class card says what the class decides,
+       and, inside the 7-day wait, when it can change again. */
+    classCardSub: 'Your notes, practice and study plan follow this class. Changing it starts your progress over.',
+    classWaitNote: 'You changed class on {date}. You can change it again from {next}.',
+    /* The plan card's label: it is the way to the plan and its renewal. */
+    managePlan: 'Manage',
+    renew: 'Renew',
+    /* The website's deletion screen, alongside the shared deletion.* lines. */
+    delRefund: 'Deleting does not refund a plan. If you want money back, ask for it before you delete, because afterwards we can no longer see your account.',
+    delHowItWorks: 'How deletion works',
+    delKeep: 'Keep my account',
+    delSignedOut: 'You were signed out. Log in again, then delete your account.',
+    delFailed: 'Your account was not deleted. Try again, or email {email}.',
+  },
+
+  /* Android: deleting the account from inside the app (Settings, then
+     Delete my account). The server route does the deleting; see
+     packages/core/src/account.ts. No price and no refund talk here. */
+  deletion: {
+    title: 'Delete my account',
+    intro: 'This deletes your MatricMate account for good, on this app and on the website. It cannot be undone.',
+    goneTitle: 'What is deleted',
+    gone1: 'Your login, name, email, mobile number and school',
+    gone2: 'Every answer, score, test, streak and XP, and your reading progress',
+    gone3: 'Your AI tutor chats, AI sets and notifications',
+    gone4: 'Your plan, including any days left on it',
+    keptTitle: 'What is kept',
+    kept1: 'Payment records (date, plan and reference), which we keep for our accounts. They stay linked to no account.',
+    typeLabel: 'Type DELETE to confirm',
+    typePlaceholder: 'DELETE',
+    confirmTitle: 'Delete your account now?',
+    confirmBody: 'Everything listed on the page is removed straight away, and you are signed out.',
+    confirmCta: 'Yes, delete it',
+    failed: 'Your account was not deleted. Try again in a moment.',
+    offline: 'Connect to the internet to delete your account.',
+    webLink: 'How deletion works, on our website',
+    doneTitle: 'Your account was deleted',
+    doneBody: 'Everything on it has been removed. Thank you for studying with MatricMate.',
   },
 
   states: {
@@ -1569,6 +1676,11 @@ export const ur: typeof en = {
     previousSection: 'پچھلا حصہ',
     nextSection: 'اگلا حصہ',
     markDone: 'مکمل کا نشان لگائیں',
+    clearSearch: 'تلاش صاف کریں',
+    chatOptions: 'اس چیٹ کا نام بدلیں یا اسے مٹائیں',
+    showPassword: 'پاس ورڈ دکھائیں',
+    hidePassword: 'پاس ورڈ چھپائیں',
+    slideOf: 'سلائیڈ {n} از {total}',
   },
 
   /* Each language is named in its own script, the way every language picker
@@ -1716,6 +1828,13 @@ export const ur: typeof en = {
     school: 'اسکول (اختیاری)',
     schoolPlaceholder: 'اپنے اسکول کا نام',
     errSchoolLength: 'اسکول کا نام 2 سے 120 حروف کا ہونا چاہیے۔',
+    agreeLine: 'آگے بڑھنے کا مطلب ہے کہ آپ {terms} اور {privacy} مانتے ہیں۔',
+    termsWord: 'شرائط',
+    privacyWord: 'پرائیویسی پالیسی',
+    teacherCode: 'اُستاد کا کوڈ (اختیاری)',
+    teacherCodePlaceholder: 'صرف اگر آپ کے اُستاد نے دیا ہو',
+    errTeacherCode: 'اُستاد کا کوڈ 4 سے 16 حروف اور ہندسوں کا ہوتا ہے۔',
+    teacherCodeMissed: 'یہ اُستاد کا کوڈ نہیں ملا، اس لیے آپ کے اکاؤنٹ سے کوئی اُستاد نہیں جُڑا۔',
     roleAdmin: 'ایڈمنسٹریٹر',
     rolePartner: 'ریفرل پارٹنر',
   },
@@ -1890,7 +2009,7 @@ export const ur: typeof en = {
     selected: 'چن لیا',
     chooseLength: 'یہ مدت چنیں',
     premiumIncludes: 'پریمیم میں شامل',
-    noChargeToday: 'جب چاہیں منسوخ کریں · خود سے کچھ تجدید نہیں ہوتا',
+    noChargeToday: 'ایک ہی ادائیگی · خود سے کچھ تجدید نہیں ہوتا',
   },
 
   tabs: {
@@ -1920,6 +2039,7 @@ export const ur: typeof en = {
     taskMcq: '{chapter} کے 10 MCQs',
     taskCards: 'فلیش کارڈز · 10 کارڈز',
     taskWeak: '{topic} دہرائیں · ابھی تک {n}%',
+    autoDone: 'آپ کی پڑھائی سے مکمل: {task}',
     continueLearning: 'پڑھائی جاری رکھیں',
     nextContinue: '{chapter} جاری رکھیں',
     nextFix: '{topic} ٹھیک کریں',
@@ -1994,6 +2114,7 @@ export const ur: typeof en = {
 
   notifications: {
     title: 'اطلاعات',
+    newLabel: 'نیا',
     today: 'آج',
     earlier: 'پہلے',
     emptyTitle: 'ابھی کوئی اطلاع نہیں',
@@ -2002,13 +2123,11 @@ export const ur: typeof en = {
     paymentBody: 'پریمیم {date} تک فعال ہے۔',
     paymentBodyBasic: 'بیسک {date} تک فعال ہے۔',
     welcomeTitle: 'MatricMate میں خوش آمدید',
-    welcomeBody: 'آپ کے نوٹس، پرانے پرچے اور اے آئی ٹیوٹر تیار ہیں۔ کوئی بھی باب کھولیں اور شروع کریں۔',
-    reminderTitle: 'آج کچھ نہیں پڑھا',
-    reminderBody: 'ابھی چند سوال بھی شمار ہوتے ہیں۔ دس منٹ بھی آپ کو آگے رکھتے ہیں۔',
+    welcomeBody: 'آپ کے نوٹس، مشق اور پرانے پرچے تیار ہیں۔ کوئی بھی باب کھولیں اور شروع کریں۔',
     streakTitle: '{n} دن کا تسلسل خطرے میں',
     streakBody: 'آج آپ نے کچھ نہیں پڑھا۔ رات بارہ بجے سے پہلے چند سوال کر لیں تو تسلسل بچ جائے گا۔',
-    reportTitle: 'آپ کا رپورٹ کارڈ تیار ہے',
-    reportBody: 'اس ہفتے کی کارکردگی پر آپ کے کوچ کی تازہ رائے۔',
+    reportTitle: 'آپ کے کوچ کی نئی رائے',
+    reportBody: 'آپ کی پڑھائی کیسی چل رہی ہے اور آگے کیا کریں، اس پر کوچ کی تازہ رائے۔',
 
     streakLongTitle: '{n} دن ضائع نہ کریں',
     streakLongBody: 'یہ ایک ہفتے سے زیادہ کی محنت ہے۔ آج رات چند سوال اسے بچا لیں گے۔',
@@ -2022,8 +2141,6 @@ export const ur: typeof en = {
     resumeChapterBody: 'جہاں چھوڑا تھا وہیں سے شروع کرنے میں دس منٹ لگیں گے۔',
     weakTopicTitle: '{topic} آپ کا کمزور ترین موضوع ہے',
     weakTopicBody: 'اس میں آپ {pct}% پر ہیں۔ آج رات دس سوال اسے بہتر کر دیں گے۔',
-    planLeftTitle: 'آج کے منصوبے میں {n} باقی',
-    planLeftBody: 'یہ ایک ہی نشست کے لیے بنایا گیا تھا۔ ابھی وقت ہے۔',
 
     comeback1Title: 'آج کچھ نہیں پڑھا',
     comeback1Body: 'ابھی چند سوال بھی شمار ہوتے ہیں۔ دس منٹ بھی آپ کو آگے رکھتے ہیں۔',
@@ -2060,8 +2177,6 @@ export const ur: typeof en = {
     moreTodayBody: 'مزید {k} سوال، اور آج اس ہفتے کا آپ کا بہترین دن ہوگا۔',
     moreSetTitle: 'آج {n} سوال',
     moreSetBody: 'سونے سے پہلے دس سوال اور کر لیں، رفتار بنی رہے گی۔',
-    planDoneTitle: 'آج کا منصوبہ مکمل',
-    planDoneBody: 'تینوں کام مکمل۔ نصاب ایسے ہی ختم ہوتا ہے، روز ایک قدم۔',
     keepGoingTitle: 'آج اچھا آغاز',
     keepGoingBody: 'جو پڑھا اس پر دس سوال حل کریں، یاد پکی ہو جائے گی۔',
 
@@ -2129,7 +2244,17 @@ export const ur: typeof en = {
     planEndedBody: 'آپ کا پلان {date} کو ختم ہو گیا۔ آپ کی پیش رفت محفوظ ہے۔ matricmate.co پر تجدید کریں اور سب کچھ دوبارہ کھل جائے گا۔',
     seePlans: 'پلان دیکھیں',
     renew: 'پلان کی تجدید کریں',
-    linkNote: 'یہ بٹن آپ کو matricmate.co پر سائن ان کر دیتا ہے۔ یہ 7 دن تک کام کرتا ہے۔',
+    linkNote: 'یہ بٹن آپ کو matricmate.co پر سائن ان کر دیتا ہے۔ یہ 7 دن کے اندر ایک بار کام کرتا ہے۔',
+    receiptBody: 'ہمیں پریمیم کے لیے {amount} موصول ہو گئے۔ یہ {date} تک فعال ہے۔',
+    receiptBodyBasic: 'ہمیں بیسک کے لیے {amount} موصول ہو گئے۔ یہ {date} تک فعال ہے۔',
+    receiptNote: 'ادائیگی کا حوالہ: {reference}۔ یہ ای میل اپنی رسید کے طور پر رکھیں۔',
+    stopEmails: 'یہ ای میلز بند کریں',
+    unsubDoneTitle: 'اب ای میل نہیں آئے گی',
+    unsubDoneBody: 'میٹرک میٹ آپ کو اب ای میل نہیں بھیجے گا۔ ایپ کے اندر اطلاعات جاری رہیں گی، اور آپ پروفائل میں ”اطلاعات“ سے ای میل دوبارہ چالو کر سکتے ہیں۔',
+    unsubBadTitle: 'یہ لنک کام نہیں کر سکا',
+    unsubBadBody: 'ہو سکتا ہے کاپی کرتے ہوئے ادھورا رہ گیا ہو۔ آپ ایپ میں پروفائل، پھر ”اطلاعات“ سے ای میل بند کر سکتے ہیں۔',
+    unsubRetryTitle: 'دوبارہ کوشش کریں',
+    unsubRetryBody: 'ابھی محفوظ نہیں ہو سکا۔ ایک منٹ بعد لنک دوبارہ کھولیں۔',
   },
 
   trialStart: {
@@ -2181,7 +2306,7 @@ export const ur: typeof en = {
     trialLine: 'مفت آزمائش · {subject}',
     checking: 'دیکھ رہے ہیں…',
     faqPlanQ: 'میرا پلان بدل گیا لیکن ایپ میں پرانا ہی دکھ رہا ہے',
-    faqPlanA: 'پروفائل میں سبسکرپشن کھولیں اور ”دوبارہ دیکھیں“ دبائیں۔ ایپ ہر بار کھلنے پر بھی خود دیکھ لیتی ہے۔',
+    faqPlanA: 'ترتیبات (اوپر گیئر کا نشان) کھولیں، اپنے پلان پر ٹیپ کریں، پھر ”دوبارہ چیک کریں“ دبائیں۔ ایپ ہر بار کھلنے پر بھی خود دیکھ لیتی ہے۔',
     faqAiA: 'AI ٹیوٹر کی روز کی ایک حد ہے، جس سے میٹرک میٹ سب کے لیے سستی رہتی ہے۔ یہ ہر رات نئی ہو جاتی ہے۔',
   },
 
@@ -2207,6 +2332,7 @@ export const ur: typeof en = {
     chapterN: 'باب {n}',
     percentComplete: '{n}% مکمل',
     subjectsOnList: 'آپ کی فہرست میں {n} مضامین',
+    subjectsOnListOne: 'آپ کی فہرست میں 1 مضمون',
     thisChapter: 'یہ باب',
     upNext: 'آگے کیا',
     coachStart: 'نوٹس سے شروع کریں۔ MCQs انہی حصوں سے بنتے ہیں۔',
@@ -2223,6 +2349,7 @@ export const ur: typeof en = {
     premiumChapter: 'پریمیم',
     premiumNote: 'ہر باب پلان کے ساتھ کھلتا ہے۔',
     notOnPaper: 'سالانہ پرچے میں نہیں',
+    notOnPaperBody: 'پڑھنا چاہیں تو پڑھ لیں۔ یہ امتحان میں نہیں آئے گا، اس لیے آپ کا منصوبہ اور ٹیسٹ اسے شامل نہیں کرتے۔',
     chapterCleared: 'باب مکمل!',
     emptyChapterTitle: 'یہاں دہرانے کے لیے کچھ نہیں',
     emptyChapterBody: 'اس باب کے لیے کوئی نوٹس، آڈیو، فلیش کارڈز یا سوال نہیں ہیں۔',
@@ -2296,6 +2423,8 @@ export const ur: typeof en = {
     oneLanguageUr: 'یہ مضمون اردو میں پڑھایا جاتا ہے، اس لیے اس کا سبق ہر طالب علم کے لیے اردو میں ہے۔',
     oneLanguageEn: 'یہ مضمون انگریزی میں پڑھایا جاتا ہے، اس لیے اس کا سبق ہر طالب علم کے لیے انگریزی میں ہے۔',
     voiceMaking: 'اس سبق کی نئی آواز آپ کے سنتے سنتے تیار ہو رہی ہے، اس لیے یہ عام رفتار سے چلے گا۔ آگے پیچھے جانا اور رفتار بدلنا چند منٹ میں، اس کے تیار ہوتے ہی واپس آ جائے گا۔',
+    resumeFrom: '{time} سے جاری رکھیں',
+    loading: 'سبق لوڈ ہو رہا ہے',
   },
 
   downloads: {
@@ -2386,10 +2515,12 @@ export const ur: typeof en = {
     askAi: 'AI سے پوچھیں',
     nextQuestion: 'اگلا سوال',
     seeResult: 'نتیجہ دیکھیں',
+    resultPageTitle: 'آپ کا نتیجہ',
     levelUp: 'لیول {n} کھل گیا!',
     combo: 'لگاتار {n} صحیح!',
     noItemsTitle: 'ابھی یہاں کچھ نہیں',
     noItemsBody: 'اس باب میں یہ مشق ابھی موجود نہیں۔',
+    offlineChapterBody: 'یہ باب آپ کے فون میں محفوظ نہیں۔ انٹرنیٹ سے جُڑیں، یا سگنل ہو تو اسے ڈاؤن لوڈ کر لیں۔',
     noSession: 'کوئی نشست نہیں چل رہی',
     noSessionBody: 'سوال دیکھنے کے لیے پہلے مشق کی نشست شروع کریں۔',
     setUpSession: 'نشست بنائیں',
@@ -2417,6 +2548,9 @@ export const ur: typeof en = {
     noChangeAfter: 'جمع کرانے کے بعد جواب نہیں بدل سکتے۔',
     submitNow: 'اب جمع کرائیں',
     keepWorking: 'ابھی کرنے دیں',
+    leaveTestTitle: 'ٹیسٹ چھوڑ دیں؟',
+    leaveTestBody: 'آپ کے جواب محفوظ نہیں ہوں گے اور یہ ٹیسٹ شمار نہیں ہو گا۔',
+    leaveTest: 'ٹیسٹ چھوڑ دیں',
     endSetTitle: 'یہ سیٹ ختم کرنا ہے؟',
     endSetBody: 'آپ نے {b} میں سے {a} سوال حل کیے ہیں۔ نتیجہ صرف حل کیے گئے سوالوں پر بنے گا۔',
     endSetNow: 'ختم کر کے نتیجہ دیکھیں',
@@ -2508,7 +2642,11 @@ export const ur: typeof en = {
     toppersIntro: 'پرانا پرچہ بتاتا ہے کیا پوچھا گیا تھا۔ ٹاپر کی کاپی دکھاتی ہے وہ جواب اصل میں کیسے لکھا گیا: 3 نمبر اور 6 نمبر کے لیے کتنا لکھنا ہے، کام کیسے لکھا جاتا ہے۔ یہ بورڈ کی اپنی کاپیاں ہیں، FBISE کے ممتحنین نے جانچی ہیں۔',
     toppersScript: 'کاپی {n}',
     toppersCount: '{n} کاپیاں',
+    toppersCountOne: '1 کاپی',
     toppersFootnote: 'یہ بورڈ کی اپنی ویب سائٹ پر نئے ٹیب میں کھلتے ہیں۔',
+    papersFootnoteApp: 'یہ آپ کے براؤزر میں، بورڈ کی اپنی ویب سائٹ پر کھلتے ہیں۔ FBISE جب نیا سال شائع کرتا ہے، ہم شامل کر دیتے ہیں۔',
+    papersFootnotePunjabApp: 'یہ آپ کے براؤزر میں، ہر بورڈ کی اپنی ویب سائٹ پر کھلتے ہیں۔ پنجاب کے بورڈ جب نئے پرچے شائع کرتے ہیں، ہم شامل کر دیتے ہیں۔',
+    toppersFootnoteApp: 'یہ آپ کے براؤزر میں، بورڈ کی اپنی ویب سائٹ پر کھلتے ہیں۔',
     toppersSource: 'بورڈ کی SSC {year} ٹاپر کاپیوں سے۔',
     askWhyWrong: 'میں نے ”{mine}“ جواب دیا، لیکن ”{q}“ کا درست جواب ”{right}“ ہے۔ میرا جواب غلط کیوں ہے؟',
     askWhyBlank: '”{before} ____ {after}“ میں ”{a}“ کیوں آتا ہے؟',
@@ -2556,6 +2694,7 @@ export const ur: typeof en = {
     planNeeded: 'اے آئی ٹیوٹر پریمیم کے ساتھ ہے۔',
     aiNotInPlan: 'اے آئی ٹیوٹر آپ کے پلان میں شامل نہیں۔',
     notInTrial: 'آپ کی مفت آزمائش میں ایک مضمون کھلا ہے، اور یہ وہ نہیں۔',
+    cutShort: '(یہ جواب بہت لمبا تھا اس لیے ادھورا رہ گیا۔ مجھ سے کہیں کہ آگے بتاؤں۔)',
     offline: 'ٹیوٹر کے لیے انٹرنیٹ چاہیے۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔',
     refused: 'ٹیوٹر اس سوال کا جواب نہیں دے سکا۔ اسے دوسرے انداز میں پوچھیں۔',
     errorReply: 'ہماری طرف سے کچھ غلط ہوا۔ آپ کا سوال شمار نہیں ہوا، دوبارہ کوشش کریں۔',
@@ -2576,6 +2715,9 @@ export const ur: typeof en = {
     pickCount: 'کتنے',
     building: 'آپ کا سیٹ بن رہا ہے…',
     buildStopped: 'انتظار روک دیا۔ اگر بن گیا تو آپ کے سیٹس میں ہو گا۔',
+    buildTimedOut: 'اس بار معمول سے زیادہ وقت لگ رہا ہے۔ یہ ابھی لکھا جا رہا ہے، اور تیار ہوتے ہی آپ کے AI سیٹس میں آ جائے گا۔',
+    paperTimedOut: 'اس بار معمول سے زیادہ وقت لگ رہا ہے۔ یہ ابھی لکھا جا رہا ہے، اور تیار ہوتے ہی آپ کے نمونہ پرچوں میں آ جائے گا۔',
+    readOnlyNote: 'آپ اپنی محفوظ گفتگو پڑھ سکتے ہیں۔ AI ٹیوٹر سے سوال پوچھنا آپ کے پلان میں شامل نہیں۔',
     buildIt: 'میرا سیٹ بنائیں',
     aiMade: 'AI نے آپ کے لیے بنایا',
     recentSets: 'آپ کے AI سیٹ',
@@ -2775,9 +2917,9 @@ export const ur: typeof en = {
     title: 'پروفائل',
     classLine: 'کلاس {class} · {board} · {medium} میڈیم',
     premiumActive: 'پلان فعال ہے',
-    premiumTill: '{date} تک · تجدید آپ خود کرتے ہیں',
+    premiumTill: '{date} تک کھلا ہے۔ یہ خود بخود نہیں بڑھتا۔',
     freeMode: 'ابھی کوئی پلان نہیں',
-    freeModeSub: 'پلان ویب سائٹ پر منظم ہوتا ہے',
+    freeModeSub: 'ہر باب کھولنے کے لیے پلان چنیں',
     upgrade: 'اپ گریڈ کریں',
     levelLine: '{xp} XP · لیول {level}',
     toNextLevel: '{n} باقی',
@@ -2838,7 +2980,7 @@ export const ur: typeof en = {
     readingSize: 'پڑھنے کے متن کا سائز',
     notificationsSection: 'اطلاعات',
     studyReminder: 'پڑھائی کی یاد دہانی',
-    studyReminderSub: 'روز · {time}',
+    studyReminderSub: 'دوپہر 2 بجے ایک مشورہ اور {time} پر یاد دہانی',
     reminderTimeTitle: 'یاد دہانی کا وقت',
     streakAlerts: 'تسلسل کی اطلاع',
     streakAlertsSub: 'تسلسل ٹوٹنے سے پہلے یاد دلائیں گے',
@@ -2847,7 +2989,7 @@ export const ur: typeof en = {
     channelPushSub: 'مفت، اور آپ تک پہنچنے کا تیز ترین راستہ',
     channelPushEnable: 'اس براؤزر پر آن کریں',
     channelEmail: 'ای میل',
-    channelEmailSub: 'رسیدیں اور ماہانہ رپورٹ کارڈ',
+    channelEmailSub: 'رسیدیں اور پلان کی یاد دہانیاں',
     storage: 'جگہ',
     manageDownloads: 'ڈاؤن لوڈ منظم کریں',
     chaptersCount: '{n} ابواب',
@@ -2858,6 +3000,11 @@ export const ur: typeof en = {
     terms: 'شرائط اور پرائیویسی',
     deleteAccount: 'میرا اکاؤنٹ حذف کریں',
     deleteAccountSub: 'سب کچھ ہٹوانے کا طریقہ',
+    termsOfUse: 'استعمال کی شرائط',
+    privacyPolicy: 'پرائیویسی پالیسی',
+    deleteAccountAppSub: 'اپنا اکاؤنٹ اور اس کا ڈیٹا حذف کریں',
+    noReceiptsTitle: 'کوئی رسید نہیں',
+    noReceiptsBody: 'اس اکاؤنٹ کی رسیدیں یہاں درج ہوتی ہیں۔',
 
     helpTitle: 'مدد اور معاونت',
     emailUs: 'ای میل کریں: {email}',
@@ -2866,10 +3013,15 @@ export const ur: typeof en = {
     faq1A:
       'پلان ہماری ویب سائٹ matricmate.co پر منظم ہوتے ہیں، ایپ میں کبھی نہیں۔ وہاں اسی اکاؤنٹ سے تجدید کریں جو یہاں استعمال کرتے ہیں، پھر پروفائل ← سبسکرپشن کھول کر ”دوبارہ چیک کریں“ دبائیں۔',
     faq2Q: 'کیا بغیر انٹرنیٹ چلتا ہے؟',
-    faq2A: 'ڈاؤن لوڈ کیے ابواب، آڈیو اور MCQs آف لائن چلتے ہیں۔ AI ٹیوٹر اور وقت والے ٹیسٹ کے لیے انٹرنیٹ چاہیے۔',
+    faq2A: 'ڈاؤن لوڈ کیے ابواب آف لائن چلتے ہیں: ان کے نوٹس، آڈیو سبق، فلیش کارڈز، سوالات اور باب کا ٹیسٹ۔ AI ٹیوٹر اور جو کچھ ڈاؤن لوڈ نہیں کیا، اس کے لیے انٹرنیٹ چاہیے۔',
     faq1AWeb:
-      'ترتیبات ← سبسکرپشن کھولیں اور وہیں نیا پلان لیں۔ پلان ایک مقررہ مدت کے لیے ایک ہی ادائیگی ہے اور خود بخود تجدید نہیں ہوتا، اس لیے جب تک آپ خود نہ چاہیں کوئی پیسے نہیں کٹتے۔ اینڈرائیڈ ایپ بھی اسی اکاؤنٹ پر نیا پلان خود لے لیتی ہے۔',
+      'ترتیبات ← سبسکرپشن کھولیں۔ وہاں آپ کا پلان، اس کے ختم ہونے کی تاریخ اور اگلا پلان لینے کا طریقہ لکھا ہے۔ پلان ایک مقررہ مدت کے لیے ایک ہی ادائیگی ہے اور خود بخود تجدید نہیں ہوتا، اس لیے جب تک آپ خود نہ چاہیں کوئی پیسے نہیں کٹتے۔ اینڈرائیڈ ایپ بھی اسی اکاؤنٹ پر نیا پلان خود لے لیتی ہے۔',
     faq2AWeb: 'ویب سائٹ کے لیے انٹرنیٹ چاہیے۔ ابواب، آڈیو اور MCQs کو آف لائن استعمال کے لیے ڈاؤن لوڈ کرنا اینڈرائیڈ ایپ میں ہے۔',
+    faq1AWebManual:
+      'ترتیبات کھولیں، اپنے پلان پر ٹیپ کریں، پھر ”تجدید کریں“ دبائیں۔ آن لائن ادائیگی ابھی شروع نہیں ہوئی، اس لیے وہاں لکھا ہے کہ ہم سے کیسے رابطہ کریں: ہماری ٹیم ادائیگی کا طریقہ بتاتی ہے اور پلان آپ کے اکاؤنٹ پر چالو کر دیتی ہے۔ پلان کبھی خود بخود نہیں بڑھتا۔',
+    faq3APlans:
+      'پریمیم میں روزانہ {premium} AI سوال شامل ہیں اور مفت آزمائش میں {trial}۔ بیسک میں AI شامل نہیں۔ گنتی ہر رات نئے سرے سے شروع ہوتی ہے، جس سے میٹرک میٹ سب کے لیے سستی رہتی ہے۔',
+    whatsappUs: 'واٹس ایپ پر رابطہ کریں',
     faq3Q: 'AI کی روز کی حد کیوں ہے؟',
     faq3A: 'AI ٹیوٹر کی حد روز 50 سوال ہے، جس سے ایپ سب کے لیے سستی رہتی ہے۔',
     faq4Q: 'کیا والدین میری پیش رفت دیکھ سکتے ہیں؟',
@@ -2881,6 +3033,37 @@ export const ur: typeof en = {
     replyTime: 'ہم ہر رپورٹ پڑھتے ہیں۔ جواب اسی ای میل پر آتا ہے جہاں سے آپ لکھتے ہیں، مگر وقت کا وعدہ ابھی نہیں کر سکتے۔',
     reminderTimeLabel: 'شام {h} بجے',
     channelPushOff: 'فون کی سیٹنگز میں بند ہے۔ آن کرنے کے لیے ٹیپ کریں۔',
+    classCardSub: 'آپ کے نوٹس، مشق اور مطالعے کا منصوبہ اسی کلاس کے مطابق ہیں۔ کلاس بدلنے سے پیش رفت نئے سرے سے شروع ہوتی ہے۔',
+    classWaitNote: 'آپ نے {date} کو کلاس بدلی تھی۔ {next} سے دوبارہ بدل سکیں گے۔',
+    managePlan: 'دیکھیں',
+    renew: 'تجدید کریں',
+    delRefund: 'اکاؤنٹ حذف کرنے سے پلان کی رقم واپس نہیں ہوتی۔ اگر رقم واپس چاہیے تو حذف کرنے سے پہلے کہیں، کیونکہ بعد میں ہم آپ کا اکاؤنٹ نہیں دیکھ سکتے۔',
+    delHowItWorks: 'حذف کرنے کا طریقہ',
+    delKeep: 'اکاؤنٹ رہنے دیں',
+    delSignedOut: 'آپ سائن آؤٹ ہو گئے تھے۔ دوبارہ لاگ اِن کریں، پھر اکاؤنٹ حذف کریں۔',
+    delFailed: 'آپ کا اکاؤنٹ حذف نہیں ہوا۔ دوبارہ کوشش کریں، یا {email} پر ای میل کریں۔',
+  },
+
+  deletion: {
+    title: 'میرا اکاؤنٹ حذف کریں',
+    intro: 'اس سے آپ کا MatricMate اکاؤنٹ ہمیشہ کے لیے حذف ہو جائے گا، اس ایپ پر بھی اور ویب سائٹ پر بھی۔ یہ واپس نہیں ہو سکتا۔',
+    goneTitle: 'کیا حذف ہو گا',
+    gone1: 'آپ کا لاگ اِن، نام، ای میل، موبائل نمبر اور اسکول',
+    gone2: 'ہر جواب، اسکور، ٹیسٹ، اسٹریک اور XP، اور آپ کی پڑھائی کی پیش رفت',
+    gone3: 'AI ٹیوٹر سے آپ کی گفتگو، AI سیٹس اور اطلاعات',
+    gone4: 'آپ کا پلان، اس کے باقی دنوں سمیت',
+    keptTitle: 'کیا رکھا جائے گا',
+    kept1: 'ادائیگی کا ریکارڈ (تاریخ، پلان اور حوالہ نمبر)، جو ہم اپنے حساب کتاب کے لیے رکھتے ہیں۔ یہ کسی اکاؤنٹ سے جُڑا نہیں رہتا۔',
+    typeLabel: 'تصدیق کے لیے DELETE لکھیں',
+    typePlaceholder: 'DELETE',
+    confirmTitle: 'ابھی اکاؤنٹ حذف کرنا ہے؟',
+    confirmBody: 'صفحے پر لکھی ہر چیز فوراً حذف ہو جائے گی، اور آپ سائن آؤٹ ہو جائیں گے۔',
+    confirmCta: 'ہاں، حذف کریں',
+    failed: 'آپ کا اکاؤنٹ حذف نہیں ہوا۔ تھوڑی دیر بعد دوبارہ کوشش کریں۔',
+    offline: 'اکاؤنٹ حذف کرنے کے لیے انٹرنیٹ سے جُڑیں۔',
+    webLink: 'اکاؤنٹ حذف کرنے کا طریقہ، ہماری ویب سائٹ پر',
+    doneTitle: 'آپ کا اکاؤنٹ حذف ہو گیا',
+    doneBody: 'اس میں موجود سب کچھ ہٹا دیا گیا ہے۔ MatricMate کے ساتھ پڑھنے کا شکریہ۔',
   },
 
   states: {

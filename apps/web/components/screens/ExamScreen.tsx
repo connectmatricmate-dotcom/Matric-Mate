@@ -110,8 +110,40 @@ export function ExamScreen() {
     if (s?.mcqs.length && left === 0) submit();
   }, [s, left, submit]);
 
+  /*
+   * Leaving a paper that is still open, by the sidebar, the tabs, a reload or
+   * closing the tab, silently threw it away: no answers saved, no result, the
+   * clock still running in memory. The intro warns about it; now the paper
+   * asks first. Android turns the hardware Back into the same question.
+   */
+  const [leaveTo, setLeaveTo] = useState<string | null>(null);
+  const open = !!s?.mcqs.length && !handedIn.has(s) && !leaving;
+  useEffect(() => {
+    if (!open) return;
+    const onUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+      const url = new URL(a.href, window.location.href);
+      if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setLeaveTo(url.pathname + url.search);
+    };
+    window.addEventListener('beforeunload', onUnload);
+    document.addEventListener('click', onClick, true);
+    return () => {
+      window.removeEventListener('beforeunload', onUnload);
+      document.removeEventListener('click', onClick, true);
+    };
+  }, [open]);
+
   const mcq = s?.mcqs[i];
-  if (!s || !mcq) return <NoSession />;
+  // A refreshed test starts again from its intro, where a test is set up.
+  if (!s || !mcq) return <NoSession href="/session/exam-intro" label={t('practice.exam')} />;
 
   const unanswered = s.mcqs.filter((m) => answers[m.id] == null).length;
   const mm = Math.floor(left / 60);
@@ -129,7 +161,7 @@ export function ExamScreen() {
         const isFlagged = flags.includes(m.id);
         const current = n === i;
         const style = current
-          ? 'bg-orange text-onbrand'
+          ? 'bg-orangefill text-onbrand'
           : answered
             ? 'bg-teal text-onbrand'
             : isFlagged
@@ -142,7 +174,7 @@ export function ExamScreen() {
             aria-label={`${t('session.questionOf', { a: n + 1, b: s.mcqs.length })}`}
             aria-current={current ? 'true' : undefined}
             onClick={() => setI(n)}
-            className={`h-10 w-10 rounded-[12px] text-[12.5px] font-extrabold transition-[background-color,filter] duration-200 hover:brightness-95 ${style}`}
+            className={`h-10 w-10 pointer-coarse:h-11 pointer-coarse:w-11 rounded-[12px] text-[12.5px] font-extrabold transition-[background-color,filter] duration-200 hover:brightness-95 ${style}`}
           >
             {n + 1}
           </button>
@@ -269,6 +301,22 @@ export function ExamScreen() {
         tone="orange"
         loading={leaving}
         onConfirm={submit}
+      />
+
+      <Confirm
+        open={leaveTo !== null}
+        onClose={() => setLeaveTo(null)}
+        title={t('session.leaveTestTitle')}
+        body={t('session.leaveTestBody')}
+        confirmLabel={t('session.leaveTest')}
+        cancelLabel={t('session.keepWorking')}
+        onConfirm={() => {
+          const to = leaveTo;
+          setLeaveTo(null);
+          // The paper is abandoned, not handed in: nothing is recorded.
+          session.clear();
+          if (to) router.push(to);
+        }}
       />
     </Page>
   );

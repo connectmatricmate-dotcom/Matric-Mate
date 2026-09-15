@@ -18,8 +18,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useCallback, useRef, useState } from 'react';
+import { createPortal, useFormStatus } from 'react-dom';
 import type { IconName } from '@matricmate/core';
 import { Icon, Wordmark } from '@/components/ui/primitives';
+import { Confirm } from '@/components/ui/sheet';
 
 export type StaffNavItem = {
   href: string;
@@ -163,23 +166,57 @@ export function StaffShell({
   );
 }
 
-/** The sign-out control, styled for the sidebar card and the phone header. */
+/**
+ * The sign-out control, styled for the sidebar card and the phone header.
+ *
+ * Worded on a phone too, where it was a bare icon beside the wordmark that a
+ * teacher had to guess at, and it asks first: on a phone it sits where a thumb
+ * lands reaching for the top of the page, and a slip meant typing a password
+ * back in. It submits the sign-out form it is placed in.
+ */
 export function SignOutButton({ compact = false }: { compact?: boolean }) {
-  return compact ? (
-    <button
-      type="submit"
-      aria-label="Log out"
-      className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-[12px] border border-line bg-card text-ink transition-colors duration-200 hover:bg-paper"
-    >
-      <Icon name="logout" size={18} />
-    </button>
-  ) : (
-    <button
-      type="submit"
-      className="flex min-h-9 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-line bg-paper text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:border-red hover:text-red"
-    >
-      <Icon name="logout" size={15} />
-      Log out
-    </button>
+  const button = useRef<HTMLButtonElement>(null);
+  const [asking, setAsking] = useState(false);
+  const close = useCallback(() => setAsking(false), []);
+  const { pending } = useFormStatus();
+
+  return (
+    <>
+      <button
+        ref={button}
+        type="button"
+        disabled={pending}
+        onClick={() => setAsking(true)}
+        className={
+          compact
+            ? 'flex h-11 cursor-pointer items-center gap-1.5 rounded-[12px] border border-line bg-card px-3 text-[12.5px] font-extrabold text-ink transition-colors duration-200 hover:border-red hover:text-red disabled:cursor-not-allowed'
+            : 'flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-line bg-paper text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:border-red hover:text-red disabled:cursor-not-allowed'
+        }
+      >
+        <Icon name="logout" size={compact ? 17 : 15} />
+        {pending ? 'Logging out…' : 'Log out'}
+      </button>
+      {/* Into the body: the phone header is frosted glass (backdrop-filter),
+          which makes it the frame a fixed sheet is drawn in, and the question
+          came up inside a 56px strip. */}
+      {asking
+        ? createPortal(
+            <Confirm
+              open
+              onClose={close}
+              tone="primary"
+              title="Log out of MatricMate?"
+              body="You will need your email and password to sign back in."
+              confirmLabel="Log out"
+              cancelLabel="Stay signed in"
+              onConfirm={() => {
+                setAsking(false);
+                button.current?.form?.requestSubmit();
+              }}
+            />,
+            document.body,
+          )
+        : null}
+    </>
   );
 }

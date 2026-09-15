@@ -7,11 +7,19 @@ The design decisions behind all of this are in `NOTIFICATIONS.md`. This file is 
 
 ## Where things stand
 
+Updated 15 Sep 2026: everything below is live.
+
 | Channel | State | Blocked on |
 | :-- | :-- | :-- |
-| In-app inbox | Live | nothing |
-| Email | Live, but only reaches the Resend account owner | a verified sending domain |
-| Push | Live on Android, verified against the real project | the browser half needs a service worker |
+| In-app inbox | Live on both apps | nothing |
+| Email | Live from `no-reply@matricmate.co` (domain verified in Resend, replies go to `connect@`) | nothing |
+| Push | Live on Android and in the browser (service worker `app/firebase-messaging-sw.js`) | nothing |
+
+Check it any time: `GET /api/health/channels?push=check` with the cron secret validates the Firebase
+login and every registered device, and removes devices Firebase reports dead.
+
+The sections below are the original setup notes, kept for a rebuild. Where they name
+`matricmate.com.pk`, the live domain is `matricmate.co`.
 
 A channel with no credentials returns `unconfigured`, which is deliberately distinct from `failed`
 so that a channel nobody has switched on yet does not look like an outage in the logs.

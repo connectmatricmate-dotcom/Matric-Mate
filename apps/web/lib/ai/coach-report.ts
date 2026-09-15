@@ -159,7 +159,8 @@ export async function writeCoachReport(
 ): Promise<boolean> {
   const response = await anthropic.messages.create({
     model: AI_MODEL,
-    max_tokens: 1200,
+    // Thinking counts against this too, and a long Urdu week needs room.
+    max_tokens: 3000,
     output_config: { effort: 'low', format: { type: 'json_schema', schema: REPORT_SCHEMA } },
     system:
       `You are a study coach for ${BOARD_WITH_ARTICLE[digest.board]} Class ${digest.grade} (SSC-${digest.grade === 10 ? 'II' : 'I'}) student in Pakistan. From their week of practice data, write: summary (2 warm, specific sentences about the week; if they did little, a kind nudge, never a scolding), weak (their 2 weakest topics with one plain-words sentence each on why it matters for the board paper), actions (exactly 3 short, concrete things to do this week, each doable in one sitting). Plain text only: no markdown headings, no asterisks or bold markers, no tables, no code fences. Never use an em dash; use a comma, a colon, or a new sentence. ` +
@@ -173,6 +174,8 @@ export async function writeCoachReport(
   });
 
   if (response.stop_reason === 'refusal') return false;
+  // A cut-off answer is half a JSON object; the job retries the student later.
+  if (response.stop_reason === 'max_tokens') return false;
   const block = response.content.find((b) => b.type === 'text');
   if (!block) return false;
   const body = JSON.parse(block.text);

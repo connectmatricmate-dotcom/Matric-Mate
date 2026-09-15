@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { karachiDay, studyTimeLabel } from '@matricmate/core';
 import { referredStudents, type StudentActivity } from '@/lib/affiliates';
 import { currentAffiliate } from '@/lib/affiliate-session';
-import { CellLink, Panel, PillLink, Row, Stat, StatGrid, Table, Tag, Td, rupees } from '@/components/admin/bits';
+import { RowName, Panel, PillLink, Row, Stat, StatGrid, Table, Tag, Td, ViewLink, rupees } from '@/components/admin/bits';
 import { CopyLink } from '@/components/admin/CopyLink';
+import { TapRow } from '@/components/staff/TapRow';
 import { SITE_URL } from '@/lib/site';
 import { Skeleton } from '@/components/ui/primitives';
 
@@ -33,13 +34,15 @@ function DayTag({ a }: { a: StudentActivity | null }) {
  * Their names, whether they are paying and what that is worth to the teacher,
  * and since 14 Sep 2026 (the client's call) whether each opened MatricMate on
  * the day, studied, for how long and how many questions: a teacher who sends
- * a class the link wants to see who is actually using it. A student's name
- * opens their day in full. What they asked the AI tutor stays theirs.
+ * a class the link wants to see who is actually using it. Tapping a student
+ * anywhere on their row (a card on a phone) opens their day in full, and the
+ * row says so with a "View report" button. What they asked the AI tutor stays
+ * theirs.
  */
 async function Students({ day }: { day: Day }) {
   const row = await currentAffiliate();
   const date = karachiDay(day === 'yesterday' ? 1 : 0);
-  const students = await referredStudents(row.userId, { activity: date });
+  const { students, deleted } = await referredStudents(row.userId, row.commissionPct, { activity: date });
 
   const opened = students.filter((s) => s.activity?.opened).length;
   const studied = students.filter((s) => s.activity?.studied).length;
@@ -70,31 +73,62 @@ async function Students({ day }: { day: Day }) {
             </div>
           </div>
         ) : (
-          <Table head={['Student', 'Class', day === 'yesterday' ? 'Yesterday' : 'Today', 'Time', 'Questions', 'Last active', 'Status', 'Your share']}>
-            {students.map((s) => (
-              <Row key={s.id}>
-                <Td>
-                  <CellLink href={`/affiliate/students/${s.id}?day=${date}`}>{s.name}</CellLink>
-                  <span className="block text-[11.5px] text-ink3 wrap-anywhere">{s.email}</span>
-                  <span className="block text-[11.5px] text-ink3">Joined {when(s.joinedAt)}</span>
+          <Table stack head={['Student', 'Class', day === 'yesterday' ? 'Yesterday' : 'Today', 'Time', 'Questions', 'Last active', 'Status', 'Your share', '']}>
+            {students.map((s) => {
+              const href = `/affiliate/students/${s.id}?day=${date}`;
+              return (
+                <TapRow key={s.id} href={href}>
+                  <Td span>
+                    <RowName href={href}>{s.name}</RowName>
+                    <span className="block text-[11.5px] text-ink2 wrap-anywhere">{s.email}</span>
+                    <span className="block text-[11.5px] text-ink2">Joined {when(s.joinedAt)}</span>
+                  </Td>
+                  <Td num label="Class">
+                    {s.grade ? `Class ${s.grade}` : ''}
+                  </Td>
+                  <Td label={day === 'yesterday' ? 'Yesterday' : 'Today'}>
+                    <DayTag a={s.activity} />
+                  </Td>
+                  <Td num label="Time">
+                    {s.activity?.opened && s.activity.seconds ? studyTimeLabel(s.activity.seconds, 'en') : <span className="text-ink3">·</span>}
+                  </Td>
+                  <Td num label="Questions">
+                    {s.activity?.questions ? s.activity.questions.toLocaleString('en-PK') : <span className="text-ink3">0</span>}
+                  </Td>
+                  <Td num label="Last active" className="text-ink2">
+                    {s.activity?.lastActive ? (s.activity.lastActive === karachiDay(0) ? 'Today' : shortDay(s.activity.lastActive)) : 'Never'}
+                  </Td>
+                  {/* "has paid", not "paying": anyone on a paid plan now, which is
+                      what your share is worked out from. */}
+                  <Td label="Status">{s.paid ? <Tag tone="green">has paid</Tag> : <Tag tone="grey">not yet</Tag>}</Td>
+                  <Td num label="Your share" className="font-extrabold">
+                    {s.share ? rupees(s.share) : <span className="text-ink3">Rs 0</span>}
+                  </Td>
+                  <Td span className="text-end">
+                    <ViewLink href={href}>View report</ViewLink>
+                  </Td>
+                </TapRow>
+              );
+            })}
+            {/* Students who deleted their account: gone from the list, but
+                what they paid still earns this teacher their share. */}
+            {deleted.spend ? (
+              <Row>
+                <Td span>
+                  <span className="font-extrabold text-ink2">Deleted accounts</span>
+                  <span className="block text-[11.5px] text-ink2">
+                    {deleted.payments === 1 ? 'A payment from a student who has' : `${deleted.payments} payments from students who have`} since deleted their account
+                  </span>
                 </Td>
-                <Td num>{s.grade ? `Class ${s.grade}` : ''}</Td>
-                <Td>
-                  <DayTag a={s.activity} />
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <Td key={i}>{null}</Td>
+                ))}
+                <Td num label="Your share" className="font-extrabold">
+                  {rupees(deleted.share)}
                 </Td>
-                <Td num>{s.activity?.opened ? studyTimeLabel(s.activity.seconds, 'en') : <span className="text-ink3">·</span>}</Td>
-                <Td num>{s.activity?.questions ? s.activity.questions.toLocaleString('en-PK') : <span className="text-ink3">0</span>}</Td>
-                <Td num className="text-ink2">
-                  {s.activity?.lastActive ? (s.activity.lastActive === karachiDay(0) ? 'Today' : shortDay(s.activity.lastActive)) : 'Never'}
-                </Td>
-                {/* "has paid", not "paying": anyone on a paid plan now, which is
-                    what your share is worked out from. */}
-                <Td>{s.paid ? <Tag tone="green">has paid</Tag> : <Tag tone="grey">not yet</Tag>}</Td>
-                <Td num className="font-extrabold">
-                  {s.spend ? rupees(Math.round((s.spend * row.commissionPct) / 100)) : <span className="text-ink3">Rs 0</span>}
-                </Td>
+                <Td>{null}</Td>
               </Row>
-            ))}
+            ) : null}
           </Table>
         )}
       </Panel>
@@ -142,7 +176,7 @@ export default async function AffiliateStudentsPage({ searchParams }: { searchPa
       <h1 className="font-display text-[26px] text-ink">Your students</h1>
       <p className="mt-0.5 mb-4 text-[13.5px] text-ink2">
         Everybody who signed up through your link: who used MatricMate, for how long, and what each one is worth to
-        you. Tap a name for their whole day.
+        you. Tap a student to see their report for the day.
       </p>
       <div className="mb-6 flex gap-2">
         {tab('today', 'Today')}

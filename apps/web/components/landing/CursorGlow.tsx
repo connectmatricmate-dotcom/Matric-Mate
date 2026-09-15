@@ -10,7 +10,9 @@
  * weight.
  *
  * Skipped entirely on touch screens, where there is no pointer, and under
- * prefers-reduced-motion.
+ * prefers-reduced-motion. The frame loop runs only while the light is still
+ * catching up with the pointer: it used to run sixty times a second for as
+ * long as the page was open, cursor moving or not.
  */
 import { useEffect, useRef } from 'react';
 
@@ -30,13 +32,6 @@ export function CursorGlow() {
     let ty = y;
     let frame = 0;
 
-    const onMove = (e: PointerEvent) => {
-      tx = e.clientX;
-      ty = e.clientY;
-      el.classList.add('on');
-    };
-    const onLeave = () => el.classList.remove('on');
-
     const tick = () => {
       // 0.12 is the follow weight: low enough to lag visibly, high enough
       // that it never feels like it is stuck behind the cursor.
@@ -44,9 +39,17 @@ export function CursorGlow() {
       y += (ty - y) * 0.12;
       el.style.setProperty('--gx', `${x.toFixed(1)}px`);
       el.style.setProperty('--gy', `${y.toFixed(1)}px`);
-      frame = requestAnimationFrame(tick);
+      // Within half a pixel is arrived: stop until the pointer moves again.
+      frame = Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5 ? requestAnimationFrame(tick) : 0;
     };
-    frame = requestAnimationFrame(tick);
+
+    const onMove = (e: PointerEvent) => {
+      tx = e.clientX;
+      ty = e.clientY;
+      el.classList.add('on');
+      if (!frame) frame = requestAnimationFrame(tick);
+    };
+    const onLeave = () => el.classList.remove('on');
 
     window.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('pointerleave', onLeave);

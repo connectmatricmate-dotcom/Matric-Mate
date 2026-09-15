@@ -22,6 +22,7 @@ import { Card, Check, Item, ScriptText, SectionTitle, Skeleton } from '@/compone
 import { useToast } from '@/components/ui/toast';
 import { session } from '@/lib/session';
 import { useApp, useLang, useT } from '@/lib/store';
+import { useTutorQuota } from '@/lib/use-tutor-quota';
 
 const KIND_LABEL = { mcq: 'tutor.kindMcq', flashcards: 'tutor.kindCards', blanks: 'tutor.kindBlanks', shortq: 'tutor.kindShortq' } as const;
 
@@ -67,6 +68,7 @@ export function AiTestScreen({ chaptersBySubject }: { chaptersBySubject: Record<
   /** Held while a build is in flight so the wait screen can call it off. */
   const cancel = useRef<AbortController | null>(null);
   const { state, derived } = useApp();
+  const [quota] = useTutorQuota();
   const t = useT();
   const { lang } = useLang();
   const toast = useToast();
@@ -275,7 +277,8 @@ export function AiTestScreen({ chaptersBySubject }: { chaptersBySubject: Record<
       </div>
 
       <Card flat tint="bg-tealtint" className="mt-4">
-        <p className="text-[13px] text-ink2">{t('tutor.costNote', { n: 2, limit: 50 })}</p>
+        {/* The student's own allowance: a free trial has five a day, not fifty. */}
+        <p className="text-[13px] text-ink2">{t('tutor.costNote', { n: 2, limit: quota?.limit ?? derived.aiLimit })}</p>
       </Card>
 
       <div className="mt-5">

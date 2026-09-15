@@ -6,7 +6,7 @@
  * indistinguishable, so these stay in step with that file.
  */
 @theme {
-  --color-teal: #0a7ea4;
+  --color-teal: #087598;
   --color-tealdark: #063d52;
   --color-night: #04222f;
   --color-cyan: #22c7d6;
@@ -14,18 +14,20 @@
   --color-tealtint2: #c9e4ee;
   --color-ink: #0f3d4c;
   --color-ink2: #3e6473;
-  --color-ink3: #587a87;
+  --color-ink3: #4d6d7a;
   --color-paper: #fafbf7;
   --color-card: #ffffff;
   --color-line: #d9e2dc;
   --color-track: #eaf0ec;
   --color-mute: #d7e0db;
   --color-orange: #ff8a00;
+  /* A filled orange button, under an onbrand label. See orangeFill in tokens.ts. */
+  --color-orangefill: #b85800;
   --color-orangedark: #a85700;
   --color-orangetint: #fff0dc;
-  --color-green: #2e9e5b;
+  --color-green: #1e7b45;
   --color-greentint: #e7f5ec;
-  --color-red: #d9534f;
+  --color-red: #c0392b;
   --color-redtint: #fbeceb;
   --color-grey: #eff3f0;
   --color-whatsapp: #25d366;
@@ -49,7 +51,7 @@
      the alpha is decided once rather than at each call site. */
   --color-glass: rgba(250, 251, 247, 0.9);      /* sticky header over content */
   --color-scrim: rgba(15, 61, 76, 0.4);         /* behind a modal */
-  --color-onbrand-soft: rgba(255, 255, 255, 0.7);     /* secondary text on a fill */
+  --color-onbrand-soft: rgba(255, 255, 255, 0.9);     /* secondary text on a fill: 0.7 was 3.1:1 on teal */
   --color-onbrand-line: rgba(255, 255, 255, 0.55);    /* a visible border on a fill */
   --color-onbrand-hair: rgba(255, 255, 255, 0.15);    /* a divider on a fill */
   --color-focusring: rgba(9, 106, 139, 0.13);         /* the halo round a focused field */
@@ -129,6 +131,21 @@ body {
 }
 
 /**
+ * Room for the app's fixed chrome when the browser scrolls something into
+ * view (a field that takes focus, a link to an anchor, the Tab key). Without
+ * it the element lands under the sticky header or, on a phone, under the
+ * bottom bar, and the student types into a box they cannot see.
+ */
+html:has([data-app-header]) {
+  scroll-padding-top: 4.5rem;
+}
+@media (max-width: 767.98px) {
+  html:has([data-bottom-bar]) {
+    scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+/**
  * The Urdu interface.
  *
  * When the app language is Urdu, every label on the page is Urdu, so the
@@ -174,6 +191,7 @@ body {
   --color-track: #173f4e;
   --color-mute: #2a5a6b;
   --color-orange: #ff9f2e;
+  --color-orangefill: #ff9f2e;
   --color-orangedark: #ffc178;
   --color-orangetint: #3a2712;
   --color-green: #48c77a;
@@ -188,7 +206,7 @@ body {
   /* A scrim is dark in both themes: it is shadow, not surface. */
   --color-scrim: rgba(0, 0, 0, 0.6);
   /* onBrand goes dark after dark, so everything sitting on a fill goes with it. */
-  --color-onbrand-soft: rgba(4, 34, 47, 0.72);
+  --color-onbrand-soft: rgba(4, 34, 47, 0.85);
   --color-onbrand-line: rgba(4, 34, 47, 0.55);
   --color-onbrand-hair: rgba(4, 34, 47, 0.18);
   /* The light halo is a 13% teal that vanishes on a dark field. */
@@ -754,25 +772,26 @@ button:disabled,
      would otherwise print pale ink on a navy page, or pale ink on nothing
      when the browser drops backgrounds. The light values, from @theme. */
   [data-theme='dark'] {
-    --color-teal: #0a7ea4;
+    --color-teal: #087598;
     --color-tealdark: #063d52;
     --color-cyan: #22c7d6;
     --color-tealtint: #e4f1f6;
     --color-tealtint2: #c9e4ee;
     --color-ink: #0f3d4c;
     --color-ink2: #3e6473;
-    --color-ink3: #587a87;
+    --color-ink3: #4d6d7a;
     --color-paper: #fafbf7;
     --color-card: #ffffff;
     --color-line: #d9e2dc;
     --color-track: #eaf0ec;
     --color-mute: #d7e0db;
     --color-orange: #ff8a00;
+    --color-orangefill: #b85800;
     --color-orangedark: #a85700;
     --color-orangetint: #fff0dc;
-    --color-green: #2e9e5b;
+    --color-green: #1e7b45;
     --color-greentint: #e7f5ec;
-    --color-red: #d9534f;
+    --color-red: #c0392b;
     --color-redtint: #fbeceb;
     --color-grey: #eff3f0;
     --color-onbrand: #ffffff;
@@ -780,7 +799,7 @@ button:disabled,
     --color-ink2ghost: rgba(62, 100, 115, 0.15);
     --color-glass: rgba(250, 251, 247, 0.9);
     --color-scrim: rgba(15, 61, 76, 0.4);
-    --color-onbrand-soft: rgba(255, 255, 255, 0.7);
+    --color-onbrand-soft: rgba(255, 255, 255, 0.9);
     --color-onbrand-line: rgba(255, 255, 255, 0.55);
     --color-onbrand-hair: rgba(255, 255, 255, 0.15);
     --color-focusring: rgba(9, 106, 139, 0.13);

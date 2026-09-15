@@ -256,7 +256,8 @@ export function McqScreen() {
                   const wrong = chosen != null && chosen !== mcq.answer;
                   const prompt = wrong
                     ? t('session.askWhyWrong', { mine: mcq.options[chosen], right: mcq.options[mcq.answer], q: mcq.q })
-                    : mcq.q;
+                    : // In the student's words and language, as on Android, not the bare question.
+                      t('session.askExplain', { q: mcq.q });
                   // The chapter rides along, so the tutor answers from the very notes
                   // this question came from instead of from general memory.
                   router.push(`/tutor/chat?q=${encodeURIComponent(prompt)}${mcq.chapterId ? `&chapter=${mcq.chapterId}` : ''}`);

@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { asBoard } from '@matricmate/core';
 import { PracticeView } from '@/components/screens/PracticeView';
 import { createClient, getUser } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Practice',
-  description: 'MCQs, flashcards, fill in the blanks, short questions, past papers and timed tests.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('tabs.practice', 'MCQs, flashcards, fill in the blanks, short questions, past papers and timed tests.');
 
 export default async function PracticePage() {
   /**

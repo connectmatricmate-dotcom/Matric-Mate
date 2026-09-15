@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
-import { Panel, Row, Table, Tag, Td } from '@/components/admin/bits';
+import { RowName, Panel, Table, Tag, Td, ViewLink } from '@/components/admin/bits';
+import { TapRow } from '@/components/staff/TapRow';
+import { Icon } from '@/components/ui/primitives';
 import { followUps } from '@/lib/follow-up';
 import { requireAdmin } from '@/lib/roles';
 
@@ -26,33 +28,41 @@ async function FollowUpTable() {
   }
   return (
     <Panel title={`Follow up (${rows.length})`}>
-      <Table head={['Student', 'What', 'Reminder', '']}>
+      {/* A card per student on a phone, the WhatsApp button on it in plain
+          view: it was the last column, off the right edge of the screen. */}
+      <Table stack head={['Student', 'What', 'Reminder', '', '']}>
         {rows.map((r) => (
-          <Row key={r.id}>
-            <Td>
-              <span className="block font-extrabold text-ink">{r.name}</span>
+          <TapRow key={r.id} href={`/admin/students/${r.id}`}>
+            <Td span>
+              <RowName href={`/admin/students/${r.id}`}>{r.name}</RowName>
               <span className="block text-[12px] text-ink2 wrap-anywhere">{r.email}</span>
-              {r.phone ? <span className="block text-[12px] text-ink3">{r.phone}</span> : null}
+              {r.phone ? <span className="block text-[12px] text-ink2">{r.phone}</span> : null}
             </Td>
-            <Td>
+            <Td label="What">
               <Tag tone={r.ended ? 'red' : 'orange'}>{r.status}</Tag>
             </Td>
-            <Td className="text-ink2">{r.reminded ? 'Sent' : '·'}</Td>
-            <Td className="text-end">
+            <Td label="Reminder" className="text-ink2">
+              {r.reminded ? 'Sent' : 'Not yet'}
+            </Td>
+            <Td span className="text-end">
               {r.whatsapp ? (
                 <a
                   href={r.whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-line bg-card px-3 text-[12.5px] font-extrabold text-ink2 transition-colors duration-200 hover:border-teal hover:text-teal md:h-10"
+                  className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-teal px-4 text-[12.5px] font-extrabold text-onbrand transition-[filter] duration-200 hover:brightness-110 max-md:w-full md:h-10"
                 >
-                  WhatsApp
+                  <Icon name="whatsapp" size={16} />
+                  Message on WhatsApp
                 </a>
               ) : (
-                <span className="text-[12px] text-ink3">No mobile number</span>
+                <span className="text-[12px] text-ink2">No mobile number</span>
               )}
             </Td>
-          </Row>
+            <Td span className="text-end">
+              <ViewLink href={`/admin/students/${r.id}`}>View student</ViewLink>
+            </Td>
+          </TapRow>
         ))}
       </Table>
     </Panel>

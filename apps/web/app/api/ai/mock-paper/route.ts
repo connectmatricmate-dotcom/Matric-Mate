@@ -12,6 +12,7 @@ import {
   outsideTrial,
   refused,
   studentMedium,
+  noteAiFailure,
 } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 import type { createAdminClient } from '@/lib/supabase/admin';
@@ -250,6 +251,7 @@ export async function POST(req: NextRequest) {
     withNotes = new Set(((sections.data ?? []) as { chapter_id: string }[]).map((r) => r.chapter_id));
   } catch (e) {
     console.error('[mock-paper]', e instanceof Error ? e.message : e);
+    await noteAiFailure(e);
     return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 503 });
   }
 
@@ -348,6 +350,7 @@ export async function POST(req: NextRequest) {
     groundings = new Map(found.filter((f): f is readonly [string, Grounding] => !!f[1]));
   } catch (e) {
     console.error('[mock-paper]', e instanceof Error ? e.message : e);
+    await noteAiFailure(e);
     return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 503 });
   }
 

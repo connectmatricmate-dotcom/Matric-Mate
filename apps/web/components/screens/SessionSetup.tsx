@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { type Chapter, api, chapterName, subjectById, subjectName } from '@matricmate/core';
+import { type Chapter, api, chapterName, offPaper, subjectById, subjectName } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
 import { Btn, ItemButton, Seg } from '@/components/ui/controls';
 import { Card, Check, Item, SectionTitle, Skeleton } from '@/components/ui/primitives';
@@ -71,7 +71,7 @@ export function SessionSetup({
     : undefined;
   const [subjectId, setSubjectId] = useState(initialChapter?.subjectId ?? derived.subjects[0] ?? 'phy');
   const [chapterIds, setChapterIds] = useState<string[]>(initialChapter ? [initialChapter.id] : []);
-  const [count, setCount] = useState<'10' | '20' | '50'>('10');
+  const [count, setCount] = useState('10');
   const [busy, setBusy] = useState(false);
   const [pickedSubject, setPickedSubject] = useState(subjectId);
 
@@ -79,7 +79,9 @@ export function SessionSetup({
      in the browser, and every chapter is premium, so a paying student met an
      empty list on every cold load. The layout has already refused anyone
      without a plan. */
-  const chapters = useMemo(() => chaptersBySubject[subjectId] ?? [], [chaptersBySubject, subjectId]);
+  /* Only chapters with questions to draw, as on Android: one with notes and
+     no MCQs yet could be ticked, and the set could only end in "No questions". */
+  const chapters = useMemo(() => (chaptersBySubject[subjectId] ?? []).filter((c) => c.mcqCount > 0), [chaptersBySubject, subjectId]);
 
   // The default subject is picked before the store hydrates, when the subject
   // list is still the fallback. Adjusted during render when the real list
@@ -100,12 +102,28 @@ export function SessionSetup({
     setChapterIds([]);
   }
 
+  /*
+   * How many questions there are to draw from. Every chapter holds about 30,
+   * so "Start 50" on one chapter ran "Question 1 of 30". The choices stop at
+   * what the pool holds, with the pool itself offered as the last one. A
+   * mixed set draws from the chapters on the paper (see offPaper in core).
+   */
+  const pool = initialChapter
+    ? initialChapter.mcqCount
+    : (chapterIds.length ? chapters.filter((c) => chapterIds.includes(c.id)) : chapters.filter((c) => !offPaper(c))).reduce(
+        (n, c) => n + c.mcqCount,
+        0,
+      );
+  const sizes = pool ? [...[10, 20, 50].filter((n) => n < pool), ...(pool <= 50 ? [pool] : [])].map(String) : ['10', '20', '50'];
+  // A choice the pool cannot fill becomes the nearest one it can.
+  const size = sizes.includes(count) ? count : ([...sizes].reverse().find((n) => Number(n) <= Number(count)) ?? sizes[0]);
+
   async function start() {
     setBusy(true);
     const mcqs = await api.getMcqs({
       chapterIds: chapterIds.length ? chapterIds : undefined,
       subjectId: chapterIds.length ? undefined : subjectId,
-      count: Number(count),
+      count: Number(size),
     });
     if (!mcqs.length) {
       setBusy(false);
@@ -199,7 +217,7 @@ export function SessionSetup({
                 <ItemButton
                   key={c.id}
                   title={chapterName(c, lang)}
-                  sub={t('study.mcqsSub', { n: c.mcqCount })}
+                  sub={offPaper(c) ? `${t('study.mcqsSub', { n: c.mcqCount })} · ${t('study.notOnPaper')}` : t('study.mcqsSub', { n: c.mcqCount })}
                   icon="book"
                   tone={on ? 'teal' : 'grey'}
                   last={i === chapters.length - 1}
@@ -215,18 +233,14 @@ export function SessionSetup({
 
       <SectionTitle>{t('session.howMany')}</SectionTitle>
       <Seg
-        value={count}
+        value={size}
         onChange={setCount}
         label={t('session.howMany')}
-        options={[
-          { value: '10' as const, label: '10' },
-          { value: '20' as const, label: '20' },
-          { value: '50' as const, label: '50' },
-        ]}
+        options={sizes.map((n) => ({ value: n, label: n }))}
       />
 
       <div className="mt-6">
-        <Btn title={t('session.start', { n: count })} onClick={start} loading={busy} className="w-full md:w-auto" />
+        <Btn title={t('session.start', { n: size })} onClick={start} loading={busy} className="w-full md:w-auto" />
       </div>
     </Page>
   );

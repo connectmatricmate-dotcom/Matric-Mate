@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { TrialStart } from '@/components/screens/TrialStart';
 import { createClient, getUser } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Start your free trial',
-  description: 'Three days with one subject: its chapters, notes, audio and practice.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('trialStart.title', 'Three days with one subject: its chapters, notes, audio and practice.');
 
 /**
  * The first screen after onboarding for a new account: the free trial starts

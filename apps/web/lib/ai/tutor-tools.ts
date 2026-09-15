@@ -1,6 +1,6 @@
 import 'server-only';
 import type Anthropic from '@anthropic-ai/sdk';
-import { asBoard, belongsToChapter } from '@matricmate/core';
+import { XP, asBoard, belongsToChapter, weakTopics, xpForAttempt, type Attempt } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -44,11 +44,19 @@ type Db = ReturnType<typeof createAdminClient>;
 
 /** Every attempt, paged. The only read here that can grow without bound. */
 async function allAttempts(admin: Db, userId: string) {
-  const rows: { chapter_id: string | null; subject_id: string | null; topic: string | null; correct: boolean; at: string }[] = [];
+  const rows: {
+    chapter_id: string | null;
+    subject_id: string | null;
+    topic: string | null;
+    correct: boolean;
+    confidence: number | null;
+    mode: string | null;
+    at: string;
+  }[] = [];
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await admin
       .from('attempts')
-      .select('chapter_id,subject_id,topic,correct,at')
+      .select('chapter_id,subject_id,topic,correct,confidence,mode,at')
       .eq('user_id', userId)
       .order('at', { ascending: false })
       .order('id')
@@ -125,12 +133,20 @@ export const TUTOR_TOOLS: Anthropic.Tool[] = [
 /* ------------------------------------------------------------- handlers */
 
 async function getProgress(admin: Db, userId: string) {
-  const [attempts, { data: dayRows, error: dayError }, { data: profile, error: profileError }] = await Promise.all([
+  const [attempts, { data: dayRows, error: dayError }, { data: profile, error: profileError }, { count: cards, error: cardError }] = await Promise.all([
     allAttempts(admin, userId),
     admin.from('active_days').select('day').eq('user_id', userId).order('day', { ascending: false }).range(0, 399),
-    admin.from('profiles').select('xp,grade').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('grade').eq('id', userId).maybeSingle(),
+    admin.from('cards_known').select('card_id', { count: 'exact', head: true }).eq('user_id', userId),
   ]);
-  if (dayError || profileError) throw new Error(`progress read failed: ${(dayError ?? profileError)?.message}`);
+  if (dayError || profileError || cardError) throw new Error(`progress read failed: ${(dayError ?? profileError ?? cardError)?.message}`);
+  // XP the way both apps count it (study_xp in the database): from answers and
+  // known cards. profiles.xp is a leftover nothing writes, so it said 0.
+  const xp =
+    attempts.reduce(
+      (n, a) => n + xpForAttempt({ correct: a.correct, confidence: a.confidence as Attempt['confidence'], mode: a.mode as Attempt['mode'] }),
+      0,
+    ) + (cards ?? 0) * XP.card;
 
   const bySubject = new Map<string, { n: number; right: number }>();
   for (const a of attempts) {
@@ -148,7 +164,7 @@ async function getProgress(admin: Db, userId: string) {
   const days = ((dayRows ?? []) as { day: string }[]).map((d) => d.day);
   return {
     class: profile?.grade ?? 9,
-    xp: profile?.xp ?? 0,
+    xp,
     streak_days: streakFrom(days),
     days_studied_total: days.length,
     questions_answered: attempts.length,
@@ -160,23 +176,31 @@ async function getProgress(admin: Db, userId: string) {
 }
 
 async function getWeakTopics(admin: Db, userId: string) {
-  const attempts = await allAttempts(admin, userId);
-  const byTopic = new Map<string, { n: number; right: number }>();
-  for (const a of attempts) {
-    if (!a.topic) continue;
-    const s = byTopic.get(a.topic) ?? { n: 0, right: 0 };
-    s.n++;
-    if (a.correct) s.right++;
-    byTopic.set(a.topic, s);
-  }
-  const topics = [...byTopic.entries()]
-    // Three is the floor for a topic to mean anything. One wrong answer is a
-    // bad day, not a weakness, and the tutor should not build a revision plan
-    // on it.
-    .filter(([, s]) => s.n >= 3 && s.right / s.n < 0.7)
-    .map(([topic, s]) => ({ topic, attempted: s.n, accuracy_pct: pct(s.right, s.n) }))
-    .sort((a, b) => a.accuracy_pct - b.accuracy_pct)
-    .slice(0, 8);
+  const [rows, { data: profile }] = await Promise.all([
+    allAttempts(admin, userId),
+    admin.from('profiles').select('grade,board').eq('id', userId).maybeSingle(),
+  ]);
+  /*
+   * The same weak topics the student sees on the rail, the weak topics page
+   * and the plan: core's one helper (three answers or more, under 75%, their
+   * own syllabus), with blanks and short questions counted under their
+   * chapter's name. This tool had its own grouping and threshold, so the
+   * tutor could name a weakness the app did not show, or miss one it did.
+   */
+  const attempts: Attempt[] = rows.map((a, i) => ({
+    id: String(i),
+    mcqId: String(i),
+    chapterId: a.chapter_id ?? '',
+    subjectId: a.subject_id ?? '',
+    topic: a.topic ?? '',
+    correct: a.correct,
+    confidence: a.confidence as Attempt['confidence'],
+    mode: (a.mode ?? 'practice') as Attempt['mode'],
+    at: Date.parse(a.at),
+  }));
+  const topics = weakTopics(attempts, 3, { grade: profile?.grade === 10 ? 10 : 9, board: asBoard(profile?.board) })
+    .slice(0, 8)
+    .map((w) => ({ topic: w.topic, attempted: w.total, accuracy_pct: w.accuracy }));
 
   return topics.length ? { weak_topics: topics } : { weak_topics: [], note: 'Nothing stands out yet, or they have not practised enough for it to.' };
 }

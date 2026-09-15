@@ -9,9 +9,10 @@ import {
   groundingBrief,
   guardStudent,
   outsideTrial,
-  quotaGate,
+  reserveQuota,
   refused,
   studentMedium,
+  noteAiFailure,
 } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
   if (cacheError) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 503 });
   if (cached) return NextResponse.json({ sheet: cached.body, cached: true, quota: g.quota });
 
-  const denied = quotaGate(g, AI_COST.sheet);
+  const denied = await reserveQuota(g, AI_COST.sheet);
   if (denied) return denied;
 
   try {
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     const response = await anthropic.messages.create({
       model: AI_MODEL,
-      max_tokens: 3000,
+      max_tokens: 4000,
       output_config: { effort: 'low' },
       system:
         `You write one-page revision sheets for ${BOARD_LABEL[g.board]} Class ${g.grade} (SSC-${g.grade === 10 ? 'II' : 'I'}) students, ${grounding.grounded ? 'from ONLY the chapter text provided.' : 'from the chapter brief provided.'} Structure, in this order: KEY DEFINITIONS (term: one line each), FORMULAS with what each symbol means (skip the section if the chapter has none), MUST-KNOW POINTS (the facts examiners ask), COMMON MISTAKES (2 or 3), LIKELY EXAM QUESTIONS (3, just the questions). Plain text only: capitalised section headings, hyphen bullets, no markdown symbols, no tables. Tight enough to revise in ten minutes. Never use an em dash; use a comma, a colon, or a new sentence. ` +
@@ -97,6 +98,13 @@ export async function POST(req: NextRequest) {
       messages: [{ role: 'user', content: groundingBrief(grounding, g.grade, g.board) }],
     });
     if (response.stop_reason === 'refusal') return refused(g.quota);
+    // A sheet cut off at its length limit is not cached: every student on the
+    // chapter would read the same half sheet, with nothing to regenerate it.
+    // Not charged either (the hold is given back), and the next open retries.
+    if (response.stop_reason === 'max_tokens') {
+      console.error('[cheat-sheet] cut off at the token limit', chapterId, medium);
+      return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
+    }
     const block = response.content.find((b) => b.type === 'text');
     // Asking is not enough: the model still slips one in now and then, and a
     // cached sheet is read by every student on that chapter. A dash between
@@ -121,6 +129,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ sheet, cached: false, quota });
   } catch (e) {
     console.error('[cheat-sheet]', e instanceof Error ? e.message : e);
+    await noteAiFailure(e);
     return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
   }
 }

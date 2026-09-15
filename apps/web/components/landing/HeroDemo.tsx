@@ -9,8 +9,11 @@
  * may never click: pick an option, admit how sure you were, check, read why,
  * move to the next question.
  *
- * The loop yields the moment anyone touches the card, and never resumes.
- * A demo that fights the person trying to use it is worse than no demo.
+ * The loop yields the moment anyone touches the card or tabs into it, and
+ * never resumes. A demo that fights the person trying to use it is worse than
+ * no demo. It also holds still while a mouse rests on it (someone reading the
+ * explanation), and while it is scrolled out of view or the tab is hidden,
+ * where it only burned timers.
  */
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { XP, type Confidence, type Mcq } from '@matricmate/core';
@@ -48,8 +51,29 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
   const [confidence, setConfidence] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
   const [playing, setPlaying] = useState(true);
+  const [hovered, setHovered] = useState(false);
+  const [inView, setInView] = useState(true);
   const reduced = usePrefersReducedMotion();
-  const auto = playing && !reduced;
+  const auto = playing && !reduced && !hovered && inView;
+  const box = useRef<HTMLDivElement>(null);
+
+  // Out of view, or in a tab nobody is looking at: hold still.
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    let seen = true;
+    const update = () => setInView(seen && !document.hidden);
+    const io = new IntersectionObserver(([entry]) => {
+      seen = entry.isIntersecting;
+      update();
+    });
+    io.observe(el);
+    document.addEventListener('visibilitychange', update);
+    return () => {
+      io.disconnect();
+      document.removeEventListener('visibilitychange', update);
+    };
+  }, []);
 
   const mcq = mcqs[index % mcqs.length];
   const correct = chosen === mcq.answer;
@@ -124,7 +148,14 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
     // card that grows is better than one whose answers spill out of it.
     // The wrapper carries the handler because Card is a server-safe primitive
     // with no event props, and one listener here beats one per control.
-    <div onPointerDown={stopAuto} className="w-full max-w-[430px]">
+    <div
+      ref={box}
+      onPointerDown={stopAuto}
+      onFocus={stopAuto}
+      onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      className="w-full max-w-[430px]"
+    >
     <Card
       className="relative flex w-full flex-col shadow-[0_24px_70px_rgba(4,34,47,0.45)] md:min-h-[512px] lg:h-[512px]"
     >
@@ -201,7 +232,7 @@ export function HeroDemo({ mcqs }: { mcqs: Mcq[] }) {
                     stopAuto();
                     setConfidence(c.value);
                   }}
-                  className={`min-h-10 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[13px] font-extrabold transition-all duration-300 ${
+                  className={`min-h-11 flex-1 rounded-[13px] border-[1.5px] px-2 py-2.5 text-[13px] font-extrabold transition-all duration-300 ${
                     confidence === c.value
                       ? 'border-orange bg-orangetint text-orangedark'
                       : 'border-line bg-card text-ink2 hover:border-[color-mix(in_oklab,var(--color-orange)_40%,transparent)]'

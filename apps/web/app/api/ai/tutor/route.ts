@@ -4,7 +4,7 @@ import { BOARD_LABEL, SUBJECTS, asBoard, subjectMedium, translate, type Board } 
 import { accessFromRow, planIsActive } from '@/lib/entitlement';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { addUsage, chapterGrounding, type Grounding } from '@/lib/ai/guard';
+import { addUsage, chapterGrounding, confirmHold, dayKey, holdUsage, noteAiFailure, releaseHold, resetAt, type Grounding, type QuotaHold } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 import { TUTOR_TOOLS, runTutorTool } from '@/lib/ai/tutor-tools';
 
@@ -45,7 +45,6 @@ const MAX_ANSWER_TOKENS = 6000;
 /** Messages of history the model sees: the latest ones, never the first. */
 const HISTORY_TURNS = 12;
 const RATE_LIMIT_PER_MINUTE = 5;
-const TIMEZONE = 'Asia/Karachi';
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 /** ~5 MB of base64: generous for a downscaled phone photo, a wall for abuse. */
 const IMAGE_MAX_CHARS = 7_000_000;
@@ -53,20 +52,6 @@ const IMAGE_MAX_CHARS = 7_000_000;
 export const maxDuration = 300;
 
 const anthropic = new Anthropic();
-
-/** Today's date key where the students are, not where the server is. */
-function dayKey(): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE }).format(new Date());
-}
-
-/** Next midnight in Pakistan, as an ISO instant the apps can render. */
-function resetAt(): string {
-  const now = new Date();
-  const pkNow = new Date(now.toLocaleString('en-US', { timeZone: TIMEZONE }));
-  const pkMidnight = new Date(pkNow);
-  pkMidnight.setHours(24, 0, 0, 0);
-  return new Date(now.getTime() + (pkMidnight.getTime() - pkNow.getTime())).toISOString();
-}
 
 /**
  * Who is calling. Cookies for the website, a bearer token for the app.
@@ -213,6 +198,7 @@ ${SYLLABUS[board].grounding}
 - Never invent board policies, dates or marks distributions. If unsure, say so and suggest checking ${SYLLABUS[board].site}.
 - Write in plain text: short paragraphs and numbered lists only. No markdown headings, no asterisks or bold markers, no tables, no LaTeX. Write fractions with / and powers with ^, the way they are typed in class notes.
 - Never use an em dash. Use a comma, a colon, or a new sentence instead.
+- Never talk about MatricMate's prices, plans, payments, renewals, discounts or where to buy anything, and never name a website for them, even when asked directly. Say in one sentence that you can only help with their studies and that questions about their account go to Help in the app, then offer to help with a topic. (The Android app may not point anyone at paying; the answer is the same everywhere.)
 
 What you can look up about them:
 - You can see this student's real progress with the tools you have been given: get_progress, get_weak_topics, get_recent_results, get_chapter_progress and get_today. They read the same database the app does.
@@ -294,7 +280,7 @@ export async function POST(req: NextRequest) {
    */
   const [{ data: ent, error: entError }, { data: prof, error: profError }, usage, { count: lastMinute }, owned] = await Promise.all([
     admin.from('entitlements').select('active,valid_till,plan,trial_subject').eq('user_id', userId).maybeSingle(),
-    admin.from('profiles').select('grade,role,board,onboarding').eq('id', userId).maybeSingle(),
+    admin.from('profiles').select('name,grade,role,board,onboarding').eq('id', userId).maybeSingle(),
     admin.from('ai_usage').select('used').eq('user_id', userId).eq('day', dayKey()).maybeSingle(),
     // The abuse wall: a human student cannot ask five thoughtful questions in
     // a minute; a script can. Counted from persisted messages, so it cannot be
@@ -372,6 +358,19 @@ export async function POST(req: NextRequest) {
   if ((lastMinute ?? 0) >= RATE_LIMIT_PER_MINUTE) {
     return NextResponse.json({ error: 'rate_limited', quota }, { status: 429 });
   }
+  /*
+   * The question is taken from the allowance now, before the model runs, in
+   * one statement that will not pass the limit (see QuotaHold in guard.ts):
+   * questions sent together used to all see the same count and all get
+   * answered. It is given back below if no answer reaches the student.
+   */
+  const held = await holdUsage(admin, userId, 1, quota.limit);
+  if (held === 'exhausted') {
+    return NextResponse.json({ error: 'quota_exhausted', quota: { ...quota, used: quota.limit, remaining: 0 } }, { status: 429 });
+  }
+  if (held === 'unavailable') return NextResponse.json({ error: 'server_error' }, { status: 503 });
+  const hold: QuotaHold | null = held === 'legacy' ? null : held;
+  const giveBack = () => (hold ? releaseHold(admin, userId, hold) : Promise.resolve());
 
   // What the thread remembers about this turn. Photos are answered live but
   // not stored, so the saved history says one was here, in the student's own
@@ -443,7 +442,10 @@ export async function POST(req: NextRequest) {
   ]);
 
   const thread = threadResult?.id ?? null;
-  if (!thread) return NextResponse.json({ error: 'server_error' }, { status: 500 });
+  if (!thread) {
+    await giveBack();
+    return NextResponse.json({ error: 'server_error' }, { status: 500 });
+  }
   const newThread = !existing;
 
   /*
@@ -458,24 +460,36 @@ export async function POST(req: NextRequest) {
     if (error) console.error('[tutor] could not remove an unanswered thread', error.message);
   };
 
+  /*
+   * Who they are, from their own account row, never from the request: the
+   * name and subject list used to come from the body, and anything a client
+   * sends can be written to say anything, straight into the instructions.
+   */
+  const ownName = typeof prof?.name === 'string' ? prof.name.replace(/\s+/g, ' ').trim().slice(0, 60) : '';
+  const ownSubjects = ((prof?.onboarding as { subjects?: unknown } | null)?.subjects ?? []) as unknown[];
+  const subjectNames = ownSubjects
+    .filter((id): id is string => typeof id === 'string')
+    .map((id) => SUBJECTS.find((x) => x.id === id)?.name ?? null)
+    .filter(Boolean);
+  const trialName = access.trialSubject ? (SUBJECTS.find((x) => x.id === access.trialSubject)?.name ?? access.trialSubject) : null;
   const studentBlock = [
     'About this student:',
-    profile.name ? `- Name: ${profile.name}` : null,
+    ownName ? `- Name: ${ownName}` : null,
     `- Study medium: ${medium === 'ur' ? 'Urdu' : 'English'}`,
     `- Answer them in this language: ${languageRule(answerIn, grade, board)}`,
-    profile.subjects?.length ? `- Their subjects: ${profile.subjects.join(', ')}` : null,
+    subjectNames.length ? `- Their subjects: ${subjectNames.join(', ')}` : null,
     /* A free trial opens one subject. A question from a chapter is checked
        above; a question typed with no chapter can only be steered, so the
-       tutor is told the limit and how to say it. */
-    access.trialSubject
-      ? `- They are on a free trial that opens one subject only: ${access.trialSubject}. Help with that subject. If they ask about any other subject, say kindly in one sentence that their free trial opens ${access.trialSubject} only, and offer to help with it instead. Do not mention prices, plans or how to pay.`
+       tutor is told the limit and how to say it. The daily allowance (five
+       on a trial) bounds what steering cannot. */
+    trialName
+      ? `- They are on a free trial that opens one subject only: ${trialName}. Help with ${trialName} only. If they ask about any other subject, however it is phrased, say kindly in one sentence that their free trial opens ${trialName} only, and offer to help with it instead. Do not mention prices, plans or how to pay.`
       : null,
     /* Their weak topics used to be listed here, three of them, chosen by the
        client and pushed into every question whether it needed them or not.
        get_weak_topics answers the same thing on demand, from the whole record
        rather than the top three, and freshly rather than from whatever the app
        had computed when the screen last rendered. */
-    body.context ? `- They are asking from: ${body.context.slice(0, 300)}` : null,
   ]
     .filter(Boolean)
     .join('\n');
@@ -493,7 +507,11 @@ export async function POST(req: NextRequest) {
 
   const userContent: Anthropic.ContentBlockParam[] = [];
   if (image) userContent.push({ type: 'image', source: { type: 'base64', ...image } });
-  userContent.push({ type: 'text', text: message || 'Solve or explain what is in this photo, step by step.' });
+  // Where they asked from (a screen's label, sent by the app) goes with the
+  // question as information, not into the instructions.
+  const askedWhere = (body.context ?? '').replace(/\s+/g, ' ').trim().slice(0, 200);
+  const question = message || 'Solve or explain what is in this photo, step by step.';
+  userContent.push({ type: 'text', text: askedWhere ? `(Asked from: ${askedWhere})\n${question}` : question });
 
   // The window can open on an answer whose question fell outside it, and a
   // conversation sent to the model has to start with the student.
@@ -552,7 +570,12 @@ export async function POST(req: NextRequest) {
               { type: 'text', text: personaFor(grade, board) + standing, cache_control: { type: 'ephemeral' } },
               { type: 'text', text: studentBlock + groundingBlock },
             ],
-            tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2 }, ...TUTOR_TOOLS],
+            tools: [
+              // Our own site is kept out of search: the answer would be about
+              // plans and prices, which the tutor does not discuss.
+              { type: 'web_search_20260209', name: 'web_search', max_uses: 2, blocked_domains: ['matricmate.co', 'matric-mate-web.vercel.app'] },
+              ...TUTOR_TOOLS,
+            ],
             messages: turns,
           });
           s.on('text', (delta) => {
@@ -591,13 +614,24 @@ export async function POST(req: NextRequest) {
 
         if (stopReason === 'refusal') {
           await dropEmptyThread();
+          await giveBack();
           emit({ t: 'err', reason: 'refused', quota });
           controller.close();
           return;
         }
-        const answer = nameChapters(text.trim(), chapterTitles.get(`${board}:${grade}`));
+        const named = nameChapters(text.trim(), chapterTitles.get(`${board}:${grade}`));
+        // On a free trial, no button to a chapter the trial does not open: the
+        // model sees every subject's chapters (one cached list per class), and
+        // a tag for another subject would be a tap on a locked door.
+        const whole = access.trialSubject
+          ? named.replace(/\[\[(\w+):([\w-]+)\]\]\n?/g, (tag, _kind: string, id: string) => (id.split('-')[0] === access.trialSubject ? tag : '')).trim()
+          : named;
+        // Stopped at the length limit mid-answer: said so, in their language,
+        // rather than saved and shown as if it were complete.
+        const answer = whole && stopReason === 'max_tokens' ? `${whole}\n\n${translate(language, 'tutor.cutShort')}` : whole;
         if (!answer) {
           await dropEmptyThread();
+          await giveBack();
           emit({ t: 'err', reason: 'error', quota });
           controller.close();
           return;
@@ -635,7 +669,7 @@ export async function POST(req: NextRequest) {
         const messageId = savedRows?.find((m) => m.role === 'assistant')?.id ?? null;
         const { error: bumpError } = await admin.from('chat_threads').update({ updated_at: answeredAt }).eq('id', thread);
         if (bumpError) console.error('[tutor] could not bump the thread', bumpError.message);
-        const usedNow = (await addUsage(admin, userId, 1)) ?? quota.used + 1;
+        const usedNow = hold ? confirmHold(hold) : ((await addUsage(admin, userId, 1)) ?? quota.used + 1);
 
         emit({
           t: 'done',
@@ -649,7 +683,9 @@ export async function POST(req: NextRequest) {
         controller.close();
       } catch (e) {
         console.error('[tutor]', e instanceof Error ? e.message : e);
+        await noteAiFailure(e);
         await dropEmptyThread();
+        await giveBack();
         try {
           emit({ t: 'err', reason: 'error', quota });
           controller.close();

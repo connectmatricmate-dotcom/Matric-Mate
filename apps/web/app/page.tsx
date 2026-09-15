@@ -1,15 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { BOARD_LABEL, BUSINESS, PAPER_CONTENT, SUPPORT_EMAIL, contentFor, pastPaperYears } from '@matricmate/core';
+import { AccountDeletedNote } from '@/components/app/AccountDeletedNote';
 import { AudioSample } from '@/components/landing/AudioSample';
 import { CursorGlow } from '@/components/landing/CursorGlow';
 import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
 import { Reveal } from '@/components/landing/Reveal';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { PlanLink } from '@/components/landing/PlanLink';
 import { SubjectMarquee } from '@/components/landing/SubjectMarquee';
 import { Tilt } from '@/components/landing/Tilt';
-import { Card, Icon, LinkBtn, Pill, Ur, Wordmark } from '@/components/ui';
+import { UrduWord } from '@/components/landing/UrduWord';
+import { Card, Icon, LinkBtn, Pill, Wordmark } from '@/components/ui';
 import { onlinePayments } from '@/lib/gateway';
 import { BASIC_INCLUDED, BASIC_PLAN, PREMIUM_INCLUDED, THE_PLAN, rupees } from '@/lib/plans';
 import { canonicalUrl } from '@/lib/site';
@@ -151,6 +155,10 @@ export default function LandingPage() {
       <CursorGlow />
 
       <Nav />
+      {/* After deleting an account from Settings (/?deleted=1). */}
+      <Suspense fallback={null}>
+        <AccountDeletedNote />
+      </Suspense>
 
       <main>
         {/* ---------------------------------------------------------- hero */}
@@ -179,7 +187,7 @@ export default function LandingPage() {
                 <span className="fx-rise fx-d1 inline-flex items-center gap-2 rounded-[18px] border border-white/15 bg-white/8 px-3.5 py-1.5 text-[12.5px] font-extrabold text-white/85 sm:rounded-full">
                   <Icon name="gradCap" size={14} className="shrink-0 text-cyan" />
                   <span>
-                    FBISE &amp; Punjab Board · Class 9 &amp; 10 · English &amp; <Ur>اردو</Ur>
+                    FBISE &amp; Punjab Board · Class 9 &amp; 10 · English &amp; <UrduWord />
                   </span>
                 </span>
 
@@ -458,7 +466,7 @@ export default function LandingPage() {
                 or send you, so there is nothing for you to log in to.
               </p>
               <p className="mt-3 text-mk-lead text-ink2">
-                Two plans, no upsells inside the app, and nothing your child can buy on their own.
+                Two plans at a price you see before paying, and nothing that renews or charges again on its own.
               </p>
             </div>
 
@@ -546,7 +554,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <span className="pulse-glow isolate mt-6 flex rounded-[16px] bg-orange">
-                  <LinkBtn title="Get Premium" href={`/checkout?plan=${THE_PLAN.id}`} variant="orange" className="w-full" />
+                  <PlanLink title="Get Premium" planId={THE_PLAN.id} variant="orange" className="w-full" />
                 </span>
               </Card>
             </Tilt>
@@ -566,7 +574,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <LinkBtn title="Get Basic" href={`/checkout?plan=${BASIC_PLAN.id}`} variant="line" className="mt-6 w-full" />
+                <PlanLink title="Get Basic" planId={BASIC_PLAN.id} variant="line" className="mt-6 w-full" />
               </Card>
             </Tilt>
           </Reveal>

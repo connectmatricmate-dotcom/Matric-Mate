@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
+  api,
   chapterChoices,
   chapterName,
   fetchChapterTopics,
@@ -74,7 +75,34 @@ function Picking({ onPick, chapterOnly }: { onPick: (pick: ChapterPick) => void;
    *  synchronous setState the moment the level changes. */
   const [topics, setTopics] = useState<{ forChapter: string; list: string[] } | null>(null);
 
-  const choices = useMemo(() => chapterChoices(derived.subjects), [derived.subjects]);
+  /* Read again when the chapter index lands or changes (contentReady): on a
+     cold load it has no Class 10 or Punjab chapters yet, and the picker
+     opened on "0 chapters" and an empty box, and stayed that way. */
+  const choices = useMemo(() => {
+    void derived.contentReady;
+    return chapterChoices(derived.subjects);
+  }, [derived.subjects, derived.contentReady]);
+
+  /* A subject opened before its chapters are in the index: asked for there
+     and then, as the Android picker does. The read fills the index, which
+     moves contentReady and the list above; this only remembers it settled. */
+  const [settled, setSettled] = useState<string[]>([]);
+  const openSubject = level.kind === 'chapters' ? level.subjectId : null;
+  const indexed = openSubject ? choices.some((c) => c.subjectId === openSubject) : true;
+  useEffect(() => {
+    if (!openSubject || indexed) return;
+    let alive = true;
+    void api
+      .getChapters(openSubject)
+      .catch(() => [])
+      .then(() => {
+        if (alive) setSettled((list) => [...list, openSubject]);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [openSubject, indexed]);
+  const chaptersLoading = !!openSubject && !indexed && !settled.includes(openSubject);
 
   useEffect(() => {
     if (level.kind !== 'topics') return;
@@ -178,6 +206,14 @@ function Picking({ onPick, chapterOnly }: { onPick: (pick: ChapterPick) => void;
               />
             );
           })
+        ) : level.kind === 'chapters' && chaptersLoading ? (
+          <div className="space-y-2 py-3">
+            <div className="h-11 w-full animate-pulse rounded-[12px] bg-inkghost" />
+            <div className="h-11 w-full animate-pulse rounded-[12px] bg-inkghost" />
+            <div className="h-11 w-full animate-pulse rounded-[12px] bg-inkghost" />
+          </div>
+        ) : level.kind === 'chapters' && !indexed ? (
+          <Blank text={t('tutor.noChapters')} />
         ) : level.kind === 'chapters' ? (
           choices
             .filter((c) => c.subjectId === level.subjectId)

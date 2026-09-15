@@ -69,8 +69,10 @@ export function LoginForm({ next, linkFailed }: { next?: string; linkFailed?: bo
         <Link href="/forgot" className="inline-flex min-h-11 items-center font-extrabold text-teal hover:underline">
           {t('auth.forgotPassword')}
         </Link>
+        {/* Carries where they were headed: a new visitor sent here on the way
+            to a plan lost it the moment they chose to make an account. */}
         <Link
-          href="/signup"
+          href={next ? `/signup?next=${encodeURIComponent(next)}` : '/signup'}
           className="inline-flex min-h-11 items-center font-extrabold text-ink2 transition-colors duration-200 hover:text-teal"
         >
           {t('auth.createAccount')}

@@ -1,6 +1,7 @@
+import Link from 'next/link';
 import { translate } from '@matricmate/core';
 import { Localized } from '@/components/app/Localized';
-import { Card, Icon, LinkBtn } from '@/components/ui/primitives';
+import { Card, Icon, LinkBtn, Wordmark } from '@/components/ui/primitives';
 import { readUiLanguage } from '@/lib/ui-language.server';
 
 /**
@@ -21,7 +22,12 @@ export default async function NotFound() {
   const home = ur ? translate('ur', 'states.goHome') : 'Go to the homepage';
   return (
     <Localized lang={lang}>
-      <main className="mx-auto flex min-h-[70vh] max-w-[520px] items-center px-5">
+      {/* The mark above the card, so a mistyped address still looks like
+          MatricMate and the wordmark is one more way home. */}
+      <main className="mx-auto flex min-h-[70vh] max-w-[520px] flex-col items-center justify-center gap-6 px-5 py-10">
+        <Link href="/" aria-label="MatricMate home" className="inline-flex min-h-11 items-center">
+          <Wordmark />
+        </Link>
         <Card className="w-full text-center">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-tealtint text-teal">
             <Icon name="search" size={26} />

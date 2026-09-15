@@ -40,6 +40,7 @@ import {
   setSyllabus,
   subjectById,
 } from './content';
+import { offPaper } from './domain';
 import { AudioTrack, Blank, Board, Chapter, ChapterContent, Flashcard, Mcq, Medium, Section, ShortQ, Subject } from './types';
 
 /**
@@ -90,6 +91,8 @@ type TableBuilder = {
 type Filterable = PromiseLike<{ data: unknown; error: unknown }> & {
   eq(column: string, value: string): Filterable;
   in(column: string, values: readonly string[]): Filterable;
+  not(column: string, operator: string, value: string): Filterable;
+  range(from: number, to: number): Filterable;
   or(filter: string): Filterable;
   order(column: string, opts?: { ascending?: boolean }): Filterable;
   limit(count: number): Filterable;
@@ -285,6 +288,8 @@ export function setContentOnline(next: boolean): void {
  * goes into the session cache, so the next screen gets fresh data for free.
  */
 const LIVE_DEADLINE_MS = 4000;
+/** A question set is asked for by a Start button, which can wait longer than a screen. */
+const DRAW_DEADLINE_MS = 12000;
 
 /**
  * Run a query, and if anything at all goes wrong fall back.
@@ -310,6 +315,8 @@ async function read<T>(
   own?: { empty: () => T },
   /** Whether a good answer may be cached as this key's last good answer. */
   keep: (data: T) => boolean = () => true,
+  /** How long the live answer may take before the fallback is served. */
+  deadlineMs = LIVE_DEADLINE_MS,
 ): Promise<T> {
   if (!client) return fallback();
   if (own) {
@@ -336,7 +343,7 @@ async function read<T>(
     // from surfacing as an unhandled rejection after the race is over.
     live.catch(() => {});
     const deadline = new Promise<never>((_, reject) => {
-      timer = setTimeout(() => reject(new Error('deadline')), LIVE_DEADLINE_MS);
+      timer = setTimeout(() => reject(new Error('deadline')), deadlineMs);
     });
     return await Promise.race([live, deadline]);
   } catch (e) {
@@ -506,12 +513,22 @@ export async function fetchSubject(id: string, client?: ContentClient): Promise<
   return found ?? (perRequest(client) ? undefined : subjectById(id));
 }
 
-export async function fetchChapters(subjectId: string, client?: ContentClient): Promise<Chapter[]> {
+export async function fetchChapters(
+  subjectId: string,
+  client?: ContentClient,
+  /**
+   * The medium to count sections and questions in. A server must pass it, as
+   * for fetchChapterContent: the module value is always English there, so an
+   * Urdu student's subject page counted English sections beside a hub that
+   * counted Urdu ones, and 39 chapters disagreed.
+   */
+  want: Medium = medium,
+): Promise<Chapter[]> {
   const at = client ?? db;
   const started = epoch;
   return read<Chapter[]>(
     at,
-    `chapters:${subjectId}:${medium}`,
+    `chapters:${subjectId}:${want}`,
     async () => {
       // The counts are part of the row, not an afterthought. A chapter list
       // that says "0 questions" next to a chapter holding twenty of them reads
@@ -526,9 +543,9 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
             'mcqs(count),flashcards(count),chapter_sections(count)',
         )
         .eq('subject_id', subjectId)
-        .eq('mcqs.medium', medium)
-        .eq('flashcards.medium', medium)
-        .eq('chapter_sections.medium', medium)
+        .eq('mcqs.medium', want)
+        .eq('flashcards.medium', want)
+        .eq('chapter_sections.medium', want)
         .order('number');
 
       type Counted = ChapterRow & {
@@ -568,9 +585,9 @@ export async function fetchChapters(subjectId: string, client?: ContentClient): 
   );
 }
 
-export async function fetchChapter(id: string, client?: ContentClient): Promise<Chapter | undefined> {
+export async function fetchChapter(id: string, client?: ContentClient, want: Medium = medium): Promise<Chapter | undefined> {
   const subjectId = id.split('-')[0];
-  const found = (await fetchChapters(subjectId, client)).find((c) => c.id === id);
+  const found = (await fetchChapters(subjectId, client, want)).find((c) => c.id === id);
   // On the server the index is shared by every request, primed by other
   // students' reads, so it cannot vouch for a chapter this one may not see.
   return found ?? (perRequest(client) ? undefined : chapterById(id));
@@ -625,12 +642,14 @@ async function queryChapterContent(
   if (error) return { error, data: null };
 
   const s = pick(sections.data);
-  // A chapter with no readable text is not a chapter yet. Fall back whole
-  // rather than render an empty reader with working flashcards under it.
-  // An empty answer, not an error: under row level security it can also mean
-  // this student may not read it, and a server has to be able to tell the two
-  // apart (see read()).
-  if (!s.length) return { error: null, data: null };
+  const q = pick(mcqs.data);
+  // Nothing at all is an empty answer, not an error: under row level security
+  // it also means this student may not read the chapter, and a server has to
+  // be able to tell the two apart (see read()). A chapter with questions and
+  // no notes yet is not empty, though. It used to be answered the same way,
+  // and its questions, cards and blanks were thrown away with the missing
+  // notes; the hubs start such a chapter with its questions.
+  if (!s.length && !q.length && !pick(cards.data).length) return { error: null, data: null };
 
   return {
     error: null,
@@ -640,7 +659,7 @@ async function queryChapterContent(
         title: r.title,
         blocks: r.blocks,
       })) as Section[],
-      mcqs: pick(mcqs.data).map((r) => ({
+      mcqs: q.map((r) => ({
         id: r.id,
         chapterId,
         topic: r.topic,
@@ -848,13 +867,41 @@ export async function fetchMcqs(
     return local ? draw(local, opts.count) : [];
   };
 
+  /*
+   * A whole subject's pool leaves out the chapters the board does not put on
+   * the paper (offPaper): their questions made up two in five of an FBISE
+   * Class 9 Urdu subject test. Known from the chapter index; with nothing
+   * indexed the pool is the whole subject, as it always was.
+   */
+  const offPaperIds =
+    !opts.chapterIds?.length && opts.subjectId ? chaptersFor(opts.subjectId).filter(offPaper).map((c) => c.id) : [];
+
   /** The pool's filters, the same for the id read and the whole-row read. */
   const scoped = (q: Filterable, m: Medium): Filterable => {
     let s = q.eq('medium', m);
     if (opts.chapterIds?.length) s = s.in('chapter_id', opts.chapterIds);
     else if (opts.subjectId) s = s.eq('subject_id', opts.subjectId);
+    if (offPaperIds.length) s = s.not('chapter_id', 'in', `(${offPaperIds.join(',')})`);
     if (opts.topics?.length) s = s.in('topic', opts.topics);
     return s;
+  };
+
+  /*
+   * Every id in the pool, a thousand at a time. PostgREST answers at most a
+   * thousand rows and says nothing when it stops, so a pool past that drew
+   * only from its first thousand. The largest pool today is 600; this keeps
+   * that from becoming a quiet bias when it grows.
+   */
+  const poolIds = async (m: Medium): Promise<{ data: string[] | null; error: unknown }> => {
+    const out: string[] = [];
+    for (let page = 0; page < 10; page += 1) {
+      const { data, error } = await scoped(table('mcqs', at!).select('id'), m).order('id').range(page * 1000, page * 1000 + 999);
+      if (error) return { data: null, error };
+      const rows = (data as { id: string }[]) ?? [];
+      out.push(...rows.map((r) => r.id));
+      if (rows.length < 1000) break;
+    }
+    return { data: out, error: null };
   };
 
   const drawIn = async (m: Medium): Promise<{ data: Mcq[] | null; error: unknown }> => {
@@ -864,9 +911,9 @@ export async function fetchMcqs(
       if (error) return { error, data: null };
       return { error: null, data: draw((data as Row[]) ?? [], opts.count).map(toMcq) };
     }
-    const ids = await scoped(table('mcqs', at!).select('id'), m);
+    const ids = await poolIds(m);
     if (ids.error) return { error: ids.error, data: null };
-    const picked = draw(((ids.data as { id: string }[]) ?? []).map((r) => r.id), opts.count);
+    const picked = draw(ids.data ?? [], opts.count);
     if (!picked.length) return { error: null, data: [] };
     const rows = await table('mcqs', at!).select(MCQ_COLUMNS).in('id', picked);
     if (rows.error) return { error: rows.error, data: null };
@@ -885,6 +932,14 @@ export async function fetchMcqs(
     },
     fallbackPool,
     perRequest(client) ? { empty: () => [] } : undefined,
+    undefined,
+    /*
+     * Longer than a screen's read. A subject-wide set is two round trips (the
+     * ids, then the drawn rows), and on a slow connection the four seconds ran
+     * out between them: the fallback pool is empty, so the student was told
+     * there were no questions, and the second tap worked off the cache.
+     */
+    DRAW_DEADLINE_MS,
   );
 }
 
@@ -1044,10 +1099,18 @@ export async function fetchAiSessions(client?: ContentClient): Promise<AiSession
  */
 export async function fetchAudioTracks(chapterId: string, client?: ContentClient): Promise<AudioTrack[]> {
   if (!client && !db) return [];
+  /*
+   * On a server a failed read is an error for the page to show with its Try
+   * again, not an empty list. Answered as "no recording", the website's audio
+   * page called notFound() on a chapter that has a lesson, and the hub hid its
+   * row. The devices keep the quiet empty answer their screens expect.
+   */
+  const own = perRequest(client);
   try {
     const { data, error } = await table('audio_tracks', client ?? db!)
       .select('id,chapter_id,medium,title,storage_path,duration_secs,bytes,voice_pending')
       .eq('chapter_id', chapterId);
+    if (error && own) throw new Error(`[content] audio:${chapterId}: ${(error as { message?: string }).message ?? String(error)}`);
     if (error || !data) return [];
     return (data as Record<string, unknown>[]).map((r) => ({
       id: String(r.id),
@@ -1059,7 +1122,8 @@ export async function fetchAudioTracks(chapterId: string, client?: ContentClient
       bytes: Number(r.bytes) || 0,
       voicePending: r.voice_pending === true,
     }));
-  } catch {
+  } catch (e) {
+    if (own) throw e;
     return [];
   }
 }

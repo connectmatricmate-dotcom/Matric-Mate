@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { switchAccountAction } from '@/app/(auth)/actions';
-import { SubmitButton } from '@/components/ui/controls';
+import { SwitchAccountForm } from '@/components/auth/SwitchAccountForm';
 import { Card, Icon, LinkBtn, Wordmark } from '@/components/ui/primitives';
 import { homeFor, type Role } from '@/lib/roles';
 
@@ -44,10 +43,8 @@ export function WrongAccount({ area, email, role }: { area: 'admin' | 'affiliate
           {area === 'admin' ? 'the admin account' : 'a teacher account'}. Nothing has been removed: switch to the right account
           and this page opens again.
         </p>
-        <form action={switchAccountAction} className="mt-5">
-          <input type="hidden" name="next" value={where.path} />
-          <SubmitButton title="Switch account" pendingTitle="Signing out…" className="w-full" />
-        </form>
+        {/* Hands this browser's notifications back before signing out. */}
+        <SwitchAccountForm next={where.path} title="Switch account" pendingTitle="Signing out…" />
         <LinkBtn title={HOME_LABEL[role]} href={homeFor(role)} variant="line" className="mt-3 w-full" />
       </Card>
     </div>

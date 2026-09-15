@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import { fbiseTopperSubjectIds, fbiseToppersFor } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/server';
 import { TopperPapersScreen } from '@/components/screens/TopperPapersScreen';
+import { currentAccess } from '@/lib/entitlement';
+import { localTitle } from '@/lib/page-title';
 
-export const metadata: Metadata = {
-  title: 'Topper papers',
-  // No class: the scripts carry none, see topperYears.
-  description: 'Marked FBISE topper answer scripts, subject by subject.',
-};
+// No class in the description: the scripts carry none, see topperYears.
+export const generateMetadata = (): Promise<Metadata> =>
+  localTitle('session.toppersTitle', 'Marked FBISE topper answer scripts, subject by subject.');
 
 export default async function TopperPapersPage() {
   // These are FBISE's own scripts. The dashboard and practice tabs do not
@@ -20,11 +20,16 @@ export default async function TopperPapersPage() {
     : { data: null };
   const punjab = profile?.board === 'punjab';
 
+  // On a free trial, the trial's subject only, as everywhere else in it.
+  const access = await currentAccess();
+  const trialSubject = access.tier === 'trial' ? access.trialSubject : null;
   const groups = punjab
     ? []
-    : fbiseTopperSubjectIds().map((subjectId) => ({
-        subjectId,
-        scripts: fbiseToppersFor(subjectId),
-      }));
+    : fbiseTopperSubjectIds()
+        .filter((subjectId) => !trialSubject || subjectId === trialSubject)
+        .map((subjectId) => ({
+          subjectId,
+          scripts: fbiseToppersFor(subjectId),
+        }));
   return <TopperPapersScreen groups={groups} punjab={punjab} />;
 }

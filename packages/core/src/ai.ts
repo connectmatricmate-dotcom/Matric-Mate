@@ -10,11 +10,10 @@
 import { subjectMedium } from './boards';
 import { chapterById, subjectById } from './content';
 import { contentBoard } from './db';
-import { weakTopics } from './domain';
 import { aiGet, aiPost } from './tutor';
 import type { SyncClient } from './sync';
 import type { AiFail, TutorQuota } from './tutor';
-import type { Attempt, Blank, Flashcard, Mcq, ShortQ } from './types';
+import type { Blank, Flashcard, Mcq, ShortQ } from './types';
 
 export type AiSessionKind = 'mcq' | 'flashcards' | 'blanks' | 'shortq';
 
@@ -200,6 +199,13 @@ export async function checkAnswerLive(input: {
   marks: number;
   answer: string;
   medium?: string;
+  /**
+   * Where the question comes from: its chapter (short questions) or its
+   * subject (a mock paper). The server marks a free trial's answers only in
+   * the trial's own subject and refuses a check that does not say.
+   */
+  chapterId?: string;
+  subjectId?: string;
 }): Promise<{ ok: true; verdict: AiCheckVerdict } | AiFail> {
   const res = await aiPost<AiCheckVerdict>('/api/ai/check-answer', input);
   return res.ok ? { ok: true, verdict: res.data } : res;
@@ -215,46 +221,6 @@ export async function generateMockPaper(
     { ...input, medium: askIn(input.subjectId, input.medium) },
     signal,
   );
-  return res.ok ? { ok: true, ...res.data } : res;
-}
-
-/**
- * The compact week-in-review the coach route reads. Built client-side because
- * the apps already hold the attempt history for their progress screens.
- */
-export function buildCoachDigest(input: {
-  attempts: Attempt[];
-  streak: number;
-  xp: number;
-  subjects: string[];
-  language: string;
-}) {
-  const weekAgo = Date.now() - 7 * 864e5;
-  const recent = input.attempts.filter((a) => a.at >= weekAgo);
-  const correct = recent.filter((a) => a.correct).length;
-  return {
-    streak: input.streak,
-    xp: input.xp,
-    attemptsThisWeek: recent.length,
-    accuracyPct: recent.length ? Math.round((correct / recent.length) * 100) : 0,
-    topics: weakTopics(input.attempts, 2)
-      .slice(0, 8)
-      .map((w) => ({ topic: w.topic, pct: w.accuracy, tries: w.total })),
-    subjects: input.subjects,
-    language: input.language,
-  };
-}
-
-export async function fetchCoachReport(digest: {
-  streak: number;
-  xp: number;
-  attemptsThisWeek: number;
-  accuracyPct: number;
-  topics: { topic: string; pct: number; tries: number }[];
-  subjects: string[];
-  language: string;
-}): Promise<{ ok: true; report: CoachReport; cached: boolean } | AiFail> {
-  const res = await aiPost<{ report: CoachReport; cached: boolean }>('/api/ai/coach', { digest });
   return res.ok ? { ok: true, ...res.data } : res;
 }
 

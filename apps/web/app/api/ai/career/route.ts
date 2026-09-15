@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { BOARD_WITH_ARTICLE, SUBJECTS, type CareerReport, type CareerState, type CareerSubjectStat } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chargeQuota, guardAi, guardStudent, refused, type Guarded } from '@/lib/ai/guard';
+import { AI_COST, AI_MODEL, chargeQuota, guardAi, guardStudent, noteAiFailure, refused, type Guarded } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -18,7 +18,8 @@ import { languageRule } from '@/lib/ai/language';
  * something. It is an AI feature, so it is Premium's (and a trial's, whose one
  * subject will rarely be enough), refused to Basic by the guard.
  */
-export const maxDuration = 120;
+// The apps wait 90 seconds and retry once; the route must outlive both.
+export const maxDuration = 300;
 
 /** Answers a subject needs before it counts, and how many subjects must have them. */
 const NEED_PER_SUBJECT = 20;
@@ -153,7 +154,8 @@ export async function POST(req: NextRequest) {
   try {
     const response = await anthropic.messages.create({
       model: AI_MODEL,
-      max_tokens: 1800,
+      // Five parts in Urdu run long; 1,800 cut some of them off.
+      max_tokens: 4000,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: REPORT_SCHEMA } },
       system:
         `You are a careers counsellor for ${BOARD_WITH_ARTICLE[g.board]} Class ${g.grade} student in Pakistan who will choose a Class 11 group after the matric exams. ` +
@@ -175,11 +177,14 @@ export async function POST(req: NextRequest) {
       ],
     });
     if (response.stop_reason === 'refusal') return refused(g.quota);
+    // Cut off at the limit, the JSON is not whole: an error, not a report.
+    if (response.stop_reason === 'max_tokens') throw new Error('report cut off at the token limit');
     const block = response.content.find((b) => b.type === 'text');
     if (!block || block.type !== 'text') return refused(g.quota);
     report = JSON.parse(block.text) as CareerReport;
   } catch (err) {
     console.error('[career] model call failed', err instanceof Error ? err.message : err);
+    await noteAiFailure(err);
     return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 503 });
   }
 

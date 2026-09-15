@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { notFound } from 'next/navigation';
 import { CertificateDetail, type CertDetailRow } from '@/components/screens/CertificateDetail';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Teacher certificate',
-  description: 'A teacher verification certificate for MatricMate study material.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('cert.title', 'A teacher verification certificate for MatricMate study material.');
 
 export default async function CertificatePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

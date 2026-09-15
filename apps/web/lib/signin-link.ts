@@ -1,5 +1,5 @@
 import 'server-only';
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { SITE_URL } from '@/lib/site';
 import type { createAdminClient } from '@/lib/supabase/admin';
 
@@ -14,37 +14,64 @@ type Admin = ReturnType<typeof createAdminClient>;
  * which is no good in an email read the next morning. So the email carries
  * this instead: a signed address, good for seven days, naming only the
  * account it was sent to. Opened, it asks Supabase for a fresh one-time
- * sign-in for that account and goes straight through it. Nothing about the
- * account can be read from it, and it can open nothing but that account's
- * plans page.
+ * sign-in for that account and goes straight through it, landing on the plans
+ * page. Nothing about the account can be read from it.
+ *
+ * It signs someone in once. The first version worked every time it was
+ * opened for the whole week, so a forwarded email was a week-long way into
+ * the account. Each link carries a random nonce that /go/plans claims
+ * (table signin_links) before it signs anyone in.
  *
  * Sent by email only, never shown in the app: an in-app route to the plans
  * page is exactly what Google Play forbids (core/billing.ts).
  */
 const LINK_DAYS = 7;
 
-/** A key of its own, derived from the cron secret the way the voice stream's is. */
-const key = () => createHash('sha256').update(`plans-link:${process.env.CRON_SECRET ?? ''}`).digest();
+/**
+ * A key of its own, derived from the cron secret the way the voice stream's
+ * is. Null without the secret: then no link is made or accepted, rather than
+ * one signed with a key anybody could work out.
+ */
+const key = () => {
+  const secret = process.env.CRON_SECRET;
+  return secret ? createHash('sha256').update(`plans-link:${secret}`).digest() : null;
+};
 
-export function plansLink(userId: string): string {
+/** The email's button, or null when links cannot be signed here. */
+export function plansLink(userId: string): string | null {
+  const k = key();
+  if (!k) return null;
   const exp = Math.floor(Date.now() / 1000) + LINK_DAYS * 24 * 60 * 60;
-  const sig = createHmac('sha256', key()).update(`${userId}.${exp}`).digest('base64url');
+  const nonce = randomBytes(16).toString('base64url');
+  const sig = createHmac('sha256', k).update(`${userId}.${exp}.${nonce}`).digest('base64url');
   const url = new URL('/go/plans', SITE_URL);
   url.searchParams.set('u', userId);
   url.searchParams.set('e', String(exp));
+  url.searchParams.set('n', nonce);
   url.searchParams.set('s', sig);
   return url.toString();
 }
 
-/** The account a plans link was made for, or null when it is forged or out of date. */
-export function readPlansLink(q: URLSearchParams): string | null {
+/** Who a plans link was made for and its nonce, or null when it is forged or out of date. */
+export function readPlansLink(q: URLSearchParams): { userId: string; nonce: string } | null {
+  const k = key();
   const userId = q.get('u') ?? '';
   const exp = Number(q.get('e'));
+  const nonce = q.get('n') ?? '';
   const sig = q.get('s') ?? '';
-  if (!/^[0-9a-f-]{36}$/i.test(userId) || !Number.isFinite(exp) || exp < Date.now() / 1000) return null;
-  const want = createHmac('sha256', key()).update(`${userId}.${exp}`).digest();
+  if (!k || !/^[0-9a-f-]{36}$/i.test(userId) || !/^[\w-]{16,64}$/.test(nonce) || !Number.isFinite(exp) || exp < Date.now() / 1000) return null;
+  const want = createHmac('sha256', k).update(`${userId}.${exp}.${nonce}`).digest();
   const got = Buffer.from(sig, 'base64url');
-  return got.length === want.length && timingSafeEqual(got, want) ? userId : null;
+  return got.length === want.length && timingSafeEqual(got, want) ? { userId, nonce } : null;
+}
+
+/** Marks a link used. False when it already was (or the claim could not be written). */
+export async function claimPlansLink(admin: Admin, link: { userId: string; nonce: string }): Promise<boolean> {
+  const { data, error } = await admin
+    .from('signin_links')
+    .upsert({ nonce: link.nonce, user_id: link.userId }, { onConflict: 'nonce', ignoreDuplicates: true })
+    .select('nonce');
+  return !error && !!data?.length;
 }
 
 /**

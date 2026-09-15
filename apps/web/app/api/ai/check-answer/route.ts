@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { BOARD_WITH_ARTICLE, subjectMedium } from '@matricmate/core';
-import { AI_COST, AI_MODEL, chargeQuota, guardAi, outsideTrial, refused, studentMedium } from '@/lib/ai/guard';
+import { AI_COST, AI_MODEL, chargeQuota, guardAi, outsideTrial, refused, studentMedium, noteAiFailure } from '@/lib/ai/guard';
 import { languageRule } from '@/lib/ai/language';
 
 /**
@@ -62,9 +62,11 @@ export async function POST(req: NextRequest) {
   const medium = from ? subjectMedium(from, g.board, studentMedium(body.medium, g)) : studentMedium(body.medium, g);
   if (!question || !answer || !modelAnswer) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
   // A free trial checks answers from its own subject only, like every other
-  // AI route (outsideTrial). A chapter id starts with its subject's id.
-  if (from) {
-    const shut = outsideTrial(g, from.split('-')[0]);
+  // AI route (outsideTrial). A chapter id starts with its subject's id. A
+  // check that does not say where its question is from used to skip this,
+  // so on a trial it must say (both apps send the chapter or the subject).
+  if (from || g.trialSubject) {
+    const shut = outsideTrial(g, from ? from.split('-')[0] : null);
     if (shut) return shut;
   }
 
@@ -97,6 +99,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ...verdict, maxMarks: marks, quota });
   } catch (e) {
     console.error('[check-answer]', e instanceof Error ? e.message : e);
+    await noteAiFailure(e);
     return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 502 });
   }
 }

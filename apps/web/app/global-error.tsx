@@ -39,10 +39,20 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
               padding: '12px 22px',
               fontSize: 15,
               fontWeight: 700,
+              minHeight: 44,
             }}
           >
             Reload
           </button>
+          {/* A plain link, not the router: the app itself is what failed, and
+              a full page load is the one way home that does not depend on it. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a
+            href="/"
+            style={{ display: 'inline-block', marginInlineStart: 10, padding: '12px 16px', minHeight: 44, boxSizing: 'border-box', color: '#096A8B', fontSize: 15, fontWeight: 700 }}
+          >
+            Go to the homepage
+          </a>
         </div>
       </body>
     </html>

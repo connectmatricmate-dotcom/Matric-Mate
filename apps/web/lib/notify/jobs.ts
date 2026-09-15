@@ -1,6 +1,7 @@
 import 'server-only';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import type { NextRequest } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
  * What every scheduled job needs and none of them had.
@@ -145,4 +146,30 @@ export function cronAuthorised(req: NextRequest): boolean {
   if (!secret) return false;
   const digest = (s: string) => createHash('sha256').update(s).digest();
   return timingSafeEqual(digest(req.headers.get('authorization') ?? ''), digest(`Bearer ${secret}`));
+}
+
+/**
+ * A job route that leaves a record of every run (table job_runs, migration
+ * 0054): the job, the status it answered and its summary. pg_cron says
+ * "succeeded" whatever happens and pg_net forgets the answer after six hours,
+ * so this is the only lasting trace of a run that sent nothing. Dry runs and
+ * refused calls are not recorded. The write is awaited: a lambda freezes as
+ * soon as the response is sent.
+ */
+export function logged(job: string, handler: (req: NextRequest) => Promise<Response>) {
+  return async (req: NextRequest): Promise<Response> => {
+    const res = await handler(req);
+    if (res.status === 401 || req.nextUrl.searchParams.get('dry') === '1' || req.nextUrl.searchParams.get('push') === 'check') return res;
+    try {
+      const summary = await res
+        .clone()
+        .json()
+        .catch(() => null);
+      const { error } = await createAdminClient().from('job_runs').insert({ job, status: res.status, summary });
+      if (error) console.error(`[${job}] could not record the run`, error.message);
+    } catch (e) {
+      console.error(`[${job}] could not record the run`, e instanceof Error ? e.message : e);
+    }
+    return res;
+  };
 }

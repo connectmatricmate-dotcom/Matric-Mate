@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { AiLocked } from '@/components/app/AiLocked';
 import { CareerView } from '@/components/screens/CareerView';
 import { currentAccess } from '@/lib/entitlement';
 
-export const metadata: Metadata = {
-  title: 'Career guidance',
-  description: 'Which Class 11 group and which fields your practice results point to, and why.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('career.title', 'Which Class 11 group and which fields your practice results point to, and why.');
 
 export default async function CareerPage() {
   // Written by the AI, so it is Premium's; the route refuses Basic as well.

@@ -2,16 +2,17 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ChapterList } from '@/components/screens/ChapterList';
 import { getChapters, getSubject } from '@/lib/content-readers';
-import { subjectOpen } from '@matricmate/core';
+import { subjectName, subjectOpen } from '@matricmate/core';
 import { currentAccess } from '@/lib/entitlement';
+import { readUiLanguage } from '@/lib/ui-language.server';
 
 type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const subject = await getSubject(id);
+  const [subject, lang] = await Promise.all([getSubject(id), readUiLanguage()]);
   return subject
-    ? { title: subject.name, description: `Every ${subject.name} chapter: notes, audio, MCQs and past papers.` }
+    ? { title: subjectName(subject, lang), description: `Every ${subject.name} chapter: notes, audio, MCQs and past papers.` }
     : { title: 'Subject' };
 }
 

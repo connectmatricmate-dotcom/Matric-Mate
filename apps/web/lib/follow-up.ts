@@ -1,6 +1,7 @@
 import 'server-only';
 import { normaliseMobile } from '@matricmate/core';
 import { plansLink } from '@/lib/signin-link';
+import { SITE_URL } from '@/lib/site';
 import { allStudents } from '@/lib/students';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -51,7 +52,7 @@ export async function followUps(): Promise<FollowUp[]> {
     const ended = r.till <= now;
     const trial = r.plan === 'trial';
     const first = r.name.trim().split(/\s+/)[0] || 'there';
-    const message = `Assalam o Alaikum ${first}, your MatricMate ${trial ? 'free trial' : 'plan'} ${ended ? 'ended' : 'ends'} on ${when(r.till)}. You can ${trial ? 'choose a plan' : 'renew'} here, it signs you in: ${plansLink(r.id)}`;
+    const message = `Assalam o Alaikum ${first}, your MatricMate ${trial ? 'free trial' : 'plan'} ${ended ? 'ended' : 'ends'} on ${when(r.till)}. You can ${trial ? 'choose a plan' : 'renew'} here, it signs you in: ${plansLink(r.id) ?? `${SITE_URL}/login?next=/upgrade`}`;
     const phone = r.phone ? normaliseMobile(r.phone) : null;
     return {
       id: r.id,

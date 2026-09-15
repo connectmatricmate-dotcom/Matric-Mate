@@ -1,15 +1,16 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole, emailAllowedAsAdmin } from '@/lib/roles';
-import { markPaidAndGrant, recordPendingPayment } from '@/lib/payments';
+import { markPaidAndGrant } from '@/lib/payments';
 import { PLANS, THE_PLAN, planById } from '@/lib/plans';
 
 /**
- * Everything the admin panel can do. Five actions, all of them privileged.
+ * Everything the admin panel can do. All of it privileged.
  *
  * Each one re-checks who is calling. The layout guard is what stops the page
  * rendering, and a server action is a public HTTP endpoint that does not go
@@ -52,8 +53,8 @@ async function requireAdmin(): Promise<{ id: string } | { error: string }> {
 const NewTeacher = z.object({
   fullName: z.string().trim().min(2, 'Name is required.').max(120),
   email: z.string().trim().toLowerCase().email('That does not look like an email address.'),
-  // Adnan sets this and passes it on himself. Email to real people is still
-  // blocked on the unverified domain, so an invite link would not arrive.
+  // Adnan sets this and hands it over himself, and the teacher changes it
+  // under Settings once they are in.
   password: z.string().min(8, 'Password must be at least 8 characters.').max(72),
   commissionPct: z.coerce.number().min(0, 'Commission cannot be negative.').max(100, 'Commission cannot be over 100%.'),
   phone: z.string().trim().max(40).optional().or(z.literal('')),
@@ -151,6 +152,12 @@ const Payout = z.object({
   note: z.string().trim().max(300).optional().or(z.literal('')),
 });
 
+const rs = (n: number) => `Rs ${n.toLocaleString('en-PK')}`;
+
+/** A date as the admin reads it: "15 Oct 2026", in Karachi. */
+const day = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Karachi' });
+
 /** Record money actually handed over, so both sides read the same number. */
 export async function recordPayoutAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   const who = await requireAdmin();
@@ -159,7 +166,11 @@ export async function recordPayoutAction(_prev: AdminState, formData: FormData):
   const parsed = Payout.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Check the amount.' };
 
-  const { error } = await createAdminClient().from('affiliate_payouts').insert({
+  const admin = createAdminClient();
+  const { data: teacher } = await admin.from('affiliates').select('full_name').eq('user_id', parsed.data.affiliateId).maybeSingle();
+  if (!teacher) return { error: 'Unknown teacher.' };
+
+  const { error } = await admin.from('affiliate_payouts').insert({
     affiliate_id: parsed.data.affiliateId,
     amount: parsed.data.amount,
     note: blank(parsed.data.note),
@@ -169,12 +180,47 @@ export async function recordPayoutAction(_prev: AdminState, formData: FormData):
 
   revalidatePath(`/admin/teachers/${parsed.data.affiliateId}`);
   revalidatePath('/admin/teachers');
-  return { ok: `Recorded Rs ${parsed.data.amount.toLocaleString('en-PK')}.` };
+  return { ok: `Recorded ${rs(parsed.data.amount)} paid to ${teacher.full_name}. It shows on their dashboard now.` };
+}
+
+/** How long a payout stays deletable: long enough to catch a typo, short
+ *  enough that a teacher never watches money they were shown disappear. */
+const PAYOUT_UNDO_MS = 24 * 3600 * 1000;
+
+/**
+ * Take back a payout recorded by mistake: a wrong amount, the wrong teacher,
+ * the same transfer entered twice. Only within a day of recording it, checked
+ * in the same statement that deletes, so an older row cannot slip through.
+ */
+export async function deletePayoutAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  const who = await requireAdmin();
+  if ('error' in who) return { error: who.error };
+
+  const id = String(formData.get('payoutId') ?? '');
+  const affiliateId = String(formData.get('affiliateId') ?? '');
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f-]{36}$/i.test(affiliateId)) return { error: 'Unknown payout.' };
+
+  const cutoff = new Date(Date.now() - PAYOUT_UNDO_MS).toISOString();
+  const { data, error } = await createAdminClient()
+    .from('affiliate_payouts')
+    .delete()
+    .eq('id', id)
+    .eq('affiliate_id', affiliateId)
+    .gt('at', cutoff)
+    .select('amount');
+  if (error) return { error: `Could not delete it: ${error.message}` };
+  if (!data?.length) return { error: 'A payout can only be deleted on the day it was recorded. This one stays.' };
+
+  revalidatePath(`/admin/teachers/${affiliateId}`);
+  revalidatePath('/admin/teachers');
+  return { ok: `Deleted the payout of ${rs(Number(data[0].amount))}.` };
 }
 
 const Grant = z.object({
   userId: z.string().uuid('Unknown student.'),
   planId: z.enum(PLANS.map((p) => p.id) as [string, ...string[]]).optional(),
+  /** Which button was pressed, for the wording of the answer only. */
+  op: z.enum(['give', 'upgrade', 'extend', 'revoke']).optional(),
 });
 
 /** The student exists, is a student, and is not staff wearing a student's URL. */
@@ -205,6 +251,15 @@ async function studentOrError(userId: string) {
  * did pay. Same path as a real payment for exactly that reason: the row, then
  * markPaidAndGrant, which extends from whichever is later and sends the
  * receipt the student would have got anyway.
+ *
+ * "Add a month" is this same action with the plan the student already has:
+ * markPaidAndGrant extends from the current end date, so a month is added to
+ * it rather than starting again from today.
+ *
+ * The same plan for the same student twice within two minutes is one grant
+ * (record_manual_payment, migration 0062). A second press, a double tap on a
+ * slow phone or the page resubmitted, used to mint a second payment: two
+ * months, double the revenue and double the teacher's commission.
  */
 export async function grantPremiumAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   const who = await requireAdmin();
@@ -218,26 +273,47 @@ export async function grantPremiumAction(_prev: AdminState, formData: FormData):
 
   const plan = planById(parsed.data.planId ?? THE_PLAN.id);
   const stamp = Date.now().toString(36);
-  const tracker = `MANUAL-${stamp}`;
 
-  await recordPendingPayment({
-    userId: parsed.data.userId,
-    tracker,
-    orderId: `MM-manual-${stamp}`,
-    planId: plan.id,
-    amountRupees: plan.price,
+  const admin = createAdminClient();
+  const { data: slot, error: slotError } = await admin.rpc('record_manual_payment', {
+    p_user: parsed.data.userId,
+    p_plan: plan.id,
+    p_amount: plan.price,
+    p_tracker: `MANUAL-${stamp}`,
+    p_order: `MM-manual-${stamp}`,
   });
+  if (slotError) return { error: `Could not record that. Nothing was changed. (${slotError.message})` };
+
+  const recorded = (slot ?? {}) as { state?: 'new' | 'pending' | 'done'; tracker?: string; at?: string };
+  if (recorded.state === 'done') {
+    return {
+      error: `${plan.name} was already given to ${check.name} a moment ago, so nothing was added twice. To add another month, wait two minutes.`,
+    };
+  }
+  if (!recorded.tracker) return { error: 'Could not record that. Nothing was changed.' };
 
   const result = await markPaidAndGrant({
-    tracker,
+    tracker: recorded.tracker,
     reference: 'manual',
     raw: { source: 'admin-grant', by: who.id, amount: plan.price },
   });
-  if (!result.handled) return { error: 'Could not record that. Nothing was changed.' };
+  if (!result.handled) {
+    return { error: `Could not switch ${plan.name} on for ${check.name}. Press the button again to retry.${result.error ? ` (${result.error})` : ''}` };
+  }
+  if (result.alreadySettled) {
+    return { error: `${plan.name} was already given to ${check.name} a moment ago, so nothing was added twice.` };
+  }
 
   revalidatePath('/admin/students');
+  revalidatePath(`/admin/students/${parsed.data.userId}`);
   revalidatePath('/admin');
-  return { ok: `${check.name} now has ${plan.name}.` };
+  const until = result.validTill ? ` until ${day(result.validTill)}` : '';
+  return {
+    ok:
+      parsed.data.op === 'extend'
+        ? `Added a month. ${check.name} now has ${plan.name}${until}.`
+        : `${check.name} now has ${plan.name}${until}. ${rs(plan.price)} is recorded as paid.`,
+  };
 }
 
 /**
@@ -246,11 +322,15 @@ export async function grantPremiumAction(_prev: AdminState, formData: FormData):
  * Access stops now: the entitlement is switched off rather than deleted, so
  * the row still says which plan they had and when it would have run out.
  *
- * Manual grants are also marked refunded, because those rows are our own
- * bookkeeping and a mistaken grant should not sit in the revenue total or earn
- * a teacher commission forever. A real gateway payment is left exactly as it
- * is: money genuinely arrived, and rewriting that history to switch off access
- * would make the books disagree with the bank.
+ * The payment behind the current plan is marked refunded when it was given
+ * from this page, because those rows are our own bookkeeping and a mistaken
+ * grant should not sit in the revenue total or earn a teacher commission
+ * forever. Only that one: it marked every manual payment the student ever
+ * had, so revoking a student who had paid for six months took six months out
+ * of the revenue and out of their teacher's commission. A real gateway
+ * payment is left exactly as it is: money genuinely arrived, and rewriting
+ * that history to switch off access would make the books disagree with the
+ * bank.
  */
 export async function revokePremiumAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   const who = await requireAdmin();
@@ -269,34 +349,77 @@ export async function revokePremiumAction(_prev: AdminState, formData: FormData)
     .eq('user_id', parsed.data.userId);
   if (error) return { error: `Could not switch it off: ${error.message}` };
 
-  const { error: refundError } = await admin
+  revalidatePath('/admin/students');
+  revalidatePath(`/admin/students/${parsed.data.userId}`);
+  revalidatePath('/admin');
+
+  // The latest paid payment is the one that set the current end date. If it
+  // came through the gateway there is nothing of ours to reverse.
+  const { data: latest, error: readError } = await admin
     .from('payments')
-    .update({ status: 'refunded' })
+    .select('id, tracker, amount, at')
     .eq('user_id', parsed.data.userId)
     .eq('status', 'paid')
-    .like('tracker', 'MANUAL-%');
+    .order('at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  revalidatePath('/admin/students');
-  revalidatePath('/admin');
+  let refundError = readError?.message;
+  let refunded = '';
+  if (!readError && latest?.tracker?.startsWith('MANUAL-')) {
+    const { error: e } = await admin.from('payments').update({ status: 'refunded' }).eq('id', latest.id).eq('status', 'paid');
+    if (e) refundError = e.message;
+    else refunded = ` The ${rs(Number(latest.amount ?? 0))} recorded on ${day(latest.at)} is marked refunded.`;
+  }
 
   // Access is already off by here, so say exactly that: a grant still counted
   // as revenue, and towards a teacher's commission, is worth knowing about.
   if (refundError) {
     return {
-      error: `${check.name} no longer has a plan, but the manual payment could not be marked refunded: ${refundError.message}`,
+      error: `${check.name} no longer has a plan, but the payment could not be marked refunded: ${refundError}`,
     };
   }
-  return { ok: `${check.name} no longer has a plan.` };
+  return { ok: `${check.name} no longer has a plan.${refunded}` };
 }
 
 /**
- * Turn a teacher's link on or off.
+ * The revision sheet a report is about, thrown away so the next student who
+ * opens it gets a freshly written one.
  *
- * Off stops the code attributing anybody new. It does not touch the students
- * they already brought or anything they have earned, which is the difference
- * between suspending a link and erasing a working relationship.
+ * Sheets are cached once per chapter and language for every student
+ * (cheat_sheets, see api/ai/cheat-sheet), so a wrong one stayed wrong for
+ * everybody until somebody ran SQL. The report kept the start of the sheet it
+ * was about, which picks the right language when there are two; when it
+ * matches neither, that sheet has already been replaced and nothing is
+ * deleted.
  */
-/** A reported AI answer, read (see /admin/reports). */
+export async function resetSheetAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  const who = await requireAdmin();
+  if ('error' in who) return { error: who.error };
+
+  const id = String(formData.get('reportId') ?? '');
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { error: 'Unknown report.' };
+
+  const admin = createAdminClient();
+  const { data: report } = await admin.from('ai_reports').select('surface, ref, excerpt').eq('id', id).maybeSingle();
+  if (!report || report.surface !== 'sheet' || !report.ref) return { error: 'This report is not about a revision sheet.' };
+
+  const { data: sheets, error } = await admin.from('cheat_sheets').select('medium, body').eq('chapter_id', report.ref);
+  if (error) return { error: `Could not read the sheet: ${error.message}` };
+  const start = (report.excerpt ?? '').trim().slice(0, 160);
+  const match = ((sheets ?? []) as { medium: string; body: string }[]).find((s) => start && s.body.trim().startsWith(start));
+  if (!match) return { ok: 'That sheet has already been replaced. Nothing to delete.' };
+
+  const { error: delError } = await admin.from('cheat_sheets').delete().eq('chapter_id', report.ref).eq('medium', match.medium);
+  if (delError) return { error: `Could not delete the sheet: ${delError.message}` };
+
+  revalidatePath('/admin/reports');
+  return { ok: 'Sheet deleted. The next student who opens it gets a newly written one.' };
+}
+
+/**
+ * A reported AI answer, read (see /admin/reports).
+ */
 export async function markReportSeenAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   const who = await requireAdmin();
   if ('error' in who) return { error: who.error };
@@ -308,6 +431,13 @@ export async function markReportSeenAction(_prev: AdminState, formData: FormData
   return { ok: 'Marked as seen.' };
 }
 
+/**
+ * Turn a teacher's link on or off.
+ *
+ * Off stops the code attributing anybody new. It does not touch the students
+ * they already brought or anything they have earned, which is the difference
+ * between suspending a link and erasing a working relationship.
+ */
 export async function setTeacherActiveAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
   const who = await requireAdmin();
   if ('error' in who) return { error: who.error };
@@ -322,4 +452,37 @@ export async function setTeacherActiveAction(_prev: AdminState, formData: FormDa
   revalidatePath(`/admin/teachers/${id}`);
   revalidatePath('/admin/teachers');
   return { ok: active ? 'Link switched on.' : 'Link switched off.' };
+}
+
+/**
+ * Deleting a student's account for them, on request: the email or the call
+ * that /delete-account offers someone who cannot sign in to do it themselves.
+ * The same deletion as the student's own button (api/account/delete): the
+ * login account goes, and everything of theirs with it by cascade; payments
+ * stay with no one attached, still earning their teacher's commission
+ * (payments.referred_by). Recorded in account_deletions as done by the admin.
+ */
+export async function deleteStudentAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  const who = await requireAdmin();
+  if ('error' in who) return { error: who.error };
+
+  const parsed = z.object({ userId: z.string().uuid('Unknown student.') }).safeParse({ userId: formData.get('userId') });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Unknown student.' };
+  const check = await studentOrError(parsed.data.userId);
+  if ('error' in check) return { error: check.error };
+
+  const admin = createAdminClient();
+  const [{ count: paid }, { data: profile }] = await Promise.all([
+    admin.from('payments').select('id', { count: 'exact', head: true }).eq('user_id', parsed.data.userId).eq('status', 'paid'),
+    admin.from('profiles').select('referred_by').eq('id', parsed.data.userId).maybeSingle(),
+  ]);
+  await admin.from('account_deletions').insert({ had_paid: (paid ?? 0) > 0, referred: !!profile?.referred_by, via: 'admin' });
+
+  const { error } = await admin.auth.admin.deleteUser(parsed.data.userId);
+  if (error) return { error: `Could not delete the account: ${error.message}` };
+
+  revalidatePath('/admin/students');
+  revalidatePath('/admin');
+  // Their page no longer exists, so the answer is given on the list.
+  redirect('/admin/students?deleted=1');
 }

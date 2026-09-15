@@ -1,15 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { AI_QUOTA, daysLeft, formatDate, subjectById, subjectName, type StringKey } from '@matricmate/core';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { AI_QUOTA, daysLeft, formatDate, subjectById, subjectName, type Access, type StringKey } from '@matricmate/core';
 import { UpgradeButton } from '@/components/commerce/UpgradeButton';
 import { Page, Work } from '@/components/app/Page';
 import { Card, Icon, Pill } from '@/components/ui/primitives';
 import { BASIC_PLAN, THE_PLAN, rupees, type Plan } from '@/lib/plans';
 import { useApp, useLang, useT } from '@/lib/store';
 
-/** A trial or plan that has run out, and when; null for anything else. */
-export type Lapsed = { kind: 'trial'; endedAt: number } | { kind: 'plan'; endedAt: number; plan: 'basic' | 'premium' } | null;
+/** A trial or plan that has run out, and when; one switched off early; null for anything else. */
+export type Lapsed =
+  | { kind: 'trial'; endedAt: number }
+  | { kind: 'plan'; endedAt: number; plan: 'basic' | 'premium' }
+  | { kind: 'off' }
+  | null;
 
 const PERKS: Record<'basic' | 'premium', StringKey[]> = {
   basic: ['plans.basicPerk1', 'plans.basicPerk2', 'plans.basicPerk3', 'plans.basicPerk4'],
@@ -27,11 +32,24 @@ const PERKS: Record<'basic' | 'premium', StringKey[]> = {
  * itself on /trial (the layout decides). Premium students never land here
  * either (the layout sends them home).
  */
-export function UpgradeView({ lapsed }: { lapsed: Lapsed }) {
+export function UpgradeView({ lapsed, current }: { lapsed: Lapsed; current?: Access }) {
   const t = useT();
   const { lang } = useLang();
-  const { derived } = useApp();
-  const access = derived.access;
+  const { derived, actions } = useApp();
+  // The server's read of the plan, made for this page; the browser's copy
+  // can lag a change made there until it asks again, which it does now.
+  const access = current ?? derived.access;
+  useEffect(() => {
+    void actions.refreshPremium();
+  }, [actions]);
+  /* Premium has nothing to buy here. The layout sends it home on a full load,
+     and a layout is not run again on a navigation inside the app, so a plan
+     granted while the app was open landed here under the wrong heading. */
+  const router = useRouter();
+  const premium = access.tier === 'premium';
+  useEffect(() => {
+    if (premium) router.replace('/dashboard');
+  }, [premium, router]);
   const until = access.validTill ? formatDate(access.validTill, lang, { day: 'numeric', month: 'long' }) : '';
   const trialSubject = subjectName(subjectById(access.trialSubject ?? ''), lang) || access.trialSubject || '';
 
@@ -48,7 +66,9 @@ export function UpgradeView({ lapsed }: { lapsed: Lapsed }) {
                 title: t('paused.planTitle'),
                 body: t('plans.endedBody', { date: formatDate(lapsed.endedAt, lang, { day: 'numeric', month: 'long', year: 'numeric' }) }),
               }
-            : { icon: 'crown' as const, title: t('billing.statusFree'), body: t('billing.freeBody') };
+            : lapsed?.kind === 'off'
+              ? { icon: 'lock' as const, title: t('paused.noneTitle'), body: t('billing.freeBody') }
+              : { icon: 'crown' as const, title: t('billing.statusFree'), body: t('billing.freeBody') };
   const renew = lapsed?.kind === 'plan' ? lapsed.plan : null;
 
   return (
@@ -63,8 +83,8 @@ export function UpgradeView({ lapsed }: { lapsed: Lapsed }) {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <PlanCard plan={THE_PLAN} highlight renew={renew === 'premium'} />
-          <PlanCard plan={BASIC_PLAN} renew={renew === 'basic'} />
+          <PlanCard plan={THE_PLAN} access={access} highlight renew={renew === 'premium'} />
+          <PlanCard plan={BASIC_PLAN} access={access} renew={renew === 'basic'} />
         </div>
 
         <p className="text-center text-[12.5px] leading-[1.6] text-ink2 rtl:leading-[1.9]">{t('checkout.noChargeToday')}</p>
@@ -74,10 +94,8 @@ export function UpgradeView({ lapsed }: { lapsed: Lapsed }) {
 }
 
 /** `renew`: the plan this student had and let run out, so its button says Renew. */
-function PlanCard({ plan, highlight, renew }: { plan: Plan; highlight?: boolean; renew?: boolean }) {
+function PlanCard({ plan, access, highlight, renew }: { plan: Plan; access: Access; highlight?: boolean; renew?: boolean }) {
   const t = useT();
-  const { derived } = useApp();
-  const access = derived.access;
   const name = t(plan.ai ? 'plans.premiumName' : 'plans.basicName');
   // The plan this student is on now: Basic is the only one that can be, here.
   const current = access.tier === 'basic' && !plan.ai;

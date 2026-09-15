@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { notify, welcome } from '@/lib/notify';
-import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry } from '@/lib/notify/jobs';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry, logged } from '@/lib/notify/jobs';
 
 /**
  * Say hello to anybody who has just put the app on a phone.
@@ -31,7 +31,9 @@ export const maxDuration = 300;
 const MAX_PER_RUN = 200;
 const CONCURRENCY = 8;
 
-export async function GET(req: NextRequest) {
+export const GET = logged('welcome', handle);
+
+async function handle(req: NextRequest) {
   if (!cronAuthorised(req)) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }

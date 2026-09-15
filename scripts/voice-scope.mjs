@@ -159,15 +159,22 @@ if (TIDY) {
     if (le) throw le;
     const gone = inFolder
       .map((f) => `${t.chapter_id}/${f.name}`)
-      .filter((p) => !playing.has(p) && new RegExp(`^${t.chapter_id}/${t.medium}(-[0-9a-f]{10})?\\.mp3$`).test(p));
-    const { data: parts, error: pe } = await admin.storage.from('audio').list(`voice-parts/${t.voice}/${t.chapter_id}/${t.medium}`, { limit: 100 });
+      .filter((p) => !playing.has(p) && new RegExp(`^${t.chapter_id}/${t.medium}(-[0-9a-f]{10})?(-[0-9a-f]{10}-[0-9a-f]{18}|-[0-9a-f]{18})?\\.mp3$`).test(p));
+    // Parts live in their own private bucket (lib/voice/lesson.ts, PARTS_BUCKET).
+    const { data: parts, error: pe } = await admin.storage.from('voice-parts').list(`${t.voice}/${t.chapter_id}/${t.medium}`, { limit: 100 });
     if (pe) throw pe;
-    gone.push(...parts.map((f) => `voice-parts/${t.voice}/${t.chapter_id}/${t.medium}/${f.name}`));
+    const partFiles = parts.map((f) => `${t.voice}/${t.chapter_id}/${t.medium}/${f.name}`);
     if (gone.length) {
       const { error: re } = await admin.storage.from('audio').remove(gone);
       if (re) throw re;
-      files += gone.length;
-      console.log(`  ${t.id}: deleted ${gone.join(', ')}`);
+    }
+    if (partFiles.length) {
+      const { error: re } = await admin.storage.from('voice-parts').remove(partFiles);
+      if (re) throw re;
+    }
+    if (gone.length || partFiles.length) {
+      files += gone.length + partFiles.length;
+      console.log(`  ${t.id}: deleted ${[...gone, ...partFiles].join(', ')}`);
     }
     const { error: de } = await admin.from('voice_parts').delete().eq('chapter_id', t.chapter_id).eq('medium', t.medium).eq('voice', t.voice);
     if (de) throw de;

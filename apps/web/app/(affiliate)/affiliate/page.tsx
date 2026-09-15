@@ -52,23 +52,28 @@ async function Money() {
             Nothing paid out yet. Every transfer will be listed here with its date.
           </p>
         ) : (
-          <Table head={['Date', 'Amount', 'Note']}>
+          <Table stack head={['Date', 'Amount', 'Note']}>
             {history.map((p) => (
               <Row key={p.id}>
-                <Td num>{when(p.at)}</Td>
-                <Td num className="font-extrabold">
+                <Td num label="Date">
+                  {when(p.at)}
+                </Td>
+                <Td num label="Amount" className="font-extrabold">
                   {rupees(p.amount)}
                 </Td>
-                <Td className="wrap-anywhere">{p.note ?? ''}</Td>
+                <Td span className="wrap-anywhere">
+                  {p.note ?? ''}
+                </Td>
               </Row>
             ))}
           </Table>
         )}
       </Panel>
 
-      <p className="mt-6 text-[12px] text-ink3">
-        Earnings are worked out from payments that actually went through, and a refunded payment comes back off. If a
-        number here looks wrong, say so and it can be checked against the payment records.
+      <p className="mt-6 text-[12px] text-ink2">
+        Earnings are worked out from payments that actually went through, and a refunded payment comes back off. A
+        student who deletes their account still counts for what they paid. If a number here looks wrong, say so and it
+        can be checked against the payment records.
       </p>
     </>
   );

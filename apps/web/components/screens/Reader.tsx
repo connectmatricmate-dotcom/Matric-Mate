@@ -17,6 +17,7 @@ import { Markdown } from '@/components/ui/Markdown';
 import { LockedNotice } from '@/components/app/LockedNotice';
 import { canGoBack } from '@/lib/nav-trail';
 import { LeaveSetButton } from '@/components/app/LeaveSetButton';
+import { ReportAi } from '@/components/app/ReportAi';
 
 /** A caller that already chose an alignment keeps it. */
 const HAS_ALIGN = /(^|\s)text-(left|center|right|start|end|justify)(?=\s|$)/;
@@ -155,7 +156,7 @@ export function Reader({
   const toast = useToast();
   const [rawIdx, setIdx] = useState(startSection);
   const [askOpen, setAskOpen] = useState(false);
-  const [answer, setAnswer] = useState<{ text: string; steps?: string[]; threadId?: string } | null>(null);
+  const [answer, setAnswer] = useState<{ text: string; steps?: string[]; threadId?: string; messageId?: string } | null>(null);
   const [asking, setAsking] = useState(false);
   /**
    * The conversation questions from this reader go into, once the first one
@@ -249,7 +250,7 @@ export function Reader({
       toast(note);
       return;
     }
-    setAnswer({ text: res.text, steps: res.steps, threadId: res.threadId });
+    setAnswer({ text: res.text, steps: res.steps, threadId: res.threadId, messageId: res.messageId });
     if (res.threadId) setThreadId(res.threadId);
     // Keep the local counter roughly in step with the server's.
     actions.consumeAi();
@@ -257,6 +258,8 @@ export function Reader({
 
   return (
     <Page width="read">
+      {/* The page's title for anyone reading by headings; the header shows it as a label. */}
+      <h1 className="sr-only">{chapterName(chapter, lang)}</h1>
       {/* Same header as every other in-session screen: back, progress, one meta control. */}
       <SessionHeader
         backHref={`/learn/chapter/${id}`}
@@ -444,6 +447,11 @@ export function Reader({
             >
               {t('reader.openChat')}
             </Link>
+            {/* An AI answer, so it can be reported where it is read, as in
+                the chat (Google Play's rule, and the same row in the table). */}
+            <div className="mt-1">
+              <ReportAi surface="tutor" refId={answer.messageId} excerpt={answer.text} />
+            </div>
           </Card>
         ) : null}
       </Sheet>

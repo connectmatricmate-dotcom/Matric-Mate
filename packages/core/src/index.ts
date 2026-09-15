@@ -24,6 +24,7 @@ export * from './icons';
 export * from './papers';
 export * from './boards';
 export * from './tutor-actions';
+export * from './account';
 export { api } from './api';
 export {
   connectContent,

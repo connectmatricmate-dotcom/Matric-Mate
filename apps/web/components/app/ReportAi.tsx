@@ -72,8 +72,8 @@ export function ReportAi({
         onClick={() => setOpen(true)}
         className={
           variant === 'pill'
-            ? 'inline-flex min-h-9 items-center gap-1.5 rounded-full bg-grey px-3 text-[12.5px] font-extrabold text-ink2 transition-[filter] duration-200 hover:brightness-95'
-            : 'inline-flex min-h-10 items-center gap-1.5 self-start text-[12.5px] font-extrabold text-ink3 transition-colors duration-200 hover:text-ink2'
+            ? 'inline-flex min-h-9 pointer-coarse:min-h-11 items-center gap-1.5 rounded-full bg-grey px-3 text-[12.5px] font-extrabold text-ink2 transition-[filter] duration-200 hover:brightness-95'
+            : 'inline-flex min-h-11 items-center gap-1.5 self-start text-[12.5px] font-extrabold text-ink3 transition-colors duration-200 hover:text-ink2'
         }
       >
         <Icon name="alert" size={14} />

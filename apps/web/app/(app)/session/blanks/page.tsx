@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
+import { localTitle } from '@/lib/page-title';
 import { normalizeAiBlanks } from '@matricmate/core';
 import { BlanksScreen } from '@/components/screens/BlanksScreen';
 import { getChapterContent } from '@/lib/content-readers';
 import { aiPracticeSet, practiceChapter } from '../practice-chapter';
 
-export const metadata: Metadata = {
-  title: 'Fill in the blanks',
-  description: 'Recall practice, one sentence at a time.',
-};
+export const generateMetadata = (): Promise<Metadata> => localTitle('practice.blanks', 'Recall practice, one sentence at a time.');
 
 export default async function BlanksPage({ searchParams }: { searchParams: Promise<{ chapter?: string; ai?: string }> }) {
   const { chapter: requested, ai } = await searchParams;
@@ -17,7 +15,7 @@ export default async function BlanksPage({ searchParams }: { searchParams: Promi
     const items = normalizeAiBlanks(set.items as Parameters<typeof normalizeAiBlanks>[0], chapter.id, set.id);
     return <BlanksScreen key={set.id} chapter={chapter} items={items} />;
   }
-  const chapter = await practiceChapter(requested);
+  const chapter = await practiceChapter(requested, 'blanks');
   /* A read that fails throws, for the route's Try again; an empty answer is
      what this student may see, and the screen says there is nothing here. */
   const content = await getChapterContent(chapter.id);

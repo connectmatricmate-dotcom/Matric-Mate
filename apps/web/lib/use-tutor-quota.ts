@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useSyncExternalStore } from 'react';
-import { fetchTutorQuota, getQuota, quotaTopic, setQuota, subscribeQuota } from '@matricmate/core';
+import { clearQuota, fetchTutorQuota, getQuota, quotaTopic, setQuota, subscribeQuota } from '@matricmate/core';
 import { createClient } from '@/lib/supabase/client';
 
 /**
@@ -43,7 +43,23 @@ export function useTutorQuota() {
   const quota = useSyncExternalStore(subscribeQuota, getQuota, () => null);
 
   useEffect(() => {
-    if (!quota) fetchOnce();
+    if (!quota) {
+      fetchOnce();
+      return;
+    }
+    /*
+     * At the count's own reset time, let every reader know it has gone.
+     * Core stops answering with a count once its day is over, but nothing
+     * told a screen to ask again, so a tab left open past midnight kept the
+     * chat box locked on yesterday's fifty until something else re-rendered.
+     * Cleared, the readers fetch today's (the effect above).
+     */
+    const wait = Date.parse(quota.resetAt) - Date.now();
+    if (!Number.isFinite(wait)) return;
+    const timer = setTimeout(() => {
+      if (!getQuota()) clearQuota();
+    }, Math.max(0, wait) + 1000);
+    return () => clearTimeout(timer);
   }, [quota]);
 
   return [quota, setQuota] as const;
@@ -66,7 +82,9 @@ export function useQuotaRealtime(userId: string | null | undefined) {
     if (!userId) return;
     const supabase = createClient();
     const channel = supabase
-      .channel(quotaTopic(userId), { config: { private: false } })
+      // Private: only this account may listen (migration 0068); a public topic
+      // let anyone with the id listen in, or send made-up updates.
+      .channel(quotaTopic(userId), { config: { private: true } })
       .on('broadcast', { event: 'change' }, (message) => {
         const payload = message.payload as { used?: number };
         if (typeof payload.used !== 'number') return;

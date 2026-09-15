@@ -42,17 +42,22 @@ export async function GET(req: NextRequest) {
       .order('period', { ascending: false })
       .limit(1)
       .maybeSingle(),
-    g.admin.from('profiles').select('grade_changed_at').eq('id', g.userId).maybeSingle(),
+    g.admin.from('profiles').select('grade_changed_at, progress_reset_at').eq('id', g.userId).maybeSingle(),
   ]);
   if (error || profileError) return NextResponse.json({ error: 'server_error', quota: g.quota }, { status: 503 });
 
   /*
    * A report written before the student changed class is about the other
    * class's chapters and topics, so it is not shown. The next night's report
-   * is about the class they are in.
+   * is about the class they are in. The same for one written before their
+   * history was wiped (a reset, or a board switch: progress_reset_at): it
+   * describes work that is no longer there.
    */
-  const changedAt = Date.parse((profile?.grade_changed_at as string | null) ?? '');
-  const stale = !!data && Number.isFinite(changedAt) && Date.parse(data.created_at as string) < changedAt;
+  const since = Math.max(
+    Date.parse((profile?.grade_changed_at as string | null) ?? '') || 0,
+    Date.parse((profile?.progress_reset_at as string | null) ?? '') || 0,
+  );
+  const stale = !!data && since > 0 && Date.parse(data.created_at as string) < since;
   const report = data && !stale ? data : null;
 
   return NextResponse.json({ report: report?.body ?? null, period: report?.period ?? null, quota: g.quota });

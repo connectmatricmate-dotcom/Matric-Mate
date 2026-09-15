@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import type { Chapter, Subject } from '@matricmate/core';
-import { chapterBlurb, chapterName, chapterPct, hasStudyMaterial, isUrduScript, subjectName, subjectPct } from '@matricmate/core';
+import { chapterBlurb, chapterName, chapterPct, hasStudyMaterial, isUrduScript, offPaper, subjectName, subjectPct } from '@matricmate/core';
 import { LockedNotice } from '@/components/app/LockedNotice';
 import { Page, PageHead, Rail, Split, Work } from '@/components/app/Page';
 import { WeakRail } from '@/components/app/rails';
@@ -49,14 +49,18 @@ export function ChapterList({ subject, chapters, paid }: { subject: Subject; cha
         title={name}
         titleUrdu={isUrduScript(name)}
         sub={`${t('study.chapterCount', { n: chapters.length })} · ${t('study.percentComplete', { n: pct })}`}
+        // No test on a subject the plan does not open: the button only led
+        // back to this page. The notice below says why.
         actions={
-          <LinkBtn
-            title={t('study.subjectTest')}
-            href={`/session/exam-intro?subject=${subject.id}`}
-            variant="orange"
-            icon="clock"
-            sm
-          />
+          paid ? (
+            <LinkBtn
+              title={t('study.subjectTest')}
+              href={`/session/exam-intro?subject=${subject.id}`}
+              variant="orange"
+              icon="clock"
+              sm
+            />
+          ) : undefined
         }
       />
 
@@ -81,7 +85,7 @@ export function ChapterList({ subject, chapters, paid }: { subject: Subject; cha
             <Card
               flat={!current}
               border={current ? 'border-teal' : undefined}
-              className={`transition-colors duration-200 ${empty ? 'opacity-60' : 'hover:border-teal'}`}
+              className={`transition-colors duration-200 ${empty ? 'opacity-60' : paid ? 'hover:border-teal' : ''}`}
             >
               <span className="flex items-center gap-3">
               <span
@@ -108,7 +112,9 @@ export function ChapterList({ subject, chapters, paid }: { subject: Subject; cha
                     {/* Each figure held to its word, so a narrow row breaks at a
                         dot and never leaves "sections" alone on the next line. */}
                     {[
-                      c.examShare ? t('study.examShare', { n: c.examShare }) : '',
+                      // Whole numbers: "6.48%" claimed more precision than the
+                      // board's table has. A chapter it gives no share is said so.
+                      c.examShare ? t('study.examShare', { n: Math.round(c.examShare) }) : offPaper(c) ? t('study.notOnPaper') : '',
                       t('study.mcqsSub', { n: c.mcqCount }),
                       t('study.sectionsSub', { n: c.sectionCount }),
                     ]
@@ -129,6 +135,9 @@ export function ChapterList({ subject, chapters, paid }: { subject: Subject; cha
                 <Pill tone="grey" className="shrink-0 whitespace-nowrap max-sm:hidden">
                   {t('study.notOnPaper')}
                 </Pill>
+              ) : !paid ? (
+                // Shut on this plan: a lock, not a chevron promising a way in.
+                <Icon name="lock" size={16} className="shrink-0 text-ink3" />
               ) : current ? (
                 <Pill tone="orange" className="shrink-0 whitespace-nowrap">{t('common.continue')}</Pill>
               ) : (
@@ -155,7 +164,9 @@ export function ChapterList({ subject, chapters, paid }: { subject: Subject; cha
             </Card>
           );
 
-          return empty ? (
+          // Not a link when there is nothing behind it: an empty chapter, or
+          // one the plan does not open (its hub only repeats the lock above).
+          return empty || !paid ? (
             <div key={c.id}>{body}</div>
           ) : (
             <Link key={c.id} href={`/learn/chapter/${c.id}`}>

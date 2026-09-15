@@ -5,6 +5,7 @@ import { useNow } from '@/lib/now';
 import { useEffect, useMemo, useState } from 'react';
 import {
   accuracy,
+  attemptsThisMonth,
   fetchDailyReport,
   formatDate,
   grade,
@@ -26,24 +27,39 @@ export function ProgressView() {
   const t = useT();
   const { lang } = useLang();
 
-  const overall = useMemo(
-    () => overallPct(derived.subjects, state.readSections, state.attempts),
-    [derived.subjects, state.readSections, state.attempts]
-  );
-  const weak = useMemo(() => namedWeakTopics(state.attempts, lang).slice(0, 4), [state.attempts, lang]);
+  /* Each of these reads the chapter index (section and question counts, which
+     chapters are this syllabus's), so each is worked out again when the index
+     lands or changes (contentReady). Keyed on the data alone, the first render
+     stuck: Physics read 11% where the full index made it 4%. */
+  const ready = derived.contentReady;
+  const overall = useMemo(() => {
+    void ready;
+    return overallPct(derived.subjects, state.readSections, state.attempts);
+  }, [derived.subjects, state.readSections, state.attempts, ready]);
+  const weak = useMemo(() => {
+    void ready;
+    return namedWeakTopics(state.attempts, lang).slice(0, 4);
+  }, [state.attempts, lang, ready]);
   const acc = useMemo(() => accuracy(state.attempts), [state.attempts]);
   // The per-subject sweep walks contentFor + attempts for every subject, so it
   // runs once per data change, not once per render.
-  const bySubject = useMemo(
-    () => derived.subjects.map((sid) => ({ sid, pct: subjectPct(sid, state.readSections, state.attempts) })),
-    [derived.subjects, state.readSections, state.attempts]
-  );
+  const bySubject = useMemo(() => {
+    void ready;
+    return derived.subjects.map((sid) => ({ sid, pct: subjectPct(sid, state.readSections, state.attempts) }));
+  }, [derived.subjects, state.readSections, state.attempts, ready]);
   // Real days with activity. The tile here used to be hours invented from
   // a formula over answer and section counts, which nothing ever measured.
   // Read through useNow so the clock is not touched during render; 0 until
   // the client has one, and an empty month label beats "January 1970".
   const now = useNow();
   const month = now ? formatDate(now, lang, { month: 'long' }) : '';
+  /* The report card row grades this month, as the report card itself and the
+     Android row do. It graded all time under a title naming the month. */
+  const monthAcc = useMemo(() => {
+    void now;
+    const set = attemptsThisMonth(state.attempts);
+    return set.length ? accuracy(set) : null;
+  }, [state.attempts, now]);
 
   return (
     <Page>
@@ -157,7 +173,7 @@ export function ProgressView() {
                 {/* No grade before there is an answer to grade. An empty
                     history used to be graded F. */}
                 <span className="block text-[13px] text-ink2">
-                  {state.attempts.length ? t('progress.reportCardSub', { grade: grade(acc) }) : t('progress.reportCardSubNone')}
+                  {monthAcc !== null ? t('progress.reportCardSub', { grade: grade(monthAcc) }) : t('progress.reportCardSubNone')}
                 </span>
               </span>
               <span className="hidden sm:block">

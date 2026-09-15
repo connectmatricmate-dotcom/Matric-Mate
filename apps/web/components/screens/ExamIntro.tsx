@@ -15,8 +15,8 @@ import {
   type Subject,
 } from '@matricmate/core';
 import { Page, PageHead } from '@/components/app/Page';
-import { Btn } from '@/components/ui/controls';
-import { Card, Icon, Pill } from '@/components/ui/primitives';
+import { Btn, PillButton } from '@/components/ui/controls';
+import { Card, Icon, Pill, SectionTitle } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/toast';
 import { useApp, useLang, useT } from '@/lib/store';
 import { session } from '@/lib/session';
@@ -48,7 +48,17 @@ export function ExamIntro({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
-  const subjectId = subject?.id ?? chapter?.subjectId ?? derived.subjects[0] ?? 'phy';
+  /*
+   * Which subject, when the link does not say: the Practice tab's timed test
+   * names none. It was always the first on the list (Mathematics for most),
+   * with no way to pick another. The student picks now, as on Android,
+   * starting from the subject today's plan is on.
+   */
+  const open = !subject && !chapter && !paper && !ai;
+  const [picked, setPicked] = useState<string | null>(null);
+  const planSubject = derived.plan[0]?.subjectId;
+  const choice = picked && derived.subjects.includes(picked) ? picked : planSubject && derived.subjects.includes(planSubject) ? planSubject : derived.subjects[0];
+  const subjectId = subject?.id ?? chapter?.subjectId ?? choice ?? 'phy';
 
   /* A weak-topic paper spans subjects, so a best score filed under one of
      them would be some other test's. Only real paper results count, too: a
@@ -88,7 +98,7 @@ export function ExamIntro({
     const focus = topics?.length
       ? topics
       : weakTopics(state.attempts.filter((a) => a.mode === 'practice' || a.mode === 'exam'))
-          .map((w) => w.topic)
+          .map((w) => w.key)
           .filter(Boolean)
           .slice(0, 3);
     /* Where the questions may come from. A chapter's or subject's test stays
@@ -100,8 +110,8 @@ export function ExamIntro({
     ];
     const scope = chapter
       ? { chapterIds: [chapter.id] }
-      : subject
-        ? { subjectId: subject.id }
+      : subject || open
+        ? { subjectId }
         : focusChapters.length
           ? { chapterIds: focusChapters }
           : undefined;
@@ -136,6 +146,19 @@ export function ExamIntro({
   return (
     <Page width="focus">
       <PageHead back="/practice" backLabel={t('practice.title')} title={t('session.examTitle')} sub={label} subUrdu={isUrduScript(label)} />
+
+      {open && derived.subjects.length > 1 ? (
+        <>
+          <SectionTitle>{t('session.subject')}</SectionTitle>
+          <div className="-mt-1 mb-5 flex flex-wrap gap-2">
+            {derived.subjects.map((sid) => (
+              <PillButton key={sid} tone={sid === subjectId ? 'teal' : 'grey'} pressed={sid === subjectId} onClick={() => setPicked(sid)}>
+                {subjectName(subjectById(sid), lang) || sid}
+              </PillButton>
+            ))}
+          </div>
+        </>
+      ) : null}
 
       <Card border="border-orange" className="flex flex-col items-center py-6 text-center">
         <Icon name="clock" size={34} className="text-orangedark" />

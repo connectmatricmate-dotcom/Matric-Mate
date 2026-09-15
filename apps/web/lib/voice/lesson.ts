@@ -1,5 +1,5 @@
 import 'server-only';
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -23,6 +23,7 @@ export type VoiceSettings = {
   voiceUr: string | null;
   voiceEn: string | null;
   model: string;
+  /** The month's allowance in ElevenLabs credits (the column's name predates the difference). */
   monthlyChars: number;
 };
 
@@ -44,6 +45,8 @@ export type Lesson = {
   rows: Map<number, PartRow>;
   /** The track row still waits for this voice (false once the joined file is in place). */
   pending: boolean;
+  /** Where the finished lesson is saved (the track row's storage_path), once it is. */
+  path: string | null;
 };
 
 /**
@@ -57,6 +60,12 @@ export const BYTES_PER_SEC = 8_000;
 const CHARS_PER_SEC = 14;
 
 export const BUCKET = 'audio';
+/**
+ * Parts in the making live in a private bucket of their own: only this
+ * server ever reads them back. They sat in the public lesson bucket under
+ * predictable names, so a part could be fetched by anyone who guessed it.
+ */
+export const PARTS_BUCKET = 'voice-parts';
 const API = 'https://api.elevenlabs.io';
 
 export async function readSettings(admin: Admin): Promise<VoiceSettings | null> {
@@ -139,8 +148,15 @@ export function splitParts(body: string): Part[] {
   return out.map((text, n) => ({ n, text, hash: sha(text).slice(0, 16) }));
 }
 
-export const partPath = (l: Pick<Lesson, 'key' | 'chapter' | 'medium'>, n: number) => `voice-parts/${l.key}/${l.chapter}/${l.medium}/${n}.mp3`;
-export const finalPath = (l: Pick<Lesson, 'key' | 'chapter' | 'medium'>) => `${l.chapter}/${l.medium}-${l.key}.mp3`;
+export const partPath = (l: Pick<Lesson, 'key' | 'chapter' | 'medium'>, n: number) => `${l.key}/${l.chapter}/${l.medium}/${n}.mp3`;
+/**
+ * A new, unguessable name for a finished lesson. The lesson bucket is public
+ * (players and downloads fetch plain addresses), so a name anyone could work
+ * out from a chapter id was a lesson anyone could fetch without a plan. The
+ * name is kept on the track row, which only a student with the plan can read.
+ */
+export const newFinalPath = (l: Pick<Lesson, 'key' | 'chapter' | 'medium'>) =>
+  `${l.chapter}/${l.medium}-${l.key}-${randomBytes(9).toString('hex')}.mp3`;
 
 /**
  * The settings and everything about one lesson's premium voice, read in one
@@ -155,7 +171,7 @@ export async function openLesson(admin: Admin, chapter: string, medium: Medium):
     admin.from('voice_scripts').select('body').eq('chapter_id', chapter).eq('medium', medium).maybeSingle(),
     // Every voice's parts, sorted out below once the voice is known.
     admin.from('voice_parts').select('voice, part, text_hash, status, storage_path, bytes').eq('chapter_id', chapter).eq('medium', medium),
-    admin.from('audio_tracks').select('voice_pending, voice').eq('id', `${chapter}-${medium}`).maybeSingle(),
+    admin.from('audio_tracks').select('voice_pending, voice, storage_path').eq('id', `${chapter}-${medium}`).maybeSingle(),
   ]);
   if (se || re || te) throw new Error(`voice lesson read failed: ${(se ?? re ?? te)?.message}`);
   if (!voiceReady(settings, medium) || !script?.body) return { settings, lesson: null };
@@ -173,6 +189,7 @@ export async function openLesson(admin: Admin, chapter: string, medium: Medium):
       parts: splitParts(String(script.body)),
       rows: new Map(mine.map((r) => [r.part, r])),
       pending: !!track && track.voice !== key,
+      path: track && track.voice === key ? ((track.storage_path as string | null) ?? null) : null,
     },
   };
 }
@@ -184,6 +201,16 @@ export const readyRow = (l: Lesson, p: Part): PartRow | null => {
 };
 
 export const remainingChars = (l: Lesson) => l.parts.filter((p) => !readyRow(l, p)).reduce((n, p) => n + p.text.length, 0);
+
+/**
+ * What text of this length will cost. The month's usage is counted in the
+ * credits ElevenLabs charges (the character-cost header), which for Alice on
+ * v3 is about 0.53 of the character count, so comparing plain characters
+ * against credits refused lessons that would have fitted near the month's
+ * end. Rounded up a little, so an estimate never overspends.
+ */
+export const CREDITS_PER_CHAR = 0.6;
+export const creditsFor = (chars: number) => Math.ceil(chars * CREDITS_PER_CHAR);
 
 /**
  * How long the whole lesson runs: measured for the parts that exist, and for
@@ -225,7 +252,10 @@ export function startPart(l: Lesson, at: number): number {
 /** Characters already sent to the voice service this Karachi month. */
 export async function usedThisMonth(admin: Admin): Promise<number> {
   const month = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi', year: 'numeric', month: '2-digit' }).format(new Date());
-  const { data } = await admin.from('voice_usage').select('chars').eq('month', month).maybeSingle();
+  const { data, error } = await admin.from('voice_usage').select('chars').eq('month', month).maybeSingle();
+  // A read that failed is not "nothing spent": counted as the whole
+  // allowance, so no lesson is started blind. The old voice plays instead.
+  if (error) return Number.MAX_SAFE_INTEGER;
   return Number(data?.chars) || 0;
 }
 
@@ -237,7 +267,13 @@ export async function usedThisMonth(admin: Admin): Promise<number> {
  * names the lesson, the student and when it expires; nothing else can be
  * read from or done with it.
  */
-const tokenKey = () => createHash('sha256').update(`voice-stream:${process.env.CRON_SECRET ?? ''}`).digest();
+const tokenKey = () => {
+  // Never a key anyone could work out: without the secret, nothing is signed
+  // or accepted (signStream and verifyStream both go through here).
+  const secret = process.env.CRON_SECRET;
+  if (!secret) throw new Error('CRON_SECRET is not set');
+  return createHash('sha256').update(`voice-stream:${secret}`).digest();
+};
 
 export function signStream(chapter: string, medium: Medium, userId: string, ttlSecs = 30 * 60): string {
   const exp = Math.floor(Date.now() / 1000) + ttlSecs;
@@ -370,7 +406,7 @@ export async function speak(
 /** Saves a finished part and counts what it cost. */
 export async function savePart(admin: Admin, l: Lesson, p: Part, { bytes, cost }: Spoken): Promise<PartRow> {
   const path = partPath(l, p.n);
-  await persist('part upload', () => admin.storage.from(BUCKET).upload(path, bytes, { contentType: 'audio/mpeg', upsert: true, cacheControl: '31536000' }));
+  await persist('part upload', () => admin.storage.from(PARTS_BUCKET).upload(path, bytes, { contentType: 'audio/mpeg', upsert: true }));
   const row: PartRow = { part: p.n, text_hash: p.hash, status: 'ready', storage_path: path, bytes: bytes.length };
   await persist('part row', () =>
     admin
@@ -410,7 +446,7 @@ export async function claimPart(admin: Admin, l: Lesson, p: Part): Promise<boole
 
 /** A saved part's audio. */
 export async function readPart(admin: Admin, row: PartRow): Promise<Uint8Array> {
-  const { data, error } = await admin.storage.from(BUCKET).download(row.storage_path as string);
+  const { data, error } = await admin.storage.from(PARTS_BUCKET).download(row.storage_path as string);
   if (error || !data) throw new Error(`part download failed: ${error?.message}`);
   return new Uint8Array(await data.arrayBuffer());
 }
@@ -467,8 +503,7 @@ export async function finalize(admin: Admin, l: Lesson, have?: Map<number, Uint8
     at += c.length;
   }
   const trackId = `${l.chapter}-${l.medium}`;
-  const { data: before } = await admin.from('audio_tracks').select('storage_path').eq('id', trackId).maybeSingle();
-  const path = finalPath(l);
+  const path = newFinalPath(l);
   await persist('final upload', () => admin.storage.from(BUCKET).upload(path, all, { contentType: 'audio/mpeg', upsert: true, cacheControl: '31536000' }));
   await persist('track update', () =>
     admin
@@ -477,16 +512,13 @@ export async function finalize(admin: Admin, l: Lesson, have?: Map<number, Uint8
       .eq('id', trackId),
   );
   l.pending = false;
+  l.path = path;
 
-  const trash = l.parts.map((p) => partPath(l, p.n));
-  const old = before?.storage_path as string | undefined;
-  if (old && old !== path) {
-    // Unless another lesson's row still plays the same file.
-    const { count } = await admin.from('audio_tracks').select('id', { count: 'exact', head: true }).eq('storage_path', old);
-    if (count === 0) trash.push(old);
-  }
-  const { error: re } = await admin.storage.from(BUCKET).remove(trash);
-  if (re) throw new Error(`lesson finished, clearing what it replaced failed: ${re.message}`);
+  // The recording this replaces stays for now: a page or phone that opened
+  // the lesson a minute ago is still playing it, and deleting it cut them off
+  // mid-lesson. `node scripts/voice-scope.mjs --tidy` clears old recordings.
+  const { error: pe } = await admin.storage.from(PARTS_BUCKET).remove(l.parts.map((p) => partPath(l, p.n)));
+  if (pe) throw new Error(`lesson finished, clearing its parts failed: ${pe.message}`);
   await admin.from('voice_parts').delete().eq('chapter_id', l.chapter).eq('medium', l.medium).eq('voice', l.key);
   return true;
 }

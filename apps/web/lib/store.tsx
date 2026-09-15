@@ -33,11 +33,14 @@ import {
   mergeHydratedState,
   newRowId,
   primeAllContent,
+  resetStudyHistory,
   setContentBoard,
   setContentGrade,
   setContentMedium,
   setQuotaUser,
+  staleQueue,
   streakFrom,
+  subjectsForScience,
   subscribeContent,
   syncAccountPrefs,
   syncActiveDay,
@@ -49,17 +52,18 @@ import {
   syncResult,
   todayKey,
   translate,
-  wipeStudyHistory,
   xpForAttempt,
 } from '@matricmate/core';
 import type { Access, Board, Group, HydratedStudyState } from '@matricmate/core';
 import {
   EMPTY,
+  type Lapse,
   Onboarding,
   Settings,
   State,
   accessOf,
   devicePrefs,
+  forgetQueue,
   getQueue,
   getSnapshot,
   hydrate,
@@ -71,8 +75,10 @@ import {
   type PlanSeed,
   subscribe,
   touchToday,
+  unloadQueue,
   update,
 } from './persisted-store';
+import { useToday } from './now';
 import { createClient } from './supabase/client';
 /*
  * Connects the shared content layer to this browser's Supabase client, for its
@@ -93,13 +99,15 @@ import { readLanguageCookie, writeLanguageCookie, writeThemeCookie } from './ui-
  */
 configureTutor({ siteUrl: '', getToken: async () => null });
 
-export type { Onboarding, Settings, State };
+export type { Lapse, Onboarding, Settings, State };
 
 type Actions = {
   /** Local mirror only; the profiles row is written by the screen that calls this. */
   setName: (name: string) => void;
   /** Sends what is still queued (briefly), then takes this account's data off the browser. */
   signOut: () => Promise<void>;
+  /** The account is gone (deleted from Settings): nothing to send, nothing to keep. */
+  accountDeleted: () => void;
   /**
    * Records onboarding choices here at once, and on the account. Resolves to
    * whether the account took them, so a step that must not move on without
@@ -175,6 +183,14 @@ type Ctx = {
 const AppCtx = createContext<Ctx | null>(null);
 
 /**
+ * The subjects before an account's own have loaded: a science student's full
+ * list, Pakistan Studies included (compulsory on both boards). The old literal
+ * had no Pakistan Studies, and a new browser showed it that way until the
+ * account answered. A constant, so memos keyed on the list keep their identity.
+ */
+const DEFAULT_SUBJECTS = subjectsForScience('bio');
+
+/**
  * The last day this browser has queued an "I studied" row for.
  *
  * Not derived from state.activeDays, which is what every caller used to do,
@@ -186,13 +202,19 @@ const AppCtx = createContext<Ctx | null>(null);
  * op; the queue collapses duplicates by day and the write is an idempotent
  * upsert, so the cost is at most one redundant upsert per session. Reset again
  * whenever the history is wiped, which deletes today's row with the rest.
+ *
+ * Kept per student. As one day for the whole tab, a second student signing in
+ * here found today already "queued" by the first, and their day was never
+ * written. And only once someone is signed in to write it for: set before
+ * then, the sign-in that followed never queued the day at all.
  */
-let activeDaySynced: string | null = null;
+let activeDaySynced: { uid: string; day: string } | null = null;
 
 function markDayActive(): void {
   const day = todayKey();
-  if (activeDaySynced === day) return;
-  activeDaySynced = day;
+  const uid = syncedFor;
+  if (!uid || (activeDaySynced?.uid === uid && activeDaySynced.day === day)) return;
+  activeDaySynced = { uid, day };
   queueAndFlush(syncActiveDay(day));
 }
 
@@ -349,7 +371,12 @@ const actions: Actions = {
     const uid = syncedFor;
     if (uid) {
       await Promise.race([flush(uid), new Promise((resolve) => setTimeout(resolve, 3000))]);
-      saveQueue(uid, clearSyncQueue());
+      /* Stops a send still in flight and lets go of this tab's copy. The saved
+         copy stays: whatever did not get through goes the next time this
+         student signs in here. Saving an empty queue over it, as this did,
+         lost every answer given offline before signing out. */
+      clearSyncQueue();
+      unloadQueue();
     }
     setQuotaUser(null);
     clearQuota();
@@ -359,6 +386,24 @@ const actions: Actions = {
     // looked already synced and got no history and no chapters.
     syncedFor = null;
     pulledFor = null;
+    update((s) => ({ ...EMPTY, hydrated: true, settings: devicePrefs(s.settings) }));
+  },
+  /**
+   * Like signing out, less the sending: the account and everything on it are
+   * already gone from the server, so its queue is deleted rather than kept
+   * for a sign-in that can never happen.
+   */
+  accountDeleted: () => {
+    const uid = syncedFor ?? getSnapshot().user?.id;
+    clearSyncQueue();
+    if (uid) forgetQueue(uid);
+    setQuotaUser(null);
+    clearQuota();
+    clearContentCache();
+    syncedFor = null;
+    pulledFor = null;
+    activeDaySynced = null;
+    profileName = null;
     update((s) => ({ ...EMPTY, hydrated: true, settings: devicePrefs(s.settings) }));
   },
   /**
@@ -641,10 +686,15 @@ const actions: Actions = {
    */
   resetDemo: async () => {
     const uid = getSnapshot().user?.id;
+    // The server's time for the wipe, which every other device compares its
+    // copy with (progress epoch): theirs is older, so they drop it.
+    let resetAt: number | null = null;
     if (uid) {
       dropQueue(uid);
       await flushing;
-      if (!(await wipeStudyHistory(createClient(), uid))) return false;
+      const wiped = await resetStudyHistory(createClient(), uid);
+      if (!wiped.ok) return false;
+      resetAt = wiped.resetAt;
     }
     activeDaySynced = null;
     /* Notifications survive. They belong to the account, nothing here can
@@ -659,6 +709,7 @@ const actions: Actions = {
       onboarding: s.onboarding,
       settings: s.settings,
       notifications: s.notifications,
+      progressEpoch: resetAt ?? s.progressEpoch ?? null,
     }));
     return true;
   },
@@ -680,7 +731,7 @@ async function startOver(uid: string, onboarding: Onboarding): Promise<void> {
   const supabase = createClient();
   dropQueue(uid);
   await flushing;
-  await wipeStudyHistory(supabase, uid);
+  const { resetAt } = await resetStudyHistory(supabase, uid);
   activeDaySynced = null;
   setContentGrade(onboarding.classLevel);
   setContentBoard(onboarding.board ?? 'fbise');
@@ -692,6 +743,7 @@ async function startOver(uid: string, onboarding: Onboarding): Promise<void> {
     settings: s.settings,
     hydrated: true,
     onboarding,
+    progressEpoch: resetAt ?? s.progressEpoch ?? null,
   }));
   /*
    * After the state, not before it: a render still holding the old class
@@ -721,12 +773,23 @@ async function refreshPremium(): Promise<boolean> {
   // happened to succeed.
   if (error) return getSnapshot().premium.active;
   const till = data?.valid_till ? new Date(data.valid_till).getTime() : null;
-  const active = Boolean(data?.active) && till !== null && Number.isFinite(till) && till > Date.now();
+  const dated = till !== null && Number.isFinite(till);
+  const active = Boolean(data?.active) && dated && till > Date.now();
+  /* A different plan, or a different end to it, can mean a different AI
+     allowance (trial 5, Premium 50, Basic none), and the day's count carries
+     the allowance it was read under. Dropped, every screen asks the server
+     again; kept, the tutor showed the old plan's limit until a reload. */
+  const before = getSnapshot().premium;
+  if (before.active !== active || (active && (before.plan !== (data?.plan ?? undefined) || before.validTill !== till))) clearQuota();
+  // What happened to a plan that is not running, so the screens can say
+  // "ended on" or "switched off" rather than "no plan yet".
+  const lapse: Lapse | undefined =
+    active || !dated ? undefined : till <= Date.now() ? { kind: data?.plan === 'trial' ? 'trial' : 'plan', at: till } : { kind: 'off', at: till };
   update((s) => ({
     ...s,
     premium: active
       ? { active: true, plan: data?.plan ?? undefined, validTill: till, trialSubject: data?.trial_subject ?? undefined }
-      : { active: false, validTill: null },
+      : { active: false, validTill: null, ...(lapse ? { lapse } : {}) },
   }));
   return active;
 }
@@ -765,7 +828,15 @@ function flush(userId: string): Promise<void> {
   flushing = (async () => {
     let more = false;
     try {
-      const { settled, remaining, cancelled } = await flushQueue(createClient(), userId, getQueue());
+      const batch = getQueue();
+      expectEchoes(batch, 1);
+      const { settled, remaining, cancelled } = await flushQueue(createClient(), userId, batch);
+      // Whatever did not go out will not echo back.
+      const sent = new Set(settled);
+      expectEchoes(
+        batch.filter((op) => !sent.has(op.id)),
+        -1,
+      );
       // Dropped while this was sending, or a different student since: what
       // it returns belongs to a queue that no longer exists.
       if (cancelled || syncedFor !== userId) return;
@@ -785,6 +856,49 @@ function flush(userId: string): Promise<void> {
     if (more) void flush(userId);
   })();
   return flushing;
+}
+
+/**
+ * The live-channel broadcasts this tab expects back from its own writes.
+ *
+ * Every row a student writes makes the database announce "attempts moved" on
+ * their channel, to every device, including the one that wrote it. That one
+ * then re-read the whole history (nine queries) after every single answer, to
+ * learn what it already knew. So a flush counts what it sends, by table, and
+ * the live refresh skips the announcements it accounts for. Counts lapse after
+ * a few seconds: a write that changed nothing (an upsert of a row already
+ * there) announces nothing, and a stale count must not swallow a real change
+ * from the phone.
+ */
+const OP_TABLE: Record<SyncOp['kind'], string> = {
+  attempt: 'attempts',
+  result: 'results',
+  read_section: 'read_sections',
+  card_known: 'cards_known',
+  card_unknown: 'cards_known',
+  active_day: 'active_days',
+  plan_task: 'plan_done',
+};
+const ECHO_WINDOW_MS = 6000;
+const ownEchoes = new Map<string, { n: number; until: number }>();
+
+function expectEchoes(ops: SyncOp[], sign: 1 | -1): void {
+  const until = Date.now() + ECHO_WINDOW_MS;
+  for (const op of ops) {
+    const table = OP_TABLE[op.kind];
+    const cur = ownEchoes.get(table);
+    const live = cur && cur.until > Date.now() ? cur.n : 0;
+    ownEchoes.set(table, { n: Math.max(0, live + sign), until: sign > 0 ? until : (cur?.until ?? until) });
+  }
+}
+
+/** True, and counted off, when a broadcast for `table` is one of this tab's own. */
+function ownEcho(table: string | undefined): boolean {
+  if (!table) return false;
+  const cur = ownEchoes.get(table);
+  if (!cur || cur.n <= 0 || cur.until <= Date.now()) return false;
+  cur.n -= 1;
+  return true;
 }
 
 /**
@@ -869,6 +983,13 @@ async function syncStudyState(userId: string): Promise<void> {
    */
   let server = pulled ?? (await readSetupOnly(supabase, userId));
   /*
+   * The setup alone carries no history, and merged as if it did it wiped the
+   * known cards, the plan ticks and the XP on every slow sign-in: an empty
+   * list from the server reads as "none". So the fallback sets up and nothing
+   * more, and the history is asked for once more in the background.
+   */
+  const full = pulled !== null;
+  /*
    * The class step can be pressed while this read is still out. Its write
    * then lands after the read did, and the read's older class looked like a
    * switch made on another device: the student was reset to Class 9 a second
@@ -882,8 +1003,13 @@ async function syncStudyState(userId: string): Promise<void> {
     if (fresh) server = { ...server, ...fresh };
   }
   if (name) profileName = { id: userId, name };
-  await applyServerState(userId, server);
+  await applyServerState(userId, server, full);
   if (syncedFor !== userId) return;
+  if (!full) {
+    void hydrateStudyState(supabase, userId).then((late) => {
+      if (late && syncedFor === userId) void applyServerState(userId, late, true);
+    });
+  }
   /*
    * And the index once more, on the syllabus and medium the account has just
    * settled. Adopting a class, board or medium moves the content layer's
@@ -903,7 +1029,14 @@ async function syncStudyState(userId: string): Promise<void> {
   void flush(userId);
 }
 
-async function applyServerState(userId: string, pulled: HydratedStudyState | null): Promise<void> {
+/**
+ * Folds what the server holds into this browser: on sign-in, and again every
+ * time the live channel says the account moved.
+ *
+ * `full` is false for the setup-only fallback (see syncStudyState): its empty
+ * history lists mean "not read", so nothing is merged from them.
+ */
+async function applyServerState(userId: string, pulled: HydratedStudyState | null, full = true): Promise<void> {
   let server = pulled;
   const local = getSnapshot().onboarding;
   /*
@@ -949,7 +1082,7 @@ async function applyServerState(userId: string, pulled: HydratedStudyState | nul
     // Anything still queued here belongs to the syllabus the account left.
     dropQueue(userId);
     activeDaySynced = null;
-    const history = server;
+    const history = full ? server : null;
     update((s) => {
       const fresh: State = {
         ...EMPTY,
@@ -970,33 +1103,86 @@ async function applyServerState(userId: string, pulled: HydratedStudyState | nul
   }
   if (!server) return;
   const history = server;
+  /*
+   * A reset or a switch made on another device since this copy was built: what
+   * this browser queued before it must not reach the server after it, or the
+   * wiped history comes back on every device. Stops a send in flight, keeps
+   * what was done since, and today is written again on the next study action.
+   */
+  const kept = full ? staleQueue(getSnapshot(), history, getQueue()) : null;
+  if (kept) {
+    clearSyncQueue();
+    saveQueue(userId, kept);
+    activeDaySynced = null;
+  }
+  /*
+   * The medium and the subjects follow the account, like the class and board.
+   * "Choices made on this browser win" meant a switch to Urdu, or a subject
+   * dropped, on the phone never reached a browser already open, not even
+   * after a reload. The account's copy wins now whenever it has one and no
+   * write from this browser is still on its way to it; a browser with choices
+   * the account lacks sends them up below instead.
+   */
+  const before = getSnapshot();
+  const quiet = setupPending === 0;
+  const takeSubjects =
+    quiet && !!account?.subjects?.length && account.subjects.join(',') !== (before.onboarding?.subjects ?? []).join(',');
+  const takeMedium = quiet && !!account?.medium && account.medium !== before.settings.language;
   update((s) => {
     // The queue rides along, so a tick or a card this browser has not sent
     // yet is neither lost to the server's older copy nor counted twice.
     const pending = getQueue();
-    const merged = mergeHydratedState(s, history, pending);
-    /*
-     * Choices made on this browser win; the account's copy is for a browser
-     * that has none, which is every new one. Nothing read it before, so a
-     * student signing in somewhere new got the default subjects (no Pakistan
-     * Studies, no Computer Science) and an English app over their Urdu notes,
-     * until they happened to save a choice, which then overwrote the account
-     * with those defaults. The same rule as the Android app.
-     */
-    const adopt = !s.onboarding?.subjects?.length && account;
+    const merged = full ? mergeHydratedState(s, history, pending) : s;
+    const adopt = (!s.onboarding?.subjects?.length || takeSubjects || takeMedium) && account;
     const onboarding = adopt ? composeSetup({ medium: s.settings.language }, s.onboarding, account) : s.onboarding;
     // The nudge preferences belong to the account, so the server's copy
     // wins. Null means never set, and this browser's defaults stand.
     const prefs = history.accountPrefs ? { ...s.settings, ...history.accountPrefs } : s.settings;
     const settings = adopt && account?.medium ? withMedium(prefs, account.medium) : prefs;
-    return { ...merged, onboarding, settings, xp: hydratedXp(merged, history, pending) };
+    return full ? { ...merged, onboarding, settings, xp: hydratedXp(merged, history, pending) } : { ...s, onboarding, settings };
   });
+  /* A medium from the other device: the chapter index is counted per medium,
+     so it is read again in the new one (the language cookie and the server
+     tree follow the store's language in AppProvider). */
+  if (takeMedium && account?.medium) {
+    setContentMedium(account.medium);
+    void primeAllContent(createClient());
+  }
   // The account has no saved choices but this browser does: an account made
   // before choices synced. Send them up, so the next browser starts from them.
   const onb = getSnapshot().onboarding;
   if (onb?.subjects?.length && !account?.subjects?.length) {
     void saveSetup({ board: onb.board, medium: onb.medium, group: onb.group, subjects: onb.subjects });
   }
+}
+
+/**
+ * Looks for a setup changed on another device: one small read, and the full
+ * fold only when the class, board, medium or subjects there differ from this
+ * browser's. Profile writes announce nothing on the live channel, so without
+ * this a switch to Urdu on the phone waited for the next answer to be heard.
+ * At most every half minute, and never over a write of this browser's own.
+ */
+let setupCheckedAt = 0;
+/** When the plan was last read again on a return to the tab. */
+let planCheckedAt = 0;
+
+async function recheckSetup(userId: string): Promise<void> {
+  if (Date.now() - setupCheckedAt < 30_000 || setupPending > 0 || pulledFor !== userId) return;
+  setupCheckedAt = Date.now();
+  const supabase = createClient();
+  const fresh = await readSetup(supabase, userId).catch(() => null);
+  if (!fresh || syncedFor !== userId || setupPending > 0) return;
+  const account = setupFrom(fresh.onboarding);
+  const s = getSnapshot();
+  const moved =
+    (account.classLevel !== undefined && account.classLevel !== (s.onboarding?.classLevel ?? 9)) ||
+    (account.board !== undefined && account.board !== (s.onboarding?.board ?? 'fbise')) ||
+    (account.medium !== undefined && account.medium !== s.settings.language) ||
+    (!!account.subjects?.length && account.subjects.join(',') !== (s.onboarding?.subjects ?? []).join(','));
+  if (!moved) return;
+  const server = await hydrateStudyState(supabase, userId);
+  if (server && syncedFor === userId) await applyServerState(userId, server, true);
 }
 
 type AuthUser = { id: string; email?: string; user_metadata?: { name?: string } };
@@ -1183,7 +1369,17 @@ export function AppProvider({
       if (syncedFor) void flush(syncedFor);
     };
     const onVisible = () => {
-      if (document.visibilityState === 'visible' && syncedFor) void flush(syncedFor);
+      if (document.visibilityState !== 'visible' || !syncedFor) return;
+      void flush(syncedFor);
+      // A plan given or ended while this tab was in the background: the
+      // screens, the locks and the AI allowance follow it without a reload.
+      if (Date.now() - planCheckedAt > 60_000) {
+        planCheckedAt = Date.now();
+        void refreshPremium();
+      }
+      // Back from the phone: a setup changed there announces nothing on the
+      // live channel, so it is looked for here.
+      void recheckSetup(syncedFor);
     };
     window.addEventListener('online', onOnline);
     document.addEventListener('visibilitychange', onVisible);
@@ -1214,33 +1410,35 @@ export function AppProvider({
     const supabase = createClient();
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    /** Tables announced since the last re-read, own echoes not yet counted off. */
+    let heard: (string | undefined)[] = [];
 
-    const refresh = () => {
+    const refresh = (message?: { payload?: { table?: string } }) => {
+      heard.push(message?.payload?.table);
       if (timer) clearTimeout(timer);
       timer = setTimeout(async () => {
+        /* Counted off here, not on arrival: the announcement of a write can
+           beat the reply to it, before the flush has said what it sent. Only
+           announcements this tab did not cause are worth a re-read. */
+        const others = heard.filter((table) => !ownEcho(table));
+        heard = [];
+        if (!others.length) return;
         const server = await hydrateStudyState(supabase, liveUserId);
-        if (cancelled || !server) return;
-        update((s) => {
-          /*
-           * With the queue, plan ticks and known cards follow the server plus
-           * what this browser has not sent yet, so a tick taken back on the
-           * phone comes off here too, and one made here a second ago stays.
-           */
-          const pending = getQueue();
-          const merged = mergeHydratedState(s, server, pending);
-          return {
-            ...merged,
-            // A switch turned off on the phone must turn off here, and a
-            // merge would never let it.
-            settings: server.accountPrefs ? { ...s.settings, ...server.accountPrefs } : s.settings,
-            xp: hydratedXp(merged, server, pending),
-          };
-        });
+        if (cancelled || !server || syncedFor !== liveUserId) return;
+        /*
+         * The same fold as sign-in: plan ticks and known cards follow the
+         * server plus what this browser has not sent yet, the nudge settings
+         * follow the account, and now so do a class, board, medium or subject
+         * change made on the phone, and a reset made there (progress epoch).
+         */
+        await applyServerState(liveUserId, server, true);
       }, 1200);
     };
 
     const channel = supabase
-      .channel(`study:${liveUserId}`, { config: { private: false } })
+      // Private: only this account may listen (migration 0068); a public topic
+      // let anyone with the id listen in, or send made-up updates.
+      .channel(`study:${liveUserId}`, { config: { private: true } })
       .on('broadcast', { event: 'change' }, refresh)
       .subscribe();
 
@@ -1275,14 +1473,18 @@ export function AppProvider({
    * chapters were not there yet.
    */
   const contentReady = useSyncExternalStore(subscribeContent, contentVersion, contentVersion);
+  /*
+   * The day, which also moves the plan: its tasks are today's (the ids carry
+   * the date) and a tab left open overnight kept yesterday's, ticks and all,
+   * because nothing in the store changes at midnight.
+   */
+  const today = useToday();
 
   const derived = useMemo(() => {
     const access = accessOf(state.premium);
     const aiLimit = access.aiLimit;
-    const usedToday = state.ai.day === todayKey() ? state.ai.used : 0;
-    const chosen = state.onboarding?.subjects?.length
-      ? state.onboarding.subjects
-      : ['phy', 'chem', 'bio', 'math', 'eng', 'urd', 'isl'];
+    const usedToday = state.ai.day === today ? state.ai.used : 0;
+    const chosen = state.onboarding?.subjects?.length ? state.onboarding.subjects : DEFAULT_SUBJECTS;
     /*
      * On a trial the one subject it opens is the student's whole syllabus for
      * three days: today's plan, the practice pickers and the tutor's starters
@@ -1315,7 +1517,7 @@ export function AppProvider({
       }),
       contentReady,
     };
-  }, [state, contentReady]);
+  }, [state, contentReady, today]);
 
   const synced = pulledFor !== null && pulledFor === state.user?.id;
   const value = useMemo(() => ({ state, hydrated: state.hydrated, synced, actions, derived }), [state, synced, derived]);
@@ -1345,6 +1547,15 @@ export function useApp(): Ctx {
   const c = useContext(AppCtx);
   if (!c) throw new Error('useApp must be used inside AppProvider');
   return c;
+}
+
+/**
+ * The app's language where there is an app around the caller, else null: for
+ * the few components also rendered outside it (auth, onboarding), which fall
+ * back to the page's own language.
+ */
+export function useStoreLanguage(): Language | null {
+  return useContext(AppCtx)?.state.settings.language ?? null;
 }
 
 /** Same call signature as the Android app's hook. */
