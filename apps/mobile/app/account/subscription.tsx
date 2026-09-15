@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { AI_QUOTA, formatDate, subjectById, subjectName } from '@matricmate/core';
+import { AI_QUOTA, formatDate, hasEnded, subjectById, subjectName } from '@matricmate/core';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon, IconName } from '../../src/components/Icon';
@@ -44,7 +44,9 @@ export default function Subscription() {
   const tier = derived.access.tier;
   const planLabel = active ? t(PLAN_KEY[state.premium.plan ?? ''] ?? 'billing.planMonthly') : '';
   const trialSubject = tier === 'trial' ? subjectName(subjectById(derived.access.trialSubject ?? ''), lang) || derived.access.trialSubject || '' : '';
-  const date = state.premium.validTill ? formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  // "Ended on" only for a date that has passed: a plan switched off early keeps a date still to come.
+  const shown = state.premium.validTill && (active || hasEnded(state.premium.validTill)) ? state.premium.validTill : null;
+  const date = shown ? formatDate(shown, lang, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   // After "Check again" the answer is whatever the re-read found, not what
   // this render held before it: the toast used to report the old state.
   const activeNow = useRef(active);

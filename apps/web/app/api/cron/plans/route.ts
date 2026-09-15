@@ -75,6 +75,9 @@ export async function GET(req: NextRequest) {
       admin
         .from('entitlements')
         .select('user_id, plan, valid_till, trial_subject')
+        // Switched on: a plan revoked by hand keeps its end date, and must not
+        // be told it "ends soon" or has "ended".
+        .eq('active', true)
         .not('plan', 'is', null)
         .gte('valid_till', from)
         .lte('valid_till', to)

@@ -22,18 +22,7 @@ import {
   Toggle,
   useToast,
 } from '../../src/components/ui';
-import {
-  GRADE_10_READY,
-  Language,
-  REMINDER_TIMES,
-  boardName,
-  formatDate,
-  levelProgress,
-  mediumName,
-  reminderHour,
-  translate,
-  xpToNextLevel,
-} from '@matricmate/core';
+import { boardName, formatDate, GRADE_10_READY, hasEnded, Language, levelProgress, mediumName, REMINDER_TIMES, reminderHour, translate, xpToNextLevel } from '@matricmate/core';
 import { useLang, useT } from '../../src/i18n';
 import { AvatarBadge } from '../../src/components/AvatarBadge';
 import { needsDownloadIn } from '../../src/core/downloads';
@@ -140,7 +129,7 @@ export default function Account() {
                   : t('access.noPlan')}
               </Text>
               <Small>
-                {state.premium.validTill
+                {state.premium.validTill && (state.premium.active || hasEnded(state.premium.validTill))
                   ? t(state.premium.active ? 'access.activeUntil' : 'access.endedOn', {
                       date: formatDate(state.premium.validTill, lang, { day: 'numeric', month: 'short' }),
                     })

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { formatDate, subjectById, subjectName } from '@matricmate/core';
+import { formatDate, hasEnded, subjectById, subjectName } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
 import { Btn, Card, H2, Header, IconButton, Screen, Small, Spacer } from '../src/components/ui';
 import { useLang, useT } from '../src/i18n';
@@ -37,9 +37,13 @@ export default function Paused() {
     else if (premium.trialState === 'eligible') router.replace('/trial');
   }, [premium.active, premium.trialState]);
 
-  const wasTrial = premium.plan === 'trial';
+  // Ended means its date has passed. A plan the admin switched off early
+  // keeps a date still to come, and "it ended on" a future date is nonsense:
+  // that account is simply not active.
+  const endedAt = hasEnded(premium.validTill) ? premium.validTill : null;
+  const wasTrial = premium.plan === 'trial' && !!endedAt;
   const subject = premium.trialSubject ? subjectName(subjectById(premium.trialSubject), lang) || premium.trialSubject : '';
-  const ended = premium.validTill ? formatDate(premium.validTill, lang, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const ended = endedAt ? formatDate(endedAt, lang, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
   const title = wasTrial ? t('paused.trialTitle') : premium.plan && ended ? t('paused.planTitle') : t('paused.noneTitle');
   const body = wasTrial

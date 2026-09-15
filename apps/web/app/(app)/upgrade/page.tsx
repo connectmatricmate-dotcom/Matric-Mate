@@ -21,7 +21,8 @@ async function lapsed(): Promise<Lapsed> {
   const { data: ent } = await supabase.from('entitlements').select('active, valid_till, plan').maybeSingle();
   if (!ent?.valid_till || planIsActive(ent)) return null;
   const endedAt = Date.parse(ent.valid_till);
-  if (!Number.isFinite(endedAt)) return null;
+  // Switched off by hand before its date: not "ended", just not active.
+  if (!Number.isFinite(endedAt) || endedAt > Date.now()) return null;
   if (ent.plan === 'trial') return { kind: 'trial', endedAt };
   return { kind: 'plan', endedAt, plan: ent.plan === 'basic' ? 'basic' : 'premium' };
 }

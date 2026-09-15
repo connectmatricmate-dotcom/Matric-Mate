@@ -68,3 +68,11 @@ export function daysLeft(validTill: number | null, now = Date.now()): number {
 /** Whether a subject's content is open under this plan: everything, except on a trial. */
 export const subjectOpen = (access: Access, subjectId: string): boolean =>
   access.active && (access.tier !== 'trial' || access.trialSubject === subjectId);
+
+/**
+ * A plan's end date has passed. Not the same as "not active": a plan the admin
+ * switched off early keeps an end date still to come, and saying it "ended on"
+ * that date would be saying something that has not happened.
+ */
+export const hasEnded = (validTill: number | null | undefined, now: number = Date.now()): boolean =>
+  typeof validTill === 'number' && validTill <= now;
