@@ -41,7 +41,10 @@ const ENDING_WINDOW = 3 * DAY;
 type Kind = 'trial_ending' | 'trial_ended' | 'plan_ending' | 'plan_ended';
 type Row = { user_id: string; plan: string | null; valid_till: string; trial_subject: string | null };
 
-const karachiHour = (d: Date) => Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Karachi', hour: '2-digit', hour12: false }).format(d));
+const KARACHI = 'Asia/Karachi';
+const karachiHour = (d: Date) => Number(new Intl.DateTimeFormat('en-GB', { timeZone: KARACHI, hour: '2-digit', hour12: false }).format(d));
+/** The calendar day in Karachi, for "today" versus "tomorrow". The server runs on UTC. */
+const karachiDay = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: KARACHI }).format(d);
 
 /** Which reminder, if any, this plan is due, at `now`. */
 function due(row: Row, now: number): Kind | null {
@@ -64,6 +67,9 @@ export async function GET(req: NextRequest) {
   // ?force=1 sends at any hour: for running it by hand (the secret is still required).
   const force = req.nextUrl.searchParams.get('force') === '1';
   if (!force && (hour < 8 || hour >= 21)) return NextResponse.json({ quiet: true, hour });
+  // ?user=<id> runs it for one account only: a support check that must not
+  // remind everyone else whose plan happens to be ending.
+  const only = req.nextUrl.searchParams.get('user');
 
   const admin = createAdminClient();
   const now = nowDate.getTime();
@@ -71,8 +77,8 @@ export async function GET(req: NextRequest) {
     // Every plan ending in the next three days or ended in the last three.
     const from = new Date(now - ENDED_WINDOW).toISOString();
     const to = new Date(now + ENDING_WINDOW).toISOString();
-    const rows = await pageAll<Row>('entitlements', (a, b, signal) =>
-      admin
+    const rows = await pageAll<Row>('entitlements', (a, b, signal) => {
+      let q = admin
         .from('entitlements')
         .select('user_id, plan, valid_till, trial_subject')
         // Switched on: a plan revoked by hand keeps its end date, and must not
@@ -80,11 +86,10 @@ export async function GET(req: NextRequest) {
         .eq('active', true)
         .not('plan', 'is', null)
         .gte('valid_till', from)
-        .lte('valid_till', to)
-        .order('user_id')
-        .range(a, b)
-        .abortSignal(signal),
-    );
+        .lte('valid_till', to);
+      if (only) q = q.eq('user_id', only);
+      return q.order('user_id').range(a, b).abortSignal(signal);
+    });
 
     const candidates = rows.map((r) => ({ row: r, kind: due(r, now) })).filter((c): c is { row: Row; kind: Kind } => !!c.kind);
     if (!candidates.length) return NextResponse.json({ candidates: 0, sent: 0 });
@@ -104,27 +109,52 @@ export async function GET(req: NextRequest) {
 
     let claimed = 0;
     let sent = 0;
+    let failed = 0;
+    let emailFailed = 0;
+    /** Not sent after all: the next hourly run tries again. */
+    const release = (row: Row, kind: Kind) =>
+      admin.from('plan_notices').delete().eq('user_id', row.user_id).eq('kind', kind).eq('until', row.valid_till);
     await eachLimited(
       candidates.filter((c) => students.has(c.row.user_id)),
       CONCURRENCY,
       async ({ row, kind }) => {
         // Claim first: only the run that inserts the row sends.
-        const { data: claim, error } = await admin
-          .from('plan_notices')
-          .upsert({ user_id: row.user_id, kind, until: row.valid_till }, { onConflict: 'user_id,kind,until', ignoreDuplicates: true })
-          .select('user_id');
-        if (error || !claim?.length) return;
+        const { data: claim, error } = await withRetry((signal) =>
+          admin
+            .from('plan_notices')
+            .upsert({ user_id: row.user_id, kind, until: row.valid_till }, { onConflict: 'user_id,kind,until', ignoreDuplicates: true })
+            .select('user_id')
+            .abortSignal(signal),
+        );
+        if (error) {
+          failed++;
+          return;
+        }
+        if (!claim?.length) return;
         claimed++;
 
         const recipient = await loadRecipient(row.user_id, { email: true });
-        if (!recipient) return;
+        if (!recipient) {
+          failed++;
+          await release(row, kind);
+          return;
+        }
         const link = plansLink(row.user_id);
         const s = row.trial_subject ? subjectRow.get(row.trial_subject) : undefined;
         const subject = s ? (recipient.lang === 'ur' && s.urdu_name) || s.name : '';
-        const date = formatDate(row.valid_till, recipient.lang, { day: 'numeric', month: 'long' });
+        // In Karachi time: the server's own clock is UTC, which put a plan
+        // ending after 7 pm on the day before.
+        const date = formatDate(row.valid_till, recipient.lang, { day: 'numeric', month: 'long', timeZone: KARACHI });
+        const ends = new Date(row.valid_till);
+        const time = ends.toLocaleTimeString(recipient.lang === 'ur' ? 'ur-PK-u-nu-latn' : 'en-GB', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+          timeZone: KARACHI,
+        });
         const notice: Notice =
           kind === 'trial_ending'
-            ? trialEnding(subject, link)
+            ? trialEnding(subject, time, karachiDay(ends) === karachiDay(nowDate), link)
             : kind === 'trial_ended'
               ? trialEnded(link)
               : kind === 'plan_ending'
@@ -132,10 +162,20 @@ export async function GET(req: NextRequest) {
                 : planEnded(date, link);
         const report = await notify(recipient, notice);
         if (report.inbox === 'sent' || report.push === 'sent' || report.email === 'sent') sent++;
+        else {
+          failed++;
+          await release(row, kind);
+        }
+        // The email is the only one with the button to renew, so its failure
+        // is worth a status of its own even when the inbox row landed.
+        if (report.email === 'failed') emailFailed++;
       },
     );
 
-    return NextResponse.json({ candidates: candidates.length, claimed, sent });
+    const summary = { candidates: candidates.length, claimed, sent, failed, emailFailed };
+    // pg_cron records every run as a success; this status is the only trace.
+    if (failed || emailFailed) return NextResponse.json({ error: 'incomplete', ...summary }, { status: 503 });
+    return NextResponse.json(summary);
   } catch (e) {
     console.error('[cron/plans] run failed', e instanceof Error ? e.message : e);
     return NextResponse.json(

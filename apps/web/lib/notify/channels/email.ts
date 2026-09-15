@@ -26,6 +26,8 @@ import type { ChannelAdapter } from '../types';
 
 const apiKey = () => process.env.RESEND_API_KEY ?? '';
 const from = () => process.env.EMAIL_FROM ?? '';
+/** Domains no mailbox can exist on (RFC 2606 and 6761). */
+const RESERVED_DOMAIN = /@(?:[^@\s]+\.)?(?:test|example|invalid|localhost)$|@example\.(?:com|net|org)$/i;
 
 const esc = (s: string) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
@@ -83,6 +85,10 @@ export const email: ChannelAdapter = {
     // Normally set, since sign-in is by email. It can still be absent on an
     // account created before that was true.
     if (!to.email) return 'skipped';
+    // Test accounts live on reserved domains (probe-...@matricmate.test).
+    // Mail to them can only bounce, and bounces cost the sender its standing
+    // with every inbox a real student uses.
+    if (RESERVED_DOMAIN.test(to.email)) return 'skipped';
 
     const subject = translate(to.lang, notice.title, notice.params);
     const body = translate(to.lang, notice.email?.body ?? notice.body, notice.params);
@@ -106,7 +112,7 @@ export const email: ChannelAdapter = {
           html: shell(to.lang, subject, body, action, note),
           // A plain-text part as well, so a client that refuses HTML still
           // shows something, and so spam filters see a complete message.
-          text: `${subject}\n\n${body}\n${action ? `\n${action.label}: ${action.href}\n` : ''}${note ? `${note}\n` : ''}`,
+          text: `${subject}\n\n${body}\n${action ? `\n${action.label}: ${action.href}\n` : ''}${note ? `${note}\n` : ''}\n${translate(to.lang, 'email.footer')}\n`,
         }),
       });
       if (!res.ok) {

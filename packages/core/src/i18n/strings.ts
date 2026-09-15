@@ -594,9 +594,11 @@ export const en = {
     recallBody: '{question}\n{answer}',
     tipTitle: '{subject} exam tip',
     tipTitleGeneral: 'Exam tip of the day',
-    /* A free trial's last day, in place of that afternoon's tip. */
+    /* A free trial's last day. The job sends it up to a day ahead, so it
+       says which day and when, in Karachi time. */
     trialEndsTitle: 'Last day of your free trial',
-    trialEndsBody: 'Your {subject} trial ends today.',
+    trialEndsBody: 'Your {subject} trial ends today at {time}.',
+    trialEndsTomorrowBody: 'Your {subject} trial ends tomorrow at {time}.',
     /* Plan reminders, from the hourly plans job. Shown inside the apps, so
        they say what happened and nothing about buying (Google Play). The
        email versions, which may, are under email.* */
@@ -654,7 +656,8 @@ export const en = {
     footer: 'You are getting this because you have a MatricMate account. You can turn these off in Profile, under Notifications.',
     /* Plan reminders by email, which is outside the app and so may say where
        to renew. The button signs the student in on the website. */
-    trialEndsBody: 'Your {subject} trial ends today. Choose a plan on matricmate.co to keep {subject} open and open every other subject too.',
+    trialEndsBody: 'Your {subject} trial ends today at {time}. Choose a plan on matricmate.co to keep {subject} open and open every other subject too.',
+    trialEndsTomorrowBody: 'Your {subject} trial ends tomorrow at {time}. Choose a plan on matricmate.co to keep {subject} open and open every other subject too.',
     trialEndedBody: 'Your progress is saved. Choose a plan on matricmate.co and everything opens again.',
     planEndsBody: 'Your plan ends on {date}. Renew on matricmate.co before then so nothing locks.',
     planEndedBody: 'Your plan ended on {date}. Your progress is saved. Renew on matricmate.co and everything opens again.',
@@ -2064,7 +2067,8 @@ export const ur: typeof en = {
     tipTitle: '{subject} · امتحانی مشورہ',
     tipTitleGeneral: 'آج کا امتحانی مشورہ',
     trialEndsTitle: 'مفت آزمائش کا آخری دن',
-    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج ختم ہو رہی ہے۔',
+    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج {time} پر ختم ہو رہی ہے۔',
+    trialEndsTomorrowBody: 'آپ کی {subject} کی مفت آزمائش کل {time} پر ختم ہو جائے گی۔',
     trialEndedTitle: 'آپ کی مفت آزمائش ختم ہو گئی ہے',
     trialEndedBody: 'آپ کی پیش رفت محفوظ ہے۔',
     planEndsTitle: 'آپ کا پلان جلد ختم ہو رہا ہے',
@@ -2115,7 +2119,8 @@ export const ur: typeof en = {
 
   email: {
     footer: 'یہ پیغام آپ کو اس لیے ملا کہ آپ کا میٹرک میٹ اکاؤنٹ ہے۔ انہیں پروفائل میں ”اطلاعات“ سے بند کیا جا سکتا ہے۔',
-    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج ختم ہو رہی ہے۔ matricmate.co پر پلان لیں تاکہ {subject} کھلا رہے اور باقی ہر مضمون بھی کھل جائے۔',
+    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج {time} پر ختم ہو رہی ہے۔ matricmate.co پر پلان لیں تاکہ {subject} کھلا رہے اور باقی ہر مضمون بھی کھل جائے۔',
+    trialEndsTomorrowBody: 'آپ کی {subject} کی مفت آزمائش کل {time} پر ختم ہو جائے گی۔ matricmate.co پر پلان لیں تاکہ {subject} کھلا رہے اور باقی ہر مضمون بھی کھل جائے۔',
     trialEndedBody: 'آپ کی پیش رفت محفوظ ہے۔ matricmate.co پر پلان لیں اور سب کچھ دوبارہ کھل جائے گا۔',
     planEndsBody: 'آپ کا پلان {date} کو ختم ہو رہا ہے۔ اس سے پہلے matricmate.co پر تجدید کر لیں تاکہ کچھ بند نہ ہو۔',
     planEndedBody: 'آپ کا پلان {date} کو ختم ہو گیا۔ آپ کی پیش رفت محفوظ ہے۔ matricmate.co پر تجدید کریں اور سب کچھ دوبارہ کھل جائے گا۔',

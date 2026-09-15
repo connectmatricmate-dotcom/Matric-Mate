@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/primitives';
 export const dynamic = 'force-dynamic';
 
 const when = (iso: string) =>
-  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Karachi' }) : '';
 
 /**
  * What a teacher sees first: their link, and their money.

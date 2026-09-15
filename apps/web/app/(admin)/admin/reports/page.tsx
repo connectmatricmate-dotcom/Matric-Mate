@@ -57,7 +57,7 @@ async function ReportTable() {
         {rows.map((r) => (
           <Row key={r.id}>
             <Td num className="whitespace-nowrap text-ink2">
-              {new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+              {new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Asia/Karachi' })}
               <span className="block text-[12px] text-ink3">{name.get(r.user_id) || 'A student'}</span>
             </Td>
             <Td className="text-ink2">{SURFACE[r.surface] ?? r.surface}</Td>

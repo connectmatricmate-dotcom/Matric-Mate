@@ -74,13 +74,13 @@ export async function landingFor(role: Role): Promise<string> {
  * what people are paid and record money as handed over; one compromised row
  * should not be enough.
  *
- * Unset means the allowlist is not enforced, which is the right behaviour for
- * a local checkout and the wrong one for production. `docs/DEPLOYMENT.md`
- * carries the note.
+ * Unset means the allowlist is not enforced on a local checkout, and shut in
+ * a production build: a deploy that lost the variable must lock the panel,
+ * not open it to any account that says it is an admin.
  */
 export function emailAllowedAsAdmin(email: string | null | undefined): boolean {
   const raw = process.env.ADMIN_EMAILS?.trim();
-  if (!raw) return true;
+  if (!raw) return process.env.NODE_ENV !== 'production';
   const allowed = raw.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
   return !!email && allowed.includes(email.toLowerCase());
 }

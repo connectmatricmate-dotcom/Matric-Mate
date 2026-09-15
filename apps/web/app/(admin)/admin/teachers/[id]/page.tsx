@@ -9,7 +9,7 @@ import { RecordPayout, ToggleActive } from '@/components/admin/TeacherControls';
 export const dynamic = 'force-dynamic';
 
 const when = (iso: string) =>
-  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Karachi' }) : '';
 
 export default async function TeacherPage({ params }: { params: Promise<{ id: string }> }) {
   // Before any read: these readers use the service key, and a student who had

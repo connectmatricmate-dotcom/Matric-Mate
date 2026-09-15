@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/primitives';
 export const dynamic = 'force-dynamic';
 
 const when = (iso: string) =>
-  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Karachi' }) : '';
 
 /** A YYYY-MM-DD day as "14 Sep", read at noon in Karachi so it cannot slip a day. */
 const shortDay = (day: string) =>

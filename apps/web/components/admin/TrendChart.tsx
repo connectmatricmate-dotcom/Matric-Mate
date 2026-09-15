@@ -18,7 +18,7 @@ import { rupees } from '@/components/admin/bits';
 export type TrendPoint = { day: string; value: number };
 
 const dayLabel = (iso: string) =>
-  new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
 export function TrendChart({
   title,

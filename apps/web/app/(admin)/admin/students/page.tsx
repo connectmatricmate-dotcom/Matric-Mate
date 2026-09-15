@@ -9,7 +9,7 @@ import { requireAdmin } from '@/lib/roles';
 export const dynamic = 'force-dynamic';
 
 const when = (iso: string) =>
-  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Karachi' }) : '';
 
 /**
  * Everybody who signed up, and one button each.

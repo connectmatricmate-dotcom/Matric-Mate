@@ -21,7 +21,7 @@ import {
   weakTopicNudge,
 } from '@/lib/notify';
 import type { Notice, Recipient } from '@/lib/notify';
-import { JobError, chunks, cronAuthorised, eachLimited, pageAll } from '@/lib/notify/jobs';
+import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry } from '@/lib/notify/jobs';
 
 /**
  * The evening nudge, and the thing that makes two settings real.
@@ -53,15 +53,16 @@ import { JobError, chunks, cronAuthorised, eachLimited, pageAll } from '@/lib/no
  *
  * Safe to run twice in the same hour, and it is: a second pg_cron entry calls
  * it again five minutes later (migration 0040). Anyone already nudged tonight
- * is skipped, so the second run only reaches the students the first one could
- * not, because the database timed out or the run ran out of time.
+ * (profiles.nudged_on, migration 0047) is skipped, so the second run only
+ * reaches the students the first one could not, because the database timed
+ * out or the run ran out of time.
  *
  * Costs nothing per student: no model call, a handful of rows, one insert.
  */
 
 export const maxDuration = 300;
 
-/** Only ever one nudge per student per evening, whichever kind it wins. */
+/** The kinds a nudge is sent as, read back so tonight's topic is not last night's. */
 const KINDS = ['reminder', 'streak'];
 /**
  * How far back "days since they last studied" is counted. Past this it only
@@ -102,7 +103,7 @@ const MAX_GAP = 30;
 /** Enough questions for "best day this week" to be worth saying. */
 const BEST_DAY_MIN = 10;
 
-type ProfileRow = { id: string; settings: unknown; onboarding: { medium?: string } | null; created_at: string };
+type ProfileRow = { id: string; settings: unknown; onboarding: { medium?: string } | null; created_at: string; nudged_on: string | null };
 type AttemptRow = { user_id: string; chapter_id: string; subject_id: string; topic: string; correct: boolean; confidence: number; at: string };
 
 const karachiDay = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(d);
@@ -185,7 +186,7 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
   const profiles = await pageAll<ProfileRow>('profiles', (from, to, signal) =>
     admin
       .from('profiles')
-      .select('id,settings,onboarding,created_at')
+      .select('id,settings,onboarding,created_at,nudged_on')
       .eq('role', 'student')
       .order('id')
       .range(from, to)
@@ -199,7 +200,7 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
     if (settings.reminders === false && settings.streakAlerts === false) return false;
     return reminderHour(settings.reminderTime as string | undefined) === hourNow;
   });
-  if (!dueHour.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+  if (!dueHour.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0, reason: 'nobody_this_hour' });
 
   // With a plan, by the same rule as the paywall.
   const plans = await forIds<{ user_id: string; active: boolean | null; valid_till: string | null; plan: string | null; trial_subject: string | null }>(
@@ -221,14 +222,17 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
     plans.filter((e) => planIsActive(e) && e.plan === 'trial' && e.trial_subject).map((e) => [e.user_id, e.trial_subject as string]),
   );
   const due = dueHour.filter((p) => paying.has(p.id));
-  if (!due.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+  if (!due.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0, reason: 'nobody_with_a_plan' });
 
   /*
-   * What we have told them lately. The last 18 hours decide "already nudged
-   * this evening", so a retried or double-fired run cannot put a second
-   * sentence in the same inbox. The last few days decide whether tonight's
-   * weak topic was already named: the same "X is your weakest topic" went
-   * out four nights running to one student.
+   * What we have told them lately, to decide whether tonight's weak topic was
+   * already named: the same "X is your weakest topic" went out four nights
+   * running to one student.
+   *
+   * Not whether they were nudged tonight. That was worked out from this list
+   * (any reminder in the last 18 hours) until the 14:00 tip, also a
+   * reminder, made every student look nudged before the evening began, and
+   * the job sent nothing for days. profiles.nudged_on says it now.
    */
   const lately = await forIds<{ user_id: string; title: string; body: string; at: string }>(
     'notifications',
@@ -244,8 +248,7 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
         .range(from, to)
         .abortSignal(signal),
   );
-  const tonight = now.getTime() - 18 * 60 * 60 * 1000;
-  const already = new Set(lately.filter((n) => Date.parse(n.at) >= tonight).map((n) => n.user_id));
+  const already = new Set(due.filter((p) => p.nudged_on === today).map((p) => p.id));
   const saidLately = new Map<string, string[]>();
   for (const n of lately) saidLately.set(n.user_id, [...(saidLately.get(n.user_id) ?? []), `${n.title} ${n.body}`]);
 
@@ -258,7 +261,7 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
   const batch = pending.slice(0, MAX_PER_RUN);
   const dropped = pending.length - batch.length;
   if (dropped) console.warn(`[cron/nudge] ${dropped} students over the per-run ceiling, left for the next run`);
-  if (!batch.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0 });
+  if (!batch.length) return NextResponse.json({ hour: hourNow, considered: 0, sent: 0, reason: 'all_nudged_tonight' });
 
   const historyStart = karachiDay(new Date(now.getTime() - HISTORY_DAYS * 864e5));
   const dayRows = await forIds<{ user_id: string; day: string }>(
@@ -468,6 +471,25 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
         email: null,
         prefs: { channelPush: settings.channelPush !== false, channelEmail: settings.channelEmail !== false },
       };
+      /*
+       * Claimed just before sending, one student at a time: the :05 run, or
+       * a double-fired one, finds the day already written and moves on. A
+       * run that dies holds back only the few it was sending at that moment.
+       */
+      const { data: claim, error: claimError } = await withRetry((signal) =>
+        admin
+          .from('profiles')
+          .update({ nudged_on: today })
+          .eq('id', profile.id)
+          .or(`nudged_on.is.null,nudged_on.neq.${today}`)
+          .select('id')
+          .abortSignal(signal),
+      );
+      if (claimError) {
+        failed++;
+        return;
+      }
+      if (!claim?.length) return;
       // Through the dispatcher, so the same message reaches the phone and the
       // inbox without this job knowing anything about either.
       const report = await notify(recipient, notice);
@@ -475,7 +497,11 @@ async function run(dry = false, hourOverride: number | null = null): Promise<Nex
         sent++;
         const label = String(notice.title).replace('notifications.', '');
         picked[label] = (picked[label] ?? 0) + 1;
-      } else failed++;
+      } else {
+        failed++;
+        // Not sent, so not nudged: give the day back for the :05 run.
+        await admin.from('profiles').update({ nudged_on: profile.nudged_on }).eq('id', profile.id);
+      }
       if (report.push === 'sent') pushed++;
       else if (report.push === 'failed' || report.push === 'unconfigured') pushFailed++;
     },

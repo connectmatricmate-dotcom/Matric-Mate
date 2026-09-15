@@ -258,15 +258,23 @@ export const recall = (subject: string, question: string, answer: string, chapte
  * student in on the website's plans page (`link`, lib/signin-link.ts).
  */
 
-/** The last day of a free trial. */
-export const trialEnding = (subject: string, link: string): Notice => ({
+/**
+ * The last day of a free trial: `time` is when it ends, and `today` whether
+ * that is still today in Karachi. It can go out up to a day ahead, so an
+ * evening reminder is usually about tomorrow.
+ */
+export const trialEnding = (subject: string, time: string, today: boolean, link: string): Notice => ({
   kind: 'reminder',
   title: 'notifications.trialEndsTitle',
-  body: 'notifications.trialEndsBody',
-  params: { subject },
+  body: today ? 'notifications.trialEndsBody' : 'notifications.trialEndsTomorrowBody',
+  params: { subject, time },
   target: 'subscription',
   also: ['email'],
-  email: { body: 'email.trialEndsBody', action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
+  email: {
+    body: today ? 'email.trialEndsBody' : 'email.trialEndsTomorrowBody',
+    action: { label: 'email.seePlans', href: link },
+    note: 'email.linkNote',
+  },
 });
 
 /** A free trial that has just ended. */

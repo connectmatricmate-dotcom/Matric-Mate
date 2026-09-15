@@ -9,7 +9,7 @@ const DAY = 24 * 60 * 60 * 1000;
 const BACK = 14 * DAY;
 const AHEAD = 3 * DAY;
 
-const when = (ms: number) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const when = (ms: number) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Asia/Karachi' });
 
 export type FollowUp = {
   id: string;

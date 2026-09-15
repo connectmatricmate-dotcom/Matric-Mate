@@ -139,7 +139,7 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
   // write to and every receipt email was skipped.
   const to = await loadRecipient(payment.user_id, { email: true });
   if (to) {
-    const date = formatDate(validTill, to.lang, { day: 'numeric', month: 'long', year: 'numeric' });
+    const date = formatDate(validTill, to.lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Karachi' });
     await notify(to, paymentReceived(date, plan.id === 'basic' ? 'basic' : 'premium'));
   }
 
