@@ -173,19 +173,21 @@ async function Jobs() {
           : 'Green means the last run worked. Nothing here needs you.'}
       </p>
       <ul>
+        {/* The same grid on every row and every screen: the tag at the right
+            of the name, the schedule and what happened full width below. A
+            wrapping row put the tag beside a short description and under a
+            long one, so on a phone no two rows lined up. */}
         {jobs.map((j) => (
-          <li key={j.job} className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1.5 border-b border-line px-4 py-3 last:border-b-0">
-            <div className="min-w-0">
-              <p className="text-[13.5px] font-extrabold text-ink">{j.name}</p>
-              <p className="text-[12px] text-ink2">
-                Runs {j.when}
-                {j.at ? ` · last ${at(j.at)}` : ''}
-              </p>
-            </div>
-            <div className="flex min-w-0 flex-col items-start gap-1 sm:items-end">
+          <li key={j.job} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 border-b border-line px-4 py-3 last:border-b-0">
+            <p className="min-w-0 text-[13.5px] font-extrabold text-ink">{j.name}</p>
+            <span className="whitespace-nowrap">
               <Tag tone={JOB_TAG[j.state].tone}>{JOB_TAG[j.state].label}</Tag>
-              <p className="text-[12.5px] text-ink2 sm:text-end">{j.said}</p>
-            </div>
+            </span>
+            <p className="col-span-2 text-[12px] text-ink2">
+              Runs {j.when}
+              {j.at ? ` · last ${at(j.at)}` : ''}
+            </p>
+            <p className="col-span-2 text-[12.5px] text-ink">{j.said}</p>
           </li>
         ))}
       </ul>
