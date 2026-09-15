@@ -57,4 +57,4 @@ export const canonicalUrl = (path: string): string => `${CANONICAL_ORIGIN}${path
  * release (apps/mobile/app.json), so a student reading it out to support
  * gives one number whichever they use; it said 0.2.1 three releases on.
  */
-export const APP_VERSION = '0.5.0';
+export const APP_VERSION = '0.6.0';
