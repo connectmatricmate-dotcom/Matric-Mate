@@ -1046,7 +1046,7 @@ export async function fetchAudioTracks(chapterId: string, client?: ContentClient
   if (!client && !db) return [];
   try {
     const { data, error } = await table('audio_tracks', client ?? db!)
-      .select('id,chapter_id,medium,title,storage_path,duration_secs,bytes')
+      .select('id,chapter_id,medium,title,storage_path,duration_secs,bytes,voice_pending')
       .eq('chapter_id', chapterId);
     if (error || !data) return [];
     return (data as Record<string, unknown>[]).map((r) => ({
@@ -1057,6 +1057,7 @@ export async function fetchAudioTracks(chapterId: string, client?: ContentClient
       storagePath: String(r.storage_path),
       durationSecs: Number(r.duration_secs) || 0,
       bytes: Number(r.bytes) || 0,
+      voicePending: r.voice_pending === true,
     }));
   } catch {
     return [];

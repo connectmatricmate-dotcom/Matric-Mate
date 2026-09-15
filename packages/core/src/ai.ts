@@ -314,6 +314,29 @@ export async function buildCareer(language: 'en' | 'ur'): Promise<{ ok: true; da
   return aiPost<CareerState>('/api/ai/career', { language });
 }
 
+/* ---------------------------------------------------------- premium voice */
+
+/**
+ * Where to play a lesson whose premium voice is still being made
+ * (AudioTrack.voicePending). Not AI, but the same signed-in call to the
+ * website as the AI reads, so it lives with them.
+ *
+ *   stream   play this address, made as it plays; not seekable. `estSecs`
+ *            is the whole lesson's length, for the player's clock
+ *   url      it has just been finished: play this file instead, seekable
+ *   neither  play the track's own file (the voice is off, the lesson is out
+ *            of scope, or this month's allowance is spent)
+ *
+ * `at` asks for the stream from that many seconds in, after one ended early.
+ */
+export type VoiceStream = { stream: string | null; estSecs?: number; url?: string; durationSecs?: number; reason?: string };
+
+export async function fetchVoiceStream(chapterId: string, medium: 'en' | 'ur', at = 0): Promise<VoiceStream | null> {
+  const q = `chapter=${encodeURIComponent(chapterId)}&medium=${medium}${at > 0 ? `&at=${Math.floor(at)}` : ''}`;
+  const res = await aiGet<VoiceStream>(`/api/audio/voice?${q}`);
+  return res.ok ? res.data : null;
+}
+
 /**
  * A one-time link that opens the website already signed in, on the upgrade
  * page. The Android app can only be consumed from, not bought in, so this

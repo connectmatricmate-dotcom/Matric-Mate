@@ -741,6 +741,9 @@ export const en = {
        coming. See subjectMedium. */
     oneLanguageUr: 'This subject is taught in Urdu, so its lesson is in Urdu for every student.',
     oneLanguageEn: 'This subject is taught in English, so its lesson is in English for every student.',
+    /* The first listen to a lesson whose new voice is still being made: it
+       plays as it is made, so it cannot be skipped through yet. */
+    voiceMaking: 'This lesson has a new voice, made as you listen, so it plays at normal speed. Skipping and speed come back once it is ready, in a few minutes.',
   },
 
   downloads: {
@@ -2088,6 +2091,7 @@ export const ur: typeof en = {
     nextChapter: 'اگلے باب کا آڈیو',
     oneLanguageUr: 'یہ مضمون اردو میں پڑھایا جاتا ہے، اس لیے اس کا سبق ہر طالب علم کے لیے اردو میں ہے۔',
     oneLanguageEn: 'یہ مضمون انگریزی میں پڑھایا جاتا ہے، اس لیے اس کا سبق ہر طالب علم کے لیے انگریزی میں ہے۔',
+    voiceMaking: 'اس سبق کی نئی آواز آپ کے سنتے سنتے تیار ہو رہی ہے، اس لیے یہ عام رفتار سے چلے گا۔ آگے پیچھے جانا اور رفتار بدلنا چند منٹ میں، اس کے تیار ہوتے ہی واپس آ جائے گا۔',
   },
 
   downloads: {

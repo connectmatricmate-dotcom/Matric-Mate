@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Image, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
@@ -6,8 +6,8 @@ import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-au
 import { ErrorBoundary } from '../../../src/components/ErrorBoundary';
 import { Icon } from '../../../src/components/Icon';
 import { Bar, Card, H2, Header, IconButton, Pill, Row, Screen, Small, Spacer, Tap, Text } from '../../../src/components/ui';
-import { api, chapterById, chapterName, isOneLanguageSubject, pickAudioTrack, subjectMedium } from '@matricmate/core';
-import type { Medium } from '@matricmate/core';
+import { api, chapterById, chapterName, fetchVoiceStream, isOneLanguageSubject, pickAudioTrack, subjectMedium } from '@matricmate/core';
+import type { Medium, VoiceStream } from '@matricmate/core';
 import { Equalizer } from '../../../src/components/celebration';
 import { useChapterDownload } from '../../../src/components/ChapterDownload';
 import { audioSource } from '../../../src/core/audio';
@@ -42,6 +42,25 @@ const lessonTitle = (chapterId: string, lang: string): string =>
   chapterName(chapterById(chapterId) ?? localChapter(chapterId) ?? undefined, lang);
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
+/**
+ * What is playing instead of the track's own file, for a lesson whose premium
+ * voice is still being made (Islamiyat, Urdu, other Islamic content). The
+ * website's player does the same (AudioLesson.tsx).
+ *
+ * A stream is the lesson made as it plays: it cannot be skipped through, and
+ * its clock starts at `offset`, where it was asked to start. A file is the
+ * finished lesson, swapped in the moment it exists so skipping works again.
+ */
+type Voice = { uri: string; stream: boolean; offset: number; estSecs: number; fileSecs?: number };
+
+/** How long a play press waits for the stream before playing the file it has. */
+const ASK_MS = 8000;
+/** While streaming, how often to look for the finished file. */
+const POLL_MS = 20_000;
+
+const askVoice = (chapterId: string, medium: Medium, at: number): Promise<VoiceStream | null> =>
+  Promise.race([fetchVoiceStream(chapterId, medium, at), new Promise<null>((r) => setTimeout(() => r(null), ASK_MS))]);
+
 /** "Urdu narration" or "English narration", for the recording actually playing. */
 const narration = (medium: Medium): StringKey => (medium === 'ur' ? 'audio.narrationUr' : 'audio.narrationEn');
 
@@ -69,6 +88,8 @@ function PlayerChrome({
   onSeek,
   onSpeed,
   disabled,
+  making,
+  asking,
   note,
   downloaded,
   offlineAudio,
@@ -86,6 +107,10 @@ function PlayerChrome({
   onSeek: (delta: number) => void;
   onSpeed: () => void;
   disabled?: boolean;
+  /** The lesson is being made as it plays: no skipping, and 1x only. */
+  making?: boolean;
+  /** The play press is waiting for the lesson's stream. */
+  asking?: boolean;
   note: string;
   downloaded: boolean;
   /**
@@ -144,8 +169,8 @@ function PlayerChrome({
       </Row>
 
       <Row style={{ justifyContent: 'center', marginTop: S.lg }} gap={S.xl}>
-        <Tap onPress={() => onSeek(-15)} disabled={disabled} label={t('audio.back15')}>
-          <View style={[ctl(), disabled && { opacity: 0.4 }]}>
+        <Tap onPress={() => onSeek(-15)} disabled={disabled || making} label={t('audio.back15')}>
+          <View style={[ctl(), (disabled || making) && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>−15</Text>
           </View>
         </Tap>
@@ -164,18 +189,22 @@ function PlayerChrome({
               justifyContent: 'center',
             }}
           >
-            <Icon name={playing ? 'pause' : 'play'} size={30} color={C.onBrand} strokeWidth={2.2} />
+            {asking ? (
+              <ActivityIndicator size="large" color={C.onBrand} />
+            ) : (
+              <Icon name={playing ? 'pause' : 'play'} size={30} color={C.onBrand} strokeWidth={2.2} />
+            )}
           </View>
         </Tap>
-        <Tap onPress={() => onSeek(15)} disabled={disabled} label={t('audio.forward15')}>
-          <View style={[ctl(), disabled && { opacity: 0.4 }]}>
+        <Tap onPress={() => onSeek(15)} disabled={disabled || making} label={t('audio.forward15')}>
+          <View style={[ctl(), (disabled || making) && { opacity: 0.4 }]}>
             <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.ink }}>+15</Text>
           </View>
         </Tap>
       </Row>
 
       <Row style={{ justifyContent: 'center', marginTop: S.md, flexWrap: 'wrap' }} gap={S.sm}>
-        <Pill tone="grey" onPress={disabled ? undefined : onSpeed}>
+        <Pill tone="grey" onPress={disabled || making ? undefined : onSpeed} style={making ? { opacity: 0.45 } : undefined}>
           {t('audio.speed', { n: SPEEDS[speed] })}
         </Pill>
         <Pill tone={offlineAudio ? 'green' : 'grey'} icon={offlineAudio ? 'check' : 'download'}>
@@ -215,6 +244,33 @@ function RealPlayer({ id }: { id: string }) {
     () => (picked && isDownloaded ? localAudioUri(id, picked.medium) : null),
     [id, picked, isDownloaded],
   );
+  // Unless the lesson got its new voice after it was saved: online, the new
+  // one plays. Offline, the saved copy is still the lesson.
+  const stale = !!(online && localTrack && picked && picked !== localTrack && picked.storagePath !== localTrack.storagePath);
+
+  const [voice, setVoice] = useState<Voice | null>(null);
+  const [asking, setAsking] = useState(false);
+  const streaming = !!voice?.stream;
+  /** Where to put the playhead, and whether to play, once the next source loads. */
+  const resume = useRef<{ at: number; play: boolean } | null>(null);
+  /** The stream is asked for once per visit; after that the answer stands. */
+  const asked = useRef(false);
+  /** The last point a stream was asked again from, and how often: the same point twice means it is not moving. */
+  const retry = useRef({ at: -1, count: 0 });
+  // Another lesson or language is a fresh start. Adjusted during render so the
+  // old lesson's stream is never handed to the new one's player.
+  const lessonKey = `${id}|${medium}`;
+  const [loadedLesson, setLoadedLesson] = useState(lessonKey);
+  if (lessonKey !== loadedLesson) {
+    setLoadedLesson(lessonKey);
+    setVoice(null);
+    setAsking(false);
+  }
+  useEffect(() => {
+    asked.current = false;
+    resume.current = null;
+    retry.current = { at: -1, count: 0 };
+  }, [lessonKey]);
   /**
    * The hook owns source changes, nothing here calls player.replace().
    *
@@ -226,7 +282,10 @@ function RealPlayer({ id }: { id: string }) {
    * restarted its load twice a second and nothing ever played.
    */
   const remoteUri = audioSource(picked)?.uri ?? null;
-  const uri = offlineUri ?? remoteUri;
+  const fileUri = offlineUri && !stale ? offlineUri : remoteUri;
+  // The stream is set as the source only by a press: expo-audio starts
+  // loading a source the moment it has one, and loading it is what makes it.
+  const uri = voice?.uri ?? fileUri;
   const track = useMemo(() => (uri ? { uri } : null), [uri]);
   const player = useAudioPlayer(track);
 
@@ -275,14 +334,91 @@ function RealPlayer({ id }: { id: string }) {
 
   // A new player starts at 1x, but the speed pill keeps its state across a
   // source switch. Re-applied whenever either changes, so they cannot drift.
+  // A lesson being made as it plays is heard at 1x only: faster than that
+  // could overtake the voice making it.
   useEffect(() => {
-    player.setPlaybackRate(SPEEDS[speed]);
-  }, [player, speed]);
+    player.setPlaybackRate(streaming ? 1 : SPEEDS[speed]);
+  }, [player, speed, streaming]);
 
   // Until the file's own metadata arrives, the row's measured duration is the
-  // truth. audioMinutes on the chapter row is a summary for the lists.
-  const duration = status.duration || picked?.durationSecs || 0;
-  const position = status.currentTime || 0;
+  // truth. audioMinutes on the chapter row is a summary for the lists. A
+  // stream has no length until it is over: the lesson's estimated one.
+  const duration = streaming ? (voice?.estSecs ?? 0) : status.duration || voice?.fileSecs || picked?.durationSecs || 0;
+  const position = (streaming ? (voice?.offset ?? 0) : 0) + (status.currentTime || 0);
+
+  // A new source (the stream, or the finished file swapped in) plays as soon
+  // as it can when the press or the swap asked for it; a file seeks first.
+  useEffect(() => {
+    const r = resume.current;
+    if (!r) return;
+    if (!streaming && !status.isLoaded) return;
+    if (!streaming && r.at > 0) player.seekTo(r.at);
+    if (r.play) player.play();
+    resume.current = null;
+  }, [player, status.isLoaded, streaming]);
+
+  /**
+   * The lesson from `at` seconds in, after a stream stopped: the finished
+   * file when it exists (at the same point, since the stream is made of the
+   * very same parts), more of the stream when it is still being made, and
+   * the old recording at about the same point when neither can be had, so a
+   * student is never left with silence mid-lesson.
+   */
+  const carryOn = useCallback(
+    async (at: number) => {
+      if (!picked || !voice) return;
+      if (Math.abs(retry.current.at - at) < 2) retry.current.count += 1;
+      else retry.current = { at, count: 1 };
+      const r = retry.current.count > 2 || !online ? null : await askVoice(picked.chapterId, picked.medium, at);
+      if (r?.url) {
+        const end = !!r.durationSecs && at >= r.durationSecs - 3;
+        resume.current = end ? null : { at, play: true };
+        setVoice({ uri: r.url, stream: false, offset: 0, estSecs: 0, fileSecs: r.durationSecs });
+      } else if (r?.stream) {
+        resume.current = { at: 0, play: true };
+        setVoice({ uri: r.stream, stream: true, offset: at, estSecs: r.estSecs || voice.estSecs });
+      } else if (r?.reason === 'end') {
+        // It was the end of the lesson. The next press asks afresh, and by then it is a file.
+        asked.current = false;
+        resume.current = null;
+        setVoice(null);
+      } else if (fileUri) {
+        const ratio = voice.estSecs ? Math.min(1, at / voice.estSecs) : 0;
+        resume.current = { at: Math.max(0, ratio * (picked.durationSecs || 0) - 3), play: true };
+        setVoice({ uri: fileUri, stream: false, offset: 0, estSecs: 0 });
+      }
+    },
+    [picked, voice, online, fileUri],
+  );
+
+  // A stream ends at the end of the lesson, or early (its time ran out, the
+  // connection dropped, which the player reports as an error): ask again from
+  // here to find out which. Once per player: the flag stays up after the end.
+  const ended = status.didJustFinish || !!status.error;
+  const endHandled = useRef<unknown>(null);
+  useEffect(() => {
+    if (!ended || !streaming || !voice || endHandled.current === player) return;
+    endHandled.current = player;
+    void carryOn(voice.offset + (status.currentTime || 0));
+  }, [ended, streaming, voice, player, carryOn, status.currentTime]);
+
+  // While the lesson streams, look now and then for the finished file, and
+  // move to it at the same point: from then on the seek buttons work.
+  const now = useRef({ position, playing: status.playing, uri: voice?.uri });
+  useEffect(() => {
+    now.current = { position, playing: status.playing, uri: voice?.uri };
+  });
+  useEffect(() => {
+    if (!streaming || !status.playing || !picked) return;
+    const streamUri = voice?.uri;
+    const timer = setInterval(async () => {
+      const r = await fetchVoiceStream(picked.chapterId, picked.medium);
+      if (!r?.url || now.current.uri !== streamUri) return;
+      resume.current = { at: now.current.position, play: now.current.playing };
+      setVoice({ uri: r.url, stream: false, offset: 0, estSecs: 0, fileSecs: r.durationSecs });
+    }, POLL_MS);
+    return () => clearInterval(timer);
+  }, [streaming, status.playing, picked, voice?.uri]);
 
   /**
    * Listening counts as studying.
@@ -313,15 +449,41 @@ function RealPlayer({ id }: { id: string }) {
       playing={status.playing}
       speed={speed}
       disabled={!track}
-      onPlay={() => {
-        if (!track) return;
-        if (status.playing) player.pause();
-        else {
-          if (status.didJustFinish) player.seekTo(0);
-          player.play();
+      making={streaming}
+      asking={asking}
+      onPlay={async () => {
+        if (!track || asking) return;
+        if (status.playing) {
+          player.pause();
+          return;
         }
+        // The first press on a lesson whose new voice is still being made
+        // asks for it. Asked here and not on opening, because asking starts it
+        // being made, and a student who opens the lesson and leaves should
+        // cost nothing. Offline there is no stream: the file it has plays.
+        if (picked?.voicePending && online && !voice && !asked.current) {
+          asked.current = true;
+          setAsking(true);
+          const r = await askVoice(picked.chapterId, picked.medium, 0);
+          setAsking(false);
+          if (r?.stream) {
+            resume.current = { at: 0, play: true };
+            setSpeed(0);
+            setVoice({ uri: r.stream, stream: true, offset: 0, estSecs: r.estSecs || picked.durationSecs });
+            return;
+          }
+          if (r?.url) {
+            resume.current = { at: 0, play: true };
+            setVoice({ uri: r.url, stream: false, offset: 0, estSecs: 0, fileSecs: r.durationSecs });
+            return;
+          }
+        }
+        if (status.didJustFinish) player.seekTo(0);
+        player.play();
       }}
-      onSeek={(d) => player.seekTo(Math.max(0, Math.min(duration, position + d)))}
+      onSeek={(d) => {
+        if (!streaming) player.seekTo(Math.max(0, Math.min(duration, position + d)));
+      }}
       onSpeed={() => setSpeed((n) => (n + 1) % SPEEDS.length)}
       /**
        * Three different states, and they used to render as one.
@@ -332,7 +494,9 @@ function RealPlayer({ id }: { id: string }) {
        * lesson. A failed request looked like one too, silently.
        */
       note={
-        track
+        streaming
+          ? t('audio.voiceMaking')
+          : track
           ? t(lessonNote(id, state.onboarding?.board))
           : tracksLoading
             ? t('common.loading')
@@ -343,7 +507,7 @@ function RealPlayer({ id }: { id: string }) {
               : t('audio.noTrackNote')
       }
       downloaded={download.readable}
-      offlineAudio={!!offlineUri}
+      offlineAudio={!!offlineUri && uri === offlineUri}
       busy={download.busy}
       onToggleDownload={download.press}
       confirm={download.confirm}

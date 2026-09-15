@@ -106,6 +106,12 @@ export type AudioTrack = {
   storagePath: string;
   durationSecs: number;
   bytes: number;
+  /**
+   * This lesson's premium voice is still being made (Islamiyat, Urdu and
+   * other lessons with Islamic content): on play, ask for the stream
+   * (fetchVoiceStream) and fall back to this file when there is none.
+   */
+  voicePending?: boolean;
 };
 export type ShortQ = { id: string; chapterId: string; marks: number; q: string; answer: string; points: string[] };
 export type Blank = { id: string; chapterId: string; sentence: [string, string]; answer: string; options: string[] };
