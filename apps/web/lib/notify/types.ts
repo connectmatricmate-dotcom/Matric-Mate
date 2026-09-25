@@ -89,17 +89,30 @@ export type Notice = {
    */
   also?: Exclude<Channel, 'inbox' | 'push'>[];
   /**
+   * Email and nothing else: no inbox row, no push.
+   *
+   * For the late follow-ups to an account that has stopped (14 and 30 days
+   * after a plan ended). A phone that buzzes about the same thing a fifth time
+   * teaches its owner to turn notifications off, and then the one that matters
+   * never arrives. An email two weeks later is a reminder; a push is nagging.
+   */
+  emailOnly?: boolean;
+  /**
    * The email's own wording and button, when it needs more than the inbox
-   * line. The inbox and the push notification are shown by the app, where
-   * nothing may point at paying outside Google Play (core/billing.ts); an email
-   * is outside the app and can say where to renew, with a button that signs
-   * the student in (lib/signin-link.ts). Interpolated with `params` too.
+   * line. The inbox and the push notification are shown by the app, which may
+   * name the website in plain words but never link to it or show a price
+   * (core/billing.ts); an email is outside the app and can carry both, with a
+   * button that signs the student in on the plans page (lib/signin-link.ts).
+   * Interpolated with `params` too. A blank line in the body starts a new
+   * paragraph.
    */
   email?: {
     body?: StringKey;
     action?: { label: StringKey; href: string };
     /** A small line under the button. */
     note?: StringKey;
+    /** The plans on sale and what they cost, under the body (lib/plans.ts). */
+    plans?: boolean;
   };
 };
 

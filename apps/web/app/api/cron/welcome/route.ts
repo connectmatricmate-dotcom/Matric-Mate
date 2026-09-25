@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { AI_QUOTA } from '@matricmate/core';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { notify, welcome } from '@/lib/notify';
+import { plansLink } from '@/lib/signin-link';
+import { SITE_URL } from '@/lib/site';
 import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry, logged } from '@/lib/notify/jobs';
 
 /**
- * Say hello to anybody who has just put the app on a phone.
+ * Say hello to every new student: a line in the app and a push, and the email
+ * that explains the free trial, what comes after it and the plans (welcome in
+ * lib/notify/notices.ts).
  *
- * Runs every fifteen minutes. There is no install hook to hang this on: the
- * first true signal we get is a device registering a push token, which both
- * apps do through claim_push_token the first time somebody opens and signs
- * into them. So this sweeps for accounts that have a device and have never
- * been welcomed.
+ * Runs every fifteen minutes. There is no install hook to hang this on, so it
+ * sweeps two ways: accounts made in the last two days (which catches somebody
+ * who signed up on the website and never allowed notifications), and accounts
+ * with a device, which both apps register through claim_push_token the first
+ * time somebody opens and signs into them. Either way, only those never
+ * welcomed.
  *
  * Once each, guaranteed by profiles.welcomed_at rather than by looking for an
  * existing notification. A row can be cleared from an inbox and the wording
@@ -27,6 +33,14 @@ import { JobError, chunks, cronAuthorised, eachLimited, pageAll, withRetry, logg
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
+/**
+ * How recent an account must be to be welcomed without a device. Somebody who
+ * signs up on the website and never allows notifications has no push token,
+ * and used to be welcomed never; now the email reaches them. Recent only, so
+ * the day this shipped did not greet every old account at once.
+ */
+const NEW_ACCOUNT = 2 * 24 * 60 * 60 * 1000;
+
 /** Enough for any realistic quarter hour, and a ceiling on a runaway sweep. */
 const MAX_PER_RUN = 200;
 const CONCURRENCY = 8;
@@ -38,6 +52,9 @@ async function handle(req: NextRequest) {
     return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   }
 
+  // ?user=<id> welcomes that one account only (if it has not been already): a
+  // support check or a test that must not greet everybody else who is new.
+  const only = req.nextUrl.searchParams.get('user');
   const admin = createAdminClient();
 
   try {
@@ -53,16 +70,31 @@ async function handle(req: NextRequest) {
     );
 
     const withDevice = [...new Set(devices.map((d) => d.user_id))];
-    if (!withDevice.length) return NextResponse.json({ candidates: 0, welcomed: 0 });
 
     const pending: string[] = [];
-    for (const slice of chunks(withDevice)) {
+    // New accounts first, device or not.
+    {
+      const { data, error } = await withRetry((signal) => {
+        let q = admin
+          .from('profiles')
+          .select('id')
+          .is('welcomed_at', null)
+          .eq('role', 'student')
+          .gte('created_at', new Date(Date.now() - NEW_ACCOUNT).toISOString());
+        if (only) q = q.eq('id', only);
+        return q.order('created_at').limit(MAX_PER_RUN).abortSignal(signal);
+      });
+      if (error) throw new JobError('profiles', error.message);
+      pending.push(...((data ?? []) as { id: string }[]).map((r) => r.id));
+    }
+    const seen = new Set(pending);
+    for (const slice of chunks(only ? withDevice.filter((id) => id === only) : withDevice)) {
       if (pending.length >= MAX_PER_RUN) break;
       const { data, error } = await withRetry((signal) =>
         admin.from('profiles').select('id').in('id', slice).is('welcomed_at', null).eq('role', 'student').abortSignal(signal),
       );
       if (error) throw new JobError('profiles', error.message);
-      pending.push(...((data ?? []) as { id: string }[]).map((r) => r.id));
+      for (const r of (data ?? []) as { id: string }[]) if (!seen.has(r.id)) pending.push(r.id);
     }
 
     if (!pending.length) return NextResponse.json({ candidates: 0, welcomed: 0 });
@@ -80,7 +112,9 @@ async function handle(req: NextRequest) {
     let welcomed = 0;
     await eachLimited(ids, CONCURRENCY, async (id) => {
       // notify never throws: a channel that fails is reported, not raised.
-      const report = await notify(id, welcome());
+      // Without the secret no link can be signed; the email then points at sign-in.
+      const link = plansLink(id) ?? `${SITE_URL}/login?next=/upgrade`;
+      const report = await notify(id, welcome(link, AI_QUOTA.trial));
       if (report.inbox === 'sent') welcomed++;
     });
 

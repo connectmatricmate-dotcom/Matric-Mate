@@ -15,24 +15,32 @@
  * Rules this file exists to enforce (breaking them risks suspension, not just a
  * failed review):
  *   · no checkout, plan picker, price, or Buy/Upgrade/Subscribe/Renew control
- *   · no link, copied link, deep link or WebView to a payment or pricing page,
- *     and no instruction to go and pay somewhere (Play's rule covers "messaging
- *     or other calls to action", whatever the wording)
- *   · no mention of where plans are bought, not even as plain text
- *   · push and inbox text says what happened (a trial or plan ending), never
- *     how to pay; the email version of the same notice may, because email is
- *     outside the app (lib/notify on the website)
- *   · a locked screen says it is locked and nothing more; a student whose plan
- *     has ended meets the paused screen (app/paused.tsx), which can only Check
- *     again
- * Checked 15 Sep 2026: the external-links programme (billing choice) covers
- * the UK, the EEA and the US only, not Pakistan.
+ *   · no link, copied link, deep link or WebView to a payment or pricing page
+ *   · the website may be NAMED in plain text ("plans are on matricmate.co"),
+ *     never linked. Google allows exactly this for an app that sells nothing
+ *     itself: "For services and products that are consumption only ...,
+ *     developers may choose to provide additional information about
+ *     purchasing options without direct links", with "Go to our website to
+ *     upgrade your subscription to Premium" as its own example (Play Console
+ *     Help, Understanding Google Play's Payments policy, checked 25 Sep 2026).
+ *     The Android wording lives under plansWhere.* and the plan notices.
+ *   · no price anywhere in the app, not even in plain text; prices, and the
+ *     button that signs a student in on the plans page, are for email only
+ *     (lib/notify on the website), which is outside the app
+ *   · a locked screen says it is locked; a student whose plan has ended meets
+ *     the paused screen (app/paused.tsx), which names the website and can
+ *     Check again
+ * This file used to forbid naming the website at all, which was stricter than
+ * the policy and left a student who only had the app with no way to find out
+ * how to continue. Checked 15 Sep 2026: the external-links programme (billing
+ * choice), which would allow an actual link, covers the UK, the EEA and the US
+ * only, not Pakistan.
  */
 
 /** Named so the intent survives future edits: nothing may be sold here. */
 export const CAN_SELL_IN_APP = false;
 
-/** The website's name. Only for the staff signpost (a teacher or admin told where their pages are), never about plans: see the rules above. */
+/** The website's name, as plain text only: where plans are (plansWhere.*) and the staff signpost. Never as a link on Android: see the rules above. */
 export const BILLING_SITE = 'matricmate.co';
 
 /**

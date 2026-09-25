@@ -21,7 +21,9 @@ const seenKey = (userId: string) => `mm.welcomeTrial.${userId}`;
 
 /**
  * The first thing on the dashboard after the free trial starts: that it has,
- * which subject it opens and until when, and the three places worth knowing.
+ * which subject it opens and until when, the three places worth knowing, and
+ * what happens after it (plans on the website, named, never linked:
+ * core/billing.ts).
  * Once per account on this phone, gone at "Got it" or at the first "Start".
  *
  * Only on a trial: a student whose plan was switched on by hand has had
@@ -76,6 +78,8 @@ export function WelcomeTrial() {
           </Row>
         ))}
       </View>
+      <Spacer h={S.md} />
+      <Small style={{ color: C.ink2 }}>{t('plansWhere.trialCard')}</Small>
       <Spacer h={S.md} />
       <Btn
         title={t('welcomeTrial.start', { subject })}

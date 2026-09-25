@@ -29,20 +29,24 @@ export const streakAtRisk = (days: number): Notice => ({
 });
 
 /**
- * The first thing a new install says.
+ * The first thing a new account hears, from the welcome job (/api/cron/welcome),
+ * once per account (profiles.welcomed_at).
  *
- * Sent by hand rather than on a trigger, because "installed the app" is not
- * an event this system can see: there is no install hook, only a device
- * registering a push token, and firing on that would greet the same person
- * again every time they reinstalled or switched phone.
- *
- * Inbox and push, no email. It is a hello, not a record.
+ * Email too, and the email is the long one: how the free trial works, what
+ * comes after it, the plans with their prices and a button that signs the
+ * student in on the plans page. A student who only ever has the app used to
+ * meet a locked screen on day four with nothing having told them what comes
+ * next. The inbox and push line names the website in plain words, which is as
+ * far as the app may go (core/billing.ts).
  */
-export const welcome = (): Notice => ({
+export const welcome = (link: string, aiPerDay: number): Notice => ({
   kind: 'reminder',
   title: 'notifications.welcomeTitle',
   body: 'notifications.welcomeBody',
+  params: { n: aiPerDay },
   target: 'home',
+  also: ['email'],
+  email: { body: 'email.welcomeBody', plans: true, action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
 });
 
 /**
@@ -239,11 +243,23 @@ export const recall = (subject: string, question: string, answer: string, chapte
 /*
  * Plan reminders, from the hourly plans job (/api/cron/plans), each sent once
  * per plan end date (plan_notices). The inbox and push lines say what is
- * happening and nothing more, because the app shows them and Google Play
- * forbids an app pointing anyone at paying outside Play. The email, which is
- * outside the app, says where to renew and carries a button that signs the
+ * happening and name the website in plain words, because the app shows them:
+ * Google Play allows that much for an app that sells nothing itself, but no
+ * link and no price (core/billing.ts). The email, which is outside the app,
+ * lists the plans with their prices and carries a button that signs the
  * student in on the website's plans page (`link`, lib/signin-link.ts).
  */
+
+/** Day two of a three-day trial: two days left, and what happens after. */
+export const trialDay2 = (subject: string, date: string, link: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.trialDay2Title',
+  body: 'notifications.trialDay2Body',
+  params: { subject, date },
+  target: 'subscription',
+  also: ['email'],
+  email: { body: 'email.trialDay2Body', plans: true, action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
+});
 
 /**
  * The last day of a free trial: `time` is when it ends, and `today` whether
@@ -259,6 +275,7 @@ export const trialEnding = (subject: string, time: string, today: boolean, link:
   also: ['email'],
   email: {
     body: today ? 'email.trialEndsBody' : 'email.trialEndsTomorrowBody',
+    plans: true,
     action: { label: 'email.seePlans', href: link },
     note: 'email.linkNote',
   },
@@ -271,7 +288,7 @@ export const trialEnded = (link: string): Notice => ({
   body: 'notifications.trialEndedBody',
   target: 'subscription',
   also: ['email'],
-  email: { body: 'email.trialEndedBody', action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
+  email: { body: 'email.trialEndedBody', plans: true, action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
 });
 
 /** A paid plan with three days left. */
@@ -282,7 +299,18 @@ export const planEnding = (date: string, link: string): Notice => ({
   params: { date },
   target: 'subscription',
   also: ['email'],
-  email: { body: 'email.planEndsBody', action: { label: 'email.renew', href: link }, note: 'email.linkNote' },
+  email: { body: 'email.planEndsBody', plans: true, action: { label: 'email.renew', href: link }, note: 'email.linkNote' },
+});
+
+/** A paid plan in its last day. */
+export const planLastDay = (date: string, link: string): Notice => ({
+  kind: 'reminder',
+  title: 'notifications.planLastDayTitle',
+  body: 'notifications.planLastDayBody',
+  params: { date },
+  target: 'subscription',
+  also: ['email'],
+  email: { body: 'email.planLastDayBody', plans: true, action: { label: 'email.renew', href: link }, note: 'email.linkNote' },
 });
 
 /** A paid plan that has just ended. */
@@ -293,8 +321,31 @@ export const planEnded = (date: string, link: string): Notice => ({
   params: { date },
   target: 'subscription',
   also: ['email'],
-  email: { body: 'email.planEndedBody', action: { label: 'email.renew', href: link }, note: 'email.linkNote' },
+  email: { body: 'email.planEndedBody', plans: true, action: { label: 'email.renew', href: link }, note: 'email.linkNote' },
 });
+
+export type LapsedStep = 3 | 7 | 14 | 30;
+
+/**
+ * Still no plan, 3, 7, 14 or 30 days after a trial or plan ended, and then
+ * silence: a student who has not come back in a month is not brought back by
+ * a fifth email, only taught to ignore the address. Each step has its own
+ * wording, so the ladder never repeats itself. The last two are email only
+ * (Notice.emailOnly): a phone buzzing about it for the fourth time is nagging.
+ */
+export const lapsed = (step: LapsedStep, link: string): Notice => {
+  const late = step >= 14;
+  return {
+    kind: 'reminder',
+    title: `notifications.lapsed${step}Title` as Notice['title'],
+    // The inbox line for the email-only steps is never shown; 3's stands in so the key is real.
+    body: late ? 'notifications.lapsed3Body' : (`notifications.lapsed${step}Body` as Notice['body']),
+    target: 'subscription',
+    also: ['email'],
+    ...(late ? { emailOnly: true } : {}),
+    email: { body: `email.lapsed${step}Body` as Notice['body'], plans: true, action: { label: 'email.seePlans', href: link }, note: 'email.linkNote' },
+  };
+};
 
 const GENERAL_TIPS: StringKey[] = [
   'tips.general1',

@@ -9,8 +9,9 @@ import { Tap, Text } from './ui';
 
 /**
  * A strip under the header of every tab while a free trial runs: which subject
- * it opens and how many days are left. The website shows the same strip; here
- * it opens the student's own plan status, not plans (core/billing.ts).
+ * it opens, how many days are left, and where plans are, named in plain words.
+ * The website shows the same strip; here it opens the student's own plan
+ * status, never the website (core/billing.ts).
  *
  * A trial that ends without warning reads as the app breaking, three days in,
  * so the count is always in view, and it says "last day" rather than
@@ -41,7 +42,10 @@ export function TrialBanner() {
         }}
       >
         <Icon name="clock" size={16} color={C.orangeDark} />
-        <Text style={{ flex: 1, fontFamily: F.bodyBold, fontSize: 13, color: C.orangeDark }}>{line}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: F.bodyBold, fontSize: 13, color: C.orangeDark }}>{line}</Text>
+          <Text style={{ fontFamily: F.body, fontSize: 12, color: C.orangeDark, marginTop: 1 }}>{t('plansWhere.banner')}</Text>
+        </View>
         <Icon name="chevron" size={16} color={C.orangeDark} />
       </View>
     </Tap>

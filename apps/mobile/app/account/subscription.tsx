@@ -28,9 +28,10 @@ const BASIC_PERKS: [IconName, StringKey][] = [
 ];
 
 /**
- * The student's own plan: what it is, until when, and what it opens. Nothing
- * about other plans, prices, renewing or where plans are bought, which Google
- * Play would read as leading the student to pay outside Play (core/billing.ts).
+ * The student's own plan: what it is, until when, and what it opens, and where
+ * plans are chosen and renewed, named in plain words. No prices, no other
+ * plans and no link to the website, which Google Play would read as leading
+ * the student to pay outside Play (core/billing.ts).
  */
 export default function Subscription() {
   const { state, derived } = useApp();
@@ -46,6 +47,7 @@ export default function Subscription() {
   // "Ended on" only for a date that has passed: a plan switched off early keeps a date still to come.
   const shown = state.premium.validTill && (active || hasEnded(state.premium.validTill)) ? state.premium.validTill : null;
   const date = shown ? formatDate(shown, lang, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  const email = state.user?.contact ?? '';
   // After "Check again" the answer is whatever the re-read found, not what
   // this render held before it: the toast used to report the old state.
   const activeNow = useRef(active);
@@ -82,6 +84,9 @@ export default function Subscription() {
         </>
       ) : null}
 
+      <Card flat tint={C.tealTint} style={{ marginTop: S.md }}>
+        <Small style={{ color: C.ink2 }}>{email ? t('plansWhere.subscription', { email }) : t('plansWhere.subscriptionNoEmail')}</Small>
+      </Card>
       <Spacer h={S.md} />
       {/*
         For the student whose plan has just been switched on and who came back

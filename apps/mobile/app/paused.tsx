@@ -3,20 +3,21 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { formatDate, hasEnded, subjectById, subjectName } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
-import { Btn, Card, H2, Header, IconButton, Screen, Small, Spacer } from '../src/components/ui';
+import { Btn, Card, H2, H3, Header, IconButton, Row, Screen, Small, Spacer, Text } from '../src/components/ui';
 import { useLang, useT } from '../src/i18n';
 import { useApp } from '../src/store/app';
 import { useAuth } from '../src/store/auth';
-import { C, S } from '../src/theme';
+import { C, F, S, T } from '../src/theme';
 
 /**
  * Where a student lands when their free trial or their plan has ended.
  *
- * It says what happened and nothing about buying. Google Play forbids an app
- * from leading anyone to pay outside Play, by link, button or instruction,
- * and Pakistan is not in any programme that allows it (core/billing.ts). How
- * to continue reaches the student outside the app: the reminder emails, the
- * website, their teacher.
+ * It says what happened and how to continue, in plain words: open the website,
+ * sign in with this account, choose a plan, come back and check again. No link
+ * to it and no price. Google Play allows exactly that for an app that sells
+ * nothing itself (core/billing.ts). This screen used to say nothing about how
+ * to continue, and a student who only had the app had no way to find out.
+ * The emails carry the prices and a button that signs them in.
  *
  * What it can do is check again, which is the whole way back: a plan made
  * active on the website, or by hand, is invisible to this phone until it
@@ -44,6 +45,13 @@ export default function Paused() {
   const wasTrial = premium.plan === 'trial' && !!endedAt;
   const subject = premium.trialSubject ? subjectName(subjectById(premium.trialSubject), lang) || premium.trialSubject : '';
   const ended = endedAt ? formatDate(endedAt, lang, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const email = state.user?.contact ?? '';
+  const steps = [
+    t('plansWhere.step1'),
+    email ? t('plansWhere.step2', { email }) : t('plansWhere.step2NoEmail'),
+    t('plansWhere.step3'),
+    t('plansWhere.step4'),
+  ];
 
   const title = wasTrial ? t('paused.trialTitle') : premium.plan && ended ? t('paused.planTitle') : t('paused.noneTitle');
   const body = wasTrial
@@ -83,7 +91,35 @@ export default function Paused() {
         <Small style={{ textAlign: 'center' }}>{body}</Small>
       </View>
 
-      <Card flat tint={C.tealTint} style={{ marginTop: S.xl }}>
+      <Card style={{ marginTop: S.xl }}>
+        <H3>{t('plansWhere.pausedTitle')}</H3>
+        <Spacer h={S.sm} />
+        <View style={{ gap: S.sm }}>
+          {steps.map((line, i) => (
+            <Row key={i} gap={S.sm} style={{ alignItems: 'flex-start' }}>
+              <View
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: 11,
+                  backgroundColor: C.tealTint,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={{ fontFamily: F.bodyBold, fontSize: 12, color: C.teal }}>{i + 1}</Text>
+              </View>
+              {/* selectable: the address and the email can be copied by hand;
+                  nothing here opens the website (core/billing.ts). */}
+              <Text selectable style={[T.small, { flex: 1, color: C.ink }]}>
+                {line}
+              </Text>
+            </Row>
+          ))}
+        </View>
+      </Card>
+
+      <Card flat tint={C.tealTint} style={{ marginTop: S.md }}>
         <Small style={{ color: C.ink2 }}>{t('paused.saved')}</Small>
       </Card>
 

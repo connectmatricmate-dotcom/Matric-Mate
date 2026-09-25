@@ -533,7 +533,7 @@ export const en = {
     paymentBody: 'Premium is active until {date}.',
     paymentBodyBasic: 'Basic is active until {date}.',
     welcomeTitle: 'Welcome to MatricMate',
-    welcomeBody: 'Your notes, practice and past papers are ready. Open a chapter and start where you like.',
+    welcomeBody: 'Your notes, practice and past papers are ready. You get 3 free days with one subject; after that, plans for every subject are on matricmate.co.',
     streakTitle: '{n} day streak at risk',
     streakBody: 'You have not studied today. Answer a few questions before midnight to keep it.',
     reportTitle: 'Your coach has new advice',
@@ -608,20 +608,34 @@ export const en = {
     recallBody: '{question}\n{answer}',
     tipTitle: '{subject} exam tip',
     tipTitleGeneral: 'Exam tip of the day',
+    /* Plan reminders, from the hourly plans job. Shown inside the apps, so
+       they name the website in plain words and nothing more: no link, no
+       price (Google Play allows that much for an app that sells nothing
+       itself, core/billing.ts). The emails, which may carry prices and a
+       sign-in button, are under email.* */
+    trialDay2Title: '2 days left in your free trial',
+    trialDay2Body: 'Your {subject} trial ends on {date}. Plans for every subject are on matricmate.co.',
     /* A free trial's last day. The job sends it up to a day ahead, so it
        says which day and when, in Karachi time. */
     trialEndsTitle: 'Last day of your free trial',
-    trialEndsBody: 'Your {subject} trial ends today at {time}.',
-    trialEndsTomorrowBody: 'Your {subject} trial ends tomorrow at {time}.',
-    /* Plan reminders, from the hourly plans job. Shown inside the apps, so
-       they say what happened and nothing about buying (Google Play). The
-       email versions, which may, are under email.* */
+    trialEndsBody: 'Your {subject} trial ends today at {time}. To keep studying, get a plan on matricmate.co.',
+    trialEndsTomorrowBody: 'Your {subject} trial ends tomorrow at {time}. To keep studying, get a plan on matricmate.co.',
     trialEndedTitle: 'Your free trial has ended',
-    trialEndedBody: 'Your progress is saved.',
+    trialEndedBody: 'Your progress is saved. Plans are on matricmate.co: sign in there with this same email.',
     planEndsTitle: 'Your plan ends soon',
-    planEndsBody: 'It ends on {date}.',
+    planEndsBody: 'It ends on {date}. Renew on matricmate.co before then.',
+    planLastDayTitle: 'Your plan ends in a day',
+    planLastDayBody: 'It ends on {date}. Renew on matricmate.co so nothing locks.',
     planEndedTitle: 'Your plan has ended',
-    planEndedBody: 'Your progress is saved.',
+    planEndedBody: 'Your progress is saved. Renew on matricmate.co and everything opens again.',
+    /* Follow-ups for an account still without a plan, 3, 7, 14 and 30 days
+       after it ended. The last two go by email only. */
+    lapsed3Title: 'Your progress is waiting for you',
+    lapsed3Body: 'Everything you practised is saved. Get a plan on matricmate.co and carry on where you stopped.',
+    lapsed7Title: 'A week away from your studies',
+    lapsed7Body: 'Your notes, scores and weak topics are all still here. Plans are on matricmate.co.',
+    lapsed14Title: 'Your weak topics are still waiting',
+    lapsed30Title: 'We have kept everything for you',
   },
 
   /* Exam technique, one per afternoon. General enough to hold for both boards
@@ -668,8 +682,21 @@ export const en = {
 
   email: {
     footer: 'You are getting this because you have a MatricMate account. You can turn these off in Profile, under Notifications.',
+    /* The welcome, a few minutes after sign-up: how the trial and the plans
+       work, so nobody meets a locked screen without knowing what comes next.
+       Paragraphs are separated by a blank line. */
+    welcomeBody: 'Your MatricMate account is ready, in the Android app and on matricmate.co. Here is how it works.\n\n1. Free for 3 days. Pick one subject and its chapters, notes, audio lessons and practice are open for 3 days, with {n} AI questions a day.\n\n2. Then choose a plan on matricmate.co. Sign in with this email, choose a plan and follow the steps there. It opens every subject, in the app and on the website.\n\n3. As soon as your plan is on, everything opens. In the app, tap Check again if it has not opened yet.',
     /* Plan reminders by email, which is outside the app and so may say where
        to renew. The button signs the student in on the website. */
+    trialDay2Body: 'Your {subject} trial ends on {date}. When it does, a plan keeps {subject} open and opens every other subject too.',
+    planLastDayBody: 'Your plan ends on {date}. Renew on matricmate.co today so nothing locks.',
+    lapsed3Body: 'It has been 3 days since your MatricMate access ended. Everything you practised is saved: your scores, your streak and your weak topics. Choose a plan on matricmate.co and carry on from where you stopped.',
+    lapsed7Body: 'A week has gone by. Your board exam gets closer every week, and your notes, scores and weak topics are all still here. Choose a plan on matricmate.co and pick up where you left off.',
+    lapsed14Body: 'The topics you found hardest are still in your account, waiting to be practised. A plan on matricmate.co opens every subject again, in the app and on the website.',
+    lapsed30Body: 'It has been a month. Your progress is still saved, and a plan on matricmate.co opens everything again whenever you are ready. This is the last reminder we will send about it.',
+    plansHeading: 'The plans',
+    planPremium: 'Premium: Rs {price} a month. Every subject, with the AI tutor.',
+    planBasic: 'Basic: Rs {price} a month. Every subject, without AI.',
     trialEndsBody: 'Your {subject} trial ends today at {time}. Choose a plan on matricmate.co to keep {subject} open and open every other subject too.',
     trialEndsTomorrowBody: 'Your {subject} trial ends tomorrow at {time}. Choose a plan on matricmate.co to keep {subject} open and open every other subject too.',
     trialEndedBody: 'Your progress is saved. Choose a plan on matricmate.co and everything opens again.',
@@ -716,9 +743,9 @@ export const en = {
     dismiss: 'Got it',
   },
 
-  /* Android only: a trial or plan that has ended. Status and nothing else. No
-     price, no plan to buy and no website, by Google Play's payments policy
-     (core/billing.ts). */
+  /* Android only: a trial or plan that has ended. Status, plus where plans
+     are in plain words (plansWhere.*); no price, no link and nothing to buy
+     here, by Google Play's payments policy (core/billing.ts). */
   paused: {
     trialTitle: 'Your free trial has ended',
     trialBody: 'Your 3 days with {subject} are over.',
@@ -731,6 +758,23 @@ export const en = {
     stillInactive: 'Still not active.',
     nowActive: 'Your account is active again.',
     help: 'Help',
+  },
+
+  /* Where plans are, said in the Android app in plain words. Google Play
+     allows this for an app that sells nothing itself, "without direct links"
+     (core/billing.ts): so the site is named, never linked, and no price
+     appears. */
+  plansWhere: {
+    trialCard: 'When your trial ends, plans for every subject are on our website, matricmate.co. Sign in there with this same email.',
+    banner: 'Get a plan on matricmate.co to keep studying.',
+    pausedTitle: 'How to open everything again',
+    step1: 'Open matricmate.co in your phone\'s browser.',
+    step2: 'Sign in with {email}.',
+    step2NoEmail: 'Sign in with the email you use in this app.',
+    step3: 'Choose your plan there.',
+    step4: 'Come back here and tap Check again.',
+    subscription: 'Plans are chosen and renewed on matricmate.co, signed in with {email}.',
+    subscriptionNoEmail: 'Plans are chosen and renewed on matricmate.co, signed in with the email you use here.',
   },
 
   /* The Android app's plan wording: status only, the same policy as paused.* */
@@ -2123,7 +2167,7 @@ export const ur: typeof en = {
     paymentBody: 'پریمیم {date} تک فعال ہے۔',
     paymentBodyBasic: 'بیسک {date} تک فعال ہے۔',
     welcomeTitle: 'MatricMate میں خوش آمدید',
-    welcomeBody: 'آپ کے نوٹس، مشق اور پرانے پرچے تیار ہیں۔ کوئی بھی باب کھولیں اور شروع کریں۔',
+    welcomeBody: 'آپ کے نوٹس، مشق اور پرانے پرچے تیار ہیں۔ ایک مضمون کے ساتھ 3 دن مفت ملتے ہیں؛ اس کے بعد ہر مضمون کے پلان matricmate.co پر ہیں۔',
     streakTitle: '{n} دن کا تسلسل خطرے میں',
     streakBody: 'آج آپ نے کچھ نہیں پڑھا۔ رات بارہ بجے سے پہلے چند سوال کر لیں تو تسلسل بچ جائے گا۔',
     reportTitle: 'آپ کے کوچ کی نئی رائے',
@@ -2184,15 +2228,25 @@ export const ur: typeof en = {
     recallBody: '{question}\n{answer}',
     tipTitle: '{subject} · امتحانی مشورہ',
     tipTitleGeneral: 'آج کا امتحانی مشورہ',
+    trialDay2Title: 'مفت آزمائش کے 2 دن باقی',
+    trialDay2Body: 'آپ کی {subject} کی آزمائش {date} کو ختم ہو گی۔ ہر مضمون کے پلان matricmate.co پر ہیں۔',
     trialEndsTitle: 'مفت آزمائش کا آخری دن',
-    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج {time} پر ختم ہو رہی ہے۔',
-    trialEndsTomorrowBody: 'آپ کی {subject} کی مفت آزمائش کل {time} پر ختم ہو جائے گی۔',
+    trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج {time} پر ختم ہو رہی ہے۔ پڑھائی جاری رکھنے کے لیے matricmate.co پر پلان لیں۔',
+    trialEndsTomorrowBody: 'آپ کی {subject} کی مفت آزمائش کل {time} پر ختم ہو جائے گی۔ پڑھائی جاری رکھنے کے لیے matricmate.co پر پلان لیں۔',
     trialEndedTitle: 'آپ کی مفت آزمائش ختم ہو گئی ہے',
-    trialEndedBody: 'آپ کی پیش رفت محفوظ ہے۔',
+    trialEndedBody: 'آپ کی پیش رفت محفوظ ہے۔ پلان matricmate.co پر ہیں: وہاں اسی ای میل سے سائن اِن کریں۔',
     planEndsTitle: 'آپ کا پلان جلد ختم ہو رہا ہے',
-    planEndsBody: 'یہ {date} کو ختم ہو گا۔',
+    planEndsBody: 'یہ {date} کو ختم ہو گا۔ اس سے پہلے matricmate.co پر تجدید کر لیں۔',
+    planLastDayTitle: 'آپ کا پلان ایک دن میں ختم ہو رہا ہے',
+    planLastDayBody: 'یہ {date} کو ختم ہو گا۔ matricmate.co پر تجدید کریں تاکہ کچھ بند نہ ہو۔',
     planEndedTitle: 'آپ کا پلان ختم ہو گیا ہے',
-    planEndedBody: 'آپ کی پیش رفت محفوظ ہے۔',
+    planEndedBody: 'آپ کی پیش رفت محفوظ ہے۔ matricmate.co پر تجدید کریں اور سب کچھ دوبارہ کھل جائے گا۔',
+    lapsed3Title: 'آپ کی پیش رفت آپ کا انتظار کر رہی ہے',
+    lapsed3Body: 'آپ نے جو مشق کی وہ سب محفوظ ہے۔ matricmate.co پر پلان لیں اور وہیں سے شروع کریں جہاں رکے تھے۔',
+    lapsed7Title: 'پڑھائی سے ایک ہفتے کا وقفہ',
+    lapsed7Body: 'آپ کے نوٹس، نمبر اور کمزور موضوعات سب یہیں محفوظ ہیں۔ پلان matricmate.co پر ہیں۔',
+    lapsed14Title: 'آپ کے کمزور موضوعات ابھی انتظار میں ہیں',
+    lapsed30Title: 'ہم نے آپ کا سب کچھ سنبھال کر رکھا ہے',
   },
 
   tips: {
@@ -2237,6 +2291,16 @@ export const ur: typeof en = {
 
   email: {
     footer: 'یہ پیغام آپ کو اس لیے ملا کہ آپ کا میٹرک میٹ اکاؤنٹ ہے۔ انہیں پروفائل میں ”اطلاعات“ سے بند کیا جا سکتا ہے۔',
+    welcomeBody: 'آپ کا میٹرک میٹ اکاؤنٹ تیار ہے، اینڈرائیڈ ایپ میں بھی اور matricmate.co پر بھی۔ یہ اس طرح کام کرتا ہے۔\n\n1۔ 3 دن مفت۔ ایک مضمون چنیں، اس کے ابواب، نوٹس، آڈیو اسباق اور مشق 3 دن کے لیے کھل جاتے ہیں، روزانہ {n} اے آئی سوالات کے ساتھ۔\n\n2۔ پھر matricmate.co پر پلان چنیں۔ اسی ای میل سے سائن اِن کریں، پلان چنیں اور وہاں دیے گئے مراحل پورے کریں۔ اس سے ہر مضمون کھل جاتا ہے، ایپ میں بھی اور ویب سائٹ پر بھی۔\n\n3۔ پلان فعال ہوتے ہی سب کچھ کھل جاتا ہے۔ اگر ایپ میں ابھی نہ کھلا ہو تو ”دوبارہ چیک کریں“ دبائیں۔',
+    trialDay2Body: 'آپ کی {subject} کی آزمائش {date} کو ختم ہو گی۔ اس کے بعد پلان سے {subject} کھلا رہے گا اور باقی ہر مضمون بھی کھل جائے گا۔',
+    planLastDayBody: 'آپ کا پلان {date} کو ختم ہو رہا ہے۔ آج ہی matricmate.co پر تجدید کریں تاکہ کچھ بند نہ ہو۔',
+    lapsed3Body: 'آپ کی میٹرک میٹ رسائی ختم ہوئے 3 دن ہو گئے ہیں۔ آپ کی ساری مشق محفوظ ہے: نمبر، اسٹریک اور کمزور موضوعات۔ matricmate.co پر پلان لیں اور وہیں سے شروع کریں جہاں رکے تھے۔',
+    lapsed7Body: 'ایک ہفتہ گزر گیا۔ بورڈ کا امتحان ہر ہفتے قریب آ رہا ہے، اور آپ کے نوٹس، نمبر اور کمزور موضوعات سب یہیں محفوظ ہیں۔ matricmate.co پر پلان لیں اور وہیں سے جاری رکھیں۔',
+    lapsed14Body: 'جو موضوعات آپ کو سب سے مشکل لگے وہ ابھی آپ کے اکاؤنٹ میں مشق کے انتظار میں ہیں۔ matricmate.co پر پلان سے ہر مضمون دوبارہ کھل جاتا ہے، ایپ میں بھی اور ویب سائٹ پر بھی۔',
+    lapsed30Body: 'ایک مہینہ ہو گیا۔ آپ کی پیش رفت اب بھی محفوظ ہے، اور جب آپ تیار ہوں matricmate.co پر پلان سے سب کچھ دوبارہ کھل جائے گا۔ اس بارے میں یہ ہماری آخری یاد دہانی ہے۔',
+    plansHeading: 'پلان',
+    planPremium: 'پریمیم: ماہانہ {price} روپے۔ ہر مضمون، اے آئی ٹیوٹر کے ساتھ۔',
+    planBasic: 'بیسک: ماہانہ {price} روپے۔ ہر مضمون، اے آئی کے بغیر۔',
     trialEndsBody: 'آپ کی {subject} کی مفت آزمائش آج {time} پر ختم ہو رہی ہے۔ matricmate.co پر پلان لیں تاکہ {subject} کھلا رہے اور باقی ہر مضمون بھی کھل جائے۔',
     trialEndsTomorrowBody: 'آپ کی {subject} کی مفت آزمائش کل {time} پر ختم ہو جائے گی۔ matricmate.co پر پلان لیں تاکہ {subject} کھلا رہے اور باقی ہر مضمون بھی کھل جائے۔',
     trialEndedBody: 'آپ کی پیش رفت محفوظ ہے۔ matricmate.co پر پلان لیں اور سب کچھ دوبارہ کھل جائے گا۔',
@@ -2291,6 +2355,19 @@ export const ur: typeof en = {
     stillInactive: 'ابھی بھی فعال نہیں۔',
     nowActive: 'آپ کا اکاؤنٹ دوبارہ فعال ہے۔',
     help: 'مدد',
+  },
+
+  plansWhere: {
+    trialCard: 'آزمائش ختم ہونے پر ہر مضمون کے پلان ہماری ویب سائٹ matricmate.co پر ملتے ہیں۔ وہاں اسی ای میل سے سائن اِن کریں۔',
+    banner: 'پڑھائی جاری رکھنے کے لیے matricmate.co پر پلان لیں۔',
+    pausedTitle: 'سب کچھ دوبارہ کیسے کھولیں',
+    step1: 'اپنے فون کے براؤزر میں matricmate.co کھولیں۔',
+    step2: '{email} سے سائن اِن کریں۔',
+    step2NoEmail: 'اسی ای میل سے سائن اِن کریں جو آپ اس ایپ میں استعمال کرتے ہیں۔',
+    step3: 'وہاں اپنا پلان چنیں۔',
+    step4: 'پھر یہاں واپس آ کر ”دوبارہ چیک کریں“ دبائیں۔',
+    subscription: 'پلان matricmate.co پر چنے اور تجدید کیے جاتے ہیں، {email} سے سائن اِن کر کے۔',
+    subscriptionNoEmail: 'پلان matricmate.co پر چنے اور تجدید کیے جاتے ہیں، اسی ای میل سے سائن اِن کر کے جو آپ یہاں استعمال کرتے ہیں۔',
   },
 
   access: {

@@ -74,13 +74,14 @@ export async function loadRecipient(userId: string, opts: { email?: boolean } = 
 export type NotifyReport = Partial<Record<Channel, DeliveryResult>>;
 
 export async function notify(to: Recipient | string, notice: Notice): Promise<NotifyReport> {
-  const recipient = typeof to === 'string' ? await loadRecipient(to, { email: !!notice.also?.includes('email') }) : to;
+  const recipient = typeof to === 'string' ? await loadRecipient(to, { email: !!notice.emailOnly || !!notice.also?.includes('email') }) : to;
   if (!recipient) return {};
 
   const report: NotifyReport = {};
 
-  // The free pair always, plus whatever this notice adds. See Notice.also.
-  const channels: Channel[] = ['inbox', 'push', ...(notice.also ?? [])];
+  // The free pair always, plus whatever this notice adds (Notice.also), except
+  // for the few that go by email alone (Notice.emailOnly).
+  const channels: Channel[] = notice.emailOnly ? ['email'] : ['inbox', 'push', ...(notice.also ?? [])];
 
   await Promise.all(
     channels.map(async (name) => {

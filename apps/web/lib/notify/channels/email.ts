@@ -3,6 +3,7 @@ import { SUPPORT_EMAIL, colors, translate } from '@matricmate/core';
 import type { Language } from '@matricmate/core';
 import type { ChannelAdapter } from '../types';
 import { unsubscribeLink } from '@/lib/unsubscribe';
+import { PLANS } from '@/lib/plans';
 
 /**
  * Resend, for the messages a student may want to keep.
@@ -33,6 +34,26 @@ const RESERVED_DOMAIN = /@(?:[^@\s]+\.)?(?:test|example|invalid|localhost)$|@exa
 const esc = (s: string) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
 
+/** A body with blank lines between its paragraphs, as HTML paragraphs; single line breaks stay line breaks. */
+const paragraphs = (body: string, color: string) =>
+  body
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p, i) => `<p style="margin:${i ? '12px' : '0'} 0 0;font-size:14.5px;color:${color}">${esc(p).replace(/\n/g, '<br>')}</p>`)
+    .join('');
+
+/**
+ * The plans on sale and their prices, one line each, in the student's
+ * language. Email only: the app may never show a price (core/billing.ts).
+ */
+function planLines(lang: Language): { heading: string; lines: string[] } {
+  const lines = PLANS.map((p) =>
+    translate(lang, p.id === 'basic' ? 'email.planBasic' : 'email.planPremium', { price: p.price.toLocaleString('en-PK') }),
+  );
+  return { heading: translate(lang, 'email.plansHeading'), lines };
+}
+
 /**
  * The wrapper every message is posted in.
  *
@@ -41,7 +62,15 @@ const esc = (s: string) =>
  * and Gmail strips a <style> block outright. Table-free and single-column, so
  * it survives Outlook without a layout table.
  */
-function shell(lang: Language, heading: string, body: string, action?: { label: string; href: string }, note?: string, stop?: string | null): string {
+function shell(
+  lang: Language,
+  heading: string,
+  body: string,
+  action?: { label: string; href: string },
+  note?: string,
+  stop?: string | null,
+  plans?: { heading: string; lines: string[] },
+): string {
   const rtl = lang === 'ur';
   const dir = rtl ? 'rtl' : 'ltr';
   const font = rtl
@@ -58,7 +87,15 @@ function shell(lang: Language, heading: string, body: string, action?: { label: 
     </div>
     <div style="padding:22px">
       <h1 style="margin:0 0 10px;font-size:19px;color:${colors.ink}">${esc(heading)}</h1>
-      <p style="margin:0;font-size:14.5px;color:${colors.ink2}">${esc(body)}</p>
+      ${paragraphs(body, colors.ink2)}
+      ${
+        plans
+          ? `<div style="margin:18px 0 0;padding:14px 16px;background:${colors.paper};border:1px solid ${colors.line};border-radius:12px">
+               <p style="margin:0 0 6px;font-size:13px;font-weight:800;color:${colors.ink}">${esc(plans.heading)}</p>
+               ${plans.lines.map((l) => `<p style="margin:4px 0 0;font-size:14px;color:${colors.ink2}">${esc(l)}</p>`).join('')}
+             </div>`
+          : ''
+      }
       ${
         action
           ? `<p style="margin:22px 0 0">
@@ -95,6 +132,7 @@ export const email: ChannelAdapter = {
     const body = translate(to.lang, notice.email?.body ?? notice.body, notice.params);
     const action = notice.email?.action ? { label: translate(to.lang, notice.email.action.label, notice.params), href: notice.email.action.href } : undefined;
     const note = notice.email?.note ? translate(to.lang, notice.email.note, notice.params) : undefined;
+    const plans = notice.email?.plans ? planLines(to.lang) : undefined;
 
     const stop = unsubscribeLink(to.userId, to.lang);
     try {
@@ -111,13 +149,13 @@ export const email: ChannelAdapter = {
            */
           reply_to: SUPPORT_EMAIL,
           subject,
-          html: shell(to.lang, subject, body, action, note, stop),
+          html: shell(to.lang, subject, body, action, note, stop, plans),
           // Mail apps show their own unsubscribe button for this, and a
           // press on it POSTs straight to the link (one-click, RFC 8058).
           ...(stop ? { headers: { 'List-Unsubscribe': `<${stop}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } } : {}),
           // A plain-text part as well, so a client that refuses HTML still
           // shows something, and so spam filters see a complete message.
-          text: `${subject}\n\n${body}\n${action ? `\n${action.label}: ${action.href}\n` : ''}${note ? `${note}\n` : ''}\n${translate(to.lang, 'email.footer')}\n${stop ? `${translate(to.lang, 'email.stopEmails')}: ${stop}\n` : ''}`,
+          text: `${subject}\n\n${body}\n${plans ? `\n${plans.heading}\n${plans.lines.join('\n')}\n` : ''}${action ? `\n${action.label}: ${action.href}\n` : ''}${note ? `${note}\n` : ''}\n${translate(to.lang, 'email.footer')}\n${stop ? `${translate(to.lang, 'email.stopEmails')}: ${stop}\n` : ''}`,
         }),
       });
       if (!res.ok) {
