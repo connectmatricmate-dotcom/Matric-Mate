@@ -228,4 +228,13 @@ export const urdu = (size = 16): TextStyle => ({
 });
 
 export const WEB_MAX = CONTENT_MAX;
+/**
+ * The widest a column of screen content gets on a phone or tablet.
+ *
+ * Portrait phones are narrower than this, so it changes nothing there. It is
+ * for the screens that turn: from Android 16 a tablet or foldable ignores an
+ * app's portrait lock (core/orientation.ts), and a paragraph of notes run
+ * across 1000dp is a line nobody can follow back to its start.
+ */
+export const NATIVE_MAX = 720;
 export const isWeb = Platform.OS === 'web';

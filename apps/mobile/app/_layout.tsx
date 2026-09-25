@@ -14,6 +14,7 @@ import { AppProvider, useApp } from '../src/store/app';
 import { useQuotaRealtime } from '../src/core/useQuota';
 import { usePush } from '../src/core/usePush';
 import { markTouched, useStudyClock } from '../src/core/studyClock';
+import { usePortraitOnPhones } from '../src/core/orientation';
 import { Btn, Text, ToastHost } from '../src/components/ui';
 import { C, F, isRTL } from '../src/theme';
 import { en, fetchTutorQuota, ur } from '@matricmate/core';
@@ -69,6 +70,8 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function RootLayout() {
+  // Phones stay portrait, bigger screens turn (core/orientation.ts).
+  usePortraitOnPhones();
   const [fontsLoaded, fontError] = useFonts({
     Baloo2_600SemiBold,
     Baloo2_700Bold,

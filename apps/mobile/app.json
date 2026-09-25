@@ -4,7 +4,7 @@
     "slug": "matricmate",
     "version": "0.6.0",
     "scheme": "matricmate",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {

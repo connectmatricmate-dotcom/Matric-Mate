@@ -18,6 +18,7 @@ import {
   TextStyle,
   View,
   ViewStyle,
+  useWindowDimensions,
 } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent, TextInputProps, TextProps as NativeTextProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,7 +26,7 @@ import { useReducedMotion } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
 import { useKeyboardOverlap } from '../core/keyboard';
-import { C, F, R, S, T, WEB_MAX, isDark, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
+import { C, F, NATIVE_MAX, R, S, T, WEB_MAX, isDark, isRTL, isWeb, rowDir, shadow, textStart, urdu } from '../theme';
 import { colors, isUrduScript, type StringKey } from '@matricmate/core';
 import { useT } from '../i18n';
 import { Icon, IconName } from './Icon';
@@ -174,8 +175,8 @@ export function Wordmark({ width = 210, height = 40 }: { width?: number; height?
 /**
  * Page wrapper. Handles the four things every screen needs:
  * the status-bar inset at the top, the gesture-bar inset at the bottom,
- * the keyboard when one is open, and (on web) a centred column instead of
- * full-bleed text.
+ * the keyboard when one is open, and on any wide screen a centred column
+ * instead of full-bleed text.
  *
  * `tabbed`, set on the five tab roots, where the tab bar already occupies the
  * bottom inset and adding it again would leave a dead gap.
@@ -208,6 +209,17 @@ export function Screen({
 }) {
   const insets = useSafeAreaInsets();
   const keyboard = useKeyboardOverlap();
+  const { width: viewport } = useWindowDimensions();
+  /**
+   * One readable column, whatever the screen is doing.
+   *
+   * The web has always centred its content. Since phones are the only thing
+   * still locked to portrait (core/orientation.ts), a tablet, a foldable or a
+   * phone turned sideways now gets the same treatment rather than text run
+   * edge to edge.
+   */
+  const columnMax = isWeb ? WEB_MAX : NATIVE_MAX;
+  const column = isWeb || viewport > NATIVE_MAX ? { maxWidth: columnMax, width: '100%' as const, alignSelf: 'center' as const } : null;
   const scroller = useRef<ScrollView | null>(null);
   /** A plain View wrapped around the scroll area purely so there is something
    *  we can measure in window coordinates. Comparing an input's position
@@ -264,7 +276,7 @@ export function Screen({
       contentContainerStyle={[
         { paddingHorizontal: padded ? S.lg : 0, paddingBottom: bottomGap },
         grow && { flexGrow: 1 },
-        isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
+        column,
       ]}
       onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
         offset.current = e.nativeEvent.contentOffset.y;
@@ -277,7 +289,7 @@ export function Screen({
       {children}
     </ScrollView>
   ) : (
-    <View style={[{ flex: 1, width: '100%' }, isWeb && { maxWidth: WEB_MAX, alignSelf: 'center' }]}>
+    <View style={[{ flex: 1, width: '100%' }, column]}>
       {children}
     </View>
   );
@@ -301,7 +313,7 @@ export function Screen({
                  the button and the keys. */
               paddingBottom: keyboard > 0 ? S.md : tabbed ? S.md : Math.max(insets.bottom, S.md) + S.sm,
             },
-            isWeb && { maxWidth: WEB_MAX, width: '100%', alignSelf: 'center' },
+            column,
           ]}
         >
           {footer}
