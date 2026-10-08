@@ -58,3 +58,6 @@ export const canonicalUrl = (path: string): string => `${CANONICAL_ORIGIN}${path
  * gives one number whichever they use; it said 0.2.1 three releases on.
  */
 export const APP_VERSION = '0.6.1';
+
+/** The Android app on Google Play. The only place the website sends people for the app; the APK we used to hand round is retired. */
+export const PLAY_URL = 'https://play.google.com/store/apps/details?id=pk.matricmate.app';

@@ -9,6 +9,7 @@ import { HeroDemo } from '@/components/landing/HeroDemo';
 import { Nav } from '@/components/landing/Nav';
 import { Reveal } from '@/components/landing/Reveal';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { PlayBadge } from '@/components/landing/PlayBadge';
 import { PlanLink } from '@/components/landing/PlanLink';
 import { SubjectMarquee } from '@/components/landing/SubjectMarquee';
 import { Tilt } from '@/components/landing/Tilt';
@@ -114,7 +115,7 @@ const faq = (online: boolean) => [
   },
   {
     q: 'Does it work without internet?',
-    a: 'The website needs a connection, and it is what MatricMate runs on today: any phone or laptop browser, nothing to install. Offline study belongs to the Android app, which is not on Play yet. Once it is, a saved chapter keeps its notes, audio and MCQs with no signal, and answers sync when you reconnect. The AI tutor and timed tests need a connection either way.',
+    a: 'The Android app does: download a chapter and its notes, audio and MCQs work with no signal, and your answers sync when you reconnect. Get it from Google Play. The website needs a connection, and the AI tutor and timed tests need one in either.',
   },
   {
     q: 'My child studies in Urdu medium. Is the content really in Urdu?',
@@ -137,7 +138,7 @@ const faq = (online: boolean) => [
   },
   {
     q: 'Can I use it on both phone and computer?',
-    a: 'Yes. The website runs the same on a phone browser and a laptop, and your progress lives on the account rather than the device. The Android app signs in to that same account when it reaches Play.',
+    a: 'Yes. The website runs the same on a phone browser and a laptop, and the Android app from Google Play signs in to the same account. Your progress lives on the account rather than the device.',
   },
   {
     q: 'Can I stop whenever I want?',
@@ -224,6 +225,12 @@ export default function LandingPage() {
                 <p className="fx-rise fx-d6 mt-4 text-mk-small text-white/70">
                   From {rupees(BASIC_PLAN.price)} a month · three days free with one subject · nothing renews on its own
                 </p>
+                {/* The Android app, one account with the website. Its own row,
+                    under the price line, so it never competes with the one
+                    orange button and keeps Google's clear space. */}
+                <div className="fx-rise fx-d6 mt-6">
+                  <PlayBadge onDark />
+                </div>
               </div>
 
               <div className="fx-card flex justify-center md:justify-end">
@@ -639,6 +646,9 @@ export default function LandingPage() {
                 >
                   I already have an account
                 </Link>
+              </div>
+              <div className="relative mt-7 flex justify-center">
+                <PlayBadge onDark />
               </div>
             </div>
           </Reveal>

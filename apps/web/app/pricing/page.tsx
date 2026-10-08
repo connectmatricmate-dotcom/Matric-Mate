@@ -30,7 +30,7 @@ const COMPARE: { feature: string; basic: string; premium: string }[] = [
   { feature: 'AI answer checking, AI tests and mock papers', basic: 'Not included', premium: 'Included' },
   { feature: 'Revision sheets, weekly coach and career guidance', basic: 'Not included', premium: 'Included' },
   { feature: 'Offline downloads', basic: 'With the Android app', premium: 'With the Android app' },
-  { feature: 'Where it works', basic: 'Website now, Android app next', premium: 'Website now, Android app next' },
+  { feature: 'Where it works', basic: 'Website and Android app', premium: 'Website and Android app' },
 ];
 
 /**

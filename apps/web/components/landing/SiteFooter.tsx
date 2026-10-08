@@ -5,6 +5,7 @@
 import Link from 'next/link';
 import { BUSINESS, SUPPORT_EMAIL } from '@matricmate/core';
 import { Wordmark } from '@/components/ui/primitives';
+import { PlayBadge } from './PlayBadge';
 
 /* 44px rows on a phone, where every one of these is a thumb target; a
    mouse gets the tighter 40px list. Never narrower than tall either: "FAQ"
@@ -47,6 +48,9 @@ export function SiteFooter({ home = false, bare = false }: { home?: boolean; bar
           <p className="mt-3 text-mk-small text-ink2">
             Exam preparation for FBISE and Punjab Board, Class 9 and 10, in English and Urdu medium.
           </p>
+          <div className="mt-4">
+            <PlayBadge size="sm" />
+          </div>
           {/* The registered office. Rendered only when it is filled in: a blank
               line reads as an oversight, an invented address is worse. */}
           {BUSINESS.address ? (
@@ -126,7 +130,11 @@ export function SiteFooter({ home = false, bare = false }: { home?: boolean; bar
           wraps to its own line under the copyright. */}
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 px-5 py-2 text-[12.5px] text-ink3">
-          <p className="py-2">© {new Date().getFullYear()} MatricMate</p>
+          <p className="py-2">
+            © {new Date().getFullYear()} MatricMate
+            {/* Google asks for this line wherever its badge is used. */}
+            <span className="block text-[11.5px]">Google Play and the Google Play logo are trademarks of Google LLC.</span>
+          </p>
           {/* The whole line is the link, with the studio's name set a little
               heavier. The heart is green for the flag, and grows a little when
               the line is pointed at, unless the visitor has asked for less

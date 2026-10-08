@@ -17,7 +17,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
  *
  * On a phone this cannot open the Android app yet, and that is not an
  * oversight. The app declares a custom scheme and nothing else: no intent
- * filters, no assetlinks.json, and it is not on Play. Real App Links need the
+ * filters and no assetlinks.json. Real App Links need the
  * domain verified, a native config change and a fresh APK, none of which is
  * available over the air. Until then the link works everywhere as a web
  * signup, which is where a student has to end up anyway, since the website is
