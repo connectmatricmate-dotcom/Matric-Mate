@@ -24,6 +24,7 @@ import { useApp, useLang, useT } from '@/lib/store';
 import { BASIC_PLAN, PAYMENT_METHODS, THE_PLAN, planName, rupees, type Plan } from '@/lib/plans';
 import { startCheckout } from '@/lib/start-checkout';
 import { ManualActivation } from '@/components/commerce/ManualActivation';
+import { ManualPremium } from '@/components/commerce/ManualPremium';
 
 /** What each plan opens, from the shared strings so both languages agree. */
 const PERKS: Record<'basic' | 'premium', StringKey[]> = {
@@ -251,7 +252,7 @@ export function CheckoutForm({
 
         {!online ? (
           <div className="mt-5">
-            <ManualActivation plan={chosen} bare />
+            {chosen.ai ? <ManualPremium bare /> : <ManualActivation plan={chosen} bare />}
           </div>
         ) : (
         <>

@@ -1,5 +1,8 @@
 import 'server-only';
 import { normaliseMobile } from '@matricmate/core';
+import { accountLines } from '@/lib/manual-pay';
+import { THE_PLAN, rupees } from '@/lib/plans';
+import { requireAdmin } from '@/lib/roles';
 import { plansLink } from '@/lib/signin-link';
 import { SITE_URL } from '@/lib/site';
 import { allStudents } from '@/lib/students';
@@ -65,4 +68,78 @@ export async function followUps(): Promise<FollowUp[]> {
       whatsapp: phone ? `https://wa.me/${phone.replace('+', '')}?text=${encodeURIComponent(message)}` : null,
     };
   });
+}
+
+export type PlanRequestRow = {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  /** "15 Sep, 11:47 pm", Karachi time. */
+  at: string;
+  /** Minutes since the request, for "waiting 12 min". */
+  waitingMin: number;
+  via: 'web' | 'app';
+  /** On Basic now, so Premium is an upgrade rather than a new plan. */
+  onBasic: boolean;
+  /** wa.me address with the payment details written, or null with no usable number. */
+  whatsapp: string | null;
+};
+
+const stamp = (iso: string) =>
+  new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Karachi' });
+
+/**
+ * Students waiting for Premium (lib/plan-requests.ts), oldest first: each was
+ * promised it within 5 minutes of paying. The WhatsApp message carries the
+ * payment details, because a request from the Android app has never seen them.
+ */
+export async function pendingPlanRequests(): Promise<PlanRequestRow[]> {
+  // The service key reads every request: the admin door first (lib/roles).
+  await requireAdmin();
+  const { data, error } = await createAdminClient()
+    .from('plan_requests')
+    .select('id, user_id, created_at, via')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.error('follow-up: plan requests read failed', error.message);
+    throw new Error('Could not load the plan requests.');
+  }
+  if (!data?.length) return [];
+
+  const students = new Map((await allStudents()).map((s) => [s.id, s]));
+  const now = Date.now();
+  return (data as { id: string; user_id: string; created_at: string; via: string }[]).map((r) => {
+    const s = students.get(r.user_id);
+    const first = s?.name.trim().split(/\s+/)[0] || 'there';
+    const message = `Assalam o Alaikum ${first}, thank you for choosing MatricMate Premium. Please send ${rupees(THE_PLAN.price)} to any one of these accounts:\n\n${accountLines()}\n\nThen send the screenshot of the payment here, and your Premium will be switched on within 5 minutes.`;
+    const phone = s?.phone ? normaliseMobile(s.phone) : null;
+    const onBasic = !!s && s.active && s.plan === 'basic' && !!s.validTill && Date.parse(s.validTill) > now;
+    return {
+      id: r.id,
+      userId: r.user_id,
+      name: s?.name || 'Unknown student',
+      email: s?.email ?? '',
+      phone: s?.phone ?? null,
+      at: stamp(r.created_at),
+      waitingMin: Math.max(0, Math.round((now - Date.parse(r.created_at)) / 60_000)),
+      via: r.via === 'app' ? 'app' : 'web',
+      onBasic,
+      whatsapp: phone ? `https://wa.me/${phone.replace('+', '')}?text=${encodeURIComponent(message)}` : null,
+    };
+  });
+}
+
+/** How many students are waiting for Premium, for the overview; null when it could not be read. */
+export async function pendingPlanRequestCount(): Promise<number | null> {
+  // The service key reads every request: the admin door first (lib/roles).
+  await requireAdmin();
+  const { count, error } = await createAdminClient().from('plan_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending');
+  if (error) {
+    console.error('follow-up: plan request count failed', error.message);
+    return null;
+  }
+  return count ?? 0;
 }

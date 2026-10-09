@@ -6,6 +6,7 @@ import type { IconName } from '@matricmate/core';
 import { Btn } from '@/components/ui/controls';
 import { Sheet } from '@/components/ui/sheet';
 import { ManualActivation } from '@/components/commerce/ManualActivation';
+import { ManualPremium } from '@/components/commerce/ManualPremium';
 import { formatDate } from '@matricmate/core';
 import { THE_PLAN, rupees, type Plan } from '@/lib/plans';
 import { startCheckout } from '@/lib/start-checkout';
@@ -112,7 +113,8 @@ export function UpgradeButton({
         </p>
       ) : null}
       <Sheet open={manual} onClose={() => setManual(false)} title={title}>
-        <ManualActivation plan={plan} />
+        {/* Premium is asked for and paid by hand; Basic is still arranged with the team. */}
+        {plan.ai ? <ManualPremium bare /> : <ManualActivation plan={plan} />}
       </Sheet>
     </div>
   );

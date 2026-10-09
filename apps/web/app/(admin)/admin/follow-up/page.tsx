@@ -2,7 +2,9 @@ import { Suspense } from 'react';
 import { RowName, Panel, Table, Tag, Td, ViewLink } from '@/components/admin/bits';
 import { TapRow } from '@/components/staff/TapRow';
 import { Icon } from '@/components/ui/primitives';
-import { followUps } from '@/lib/follow-up';
+import { DismissRequest } from '@/components/admin/DismissRequest';
+import { PlanToggle } from '@/components/admin/PlanToggle';
+import { followUps, pendingPlanRequests } from '@/lib/follow-up';
 import { requireAdmin } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
@@ -69,6 +71,59 @@ async function FollowUpTable() {
   );
 }
 
+/**
+ * Students who asked for Premium and are waiting for it, oldest first: each
+ * was told it would be on within 5 minutes of their payment screenshot.
+ * Giving Premium here closes the request; the WhatsApp button sends the
+ * payment details, which a request from the Android app has never seen.
+ */
+async function RequestsTable() {
+  const rows = await pendingPlanRequests();
+  if (!rows.length) return null;
+  return (
+    <div className="mb-6">
+      <Panel title={`Premium requests (${rows.length})`}>
+        <Table stack head={['Student', 'Asked', '', '']}>
+          {rows.map((r) => (
+            <TapRow key={r.id} href={`/admin/students/${r.userId}`}>
+              <Td span>
+                <RowName href={`/admin/students/${r.userId}`}>{r.name}</RowName>
+                <span className="block text-[12px] text-ink2 wrap-anywhere">{r.email}</span>
+                {r.phone ? <span className="block text-[12px] text-ink2">{r.phone}</span> : null}
+              </Td>
+              <Td label="Asked">
+                <Tag tone={r.waitingMin > 30 ? 'red' : 'orange'}>{r.at}</Tag>
+                <span className="mt-1 block text-[12px] text-ink2">{r.via === 'app' ? 'Android app, not shown how to pay' : 'Website, shown how to pay'}</span>
+              </Td>
+              <Td span className="text-end">
+                <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                  {r.whatsapp ? (
+                    <a
+                      href={r.whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-teal bg-card px-4 text-[12.5px] font-extrabold text-teal transition-colors duration-200 hover:bg-tealtint max-md:w-full md:h-10"
+                    >
+                      <Icon name="whatsapp" size={16} />
+                      Send payment details
+                    </a>
+                  ) : (
+                    <span className="text-[12px] text-ink2">No mobile number</span>
+                  )}
+                  <DismissRequest id={r.id} name={r.name} />
+                </div>
+              </Td>
+              <Td span className="text-end">
+                <PlanToggle userId={r.userId} tier={r.onBasic ? 'basic' : null} name={r.name} />
+              </Td>
+            </TapRow>
+          ))}
+        </Table>
+      </Panel>
+    </div>
+  );
+}
+
 export default async function FollowUpPage() {
   // Before any read: see requireAdmin for why the layout's check is not enough.
   await requireAdmin();
@@ -76,10 +131,14 @@ export default async function FollowUpPage() {
     <>
       <h1 className="font-display text-[26px] text-ink">Follow up</h1>
       <p className="mt-0.5 mb-6 text-[13.5px] text-ink2">
-        Students whose free trial or plan has ended in the last two weeks, or ends in the next three days. Each gets
+        Students who asked for Premium come first: send them the payment details, and give Premium when their
+        screenshot arrives. Then students whose free trial or plan has ended in the last two weeks, or ends in the next three days. Each gets
         one automatic reminder by email and in the app; the WhatsApp button writes a personal one for you, with a
         link that signs them in on the plans page.
       </p>
+      <Suspense fallback={null}>
+        <RequestsTable />
+      </Suspense>
       <Suspense fallback={<div className="h-[320px] animate-pulse rounded-[16px] border border-line bg-card" />}>
         <FollowUpTable />
       </Suspense>

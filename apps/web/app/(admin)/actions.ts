@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { currentRole, emailAllowedAsAdmin } from '@/lib/roles';
 import { markPaidAndGrant } from '@/lib/payments';
+import { dismissPlanRequest } from '@/lib/plan-requests';
 import { PLANS, THE_PLAN, planById } from '@/lib/plans';
 
 /**
@@ -307,6 +308,8 @@ export async function grantPremiumAction(_prev: AdminState, formData: FormData):
   revalidatePath('/admin/students');
   revalidatePath(`/admin/students/${parsed.data.userId}`);
   revalidatePath('/admin');
+  // Premium given closes the student's request for it (lib/plan-requests.ts).
+  revalidatePath('/admin/follow-up');
   const until = result.validTill ? ` until ${day(result.validTill)}` : '';
   return {
     ok:
@@ -415,6 +418,22 @@ export async function resetSheetAction(_prev: AdminState, formData: FormData): P
 
   revalidatePath('/admin/reports');
   return { ok: 'Sheet deleted. The next student who opens it gets a newly written one.' };
+}
+
+/**
+ * A request for Premium set aside without giving the plan: a test, a second
+ * account, a student who never paid. Giving Premium closes a request by
+ * itself (markPaidAndGrant), so this is only for the ones that go nowhere.
+ */
+export async function dismissPlanRequestAction(_prev: AdminState, formData: FormData): Promise<AdminState> {
+  const who = await requireAdmin();
+  if ('error' in who) return { error: who.error };
+  const id = String(formData.get('requestId') ?? '');
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { error: 'Unknown request.' };
+  if (!(await dismissPlanRequest(id))) return { error: 'Could not update the request.' };
+  revalidatePath('/admin/follow-up');
+  revalidatePath('/admin');
+  return { ok: 'Request dismissed.' };
 }
 
 /**

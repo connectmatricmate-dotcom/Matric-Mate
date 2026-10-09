@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
-import { formatDate, hasEnded, subjectById, subjectName } from '@matricmate/core';
+import { formatDate, hasEnded, requestPlan, subjectById, subjectName } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
 import { Btn, Card, H2, H3, Header, IconButton, Row, Screen, Small, Spacer, Text } from '../src/components/ui';
 import { useLang, useT } from '../src/i18n';
+import { SITE_URL } from '../src/lib/site';
+import { supabase } from '../src/lib/supabase';
 import { useApp } from '../src/store/app';
 import { useAuth } from '../src/store/auth';
 import { C, F, S, T } from '../src/theme';
@@ -22,6 +24,11 @@ import { C, F, S, T } from '../src/theme';
  * What it can do is check again, which is the whole way back: a plan made
  * active on the website, or by hand, is invisible to this phone until it
  * re-reads the server. The app also re-reads every time it comes to the front.
+ *
+ * And it can ask the team to get in touch (requestPlan in core/account.ts).
+ * That is a request to be contacted, not a purchase: no price, no account
+ * number, no payment method. The server emails the student the details and
+ * the team messages them on WhatsApp, both outside the app.
  */
 export default function Paused() {
   const t = useT();
@@ -29,6 +36,7 @@ export default function Paused() {
   const { state } = useApp();
   const { refresh, checking } = useAuth();
   const [asked, setAsked] = useState(false);
+  const [request, setRequest] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
   const premium = state.premium;
 
   // Back to the app the moment there is a plan again, and to the trial if the
@@ -61,6 +69,22 @@ export default function Paused() {
     : premium.plan && ended
       ? t('paused.planBody', { date: ended })
       : t('paused.noneBody');
+
+  async function askTeam() {
+    if (request === 'sending') return;
+    setRequest('sending');
+    // The current token, refreshed if it had run out (as account/delete does).
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    const res = token ? await requestPlan(SITE_URL, token) : { ok: false as const, reason: 'error' as const };
+    if (res.ok && res.already) {
+      // Switched on since this screen opened: the effect above takes it home.
+      await refresh();
+      setRequest('idle');
+      return;
+    }
+    setRequest(res.ok ? 'sent' : 'failed');
+  }
 
   async function checkAgain() {
     setAsked(false);
@@ -124,7 +148,22 @@ export default function Paused() {
       </Card>
 
       <Spacer h={S.xl} />
-      <Btn title={checking ? t('access.checking') : t('billing.checkAgain')} icon="refresh" loading={checking} onPress={() => void checkAgain()} />
+      {request === 'sent' ? (
+        <Card flat tint={C.tealTint}>
+          <Small style={{ color: C.ink }}>{t('paused.requestSent')}</Small>
+        </Card>
+      ) : (
+        <Btn title={t('paused.requestCta')} icon="whatsapp" loading={request === 'sending'} onPress={() => void askTeam()} />
+      )}
+      {request === 'failed' ? <Small style={{ textAlign: 'center', marginTop: S.sm, color: C.red }}>{t('paused.requestFailed')}</Small> : null}
+      <Spacer h={S.md} />
+      <Btn
+        title={checking ? t('access.checking') : t('billing.checkAgain')}
+        variant={request === 'sent' ? 'primary' : 'line'}
+        icon="refresh"
+        loading={checking}
+        onPress={() => void checkAgain()}
+      />
       {asked && !checking && !premium.active ? (
         <Small style={{ textAlign: 'center', marginTop: S.sm }}>{t('paused.stillInactive')}</Small>
       ) : null}

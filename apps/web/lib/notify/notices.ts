@@ -86,6 +86,24 @@ export const paymentReceived = (
     : {}),
 });
 
+/**
+ * A student has asked for Premium while plans are switched on by hand.
+ *
+ * The inbox and push line says the request arrived and nothing more: it shows
+ * in the Android app, which may not show a price or a way to pay
+ * (core/billing.ts). The email is outside the app and carries the whole of
+ * it: the amount, the accounts, and the WhatsApp number for the screenshot.
+ */
+export const planRequested = (details: { amount: string; accounts: string; whatsapp: string }): Notice => ({
+  kind: 'payment',
+  title: 'notifications.planRequestTitle',
+  body: 'notifications.planRequestBody',
+  params: details,
+  target: 'subscription',
+  also: ['email'],
+  email: { body: 'email.planRequestBody' },
+});
+
 /* ------------------------------------------------------- the evening nudge */
 
 /**
