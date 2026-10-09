@@ -1,3 +1,5 @@
+import { SUPPORT_WHATSAPP, whatsappUrl } from '@matricmate/core';
+
 /**
  * Where the money goes while plans are switched on by hand.
  *
@@ -27,7 +29,7 @@ export const PAY_ACCOUNTS: PayAccount[] = [
 ];
 
 /** The WhatsApp number the payment screenshot goes to, as it is read out. */
-export const PAY_WHATSAPP = '+92 315 6969779';
+export const PAY_WHATSAPP = SUPPORT_WHATSAPP;
 
 /** The accounts as plain lines, for an email or a WhatsApp message. */
 export const accountLines = (): string => PAY_ACCOUNTS.map((a) => `${a.method}: ${a.number} (${a.title})`).join('\n');
@@ -37,6 +39,4 @@ export const accountLines = (): string => PAY_ACCOUNTS.map((a) => `${a.method}: 
  * paying and for what, so the screenshot can be matched to an account
  * without a conversation.
  */
-export function whatsappLink(message: string): string {
-  return `https://wa.me/${PAY_WHATSAPP.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
-}
+export const whatsappLink = (message: string): string => whatsappUrl(PAY_WHATSAPP, message);
