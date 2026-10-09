@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { JOBS, adminStats, dailyStats, jobHealth, newReportCount, serviceAlerts, type JobState, type ServiceAlert } from '@/lib/admin-stats';
+import { pendingPlanRequestCount } from '@/lib/follow-up';
 import { requireAdmin } from '@/lib/roles';
 import { TrendChart } from '@/components/admin/TrendChart';
 import { Panel, Stat, StatGrid, Tag, rupees } from '@/components/admin/bits';
@@ -32,6 +33,11 @@ export default async function AdminOverview() {
       {/* Nothing while it loads: most days there is nothing to say. */}
       <Suspense fallback={null}>
         <Alerts />
+      </Suspense>
+
+      {/* Nothing while it loads, and nothing when nobody is waiting. */}
+      <Suspense fallback={null}>
+        <PlanRequests />
       </Suspense>
 
       <Suspense fallback={<ReportsSkeleton />}>
@@ -134,6 +140,33 @@ async function Reports() {
             : n === 0
               ? 'Nothing new to read'
               : `${n} new ${n === 1 ? 'report' : 'reports'} to read`}
+        </span>
+      </span>
+      <Icon name="chevron" size={18} className="shrink-0 text-ink3" />
+    </Link>
+  );
+}
+
+/**
+ * Students waiting for Premium (lib/plan-requests.ts). Each was promised it
+ * within 5 minutes of paying, so this sits above everything else and only
+ * shows while somebody is waiting. The list itself is at the top of Follow up.
+ */
+async function PlanRequests() {
+  const n = await pendingPlanRequestCount();
+  if (!n) return null;
+  return (
+    <Link
+      href="/admin/follow-up"
+      className="mb-6 flex min-h-[68px] items-center gap-3 rounded-[16px] border border-orange bg-orangetint px-4 py-3 transition-colors duration-200 hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+    >
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange text-white">
+        <Icon name="crown" size={19} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[14.5px] font-extrabold text-ink">Premium requests</span>
+        <span className="block text-[13px] font-extrabold text-orangedark">
+          {n} {n === 1 ? 'student is' : 'students are'} waiting for Premium
         </span>
       </span>
       <Icon name="chevron" size={18} className="shrink-0 text-ink3" />

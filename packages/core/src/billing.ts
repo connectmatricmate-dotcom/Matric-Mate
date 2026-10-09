@@ -59,6 +59,20 @@ export const BILLING_SITE = 'matricmate.co';
 export const SUPPORT_EMAIL = 'connect@matricmate.co';
 
 /**
+ * The team's WhatsApp number, as it is read out.
+ *
+ * The website gives it as where the payment screenshot goes. The Android app
+ * opens a chat with it from the paused screen, with a message that says only
+ * that the student wants to upgrade their account: no price and no way to pay
+ * goes with it, and the person who answers explains the rest.
+ */
+export const SUPPORT_WHATSAPP = '+92 315 6969779';
+
+/** A wa.me link to a number, with the message already written. */
+export const whatsappUrl = (number: string, text: string): string =>
+  `https://wa.me/${number.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+
+/**
  * Who is behind the site, in the words a payment gateway checks for.
  *
  * PayFast will not review a merchant whose website does not name a local

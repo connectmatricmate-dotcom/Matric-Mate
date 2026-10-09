@@ -247,6 +247,26 @@ export const en = {
     mailBody: 'Hello MatricMate team,\n\nPlease switch on the {plan} plan for my account: {email}.\n\nThank you.',
   },
 
+  /* Premium while plans are switched on by hand: the student's request, the
+     accounts to pay into and the WhatsApp number for the screenshot.
+     Website only: the Android app never shows a way to pay (billing.ts). */
+  manualPay: {
+    title: 'Get Premium',
+    requesting: 'Sending your request…',
+    received: 'Request received. Here is how to pay.',
+    already: 'Premium is already active on your account.',
+    failed: 'Couldn’t send your request. Check your connection and try again.',
+    step1: 'Send {amount} to any one of these accounts.',
+    step2: 'Send a screenshot of the payment on WhatsApp to {whatsapp}.',
+    step3: 'Your Premium plan will be switched on within 5 minutes.',
+    accountName: 'Account name',
+    copy: 'Copy',
+    copied: 'Copied',
+    whatsapp: 'Send screenshot on WhatsApp',
+    waMessage: 'Assalam o Alaikum, I have paid {amount} for MatricMate Premium. My account: {account}. Screenshot attached.',
+    emailed: 'We have emailed you these details too.',
+  },
+
   plans: {
     basicName: 'Basic',
     premiumName: 'Premium',
@@ -532,6 +552,8 @@ export const en = {
     paymentTitle: 'Payment received',
     paymentBody: 'Premium is active until {date}.',
     paymentBodyBasic: 'Basic is active until {date}.',
+    planRequestTitle: 'Premium request received',
+    planRequestBody: 'We have your request for Premium. Our team will contact you on WhatsApp and switch it on.',
     welcomeTitle: 'Welcome to MatricMate',
     welcomeBody: 'Your notes, practice and past papers are ready. You get 3 free days with one subject; after that, plans for every subject are on matricmate.co.',
     streakTitle: '{n} day streak at risk',
@@ -707,6 +729,7 @@ export const en = {
     linkNote: 'The button signs you in to matricmate.co. It works once, within 7 days.',
     receiptBody: 'We received {amount} for Premium. It is active until {date}.',
     receiptBodyBasic: 'We received {amount} for Basic. It is active until {date}.',
+    planRequestBody: 'We have your request for Premium. To switch it on:\n\n1. Send {amount} to any one of these accounts:\n{accounts}\n\n2. Send a screenshot of the payment on WhatsApp to {whatsapp}.\n\n3. Your Premium plan will be switched on within 5 minutes.',
     receiptNote: 'Payment reference: {reference}. Keep this email as your receipt.',
     /* The footer's one-tap way to stop emails (/unsubscribe). */
     stopEmails: 'Stop these emails',
@@ -757,6 +780,10 @@ export const en = {
     saved: 'Your progress, scores and notes are saved. Everything opens again as soon as your account is active.',
     stillInactive: 'Still not active.',
     nowActive: 'Your account is active again.',
+    whatsappCta: 'Message us on WhatsApp',
+    whatsappHint: 'Our team will guide you from there.',
+    whatsappMessage: 'Assalam o Alaikum, I want to upgrade my MatricMate account. My account: {account}',
+    whatsappFailed: 'Couldn’t open WhatsApp. Message us on {number}.',
     help: 'Help',
   },
 
@@ -1895,6 +1922,23 @@ export const ur: typeof en = {
     mailBody: 'Hello MatricMate team,\n\nPlease switch on the {plan} plan for my account: {email}.\n\nThank you.',
   },
 
+  manualPay: {
+    title: 'پریمیم حاصل کریں',
+    requesting: 'آپ کی درخواست بھیجی جا رہی ہے…',
+    received: 'درخواست موصول ہو گئی۔ ادائیگی کا طریقہ یہ ہے۔',
+    already: 'آپ کے اکاؤنٹ پر پریمیم پہلے سے فعال ہے۔',
+    failed: 'آپ کی درخواست نہیں بھیجی جا سکی۔ اپنا کنکشن چیک کر کے دوبارہ کوشش کریں۔',
+    step1: '{amount} ان میں سے کسی بھی اکاؤنٹ میں بھیجیں۔',
+    step2: 'ادائیگی کا اسکرین شاٹ واٹس ایپ پر {whatsapp} پر بھیجیں۔',
+    step3: 'آپ کا پریمیم پلان 5 منٹ کے اندر فعال کر دیا جائے گا۔',
+    accountName: 'اکاؤنٹ کا نام',
+    copy: 'کاپی کریں',
+    copied: 'کاپی ہو گیا',
+    whatsapp: 'واٹس ایپ پر اسکرین شاٹ بھیجیں',
+    waMessage: 'Assalam o Alaikum, I have paid {amount} for MatricMate Premium. My account: {account}. Screenshot attached.',
+    emailed: 'یہ تفصیلات ہم نے آپ کو ای میل بھی کر دی ہیں۔',
+  },
+
   plans: {
     basicName: 'بیسک',
     premiumName: 'پریمیم',
@@ -2166,6 +2210,8 @@ export const ur: typeof en = {
     paymentTitle: 'ادائیگی موصول ہوئی',
     paymentBody: 'پریمیم {date} تک فعال ہے۔',
     paymentBodyBasic: 'بیسک {date} تک فعال ہے۔',
+    planRequestTitle: 'پریمیم کی درخواست موصول ہو گئی',
+    planRequestBody: 'ہمیں پریمیم کے لیے آپ کی درخواست مل گئی ہے۔ ہماری ٹیم واٹس ایپ پر آپ سے رابطہ کر کے اسے فعال کر دے گی۔',
     welcomeTitle: 'MatricMate میں خوش آمدید',
     welcomeBody: 'آپ کے نوٹس، مشق اور پرانے پرچے تیار ہیں۔ ایک مضمون کے ساتھ 3 دن مفت ملتے ہیں؛ اس کے بعد ہر مضمون کے پلان matricmate.co پر ہیں۔',
     streakTitle: '{n} دن کا تسلسل خطرے میں',
@@ -2311,6 +2357,7 @@ export const ur: typeof en = {
     linkNote: 'یہ بٹن آپ کو matricmate.co پر سائن ان کر دیتا ہے۔ یہ 7 دن کے اندر ایک بار کام کرتا ہے۔',
     receiptBody: 'ہمیں پریمیم کے لیے {amount} موصول ہو گئے۔ یہ {date} تک فعال ہے۔',
     receiptBodyBasic: 'ہمیں بیسک کے لیے {amount} موصول ہو گئے۔ یہ {date} تک فعال ہے۔',
+    planRequestBody: 'ہمیں پریمیم کے لیے آپ کی درخواست مل گئی ہے۔ اسے فعال کرنے کے لیے:\n\n1۔ {amount} ان میں سے کسی بھی اکاؤنٹ میں بھیجیں:\n{accounts}\n\n2۔ ادائیگی کا اسکرین شاٹ واٹس ایپ پر {whatsapp} پر بھیجیں۔\n\n3۔ آپ کا پریمیم پلان 5 منٹ کے اندر فعال کر دیا جائے گا۔',
     receiptNote: 'ادائیگی کا حوالہ: {reference}۔ یہ ای میل اپنی رسید کے طور پر رکھیں۔',
     stopEmails: 'یہ ای میلز بند کریں',
     unsubDoneTitle: 'اب ای میل نہیں آئے گی',
@@ -2354,6 +2401,10 @@ export const ur: typeof en = {
     saved: 'آپ کی پیش رفت، نمبر اور نوٹس محفوظ ہیں۔ جیسے ہی آپ کا اکاؤنٹ فعال ہو گا، سب کچھ دوبارہ کھل جائے گا۔',
     stillInactive: 'ابھی بھی فعال نہیں۔',
     nowActive: 'آپ کا اکاؤنٹ دوبارہ فعال ہے۔',
+    whatsappCta: 'واٹس ایپ پر ہم سے بات کریں',
+    whatsappHint: 'ہماری ٹیم وہاں آپ کی رہنمائی کرے گی۔',
+    whatsappMessage: 'Assalam o Alaikum, I want to upgrade my MatricMate account. My account: {account}',
+    whatsappFailed: 'واٹس ایپ نہیں کھل سکا۔ ہمیں {number} پر میسج کریں۔',
     help: 'مدد',
   },
 

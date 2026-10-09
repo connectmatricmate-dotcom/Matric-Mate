@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { gateway, onlinePayments } from '@/lib/gateway';
 import { BASIC_PLAN, THE_PLAN, planById, type Plan } from '@/lib/plans';
 import { planIsActive } from '@/lib/entitlement';
+import { closePlanRequests } from '@/lib/plan-requests';
 
 /**
  * Money, written server-side only.
@@ -175,6 +176,9 @@ export async function markPaidAndGrant(input: { tracker: string; reference?: str
   }
 
   if (!userId) return { handled: true };
+
+  // Premium is on, so a request for it is answered (lib/plan-requests.ts).
+  if (plan.ai) await closePlanRequests(userId);
 
   /*
    * Through the dispatcher, not straight into the table. A receipt should

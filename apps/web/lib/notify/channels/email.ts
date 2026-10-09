@@ -1,7 +1,7 @@
 import 'server-only';
 import { SUPPORT_EMAIL, colors, translate } from '@matricmate/core';
 import type { Language } from '@matricmate/core';
-import type { ChannelAdapter } from '../types';
+import type { ChannelAdapter, DeliveryResult } from '../types';
 import { unsubscribeLink } from '@/lib/unsubscribe';
 import { PLANS } from '@/lib/plans';
 
@@ -111,6 +111,41 @@ function shell(
   </p>
 </body>
 </html>`;
+}
+
+/**
+ * A message to the team rather than a student: in English, to every address
+ * on ADMIN_EMAILS, with a button into the admin pages. Not a notice, because
+ * the team has no profile, preferences or language to read them from.
+ */
+export async function emailStaff(subject: string, body: string, action?: { label: string; href: string }): Promise<DeliveryResult> {
+  if (!email.configured()) return 'unconfigured';
+  const to = (process.env.ADMIN_EMAILS ?? '')
+    .split(',')
+    .map((e) => e.trim())
+    .filter((e) => e && !RESERVED_DOMAIN.test(e));
+  if (!to.length) return 'skipped';
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${apiKey()}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        from: from(),
+        to,
+        subject,
+        html: shell('en', subject, body, action),
+        text: `${subject}\n\n${body}\n${action ? `\n${action.label}: ${action.href}\n` : ''}`,
+      }),
+    });
+    if (!res.ok) {
+      console.error('notify/email: resend refused a staff email', res.status, (await res.text()).slice(0, 200));
+      return 'failed';
+    }
+    return 'sent';
+  } catch (e) {
+    console.error('notify/email: staff email failed', e instanceof Error ? e.message : e);
+    return 'failed';
+  }
 }
 
 export const email: ChannelAdapter = {

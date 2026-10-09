@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
-import { formatDate, hasEnded, subjectById, subjectName } from '@matricmate/core';
+import { SUPPORT_WHATSAPP, formatDate, hasEnded, subjectById, subjectName, whatsappUrl } from '@matricmate/core';
 import { Icon } from '../src/components/Icon';
 import { Btn, Card, H2, H3, Header, IconButton, Row, Screen, Small, Spacer, Text } from '../src/components/ui';
 import { useLang, useT } from '../src/i18n';
@@ -22,6 +22,11 @@ import { C, F, S, T } from '../src/theme';
  * What it can do is check again, which is the whole way back: a plan made
  * active on the website, or by hand, is invisible to this phone until it
  * re-reads the server. The app also re-reads every time it comes to the front.
+ *
+ * And it can open a WhatsApp chat with the team, the message already written:
+ * the student wants to upgrade, and which account is theirs. No price, no
+ * account number and no way to pay goes with it (core/billing.ts); the person
+ * who answers explains the rest, outside the app.
  */
 export default function Paused() {
   const t = useT();
@@ -29,6 +34,7 @@ export default function Paused() {
   const { state } = useApp();
   const { refresh, checking } = useAuth();
   const [asked, setAsked] = useState(false);
+  const [noWhatsapp, setNoWhatsapp] = useState(false);
   const premium = state.premium;
 
   // Back to the app the moment there is a plan again, and to the trial if the
@@ -61,6 +67,17 @@ export default function Paused() {
     : premium.plan && ended
       ? t('paused.planBody', { date: ended })
       : t('paused.noneBody');
+
+  async function messageTeam() {
+    setNoWhatsapp(false);
+    const account = email || state.user?.name || '';
+    try {
+      await Linking.openURL(whatsappUrl(SUPPORT_WHATSAPP, t('paused.whatsappMessage', { account })));
+    } catch {
+      // No WhatsApp and no browser to hand the link to: the number, to type.
+      setNoWhatsapp(true);
+    }
+  }
 
   async function checkAgain() {
     setAsked(false);
@@ -124,7 +141,18 @@ export default function Paused() {
       </Card>
 
       <Spacer h={S.xl} />
-      <Btn title={checking ? t('access.checking') : t('billing.checkAgain')} icon="refresh" loading={checking} onPress={() => void checkAgain()} />
+      <Btn title={t('paused.whatsappCta')} icon="whatsapp" onPress={() => void messageTeam()} />
+      <Small style={{ textAlign: 'center', marginTop: S.sm, color: noWhatsapp ? C.red : C.ink2 }}>
+        {noWhatsapp ? t('paused.whatsappFailed', { number: SUPPORT_WHATSAPP }) : t('paused.whatsappHint')}
+      </Small>
+      <Spacer h={S.md} />
+      <Btn
+        title={checking ? t('access.checking') : t('billing.checkAgain')}
+        variant="line"
+        icon="refresh"
+        loading={checking}
+        onPress={() => void checkAgain()}
+      />
       {asked && !checking && !premium.active ? (
         <Small style={{ textAlign: 'center', marginTop: S.sm }}>{t('paused.stillInactive')}</Small>
       ) : null}
